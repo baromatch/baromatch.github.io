@@ -56,6 +56,20 @@
     </div>
   </section>
 
+  <section class="film page" aria-labelledby="titre-film">
+    <h2 class="titre-section" id="titre-film">Baromatch en 30 secondes</h2>
+    <div class="film__cadre" id="film-cadre">
+      <video class="film__video" id="film" playsinline muted loop preload="metadata"
+        poster="/baromatch-film-16x9.jpg"
+        data-paysage="/baromatch-film-16x9.mp4" data-portrait="/baromatch-film-9x16.mp4"
+        data-affiche-paysage="/baromatch-film-16x9.jpg" data-affiche-portrait="/baromatch-film-9x16.jpg"
+        aria-label="Le film de présentation de Baromatch">
+        <source src="/baromatch-film-16x9.mp4" type="video/mp4">
+      </video>
+      <button class="film__son" id="film-son" type="button" aria-pressed="false">Mettre le son</button>
+    </div>
+  </section>
+
   <section class="soiree page" aria-labelledby="titre-soiree">
     <h2 class="titre-section" id="titre-soiree">Une soirée de match, du canapé au comptoir</h2>
     <ol class="etapes">

@@ -499,3 +499,43 @@ a:hover { color: var(--goutte); }
   .anime .ouverture__titre span { clip-path: none; transform: none; }
   .anime .verre__halo { opacity: 1; }
 }
+
+/* Le film de présentation */
+.film { padding-top: 24px; padding-bottom: 8px; }
+@media (min-width: 720px) { .film { padding-top: 40px; padding-bottom: 24px; } }
+.film .titre-section { margin-bottom: 20px; }
+.film__cadre {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--nuit-releve);
+  border: 1px solid var(--trait);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.film__cadre--portrait {
+  aspect-ratio: 9 / 16;
+  max-width: min(100%, 440px);
+  max-height: 82vh;
+  margin: 0 auto;
+}
+.film__video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.film__son {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(10, 11, 16, 0.62);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: var(--texte);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+.film__son[aria-pressed="true"] { background: var(--ambre); color: var(--nuit); border-color: var(--ambre); }
+.film__son:focus-visible { outline: 2px solid var(--ambre); outline-offset: 3px; }

@@ -562,7 +562,8 @@ a:hover { color: var(--goutte); }
 .vitrine-accueil__bouton,
 .boutique-produit__ajouter,
 .boutique-barre__bouton,
-.panier__envoyer {
+.panier__envoyer,
+.tablee__bouton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -581,7 +582,8 @@ a:hover { color: var(--goutte); }
 .vitrine-accueil__bouton:hover,
 .boutique-produit__ajouter:hover,
 .boutique-barre__bouton:hover,
-.panier__envoyer:hover { background: #FFC163; color: var(--nuit); }
+.panier__envoyer:hover,
+.tablee__bouton:hover { background: #FFC163; color: var(--nuit); }
 .panier__envoyer[disabled] { opacity: 0.55; cursor: not-allowed; }
 
 /* ---------- La boutique ---------- */
@@ -816,3 +818,67 @@ body.avec-barre { padding-bottom: 88px; }
 .panier__merci h3 { margin: 12px 0 8px; font-size: 1.75rem; font-weight: 800; }
 .panier__merci h3:focus { outline: none; }
 .panier__merci p { margin: 0 0 24px; color: var(--texte-doux); }
+
+/* ---------- Le lien d’une tablée (/t/‹code›, servi par 404.html) ---------- */
+
+.tablee { display: none; }
+.est-tablee .perdu__introuvable { display: none; }
+.est-tablee .tablee { display: block; }
+
+.tablee { max-width: 34rem; margin: 0 auto; }
+.tablee .tablee__sur {
+  margin: 0 auto 12px;
+  color: var(--ambre);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tablee .tablee__titre {
+  margin: 0 auto;
+  max-width: none;
+  font-size: clamp(2.25rem, 8vw, 3.25rem);
+  overflow-wrap: anywhere;
+}
+.tablee .tablee__etat { margin: 16px auto 0; color: var(--texte-doux); max-width: 28rem; }
+.tablee .tablee__etat:empty { display: none; }
+
+.tablee__carte {
+  margin: 28px 0 0;
+  padding: 4px 20px;
+  text-align: left;
+  border: 1px solid var(--trait);
+  border-radius: 24px;
+  background: var(--nuit-releve);
+}
+.tablee__carte[hidden] { display: none; }
+.tablee__ligne { padding: 14px 0; border-bottom: 1px solid var(--trait); }
+.tablee__ligne:last-child { border-bottom: 0; }
+.tablee__carte dt {
+  color: var(--texte-discret);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tablee__carte dd { margin: 4px 0 0; font-size: 1.125rem; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+.tablee__carte dd span { display: block; margin-top: 2px; color: var(--texte-doux); font-size: 1rem; font-weight: 500; }
+
+.tablee .tablee__appel {
+  margin: 36px auto 0;
+  max-width: none;
+  color: var(--texte);
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 800;
+  font-stretch: 88%;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.tablee__appli { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--trait); text-align: left; }
+.tablee__appli h2 { margin: 0 0 10px; font-size: 1.375rem; line-height: 1.25; }
+.tablee__appli ul { margin: 0; padding-left: 1.2em; color: var(--texte-doux); }
+.tablee__appli li { margin: 6px 0; }
+.tablee__appli strong { color: var(--texte); font-weight: 600; }
+.tablee__bouton { margin-top: 22px; }
+.tablee .tablee__note { margin: 20px 0 0; max-width: none; color: var(--texte-discret); font-size: 0.9375rem; }

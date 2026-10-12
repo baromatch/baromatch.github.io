@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "fr.baromatch.app",
+      "sha256_cert_fingerprints": ["À_REMPLIR_PAR_SKANDER"]
+    }
+  }
+]

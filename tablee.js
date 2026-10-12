@@ -5,11 +5,10 @@
    (GET /api/tablee/‹code›, permise depuis https://baromatch.fr) et l’affiche.
    Sur Android avec l’appli, le lien s’ouvre dans l’appli et cette page n’apparaît pas.
 
-   À REMPLIR : l’adresse publique de l’API, avec /api à la fin, la même que
-   EXPO_PUBLIC_API_URL dans EAS (par exemple "https://ton-api.exemple/api").
-   Tant qu’elle est vide, la page ne montre pas le détail de l’invitation,
-   mais dit quand même d’ouvrir le lien avec l’appli. */
-var API = "";
+   L’adresse publique de l’API, avec /api à la fin : la même que EXPO_PUBLIC_API_URL
+   dans EAS. Vide, la page ne montre pas le détail de l’invitation, mais dit quand même
+   d’ouvrir le lien avec l’appli. */
+var API = "https://api-production-8ce4.up.railway.app/api";
 
 (function () {
   if (!document.documentElement.classList.contains("est-tablee")) return;

@@ -4,7 +4,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "fr.baromatch.app",
-      "sha256_cert_fingerprints": ["À_REMPLIR_PAR_SKANDER"]
+      "sha256_cert_fingerprints": ["7C:26:27:DF:FB:2B:E5:7F:AC:CC:0D:74:96:DF:2C:BE:DA:FA:CD:75:8C:BD:7F:26:0C:19:6B:83:FC:37:8C:F2"]
     }
   }
 ]

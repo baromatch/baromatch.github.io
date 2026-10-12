@@ -39,7 +39,7 @@
   <p>Cette page explique ce que <a href="#application">l’application Baromatch</a> et le <a href="#site">site baromatch.fr</a> font de tes données. Le fonctionnement de l’appli est expliqué à part, dans <a href="/cgu.html">les règles de l’appli</a>.</p>
 
   <h2>Qui est responsable</h2>
-  <p>Skander Kamoun, porteur du projet Baromatch, à titre personnel pour le moment. Pour toute question ou demande&nbsp;: <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>.</p>
+  <p>Skander Kamoun, porteur du projet Baromatch, à titre personnel pour le moment. Pour toute question ou demande sur tes données&nbsp;: <a href="mailto:confidentialite@baromatch.fr">confidentialite@baromatch.fr</a>.</p>
 
   <h2 id="application">L’application Baromatch</h2>
   <p>L’application t’aide à trouver un bar qui passe ton match, à y garder ta place et à valider ton arrivée. Elle est réservée aux personnes de 18&nbsp;ans et plus&nbsp;: les soirées se passent dans des bars.</p>
@@ -48,9 +48,10 @@
   <ul>
     <li><strong>Ton compte&nbsp;:</strong> ton adresse mail, pour t’envoyer ton code de connexion, ton pseudo, et ton club préféré si tu en choisis un.</li>
     <li><strong>Tes soirées&nbsp;:</strong> les places que tu réserves (bar, match, nombre de personnes, heure d’arrivée prévue, numéro de pass, et ton camp si tu le dis), ta tablée si tu en as une, tes arrivées validées à la porte, tes sous-bocks, et les matchs que tu nous dis vouloir voir.</li>
-    <li><strong>Des informations techniques&nbsp;:</strong> tes sessions de connexion (adresse IP, type d’appareil ou de navigateur) et des journaux techniques, pour que le service marche et reste sûr.</li>
+    <li><strong>Des informations techniques&nbsp;:</strong> tes sessions de connexion (adresse IP, type d’appareil ou de navigateur) des journaux techniques et des rapports de plantage, pour que le service marche et reste sûr.</li>
     <li><strong>Ta position, seulement si tu l’autorises&nbsp;:</strong> elle sert, sur ton téléphone, à classer les bars par distance et à te situer sur la carte. Elle n’est pas envoyée avec une arrivée et n’est jamais utilisée en arrière-plan. L’application marche sans.</li>
     <li><strong>Un identifiant d’installation&nbsp;:</strong> un nombre tiré au hasard quand tu installes l’appli, gardé sur ton téléphone. Il sert seulement à compter une fois chaque téléphone qui voit l’offre d’un bar (<a href="#offres">voir plus bas</a>). Il n’est pas relié à ton compte.</li>
+    <li><strong>Pour les notifications, si tu les autorises&nbsp;:</strong> le jeton de ton téléphone, l’adresse qui permet de lui envoyer une notification (<a href="#notifications">voir plus bas</a>).</li>
   </ul>
   <p>On ne collecte ni tes contacts, ni tes photos, ni de données de paiement. Pas de publicité, pas d’outil de mesure d’audience (seules les vues des offres sont comptées, sans compte), pas de cookies dans l’application, et tes données ne sont ni vendues ni louées.</p>
 
@@ -65,7 +66,7 @@
   <ul>
     <li><strong>Le bar où tu réserves</strong> voit, le soir du match, ton pseudo, le nombre de personnes, ton heure d’arrivée prévue et ton numéro de pass, pour t’accueillir à la porte. Pour une tablée, il voit aussi le pseudo de l’hôte et combien de potes l’ont rejointe. Il ne voit jamais ton camp, seulement l’ambiance de la salle en parts. Son historique ne garde ensuite que des totaux, sans pseudo.</li>
     <li><strong>Les autres fans</strong> ne voient ni tes réservations ni tes arrivées, sauf les personnes de ta tablée (<a href="#tablee">voir plus bas</a>).</li>
-    <li><strong>Nos prestataires techniques</strong>, uniquement pour faire tourner le service&nbsp;: Railway, qui héberge le serveur et la base de données en Europe (Pays-Bas)&nbsp;; Resend, qui envoie les mails avec ton code de connexion&nbsp;; CARTO, qui fournit le fond de carte (quand tu ouvres la carte, les images de ton quartier sont chargées chez lui). Certains sont des sociétés établies hors de l’Union européenne, notamment aux États-Unis&nbsp;; un transfert de données vers elles est alors encadré par les clauses contractuelles types de la Commission européenne ou un mécanisme équivalent.</li>
+    <li><strong>Nos prestataires techniques</strong>, uniquement pour faire tourner le service&nbsp;: Railway, qui héberge le serveur et la base de données en Europe (Pays-Bas)&nbsp;; Resend, qui envoie les mails avec ton code de connexion&nbsp;; CARTO, qui fournit le fond de carte (quand tu ouvres la carte, les images de ton quartier sont chargées chez lui)&nbsp;; Google, dont le service Firebase Cloud Messaging livre les notifications sur ton téléphone&nbsp;; Expo, qui fournit les mises à jour de l’appli&nbsp;; Sentry, qui reçoit les rapports de plantage. Certains sont des sociétés établies hors de l’Union européenne, notamment aux États-Unis&nbsp;; un transfert de données vers elles est alors encadré par les clauses contractuelles types de la Commission européenne ou un mécanisme équivalent.</li>
     <li><strong>Le service de recherche d’adresses de l’État</strong> (la Géoplateforme de l’IGN) reçoit ce que tu tapes dans la recherche de la carte, sans rien sur toi (<a href="#adresses">voir plus bas</a>).</li>
     <li><strong>Les autorités</strong>, seulement si la loi nous y oblige.</li>
   </ul>
@@ -93,13 +94,23 @@
   <ul>
     <li>Quand tu valides une arrivée, l’arrivée garde qui l’a validée&nbsp;: l’équipe du bar voit ton prénom à côté.</li>
     <li>Un compte de porte ouvert avec le code du bar ne contient que ton prénom, sans adresse mail.</li>
+    <li>Ton prénom reste sur ces arrivées tant que ton compte existe. Si ton compte est supprimé (écris-nous pour le demander), ton prénom est effacé et l’arrivée indique seulement «&nbsp;par la porte&nbsp;». Être retiré de l’équipe par le bar ne l’efface pas.</li>
   </ul>
 
   <h3 id="offres">Les vues des offres</h3>
   <p>Quand tu ouvres la page d’un bar qui affiche une offre ce soir-là, l’appli compte une vue, sans ton compte, même si tu n’es pas connecté. Pour ne compter qu’une fois chaque téléphone, elle envoie son identifiant d’installation&nbsp;; le serveur n’en garde qu’une empreinte mêlée à la soirée, qui ne permet pas de te suivre d’un soir à l’autre. Cette marque est effacée un jour après le coup d’envoi. Le bar ne voit que le nombre de vues.</p>
 
   <h3 id="adresses">La recherche d’adresse</h3>
-  <p>Ce que tu tapes dans la recherche de la carte (3&nbsp;caractères au moins) part de notre serveur vers le service de géocodage de l’État, la Géoplateforme de l’IGN (Institut national de l’information géographique et forestière), qui propose des adresses. Il ne reçoit que ce texte&nbsp;: ni ton compte, ni ton adresse IP, ni rien d’autre sur toi. Notre serveur ne garde pas ce que tu tapes et ne l’écrit dans aucun journal. L’adresse que tu choisis reste sur ton téléphone, pour centrer la carte et calculer les distances, jusqu’à ce que tu l’effaces&nbsp;; elle n’est pas envoyée à Baromatch.</p>
+  <p>Ce que tu tapes dans la recherche de la carte (3&nbsp;caractères au moins) part de notre serveur vers le service de géocodage de l’État, la Géoplateforme de l’IGN (Institut national de l’information géographique et forestière), qui propose des adresses. Il ne reçoit que ce texte&nbsp;: ni ton compte, ni ton adresse IP, ni rien d’autre sur toi. Notre serveur ne garde pas ce que tu tapes et ne l’écrit dans aucun journal. L’adresse que tu choisis reste sur ton téléphone, pour centrer la carte et calculer les distances, jusqu’à ce que tu l’effaces&nbsp;; elle n’est pas envoyée à Baromatch. Si tu supprimes ton compte, l’appli oublie aussi les adresses cherchées.</p>
+
+  <h3 id="notifications">Les notifications</h3>
+  <p>Si tu autorises les notifications et que tu es connecté, ton téléphone donne à l’appli un jeton, que l’appli enregistre sur notre serveur avec ton compte. Quand on a quelque chose à te dire, par exemple une place qui se libère ou ton club qui joue, notre serveur envoie le message à Firebase Cloud Messaging, le service de notifications de Google, qui le livre sur ton téléphone. Le message contient son texte et de quoi ouvrir le bon écran (le bar, le match), jamais ton identifiant de compte. Le jeton ne sert plus quand tu te déconnectes, et il est effacé si tu supprimes ton compte. Tu choisis les notifications que tu reçois dans Réglages, ou tu les coupes dans les réglages de ton téléphone.</p>
+
+  <h3 id="mises-a-jour">Les mises à jour de l’appli</h3>
+  <p>À chaque ouverture, l’appli demande au serveur de mises à jour d’Expo s’il existe une nouvelle version de son code, et la télécharge si besoin. Elle envoie seulement le système du téléphone, la version de l’appli et de la mise à jour en cours, et un identifiant tiré au hasard par Expo à l’installation, sans lien avec ton compte. Comme tout serveur, Expo voit aussi l’adresse IP de la connexion. Si l’appli a planté à l’ouverture précédente, le début du message d’erreur part aussi. Aucun compte, aucun mail, aucune position. Baromatch ne garde rien de ces demandes, et l’identifiant d’Expo disparaît quand tu désinstalles l’appli.</p>
+
+  <h3 id="plantages">Les rapports de plantage</h3>
+  <p>Quand l’appli ou notre serveur rencontre une erreur, un rapport technique part chez Sentry, un service de suivi des plantages&nbsp;: ce qui a planté et où, le modèle et le système du téléphone, la version de l’appli. Côté appli, le rapport porte l’identifiant interne de ton compte (une suite de caractères, ni ton mail ni ton pseudo), pour retrouver un problème qui se répète. Les adresses mail, les mots de passe, les jetons de connexion, les adresses et les positions sont retirés avant l’envoi, et aucune capture d’écran ne part.</p>
 
   <h3>Combien de temps</h3>
   <ul>
@@ -111,7 +122,10 @@
     <li>Les pseudos de la bande sur un sous-bock&nbsp;: tant que le compte de chacun existe.</li>
     <li>Les marques des vues d’offre&nbsp;: effacées un jour après le coup d’envoi&nbsp;; le bar garde seulement le total.</li>
     <li>Ce que tu tapes dans la recherche d’adresse&nbsp;: rien n’est gardé.</li>
-    <li>Le prénom de l’équipe de la porte sur les arrivées qu’elle a validées&nbsp;: à&nbsp;préciser.</li>
+    <li>Le prénom de l’équipe de la porte sur les arrivées qu’elle a validées&nbsp;: tant que le compte de l’équipier existe, effacé si ce compte est supprimé&nbsp;; aucune durée maximale n’est fixée pour l’instant (à&nbsp;préciser).</li>
+    <li>Le jeton de notifications de ton téléphone&nbsp;: tant que ton compte existe&nbsp;; il ne sert plus dès que tu te déconnectes.</li>
+    <li>Les rapports de plantage chez Sentry&nbsp;: à&nbsp;préciser.</li>
+    <li>Les demandes de mise à jour chez Expo&nbsp;: selon les règles d’Expo, à&nbsp;préciser.</li>
     <li>Si tu supprimes ton compte&nbsp;: tes données personnelles sont effacées, ton camp aussi, et tes places à venir sont libérées pour d’autres fans. Les bars ne gardent que des totaux sans nom&nbsp;; ton numéro de pass reste sur l’ancienne réservation, sans renvoyer à personne.</li>
   </ul>
 
@@ -146,7 +160,7 @@
   <p>Le site est hébergé par GitHub Pages (GitHub, Inc., États-Unis). Comme tout hébergeur, GitHub enregistre l’adresse IP des visiteurs pour assurer la sécurité du service.</p>
 
   <h2>Tes droits</h2>
-  <p>Pour l’application comme pour le site, tu peux demander l’accès à tes données, leur correction, leur suppression ou leur récupération, en demander la limitation et t’opposer à leur utilisation, en écrivant à <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>. On te répond sous un mois.</p>
+  <p>Pour l’application comme pour le site, tu peux demander l’accès à tes données, leur correction, leur suppression ou leur récupération, en demander la limitation et t’opposer à leur utilisation, en écrivant à <a href="mailto:confidentialite@baromatch.fr">confidentialite@baromatch.fr</a>. On te répond sous un mois.</p>
   <p>Pour supprimer ton compte Baromatch toi-même&nbsp;: dans l’application, Réglages, puis «&nbsp;Supprimer mon compte&nbsp;». Sans l’application&nbsp;: <a href="/supprimer-mon-compte.html">voir comment faire</a>.</p>
   <p>Si tu estimes que tes droits ne sont pas respectés, tu peux adresser une réclamation à la CNIL sur <a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>.</p>
 

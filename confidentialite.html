@@ -34,12 +34,12 @@
 
 <main id="contenu" class="document page">
   <h1>Confidentialité</h1>
-  <p class="document__date">Mise à jour le 8 octobre 2026</p>
+  <p class="document__date">Mise à jour le 12 octobre 2026</p>
 
-  <p>Cette page explique ce que <a href="#application">l’application Baromatch</a> et le <a href="#site">site baromatch.fr</a> font de tes données.</p>
+  <p>Cette page explique ce que <a href="#application">l’application Baromatch</a> et le <a href="#site">site baromatch.fr</a> font de tes données. Le fonctionnement de l’appli est expliqué à part, dans <a href="/cgu.html">les règles de l’appli</a>.</p>
 
   <h2>Qui est responsable</h2>
-  <p>Skander Kamoun, porteur du projet Baromatch, à titre personnel pour le moment. Pour toute question ou demande&nbsp;: <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>.</p>
+  <p>Skander Kamoun, porteur du projet Baromatch, à titre personnel pour le moment. Pour toute question ou demande sur tes données&nbsp;: <a href="mailto:confidentialite@baromatch.fr">confidentialite@baromatch.fr</a>.</p>
 
   <h2 id="application">L’application Baromatch</h2>
   <p>L’application t’aide à trouver un bar qui passe ton match, à y garder ta place et à valider ton arrivée. Elle est réservée aux personnes de 18&nbsp;ans et plus&nbsp;: les soirées se passent dans des bars.</p>
@@ -47,11 +47,13 @@
   <h3>Ce qu’on collecte</h3>
   <ul>
     <li><strong>Ton compte&nbsp;:</strong> ton adresse mail, pour t’envoyer ton code de connexion, ton pseudo, et ton club préféré si tu en choisis un.</li>
-    <li><strong>Tes soirées&nbsp;:</strong> les places que tu réserves (bar, match, nombre de personnes, heure d’arrivée prévue), tes arrivées validées à la porte, tes sous-bocks, et les matchs que tu nous dis vouloir voir.</li>
-    <li><strong>Des informations techniques&nbsp;:</strong> tes sessions de connexion (adresse IP, type d’appareil) et des journaux techniques, pour que le service marche et reste sûr.</li>
+    <li><strong>Tes soirées&nbsp;:</strong> les places que tu réserves (bar, match, nombre de personnes, heure d’arrivée prévue, numéro de pass, et ton camp si tu le dis), ta tablée si tu en as une, tes arrivées validées à la porte, tes sous-bocks, et les matchs que tu nous dis vouloir voir.</li>
+    <li><strong>Des informations techniques&nbsp;:</strong> tes sessions de connexion (adresse IP, type d’appareil ou de navigateur), des journaux techniques et des rapports de plantage, pour que le service marche et reste sûr.</li>
     <li><strong>Ta position, seulement si tu l’autorises&nbsp;:</strong> elle sert, sur ton téléphone, à classer les bars par distance et à te situer sur la carte. Elle n’est pas envoyée avec une arrivée et n’est jamais utilisée en arrière-plan. L’application marche sans.</li>
+    <li><strong>Un identifiant d’installation&nbsp;:</strong> un nombre tiré au hasard quand tu installes l’appli, gardé sur ton téléphone. Il sert seulement à compter une fois chaque téléphone qui voit l’offre d’un bar (<a href="#offres">voir plus bas</a>). Il n’est pas relié à ton compte.</li>
+    <li><strong>Pour les notifications, si tu les autorises&nbsp;:</strong> le jeton de ton téléphone, l’adresse qui permet de lui envoyer une notification (<a href="#notifications">voir plus bas</a>).</li>
   </ul>
-  <p>On ne collecte ni tes contacts, ni tes photos, ni de données de paiement. Pas de publicité, pas de mesure d’audience, pas de cookies dans l’application, et tes données ne sont ni vendues ni louées.</p>
+  <p>On ne collecte ni tes contacts, ni tes photos, ni de données de paiement. Pas de publicité, pas d’outil de mesure d’audience (seules les vues des offres sont comptées, sans compte), pas de cookies dans l’application, et tes données ne sont ni vendues ni louées.</p>
 
   <h3>Pourquoi</h3>
   <ul>
@@ -62,11 +64,53 @@
 
   <h3>Qui voit quoi</h3>
   <ul>
-    <li><strong>Le bar où tu réserves</strong> voit, le soir du match, ton pseudo, le nombre de personnes et ton heure d’arrivée prévue, pour t’accueillir à la porte. Son historique ne garde ensuite que des totaux, sans pseudo.</li>
-    <li><strong>Les autres fans</strong> ne voient ni tes réservations ni tes arrivées.</li>
-    <li><strong>Nos prestataires techniques</strong>, uniquement pour faire tourner le service&nbsp;: Railway, qui héberge le serveur et la base de données en Europe (Pays-Bas)&nbsp;; Resend, qui envoie les mails avec ton code de connexion&nbsp;; CARTO, qui fournit le fond de carte (quand tu ouvres la carte, les images de ton quartier sont chargées chez lui). Certains sont des sociétés établies hors de l’Union européenne, notamment aux États-Unis&nbsp;; un transfert de données vers elles est alors encadré par les clauses contractuelles types de la Commission européenne ou un mécanisme équivalent.</li>
+    <li><strong>Le bar où tu réserves</strong> voit, le soir du match, ton pseudo, le nombre de personnes, ton heure d’arrivée prévue et ton numéro de pass, pour t’accueillir à la porte. Pour une tablée, il voit aussi le pseudo de l’hôte et combien de potes l’ont rejointe. Il ne voit jamais ton camp, seulement l’ambiance de la salle en parts. Son historique ne garde ensuite que des totaux, sans pseudo.</li>
+    <li><strong>Les autres fans</strong> ne voient ni tes réservations ni tes arrivées, sauf les personnes de ta tablée (<a href="#tablee">voir plus bas</a>).</li>
+    <li><strong>Nos prestataires techniques</strong>, uniquement pour faire tourner le service&nbsp;: Railway, qui héberge le serveur et la base de données en Europe (Pays-Bas)&nbsp;; Resend, qui envoie les mails avec ton code de connexion&nbsp;; CARTO, qui fournit le fond de carte (quand tu ouvres la carte, les images de ton quartier sont chargées chez lui)&nbsp;; Google, dont le service Firebase Cloud Messaging livre les notifications sur ton téléphone&nbsp;; Expo, qui fournit les mises à jour de l’appli&nbsp;; Sentry, qui reçoit les rapports de plantage. Certains sont des sociétés établies hors de l’Union européenne, notamment aux États-Unis&nbsp;; un transfert de données vers elles est alors encadré par les clauses contractuelles types de la Commission européenne ou un mécanisme équivalent.</li>
+    <li><strong>Le service de recherche d’adresses de l’État</strong> (la Géoplateforme de l’IGN) reçoit ce que tu tapes dans la recherche de la carte, sans rien sur toi (<a href="#adresses">voir plus bas</a>).</li>
     <li><strong>Les autorités</strong>, seulement si la loi nous y oblige.</li>
   </ul>
+
+  <h3 id="tablee">La tablée</h3>
+  <p>Quand tu crées ou rejoins une tablée, on garde le lien entre les places, ton rôle (hôte ou pote) et l’heure à laquelle tu l’as rejointe.</p>
+  <ul>
+    <li><strong>Les personnes de ta tablée</strong> voient ton pseudo, ton camp si tu l’as dit, et ton arrivée quand elle est validée.</li>
+    <li><strong>Toute personne qui a le lien d’invitation</strong> voit le pseudo de l’hôte, le bar, le match, l’heure, les places et les pseudos de la tablée&nbsp;: jamais un camp, jamais un identifiant de compte. Le lien ne marche plus après le coup d’envoi. La page baromatch.fr/t/… lit ces informations sur notre serveur, sans cookie.</li>
+    <li><strong>Ton sous-bock garde la bande&nbsp;:</strong> les pseudos de ceux de ta tablée dont l’arrivée a été validée. Seules les personnes de cette tablée les voient. Si quelqu’un supprime son compte, son pseudo disparaît des sous-bocks des autres.</li>
+  </ul>
+
+  <h3 id="camp">«&nbsp;T’es pour qui&nbsp;?&nbsp;»</h3>
+  <ul>
+    <li>Ton camp pour une place (l’une des deux équipes, ou «&nbsp;Juste le match&nbsp;») n’est enregistré que si tu le dis. Tu peux le changer jusqu’au coup d’envoi.</li>
+    <li><strong>Il n’est visible que par toi et les personnes de ta tablée.</strong></li>
+    <li>Sur la page du bar, les fans voient l’ambiance de la salle seulement à partir de 5&nbsp;réponses, en parts arrondies à la dizaine&nbsp;: jamais un nombre de personnes, jamais un nom. L’équipe du bar voit les mêmes parts et le nombre de réponses, jamais qui est pour qui. Le bar peut masquer l’ambiance aux fans.</li>
+  </ul>
+
+  <h3 id="pass">Le numéro de pass</h3>
+  <p>Chaque place a un numéro de 4&nbsp;chiffres, tiré au hasard et propre à la soirée («&nbsp;Pass n°&nbsp;0412&nbsp;»). À la porte, l’équipe du bar peut le taper pour retrouver ta place&nbsp;: elle voit alors ton pseudo, combien vous êtes et ton heure d’arrivée. Le numéro est gardé avec ta place. Si tu supprimes ton compte, il reste sur l’ancienne réservation mais ne renvoie plus à personne.</p>
+
+  <h3 id="porte">L’équipe de la porte</h3>
+  <p>Cette partie concerne les personnes qui travaillent dans un bar partenaire.</p>
+  <ul>
+    <li>Quand tu valides une arrivée, l’arrivée garde qui l’a validée&nbsp;: l’équipe du bar voit ton prénom à côté.</li>
+    <li>Un compte de porte ouvert avec le code du bar ne contient que ton prénom, sans adresse mail.</li>
+    <li>Ton prénom reste sur ces arrivées tant que tu fais partie de l’équipe du bar. Quand le bar te retire de son équipe, ton compte est anonymisé et ton prénom effacé&nbsp;: l’arrivée indique alors seulement «&nbsp;par la porte&nbsp;». C’est pareil si ton compte est supprimé.</li>
+  </ul>
+
+  <h3 id="offres">Les vues des offres</h3>
+  <p>Quand tu ouvres la page d’un bar qui affiche une offre ce soir-là, l’appli compte une vue, sans ton compte, même si tu n’es pas connecté. Pour ne compter qu’une fois chaque téléphone, elle envoie son identifiant d’installation&nbsp;; le serveur n’en garde qu’une empreinte mêlée à la soirée, qui ne permet pas de te suivre d’un soir à l’autre. Cette marque est effacée un jour après le coup d’envoi. Le bar ne voit que le nombre de vues.</p>
+
+  <h3 id="adresses">La recherche d’adresse</h3>
+  <p>Ce que tu tapes dans la recherche de la carte (3&nbsp;caractères au moins) part de notre serveur vers le service de géocodage de l’État, la Géoplateforme de l’IGN (Institut national de l’information géographique et forestière), qui propose des adresses. Il ne reçoit que ce texte&nbsp;: ni ton compte, ni ton adresse IP, ni rien d’autre sur toi. Notre serveur ne garde pas ce que tu tapes et ne l’écrit dans aucun journal. L’adresse que tu choisis reste sur ton téléphone, pour centrer la carte et calculer les distances, jusqu’à ce que tu l’effaces&nbsp;; elle n’est pas envoyée à Baromatch. Si tu supprimes ton compte, l’appli oublie aussi les adresses cherchées.</p>
+
+  <h3 id="notifications">Les notifications</h3>
+  <p>Si tu autorises les notifications et que tu es connecté, ton téléphone donne à l’appli un jeton, que l’appli enregistre sur notre serveur avec ton compte. Quand on a quelque chose à te dire, par exemple une place qui se libère ou ton club qui joue, notre serveur envoie le message à Firebase Cloud Messaging, le service de notifications de Google, qui le livre sur ton téléphone. Le message contient son texte et de quoi ouvrir le bon écran (le bar, le match), jamais ton identifiant de compte. Le jeton ne sert plus quand tu te déconnectes, et il est effacé si tu supprimes ton compte. Tu choisis les notifications que tu reçois dans Réglages, ou tu les coupes dans les réglages de ton téléphone.</p>
+
+  <h3 id="mises-a-jour">Les mises à jour de l’appli</h3>
+  <p>À chaque ouverture, l’appli demande au serveur de mises à jour d’Expo s’il existe une nouvelle version de son code, et la télécharge si besoin. Elle envoie seulement le système du téléphone, la version de l’appli et de la mise à jour en cours, et un identifiant tiré au hasard par Expo à l’installation, sans lien avec ton compte. Comme tout serveur, Expo voit aussi l’adresse IP de la connexion. Si l’appli a planté à l’ouverture précédente, le début du message d’erreur part aussi. Aucun compte, aucun mail, aucune position. Baromatch ne garde rien de ces demandes, et l’identifiant d’Expo disparaît quand tu désinstalles l’appli.</p>
+
+  <h3 id="plantages">Les rapports de plantage</h3>
+  <p>Quand l’appli ou notre serveur rencontre une erreur, un rapport technique part chez Sentry, un service de suivi des plantages&nbsp;: ce qui a planté et où, le modèle et le système du téléphone, la version de l’appli. Côté appli, le rapport porte l’identifiant interne de ton compte (une suite de caractères, ni ton mail ni ton pseudo), pour retrouver un problème qui se répète. Les adresses mail, les mots de passe, les jetons de connexion, les adresses et les positions sont retirés avant l’envoi, et aucune capture d’écran ne part.</p>
 
   <h3>Combien de temps</h3>
   <ul>
@@ -74,7 +118,15 @@
     <li>Les journaux techniques&nbsp;: 30&nbsp;jours.</li>
     <li>Les sessions de connexion&nbsp;: effacées 30&nbsp;jours après leur fin&nbsp;; l’adresse IP et le type d’appareil sont effacés au bout de 6&nbsp;mois.</li>
     <li>Les matchs que tu veux voir&nbsp;: effacés 30&nbsp;jours après le match.</li>
-    <li>Si tu supprimes ton compte&nbsp;: tes données personnelles sont effacées et tes places à venir sont libérées pour d’autres fans. Les bars ne gardent que des totaux sans nom.</li>
+    <li>Ton camp, ta tablée et ton numéro de pass&nbsp;: gardés avec ta place, tant que ton compte existe.</li>
+    <li>Les pseudos de la bande sur un sous-bock&nbsp;: tant que le compte de chacun existe.</li>
+    <li>Les marques des vues d’offre&nbsp;: effacées un jour après le coup d’envoi&nbsp;; le bar garde seulement le total.</li>
+    <li>Ce que tu tapes dans la recherche d’adresse&nbsp;: rien n’est gardé.</li>
+    <li>Le prénom de l’équipe de la porte sur les arrivées qu’elle a validées&nbsp;: tant que l’équipier fait partie de l’équipe du bar&nbsp;; effacé, avec son compte anonymisé, quand le bar le retire de l’équipe ou que son compte est supprimé.</li>
+    <li>Le jeton de notifications de ton téléphone&nbsp;: tant que ton compte existe&nbsp;; il ne sert plus dès que tu te déconnectes.</li>
+    <li>Les rapports de plantage chez Sentry&nbsp;: à&nbsp;préciser.</li>
+    <li>Les demandes de mise à jour chez Expo&nbsp;: selon les conditions d’Expo (<a href="https://expo.dev/privacy" rel="noopener">expo.dev/privacy</a>).</li>
+    <li>Si tu supprimes ton compte&nbsp;: tes données personnelles sont effacées, ton camp aussi, et tes places à venir sont libérées pour d’autres fans. Les bars ne gardent que des totaux sans nom&nbsp;; ton numéro de pass reste sur l’ancienne réservation, sans renvoyer à personne.</li>
   </ul>
 
   <h3>Sécurité</h3>
@@ -108,15 +160,19 @@
   <p>Le site est hébergé par GitHub Pages (GitHub, Inc., États-Unis). Comme tout hébergeur, GitHub enregistre l’adresse IP des visiteurs pour assurer la sécurité du service.</p>
 
   <h2>Tes droits</h2>
-  <p>Pour l’application comme pour le site, tu peux demander l’accès à tes données, leur correction, leur suppression ou leur récupération, en demander la limitation et t’opposer à leur utilisation, en écrivant à <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>. On te répond sous un mois.</p>
+  <p>Pour l’application comme pour le site, tu peux demander l’accès à tes données, leur correction, leur suppression ou leur récupération, en demander la limitation et t’opposer à leur utilisation, en écrivant à <a href="mailto:confidentialite@baromatch.fr">confidentialite@baromatch.fr</a>. On te répond sous un mois.</p>
   <p>Pour supprimer ton compte Baromatch toi-même&nbsp;: dans l’application, Réglages, puis «&nbsp;Supprimer mon compte&nbsp;». Sans l’application&nbsp;: <a href="/supprimer-mon-compte.html">voir comment faire</a>.</p>
   <p>Si tu estimes que tes droits ne sont pas respectés, tu peux adresser une réclamation à la CNIL sur <a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>.</p>
+
+  <h2>Si cette page change</h2>
+  <p>On te prévient dans l’appli avant tout changement important. La date en haut de la page dit quand elle a changé pour la dernière fois.</p>
 </main>
 <footer class="pied page">
   <div class="pied__marque"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="pd-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="pd-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="pd-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#pd-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#pd-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#pd-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg><span>© 2026 Baromatch</span></div>
   <ul class="pied__liens">
     <li><a href="/boutique.html">Boutique</a></li>
     <li><a href="/mentions-legales.html">Mentions légales</a></li>
+    <li><a href="/cgu.html">Règles de l’appli</a></li>
     <li><a href="/confidentialite.html">Confidentialité</a></li>
     <li><a href="https://x.com/baromatchapp" rel="me noopener">X : @baromatchapp</a></li>
     <li><a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a></li>

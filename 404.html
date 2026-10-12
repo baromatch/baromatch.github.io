@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+<script>/* Le lien d’une tablée (/t/‹code›) passe par cette page : voir /tablee.js. */ if (/^\/t\//.test(location.pathname)) document.documentElement.classList.add("est-tablee");</script>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
@@ -35,19 +36,44 @@
 
 <main id="contenu" class="perdu page">
   <div class="verre"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="pp-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="pp-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="pp-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#pp-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#pp-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#pp-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg></div>
-  <h1 class="titre-section" style="margin:0 auto;max-width:none">Cette page n’existe pas.</h1>
-  <p>Le lien est peut-être incomplet ou ancien. L’accueil, lui, est toujours ouvert.</p>
-  <a class="bouton-nuit" style="background:var(--ambre);color:var(--nuit)" href="/">Revenir à l’accueil</a>
+  <div class="perdu__introuvable">
+    <h1 class="titre-section" style="margin:0 auto;max-width:none">Cette page n’existe pas.</h1>
+    <p>Le lien est peut-être incomplet ou ancien. L’accueil, lui, est toujours ouvert.</p>
+    <a class="bouton-nuit" style="background:var(--ambre);color:var(--nuit)" href="/">Revenir à l’accueil</a>
+  </div>
+  <div class="tablee" id="tablee">
+    <p class="tablee__sur">La tablée</p>
+    <h1 class="titre-section tablee__titre" id="tablee-titre">Une tablée t’attend.</h1>
+    <p class="tablee__etat" id="tablee-etat" role="status">On regarde l’invitation…</p>
+    <dl class="tablee__carte" id="tablee-carte" hidden>
+      <div class="tablee__ligne"><dt>Le bar</dt><dd id="tablee-bar"></dd></div>
+      <div class="tablee__ligne"><dt>Le match</dt><dd id="tablee-match"></dd></div>
+      <div class="tablee__ligne"><dt>L’heure</dt><dd id="tablee-heure"></dd></div>
+    </dl>
+    <p class="tablee__appel">Ouvre ce lien sur ton téléphone avec Baromatch.</p>
+    <section class="tablee__appli" aria-labelledby="tablee-appli-titre">
+      <h2 id="tablee-appli-titre">Pas encore l’appli&nbsp;?</h2>
+      <ul>
+        <li><strong>Sur Android&nbsp;:</strong> Baromatch est en test. Une fois l’appli installée, ce lien s’ouvre directement dedans.</li>
+        <li><strong>Sur iPhone&nbsp;:</strong> l’appli n’y est pas encore.</li>
+        <li>Laisse ton adresse&nbsp;: on te prévient au lancement et pour les premiers tests.</li>
+      </ul>
+      <a class="tablee__bouton" href="/#attente">Me prévenir</a>
+      <p class="tablee__note">Sans l’appli, tu peux quand même venir&nbsp;: arrive avec la personne qui t’invite. Son pass compte aussi les places de la tablée que personne n’a prises.</p>
+    </section>
+  </div>
 </main>
 <footer class="pied page">
   <div class="pied__marque"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="pd-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="pd-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="pd-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#pd-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#pd-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#pd-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg><span>© 2026 Baromatch</span></div>
   <ul class="pied__liens">
     <li><a href="/boutique.html">Boutique</a></li>
     <li><a href="/mentions-legales.html">Mentions légales</a></li>
+    <li><a href="/cgu.html">Règles de l’appli</a></li>
     <li><a href="/confidentialite.html">Confidentialité</a></li>
     <li><a href="https://x.com/baromatchapp" rel="me noopener">X : @baromatchapp</a></li>
     <li><a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a></li>
   </ul>
 </footer>
+<script src="/tablee.js" defer></script>
 </body>
 </html>

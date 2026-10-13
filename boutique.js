@@ -1,7 +1,14 @@
 /* Baromatch — la boutique.
 
-   Aujourd'hui : mode « réservation ». Rien n'est vendu ni payé. Le fan choisit ses pièces, laisse son adresse,
-   et la réservation part par Formspree (le même formulaire que la liste d'attente) vers contact@baromatch.fr.
+   Aujourd’hui : mode « sélection ». Rien n’est vendu, payé ni réservé. Le fan choisit ses pièces, laisse son adresse,
+   et sa sélection part par Formspree (le même formulaire que la liste d’attente) vers contact@baromatch.fr ; on lui
+   écrit à l’ouverture. Après l’envoi, l’adresse est rappelée ; « Corriger l’adresse » remet la sélection et l’adresse
+   dans le formulaire, et le nouvel envoi porte l’adresse qu’il remplace (champ « remplace »). Ce champ informe
+   seulement le propriétaire : rien n’est remplacé ni effacé sur sa seule foi (n’importe qui peut l’écrire en envoyant
+   au formulaire), une suppression passe par confidentialite@baromatch.fr.
+   Chaque échec d’envoi (pas de réponse en 10 s, coupure, refus) offre d’envoyer la sélection par mail, et écrit
+   l’adresse contact@baromatch.fr en toutes lettres ; seul un refus de Formspree qui nomme l’adresse dit de la vérifier
+   (même règle que la liste d’attente, main.js).
 
    Pour vendre plus tard, sans toucher au reste : renseigne `lienAchat` sur un produit (un lien de paiement Stripe,
    une page produit d'une boutique en impression à la demande…). Son bouton devient « Acheter » et ouvre ce lien.
@@ -18,6 +25,12 @@
     cleStockage: "baromatch-boutique-v1"
   };
 
+  // Les deux limites d’une sélection, dites sous la pièce et dans la fenêtre de la sélection.
+  var LIMITES = {
+    piece: CONFIG.quantiteMax + " exemplaires au plus pour une même pièce.",
+    selection: "Ta sélection est pleine (" + CONFIG.piecesMax + " pièces au plus)."
+  };
+
   var COULEURS = {
     nuit: { nom: "Nuit", tissu: "#161925", contour: "rgba(255,255,255,0.20)", encre: "#F7F7F9", marque: "bq-marque" },
     creme: { nom: "Crème", tissu: "#EFE6D6", contour: "rgba(10,11,16,0.16)", encre: "#12141C", marque: "bq-marque-nuit" },
@@ -27,6 +40,8 @@
 
   var TAILLES = ["XS", "S", "M", "L", "XL", "XXL"];
 
+  // Le nom, le type, le prix et le texte de chaque pièce sont aussi écrits dans le <noscript> de boutique.html,
+  // pour qui lit la page sans JavaScript : change les deux ensemble (tests/seo.spec.mjs les compare).
   var PRODUITS = [
     {
       id: "tshirt-le-verre",
@@ -44,7 +59,7 @@
       nom: "Coup d’envoi",
       type: "Sweat à capuche",
       prix: 59,
-      texte: "Molleton doux pour les fins de match en terrasse. Le verre et « Coup d’envoi » sur la poitrine.",
+      texte: "Molleton doux pour les fins de match en terrasse. Le verre et «\u00a0Coup d’envoi\u00a0» sur la poitrine.",
       couleurs: ["nuit", "creme"],
       tailles: TAILLES,
       dessin: "sweat",
@@ -66,7 +81,7 @@
       nom: "L’écharpe",
       type: "Écharpe tricotée",
       prix: 25,
-      texte: "Aux couleurs de la nuit et de l’ambre. Aucun club dessus : elle va à tous les matchs.",
+      texte: "Aux couleurs de la nuit et de l’ambre. Aucun club dessus\u00a0: elle va à tous les matchs.",
       couleurs: ["nuitAmbre"],
       tailles: null,
       dessin: "echarpe",
@@ -88,7 +103,7 @@
       nom: "Les sous-bocks",
       type: "Lot de 6",
       prix: 12,
-      texte: "Le sous-bock de l’appli, en vrai : carton épais, six numéros différents.",
+      texte: "Le sous-bock de l’appli, en vrai\u00a0: carton épais, six numéros différents.",
       couleurs: null,
       tailles: null,
       dessin: "sousbocks",
@@ -203,7 +218,7 @@
 
   function pieces(n) { return n + (n > 1 ? " pièces" : " pièce"); }
 
-  // ---------- La réservation, gardée sur l'appareil ----------
+  // ---------- La sélection, gardée sur l’appareil ----------
 
   var panier = lire();
 
@@ -218,7 +233,7 @@
   }
 
   function garder() {
-    try { window.localStorage.setItem(CONFIG.cleStockage, JSON.stringify(panier)); } catch (e) { /* stockage indisponible : la réservation reste en mémoire */ }
+    try { window.localStorage.setItem(CONFIG.cleStockage, JSON.stringify(panier)); } catch (e) { /* stockage indisponible : la sélection reste en mémoire */ }
   }
 
   function totalPieces() { return panier.reduce(function (s, l) { return s + l.quantite; }, 0); }
@@ -260,7 +275,7 @@
       '<p class="boutique-produit__prix">' + euros(p.prix) + (p.lienAchat ? "" : " <span>prix indicatif</span>") + "</p>";
     if (p.couleurs && p.couleurs.length > 1) {
       html += choix(p, "couleur", "Couleur", p.couleurs, function (cle) {
-        return '<i class="boutique-pastille" style="background:' + COULEURS[cle].tissu + '" aria-hidden="true"></i>' + COULEURS[cle].nom;
+        return '<i class="boutique-pastille" data-tissu="' + cle + '" aria-hidden="true"></i>' + COULEURS[cle].nom;
       });
     }
     if (p.tailles) {
@@ -268,17 +283,34 @@
     }
     html += p.lienAchat
       ? '<a class="boutique-produit__ajouter" href="' + echapper(p.lienAchat) + '" rel="noopener">Acheter</a>'
-      : '<button class="boutique-produit__ajouter" type="button" data-ajouter>Ajouter à ma réservation</button>';
-    html += '<p class="boutique-produit__retour" role="status" aria-live="polite"></p></div>';
+      : '<button class="boutique-produit__ajouter" type="button" data-ajouter>Ajouter à ma sélection</button>';
+    html += '<p class="boutique-produit__retour" id="retour-' + p.id + '" role="status" aria-live="polite"></p></div>';
     article.innerHTML = html;
+    // La couleur de chaque pastille est posée ici, par le style de l’élément : la politique de sécurité de
+    // boutique.html refuse tout attribut style= écrit dans du HTML.
+    Array.prototype.forEach.call(article.querySelectorAll("[data-tissu]"), function (pastille) {
+      pastille.style.background = COULEURS[pastille.getAttribute("data-tissu")].tissu;
+    });
     grille.appendChild(article);
 
     var vitrine = article.querySelector("[data-vitrine]");
     var retour = article.querySelector(".boutique-produit__retour");
+    var tailles = article.querySelectorAll('input[name="' + p.id + '-taille"]');
+
+    // Le message sous la pièce. Tant que « Choisis d’abord ta taille. » se voit, chaque bouton de taille le donne pour
+    // description (aria-describedby, WCAG 3.3.1) : revenir sur la taille dit pourquoi ; le lien part avec le message.
+    function dire(message, erreur, surLaTaille) {
+      retour.textContent = message;
+      retour.className = "boutique-produit__retour" + (erreur ? " boutique-produit__retour--erreur" : "");
+      Array.prototype.forEach.call(tailles, function (champ) {
+        if (surLaTaille) champ.setAttribute("aria-describedby", retour.id);
+        else champ.removeAttribute("aria-describedby");
+      });
+    }
 
     article.addEventListener("change", function (event) {
       if (event.target.name === p.id + "-couleur") vitrine.innerHTML = dessin(p, event.target.value);
-      if (event.target.name === p.id + "-taille") { retour.textContent = ""; retour.className = "boutique-produit__retour"; }
+      if (event.target.name === p.id + "-taille") dire("", false, false);
     });
 
     var bouton = article.querySelector("[data-ajouter]");
@@ -289,23 +321,20 @@
       if (p.tailles) {
         var coche = article.querySelector('input[name="' + p.id + '-taille"]:checked');
         if (!coche) {
-          retour.textContent = "Choisis d’abord ta taille.";
-          retour.className = "boutique-produit__retour boutique-produit__retour--erreur";
-          article.querySelector('input[name="' + p.id + '-taille"]').focus();
+          dire("Choisis d’abord ta taille.", true, true);
+          tailles[0].focus();
           return;
         }
         taille = coche.value;
       }
       if (totalPieces() >= CONFIG.piecesMax) {
-        retour.textContent = "Ta réservation est pleine (" + CONFIG.piecesMax + " pièces au plus).";
-        retour.className = "boutique-produit__retour boutique-produit__retour--erreur";
+        dire(LIMITES.selection, true, false);
         return;
       }
       var ligne = panier.filter(function (l) { return l.id === p.id && l.couleur === couleur && l.taille === taille; })[0];
       if (ligne) {
         if (ligne.quantite >= CONFIG.quantiteMax) {
-          retour.textContent = CONFIG.quantiteMax + " exemplaires au plus pour une même pièce.";
-          retour.className = "boutique-produit__retour boutique-produit__retour--erreur";
+          dire(LIMITES.piece, true, false);
           return;
         }
         ligne.quantite += 1;
@@ -315,8 +344,7 @@
       garder();
       majBarre();
       var detail = detailLigne({ id: p.id, couleur: couleur, taille: taille });
-      retour.textContent = "Ajouté à ta réservation" + (detail ? " (" + detail + ")" : "") + ".";
-      retour.className = "boutique-produit__retour";
+      dire("Ajouté à ta sélection" + (detail ? " (" + detail + ")" : "") + ".", false, false);
     });
   });
 
@@ -325,13 +353,40 @@
   var barre = document.getElementById("boutique-barre");
   var barreTexte = document.getElementById("barre-texte");
   var dialogue = document.getElementById("panier");
+  var titrePanier = document.getElementById("panier-titre");
   var liste = document.getElementById("panier-liste");
   var total = document.getElementById("panier-total");
+  var annonce = document.getElementById("panier-annonce");
   var formulaire = document.getElementById("panier-form");
   var vue = document.getElementById("panier-vue");
   var merci = document.getElementById("panier-merci");
   var retourForm = document.getElementById("panier-retour");
   var envoyer = formulaire.querySelector('button[type="submit"]');
+  var texteEnvoyer = envoyer.textContent;
+  var mail = formulaire.querySelector('input[type="email"]');
+  var prenom = formulaire.querySelector('input[name="prenom"]');
+  var accord = formulaire.querySelector('input[name="accord"]');
+  var merciAdresse = document.getElementById("panier-merci-adresse");
+  var corriger = document.getElementById("panier-corriger");
+  // Au-delà, un envoi sans réponse est une panne : le bouton revient et la sélection peut partir par mail.
+  var DELAI_MS = 10000;
+  // Une adresse complète, même règle que la liste d’attente (main.js) : un « @ », puis un domaine avec un point suivi
+  // d’au moins deux caractères qui ne sont ni un point, ni une espace, ni un « @ » (« paul@gmail » ne passe pas).
+  var ADRESSE_COMPLETE = /^[^@\s]+@[^@\s]+\.[^@\s.]{2,}$/;
+  var TEXTES = {
+    vide: "Ajoute au moins une pièce.",
+    forme: "Vérifie ton adresse mail\u00a0: elle doit ressembler à prenom@exemple.fr.",
+    incomplete: "Il manque la fin de ton adresse, par exemple .fr ou .com.",
+    refusee: "Cette adresse ne semble pas valide. Vérifie-la\u00a0: elle doit ressembler à prenom@exemple.fr. Si elle est juste, ",
+    refuseeLien: "envoie ta sélection par mail",
+    panne: "Ta sélection n’est pas partie. Réessaie dans un instant, ou ",
+    panneLien: "envoie-la par mail",
+    accord: "Coche la case pour qu’on puisse t’écrire à l’ouverture."
+  };
+  // Le dernier envoi réussi (sélection, adresse, prénom), pour « Corriger l’adresse ».
+  var dernierEnvoi = null;
+  var remplace = "";
+  var envoiEnCours = false;
 
   function majBarre() {
     var n = totalPieces();
@@ -359,44 +414,90 @@
     });
     total.textContent = euros(totalEuros());
     if (panier.length === 0) {
-      liste.innerHTML = '<li class="panier__vide">Ta réservation est vide. Choisis une pièce dans la collection.</li>';
+      liste.innerHTML = '<li class="panier__vide">Ta sélection est vide. Choisis une pièce dans la collection.</li>';
     }
     envoyer.disabled = panier.length === 0;
   }
 
+  // Le nom d’une ligne, avec sa couleur et sa taille : « Le verre (Nuit, taille M) ».
+  function nomLigne(l) {
+    var detail = detailLigne(l);
+    return produitPar(l.id).nom + (detail ? " (" + detail + ")" : "");
+  }
+
+  function totalDit() {
+    return panier.length ? "Total indicatif " + euros(totalEuros()) + "." : "Ta sélection est vide.";
+  }
+
+  // La liste est refaite à chaque appui (WCAG 2.4.3) : le focus revient au même bouton de la même ligne, ou de celle qui
+  // prend la place d’une ligne partie (la suivante, sinon la précédente), sinon au titre de la fenêtre vide. Jamais sur
+  // la page : ce qui est hors de la fenêtre est inerte.
+  function remettreLeFocus(attribut, i) {
+    var cible = panier.length ? liste.querySelector("[" + attribut + '="' + Math.min(i, panier.length - 1) + '"]') : null;
+    if (cible) cible.focus();
+    else focaliserLeTitre();
+  }
+
+  // Le titre ne peut prendre le focus que le temps qu’il l’a (tabindex="-1", retiré quand il le perd) : la fenêtre
+  // s’ouvre toujours sur « Fermer », son premier élément focalisable.
+  function focaliserLeTitre() {
+    titrePanier.setAttribute("tabindex", "-1");
+    titrePanier.focus();
+  }
+  titrePanier.addEventListener("blur", function () { titrePanier.removeAttribute("tabindex"); });
+
+  // « Un de plus », « Un de moins », « Retirer » : la nouvelle quantité et le total sont dits dans la fenêtre (4.1.3).
   liste.addEventListener("click", function (event) {
     var cible = event.target.closest("button");
     if (!cible) return;
-    var i;
-    if (cible.hasAttribute("data-retirer")) {
-      panier.splice(Number(cible.getAttribute("data-retirer")), 1);
-    } else if (cible.hasAttribute("data-moins")) {
-      i = Number(cible.getAttribute("data-moins"));
-      panier[i].quantite -= 1;
-      if (panier[i].quantite <= 0) panier.splice(i, 1);
-    } else if (cible.hasAttribute("data-plus")) {
-      i = Number(cible.getAttribute("data-plus"));
-      if (panier[i].quantite < CONFIG.quantiteMax && totalPieces() < CONFIG.piecesMax) panier[i].quantite += 1;
+    var attribut = ["data-plus", "data-moins", "data-retirer"].filter(function (a) { return cible.hasAttribute(a); })[0];
+    if (!attribut) return;
+    var i = Number(cible.getAttribute(attribut));
+    var ligne = panier[i];
+    var message = null;
+    if (attribut === "data-plus") {
+      if (ligne.quantite >= CONFIG.quantiteMax) message = LIMITES.piece;
+      else if (totalPieces() >= CONFIG.piecesMax) message = LIMITES.selection;
+      else ligne.quantite += 1;
+    } else if (attribut === "data-moins" && ligne.quantite > 1) {
+      ligne.quantite -= 1;
     } else {
-      return;
+      panier.splice(i, 1);
+      message = "Pièce retirée : " + nomLigne(ligne) + ". " + totalDit();
     }
     garder();
     majPanier();
     majBarre();
+    remettreLeFocus(attribut, i);
+    annonce.textContent = message || nomLigne(ligne) + " : " + ligne.quantite + ". " + totalDit();
   });
 
   function ouvrir() {
     vue.hidden = false;
     merci.hidden = true;
-    retourForm.textContent = "";
+    viderLeRetour();
+    annonce.textContent = "";
     majPanier();
     if (typeof dialogue.showModal === "function") dialogue.showModal();
     else dialogue.setAttribute("open", "");
   }
 
+  // Fermée, la fenêtre rend le focus à « Voir ma sélection ». Quand la sélection est vide (envoyée, ou tout retiré), ce
+  // bouton est caché avec sa barre : le focus va au titre de la collection, à l’écran, au lieu de tomber sur la page
+  // (WCAG 2.4.3). « close » vient aussi d’Échap.
+  var titreCollection = document.getElementById("titre-collection");
+  function apresFermeture() {
+    if (barre.hidden) titreCollection.focus();
+  }
+  dialogue.addEventListener("close", apresFermeture);
+
   function fermer() {
-    if (typeof dialogue.close === "function") dialogue.close();
-    else dialogue.removeAttribute("open");
+    if (typeof dialogue.close === "function") {
+      dialogue.close();
+    } else {
+      dialogue.removeAttribute("open");
+      apresFermeture();
+    }
   }
 
   document.getElementById("barre-ouvrir").addEventListener("click", ouvrir);
@@ -411,47 +512,172 @@
     }).join("\n");
   }
 
-  function erreur(message) {
+  // La zone de message de la sélection, vidée ; le lien de la case de consentement à son message part avec lui.
+  function viderLeRetour() {
+    retourForm.className = "panier__retour";
+    retourForm.textContent = "";
+    accord.removeAttribute("aria-describedby");
+  }
+
+  // Le message s’affiche au-dessus du bouton d’envoi ; sur un téléphone court, la fenêtre défile jusqu’à lui.
+  // morceaux : du texte, ou { texte, lien } pour un lien. Jamais d’innerHTML : l’adresse tapée y passe.
+  // L’adresse est décrite par ce message dès le HTML ; la case de consentement l’est tant que son erreur se voit
+  // (aria-describedby, WCAG 3.3.1).
+  function erreur(morceaux, champ) {
+    viderLeRetour();
     retourForm.className = "panier__retour panier__retour--erreur";
-    retourForm.innerHTML = message;
+    [].concat(morceaux).forEach(function (morceau) {
+      if (typeof morceau === "string") {
+        retourForm.appendChild(document.createTextNode(morceau));
+        return;
+      }
+      var lien = document.createElement("a");
+      lien.href = morceau.lien;
+      lien.textContent = morceau.texte;
+      retourForm.appendChild(lien);
+    });
+    if (champ) {
+      if (champ === mail) mail.setAttribute("aria-invalid", "true");
+      if (champ === accord) accord.setAttribute("aria-describedby", retourForm.id);
+      champ.focus();
+    }
+    if (retourForm.scrollIntoView) retourForm.scrollIntoView({ block: "nearest" });
+  }
+
+  function copie(liste) {
+    return liste.map(function (l) { return { id: l.id, couleur: l.couleur, taille: l.taille, quantite: l.quantite }; });
+  }
+
+  // Le mail de secours : la sélection telle qu’elle partait, et l’adresse, vers contact@baromatch.fr.
+  function mailDeSecours(selection, adresse) {
+    var sujet = encodeURIComponent("Sélection boutique Baromatch");
+    var corps = encodeURIComponent("Ma sélection\u00a0:\n" + selection + "\n\nMon adresse\u00a0: " + adresse);
+    return "mailto:" + CONFIG.contact + "?subject=" + sujet + "&body=" + corps;
+  }
+
+  // Formspree répond 422 quand il refuse un envoi, avec la liste de ce qu’il refuse (errors[].field, errors[].code).
+  // Seul un refus de l’adresse elle-même mérite « vérifie ton adresse » ; un autre refus est une panne de notre côté.
+  function refusDeLAdresse(corps) {
+    var erreurs = corps && corps.errors;
+    return Array.isArray(erreurs) && erreurs.some(function (e) {
+      return !!e && (e.field === "email" || e.code === "TYPE_EMAIL");
+    });
+  }
+
+  // L’issue d’un envoi, décidée en un seul endroit : "ok", "refusee" ou "panne" (réseau, pas de réponse en DELAI_MS,
+  // tout autre statut). La promesse ne rejette jamais et se règle une seule fois, même sans AbortController ; ce qui
+  // s’affiche ensuite est hors de tout catch.
+  function transmettre(urlEnvoi, donnees) {
+    return new Promise(function (conclure) {
+      var regle = false;
+      var controle = typeof AbortController === "function" ? new AbortController() : null;
+      var minuteur = setTimeout(function () {
+        if (controle) controle.abort();
+        une("panne");
+      }, DELAI_MS);
+      function une(issue) {
+        if (regle) return;
+        regle = true;
+        clearTimeout(minuteur);
+        conclure(issue);
+      }
+      fetch(urlEnvoi, {
+        method: "POST",
+        body: donnees,
+        headers: { Accept: "application/json" },
+        signal: controle ? controle.signal : undefined
+      })
+        .then(function (reponse) {
+          if (reponse.ok) return "ok";
+          if (reponse.status !== 422) return "panne";
+          return reponse.json().then(function (corps) {
+            return refusDeLAdresse(corps) ? "refusee" : "panne";
+          }, function () { return "panne"; });
+        }, function () { return "panne"; })
+        .then(une, function () { une("panne"); });
+    });
+  }
+
+  // Pendant l’envoi, le bouton garde le focus (aria-disabled, jamais disabled, comme pour-les-bars.js : WCAG 2.4.3) et
+  // la page ignore ses appuis ; « Envoi… » est aussi écrit, caché, dans la zone de statut (4.1.3).
+  function marquerLEnvoi(enCours) {
+    envoiEnCours = enCours;
+    if (enCours) envoyer.setAttribute("aria-disabled", "true");
+    else envoyer.removeAttribute("aria-disabled");
+    envoyer.textContent = enCours ? "Envoi…" : texteEnvoyer;
+    viderLeRetour();
+    if (!enCours) return;
+    retourForm.className = "panier__retour panier__retour--envoi";
+    var texte = document.createElement("span");
+    texte.className = "visuellement-cache";
+    texte.textContent = "Envoi…";
+    retourForm.appendChild(texte);
+  }
+
+  // La sélection est partie : elle est vidée sur l’appareil, et gardée pour « Corriger l’adresse ».
+  function confirmer(envoi) {
+    dernierEnvoi = envoi;
+    remplace = "";
+    panier = [];
+    garder();
+    majBarre();
+    formulaire.reset();
+    merciAdresse.textContent = envoi.adresse;
+    vue.hidden = true;
+    merci.hidden = false;
+    merci.querySelector("h3").focus();
   }
 
   formulaire.addEventListener("submit", function (event) {
     event.preventDefault();
-    var mail = formulaire.querySelector('input[type="email"]');
-    var accord = formulaire.querySelector('input[name="accord"]');
-    if (panier.length === 0) { erreur("Ajoute au moins une pièce."); return; }
-    if (!mail.value || !mail.checkValidity()) { erreur("Vérifie ton adresse mail : elle doit ressembler à prenom@exemple.fr."); mail.focus(); return; }
-    if (!accord.checked) { erreur("Coche la case pour qu’on puisse t’écrire à l’ouverture."); accord.focus(); return; }
+    if (envoiEnCours) return;
+    var adresse = mail.value.trim();
+    if (panier.length === 0) { erreur(TEXTES.vide); return; }
+    if (!adresse || !mail.checkValidity()) { erreur(TEXTES.forme, mail); return; }
+    if (!ADRESSE_COMPLETE.test(adresse)) { erreur(TEXTES.incomplete, mail); return; }
+    mail.removeAttribute("aria-invalid");
+    if (!accord.checked) { erreur(TEXTES.accord, accord); return; }
 
-    document.getElementById("panier-selection").value = resume();
+    // Ce qui part, lu avant l’envoi : le mail de secours et « Corriger l’adresse » montrent cette sélection-là.
+    var selection = resume();
+    var envoi = { panier: copie(panier), adresse: adresse, prenom: prenom.value };
+    document.getElementById("panier-selection").value = selection;
     document.getElementById("panier-total-champ").value = euros(totalEuros()) + " (indicatif), " + pieces(totalPieces());
+    var donnees = new FormData(formulaire);
+    if (remplace && remplace !== adresse) donnees.append("remplace", remplace);
 
-    envoyer.disabled = true;
-    envoyer.textContent = "Envoi…";
-    retourForm.textContent = "";
+    marquerLEnvoi(true);
 
-    fetch(CONFIG.formulaire, { method: "POST", body: new FormData(formulaire), headers: { Accept: "application/json" } })
-      .then(function (reponse) {
-        if (!reponse.ok) throw new Error("HTTP " + reponse.status);
-        panier = [];
-        garder();
-        majBarre();
-        formulaire.reset();
-        vue.hidden = true;
-        merci.hidden = false;
-        merci.querySelector("h3").focus();
-      })
-      .catch(function () {
-        var sujet = encodeURIComponent("Réservation boutique Baromatch");
-        var corps = encodeURIComponent("Ma réservation :\n" + resume() + "\n\nMon adresse : " + mail.value);
-        erreur("La réservation n’est pas partie. Réessaie dans un instant, ou <a href=\"mailto:" + CONFIG.contact + "?subject=" + sujet + "&body=" + corps + "\">envoie-la par mail</a>.");
-      })
-      .then(function () {
-        envoyer.disabled = panier.length === 0;
-        envoyer.textContent = "Réserver sans payer";
-      });
+    transmettre(CONFIG.formulaire, donnees).then(function (issue) {
+      marquerLEnvoi(false);
+      if (issue === "ok") return confirmer(envoi);
+      // Le lien emporte la sélection ; l’adresse est aussi écrite en toutes lettres, pour qui n’a pas de messagerie.
+      var secours = mailDeSecours(selection, adresse);
+      var aQui = " à " + CONFIG.contact + ".";
+      if (issue === "refusee") erreur([TEXTES.refusee, { texte: TEXTES.refuseeLien, lien: secours }, aQui], mail);
+      else erreur([TEXTES.panne, { texte: TEXTES.panneLien, lien: secours }, aQui]);
+    });
   });
+
+  // « Corriger l’adresse » : la sélection envoyée et l’adresse reviennent dans le formulaire, le champ prend le focus.
+  corriger.addEventListener("click", function () {
+    if (!dernierEnvoi) return;
+    panier = copie(dernierEnvoi.panier);
+    garder();
+    majBarre();
+    remplace = dernierEnvoi.adresse;
+    vue.hidden = false;
+    merci.hidden = true;
+    viderLeRetour();
+    majPanier();
+    mail.value = dernierEnvoi.adresse;
+    prenom.value = dernierEnvoi.prenom;
+    accord.checked = false; // la case reste à cocher par la personne : une case précochée ne vaut pas accord
+    mail.focus();
+    mail.select();
+  });
+
+  mail.addEventListener("input", function () { mail.removeAttribute("aria-invalid"); });
 
   majBarre();
 })();

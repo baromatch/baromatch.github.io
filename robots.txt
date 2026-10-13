@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /tests/
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /playwright.config.mjs
 
 Sitemap: https://baromatch.fr/sitemap.xml

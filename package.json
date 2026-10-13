@@ -1,0 +1,17 @@
+{
+  "name": "baromatch-site",
+  "private": true,
+  "description": "Outils de vérification du site baromatch.fr (rien de tout ça n'est servi aux visiteurs).",
+  "scripts": {
+    "serve": "http-server . -p 4173 -a 127.0.0.1 -s -c-1",
+    "test": "playwright test",
+    "lighthouse": "node tests/outils/lighthouse.mjs",
+    "liens": "playwright test tests/liens.spec.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.56.1",
+    "http-server": "14.1.1",
+    "lighthouse": "13.5.0"
+  }
+}

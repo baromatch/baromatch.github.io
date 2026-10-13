@@ -1,0 +1,402 @@
+/* Baromatch — la page « Pour les bars » (pour-les-bars.html), et elle seule : les autres pages ne chargent pas ce
+   fichier. Ce qu’on ne voit qu’en descendant (les écrans de la Console, Comment ça marche, heure par heure, ce que tu
+   vois des fans) et le formulaire, qui ne s’affiche qu’avec son script. pour-les-bars-amorce.js demande ce fichier
+   une fois le premier écran affiché (aussitôt en arrivant sur une ancre) ; sans JavaScript, le <noscript> de la tête
+   le charge. Il vient après styles.css et le style de la page, dont il reprend les jetons (:root, dont le verre et
+   l’ombre des écrans) et les classes (.titre-section, .boutique-promesses, la bande ambre .bars, .bouton-nuit, la
+   capsule et, pour le formulaire, .panier__etiquette, .panier__champ, .panier__accord, .panier__envoyer). Aucune
+   règle ici ne touche une autre page. Deux règles de la marque y reviennent : l’ambre est réservé aux actions, et
+   jamais de spinner (une attente se dit par un verre qui se remplit).
+
+   Le style de la page (dans la tête de pour-les-bars.html, sans autre commentaire qu’un renvoi ici, pour tenir dans
+   le premier aller-retour du HTML) : ce qu’on voit en arrivant, du téléphone au grand écran (l’ouverture, la ligne
+   pour les fans, les atouts), la carte du formulaire et les questions, qu’on voit en arrivant par #proposer. Une
+   règle qui touche ce qu’on voit en arrivant va là, pas ici. Ce qu’il faut savoir de ses règles :
+   - avant que ce fichier n’arrive, les icônes sans classe et les verres de l’heure par heure font 1,25 em (pas
+     300 × 150), les images gardent leurs proportions, les listes numérotées perdent leurs numéros et ce que le
+     téléphone cache reste caché : la page a déjà sa hauteur. Ces règles sont dans :where(), sans poids : les règles
+     d’ici les remplacent ;
+   - le rythme des sections (.bloc) est celui de l’accueil, un peu resserré sur téléphone ;
+   - l’étiquette est neutre, avec le verre de la marque : ici l’ambre reste aux actions ;
+   - les capsules (la capsule ambre est dans styles.css) : l’icône, l’appui (transform seulement), le verre ; le
+     bouton d’envoi et celui de la bande ambre s’enfoncent de même, pas pendant l’envoi ;
+   - .lien-fleche fait le travail d’un second bouton, sans en avoir le poids ; sa flèche ne descend que sous une
+     vraie souris (sur un écran tactile, un survol resterait collé après le tap) ;
+   - le téléphone est sans marque : bord de 6 px, rayons concentriques 34 = 28 + 6 ; « C’est bon. » est coupé
+     au-dessus des puces de la maquette, l’écran continue de ses couleurs, puis se fond ;
+   - la scène : la Console sur un téléphone (70 % au moins de sa taille réelle) et, devant, le téléphone de la porte,
+     sur la case vide à droite de « places encore en ligne ». La légende tient sous la Console, à gauche de la
+     porte ; sa hauteur minimale couvre le dépassement de la porte. À l’entrée, seul le téléphone de la porte se
+     pose : le titre s’affiche tout de suite (c’est le LCP) ;
+   - à côté de « Pour les bars », le lien du fan arrivé ici par erreur (sa marge négative lui donne 44 px à toucher
+     sans grandir la ligne) ; sous la phrase d’ouverture, la ligne d’état ; sous les boutons, la phrase du prix ;
+   - l’étiquette « Exemple », posée dans le coin haut de chaque capture (la figure est son repère) ;
+   - les lignes pour le fan, en bas de page ; les atouts, sur téléphone une liste légère, à partir de
+     720 px des cartes de verre ;
+   - la carte du formulaire et la mise en page du formulaire (grille, marges, bord des champs, piège à robots, petit
+     verre du bouton caché, lien Confidentialité sous la case, bouton d’envoi effacé par son attribut hidden) :
+     pour-les-bars-amorce.js lui fait prendre sa place, invisible (data-attente), dès que la page est lue, et il
+     apparaît là avec son script, sans rien pousser et sans attendre ce fichier. Sans JavaScript, ou si le formulaire
+     ne vient pas, il reste caché et le chemin e-mail (.sans-js, #demande-secours) est en haut de la carte ;
+   - les questions, qu’on voit au-dessus de la carte en arrivant par #proposer. */
+
+/* ---------- Les écrans ---------- */
+
+/* La Console dans une fenêtre de navigateur, sans adresse : la page ne la publie pas. */
+.fenetre {
+  overflow: hidden;
+  border-radius: 18px;
+  background: #0D0E14;
+  box-shadow: inset 0 0 0 1px var(--verre-bord), var(--ombre-scene);
+}
+.fenetre__barre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  margin: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--texte-discret);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.fenetre__barre svg { width: 16px; height: 16px; }
+.fenetre__page img { width: 100%; height: auto; }
+
+/* Un morceau de la Console (une carte, une liste) : un panneau de nuit. Rayon concentrique : la carte de la
+   Console (≈ 24) + sa marge dans la découpe (≈ 14). Montré à 84 % au moins de sa taille réelle. */
+.capture {
+  overflow: hidden;
+  max-width: 300px;
+  border-radius: 36px;
+  background: var(--nuit);
+  outline: 1px solid rgba(255, 255, 255, 0.1);
+  outline-offset: -1px;
+  box-shadow: var(--ombre-scene);
+}
+.capture img { width: 100%; height: auto; }
+@media (min-width: 720px) { .capture { max-width: 360px; } }
+/* Une carte de la Console découpée au ras de son bord : ses propres coins, pas de panneau autour. */
+.carte-capture {
+  overflow: hidden;
+  max-width: 300px;
+  margin: 0 auto;
+  border-radius: 20px;
+  outline: 1px solid rgba(255, 255, 255, 0.1);
+  outline-offset: -1px;
+  box-shadow: var(--ombre-scene);
+}
+.carte-capture img { width: 100%; height: auto; }
+@media (min-width: 720px) { .carte-capture { max-width: 360px; border-radius: 24px; } }
+.capture--fondu {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  outline: 0;
+  box-shadow: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+
+/* ---------- Comment ça marche ---------- */
+
+.marche__etapes { display: grid; gap: 48px; margin: 36px 0 0; padding: 0; list-style: none; }
+.marche__etape { display: grid; gap: 28px; }
+@media (min-width: 960px) {
+  .marche__etapes { gap: 104px; margin-top: 72px; }
+  .marche__etape { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 64px; align-items: center; }
+  .marche__etape--large { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .marche__etape--large .marche__texte { max-width: 40rem; }
+}
+.marche__numero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  color: var(--texte-doux);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.marche__numero span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--verre-bord-fort);
+  color: var(--texte);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.marche__titre { margin: 0; font-size: clamp(1.625rem, 5vw, 2.5rem); font-weight: 800; font-stretch: 88%; line-height: 1.04; letter-spacing: -0.015em; }
+.marche__texte p:not(.marche__numero) { margin: 12px 0 0; color: var(--texte-doux); }
+
+.marche__visuel { width: 100%; max-width: 300px; margin: 0 auto; }
+@media (min-width: 720px) { .marche__visuel { max-width: 360px; } }
+.marche__visuel .telephone { max-width: 300px; }
+.marche__visuel .capture { margin: 0 auto; }
+
+/* Étape 2 : rien sous 720 px (le téléphone garde le texte ; le <picture> n’y sert qu’une image vide) ; de 720 à 959 px,
+   la carte des arrivées et des réglages ; à partir de 960 px, la page Ce soir entière, recomposée de ses trois
+   découpes dans leurs proportions réelles (1150 px : 752 + 14 + 384), à 97 %. */
+.marche__visuel--soir { display: none; }
+@media (min-width: 720px) { .marche__visuel--soir { display: block; } }
+.marche__visuel--soir .fenetre { display: none; }
+@media (min-width: 960px) {
+  .marche__visuel--soir { max-width: none; }
+  .marche__visuel--soir .carte-capture { display: none; }
+  .marche__visuel--soir .fenetre { display: block; }
+}
+.soir__page { display: grid; gap: 1.2%; padding: 1.4% 1.6% 2%; }
+.soir__rangee { display: grid; grid-template-columns: 752fr 384fr; gap: 1.2%; align-items: start; }
+
+/* Étape 3 : la porte vue des deux bouts à partir de 720 px (l'écran « C'est bon. » et la liste des arrivées). */
+.marche__visuel--porte .porte__duo { display: block; }
+.marche__visuel--porte .telephone { display: none; }
+@media (min-width: 720px) {
+  .marche__visuel--porte { max-width: 560px; }
+  .marche__visuel--porte .porte__duo { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .marche__visuel--porte .telephone { display: block; }
+  .marche__visuel--porte .capture { width: 100%; margin: 48px 0 0; }
+}
+
+/* ---------- Ton soir de match, heure par heure ---------- */
+
+.horaire__liste { margin: 40px 0 0; padding: 0; list-style: none; }
+.horaire__moment {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-content: start;
+  column-gap: 16px;
+  padding-bottom: 22px;
+}
+/* Le fil de la soirée, d'un verre au suivant ; en pointillé après le coup d'envoi, comme dans la Console. */
+.horaire__moment::before {
+  content: "";
+  position: absolute;
+  top: 52px;
+  bottom: 6px;
+  left: 21.5px;
+  width: 1px;
+  background: var(--verre-bord-fort);
+}
+.horaire__moment:last-child { padding-bottom: 0; }
+.horaire__moment:last-child::before { display: none; }
+.horaire__moment--envoi::before, .horaire__moment--envoi + .horaire__moment::before { width: 0; background: none; border-left: 1px dashed var(--verre-bord-fort); }
+
+.horaire__jauge { grid-row: 1 / span 3; width: 44px; height: 44px; }
+/* Les verres se remplissent la première fois qu'on les voit (pour-les-bars.js pose --a-verser, puis --versee) :
+   800 ms, l'élan du remplissage de l'accueil, 60 ms d'un verre au suivant. Sans script ou en mouvement réduit, ils
+   sont à leur niveau d'emblée. */
+.horaire__liste--a-verser .horaire__niveau { transform: translateY(160px); }
+.horaire__liste--versee .horaire__niveau { transform: none; transition: transform 800ms cubic-bezier(0.22, 1.3, 0.42, 1); }
+.horaire__liste--versee .horaire__moment:nth-child(2) .horaire__niveau { transition-delay: 60ms; }
+.horaire__liste--versee .horaire__moment:nth-child(3) .horaire__niveau { transition-delay: 120ms; }
+.horaire__liste--versee .horaire__moment:nth-child(4) .horaire__niveau { transition-delay: 180ms; }
+.horaire__liste--versee .horaire__moment:nth-child(5) .horaire__niveau { transition-delay: 240ms; }
+.horaire__heure { margin: 6px 0 0; font-size: 1.625rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.horaire__titre { margin: 8px 0 0; font-size: 1.125rem; font-weight: 700; line-height: 1.25; }
+.horaire__texte { margin: 4px 0 0; color: var(--texte-doux); font-size: 1rem; }
+
+@media (min-width: 960px) {
+  .horaire__liste { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 32px; margin-top: 64px; }
+  .horaire__moment { grid-template-columns: minmax(0, 1fr); padding-bottom: 0; }
+  .horaire__moment::before { top: 30px; right: -32px; bottom: auto; left: 72px; width: auto; height: 1px; }
+  .horaire__moment--envoi::before, .horaire__moment--envoi + .horaire__moment::before { height: 0; border-left: 0; border-top: 1px dashed var(--verre-bord-fort); }
+  .horaire__jauge { grid-row: auto; width: 60px; height: 60px; margin-bottom: 20px; }
+  .horaire__heure { margin: 0; font-size: 2.25rem; }
+  /* « Après le match » : des mots à la place d'une heure, sur la même hauteur de ligne que les heures. */
+  .horaire__heure--mots { font-size: 1.625rem; line-height: 36px; white-space: nowrap; }
+  .horaire__titre { margin-top: 12px; }
+}
+
+/* L'Historique, une seule fois, sous le dernier arrêt : la découpe téléphone jusqu'à 960 px, la page entière après. */
+.horaire__historique { max-width: 300px; margin: 32px 0 0; }
+@media (min-width: 720px) { .horaire__historique { max-width: 360px; margin-left: 60px; } }
+.horaire__historique .fenetre { display: none; }
+@media (min-width: 960px) {
+  .horaire__historique { max-width: none; margin: 56px 0 0; }
+  .horaire__historique .capture { display: none; }
+  .horaire__historique .fenetre { display: block; }
+}
+
+/* ---------- Ce que tu vois des fans ---------- */
+
+.regard .titre-section { max-width: 20ch; }
+.regard__corps { display: grid; gap: 40px; margin-top: 36px; }
+@media (min-width: 720px) { .regard__corps { margin-top: 56px; } }
+@media (min-width: 960px) { .regard__corps { grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; align-items: start; } }
+.regard__colonnes { display: grid; gap: 10px; }
+@media (min-width: 720px) { .regard__colonnes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
+/* La liste des réservations répète ce que disent les deux listes : seulement quand il y a la place à côté. */
+.regard__visuel { display: none; margin: 0; }
+@media (min-width: 960px) { .regard__visuel { display: block; } }
+
+.regard__carte {
+  padding: 18px 18px 6px;
+  border-radius: 24px;
+  background: var(--verre);
+  box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet);
+}
+@media (min-width: 720px) { .regard__carte { padding: 28px 28px 14px; } }
+.regard__titre { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; font-size: 1.1875rem; font-weight: 800; line-height: 1.2; }
+.regard__titre svg { flex: none; width: 24px; height: 24px; color: var(--texte-doux); }
+.regard__liste { margin: 0; padding: 0; list-style: none; }
+.regard__liste li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--trait);
+  color: var(--texte-doux);
+  font-size: 1rem;
+}
+.regard__liste svg { width: 20px; height: 20px; margin-top: 3px; color: var(--texte-discret); }
+.regard__liste strong { color: var(--texte); font-weight: 600; }
+
+/* ---------- Propose ton bar : le formulaire ---------- */
+
+/* Les champs reprennent .panier__etiquette et .panier__champ de la boutique (52 px, fond de nuit, rayon 14) ; leur
+   grille, les marges, le piège à robots et le bord des champs sont dans le style de la page : le formulaire y prend
+   sa place, invisible, et son script l’affiche sans attendre ce fichier. Sur la carte de verre, le fond de nuit du
+   champ ne se distingue pas (1,16:1) : son bord seul le dessine, à 3:1 au moins (WCAG 1.4.11 ; 0,18 de la boutique
+   donnait 1,78:1 ici), d’où le 0,34 du style de la page. */
+.formulaire .panier__champ[aria-invalid="true"] { border-color: var(--erreur); box-shadow: 0 0 0 1px var(--erreur); }
+.panier__accord input[aria-invalid="true"] { outline: 2px solid var(--erreur); outline-offset: 2px; }
+.champ__erreur {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 8px 0 0;
+  color: var(--erreur);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.champ__erreur[hidden] { display: none; }
+.champ__erreur svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+.formulaire .panier__accord + .champ__erreur { margin: 6px 0 0 30px; }
+
+.formulaire__statut:empty, .formulaire__alerte:empty { display: none; }
+.formulaire__statut, .formulaire__alerte, .courriel { margin-top: 18px; }
+/* Pendant l'envoi : le bouton garde le focus (aria-disabled), devient une capsule de verre et un petit verre s'y
+   remplit, jamais de spinner. */
+.panier__envoyer[aria-disabled="true"],
+.panier__envoyer[aria-disabled="true"]:hover {
+  gap: 10px;
+  background: var(--verre-fort);
+  color: var(--texte-doux);
+  box-shadow: inset 0 0 0 1px var(--verre-bord-fort);
+  cursor: progress;
+}
+/* Le petit verre est dans le bouton dès le HTML (le script ne change que le texte) : caché par le style de la page,
+   il ne paraît que pendant l'envoi. */
+.panier__envoyer[aria-disabled="true"] svg { display: block; }
+/* Quand la page ne peut plus envoyer elle-même (l'étape e-mail, un 400 REQUETE_INVALIDE, la page périmée), son script
+   efface le bouton d'envoi (hidden ; la règle est dans le style de la page) et l'action qui le remplace est le geste
+   principal : le chemin e-mail (ambre), ou « Recharger la page » quand la page est périmée. Après un 429, et après
+   « Ouvrir ma messagerie » quand la page pouvait encore envoyer, le chemin e-mail mène aussi, et le bouton d'envoi, qui
+   reste, passe en verre. Hors ligne (.courriel--second), c'est l'inverse : la demande part d'elle-même au retour du
+   réseau, le chemin e-mail est le second choix. */
+.courriel--second .capsule,
+.courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer {
+  background: var(--verre-fort);
+  color: var(--texte);
+  box-shadow: inset 0 0 0 1px var(--verre-bord-fort);
+}
+.courriel--second .capsule:hover,
+.courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover { background: rgba(255, 255, 255, 0.15); color: var(--texte); }
+.courriel .lien-bouton { justify-self: start; }
+/* Sous « C'est envoyé. », l'autre chemin et « Tu nous as déjà écrit ? » n'ont plus lieu d'être. */
+.merci:not([hidden]) ~ .formulaire__ailleurs { display: none; }
+.resume a { color: var(--texte-doux); }
+.resume a:hover { color: var(--ambre); }
+
+/* Les messages : une boîte calme, bord neutre ; bord rouge pâle seulement quand quelque chose est refusé. */
+.message, .resume {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px var(--verre-bord);
+}
+.message > svg, .resume > svg { width: 24px; height: 24px; color: var(--texte-doux); }
+.message--erreur, .resume { box-shadow: inset 0 0 0 1px rgba(255, 156, 138, 0.5); }
+.message--erreur > svg, .resume > svg { color: var(--erreur); }
+.message__titre, .resume__titre { margin: 0; color: var(--texte); font-size: 1rem; font-weight: 700; line-height: 1.35; }
+.resume__titre { font-variant-numeric: tabular-nums; }
+.message__texte { margin: 4px 0 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.45; }
+.message__actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
+.message__actions .capsule { flex: 1 1 auto; min-height: 48px; padding: 0 20px; white-space: nowrap; }
+.resume { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 16px; }
+.resume[hidden] { display: none; }
+.resume:focus { outline: none; }
+.resume:focus-visible { outline: 2px solid var(--ambre); outline-offset: 3px; }
+.resume__liste { margin: 6px 0 0; padding: 0 0 0 1.1em; color: var(--texte-doux); font-size: 0.9375rem; }
+.resume__liste li { margin: 4px 0; }
+
+/* L'étape e-mail : sous le message (statut, ou alerte après un 429), le moyen d'envoyer, sans seconde boîte. */
+/* Une seule colonne, à la largeur du formulaire et jamais à celle de son contenu : avec le texte agrandi (200 % sur 320
+   à 414 px, WCAG 1.4.4), le texte à copier (20 colonnes par défaut) et les capsules sur une ligne poussaient le bloc
+   hors de l’écran. Les capsules passent à la ligne. */
+.courriel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.courriel .capsule { width: 100%; padding: 0 18px; font-size: 1rem; white-space: normal; }
+.courriel[hidden] { display: none; }
+.courriel__etiquette { display: block; margin: 6px 0 0; color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; line-height: 1.4; }
+.courriel__texte {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--verre-bord);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--texte-doux);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  resize: none;
+}
+
+/* Envoyé : le verre est plein, la carte laisse la place au merci. */
+.merci[hidden] { display: none; }
+.merci { padding-top: 16px; }
+.merci:focus { outline: none; }
+.merci__verre { width: 72px; height: 72px; margin-bottom: 20px; }
+.merci__titre { margin: 0; font-size: 2.25rem; font-weight: 800; font-stretch: 88%; line-height: 1; letter-spacing: -0.02em; }
+.merci p { margin: 14px 0 0; color: var(--texte-doux); }
+.merci strong { color: var(--texte); font-weight: 600; overflow-wrap: anywhere; }
+.lien-bouton {
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  color: var(--texte);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+.lien-bouton:hover { color: var(--ambre); }
+/* Le petit verre qui se remplit pendant l'envoi. */
+@keyframes pb-monter {
+  0% { transform: translateY(70px); opacity: 1; }
+  80% { transform: translateY(-30px); opacity: 1; }
+  100% { transform: translateY(-30px); opacity: 0; }
+}
+.jauge-envoi { animation: pb-monter 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+
+/* ---------- Mouvement réduit ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .jauge-envoi { animation: none; }
+  .horaire__niveau { transform: none !important; transition: none !important; }
+}

@@ -20,6 +20,19 @@
   --texte-doux: rgba(247, 247, 249, 0.74);
   --texte-discret: rgba(247, 247, 249, 0.56);
   --trait: rgba(255, 255, 255, 0.10);
+  --erreur: #FF9C8A;
+  /* Le bord d’un champ, tel qu’il est peint, se voit à 3:1 au moins contre ce qui l’entoure : la page (#0A0B10)
+     ou le panneau de la sélection (#151722), WCAG 1.4.11. Avant : 2,1:1 sur la liste d’attente, 1,5:1 dans la boutique. */
+  --champ-bord: rgba(255, 255, 255, 0.36);
+  /* Le verre de la marque (surfaces, bords, reflet) et l’ombre des écrans montrés dans les pages. Les cibles tactiles
+     visent 44 px de haut, notre minimum ; WCAG 2.5.8 n’en demande que 24. */
+  --verre: rgba(255, 255, 255, 0.07);
+  --verre-fort: rgba(255, 255, 255, 0.10);
+  --verre-bord: rgba(255, 255, 255, 0.14);
+  --verre-bord-fort: rgba(255, 255, 255, 0.22);
+  --verre-reflet: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  --ombre-scene: 0 24px 60px rgba(0, 0, 0, 0.45);
+  --sortie-douce: cubic-bezier(0.2, 0.8, 0.2, 1);
   --page: 1120px;
   --gouttiere: 16px;
   color-scheme: dark;
@@ -41,6 +54,9 @@ body {
   font-size: 1.0625rem;
   line-height: 1.55;
   font-variation-settings: "opsz" 16;
+  /* Un mot plus large que sa ligne (un titre en très grand, texte agrandi à 200 % sur 320 px) passe à la ligne au lieu
+     de sortir de l’écran. */
+  overflow-wrap: break-word;
   overflow-x: hidden;
 }
 
@@ -51,6 +67,9 @@ body {
 img, svg { display: block; max-width: 100%; }
 
 a { color: var(--ambre); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+/* Une adresse e-mail ou un lien écrit en toutes lettres n’a pas d’espace où passer à la ligne : avec le texte agrandi,
+   il coupait le bord de l’écran (contact@baromatch.fr perdait son « fr »). Il passe à la ligne où il faut. */
+a[href^="mailto:"], .document a { overflow-wrap: anywhere; }
 a:hover { color: var(--goutte); }
 
 :focus-visible {
@@ -67,19 +86,23 @@ a:hover { color: var(--goutte); }
   white-space: nowrap; border: 0;
 }
 
+/* Caché au-dessus de l’écran de toute sa hauteur, quelle que soit la taille du texte : l’ancien décalage de -60 px
+   laissait dépasser le bas du lien dès que le texte grandissait (150 %, 200 %). */
 .lien-evitement {
   position: absolute;
   left: var(--gouttiere);
-  top: -60px;
+  top: 0;
   z-index: 10;
+  max-width: calc(100% - 2 * var(--gouttiere));
   padding: 10px 16px;
   background: var(--ambre);
   color: var(--nuit);
   font-weight: 700;
   border-radius: 10px;
   text-decoration: none;
+  transform: translateY(calc(-100% - 4px));
 }
-.lien-evitement:focus { top: 12px; color: var(--nuit); }
+.lien-evitement:focus { transform: translateY(12px); color: var(--nuit); }
 
 .page {
   width: 100%;
@@ -92,14 +115,19 @@ a:hover { color: var(--goutte); }
 
 .entete {
   display: flex;
+  /* Quand le texte est agrandi (200 % dans les réglages du navigateur), le menu passe sous le logo au lieu de déborder. */
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-top: 22px;
-  padding-bottom: 22px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
-.entete__logo { display: block; width: 132px; }
+/* Le logo et les liens se touchent du doigt sur 44 px de haut (notre minimum ; WCAG 2.5.8 n’en demande que 24) ;
+   la marge négative garde l’en-tête à la même hauteur : seule la zone qui répond au toucher s’agrandit. Le logo ne
+   rétrécit jamais : 120 px au moins, le minimum de la marque. */
+.entete__logo { display: block; flex: none; width: 132px; padding: 13px 0; margin: -13px 0; }
 @media (min-width: 720px) { .entete__logo { width: 156px; } }
 .entete__logo svg { width: 100%; height: auto; }
 
@@ -108,7 +136,10 @@ a:hover { color: var(--goutte); }
   font-weight: 600;
   font-size: 0.9375rem;
   text-decoration: none;
-  padding: 8px 2px;
+  padding: 10px 2px;
+  /* 45 px de haut avec le bord, quelle que soit la taille du texte : quand le texte grandit, la ligne seule dépasse
+     44 px et la marge se réduit (les deux liens empilés sous le logo prennent moins de place). */
+  padding-block: max(2px, calc((45px - 1lh - 1px) / 2));
   border-bottom: 1px solid rgba(255, 177, 61, 0.55);
 }
 .entete__lien:hover { color: var(--ambre); }
@@ -122,7 +153,7 @@ a:hover { color: var(--goutte); }
   padding-top: 24px;
   padding-bottom: 96px;
 }
-@media (min-width: 720px) { .ouverture { padding-top: 40px; padding-bottom: 140px; } }
+@media (min-width: 720px) { .ouverture { padding-top: 28px; padding-bottom: 140px; } }
 
 .verre {
   position: relative;
@@ -131,6 +162,28 @@ a:hover { color: var(--goutte); }
   margin: 0 auto 28px;
 }
 @media (min-width: 720px) { .verre { width: 232px; height: 232px; margin-bottom: 36px; } }
+
+/* Le statut de Baromatch, dit juste au-dessus de la promesse « Ce soir. » : pas encore ouvert. Une puce, pas une
+   action : du verre neutre (l’ambre des bords et des fonds est pour les actions), le texte en ambre clair (l’ambre
+   en texte sur la nuit est #FFD08A). Choix assumé : ce n’est pas une étiquette de la marque (12–13 px en capitales,
+   +1,5 px, pour un mot ou deux comme « LA TABLÉE ») mais une phrase de statut, qui se lit d’un trait : en bas de
+   casse, 14 puis 15 px, gras, sur une seule ligne dès 320 px (en capitales, elle passait sur deux lignes à 360 px ;
+   tests/accueil.spec.mjs le vérifie). */
+.ouverture__statut {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 5px 14px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  background: var(--verre);
+  box-shadow: var(--verre-reflet);
+  color: #FFD08A;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+@media (min-width: 720px) { .ouverture__statut { margin-bottom: 22px; font-size: 0.9375rem; } }
 
 .verre__halo {
   position: absolute;
@@ -170,6 +223,9 @@ a:hover { color: var(--goutte); }
   max-width: 34rem;
   margin: 36px auto 0;
   text-align: left;
+  /* Un lien vers /#attente (page des bars, page d’une tablée) s’arrête au-dessus de la phrase d’ouverture : on lit
+     pourquoi laisser son adresse, puis l’étiquette et le champ. */
+  scroll-margin-top: 9rem;
 }
 
 .attente__etiquette {
@@ -200,7 +256,7 @@ a:hover { color: var(--goutte); }
   padding: 0 18px;
   color: var(--texte);
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.20);
+  border: 1px solid var(--champ-bord);
 }
 .attente__champ::placeholder { color: var(--texte-discret); }
 .attente__champ:focus-visible { outline-offset: 2px; }
@@ -215,7 +271,7 @@ a:hover { color: var(--goutte); }
   white-space: nowrap;
 }
 .attente__bouton:hover { background: #FFC163; }
-.attente__bouton[disabled] { opacity: 0.7; cursor: progress; }
+.attente__bouton[aria-disabled="true"] { opacity: 0.7; cursor: progress; }
 
 @media (min-width: 560px) {
   .attente__ligne {
@@ -224,7 +280,7 @@ a:hover { color: var(--goutte); }
     padding: 6px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.20);
+    border: 1px solid var(--champ-bord);
   }
   .attente__ligne:focus-within { border-color: rgba(255, 177, 61, 0.7); }
   .attente__champ {
@@ -238,8 +294,14 @@ a:hover { color: var(--goutte); }
   .attente__bouton { height: 52px; border-radius: 999px; }
 }
 
-.attente__note {
+.attente__plateformes {
   margin: 12px 4px 0;
+  font-size: 0.9375rem;
+  color: var(--texte-doux);
+}
+
+.attente__note {
+  margin: 8px 4px 0;
   font-size: 0.875rem;
   color: var(--texte-discret);
 }
@@ -253,8 +315,67 @@ a:hover { color: var(--goutte); }
   font-size: 1rem;
 }
 .attente__retour:empty { display: none; }
+/* Pendant l’envoi, la zone ne contient que « Envoi… », caché (main.js) : elle ne prend pas de place. */
+.attente__retour--envoi { margin: 0; }
 .attente__retour--ok { color: var(--goutte); }
-.attente__retour--erreur { color: #FF9C8A; }
+.attente__retour--erreur { color: var(--erreur); }
+
+/* « Corriger l’adresse », sous le message qui la rappelle : un lien d’allure, un bouton de 44 px, notre minimum. */
+.attente__corriger {
+  min-height: 44px;
+  margin: 2px 0 0;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--texte);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 177, 61, 0.7);
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+.attente__corriger[hidden] { display: none; }
+.attente__corriger:hover { color: var(--ambre); }
+
+/* Un téléphone de 880 px de haut ou moins (barre du navigateur comprise) : les marges se resserrent et le verre prend
+   la place qui reste, de 88 à 176 px, pour que le statut, le champ et le bouton de la liste d’attente soient dans le
+   premier écran (556 px : tout ce qui, sans le verre, va du haut de la page au bas du bouton, avec 8 px de marge).
+   Le verre est à 88 px dès 644 px de haut et en dessous, où le premier écran ne tient plus. */
+@media (max-width: 719px) and (max-height: 880px) {
+  .ouverture { padding-top: 4px; }
+  .ouverture .verre { --cote: clamp(88px, calc(100vh - 556px), 176px); width: var(--cote); height: var(--cote); margin-bottom: 12px; }
+  @supports (height: 100svh) {
+    .ouverture .verre { --cote: clamp(88px, calc(100svh - 556px), 176px); }
+  }
+  .ouverture__statut { margin-bottom: 12px; }
+  .ouverture__titre { font-size: clamp(2.75rem, 13vw, 3.4rem); }
+  .ouverture__texte { margin-top: 14px; font-size: 1rem; }
+  .attente { margin-top: 18px; }
+  .attente__etiquette { margin-bottom: 8px; }
+  .attente__ligne { gap: 8px; }
+  .attente__champ, .attente__bouton { height: 52px; }
+}
+
+/* Un ordinateur de 1 000 px de haut ou moins : le titre reste très grand, le verre prend la place qui reste (120 à
+   232 px) pour que le statut, le titre et la phrase « gratuite pour les fans… pas encore ouverte » soient dans le
+   premier écran (680 px : tout ce qui, sans le verre, va du haut de la page au bas de la phrase, avec 12 px de marge). */
+@media (min-width: 720px) and (max-height: 1000px) {
+  .ouverture .verre { --cote: clamp(120px, calc(100vh - 680px), 232px); width: var(--cote); height: var(--cote); margin-bottom: 20px; }
+  .ouverture__statut { margin-bottom: 16px; }
+  .ouverture__texte { margin-top: 24px; }
+}
+/* Un ordinateur de 800 px de haut ou moins (1 280 × 720, 1 366 × 768, barre du navigateur ôtée) : les marges se
+   resserrent et le verre descend jusqu’à 64 px, pour que la phrase « gratuite… pas encore ouverte » reste dans le
+   premier écran (633 px : tout ce qui, sans le verre, va du haut de la page au bas de la phrase, avec 12 px de marge).
+   Le titre garde sa taille : une taille en vh ne suivrait pas le texte agrandi (WCAG 1.4.4). */
+@media (min-width: 720px) and (max-height: 800px) {
+  .ouverture { padding-top: 12px; }
+  .ouverture .verre { --cote: clamp(64px, calc(100vh - 633px), 232px); margin-bottom: 12px; }
+  .ouverture__statut { margin-bottom: 12px; }
+  .ouverture__texte { margin-top: 18px; }
+}
 
 /* ---------- La soirée, étape par étape ---------- */
 
@@ -329,6 +450,8 @@ a:hover { color: var(--goutte); }
 
 .bars__contenu {
   display: grid;
+  /* Une colonne qui ne s’élargit pas pour un mot long (texte agrandi) : le texte passe à la ligne dans la bande. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 32px;
   padding-top: 72px;
   padding-bottom: 80px;
@@ -346,7 +469,7 @@ a:hover { color: var(--goutte); }
 .bars__verre { width: 112px; order: -1; }
 @media (min-width: 820px) { .bars__verre { width: 220px; order: 0; } }
 
-.bars .titre-section { max-width: 16ch; }
+.bars .titre-section { max-width: 16ch; overflow-wrap: break-word; }
 
 .bars__texte {
   max-width: 36rem;
@@ -366,8 +489,11 @@ a:hover { color: var(--goutte); }
 .bouton-nuit {
   display: inline-flex;
   align-items: center;
-  height: 56px;
+  justify-content: center;
+  min-height: 56px;
+  max-width: 100%;
   padding: 0 26px;
+  text-align: center;
   border-radius: 999px;
   background: var(--nuit);
   color: var(--ambre);
@@ -377,6 +503,8 @@ a:hover { color: var(--goutte); }
 .bouton-nuit:hover { color: var(--goutte); }
 
 .bars a:not(.bouton-nuit) { color: var(--nuit); font-weight: 600; }
+/* L’e-mail, seul sur sa ligne : une cible tactile entière, pas un lien pris dans une phrase. */
+.bars__actions a:not(.bouton-nuit) { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; }
 .bars a:not(.bouton-nuit):hover { color: rgba(10, 11, 16, 0.7); }
 .bars :focus-visible { outline-color: var(--nuit); }
 
@@ -400,12 +528,13 @@ a:hover { color: var(--goutte); }
 .pied__liens {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 24px;
+  gap: 0 24px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.pied__liens a { color: var(--texte-doux); text-decoration: none; }
+/* Chaque lien se touche sur 44 px de haut (il en faisait 18, sous les 24 px de WCAG 2.5.8). */
+.pied__liens a { display: inline-flex; align-items: center; min-height: 44px; color: var(--texte-doux); text-decoration: none; overflow-wrap: anywhere; }
 .pied__liens a:hover { color: var(--ambre); text-decoration: underline; }
 
 /* ---------- Pages de texte (mentions, confidentialité, 404) ---------- */
@@ -435,7 +564,7 @@ a:hover { color: var(--goutte); }
   line-height: 1.25;
 }
 
-.document h2[id] { scroll-margin-top: 24px; }
+.document h2[id], .document h3[id] { scroll-margin-top: 24px; }
 
 .document h3 {
   margin: 28px 0 8px;
@@ -453,6 +582,11 @@ a:hover { color: var(--goutte); }
 .perdu .verre { width: 140px; height: 140px; }
 .perdu h1 { font-size: clamp(2.5rem, 9vw, 4rem); }
 .perdu p { margin: 16px auto 32px; color: var(--texte-doux); max-width: 28rem; }
+.perdu .perdu__titre { margin: 0 auto; max-width: none; }
+/* Sans JavaScript, la phrase pour qui a ouvert un lien de tablée, juste sous celle de la page introuvable. */
+.perdu .perdu__sans-js { margin-top: -16px; }
+.bouton-nuit.perdu__accueil { background: var(--ambre); color: var(--nuit); }
+.bouton-nuit.perdu__accueil:hover { background: #FFC163; color: var(--nuit); }
 
 /* ---------- L'ouverture animée : la goutte tombe dans le verre ---------- */
 
@@ -482,13 +616,18 @@ a:hover { color: var(--goutte); }
 .anime .bm-reflet { opacity: 0; animation: bm-apparaitre 0.4s ease-out 1.55s both; }
 .anime .bm-goutte { transform-box: fill-box; transform-origin: center; animation: bm-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) 1.6s both; }
 .anime .verre__halo { animation: bm-eclore 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 1s both; }
-.anime .ouverture__titre span { clip-path: inset(100% 0 -20% 0); transform: translateY(18px); animation: bm-verser 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-.anime .ouverture__titre span:nth-child(1) { animation-delay: 1.35s; }
-.anime .ouverture__titre span:nth-child(2) { animation-delay: 1.47s; }
-.anime .ouverture__titre span:nth-child(3) { animation-delay: 1.59s; }
-.anime .ouverture__suite { opacity: 0; transform: translateY(10px); animation: bm-lever 0.6s ease-out 1.85s both; }
+/* Le titre et la phrase d’ouverture arrivent tout de suite et sont posés avant 0,6 s (ils font le LCP) :
+   la signature de l’ouverture, c’est la goutte et le verre, qui gardent leur temps. */
+.anime .ouverture__titre span { clip-path: inset(100% 0 -20% 0); transform: translateY(18px); animation: bm-verser 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anime .ouverture__titre span:nth-child(1) { animation-delay: 0s; }
+.anime .ouverture__titre span:nth-child(2) { animation-delay: 0.06s; }
+.anime .ouverture__titre span:nth-child(3) { animation-delay: 0.12s; }
+.anime .ouverture__suite { opacity: 0; transform: translateY(10px); animation: bm-lever 0.45s ease-out 0.15s both; }
 
-.bm-vague { animation: bm-vague 3.2s linear infinite; }
+/* La vague ondule une fois et se pose, avant 5 s (WCAG 2.2.2 : un mouvement qui part seul s’arrête seul) : une
+   longueur d’onde entière (140 px), qui ralentit jusqu’à l’arrêt ; sa dernière image est la première, celle du verre
+   immobile du logo. */
+.bm-vague { animation: bm-vague 4.8s cubic-bezier(0.3, 0.45, 0.45, 1) 1; }
 .bm-goutte-chute, .bm-onde { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -520,10 +659,22 @@ a:hover { color: var(--goutte); }
   margin: 0 auto;
 }
 .film__video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.film__son {
+/* Les boutons du film, en bas à droite du cadre : « Pause » puis le son (main.js). Hors des boutons, les clics passent
+   au film (et au lecteur classique, sans script). */
+.film__commandes {
   position: absolute;
   right: 14px;
   bottom: 14px;
+  left: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+.film__commandes[hidden] { display: none; }
+.film__bouton {
+  pointer-events: auto;
   min-height: 44px;
   padding: 10px 18px;
   border-radius: 999px;
@@ -537,18 +688,33 @@ a:hover { color: var(--goutte); }
   font-size: 0.9375rem;
   cursor: pointer;
 }
-.film__son[aria-pressed="true"] { background: var(--ambre); color: var(--nuit); border-color: var(--ambre); }
-.film__son:focus-visible { outline: 2px solid var(--ambre); outline-offset: 3px; }
+.film__bouton[hidden] { display: none; }
+/* Le texte du film, replié sous lui. */
+.film__note { max-width: 46rem; margin: 12px 0 0; color: var(--texte-doux); font-size: 0.9375rem; }
+.film__texte { max-width: 46rem; margin-top: 4px; }
+.film__texte summary { padding: 10px 0; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 600; cursor: pointer; }
+.film__texte summary:hover { color: var(--ambre); }
+.film__texte ol { margin: 4px 0 8px; padding-left: 1.4em; color: var(--texte-doux); font-size: 0.9375rem; }
+.film__texte li { margin: 6px 0; }
+.film__son--avec-son { background: var(--ambre); color: var(--nuit); border-color: var(--ambre); }
+.film__bouton:focus-visible { outline: 2px solid var(--ambre); outline-offset: 3px; }
 
 /* ---------- Navigation de l'en-tête ---------- */
 
-.entete__nav { display: flex; align-items: center; gap: 18px; }
+.entete__nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; }
 .entete__lien[aria-current="page"] { color: var(--ambre); }
 @media (max-width: 400px) {
-  .entete__logo { width: 116px; }
-  .entete__nav { gap: 14px; }
+  .entete__logo { width: 120px; }
+  .entete__nav { column-gap: 14px; }
 }
-@media (max-width: 359px) { .entete__lien--bars { display: none; } }
+/* « Pour les bars » est l’entrée des patrons : il reste visible jusqu’à 320 px, avec le logo à 120 px. Les écarts et le
+   texte des liens se resserrent (120 + 4 + 65 + 4 + 92 px tiennent dans les 288 px d’un écran de 320) ; les liens
+   gardent 44 px de haut. */
+@media (max-width: 359px) {
+  .entete { column-gap: 4px; }
+  .entete__nav { column-gap: 4px; }
+  .entete__lien { font-size: 0.875rem; }
+}
 
 /* ---------- La boutique sur l'accueil ---------- */
 
@@ -563,7 +729,8 @@ a:hover { color: var(--goutte); }
 .boutique-produit__ajouter,
 .boutique-barre__bouton,
 .panier__envoyer,
-.tablee__bouton {
+.tablee__bouton,
+.capsule {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -583,8 +750,12 @@ a:hover { color: var(--goutte); }
 .boutique-produit__ajouter:hover,
 .boutique-barre__bouton:hover,
 .panier__envoyer:hover,
-.tablee__bouton:hover { background: #FFC163; color: var(--nuit); }
+.tablee__bouton:hover,
+.capsule:hover { background: #FFC163; color: var(--nuit); }
 .panier__envoyer[disabled] { opacity: 0.55; cursor: not-allowed; }
+/* La sélection pendant l’envoi : le bouton garde le focus (aria-disabled, boutique.js) et paraît en attente. */
+.panier .panier__envoyer[aria-disabled="true"],
+.panier .panier__envoyer[aria-disabled="true"]:hover { background: var(--ambre); opacity: 0.55; cursor: progress; }
 
 /* ---------- La boutique ---------- */
 
@@ -637,6 +808,11 @@ a:hover { color: var(--goutte); }
 .boutique-grille { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
 @media (min-width: 640px) { .boutique-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1000px) { .boutique-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Tant que boutique.js n’a pas dessiné la collection, sa grille garde la hauteur de l’écran, sans dépasser 87,5 rem
+   (1 400 px au réglage normal ; la collection finie mesure plus : 1 480 px à 1 000 px de large, 4 445 à 360) : les
+   questions sont déjà sous l’écran et ne sautent pas quand les pièces arrivent. Sans JavaScript, la tête de
+   boutique.html annule cette réserve. */
+.boutique-grille:empty { min-height: min(100vh, 87.5rem); }
 
 .boutique-produit {
   display: flex;
@@ -672,7 +848,7 @@ a:hover { color: var(--goutte); }
 .boutique-produit__prix span { margin-left: 6px; color: var(--texte-discret); font-size: 0.875rem; font-weight: 500; }
 .boutique-produit__ajouter { margin-top: auto; width: 100%; }
 .boutique-produit__retour { min-height: 1.4em; margin: -2px 0 0; color: var(--goutte); font-size: 0.9375rem; }
-.boutique-produit__retour--erreur { color: #FF9C8A; }
+.boutique-produit__retour--erreur { color: var(--erreur); }
 
 .boutique-choix { margin: 0; padding: 0; border: 0; min-width: 0; }
 .boutique-choix legend { margin-bottom: 8px; padding: 0; color: var(--texte-discret); font-size: 0.875rem; }
@@ -695,17 +871,27 @@ a:hover { color: var(--goutte); }
 .boutique-puce input:checked + span { border-color: var(--ambre); background: rgba(255, 177, 61, 0.12); color: var(--texte); }
 .boutique-puce input:focus-visible + span { outline: 2px solid var(--ambre); outline-offset: 2px; }
 .boutique-pastille { width: 16px; height: 16px; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; }
+/* En couleurs forcées (contraste élevé de Windows), le fond ambré de la puce choisie et la teinte des pastilles
+   s’effacent : la puce choisie prend un bord Highlight plus épais (même taille : le bord gagne ce que le retrait perd),
+   et chaque pastille garde sa teinte, cernée d’un bord de la couleur du texte. */
+@media (forced-colors: active) {
+  .boutique-puce input:checked + span { padding: 0 12px; border: 3px solid Highlight; }
+  .boutique-pastille { forced-color-adjust: none; border-color: CanvasText; }
+}
 
 .boutique-sans-js { color: var(--texte-doux); }
 
 .boutique-questions { padding-top: 64px; padding-bottom: 48px; border-top: 1px solid var(--trait); }
-.boutique-questions details { max-width: 46rem; padding: 18px 0; border-bottom: 1px solid var(--trait); }
-.boutique-questions summary { cursor: pointer; font-size: 1.125rem; font-weight: 700; }
+.boutique-questions details { max-width: 46rem; padding: 10px 0; border-bottom: 1px solid var(--trait); }
+.boutique-questions summary { padding: 8px 0; cursor: pointer; font-size: 1.125rem; font-weight: 700; }
 .boutique-questions summary:hover { color: var(--ambre); }
-.boutique-questions details p { margin: 12px 0 0; color: var(--texte-doux); }
+.boutique-questions details p { margin: 4px 0 8px; color: var(--texte-doux); }
 
 .boutique-mention { padding-bottom: 56px; color: var(--texte-discret); font-size: 0.9375rem; }
-body.avec-barre { padding-bottom: 88px; }
+/* La barre de la sélection, fixée en bas, ne cache ni la fin de la page ni ce qui a le focus au clavier (WCAG 2.4.11) :
+   la page garde dessous la hauteur de la barre, texte agrandi compris, et le défilement du clavier s’arrête au-dessus. */
+body.avec-barre { padding-bottom: calc(4rem + 48px); }
+html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 
 .boutique-barre {
   position: fixed;
@@ -714,6 +900,7 @@ body.avec-barre { padding-bottom: 88px; }
   left: 0;
   z-index: 20;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -724,13 +911,16 @@ body.avec-barre { padding-bottom: 88px; }
   backdrop-filter: blur(16px);
 }
 .boutique-barre[hidden] { display: none; }
-.boutique-barre__texte { margin: 0; font-size: 0.9375rem; font-weight: 600; }
-.boutique-barre__bouton { min-height: 48px; padding: 0 20px; white-space: nowrap; }
+.boutique-barre__texte { flex: 1 1 8rem; min-width: 0; margin: 0; font-size: 0.9375rem; font-weight: 600; }
+.boutique-barre__bouton { min-height: 48px; max-width: 100%; padding: 0 20px; text-align: center; }
 
-/* ---------- Le panneau de réservation ---------- */
+/* ---------- Le panneau de la sélection ---------- */
 
 .panier {
   width: min(560px, calc(100% - 24px));
+  /* Le navigateur limite une fenêtre modale à 100 % moins 2 em : à 200 % de texte sur 320 px, elle perdait 50 px et
+     « Ta sélection » se coupait au milieu du mot. Sa largeur ne dépend que de l’écran. */
+  max-width: calc(100% - 24px);
   max-height: min(90vh, 780px);
   margin: auto;
   padding: 0;
@@ -743,8 +933,13 @@ body.avec-barre { padding-bottom: 88px; }
 .panier::backdrop { background: rgba(0, 0, 0, 0.62); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 
 .panier__entete { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 20px 4px; }
-.panier__entete h2 { margin: 0; font-size: 1.75rem; font-weight: 800; font-stretch: 88%; }
+/* Le titre grandit avec le texte (en rem seulement : une taille en vw ne suivrait pas le réglage, WCAG F94) ; sur un
+   téléphone il part de 22 px, pour tenir à côté du bouton de fermeture même à 200 % sur 320 px. Les lignes de la
+   sélection passent à la ligne au lieu de se couper. */
+.panier__entete h2 { min-width: 0; margin: 0; font-size: 1.375rem; font-weight: 800; font-stretch: 88%; line-height: 1.1; overflow-wrap: anywhere; }
+@media (min-width: 480px) { .panier__entete h2 { font-size: 1.75rem; } }
 .panier__fermer {
+  flex: none;
   width: 44px;
   height: 44px;
   border: 1px solid var(--trait);
@@ -759,13 +954,14 @@ body.avec-barre { padding-bottom: 88px; }
 .panier__corps { overflow-y: auto; padding: 4px 20px 24px; }
 
 .panier__liste { margin: 0; padding: 0; list-style: none; }
-.panier__ligne { display: flex; justify-content: space-between; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--trait); }
+.panier__ligne { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--trait); }
+.panier__ligne > div:first-child { flex: 1 1 9rem; min-width: 0; }
 .panier__nom { margin: 0; font-weight: 700; }
 .panier__nom span { color: var(--texte-discret); font-weight: 500; }
 .panier__detail { margin: 2px 0 0; color: var(--texte-doux); font-size: 0.9375rem; }
 .panier__retirer {
-  margin-top: 6px;
-  padding: 6px 0;
+  min-height: 44px;
+  padding: 0 2px;
   border: 0;
   background: none;
   color: var(--texte-discret);
@@ -774,7 +970,7 @@ body.avec-barre { padding-bottom: 88px; }
   text-decoration: underline;
   cursor: pointer;
 }
-.panier__droite { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.panier__droite { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: auto; }
 .panier__quantite { display: inline-flex; align-items: center; gap: 4px; }
 .panier__quantite button {
   width: 40px;
@@ -791,7 +987,7 @@ body.avec-barre { padding-bottom: 88px; }
 .panier__prix { margin: 0; font-weight: 700; }
 .panier__vide { padding: 18px 0; color: var(--texte-doux); }
 
-.panier__total { display: flex; justify-content: space-between; margin: 16px 0 6px; font-size: 1.0625rem; }
+.panier__total { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 12px; margin: 16px 0 6px; font-size: 1.0625rem; }
 .panier__total span { color: var(--texte-doux); }
 
 .panier__etiquette { display: block; margin: 16px 0 6px; font-size: 0.9375rem; font-weight: 600; }
@@ -800,9 +996,10 @@ body.avec-barre { padding-bottom: 88px; }
   width: 100%;
   height: 52px;
   padding: 0 16px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--champ-bord);
   border-radius: 14px;
-  background: var(--nuit);
+  /* Le fond de nuit s’arrête au bord : le bord se pose sur le panneau, c’est contre lui qu’il doit se voir. */
+  background: var(--nuit) padding-box;
   color: var(--texte);
   font: inherit;
 }
@@ -810,20 +1007,49 @@ body.avec-barre { padding-bottom: 88px; }
 .panier__accord { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; color: var(--texte-doux); font-size: 0.9375rem; cursor: pointer; }
 .panier__accord input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ambre); }
 .panier__envoyer { width: 100%; min-height: 56px; }
-.panier__retour { margin: 12px 0 0; color: var(--goutte); font-size: 0.9375rem; }
+/* Le message, juste au-dessus du bouton d’envoi (boutique.js fait défiler la fenêtre jusqu’à lui). */
+.panier__retour { margin: 0 0 14px; color: var(--goutte); font-size: 0.9375rem; }
 .panier__retour:empty { display: none; }
-.panier__retour--erreur { color: #FF9C8A; }
+/* Pendant l’envoi, la zone ne contient que « Envoi… », caché (boutique.js) : elle ne prend pas de place. */
+.panier__retour--envoi { margin: 0; }
+.panier__retour--erreur { color: var(--erreur); }
 .panier__note { margin: 12px 0 0; color: var(--texte-discret); font-size: 0.875rem; }
 .panier__note a { color: var(--texte-doux); }
 .panier__merci h3 { margin: 12px 0 8px; font-size: 1.75rem; font-weight: 800; }
 .panier__merci h3:focus { outline: none; }
 .panier__merci p { margin: 0 0 24px; color: var(--texte-doux); }
+.panier__merci strong { color: var(--texte); font-weight: 700; overflow-wrap: anywhere; }
+.panier__corriger {
+  display: block;
+  min-height: 44px;
+  margin: 8px auto 0;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--texte);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 177, 61, 0.7);
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+.panier__corriger:hover { color: var(--ambre); }
 
 /* ---------- Le lien d’une tablée (/t/‹code›, servi par 404.html) ---------- */
 
 .tablee { display: none; }
 .est-tablee .perdu__introuvable { display: none; }
 .est-tablee .tablee { display: block; }
+
+/* L’invitation arrive après le premier affichage : rien de ce qu’on voit ne doit sauter. La phrase d’état garde sa
+   ligne tant que tablee.js ne l’a pas écrite (après, data-tablee est posé : une phrase vide ne laisse plus de ligne
+   blanche), et la page garde au moins la hauteur de l’écran : le pied de page reste sous le premier écran, quoi qu’il
+   arrive au-dessus (le bloc de l’appli qui part en attente, la carte qui arrive). */
+.est-tablee .perdu { min-height: 100vh; }
+@supports (height: 100svh) { .est-tablee .perdu { min-height: 100svh; } }
+.est-tablee:not([data-tablee]) .tablee .tablee__etat:empty { display: block; min-height: 1lh; }
 
 .tablee { max-width: 34rem; margin: 0 auto; }
 .tablee .tablee__sur {
@@ -863,22 +1089,46 @@ body.avec-barre { padding-bottom: 88px; }
 }
 .tablee__carte dd { margin: 4px 0 0; font-size: 1.125rem; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
 .tablee__carte dd span { display: block; margin-top: 2px; color: var(--texte-doux); font-size: 1rem; font-weight: 500; }
+/* « Voir sur la carte », sous l’adresse du bar : une cible tactile entière. */
+.tablee__carte .tablee__plan { display: inline-flex; align-items: center; min-height: 44px; font-size: 1rem; font-weight: 600; }
 
-.tablee .tablee__appel {
-  margin: 36px auto 0;
-  max-width: none;
+.tablee .tablee__definition { margin: 12px auto 0; max-width: 28rem; color: var(--texte-discret); font-size: 0.9375rem; }
+.tablee .tablee__definition[hidden] { display: none; }
+
+.tablee__reessayer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 20px;
+  padding: 0 24px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  background: var(--verre);
   color: var(--texte);
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  font-weight: 800;
-  font-stretch: 88%;
-  line-height: 1.1;
-  text-wrap: balance;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
+.tablee__reessayer:hover { background: var(--verre-fort); }
+.tablee__reessayer[hidden] { display: none; }
 
-.tablee__appli { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--trait); text-align: left; }
-.tablee__appli h2 { margin: 0 0 10px; font-size: 1.375rem; line-height: 1.25; }
-.tablee__appli ul { margin: 0; padding-left: 1.2em; color: var(--texte-doux); }
-.tablee__appli li { margin: 6px 0; }
-.tablee__appli strong { color: var(--texte); font-weight: 600; }
-.tablee__bouton { margin-top: 22px; }
-.tablee .tablee__note { margin: 20px 0 0; max-width: none; color: var(--texte-discret); font-size: 0.9375rem; }
+/* « Tu n’as pas l’appli ? » juste sous la carte : la réponse que cherche un fan venu de WhatsApp. */
+.tablee__venir {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--verre-bord);
+  border-radius: 20px;
+  background: var(--verre);
+  box-shadow: var(--verre-reflet);
+  text-align: left;
+}
+.tablee__venir h2 { margin: 0; font-size: 1.25rem; line-height: 1.25; }
+.tablee .tablee__venir p { margin: 6px 0 0; max-width: none; color: var(--texte-doux); }
+
+.tablee__appli { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--trait); text-align: left; }
+.tablee__appli h2 { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.25; }
+.tablee .tablee__appli p { margin: 0; max-width: none; color: var(--texte-doux); }
+.tablee__bouton { margin-top: 20px; }
+/* Un lien mort ou une panne : seulement le bouton, sous la phrase d’état. */
+.tablee__appli:has(> [hidden]) { margin-top: 12px; padding-top: 0; border-top: 0; text-align: center; }

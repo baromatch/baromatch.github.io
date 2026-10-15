@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { racine } from './outils/environnement.mjs';
-import { PAGES } from './outils/pages.mjs';
+import { PAGES, pagesLighthouse } from './outils/pages.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 
 const executer = promisify(execFile);
@@ -50,6 +50,39 @@ test.describe('le serveur local', () => {
     } finally {
       arreter();
     }
+  });
+});
+
+// Les captures : un Chromium qui ne se lance pas arrête la commande, et le serveur local avec elle (son port est libre
+// juste après), au lieu de le laisser tourner seul. Sous Linux et macOS, seul le correctif l’arrête (sans lui, ce test
+// échoue : le port reste pris) ; sous Windows, le système arrête aussi le serveur avec la commande.
+test('les captures : Chromium introuvable, la commande échoue et le serveur local s’arrête', async () => {
+  const port = await portLibre();
+  const dossier = mkdtempSync(path.join(tmpdir(), 'captures-'));
+  const OUTIL = path.join(racine, 'tests', 'outils', 'captures.mjs');
+  try {
+    const sortie = await executer(process.execPath, [OUTIL, dossier, String(port)], {
+      cwd: tmpdir(), env: { ...process.env, CHROME_PATH: path.join(dossier, 'pas-de-chromium') },
+    }).then(() => ({ code: 0 }), (erreur) => ({ code: erreur.code }));
+    expect(sortie.code).not.toBe(0);
+    // Le port se reprend : plus rien n’y écoute (sans le correctif, le serveur local y répondait encore).
+    const { arreter } = await demarrerServeur(port);
+    arreter();
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+  }
+});
+
+test.describe('les pages que Lighthouse mesure', () => {
+  test('chaque page de la liste a son fichier : toutes sont mesurées, sauf lighthouse: false', () => {
+    expect(pagesLighthouse().map((page) => page.nom)).toEqual(PAGES.filter((page) => page.lighthouse !== false).map((page) => page.nom));
+  });
+
+  test('une page sans fichier : la commande échoue tout de suite en la nommant, au lieu de la sauter', () => {
+    const pages = [{ chemin: '/', nom: 'accueil' }, { chemin: '/pour-les-bars.html', nom: 'pour-les-bars' }];
+    const existe = (fichier) => !fichier.endsWith('pour-les-bars.html');
+    expect(() => pagesLighthouse(pages, existe)).toThrow(/pour-les-bars.html/);
+    expect(pagesLighthouse(pages, () => true)).toHaveLength(2);
   });
 });
 

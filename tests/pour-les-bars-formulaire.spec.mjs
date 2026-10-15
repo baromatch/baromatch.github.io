@@ -996,7 +996,9 @@ test.describe('les réponses du serveur', () => {
     const copier = page.locator('#demande-courriel-copier');
     await expect(copier).toHaveText(TEXTES.copier);
     await copier.click();
-    await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(aCopier(LIGNES_COMPLETES));
+    // Le presse-papiers de Windows rend les fins de ligne en CRLF : on compare le texte, pas la convention du système.
+    await expect.poll(() => page.evaluate(() => navigator.clipboard.readText().then((texte) => texte.replace(/\r\n/g, '\n'))))
+      .toBe(aCopier(LIGNES_COMPLETES));
     await expect(copier).toHaveText(TEXTES.copie);
     await expect(copier.locator('svg')).toHaveCount(1);
     await page.clock.runFor(1900);

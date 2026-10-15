@@ -16,8 +16,11 @@ const LARGEURS = [360, 1280];
 
 mkdirSync(sortie, { recursive: true });
 const { adresse, arreter } = await demarrerServeur(port);
-const navigateur = await chromium.launch({ executablePath: CHROMIUM });
+// Le navigateur se lance dans le try : s’il ne démarre pas (Chromium absent ou cassé), le finally arrête quand même le
+// serveur local, qui sinon resterait seul sur son port après la fin de la commande.
+let navigateur = null;
 try {
+  navigateur = await chromium.launch({ executablePath: CHROMIUM });
   for (const largeur of LARGEURS) {
     const contexte = await navigateur.newContext({ viewport: { width: largeur, height: 800 }, deviceScaleFactor: 1, reducedMotion: 'reduce', locale: 'fr-FR' });
     const onglet = await contexte.newPage();
@@ -35,6 +38,6 @@ try {
     await contexte.close();
   }
 } finally {
-  await navigateur.close();
+  await navigateur?.close();
   arreter();
 }

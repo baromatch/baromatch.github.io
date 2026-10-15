@@ -4,13 +4,14 @@
 // de sortie, dans lighthouse/ (à la racine avec npm run lighthouse), que git ignore : les mesures restent hors du dépôt.
 // --resume-seul refait le résumé à partir des JSON déjà présents.
 // La barre : la commande échoue (code 1) si une note est sous 95, sauf le SEO de la page 404, noindex exprès ; elle
-// échoue aussi si une page n’a pas de mesure, au lieu de la laisser hors du résumé.
+// échoue aussi si une page n’a pas de mesure, au lieu de la laisser hors du résumé, et avant toute mesure si une page de
+// la liste n’a pas de fichier.
 import { execFile } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { CHROMIUM, racine } from './environnement.mjs';
-import { fichierDe, PAGES } from './pages.mjs';
+import { pagesLighthouse } from './pages.mjs';
 import { demarrerServeur } from './serveur.mjs';
 
 const executer = promisify(execFile);
@@ -24,12 +25,14 @@ const APPAREILS = [
   { nom: 'mobile', options: [] },
   { nom: 'ordinateur', options: ['--preset=desktop'] },
 ];
-const binaire = path.join(racine, 'node_modules', '.bin', 'lighthouse');
+// Lighthouse se lance par Node et son script (comme le serveur local) : la même commande sous Windows.
+const binaire = path.join(racine, 'node_modules', 'lighthouse', 'cli', 'index.js');
 
 const jsonDe = (page, appareil) => path.join(sortie, `${page.nom}.${appareil.nom}.json`);
 
 const lancer = async (adresse, page, appareil) => {
-  await executer(binaire, [
+  await executer(process.execPath, [
+    binaire,
     `${adresse}${page.chemin}`,
     '--quiet',
     '--output=json',
@@ -64,7 +67,9 @@ const sousLeSeuil = (resultats) => resultats.flatMap((r) => CATEGORIES
   .filter((c) => r.notes[c] < SEUIL && !(c === 'seo' && !r.indexable))
   .map((c) => `${r.page} · ${r.appareil} · ${c} ${r.notes[c]}`));
 
-const PAGES_MESUREES = PAGES.filter((page) => page.lighthouse !== false && existsSync(fichierDe(page.chemin)));
+// Chaque page mesurée a son fichier : une page de la liste dont le fichier manque fait échouer la commande tout de
+// suite (pagesLighthouse), au lieu d’être retirée en silence de la mesure et du résumé.
+const PAGES_MESUREES = pagesLighthouse();
 
 const mesurerTout = async () => {
   const { adresse, arreter } = await demarrerServeur(port, 600);
@@ -88,7 +93,6 @@ const ecrireLeResume = (resultats) => {
 };
 
 const principal = async () => {
-  if (PAGES_MESUREES.length === 0) throw new Error(`Aucune page à mesurer : aucun fichier des pages trouvé sous ${racine}`);
   mkdirSync(sortie, { recursive: true });
   if (!process.argv.includes('--resume-seul')) await mesurerTout();
   const manquantes = PAGES_MESUREES.flatMap((page) => APPAREILS.filter((appareil) => !existsSync(jsonDe(page, appareil)))

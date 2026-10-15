@@ -1,0 +1,23 @@
+{
+  "_lisezMoi": "La carte d’identité de Baromatch, la même partout : le nom, la phrase, les logos, les profils et l’état de l’appli. Pour ajouter un profil, colle son adresse complète entre les guillemets (par exemple \"https://www.instagram.com/baromatch\"). Un profil vide n’est écrit nulle part. Quand l’appli ouvre au public, mets \"ouverte\": true et les liens des magasins : chaque page dira alors « Réserve ta place dans l’appli ».",
+  "nom": "Baromatch",
+  "slogan": "Ton match. Ton bar. Ce soir.",
+  "uneLigne": "Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.",
+  "description": "Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. En test sur Android, à Paris.",
+  "site": "https://baromatch.fr/",
+  "contact": "contact@baromatch.fr",
+  "profils": {
+    "x": "https://x.com/baromatchapp",
+    "instagram": "",
+    "tiktok": "",
+    "facebook": "",
+    "linkedin": "",
+    "youtube": "",
+    "threads": ""
+  },
+  "appli": {
+    "ouverte": false,
+    "android": "",
+    "iphone": ""
+  }
+}

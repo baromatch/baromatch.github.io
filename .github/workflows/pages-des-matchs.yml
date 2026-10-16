@@ -55,6 +55,9 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          # Le jeton n’est pas gardé dans la configuration de git : le générateur, qui lit des données venues de dehors,
+          # tourne sans lui. Seule l’étape qui envoie les pages le reçoit, pour son seul envoi.
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -68,12 +71,20 @@ jobs:
 
       - name: Enregistrer et envoyer les pages qui ont changé
         id: envoi
+        env:
+          JETON_GITHUB: ${{ github.token }}
         run: |
           set -eu
           option=""
           if [ "$ACCEPTER" = "true" ]; then option="--accepter-les-suppressions"; fi
           git config user.name "Pages des matchs"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # L’envoi s’authentifie le temps d’une commande, comme actions/checkout le fait lui-même (un en-tête http), sans
+          # rien écrire dans la configuration de git ; le dépôt est public : le reste (pull, fetch) se lit sans jeton.
+          envoyer() {
+            entete="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$JETON_GITHUB" | base64 -w0)"
+            git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main
+          }
           # Seulement les chemins du générateur, même si un autre fichier avait changé.
           enregistrer() {
             for chemin in matchs regarder-le-match bar sitemap.xml; do
@@ -92,7 +103,7 @@ jobs:
             exit 0
           fi
           for essai in 1 2 3; do
-            if git push -q origin HEAD:main; then
+            if envoyer; then
               echo "envoye=oui" >> "$GITHUB_OUTPUT"
               exit 0
             fi

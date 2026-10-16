@@ -1002,6 +1002,15 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     expect(action).toContain('for chemin in matchs regarder-le-match bar sitemap.xml; do');
     expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar)/|^sitemap\\.xml$'");
     expect(action).toContain('git pull -q --rebase origin main');
+    // Le jeton n’est pas gardé dans la configuration de git (le générateur tourne sans lui) : seule l’étape qui envoie
+    // le reçoit pour git, le temps de l’envoi, comme actions/checkout le fait lui-même ; la demande de publication à
+    // Pages le reçoit aussi (elle appelle l’API de GitHub, pas git).
+    expect(action).toMatch(/ {6}- uses: actions\/checkout@v7\n {8}with:\n {10}ref: main\n {10}fetch-depth: 0\n(?: {10}#.*\n)* {10}persist-credentials: false\n/);
+    const etapes = action.split('\n      - ');
+    const avecLeJeton = etapes.filter((etape) => etape.includes('github.token')).map((etape) => etape.split('\n')[0]);
+    expect(avecLeJeton).toEqual(['name: Enregistrer et envoyer les pages qui ont changé', 'name: Demander la publication à GitHub Pages']);
+    expect(action).toContain('git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main');
+    expect(action).not.toMatch(/git push|remote set-url/);
     // La publication demandée après l’envoi ; IndexNow n’arrête jamais l’Action.
     expect(action).toMatch(/node generateur\/publier\.mjs pages\n/);
     expect(action).toMatch(/continue-on-error: true\n        run: node generateur\/publier\.mjs indexnow "\$RUNNER_TEMP\/changees\.txt"\n/);

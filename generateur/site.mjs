@@ -15,7 +15,7 @@ import { chargerLeVocabulaire, validerLaPage } from './validateur.mjs';
 export const construireEnMemoire = async ({
   source, maintenant = Date.now(), racine = RACINE, contenu = chargerLeContenu(racine), anciens, adresse, brut,
 } = {}) => {
-  const donnees = preparer(brut ?? await lireLaSource(source, adresse ? { adresse } : {}), { maintenant, ...contenu });
+  const donnees = preparer(brut ?? await lireLaSource(source, adresse ? { adresse } : {}), { maintenant, ...contenu, adresses: anciens?.adresses });
   const cadre = lireLeCadre(racine);
   const avecPresse = existsSync(path.join(racine, 'presse.html'));
   const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens });

@@ -68,11 +68,17 @@ export const anciensDe = (etat) => {
   return {
     matchs: entrees.filter((p) => p.type === 'match' && p.memoire).map((p) => ({ ...p.memoire, debut: Date.parse(p.memoire.debut) })),
     bars: entrees.filter((p) => p.type === 'bar' && p.memoire).map((p) => ({ ...p.memoire, slug: p.cle })),
+    // Les adresses de page déjà données à un bar (les anciens états ne les avaient que par leurs pages).
+    adresses: {
+      ...Object.fromEntries(entrees.filter((p) => p.type === 'bar' && p.memoire?.id).map((p) => [p.cle, p.memoire.id])),
+      ...(etat.adresses ?? {}),
+    },
   };
 };
 
 // gardees : les chemins dont la version précédente reste (une page refusée par le contrôle), repris tels quels.
-export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = []) => {
+// adresses : les adresses de page données aux bars ({ adresse: identifiant }), gardées d’un passage à l’autre.
+export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adresses = {}) => {
   const pages = {};
   const tous = [...fichiers, ...gardees.map((chemin) => ({ chemin, garde: true }))];
   for (const f of tous.sort((a, b) => a.chemin.localeCompare(b.chemin))) {
@@ -93,8 +99,9 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = []) => {
     };
   }
   return {
-    _lisezMoi: 'L’état du générateur des pages des matchs : il l’écrit à chaque passage, ne le modifie pas à la main. Pour chaque fichier, sa sorte, son match ou son bar, l’empreinte de son contenu, la date de son dernier vrai changement (celle du plan du site) et s’il est indexable.',
+    _lisezMoi: 'L’état du générateur des pages des matchs : il l’écrit à chaque passage, ne le modifie pas à la main. Pour chaque fichier, sa sorte, son match ou son bar, l’empreinte de son contenu, la date de son dernier vrai changement (celle du plan du site) et s’il est indexable ; et l’adresse de page donnée à chaque bar, qu’il garde et qu’aucun autre ne reprend.',
     pages,
+    adresses,
   };
 };
 

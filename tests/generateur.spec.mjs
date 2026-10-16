@@ -478,6 +478,34 @@ test.describe('d’un passage à l’autre', () => {
     return `scenario:${fichier}`;
   };
 
+  test('l’adresse de page d’un bar est stable : gardée s’il change de nom, jamais redonnée, « -2 » exclu', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-21T08:00:00Z');
+    expect(etatDe(sortie).adresses['le-zinc-des-amis-paris-11']).toBe('b-zinc');
+    // Le Zinc change de nom ; un autre bar prend son ancien nom, à la même adresse.
+    const source = scenarioSans(sortie, (brut) => ({
+      ...brut,
+      bars: [...brut.bars.map((b) => (b.id === 'b-zinc' ? { ...b, name: 'Le Zinc Rénové' } : b)),
+        { id: 'b-zzz', name: 'Le Zinc des Amis', address: '12 Rue Oberkampf, 75011 Paris', isActive: true }],
+    }));
+    const resultat = await passer(sortie, '2026-10-21T09:00:00Z', { source });
+    const nomDe = (chemin) => resultat.fichiers.find((f) => f.chemin === chemin)?.bar?.nom;
+    expect(nomDe('/bar/le-zinc-des-amis-paris-11/')).toBe('Le Zinc Rénové');
+    expect(nomDe('/bar/le-zinc-des-amis-paris-11-2/')).toBe('Le Zinc des Amis');
+    expect(resultat.fichiers.some((f) => f.chemin.startsWith('/bar/le-zinc-renove'))).toBe(false);
+    expect(etatDe(sortie).adresses).toMatchObject({ 'le-zinc-des-amis-paris-11': 'b-zinc', 'le-zinc-des-amis-paris-11-2': 'b-zzz' });
+    // L’exclusion par l’adresse en « -2 » retire ce bar-là, et seulement lui.
+    await passer(sortie, '2026-10-21T10:00:00Z', { source, contenu: { ...contenu, exclus: ['le-zinc-des-amis-paris-11-2'] } });
+    expect(existsSync(path.join(sortie, 'bar/le-zinc-des-amis-paris-11-2'))).toBe(false);
+    expect(lire(sortie, 'bar/le-zinc-des-amis-paris-11/index.html')).toContain('Le Zinc Rénové');
+    expect(etatDe(sortie).adresses['le-zinc-des-amis-paris-11-2']).toBeUndefined();
+    // Sans état, deux bars du même nom : le second prend « -2 », et l’exclure par cette adresse garde le premier.
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    brut.bars.push({ id: 'b-zzz', name: 'Le Zinc des Amis', address: '14 Rue Oberkampf, 75011 Paris', isActive: true });
+    const deux = preparer(brut, { maintenant: VENDREDI, ...contenu, exclus: ['le-zinc-des-amis-paris-11-2'] });
+    expect(deux.bars.filter((b) => b.nom === 'Le Zinc des Amis').map((b) => [b.id, b.slug])).toEqual([['b-zinc', 'le-zinc-des-amis-paris-11']]);
+  });
+
   test('les bornes : un nom de club ou de bar très long est coupé proprement, et « onair=1 » dans un nom n’est pas un attribut', async () => {
     const sortie = dossierVide();
     const longBar = 'Le Grand Comptoir Lumineux des Supporters du Faubourg Saint-Antoine, et de Bercy';

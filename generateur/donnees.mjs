@@ -180,8 +180,9 @@ const atoutsDe = (features) => {
 // ---------- Tout ensemble ----------
 
 // { matches, bars, matchNights } → les données des pages. contenu : clubs, competitions, villes, exclus (la liste
-// d’exclusion, adresses de page ou identifiants), forcer (les identifiants des bars réintégrés à la main).
-export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus = [], forcer = [] }) => {
+// d’exclusion, adresses de page ou identifiants), forcer (les identifiants des bars réintégrés à la main), adresses
+// (les adresses de page déjà données, { adresse: identifiant du bar }, gardées dans l’état).
+export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus = [], forcer = [], adresses = {} }) => {
   const avertissements = [];
   const index = indexerLesClubs(clubs);
   const listeExclus = new Set(exclus.map(String));
@@ -198,16 +199,31 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
   nommerLesMatchs(matchs);
   const matchDeLId = new Map(matchs.flatMap((match) => match.ids.map((id) => [id, match])));
 
-  // Les vrais bars, chacun avec sa ville, son arrondissement et son adresse de page.
+  // Les vrais bars, chacun avec sa ville, son arrondissement et son adresse de page. Une adresse de page est stable :
+  // un bar connu (par son identifiant) garde celle de l’état, même s’il change de nom ; une adresse déjà donnée n’est
+  // jamais redonnée à un autre bar (le second prend « -2 », « -3 »… dans l’ordre des identifiants). La liste
+  // d’exclusion se lit sur l’adresse finale (« le-zinc-des-amis-paris-11-2 » marche).
+  const prises = new Map(Object.entries(adresses).map(([adressePage, id]) => [adressePage, String(id)]));
+  const slugDeLId = new Map();
+  for (const [adressePage, id] of prises) if (!slugDeLId.has(id)) slugDeLId.set(id, adressePage);
+  const libre = (base, id) => {
+    for (let rang = 1; ; rang += 1) {
+      const candidat = rang === 1 ? base : `${base}-${rang}`;
+      if (!prises.has(candidat) || prises.get(candidat) === id) return candidat;
+    }
+  };
   const bars = [];
   const ecartes = [];
   for (const brutBar of [...brut.bars].sort((a, b) => String(a.id).localeCompare(String(b.id)))) {
+    const id = String(brutBar.id);
     const adresse = lireLAdresse(brutBar.address);
     const ville = adresse && villeDe(villes, adresse.codePostal, adresse.ville);
     const arrondissement = adresse && arrondissementDe(ville.cle, ville.nom, adresse.codePostal);
-    const slugPage = adresse && `${slug(brutBar.name)}-${arrondissement ? arrondissement.ancre : ville.cle}`;
+    const slugPage = adresse && (slugDeLId.get(id) ?? libre(`${slug(brutBar.name)}-${arrondissement ? arrondissement.ancre : ville.cle}`, id));
     const raison = raisonDEcarter(brutBar, listeExclus, forces) ?? (slugPage && listeExclus.has(slugPage) ? 'liste d’exclusion' : null)
       ?? (adresse ? null : 'adresse sans code postal ni ville');
+    // Un bar exclu garde son adresse le temps du passage : le suivant du même nom prend « -2 », comme l’exclusion le dit.
+    if (slugPage && (!raison || raison === 'liste d’exclusion')) prises.set(slugPage, id);
     if (raison) {
       ecartes.push({ id: String(brutBar.id), nom: brutBar.name, raison, slug: slugPage ?? null });
       if (raison.startsWith('adresse')) avertissements.push(`Bar « ${brutBar.name} » écarté : ${raison}`);
@@ -230,13 +246,9 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
       soirees: [],
     });
   }
-  // Deux bars à la même adresse de page : le second prend « -2 », dans l’ordre de leurs identifiants.
-  const slugsPris = new Map();
-  for (const bar of bars) {
-    const rang = (slugsPris.get(bar.slug) ?? 0) + 1;
-    slugsPris.set(bar.slug, rang);
-    if (rang > 1) bar.slug = `${bar.slug}-${rang}`;
-  }
+  // Les adresses données, à garder dans l’état (sans celles des bars exclus : leur nom en sort).
+  const adressesDonnees = Object.fromEntries([...prises].filter(([adressePage, id]) => !listeExclus.has(adressePage) && !listeExclus.has(id))
+    .sort(([a], [b]) => a.localeCompare(b)));
   const barDeLId = new Map(bars.map((bar) => [bar.id, bar]));
 
   // Les soirées annoncées par un vrai bar, chacune avec son match (réuni) et son offre telle que le bar l’a écrite.
@@ -257,7 +269,7 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
   for (const match of matchs) match.soirees.sort((a, b) => a.bar.nom.localeCompare(b.bar.nom, 'fr'));
 
   // recus : la taille des listes reçues, pour reconnaître une liste vide ou tronquée (construire.mjs).
-  return { maintenant, matchs, bars, soirees, ecartes, avertissements, recus: { bars: brut.bars.length, soirees: brut.matchNights.length } };
+  return { maintenant, matchs, bars, soirees, ecartes, avertissements, adresses: adressesDonnees, recus: { bars: brut.bars.length, soirees: brut.matchNights.length } };
 };
 
 // L’offre d’une soirée, telle que le bar l’a écrite : son titre, son prix s’il est donné, et la mention santé sauf si

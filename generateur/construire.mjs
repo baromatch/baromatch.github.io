@@ -85,7 +85,7 @@ export const construire = async ({
   }
 
   const aujourdhui = jourDeParis(maintenant);
-  const etat = nouvelEtat(precedent, fichiers, aujourdhui, [...gardees]);
+  const etat = nouvelEtat(precedent, fichiers, aujourdhui, [...gardees], site.donnees.adresses);
   const planActuel = existsSync(path.join(sortie, PLAN)) ? readFileSync(path.join(sortie, PLAN), 'utf8') : readFileSync(path.join(racine, PLAN), 'utf8');
   const plan = nouveauPlan(planActuel, etat);
 

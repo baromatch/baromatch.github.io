@@ -1,4 +1,5 @@
 {
-  "_lisezMoi": "Les bars qu’aucune page publique ne montre, même s’ils sont dans l’appli : un bar de test au nom ordinaire, un bar qui a demandé à ne pas apparaître. Écris entre guillemets l’adresse de sa page (par exemple \"le-zinc-des-amis-paris-11\") ou son identifiant dans l’appli. Un bar dont le nom ou l’adresse dit démo, test ou QA est déjà écarté sans être écrit ici.",
-  "bars": []
+  "_lisezMoi": "Les bars qu’aucune page publique ne montre, même s’ils sont dans l’appli : un bar de test au nom ordinaire, un bar qui a demandé à ne pas apparaître. Dans « bars », écris entre guillemets l’adresse de sa page (par exemple \"le-zinc-des-amis-paris-11\") ou son identifiant dans l’appli. Un bar dont le nom, l’adresse ou l’identifiant contient demo, demonstration, test, essai, qa, recette, staging, sandbox, fictif ou factice (même collé à un autre mot, sans accents ni capitales) est déjà écarté sans être écrit ici. Un vrai bar peut donc être écarté à tort (« Le Testament ») : pour le remettre sur le site, écris son identifiant dans l’appli dans « forcer ».",
+  "bars": [],
+  "forcer": []
 }

@@ -33,7 +33,16 @@
     { "id": "b-demo", "name": "Bar de démo Baromatch", "address": "Site QA - 99 Rue de Rivoli, 75001 Paris", "lat": 48.8611, "lng": 2.3358, "isActive": true, "features": null },
     { "id": "b-demo-lille", "name": "Bar DÉMO Lille", "address": "10 Rue de Béthune, 59000 Lille", "isActive": true, "features": null },
     { "id": "b-isdemo", "name": "Chez Lucette", "address": "18 Rue Ordener, 75018 Paris", "isActive": true, "isDemo": true, "features": null },
-    { "id": "b-inactif", "name": "Le Rideau Baissé", "address": "7 Rue de la Roquette, 75011 Paris", "isActive": false, "features": null }
+    { "id": "b-inactif", "name": "Le Rideau Baissé", "address": "7 Rue de la Roquette, 75011 Paris", "isActive": false, "features": null },
+    { "id": "b-x1", "name": "Bar de démonstration", "address": "21 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-x2", "name": "Bar d’essai Baromatch", "address": "22 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-x3", "name": "Bar Test1", "address": "23 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-x4", "name": "bar_test", "address": "24 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-x5", "name": "Demo2", "address": "25 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-x6", "name": "QA2 Bar", "address": "26 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-x7", "name": "TestBar", "address": "27 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-x8", "name": "Bar recette", "address": "28 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
+    { "id": "b-t1", "name": "Le Testament", "address": "29 Rue de Charonne, 75011 Paris", "isActive": true, "features": null }
   ],
   "matchNights": [
     { "id": "n-zinc-psg-ol", "status": "OPEN", "bar": { "id": "b-zinc" }, "match": { "id": "m-psg-ol" },
@@ -52,6 +61,7 @@
     { "id": "n-demo-lille", "status": "OPEN", "bar": { "id": "b-demo" }, "match": { "id": "m-lille-lens" }, "offer": null },
     { "id": "n-demo-lille-2", "status": "OPEN", "bar": { "id": "b-demo-lille" }, "match": { "id": "m-lille-lens" }, "offer": null },
     { "id": "n-isdemo-psg-ol", "status": "OPEN", "bar": { "id": "b-isdemo" }, "match": { "id": "m-psg-ol" }, "offer": null },
-    { "id": "n-inactif-psg-ol", "status": "OPEN", "bar": { "id": "b-inactif" }, "match": { "id": "m-psg-ol" }, "offer": null }
+    { "id": "n-inactif-psg-ol", "status": "OPEN", "bar": { "id": "b-inactif" }, "match": { "id": "m-psg-ol" }, "offer": null },
+    { "id": "n-x7-psg-ol", "status": "OPEN", "bar": { "id": "b-x7" }, "match": { "id": "m-psg-ol" }, "offer": null }
   ]
 }

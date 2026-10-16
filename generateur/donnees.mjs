@@ -15,8 +15,12 @@ export const ECART_DOUBLON_MS = 3 * HEURE_MS;
 const ATOUTS = ['screens', 'sound', 'standing', 'bothCamps', 'outdoor', 'food'];
 // Les soirées qu’un bar a vraiment annoncées (un brouillon ou une soirée annulée ne se montre pas).
 const SOIREES_ANNONCEES = new Set(['OPEN', 'CLOSED']);
-// Un bar de démonstration ou d’essai se reconnaît à son nom ou à son adresse, sans accents ni capitales.
-const MOTS_D_ESSAI = /\b(?:demos?|tests?|qa)\b/;
+// Un bar de démonstration ou d’essai se reconnaît à un de ces mots dans son nom, son adresse ou son identifiant, sans
+// accents ni capitales, même collé à un autre mot (« TestBar », « Demo2 », « bar_test ») ; « qa » seulement seul ou
+// collé à un chiffre ou à « _ » (« QA2 Bar »), pour garder « Aquarium ». Un vrai bar écarté à tort (« Le Testament »)
+// se réintègre par son identifiant dans la liste « forcer » de bars-exclus.json.
+const MOTS_D_ESSAI = /demo|test|essai|recette|staging|sandbox|fictif|factice|(?:^|[^a-z])qa(?:[^a-z]|$)/;
+export const RAISON_D_ESSAI = 'démo, test ou essai dans le nom, l’adresse ou l’identifiant';
 // Ce qu’aucune page ne dit, même si une offre de bar l’écrit (loi Evin, et aucun score).
 export const MOTS_INTERDITS = /happy[\s-]*hours?|tournées?|verres? offerts?|\bscores?\b/i;
 
@@ -142,10 +146,12 @@ export const villeDe = (villes, codePostal, nomEcrit) => {
 };
 
 // Pourquoi un bar n’est pas un vrai bar (null s’il en est un).
-export const raisonDEcarter = (bar, exclus) => {
+// forces : les identifiants des bars réintégrés à la main (liste « forcer » de bars-exclus.json), dont le nom ou
+// l’adresse ressemble à un bar d’essai sans en être un.
+export const raisonDEcarter = (bar, exclus, forces = new Set()) => {
   if (bar.isDemo === true) return 'bar de démonstration';
   if (bar.isActive === false) return 'bar inactif';
-  if (MOTS_D_ESSAI.test(pourComparer(bar.name)) || MOTS_D_ESSAI.test(pourComparer(bar.address))) return 'démo, test ou QA dans le nom ou l’adresse';
+  if (!forces.has(String(bar.id)) && [bar.name, bar.address, bar.id].some((texte) => MOTS_D_ESSAI.test(pourComparer(texte)))) return RAISON_D_ESSAI;
   if (exclus.has(String(bar.id))) return 'liste d’exclusion';
   return null;
 };
@@ -158,11 +164,12 @@ const atoutsDe = (features) => {
 // ---------- Tout ensemble ----------
 
 // { matches, bars, matchNights } → les données des pages. contenu : clubs, competitions, villes, exclus (la liste
-// d’exclusion, adresses de page ou identifiants).
-export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus = [] }) => {
+// d’exclusion, adresses de page ou identifiants), forcer (les identifiants des bars réintégrés à la main).
+export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus = [], forcer = [] }) => {
   const avertissements = [];
   const index = indexerLesClubs(clubs);
   const listeExclus = new Set(exclus.map(String));
+  const forces = new Set(forcer.map(String));
 
   // Les matchs : ceux de la liste, et ceux qu’une soirée cite sans qu’ils y soient.
   const parId = new Map();
@@ -183,7 +190,7 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
     const ville = adresse && villeDe(villes, adresse.codePostal, adresse.ville);
     const arrondissement = adresse && arrondissementDe(ville.cle, ville.nom, adresse.codePostal);
     const slugPage = adresse && `${slug(brutBar.name)}-${arrondissement ? arrondissement.ancre : ville.cle}`;
-    const raison = raisonDEcarter(brutBar, listeExclus) ?? (slugPage && listeExclus.has(slugPage) ? 'liste d’exclusion' : null)
+    const raison = raisonDEcarter(brutBar, listeExclus, forces) ?? (slugPage && listeExclus.has(slugPage) ? 'liste d’exclusion' : null)
       ?? (adresse ? null : 'adresse sans code postal ni ville');
     if (raison) {
       ecartes.push({ id: String(brutBar.id), nom: brutBar.name, raison, slug: slugPage ?? null });

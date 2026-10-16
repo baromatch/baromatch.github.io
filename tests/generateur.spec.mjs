@@ -32,24 +32,52 @@ test.describe('les données', () => {
   test('les bars de démo, d’essai, inactifs ou exclus ne sont jamais de vrais bars', async () => {
     const donnees = await donneesDu(`scenario:${SCENARIO}`, VENDREDI);
     expect(donnees.bars.map((b) => b.nom).sort()).toEqual(['Au Bon Coin', 'La Cave des Gones', 'Le Café des Sports', 'Le Comptoir du Canal', 'Le Zinc des Amis']);
+    const essai = 'démo, test ou essai dans le nom, l’adresse ou l’identifiant';
     expect(Object.fromEntries(donnees.ecartes.map((e) => [e.nom, e.raison]))).toEqual({
-      'Bar de démo Baromatch': 'démo, test ou QA dans le nom ou l’adresse',
-      'Bar DÉMO Lille': 'démo, test ou QA dans le nom ou l’adresse',
+      'Bar de démo Baromatch': essai,
+      'Bar DÉMO Lille': essai,
       'Chez Lucette': 'bar de démonstration',
       'Le Rideau Baissé': 'bar inactif',
+      // Les noms d’essai courants, même collés à un chiffre, à « _ » ou à un autre mot.
+      'Bar de démonstration': essai,
+      'Bar d’essai Baromatch': essai,
+      'Bar Test1': essai,
+      bar_test: essai,
+      Demo2: essai,
+      'QA2 Bar': essai,
+      TestBar: essai,
+      'Bar recette': essai,
+      // Un vrai bar écarté à tort : moins grave qu’un faux bar publié, et réintégré par la liste « forcer ».
+      'Le Testament': essai,
     });
     // Aucune soirée d’un faux bar : le match de Lille, diffusé seulement par deux bars de démo, n’a pas de bar.
-    expect(donnees.soirees.map((s) => s.bar.nom).filter((nom) => /démo|lucette|rideau/i.test(nom))).toEqual([]);
+    const faux = new Set(donnees.ecartes.map((e) => e.id));
+    expect(donnees.soirees.filter((s) => faux.has(s.bar.id))).toEqual([]);
     expect(donnees.matchs.find((m) => m.slug === 'lille-lens-2026-10-26').soirees).toEqual([]);
 
-    // Insensible aux accents et aux capitales ; la liste d’exclusion, par identifiant ou adresse de page ; isDemo,
-    // qui n’existe pas encore dans les données, est déjà lu.
+    // Insensible aux accents et aux capitales, sans limite de mot, dans le nom, l’adresse ou l’identifiant ; « qa »
+    // seul ou collé à un chiffre ou à « _ », jamais dans « Aquarium » ; la liste d’exclusion, par identifiant ou
+    // adresse de page ; isDemo, qui n’existe pas encore dans les données, est déjà lu.
     const vide = new Set();
-    expect(raisonDEcarter({ name: 'Le Comptoir', address: '1 rue des Tèsts, 75001 Paris' }, vide)).toBe('démo, test ou QA dans le nom ou l’adresse');
-    expect(raisonDEcarter({ name: 'Bar Qa', address: '1 rue de Paris, 75001 Paris' }, vide)).not.toBeNull();
+    const rue = '1 rue de Paris, 75001 Paris';
+    expect(raisonDEcarter({ name: 'Le Comptoir', address: '1 rue des Tèsts, 75001 Paris' }, vide)).toBe(essai);
+    expect(raisonDEcarter({ name: 'Bar Qa', address: rue }, vide)).toBe(essai);
+    for (const name of ['Bar staging', 'Sandbox Pub', 'Le Bar fictif', 'Comptoir factice', 'Démonstration', 'bar_qa', 'Le Contest']) {
+      expect(raisonDEcarter({ name, address: rue }, vide), name).toBe(essai);
+    }
+    expect(raisonDEcarter({ id: 'bar-arrival-qa-production', name: 'Le Comptoir', address: rue }, vide)).toBe(essai);
+    expect(raisonDEcarter({ id: 'b-9', name: 'L’Aquarium', address: '1 quai de la Gare, 75013 Paris' }, vide)).toBeNull();
     expect(raisonDEcarter({ name: 'Le Quai', address: '1 quai de la Gare, 75013 Paris' }, vide)).toBeNull();
-    expect(raisonDEcarter({ name: 'Le Contest', address: '1 rue de la Testerie, 75013 Paris' }, vide)).toBeNull();
+    expect(raisonDEcarter({ id: 'b-t1', name: 'Le Testament', address: rue }, vide, new Set(['b-t1']))).toBeNull();
     expect(raisonDEcarter({ id: 'b-1', name: 'Le Quai', address: '1 quai, 75013 Paris' }, new Set(['b-1']))).toBe('liste d’exclusion');
+    const force = preparer(await lireLaSource(`scenario:${SCENARIO}`), { maintenant: VENDREDI, ...contenu, forcer: ['b-t1'] });
+    expect(force.bars.map((b) => b.nom)).toContain('Le Testament');
+    expect(force.bars.map((b) => b.nom)).not.toContain('TestBar');
+    // La liste « forcer » existe dans bars-exclus.json, vide, et son mode d’emploi est écrit à côté.
+    const fichierExclus = JSON.parse(readFileSync(path.join(racine, 'generateur', 'bars-exclus.json'), 'utf8'));
+    expect(fichierExclus.forcer).toEqual([]);
+    expect(fichierExclus._lisezMoi).toContain('Le Testament');
+    expect(fichierExclus._lisezMoi).toContain('forcer');
     const exclu = preparer(await lireLaSource(`scenario:${SCENARIO}`), { maintenant: VENDREDI, ...contenu, exclus: ['le-zinc-des-amis-paris-11'] });
     expect(exclu.bars.map((b) => b.nom)).not.toContain('Le Zinc des Amis');
   });

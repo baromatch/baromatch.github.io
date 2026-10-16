@@ -12,12 +12,14 @@ const lire = (...morceaux) => JSON.parse(readFileSync(path.join(...morceaux), 'u
 
 export const chargerLeContenu = (racine = RACINE) => {
   const contenu = path.join(racine, 'generateur', 'contenu');
+  const exclusion = lire(racine, 'generateur', 'bars-exclus.json');
   return {
     marque: lire(racine, 'marque.json'),
     textes: lire(contenu, 'textes.json'),
     villes: lire(contenu, 'villes.json'),
     clubs: lire(contenu, 'clubs.json'),
     competitions: lire(contenu, 'competitions.json'),
-    exclus: lire(racine, 'generateur', 'bars-exclus.json').bars,
+    exclus: exclusion.bars ?? [],
+    forcer: exclusion.forcer ?? [],
   };
 };

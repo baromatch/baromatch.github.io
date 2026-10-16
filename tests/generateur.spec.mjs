@@ -152,6 +152,16 @@ test.describe('les données', () => {
     expect(lireLAdresse('Site QA - 99 Rue de Rivoli, 75001 Paris')).toEqual({ rue: 'Site QA - 99 Rue de Rivoli', codePostal: '75001', ville: 'Paris' });
     expect(lireLAdresse('3 Place Sainte-Anne 35000 Rennes, France')).toEqual({ rue: '3 Place Sainte-Anne', codePostal: '35000', ville: 'Rennes' });
     expect(lireLAdresse('Quelque part à Paris')).toBeNull();
+    // Un vrai bar dont l’adresse est écrite autrement ne disparaît pas ; « Paris 11e » reste juste.
+    const oberkampf = { rue: '12 Rue Oberkampf', codePostal: '75011', ville: 'Paris' };
+    for (const ecrite of ['12 Rue Oberkampf, 75011, Paris', '12 Rue Oberkampf, Paris 75011', '12 Rue Oberkampf, 75011 Paris, FR', '12 Rue Oberkampf, 75011 Paris 11e']) {
+      expect(lireLAdresse(ecrite), ecrite).toEqual(oberkampf);
+    }
+    expect(lireLAdresse('12 rue Oberkampf 75011 PARIS')).toEqual({ ...oberkampf, rue: '12 rue Oberkampf' });
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    brut.bars.find((b) => b.id === 'b-zinc').address = '12 rue Oberkampf 75011 PARIS';
+    const zinc = preparer(brut, { maintenant: VENDREDI, ...contenu }).bars.find((b) => b.id === 'b-zinc');
+    expect([zinc.slug, zinc.quartier, zinc.adresse]).toEqual(['le-zinc-des-amis-paris-11', 'Paris 11e', '12 rue Oberkampf, 75011 Paris']);
     const villes = contenu.villes;
     expect(villeDe(villes, '75011', 'Paris')).toEqual({ cle: 'paris', nom: 'Paris' });
     expect(villeDe(villes, '59800', 'Lille')).toEqual({ cle: 'lille', nom: 'Lille' });

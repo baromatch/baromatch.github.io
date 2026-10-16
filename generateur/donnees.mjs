@@ -130,11 +130,20 @@ const nommerLesMatchs = (matchs) => {
 
 // « 12 Rue Oberkampf, 75011 Paris » → rue, code postal et ville ; null si l’adresse ne finit pas par un code postal
 // et une ville.
+// Lu aussi : « 75011, Paris », « Paris 75011 » (après une virgule), « , FR » ou « , France » à la fin, « PARIS » en
+// capitales (« Paris »), et « Paris 11e » (la ville, sans l’arrondissement, lu dans le code postal).
+const enCapitales = (ville) => (ville.length > 2 && ville === ville.toUpperCase()
+  ? ville.toLowerCase().replace(/(^|[\s'’-])(\p{L})/gu, (_, avant, lettre) => `${avant}${lettre.toUpperCase()}`)
+  : ville);
 export const lireLAdresse = (adresse) => {
-  const propre = String(adresse ?? '').trim().replace(/,?\s*France$/i, '');
-  const trouve = propre.match(/^(.*?)[,\s]+(\d{5})\s+([^\d,][^,]*?)\s*$/);
-  if (!trouve) return null;
-  return { rue: trouve[1].trim().replace(/[,\s-]+$/, ''), codePostal: trouve[2], ville: trouve[3].trim() };
+  const propre = String(adresse ?? '').trim().replace(/[,\s]+(?:France|FRA?)\.?$/i, '').trim();
+  const codeEtVille = propre.match(/^(.*?)[,\s]+(\d{5})[,\s]+([^\d,][^,]*?)\s*$/);
+  const villeEtCode = codeEtVille ? null : propre.match(/^(.*?)\s*,\s*([^\d,][^,]*?)\s+(\d{5})\s*$/);
+  if (!codeEtVille && !villeEtCode) return null;
+  const [rue, codePostal, ville] = codeEtVille ? codeEtVille.slice(1) : [villeEtCode[1], villeEtCode[3], villeEtCode[2]];
+  const villePropre = enCapitales(ville.trim().replace(/\s+\d{1,2}\s*(?:er|e|ème|eme)$/i, ''));
+  if (!rue.trim() || !villePropre) return null;
+  return { rue: rue.trim().replace(/[,\s-]+$/, ''), codePostal, ville: villePropre };
 };
 
 // Paris, Lyon et Marseille ont des arrondissements, lus dans le code postal (75011 → Paris 11e, 75116 → Paris 16e).

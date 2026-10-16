@@ -1,0 +1,4 @@
+{
+  "_lisezMoi": "Les bars qu’aucune page publique ne montre, même s’ils sont dans l’appli : un bar de test au nom ordinaire, un bar qui a demandé à ne pas apparaître. Écris entre guillemets l’adresse de sa page (par exemple \"le-zinc-des-amis-paris-11\") ou son identifiant dans l’appli. Un bar dont le nom ou l’adresse dit démo, test ou QA est déjà écarté sans être écrit ici.",
+  "bars": []
+}

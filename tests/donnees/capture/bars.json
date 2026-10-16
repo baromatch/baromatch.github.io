@@ -1,0 +1,11 @@
+[
+ {
+  "id": "bar-arrival-qa-production",
+  "name": "Bar de démo Baromatch",
+  "address": "Site QA - 99 Rue de Rivoli, 75001 Paris",
+  "lat": 48.8611,
+  "lng": 2.3358,
+  "isActive": true,
+  "features": null
+ }
+]

@@ -18,6 +18,7 @@ import { controlerLaPage } from '../generateur/controle.mjs';
 import { echapper } from '../generateur/texte.mjs';
 import { construire } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
+import { prevenirIndexNow, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
 const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
@@ -600,5 +601,52 @@ test.describe('d’un passage à l’autre', () => {
     expect(Object.values(etatDe(sortie).pages).filter((p) => p.indexable)).toEqual([]);
     expect(plan(sortie)).toBe(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8').replace(/\r\n/g, '\n'));
     expect(existsSync(path.join(sortie, 'bar'))).toBe(false);
+  });
+});
+
+// ---------- L’Action et IndexNow ----------
+
+test.describe('l’Action « Pages des matchs » et IndexNow', () => {
+  const action = readFileSync(path.join(racine, '.github', 'workflows', 'pages-des-matchs.yml'), 'utf8').replace(/\r\n/g, '\n');
+
+  test('l’Action : quand elle tourne, ce qu’elle peut, et qu’elle ne fait qu’un passage à la fois', () => {
+    expect(action).toContain("    - cron: '17 */3 * * *'");
+    expect(action).toMatch(/\n  workflow_dispatch:\n/);
+    expect(action).toMatch(/\n  push:\n    branches: \[main\]\n    paths:\n      - 'generateur\/\*\*'\n      - 'marque\.json'\n/);
+    // Le droit d’écrire le dépôt et de demander la publication de Pages, rien d’autre.
+    expect(action).toMatch(/\npermissions:\n  contents: write\n  pages: write\n\n/);
+    expect(action).toMatch(/\nconcurrency:\n  group: pages-des-matchs\n  cancel-in-progress: false\n/);
+    // Des actions à leur étiquette de version (vérifiées le 16 octobre 2026), Node 22, rien à installer.
+    expect([...action.matchAll(/uses: ([^\s]+)/g)].map((m) => m[1])).toEqual(['actions/checkout@v7', 'actions/setup-node@v7']);
+    expect(action).toContain('node-version: 22');
+    expect(action).not.toMatch(/npm (ci|install)/);
+    // Le générateur contre les listes publiques ; seuls les chemins de la liste blanche sont enregistrés.
+    expect(action).toContain('node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option');
+    expect(action).toContain('for chemin in matchs regarder-le-match bar sitemap.xml; do');
+    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar)/|^sitemap\\.xml$'");
+    expect(action).toContain('git pull -q --rebase origin main');
+    // La publication demandée après l’envoi ; IndexNow n’arrête jamais l’Action.
+    expect(action).toMatch(/node generateur\/publier\.mjs pages\n/);
+    expect(action).toMatch(/continue-on-error: true\n        run: node generateur\/publier\.mjs indexnow "\$RUNNER_TEMP\/changees\.txt"\n/);
+  });
+
+  test('IndexNow : la clé servie à la racine, seulement les adresses du site, une erreur qui n’arrête rien', async () => {
+    const reglages = reglagesIndexNow();
+    expect(reglages.cle).toMatch(/^[a-zA-Z0-9-]{8,128}$/);
+    expect(readFileSync(path.join(racine, `${reglages.cle}.txt`), 'utf8')).toBe(reglages.cle);
+    const corps = requeteIndexNow(['https://baromatch.fr/matchs/', 'https://baromatch.fr/matchs/', 'https://ailleurs.fr/x'], reglages);
+    expect(corps).toEqual({ host: 'baromatch.fr', key: reglages.cle, keyLocation: `https://baromatch.fr/${reglages.cle}.txt`, urlList: ['https://baromatch.fr/matchs/'] });
+
+    const journal = [];
+    const noter = (ligne) => journal.push(ligne);
+    expect(await prevenirIndexNow([], { reglages, journal: noter })).toBe('rien');
+    const envoyes = [];
+    const recu = async (adresse, options) => { envoyes.push([adresse, JSON.parse(options.body)]); return { ok: true, status: 202 }; };
+    expect(await prevenirIndexNow(['https://baromatch.fr/matchs/'], { reglages, envoyer: recu, journal: noter })).toBe('envoye');
+    expect(envoyes).toEqual([['https://api.indexnow.org/indexnow', corps]]);
+    const panne = async () => { throw new Error('réseau coupé'); };
+    expect(await prevenirIndexNow(['https://baromatch.fr/matchs/'], { reglages, envoyer: panne, journal: noter })).toBe('erreur');
+    expect(await prevenirIndexNow(['https://baromatch.fr/matchs/'], { reglages, envoyer: async () => ({ ok: false, status: 403 }), journal: noter })).toBe('refuse');
+    expect(journal.at(-1)).toBe('IndexNow : 1 adresses envoyées, réponse 403.');
   });
 });

@@ -1132,3 +1132,62 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .tablee__bouton { margin-top: 20px; }
 /* Un lien mort ou une panne : seulement le bouton, sous la phrase d’état. */
 .tablee__appli:has(> [hidden]) { margin-top: 12px; padding-top: 0; border-top: 0; text-align: center; }
+
+/* ---------- Page presse ---------- */
+
+.document.presse { max-width: 54rem; }
+.document .presse__chapeau { margin: 0; color: var(--texte); font-size: 1.1875rem; }
+.document .presse__slogan {
+  margin: 0 0 8px;
+  color: var(--texte);
+  font-weight: 800;
+  font-stretch: 88%;
+  font-variation-settings: "opsz" 72;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  line-height: 1.1;
+}
+
+.presse__faits { margin: 24px 0 0; border-top: 1px solid var(--trait); }
+.presse__faits > div { display: grid; gap: 2px 24px; padding: 14px 0; border-bottom: 1px solid var(--trait); }
+@media (min-width: 720px) { .presse__faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
+.presse__faits dt { font-weight: 700; }
+.presse__faits dd { margin: 0; color: var(--texte-doux); }
+
+/* L’emplacement d’un texte à venir : un cadre en pointillés, qui ne se prend pas pour du contenu. */
+.presse__a-ecrire { margin-top: 16px; padding: 18px 22px; border: 2px dashed var(--verre-bord-fort); border-radius: 18px; }
+.document .presse__a-ecrire-titre { margin: 0 0 4px; color: var(--texte); font-weight: 700; }
+.document .presse__a-ecrire p:last-child { margin-bottom: 0; }
+
+.document .presse__logos, .document .presse__captures { display: grid; gap: 20px; margin: 24px 0 0; padding: 0; list-style: none; }
+.document .presse__logos > li, .document .presse__captures > li { margin: 0; }
+@media (min-width: 720px) { .document .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.presse__logo { padding: 16px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
+.presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: 20px; border-radius: 12px; background: var(--nuit); }
+.presse__apercu--clair { background: #F7F7F9; }
+.presse__apercu img { width: 100%; height: auto; }
+.presse__apercu img.presse__icone { width: auto; height: 100%; border-radius: 22%; }
+.document .presse__legende { margin: 12px 0 0; color: var(--texte); font-weight: 700; }
+
+.document .presse__fichiers { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 10px 0 0; }
+.presse__fichiers a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0 18px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  color: var(--texte);
+  font-weight: 600;
+  text-decoration: none;
+}
+.presse__fichiers a:hover { border-color: var(--ambre); color: var(--ambre); }
+
+.document .presse__captures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) { .document .presse__captures { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.presse__captures figure { margin: 0; }
+.presse__captures img { width: 100%; height: auto; border: 1px solid var(--verre-bord); border-radius: 18px; }
+.presse__captures figcaption { margin-top: 10px; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.4; }
+
+.presse__film { display: block; margin-top: 16px; overflow: hidden; border: 1px solid var(--verre-bord); border-radius: 18px; }
+.presse__film img { width: 100%; height: auto; }

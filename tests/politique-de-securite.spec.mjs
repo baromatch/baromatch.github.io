@@ -20,6 +20,7 @@ const PAGES = [
   { chemin: '/confidentialite.html', connect: [], formulaire: [] },
   { chemin: '/mentions-legales.html', connect: [], formulaire: [] },
   { chemin: '/supprimer-mon-compte.html', connect: [], formulaire: [] },
+  { chemin: '/presse.html', connect: [], formulaire: [] },
   { chemin: '/404.html', connect: [API], formulaire: [] },
 ];
 
@@ -125,7 +126,7 @@ test.describe('rien ne viole la politique en parcourant les pages', () => {
     expect(await violations()).toEqual([]);
   });
 
-  for (const chemin of ['/nimporte-quoi.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html']) {
+  for (const chemin of ['/nimporte-quoi.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html']) {
     test(`${chemin} : la page et ses ancres`, async ({ page }) => {
       const violations = await ecouter(page);
       await page.goto(chemin);

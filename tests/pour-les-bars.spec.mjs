@@ -6,6 +6,7 @@ import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
+import { PIED } from './outils/pied.mjs';
 
 const PAGE = '/pour-les-bars.html';
 const ORIGINE = 'https://baromatch.fr';
@@ -165,8 +166,7 @@ test.describe('ce que la page dit', () => {
     // nommées, et « Supprimer mon compte » après « Confidentialité ».
     const pied = await page.$$eval('.pied__liens a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent]));
     expect(pied[0]).toEqual(['/pour-les-bars.html', 'Pour les bars']);
-    expect(pied.map(([href]) => href)).toEqual(['/pour-les-bars.html', '/boutique.html', '/mentions-legales.html', '/cgu.html',
-      '/confidentialite.html', '/supprimer-mon-compte.html', 'https://x.com/baromatchapp', 'mailto:contact@baromatch.fr']);
+    expect(pied.map(([href]) => href)).toEqual(PIED.map(([href]) => href));
   });
 
   test('les données structurées : le fil d’Ariane et la FAQ, qui répète mot pour mot chaque question de la page, rien d’autre', async ({ page }) => {

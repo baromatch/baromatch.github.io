@@ -23,7 +23,7 @@ const TITRES_CHOISIS = {
   '/': 'Baromatch — Trouve un bar qui diffuse ton match, à Paris',
   '/boutique.html': 'La boutique Baromatch — pièces pour les soirs de match',
 };
-const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html'];
+const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html'];
 const TYPES_ATTENDUS = {
   '/': ['Organization', 'WebSite', 'MobileApplication'],
   '/boutique.html': ['FAQPage'],
@@ -31,6 +31,7 @@ const TYPES_ATTENDUS = {
   '/confidentialite.html': ['WebPage'],
   '/mentions-legales.html': ['WebPage'],
   '/supprimer-mon-compte.html': ['WebPage'],
+  '/presse.html': ['AboutPage', 'BreadcrumbList'],
 };
 // Ce que le site ne peut pas promettre : ni produit en vente, ni note, ni recherche interne.
 const TYPES_INTERDITS = ['Product', 'Offer', 'AggregateOffer', 'AggregateRating', 'Review', 'SearchAction'];
@@ -223,7 +224,7 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
       const principal = tous.find((n) => typesDe(n).some((t) => TYPES_ATTENDUS[chemin].includes(t)) && n.url);
       expect(principal?.url).toBe(canoniqueDe(chemin));
       // La fiche d’une page porte le titre de la page : un titre changé d’un côté se voit ici.
-      if (typesDe(principal).some((t) => t === 'WebPage' || t === 'FAQPage')) {
+      if (typesDe(principal).some((t) => t === 'WebPage' || t === 'AboutPage' || t === 'FAQPage')) {
         expect(principal.name).toBe(await onglet.title());
       }
     });

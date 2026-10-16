@@ -10,7 +10,7 @@ import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { lireLaSource } from '../generateur/sources.mjs';
-import { arrondissementDe, clubDe, indexerLesClubs, lireLAdresse, preparer, raisonDEcarter, villeDe } from '../generateur/donnees.mjs';
+import { arrondissementDe, clubDe, indexerLesClubs, lireLAdresse, offreInterdite, preparer, raisonDEcarter, villeDe } from '../generateur/donnees.mjs';
 import { isoDeParis, jourDeParis, quandEnLettres } from '../generateur/heure.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
@@ -178,7 +178,19 @@ test.describe('les données', () => {
     expect(offre('Le Zinc des Amis', 'psg-ol-2026-10-25')).toEqual({ titre: 'Pinte et planche à partager', prixCentimes: 1200, alcool: true });
     expect(offre('Le Comptoir du Canal', 'psg-barca-2026-10-24')).toEqual({ titre: 'Menu burger et boisson fraîche', prixCentimes: 1500, alcool: false });
     expect(offre('Le Comptoir du Canal', 'le-havre-psg-2026-10-30')).toBeNull();
-    expect(donnees.avertissements).toEqual(['Offre de « Le Comptoir du Canal » non affichée : elle contient un mot que le site ne publie pas']);
+    expect(donnees.avertissements).toEqual(['Offre de « Le Comptoir du Canal » non affichée : elle pousse à boire (« happy hour »), ce que le site ne publie pas']);
+    // Loi Evin, sans accents ni capitales : la gratuité près d’une boisson, une quantité, une récompense ne
+    // s’affichent pas ; le passage continue, avec un avertissement par offre écartée.
+    const poussentABoire = ['Pinte offerte à chaque but du PSG', 'Tournee generale a la mi-temps', 'Shot offert', 'Deux bières pour le prix d’une',
+      'Open bar pendant le match', 'Bières à volonté', '2 pour 1 sur les cocktails', 'HAPPY-HOUR', 'Une pinte achetée, une offerte', 'Boisson gratuite'];
+    for (const titre of poussentABoire) expect(offreInterdite(titre), titre).not.toBeNull();
+    for (const titre of ['Pinte et planche à partager', 'Menu burger et boisson fraîche', 'Planche offerte avec le menu']) expect(offreInterdite(titre), titre).toBeNull();
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    const zinc = brut.matchNights.find((n) => n.id === 'n-zinc-psg-ol');
+    zinc.offer = { ...zinc.offer, title: 'Shot offert' };
+    const sansShot = preparer(brut, { maintenant: VENDREDI, ...contenu });
+    expect(sansShot.soirees.find((s) => s.id === 'n-zinc-psg-ol').offre).toBeNull();
+    expect(sansShot.avertissements).toContain('Offre de « Le Zinc des Amis » non affichée : elle pousse à boire (« offert … shot »), ce que le site ne publie pas');
     // Une soirée annulée ne compte pas ; une soirée complète (CLOSED) reste annoncée.
     expect(donnees.soirees.filter((s) => s.bar.nom === 'Le Comptoir du Canal' && s.match.slug === 'psg-ol-2026-10-25')).toEqual([]);
     expect(donnees.bars.find((b) => b.nom === 'La Cave des Gones').soirees.map((s) => s.match.slug)).toEqual(['brest-nice-2026-10-23', 'psg-ol-2026-10-25']);

@@ -23,6 +23,22 @@ const MOTS_D_ESSAI = /demo|test|essai|recette|staging|sandbox|fictif|factice|(?:
 export const RAISON_D_ESSAI = 'démo, test ou essai dans le nom, l’adresse ou l’identifiant';
 // Ce qu’aucune page ne dit, même si une offre de bar l’écrit (loi Evin, et aucun score).
 export const MOTS_INTERDITS = /happy[\s-]*hours?|tournées?|verres? offerts?|\bscores?\b/i;
+// Une offre de bar qui pousse à boire (loi Evin) ne s’affiche pas : la gratuité près d’une boisson, une quantité ou
+// une récompense. Comparée sans accents ni capitales.
+const BOISSON = /\b(?:bieres?|pintes?|demis?|verres?|shots?|shooters?|cocktails?|vins?|champagnes?|alcools?|boissons?|consos?|consommations?|aperos?|aperitifs?|spritz|mojitos?|pastis|ricard|whisky|vodka|rhum|tequila|gin|cidres?|pressions?|bouteilles?|seaux?|pichets?|mousses?|binouzes?|kirs?|punch)\b/;
+const GRATUIT = /\b(?:offert|gratuit|cadeau)|\boffr(?:ons|ez)\b|\b(?:t|vous)['’\s]+offr/;
+const POUSSE_A_BOIRE = [
+  /\ba volonte\b/, /\bopen[\s-]*bars?\b/, /\b(?:2|deux)\s*(?:pour|=)\s*(?:1|une?)\b/, /\bpour le prix d['’\s]*une?\b/,
+  /\bachete\w*\s*,?\s*(?:\d+|une?|deux)\s+offert/, /\bhappy[\s-]*hours?\b/, /\btournees?\b/, /\ba chaque but/, /\bscores?\b/,
+];
+// Pourquoi une offre ne s’affiche pas (ce qu’elle dit), ou null si elle peut s’afficher.
+export const offreInterdite = (titre) => {
+  const texte = pourComparer(titre);
+  const motif = POUSSE_A_BOIRE.find((m) => m.test(texte));
+  if (motif) return texte.match(motif)[0];
+  if (GRATUIT.test(texte) && BOISSON.test(texte)) return `${texte.match(GRATUIT)[0]} … ${texte.match(BOISSON)[0]}`;
+  return null;
+};
 
 // ---------- Les clubs ----------
 
@@ -244,12 +260,14 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
 };
 
 // L’offre d’une soirée, telle que le bar l’a écrite : son titre, son prix s’il est donné, et la mention santé sauf si
-// le bar a dit qu’elle ne contient pas d’alcool. Une offre finie, ou qui dit un mot interdit, ne s’affiche pas.
+// le bar a dit qu’elle ne contient pas d’alcool. Une offre finie, ou qui pousse à boire, ne s’affiche pas (le passage
+// continue, avec un avertissement dans le journal).
 const offreDe = (offre, maintenant, bar, avertissements) => {
   if (!offre || typeof offre.title !== 'string' || !offre.title.trim()) return null;
   if (offre.until && Date.parse(offre.until) <= maintenant) return null;
-  if (MOTS_INTERDITS.test(offre.title)) {
-    avertissements.push(`Offre de « ${bar.nom} » non affichée : elle contient un mot que le site ne publie pas`);
+  const interdit = offreInterdite(offre.title);
+  if (interdit) {
+    avertissements.push(`Offre de « ${bar.nom} » non affichée : elle pousse à boire (« ${interdit} »), ce que le site ne publie pas`);
     return null;
   }
   return {

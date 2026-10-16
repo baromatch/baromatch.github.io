@@ -438,7 +438,10 @@
 }
 .badge__carte .capsule { justify-self: start; max-width: 100%; padding: 0 20px; white-space: normal; }
 .badge__retour { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
-.badge__retour:empty { display: none; }
+/* La zone reste rendue en permanence (lecteurs d’écran) : vide, elle ne prend pas de place, et on reprend l’écart de la grille. */
+.badge__retour:empty { margin-top: -12px; }
+/* Contraste forcé (Windows) : un bord transparent devient visible, le bouton en verre garde sa forme. */
+.capsule--verre { border: 1px solid transparent; }
 .badge__story {
   width: 160px;
   aspect-ratio: 9 / 16;

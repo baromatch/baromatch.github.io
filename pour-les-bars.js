@@ -1034,8 +1034,12 @@
   var texteBouton = libelle.textContent;
   var minuteur = null;
 
+  // La zone est vidée, puis le message écrit un instant plus tard : un même message est annoncé à chaque copie.
+  var annonce = null;
   function dire(texte) {
-    retour.textContent = texte;
+    retour.textContent = "";
+    clearTimeout(annonce);
+    annonce = setTimeout(function () { retour.textContent = texte; }, 100);
   }
 
   function copieImpossible() {

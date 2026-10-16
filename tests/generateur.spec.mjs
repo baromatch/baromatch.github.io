@@ -12,6 +12,10 @@ import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { lireLaSource } from '../generateur/sources.mjs';
 import { arrondissementDe, clubDe, indexerLesClubs, lireLAdresse, preparer, raisonDEcarter, villeDe } from '../generateur/donnees.mjs';
 import { isoDeParis, jourDeParis, quandEnLettres } from '../generateur/heure.mjs';
+import { construireEnMemoire } from '../generateur/site.mjs';
+import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
+import { controlerLaPage } from '../generateur/controle.mjs';
+import { echapper } from '../generateur/texte.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
 const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
@@ -170,5 +174,241 @@ test.describe('les données', () => {
         serveur.close();
       }
     }
+  });
+});
+
+// ---------- Les pages ----------
+
+const NOEUDS = (valeur) => (Array.isArray(valeur) ? valeur.flatMap(NOEUDS)
+  : valeur && typeof valeur === 'object' ? [valeur, ...Object.values(valeur).flatMap(NOEUDS)] : []);
+const donneesStructurees = (p) => blocsDe(p.contenu).flatMap((bloc) => bloc['@graph']);
+const deType = (p, type) => NOEUDS(donneesStructurees(p)).filter((n) => [].concat(n['@type'] ?? []).includes(type));
+const robotsDe = (p) => p.contenu.match(/<meta name="robots" content="([^"]*)">/)[1];
+
+test.describe('les pages', () => {
+  let site;
+  test.beforeAll(async () => {
+    site = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: VENDREDI, racine });
+  });
+  const pageDe = (chemin) => {
+    const trouvee = site.pages.find((p) => p.chemin === chemin);
+    expect(trouvee, chemin).toBeTruthy();
+    return trouvee;
+  };
+
+  test('chaque page passe le contrôle et la validation de ses données structurées', () => {
+    // construireEnMemoire refuse tout le passage à la première erreur : arriver ici, c’est zéro erreur.
+    expect(site.pages.map((p) => p.chemin)).toEqual(expect.arrayContaining([
+      '/matchs/', '/matchs/psg-ol-2026-10-25/', '/regarder-le-match/', '/regarder-le-match/paris/', '/bar/le-zinc-des-amis-paris-11/',
+    ]));
+    const vocabulaire = chargerLeVocabulaire();
+    for (const p of site.pages) expect(validerLaPage(vocabulaire, p.contenu), p.chemin).toEqual([]);
+    expect(site.avertissements).toContain('Ville sans guide : Rennes (1 bar). Son guide s’écrit dans generateur/contenu/villes.json.');
+  });
+
+  test('une ville avec des bars : indexable, ses bars par arrondissement, ses soirées, sa FAQ balisée', () => {
+    const paris = pageDe('/regarder-le-match/paris/');
+    expect(paris.indexable).toBe(true);
+    expect(robotsDe(paris)).toBe('max-image-preview:large');
+    expect(paris.contenu).toContain('<h1 class="regarder-titre">Où regarder le match à Paris</h1>');
+    for (const ancre of ['paris-10', 'paris-11']) expect(paris.contenu).toContain(`id="${ancre}"`);
+    expect(paris.contenu).toContain('<a href="/bar/le-zinc-des-amis-paris-11/">Le Zinc des Amis</a>');
+    expect(paris.contenu).toContain('<a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25">Le Zinc des Amis</a>');
+    const [liste] = deType(paris, 'ItemList');
+    expect(liste.itemListElement.map((i) => i.url)).toEqual(['https://baromatch.fr/bar/le-comptoir-du-canal-paris-10/', 'https://baromatch.fr/bar/le-zinc-des-amis-paris-11/']);
+    // La FAQ balisée répète mot pour mot les questions et réponses lisibles (villes.json), dans l’ordre.
+    const [faq] = deType(paris, 'FAQPage');
+    expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text])).toEqual(contenu.villes.paris.faq.map((q) => [q.question, q.reponse]));
+    for (const { question, reponse } of contenu.villes.paris.faq) {
+      expect(paris.contenu).toContain(`<summary>${echapper(question)}</summary>`);
+      expect(paris.contenu).toContain(`<p>${echapper(reponse)}</p>`);
+    }
+    // Le guide écrit est là, tel quel.
+    for (const paragraphe of contenu.villes.paris.guide) expect(paris.contenu).toContain(echapper(paragraphe));
+    // Une ville sans guide (Rennes) a sa page, faite de ses vraies données.
+    const rennes = pageDe('/regarder-le-match/rennes/');
+    expect(rennes.indexable).toBe(true);
+    expect(rennes.contenu).toContain('1 bar de Rennes diffuse le match sur Baromatch.');
+  });
+
+  test('une ville sans bar : noindex, et la page le dit', () => {
+    for (const chemin of ['/regarder-le-match/marseille/', '/regarder-le-match/lille/']) {
+      const p = pageDe(chemin);
+      expect(p.indexable).toBe(false);
+      expect(robotsDe(p)).toBe('noindex');
+      expect(p.contenu).toMatch(/Aucun bar de (Marseille|Lille) n’est encore sur Baromatch\./);
+      expect(deType(p, 'ItemList')).toEqual([]);
+    }
+  });
+
+  test('un match sans vrai bar : noindex, et le lien « Tu tiens un bar ? » vers Pour les bars', () => {
+    const p = pageDe('/matchs/lille-lens-2026-10-26/');
+    expect(p.indexable).toBe(false);
+    expect(robotsDe(p)).toBe('noindex');
+    expect(p.contenu).toContain('Aucun bar ne diffuse encore ce match sur Baromatch.');
+    expect(p.contenu).toContain('<a href="/pour-les-bars.html">Tu tiens un bar ?</a>');
+    expect(p.contenu).not.toMatch(/démo|Lucette/i);
+    expect(deType(p, 'Event')).toEqual([]);
+  });
+
+  test('un match avec des bars : ses soirées en Event, la même adresse que sur la page du bar', () => {
+    const match = pageDe('/matchs/psg-ol-2026-10-25/');
+    expect(match.indexable).toBe(true);
+    expect(match.contenu).toContain('<h1 class="regarder-titre">PSG – OL : les bars qui diffusent le match</h1>');
+    expect(match.contenu).toContain('<p class="regarder-affiche">Paris Saint-Germain – Olympique Lyonnais</p>');
+    expect(match.contenu).toContain('<time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time>');
+    expect(match.contenu).toContain('Les places qui restent sont dans l’appli.');
+    const evenements = deType(match, 'Event');
+    expect(evenements.map((ev) => ev.name)).toEqual(['PSG – OL à la Cave des Gones', 'PSG – OL au Zinc des Amis']);
+    const zinc = evenements[1];
+    expect(zinc).toMatchObject({
+      startDate: '2026-10-25T20:45:00+01:00',
+      eventStatus: 'https://schema.org/EventScheduled',
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      image: ['https://baromatch.fr/img/og-image.jpg'],
+      url: 'https://baromatch.fr/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25',
+      location: { '@type': 'BarOrPub', name: 'Le Zinc des Amis', address: { streetAddress: '12 Rue Oberkampf', postalCode: '75011', addressLocality: 'Paris', addressCountry: 'FR' } },
+      organizer: { '@type': 'BarOrPub', name: 'Le Zinc des Amis' },
+      about: { '@type': 'SportsEvent', homeTeam: { '@type': 'SportsTeam', name: 'Paris Saint-Germain' }, awayTeam: { '@type': 'SportsTeam', name: 'Olympique Lyonnais' } },
+    });
+    // Le bar est le lieu de la diffusion, jamais celui du match ; pas d’offre tant que l’appli n’est pas ouverte.
+    expect(zinc.about.location).toBeUndefined();
+    expect(zinc.offers).toBeUndefined();
+    // La même soirée, sur la page du bar : la même adresse, et l’ancre existe.
+    const bar = pageDe('/bar/le-zinc-des-amis-paris-11/');
+    expect(deType(bar, 'Event').map((ev) => ev.url)).toContain(zinc.url);
+    expect(bar.contenu).toContain('id="soiree-psg-ol-2026-10-25"');
+    // Avant le changement d’heure, le décalage d’été.
+    expect(deType(pageDe('/matchs/psg-barca-2026-10-24/'), 'Event')[0].startDate).toBe('2026-10-24T21:00:00+02:00');
+  });
+
+  test('les offres : dans le corps seulement, avec la mention santé sauf sans alcool', () => {
+    const MENTION = 'L’abus d’alcool est dangereux pour la santé, à consommer avec modération.';
+    for (const chemin of ['/matchs/psg-ol-2026-10-25/', '/bar/le-zinc-des-amis-paris-11/']) {
+      const p = pageDe(chemin);
+      const [tete, corps] = p.contenu.split('<body>');
+      expect(corps).toMatch(new RegExp(`Pinte et planche à partager · 12 €</p>\\s*<p class="regarder-offre__sante">${MENTION}</p>`));
+      expect(tete).not.toContain('Pinte');
+    }
+    const comptoir = pageDe('/bar/le-comptoir-du-canal-paris-10/');
+    const soiree = comptoir.contenu.split('id="soiree-psg-barca-2026-10-24"')[1].split('</li>')[0];
+    expect(soiree).toContain('Menu burger et boisson fraîche · 15 €');
+    expect(soiree).not.toContain(MENTION);
+    // Aucune offre dans une page de ville, un aperçu, un badge ou une donnée structurée ; l’offre au mot interdit, nulle part.
+    for (const p of site.pages) {
+      if (p.type === 'ville' || p.type === 'villes' || p.type === 'semaine') expect(p.contenu, p.chemin).not.toContain('regarder-offre');
+      expect(JSON.stringify(donneesStructurees(p)), p.chemin).not.toMatch(/Pinte|burger/);
+      expect(p.contenu, p.chemin).not.toMatch(/happy hour/i);
+    }
+  });
+
+  test('aucun score, aucun nombre de places, aucune réservation promise tant que l’appli est fermée', () => {
+    for (const p of site.pages) {
+      expect(p.contenu, p.chemin).not.toMatch(/\bscores?\b|\b3 – 1\b|places? restantes?|Réserve ta place/i);
+    }
+  });
+
+  test('l’appli ouverte : « Réserve ta place dans l’appli » vers le magasin, et la place gratuite dans chaque Event', async () => {
+    const ouverte = { ...contenu, marque: { ...contenu.marque, appli: { ouverte: true, android: 'https://magasin.exemple/baromatch-android', iphone: '' } } };
+    const autre = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: VENDREDI, racine, contenu: ouverte });
+    const p = autre.pages.find((x) => x.chemin === '/matchs/psg-ol-2026-10-25/');
+    expect(p.contenu).toContain('<a class="capsule" href="https://magasin.exemple/baromatch-android">Réserve ta place dans l’appli · Android</a>');
+    expect(p.contenu).not.toContain('préviens-moi');
+    expect(deType(p, 'Event')[0].offers).toEqual({ '@type': 'Offer', price: 0, priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: 'https://magasin.exemple/baromatch-android' });
+  });
+
+  test('la semaine : le bloc du soir, les jours, le nombre de vrais bars de chaque match', () => {
+    const p = pageDe('/matchs/');
+    expect(p.indexable).toBe(true);
+    const ceSoir = p.contenu.split('id="titre-ce-soir">')[1].split('</section>')[0];
+    expect(ceSoir).toMatch(/^Ce soir, vendredi 23 octobre<\/h2>/);
+    expect(ceSoir).toContain('<a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
+    expect(ceSoir).toContain('1 bar à Lyon');
+    expect(p.contenu).toContain('<h2 id="jour-2026-10-25">Dimanche 25 octobre</h2>');
+    expect(p.contenu).toMatch(/PSG – OL<\/a> · <time[^>]*>dimanche 25 octobre · 20:45<\/time> · Ligue 1 · <span class="regarder-compte">1 bar à Lyon, 1 bar à Paris<\/span>/);
+    expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
+    // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
+    expect(p.contenu).not.toContain('jour-2026-10-30');
+  });
+
+  test('un bar sans soirée annoncée reste indexable et le dit', () => {
+    const p = pageDe('/bar/au-bon-coin-lyon-2/');
+    expect(p.indexable).toBe(true);
+    expect(p.contenu).toContain('Pas de soirée annoncée pour l’instant.');
+    expect(deType(p, 'Event')).toEqual([]);
+    expect(deType(p, 'BarOrPub')[0]).toMatchObject({ name: 'Au Bon Coin', address: { postalCode: '69002' } });
+  });
+
+  test('chaque page : un fil d’Ariane balisé, rattaché à l’organisation de l’accueil par son @id', () => {
+    for (const p of site.pages) {
+      const [fil] = deType(p, 'BreadcrumbList');
+      expect(fil.itemListElement[0], p.chemin).toMatchObject({ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' });
+      expect(fil.itemListElement.at(-1).item, p.chemin).toBe(`https://baromatch.fr${p.chemin}`);
+      const principal = donneesStructurees(p)[0];
+      expect(principal.publisher, p.chemin).toEqual({ '@id': 'https://baromatch.fr/#organisation' });
+      expect(principal.url, p.chemin).toBe(`https://baromatch.fr${p.chemin}`);
+    }
+  });
+
+  test('la copie enregistrée de ce soir : zéro vrai bar, donc chaque page en noindex', async () => {
+    const capture = await construireEnMemoire({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT, racine });
+    expect(capture.pages.filter((p) => p.indexable).map((p) => p.chemin)).toEqual([]);
+    expect(capture.pages.filter((p) => p.type === 'bar')).toEqual([]);
+    expect(capture.pages.every((p) => robotsDe(p) === 'noindex')).toBe(true);
+    for (const p of capture.pages) expect(p.contenu, p.chemin).not.toMatch(/démo|Rivoli/i);
+  });
+});
+
+test.describe('le validateur et le contrôle refusent ce qui est faux', () => {
+  const vocabulaire = chargerLeVocabulaire();
+  const bloc = (...graphe) => ({ '@context': 'https://schema.org', '@graph': graphe });
+  const evenement = {
+    '@type': 'Event', name: 'PSG – OL au Zinc', startDate: '2026-10-25T20:45:00+01:00', image: ['https://baromatch.fr/img/og-image.jpg'],
+    location: { '@type': 'BarOrPub', name: 'Le Zinc', address: { '@type': 'PostalAddress', streetAddress: '12 Rue Oberkampf', postalCode: '75011', addressLocality: 'Paris', addressCountry: 'FR' } },
+  };
+
+  test('schema.org : type, propriété, place de la propriété, type de valeur, énumération', () => {
+    expect(validerUnBloc(vocabulaire, bloc(evenement))).toEqual([]);
+    expect(vocabulaire.version).toBe('30.1');
+    const erreurs = (noeud) => validerUnBloc(vocabulaire, bloc(noeud)).join('\n');
+    expect(erreurs({ ...evenement, '@type': 'Evenement' })).toMatch(/le type « Evenement » n’existe pas/);
+    expect(erreurs({ ...evenement, lieu: 'Paris' })).toMatch(/la propriété « lieu » n’existe pas/);
+    expect(erreurs({ ...evenement, homeTeam: { '@type': 'SportsTeam', name: 'PSG' } })).toMatch(/« homeTeam » ne va pas sur Event/);
+    expect(erreurs({ ...evenement, eventStatus: 'https://schema.org/InStock' })).toMatch(/n’est pas une valeur de EventStatusType/);
+    expect(erreurs({ ...evenement, eventStatus: 'Prévu' })).toMatch(/n’est pas une valeur de EventStatusType/);
+    expect(erreurs({ ...evenement, location: { ...evenement.location, '@type': 'SportsTeam' } })).toMatch(/un SportsTeam là où schema.org attend/);
+    expect(erreurs({ ...evenement, startDate: 'dimanche' })).toMatch(/n’est pas une date ISO 8601/);
+    expect(validerUnBloc(vocabulaire, { '@graph': [evenement] }).join()).toMatch(/@context/);
+  });
+
+  test('Google : ce qu’exige un Event et un fil d’Ariane ; rien de Google pour une FAQ', () => {
+    const erreurs = (...graphe) => validerUnBloc(vocabulaire, bloc(...graphe)).join('\n');
+    expect(erreurs({ ...evenement, image: undefined })).toMatch(/sans image/);
+    expect(erreurs({ ...evenement, location: { '@type': 'BarOrPub', name: 'Le Zinc' } })).toMatch(/sans address PostalAddress/);
+    expect(erreurs({ ...evenement, location: { ...evenement.location, address: { '@type': 'PostalAddress', streetAddress: '12 Rue Oberkampf' } } })).toMatch(/postalCode manque/);
+    expect(erreurs({ ...evenement, startDate: undefined })).toMatch(/sans startDate/);
+    const fil = (elements) => ({ '@type': 'BreadcrumbList', itemListElement: elements.map((x) => ({ '@type': 'ListItem', ...x })) });
+    expect(erreurs(fil([{ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 2, name: 'Paris' }]))).toBe('');
+    expect(erreurs(fil([{ position: 1, name: 'Accueil' }, { position: 2, name: 'Paris' }]))).toMatch(/item manque/);
+    expect(erreurs(fil([{ position: 2, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 3, name: 'Paris' }]))).toMatch(/position 2, 1 attendu/);
+    // Une question sans réponse n’est pas une erreur de schema.org, et aucune règle de Google n’est appliquée à une FAQ.
+    expect(erreurs({ '@type': 'FAQPage', name: 'FAQ', mainEntity: [{ '@type': 'Question', name: 'Une question ?' }] })).toBe('');
+  });
+
+  test('le contrôle des pages : titre, description, h1, noindex, « ! » et mots interdits', async () => {
+    const site = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: VENDREDI, racine });
+    const p = site.pages.find((x) => x.chemin === '/regarder-le-match/paris/');
+    expect(controlerLaPage(p)).toEqual([]);
+    const avec = (remplacer) => controlerLaPage({ ...p, contenu: remplacer(p.contenu) }).join('\n');
+    expect(avec((h) => h.replace(/<title>[^<]*/, '<title>Paris'))).toMatch(/titre de 5 caractères/);
+    expect(avec((h) => h.replace(/<meta name="description" content="[^"]*"/, '<meta name="description" content="Trop court"'))).toMatch(/description de 10 caractères/);
+    expect(avec((h) => h.replace('</main>', '<h1>Encore</h1></main>'))).toMatch(/2 h1/);
+    expect(avec((h) => h.replace('max-image-preview:large', 'noindex'))).toMatch(/robots « noindex » pour une page indexable/);
+    expect(avec((h) => h.replace('</main>', '<p>Venez nombreux !</p></main>'))).toMatch(/point d’exclamation/);
+    expect(avec((h) => h.replace('</main>', '<p>Happy hour à 19 h.</p></main>'))).toMatch(/mot que le site ne publie pas/);
+    expect(avec((h) => h.replace('</main>', '<p>Le score final.</p></main>'))).toMatch(/mot que le site ne publie pas/);
+    expect(avec((h) => h.replace('</body>', '<script src="/x.js"></script></body>'))).toMatch(/un script autre/);
+    // Le nom d’un bar est le sien : « Chez Max ! » ne refuse pas la page.
+    expect(controlerLaPage({ ...p, contenu: p.contenu.replace('</main>', '<p>Chez Max !</p></main>') }, { motsDesBars: ['Chez Max !'] })).toEqual([]);
   });
 });

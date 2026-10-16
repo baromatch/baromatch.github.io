@@ -1,0 +1,204 @@
+/* Baromatch — les pages « Où regarder le match » (matchs, villes, bars), écrites par le générateur.
+   Elles reprennent styles.css (la nuit, le verre, la police, l’en-tête et le pied de page) ; ici, seulement leur
+   mise en page. L’ambre reste aux liens et à l’appel à l’action. Aucune animation. */
+
+.regarder {
+  padding-top: 8px;
+  padding-bottom: 96px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Fil d’Ariane ---------- */
+
+.regarder-fil ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+  color: var(--texte-discret);
+}
+.regarder-fil li + li::before { content: "›"; margin-right: 8px; color: var(--texte-discret); }
+/* Les liens du fil se touchent du doigt sur 44 px de haut, comme ceux de l’en-tête. */
+.regarder-fil a { display: inline-block; padding: 11px 0; color: var(--texte-doux); }
+.regarder-fil a:hover { color: var(--goutte); }
+.regarder-fil [aria-current] { color: var(--texte-doux); }
+
+/* ---------- Tête de page ---------- */
+
+.regarder-tete { padding: 16px 0 8px; }
+
+.regarder-surtitre {
+  margin: 0 0 6px;
+  color: var(--texte-doux);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.regarder-titre {
+  margin: 0 0 14px;
+  max-width: 22ch;
+  text-wrap: balance;
+  font-weight: 800;
+  font-stretch: 88%;
+  font-variation-settings: "opsz" 72;
+  font-size: clamp(2rem, 7vw, 3.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.regarder-affiche { margin: 0; color: var(--texte-doux); font-size: 1.125rem; }
+
+.regarder-quand {
+  margin: 14px 0 0;
+  font-size: clamp(1.375rem, 4.5vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.regarder-chapeau { margin: 0; max-width: 40rem; color: var(--texte-doux); font-size: 1.125rem; }
+
+.regarder-note { margin: 16px 0 0; color: var(--texte-doux); font-size: 0.9375rem; }
+
+/* ---------- Sections ---------- */
+
+.regarder-section { margin-top: 48px; }
+
+.regarder-section h2 {
+  margin: 0 0 16px;
+  font-size: clamp(1.375rem, 4vw, 1.75rem);
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.regarder-ville { margin: 28px 0 10px; font-size: 1.25rem; font-weight: 700; }
+.regarder-quartier { margin: 20px 0 10px; color: var(--texte-doux); font-size: 1.0625rem; font-weight: 650; scroll-margin-top: 24px; }
+
+.regarder-vide { margin: 0 0 8px; font-weight: 650; }
+.regarder-bars-pro { margin: 0; color: var(--texte-doux); }
+
+/* Le bloc du soir, en haut de la semaine : une carte de verre. */
+.regarder-ce-soir {
+  padding: 20px 22px;
+  border: 1px solid var(--verre-bord);
+  border-radius: 20px;
+  background: var(--verre);
+  box-shadow: var(--verre-reflet);
+}
+.regarder-ce-soir h2 { margin-bottom: 8px; }
+
+/* ---------- Cartes (bars, villes, soirées) ---------- */
+
+.regarder-cartes {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .regarder-cartes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.regarder-carte {
+  padding: 18px 20px;
+  border: 1px solid var(--verre-bord);
+  border-radius: 18px;
+  background: var(--verre);
+  box-shadow: var(--verre-reflet);
+  scroll-margin-top: 24px;
+}
+.regarder-carte p { margin: 0; }
+
+.regarder-carte__nom { margin: 0 0 4px; font-size: 1.1875rem; font-weight: 700; line-height: 1.25; }
+.regarder-carte__nom a { color: var(--texte); text-decoration-color: var(--ambre); }
+.regarder-carte__nom a:hover { color: var(--goutte); }
+.regarder-carte__lieu { color: var(--texte-doux); font-size: 0.9375rem; }
+
+.regarder-atouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.regarder-atouts li {
+  padding: 2px 10px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  color: var(--texte-doux);
+  font-size: 0.875rem;
+}
+
+.regarder-offre {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--verre-fort);
+}
+.regarder-offre__etiquette { display: block; color: var(--texte-doux); font-size: 0.8125rem; font-weight: 600; }
+.regarder-offre__sante { margin-top: 6px !important; color: var(--texte-doux); font-size: 0.8125rem; }
+
+/* ---------- Listes de matchs ---------- */
+
+.regarder-matchs { margin: 0; padding: 0; list-style: none; }
+.regarder-matchs li { padding: 12px 0; border-bottom: 1px solid var(--trait); }
+.regarder-matchs li:last-child { border-bottom: 0; }
+.regarder-matchs a { font-weight: 650; }
+.regarder-compte { color: var(--texte-doux); }
+
+/* ---------- Appel, étapes, guide, questions ---------- */
+
+.regarder-appel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 28px;
+}
+.regarder-appel .capsule { max-width: 100%; text-align: center; }
+.regarder-appel p { margin: 0; max-width: 40ch; color: var(--texte-doux); font-size: 0.9375rem; }
+
+.regarder-etapes { margin: 0; padding-left: 1.4em; }
+.regarder-etapes li { margin: 0 0 12px; color: var(--texte-doux); }
+.regarder-etapes strong { display: block; color: var(--texte); }
+
+.regarder-guide p { max-width: 42rem; margin: 0 0 14px; }
+
+.regarder-faq details { border-bottom: 1px solid var(--trait); }
+.regarder-faq summary { padding: 12px 0; min-height: 44px; box-sizing: border-box; cursor: pointer; font-weight: 650; }
+.regarder-faq details p { max-width: 42rem; margin: 0 0 16px; color: var(--texte-doux); }
+
+.regarder-passe p { margin: 0 0 10px; }
+.regarder-retour { margin: 40px 0 0; }
+
+/* ---------- Le badge d’un bar ---------- */
+
+.regarder-badge {
+  margin-top: 56px;
+  padding: 4px 20px 16px;
+  border: 1px solid var(--verre-bord);
+  border-radius: 18px;
+  background: var(--verre);
+}
+.regarder-badge summary { padding: 12px 0; min-height: 44px; box-sizing: border-box; cursor: pointer; font-weight: 700; }
+.regarder-badge p { margin: 4px 0 0; color: var(--texte-doux); font-size: 0.9375rem; }
+.regarder-badge__image { height: auto; margin: 16px 0; }
+.regarder-badge__etiquette { display: block; margin-bottom: 6px; font-size: 0.9375rem; font-weight: 600; }
+.regarder-badge__code {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--champ-bord);
+  border-radius: 10px;
+  background: var(--nuit-releve);
+  color: var(--texte);
+  font: 0.8125rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  resize: vertical;
+}

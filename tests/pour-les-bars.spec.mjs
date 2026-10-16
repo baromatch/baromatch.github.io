@@ -6,6 +6,7 @@ import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
+import { PIED } from './outils/pied.mjs';
 
 const PAGE = '/pour-les-bars.html';
 const ORIGINE = 'https://baromatch.fr';
@@ -133,7 +134,7 @@ test.describe('ce que la page dit', () => {
     expect(titres[0]).toMatch(/\bmatch\b/i);
   });
 
-  test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, questions, formulaire', async ({ page }) => {
+  test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, badge, questions, formulaire', async ({ page }) => {
     await page.goto(PAGE);
     const sections = await page.$$eval('main > section', (liste) => liste.map((s) => ({
       id: s.id,
@@ -145,12 +146,14 @@ test.describe('ce que la page dit', () => {
       'Comment ça marche',
       'Ton soir de match, heure par heure',
       'Ce que tu vois des fans. Et ce que tu ne vois jamais.',
+      'Partager mon badge',
       'Les questions des bars',
       'Propose ton bar',
     ];
     expect(sections.map((s) => s.titre).filter((t) => ATTENDUES.includes(t))).toEqual(ATTENDUES);
     expect(sections.find((s) => s.titre === 'Comment ça marche').id).toBe('comment');
     expect(sections.find((s) => s.titre === 'Propose ton bar').id).toBe('proposer');
+    expect(sections.find((s) => s.titre === 'Partager mon badge').id).toBe('badge');
     await expect(page.locator('main > section').first().locator('h1')).toHaveCount(1);
   });
 
@@ -165,8 +168,7 @@ test.describe('ce que la page dit', () => {
     // nommées, et « Supprimer mon compte » après « Confidentialité ».
     const pied = await page.$$eval('.pied__liens a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent]));
     expect(pied[0]).toEqual(['/pour-les-bars.html', 'Pour les bars']);
-    expect(pied.map(([href]) => href)).toEqual(['/pour-les-bars.html', '/boutique.html', '/mentions-legales.html', '/cgu.html',
-      '/confidentialite.html', '/supprimer-mon-compte.html', 'https://x.com/baromatchapp', 'mailto:contact@baromatch.fr']);
+    expect(pied.map(([href]) => href)).toEqual(PIED.map(([href]) => href));
   });
 
   test('les données structurées : le fil d’Ariane et la FAQ, qui répète mot pour mot chaque question de la page, rien d’autre', async ({ page }) => {

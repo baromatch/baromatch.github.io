@@ -671,6 +671,28 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
     </div>
   </section>
 
+  <section class="badge bloc page" id="badge" aria-labelledby="titre-badge">
+    <h2 class="titre-section" id="titre-badge">Partager mon badge</h2>
+    <p class="badge__intro">Sur le site de ton bar, le badge dit aux fans que tu diffuses le match et les mène à Baromatch. Tu ne paies rien, et il ne suit personne.</p>
+    <div class="badge__grille">
+      <div class="badge__carte">
+        <h3 class="badge__titre">Pour le site de ton bar</h3>
+        <div class="badge__apercu" role="img" aria-label="Aperçu du badge : On diffuse le match, sur Baromatch"></div>
+        <label class="badge__etiquette" for="badge-code">Le code à coller sur ton site, là où le badge doit apparaître</label>
+        <textarea class="badge__code" id="badge-code" rows="4" readonly spellcheck="false">&lt;a href="https://baromatch.fr/regarder-le-match/"&gt;&lt;img src="https://baromatch.fr/badge/baromatch.svg" width="360" height="72" alt="Baromatch"&gt;&lt;/a&gt;</textarea>
+        <div class="badge__actions" id="badge-actions" hidden><button class="capsule capsule--verre" id="badge-copier" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span data-libelle>Copier le code</span></button></div>
+        <p class="badge__retour" id="badge-retour" role="status"></p>
+      </div>
+      <div class="badge__carte">
+        <h3 class="badge__titre">Pour ta story Instagram</h3>
+        <div class="badge__story" role="img" aria-label="Aperçu de l’image de story : Ce soir, on diffuse le match. On est sur Baromatch."></div>
+        <a class="capsule capsule--verre" id="badge-story" href="/badge/story-baromatch.png" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></svg>Télécharger l’image</a>
+        <p class="badge__note">1080 × 1920 px, avec de la place en haut et en bas pour ce qu’Instagram y ajoute.</p>
+      </div>
+    </div>
+    <p class="badge__vivant">Quand ton bar est sur Baromatch, sa page a son propre badge, qui montre ton prochain match.</p>
+  </section>
+
   <section class="questions bloc page" aria-labelledby="titre-questions">
     <div class="questions__entete">
       <h2 class="titre-section" id="titre-questions">Les questions des bars</h2>
@@ -819,7 +841,9 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
 
   <ul class="pied__liens">
     <li><a href="/pour-les-bars.html">Pour les bars</a></li>
+    <li><a href="/matchs/">Où regarder le match</a></li>
     <li><a href="/boutique.html">Boutique</a></li>
+    <li><a href="/presse.html">Presse</a></li>
     <li><a href="/mentions-legales.html">Mentions légales</a></li>
     <li><a href="/cgu.html">Règles de l’appli (CGU)</a></li>
     <li><a href="/confidentialite.html">Confidentialité</a></li>

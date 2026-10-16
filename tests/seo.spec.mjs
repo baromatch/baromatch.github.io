@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { PROFILS } from './outils/marque.mjs';
 import { fichierDe, PAGES } from './outils/pages.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
@@ -23,7 +24,7 @@ const TITRES_CHOISIS = {
   '/': 'Baromatch — Trouve un bar qui diffuse ton match, à Paris',
   '/boutique.html': 'La boutique Baromatch — pièces pour les soirs de match',
 };
-const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html'];
+const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html'];
 const TYPES_ATTENDUS = {
   '/': ['Organization', 'WebSite', 'MobileApplication'],
   '/boutique.html': ['FAQPage'],
@@ -31,6 +32,7 @@ const TYPES_ATTENDUS = {
   '/confidentialite.html': ['WebPage'],
   '/mentions-legales.html': ['WebPage'],
   '/supprimer-mon-compte.html': ['WebPage'],
+  '/presse.html': ['AboutPage', 'BreadcrumbList'],
 };
 // Ce que le site ne peut pas promettre : ni produit en vente, ni note, ni recherche interne.
 const TYPES_INTERDITS = ['Product', 'Offer', 'AggregateOffer', 'AggregateRating', 'Review', 'SearchAction'];
@@ -223,7 +225,7 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
       const principal = tous.find((n) => typesDe(n).some((t) => TYPES_ATTENDUS[chemin].includes(t)) && n.url);
       expect(principal?.url).toBe(canoniqueDe(chemin));
       // La fiche d’une page porte le titre de la page : un titre changé d’un côté se voit ici.
-      if (typesDe(principal).some((t) => t === 'WebPage' || t === 'FAQPage')) {
+      if (typesDe(principal).some((t) => t === 'WebPage' || t === 'AboutPage' || t === 'FAQPage')) {
         expect(principal.name).toBe(await onglet.title());
       }
     });
@@ -238,7 +240,7 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
     expect(de('Organization')).toHaveLength(1);
     expect(organisation.name).toBe('Baromatch');
     expect(organisation.url).toBe(`${ORIGINE}/`);
-    expect(organisation.sameAs).toEqual(['https://x.com/baromatchapp']);
+    expect(organisation.sameAs).toEqual(PROFILS);
     expect(organisation.contactPoint.email).toBe('contact@baromatch.fr');
     expect(organisation.logo.startsWith(`${ORIGINE}/`)).toBe(true);
     expect(existsSync(fichierDe(new URL(organisation.logo).pathname))).toBe(true);
@@ -413,7 +415,7 @@ test('robots.txt : les outils de vérification hors de l’index, le site et ses
     ...INDEXABLES.map((p) => p.chemin), '/t/abcdefghjkmn', '/.well-known/assetlinks.json', '/styles.css', '/main.js',
     '/tablee.js', '/boutique.js', '/fonts/bricolage-grotesque.woff2', '/img/og-image.jpg', '/favicon.svg', '/favicon.ico',
     '/apple-touch-icon.png', '/sitemap.xml', '/pour-les-bars.css', '/pour-les-bars.js', '/pour-les-bars-amorce.js',
-    '/img/og-bars.jpg', ...fichiersSous('img/bars'),
+    '/img/og-bars.jpg', ...fichiersSous('img/bars'), '/llms.txt', ...fichiersSous('presse'), ...fichiersSous('badge'),
   ];
   expect(ouverts.filter((chemin) => !permis(chemin))).toEqual([]);
 });

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="72" viewBox="0 0 360 72" role="img" aria-labelledby="titre">
+<title id="titre">On diffuse le match · sur Baromatch</title>
+<defs><linearGradient id="verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="bol"><circle cx="100" cy="100" r="67"/></clipPath></defs>
+<rect x="0.5" y="0.5" width="359" height="71" rx="35.5" fill="#0A0B10" stroke="#FFFFFF" stroke-opacity="0.14"/>
+<g transform="translate(16 14) scale(0.22)"><g clip-path="url(#bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></g>
+<g font-family="'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-weight="700">
+<text x="72" y="33" font-size="21" fill="#F7F7F9">On diffuse le match</text>
+<text x="72" y="54" font-size="17" fill="#FFB13D">sur Baromatch</text>
+</g>
+</svg>

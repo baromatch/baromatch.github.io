@@ -73,6 +73,22 @@ test('les captures : Chromium introuvable, la commande échoue et le serveur loc
   }
 });
 
+// Le même correctif, éprouvé sur tous les systèmes : Chromium simulé qui ne se lance pas, serveur simulé qui compte ses
+// arrêts. Sans le correctif (lancement hors du try), le serveur n’est jamais arrêté et ce test échoue, Windows compris.
+test('les captures : un Chromium qui ne se lance pas arrête quand même le serveur local, sur tout système', async () => {
+  const { capturer } = await import('./outils/captures.mjs');
+  const dossier = mkdtempSync(path.join(tmpdir(), 'captures-'));
+  let arrets = 0;
+  const demarrer = async () => ({ adresse: 'http://127.0.0.1:9', arreter: () => { arrets += 1; } });
+  const lancer = async () => { throw new Error('Chromium introuvable (simulé)'); };
+  try {
+    await expect(capturer({ sortie: dossier, port: 9, demarrer, lancer })).rejects.toThrow(/simulé/);
+    expect(arrets).toBe(1);
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+  }
+});
+
 test.describe('les pages que Lighthouse mesure', () => {
   test('chaque page de la liste a son fichier : toutes sont mesurées, sauf lighthouse: false', () => {
     expect(pagesLighthouse().map((page) => page.nom)).toEqual(PAGES.filter((page) => page.lighthouse !== false).map((page) => page.nom));

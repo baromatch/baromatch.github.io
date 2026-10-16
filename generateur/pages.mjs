@@ -356,7 +356,11 @@ ${commentCaMarche(textes)}`,
   // ---------- Les bars ----------
   const reels = new Set(donnees.bars.map((b) => b.slug));
   const ecartesPourDeBon = new Set(donnees.ecartes.filter((x) => x.raison !== 'bar inactif').map((x) => x.id));
-  const partis = anciens.bars.filter((b) => !reels.has(b.slug) && !ecartesPourDeBon.has(b.id) && Date.parse(b.disparu ?? new Date(maintenant).toISOString()) + CONSERVATION_MS > maintenant);
+  // La liste d’exclusion vaut aussi pour un bar déjà parti des données : sa page est retirée tout de suite, et son nom
+  // et son adresse sortent de l’état.
+  const exclus = new Set((contenu.exclus ?? []).map(String));
+  const partis = anciens.bars.filter((b) => !reels.has(b.slug) && !ecartesPourDeBon.has(b.id) && !exclus.has(String(b.id)) && !exclus.has(b.slug)
+    && Date.parse(b.disparu ?? new Date(maintenant).toISOString()) + CONSERVATION_MS > maintenant);
   for (const bar of donnees.bars) {
     const chemin = cheminDuBar(bar);
     const etapes = [accueil, { nom: bar.ville.nom, chemin: cheminDeLaVille(bar.ville) }, { nom: bar.nom, chemin }];

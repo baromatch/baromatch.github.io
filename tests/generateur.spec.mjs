@@ -588,6 +588,21 @@ test.describe('d’un passage à l’autre', () => {
     await passer(autre, '2026-10-21T08:00:00Z');
     await passer(autre, '2026-10-21T09:00:00Z', { contenu: { ...contenu, exclus: ['b-coin'] } });
     expect(existsSync(path.join(autre, 'bar/au-bon-coin-lyon-2'))).toBe(false);
+
+    // Et un bar déjà parti des données, mis ensuite dans la liste (par identifiant ou adresse de page) : sa page est
+    // retirée au passage suivant, et son nom et son adresse sortent de l’état.
+    for (const exclu of ['b-zinc', 'le-zinc-des-amis-paris-11']) {
+      const parti = dossierVide();
+      await passer(parti, '2026-10-21T08:00:00Z');
+      const sansLui = scenarioSans(parti, (brut) => ({ ...brut, bars: brut.bars.filter((b) => b.id !== 'b-zinc') }));
+      await construire({ source: sansLui, sortie: parti, maintenant: Date.parse('2026-10-22T08:00:00Z'), racine });
+      expect(existsSync(path.join(parti, 'bar/le-zinc-des-amis-paris-11/index.html'))).toBe(true);
+      await construire({ source: sansLui, sortie: parti, maintenant: Date.parse('2026-10-22T09:00:00Z'), racine, contenu: { ...contenu, exclus: [exclu] } });
+      expect(existsSync(path.join(parti, 'bar/le-zinc-des-amis-paris-11')), exclu).toBe(false);
+      const etat = lire(parti, 'regarder-le-match/etat.json');
+      expect(etat).not.toContain('Le Zinc des Amis');
+      expect(etat).not.toContain('Oberkampf');
+    }
   });
 
   test('le plan du site : les pages fixes telles quelles, les pages générées indexables seulement', async () => {

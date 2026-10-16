@@ -1,0 +1,1167 @@
+{
+ "_lisezMoi": "L’état du générateur des pages des matchs : il l’écrit à chaque passage, ne le modifie pas à la main. Pour chaque fichier, sa sorte, son match ou son bar, l’empreinte de son contenu, la date de son dernier vrai changement (celle du plan du site) et s’il est indexable.",
+ "pages": {
+  "/matchs/": {
+   "type": "semaine",
+   "cle": "semaine",
+   "empreinte": "aCQcJoLYrDDzg8cLjcW47w",
+   "change": "2026-10-16",
+   "indexable": false
+  },
+  "/matchs/angers-lorient-2026-10-25/": {
+   "type": "match",
+   "cle": "angers-lorient-2026-10-25",
+   "date": "2026-10-25T16:15:00.000Z",
+   "empreinte": "R9A0pRuuHytglB_6AsjlPA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "angers-lorient-2026-10-25",
+    "ids": [
+     "cmuy4o39m001hzz9w17du388d"
+    ],
+    "debut": "2026-10-25T16:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "angers",
+     "court": "Angers",
+     "nom": "Angers SCO"
+    },
+    "exterieur": {
+     "cle": "lorient",
+     "court": "Lorient",
+     "nom": "FC Lorient"
+    }
+   }
+  },
+  "/matchs/angers-om-2026-10-18/": {
+   "type": "match",
+   "cle": "angers-om-2026-10-18",
+   "date": "2026-10-18T13:00:00.000Z",
+   "empreinte": "4XP4h13UgaWPHft9EdgQ-A",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "angers-om-2026-10-18",
+    "ids": [
+     "cmuy4o2tf000tzz9wztggbhpf"
+    ],
+    "debut": "2026-10-18T13:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "angers",
+     "court": "Angers",
+     "nom": "Angers SCO"
+    },
+    "exterieur": {
+     "cle": "om",
+     "court": "OM",
+     "nom": "Olympique de Marseille"
+    }
+   }
+  },
+  "/matchs/arsenal-everton-2026-10-24/": {
+   "type": "match",
+   "cle": "arsenal-everton-2026-10-24",
+   "date": "2026-10-24T14:00:00.000Z",
+   "empreinte": "uJuwx1-FuI8BkXvqV43bHw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "arsenal-everton-2026-10-24",
+    "ids": [
+     "cmv6e5jlc0015ryqjmrogsn28"
+    ],
+    "debut": "2026-10-24T14:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "arsenal",
+     "court": "Arsenal",
+     "nom": "Arsenal FC"
+    },
+    "exterieur": {
+     "cle": "everton",
+     "court": "Everton",
+     "nom": "Everton FC"
+    }
+   }
+  },
+  "/matchs/aston-villa-man-city-2026-10-24/": {
+   "type": "match",
+   "cle": "aston-villa-man-city-2026-10-24",
+   "date": "2026-10-24T11:30:00.000Z",
+   "empreinte": "gmfCmRkyu7MDiYz2CKWyHw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "aston-villa-man-city-2026-10-24",
+    "ids": [
+     "cmv6e5jkn0013ryqj4pur0exz"
+    ],
+    "debut": "2026-10-24T11:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "aston-villa",
+     "court": "Aston Villa",
+     "nom": "Aston Villa"
+    },
+    "exterieur": {
+     "cle": "man-city",
+     "court": "Man City",
+     "nom": "Manchester City"
+    }
+   }
+  },
+  "/matchs/auxerre-le-mans-2026-10-25/": {
+   "type": "match",
+   "cle": "auxerre-le-mans-2026-10-25",
+   "date": "2026-10-25T16:15:00.000Z",
+   "empreinte": "w_oezEbxKbwfnVjKh0g8Wg",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "auxerre-le-mans-2026-10-25",
+    "ids": [
+     "cmuy4o38u001fzz9wv9c9xi8d"
+    ],
+    "debut": "2026-10-25T16:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "auxerre",
+     "court": "Auxerre",
+     "nom": "AJ Auxerre"
+    },
+    "exterieur": {
+     "cle": "le-mans",
+     "court": "Le Mans",
+     "nom": "Le Mans FC"
+    }
+   }
+  },
+  "/matchs/barca-real-madrid-2026-10-25/": {
+   "type": "match",
+   "cle": "barca-real-madrid-2026-10-25",
+   "date": "2026-10-25T20:00:00.000Z",
+   "empreinte": "LjaQ1SHIkf8vSrTL1-Vmgw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "barca-real-madrid-2026-10-25",
+    "ids": [
+     "cmv6e5joo001fryqjd3flf26x"
+    ],
+    "debut": "2026-10-25T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "barca",
+     "court": "Barça",
+     "nom": "FC Barcelona"
+    },
+    "exterieur": {
+     "cle": "real-madrid",
+     "court": "Real Madrid",
+     "nom": "Real Madrid C.F."
+    }
+   }
+  },
+  "/matchs/bayern-leipzig-2026-10-17/": {
+   "type": "match",
+   "cle": "bayern-leipzig-2026-10-17",
+   "date": "2026-10-17T16:30:00.000Z",
+   "empreinte": "Z06QBypdf6HRxVRlEsRgFg",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "bayern-leipzig-2026-10-17",
+    "ids": [
+     "cmv6e5jb0000dryqjaeyen98j"
+    ],
+    "debut": "2026-10-17T16:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "bayern",
+     "court": "Bayern",
+     "nom": "FC Bayern München"
+    },
+    "exterieur": {
+     "cle": "leipzig",
+     "court": "Leipzig",
+     "nom": "RB Leipzig"
+    }
+   }
+  },
+  "/matchs/betis-barca-2026-10-17/": {
+   "type": "match",
+   "cle": "betis-barca-2026-10-17",
+   "date": "2026-10-17T16:30:00.000Z",
+   "empreinte": "KdR1Q1MQBW2uzxOMR_YHGw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "betis-barca-2026-10-17",
+    "ids": [
+     "cmv6e5jbo000fryqj3laipjjr"
+    ],
+    "debut": "2026-10-17T16:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "betis",
+     "court": "Betis",
+     "nom": "Real Betis Balompié"
+    },
+    "exterieur": {
+     "cle": "barca",
+     "court": "Barça",
+     "nom": "FC Barcelona"
+    }
+   }
+  },
+  "/matchs/brest-nice-2026-10-23/": {
+   "type": "match",
+   "cle": "brest-nice-2026-10-23",
+   "date": "2026-10-23T18:45:00.000Z",
+   "empreinte": "QijypYyRh5tiEINtV_fnjA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "brest-nice-2026-10-23",
+    "ids": [
+     "cmuy4o33f0013zz9wrv3oiom0"
+    ],
+    "debut": "2026-10-23T18:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "brest",
+     "court": "Brest",
+     "nom": "Stade Brestois 29"
+    },
+    "exterieur": {
+     "cle": "nice",
+     "court": "Nice",
+     "nom": "OGC Nice"
+    }
+   }
+  },
+  "/matchs/bruges-lens-2026-10-21/": {
+   "type": "match",
+   "cle": "bruges-lens-2026-10-21",
+   "date": "2026-10-21T19:00:00.000Z",
+   "empreinte": "3ZtseQ7QyJ9XLzUo5lr-5g",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "bruges-lens-2026-10-21",
+    "ids": [
+     "cmv6e5jh6000tryqjnandqqmv"
+    ],
+    "debut": "2026-10-21T19:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "bruges",
+     "court": "Bruges",
+     "nom": "Club Brugge KV"
+    },
+    "exterieur": {
+     "cle": "lens",
+     "court": "Lens",
+     "nom": "RC Lens"
+    }
+   }
+  },
+  "/matchs/chelsea-tottenham-2026-10-24/": {
+   "type": "match",
+   "cle": "chelsea-tottenham-2026-10-24",
+   "date": "2026-10-24T16:30:00.000Z",
+   "empreinte": "1CNa6XFpg6x0E9wM7XprZQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "chelsea-tottenham-2026-10-24",
+    "ids": [
+     "cmv6e5jna001bryqjr7o8dr8h"
+    ],
+    "debut": "2026-10-24T16:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "chelsea",
+     "court": "Chelsea",
+     "nom": "Chelsea FC"
+    },
+    "exterieur": {
+     "cle": "tottenham",
+     "court": "Tottenham",
+     "nom": "Tottenham Hotspur"
+    }
+   }
+  },
+  "/matchs/dortmund-francfort-2026-10-24/": {
+   "type": "match",
+   "cle": "dortmund-francfort-2026-10-24",
+   "date": "2026-10-24T16:30:00.000Z",
+   "empreinte": "rvLHpN37aaHSy0F9zmvznw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "dortmund-francfort-2026-10-24",
+    "ids": [
+     "cmv6e5jmn0019ryqjgpesydcl"
+    ],
+    "debut": "2026-10-24T16:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "dortmund",
+     "court": "Dortmund",
+     "nom": "Borussia Dortmund"
+    },
+    "exterieur": {
+     "cle": "francfort",
+     "court": "Francfort",
+     "nom": "Eintracht Frankfurt"
+    }
+   }
+  },
+  "/matchs/espanyol-atletico-2026-10-17/": {
+   "type": "match",
+   "cle": "espanyol-atletico-2026-10-17",
+   "date": "2026-10-17T12:00:00.000Z",
+   "empreinte": "Ppxn1k6SopFnQyuOV_pkyA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "espanyol-atletico-2026-10-17",
+    "ids": [
+     "cmv6e5j9k000bryqj0tkf7vml"
+    ],
+    "debut": "2026-10-17T12:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "espanyol",
+     "court": "Espanyol",
+     "nom": "RCD Espanyol de Barcelona"
+    },
+    "exterieur": {
+     "cle": "atletico",
+     "court": "Atlético",
+     "nom": "Atlético de Madrid"
+    }
+   }
+  },
+  "/matchs/everton-chelsea-2026-10-17/": {
+   "type": "match",
+   "cle": "everton-chelsea-2026-10-17",
+   "date": "2026-10-17T11:30:00.000Z",
+   "empreinte": "Q1BNZbKit7Vh-VU7Nd91vQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "everton-chelsea-2026-10-17",
+    "ids": [
+     "cmv6e5j890009ryqj73zobk5l"
+    ],
+    "debut": "2026-10-17T11:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "everton",
+     "court": "Everton",
+     "nom": "Everton FC"
+    },
+    "exterieur": {
+     "cle": "chelsea",
+     "court": "Chelsea",
+     "nom": "Chelsea FC"
+    }
+   }
+  },
+  "/matchs/fiorentina-atalanta-2026-10-29/": {
+   "type": "match",
+   "cle": "fiorentina-atalanta-2026-10-29",
+   "date": "2026-10-29T19:45:00.000Z",
+   "empreinte": "rjbHJMneFG64hhTWZrWvZQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "fiorentina-atalanta-2026-10-29",
+    "ids": [
+     "cmv6e5jpb001hryqjm51ofxyp"
+    ],
+    "debut": "2026-10-29T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "fiorentina",
+     "court": "Fiorentina",
+     "nom": "ACF Fiorentina"
+    },
+    "exterieur": {
+     "cle": "atalanta",
+     "court": "Atalanta",
+     "nom": "Atalanta BC"
+    }
+   }
+  },
+  "/matchs/hoffenheim-ol-2026-10-22/": {
+   "type": "match",
+   "cle": "hoffenheim-ol-2026-10-22",
+   "date": "2026-10-22T19:00:00.000Z",
+   "empreinte": "w0wm2ndrk7U3D6np26VCKw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "hoffenheim-ol-2026-10-22",
+    "ids": [
+     "cmv6e5jjt0011ryqjfdp9xljj"
+    ],
+    "debut": "2026-10-22T19:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Europa",
+    "domicile": {
+     "cle": "hoffenheim",
+     "court": "Hoffenheim",
+     "nom": "TSG Hoffenheim"
+    },
+    "exterieur": {
+     "cle": "ol",
+     "court": "OL",
+     "nom": "Olympique Lyonnais"
+    }
+   }
+  },
+  "/matchs/inter-fiorentina-2026-10-25/": {
+   "type": "match",
+   "cle": "inter-fiorentina-2026-10-25",
+   "date": "2026-10-25T11:30:00.000Z",
+   "empreinte": "wblXzWXzAJ27sjU_WM_NGA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "inter-fiorentina-2026-10-25",
+    "ids": [
+     "cmv6e5jny001dryqjip19u5u8"
+    ],
+    "debut": "2026-10-25T11:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "inter",
+     "court": "Inter",
+     "nom": "FC Internazionale Milano"
+    },
+    "exterieur": {
+     "cle": "fiorentina",
+     "court": "Fiorentina",
+     "nom": "ACF Fiorentina"
+    }
+   }
+  },
+  "/matchs/juventus-lazio-2026-10-18/": {
+   "type": "match",
+   "cle": "juventus-lazio-2026-10-18",
+   "date": "2026-10-18T18:45:00.000Z",
+   "empreinte": "lEsMET8EwKfZuHMPQvKR-A",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "juventus-lazio-2026-10-18",
+    "ids": [
+     "cmv6e5jeh000lryqj7h3np9lc"
+    ],
+    "debut": "2026-10-18T18:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "juventus",
+     "court": "Juventus",
+     "nom": "Juventus FC"
+    },
+    "exterieur": {
+     "cle": "lazio",
+     "court": "Lazio",
+     "nom": "SS Lazio"
+    }
+   }
+  },
+  "/matchs/juventus-rennes-2026-10-22/": {
+   "type": "match",
+   "cle": "juventus-rennes-2026-10-22",
+   "date": "2026-10-22T16:45:00.000Z",
+   "empreinte": "p0xzBX9vgrp1H3flCXEBZw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "juventus-rennes-2026-10-22",
+    "ids": [
+     "cmv6e5jhu000vryqjf2moooj3"
+    ],
+    "debut": "2026-10-22T16:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Europa",
+    "domicile": {
+     "cle": "juventus",
+     "court": "Juventus",
+     "nom": "Juventus FC"
+    },
+    "exterieur": {
+     "cle": "rennes",
+     "court": "Rennes",
+     "nom": "Stade Rennais FC"
+    }
+   }
+  },
+  "/matchs/le-havre-auxerre-2026-10-18/": {
+   "type": "match",
+   "cle": "le-havre-auxerre-2026-10-18",
+   "date": "2026-10-18T15:15:00.000Z",
+   "empreinte": "DkL6RRhNKqzs0gI9t3HFcg",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "le-havre-auxerre-2026-10-18",
+    "ids": [
+     "cmuy4o31c000zzz9wvq8fcogl"
+    ],
+    "debut": "2026-10-18T15:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "le-havre",
+     "court": "Le Havre",
+     "nom": "Le Havre AC"
+    },
+    "exterieur": {
+     "cle": "auxerre",
+     "court": "Auxerre",
+     "nom": "AJ Auxerre"
+    }
+   }
+  },
+  "/matchs/le-mans-toulouse-2026-10-16/": {
+   "type": "match",
+   "cle": "le-mans-toulouse-2026-10-16",
+   "date": "2026-10-16T18:45:00.000Z",
+   "empreinte": "L_DPcm93XYvdUom9nxnP7g",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "le-mans-toulouse-2026-10-16",
+    "ids": [
+     "cmuy4o2m5000lzz9wzyqgmdeq"
+    ],
+    "debut": "2026-10-16T18:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "le-mans",
+     "court": "Le Mans",
+     "nom": "Le Mans FC"
+    },
+    "exterieur": {
+     "cle": "toulouse",
+     "court": "Toulouse",
+     "nom": "Toulouse FC"
+    }
+   }
+  },
+  "/matchs/lens-paris-fc-2026-10-24/": {
+   "type": "match",
+   "cle": "lens-paris-fc-2026-10-24",
+   "date": "2026-10-24T18:45:00.000Z",
+   "empreinte": "L36QI26A2AheEn8U9FVDKQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "lens-paris-fc-2026-10-24",
+    "ids": [
+     "cmuy4o35b0017zz9w95w0gkfv"
+    ],
+    "debut": "2026-10-24T18:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "lens",
+     "court": "Lens",
+     "nom": "RC Lens"
+    },
+    "exterieur": {
+     "cle": "paris-fc",
+     "court": "Paris FC",
+     "nom": "Paris FC"
+    }
+   }
+  },
+  "/matchs/lille-brest-2026-10-17/": {
+   "type": "match",
+   "cle": "lille-brest-2026-10-17",
+   "date": "2026-10-17T18:45:00.000Z",
+   "empreinte": "LLRxbA_gncW48OYPgJdR8Q",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "lille-brest-2026-10-17",
+    "ids": [
+     "cmuy4o2qf000pzz9wd1vxevjk"
+    ],
+    "debut": "2026-10-17T18:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "lille",
+     "court": "Lille",
+     "nom": "LOSC Lille"
+    },
+    "exterieur": {
+     "cle": "brest",
+     "court": "Brest",
+     "nom": "Stade Brestois 29"
+    }
+   }
+  },
+  "/matchs/lille-galatasaray-2026-10-21/": {
+   "type": "match",
+   "cle": "lille-galatasaray-2026-10-21",
+   "date": "2026-10-21T16:45:00.000Z",
+   "empreinte": "qLSNOQZsJdmrMhNPpFEP1A",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "lille-galatasaray-2026-10-21",
+    "ids": [
+     "cmv6e5jgj000rryqjd3m8s710"
+    ],
+    "debut": "2026-10-21T16:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "lille",
+     "court": "Lille",
+     "nom": "LOSC Lille"
+    },
+    "exterieur": {
+     "cle": "galatasaray",
+     "court": "Galatasaray",
+     "nom": "Galatasaray A.Ş."
+    }
+   }
+  },
+  "/matchs/lorient-monaco-2026-10-18/": {
+   "type": "match",
+   "cle": "lorient-monaco-2026-10-18",
+   "date": "2026-10-18T15:15:00.000Z",
+   "empreinte": "0p1NYPuUZ4YtU_h8U4YETg",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "lorient-monaco-2026-10-18",
+    "ids": [
+     "cmuy4o2wd000xzz9wwnjsot1s"
+    ],
+    "debut": "2026-10-18T15:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "lorient",
+     "court": "Lorient",
+     "nom": "FC Lorient"
+    },
+    "exterieur": {
+     "cle": "monaco",
+     "court": "Monaco",
+     "nom": "AS Monaco"
+    }
+   }
+  },
+  "/matchs/milan-atalanta-2026-10-18/": {
+   "type": "match",
+   "cle": "milan-atalanta-2026-10-18",
+   "date": "2026-10-18T16:00:00.000Z",
+   "empreinte": "cpbPADBg3xPYdDyM8VTMUw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "milan-atalanta-2026-10-18",
+    "ids": [
+     "cmv6e5jdr000jryqjohg84l52"
+    ],
+    "debut": "2026-10-18T16:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "milan",
+     "court": "Milan",
+     "nom": "AC Milan"
+    },
+    "exterieur": {
+     "cle": "atalanta",
+     "court": "Atalanta",
+     "nom": "Atalanta BC"
+    }
+   }
+  },
+  "/matchs/monaco-fribourg-2026-10-22/": {
+   "type": "match",
+   "cle": "monaco-fribourg-2026-10-22",
+   "date": "2026-10-22T19:00:00.000Z",
+   "empreinte": "c5d2jl_jHWyT0eQBVCj9pQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "monaco-fribourg-2026-10-22",
+    "ids": [
+     "cmv6e5jj6000zryqjk9dgjf13"
+    ],
+    "debut": "2026-10-22T19:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Conférence",
+    "domicile": {
+     "cle": "monaco",
+     "court": "Monaco",
+     "nom": "AS Monaco"
+    },
+    "exterieur": {
+     "cle": "fribourg",
+     "court": "Fribourg",
+     "nom": "SC Freiburg"
+    }
+   }
+  },
+  "/matchs/monaco-lille-2026-10-25/": {
+   "type": "match",
+   "cle": "monaco-lille-2026-10-25",
+   "date": "2026-10-25T14:00:00.000Z",
+   "empreinte": "GZC0dr3iEDCPCG2qSX1o_Q",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "monaco-lille-2026-10-25",
+    "ids": [
+     "cmuy4o36d0019zz9w74csusip"
+    ],
+    "debut": "2026-10-25T14:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "monaco",
+     "court": "Monaco",
+     "nom": "AS Monaco"
+    },
+    "exterieur": {
+     "cle": "lille",
+     "court": "Lille",
+     "nom": "LOSC Lille"
+    }
+   }
+  },
+  "/matchs/naples-rome-2026-10-24/": {
+   "type": "match",
+   "cle": "naples-rome-2026-10-24",
+   "date": "2026-10-24T16:00:00.000Z",
+   "empreinte": "dBXc37dQUDreAGcvotanzA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "naples-rome-2026-10-24",
+    "ids": [
+     "cmv6e5jm00017ryqj0ecs7n5p"
+    ],
+    "debut": "2026-10-24T16:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "naples",
+     "court": "Naples",
+     "nom": "SSC Napoli"
+    },
+    "exterieur": {
+     "cle": "rome",
+     "court": "Rome",
+     "nom": "AS Roma"
+    }
+   }
+  },
+  "/matchs/newcastle-aston-villa-2026-10-17/": {
+   "type": "match",
+   "cle": "newcastle-aston-villa-2026-10-17",
+   "date": "2026-10-17T16:30:00.000Z",
+   "empreinte": "UxjYHSUwyk-z86AwPEXjxw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "newcastle-aston-villa-2026-10-17",
+    "ids": [
+     "cmv6e5jcf000hryqjfl08f65d"
+    ],
+    "debut": "2026-10-17T16:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "newcastle",
+     "court": "Newcastle",
+     "nom": "Newcastle United FC"
+    },
+    "exterieur": {
+     "cle": "aston-villa",
+     "court": "Aston Villa",
+     "nom": "Aston Villa"
+    }
+   }
+  },
+  "/matchs/ol-nice-2026-10-18/": {
+   "type": "match",
+   "cle": "ol-nice-2026-10-18",
+   "date": "2026-10-18T18:45:00.000Z",
+   "empreinte": "p21GX9MVnAidJxkHyUGcrA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "ol-nice-2026-10-18",
+    "ids": [
+     "cmuy4o32c0011zz9wnmirx1mt"
+    ],
+    "debut": "2026-10-18T18:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "ol",
+     "court": "OL",
+     "nom": "Olympique Lyonnais"
+    },
+    "exterieur": {
+     "cle": "nice",
+     "court": "Nice",
+     "nom": "OGC Nice"
+    }
+   }
+  },
+  "/matchs/om-le-havre-2026-10-25/": {
+   "type": "match",
+   "cle": "om-le-havre-2026-10-25",
+   "date": "2026-10-25T16:15:00.000Z",
+   "empreinte": "zH3baE1G3mkCgQmtA_y5ZA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "om-le-havre-2026-10-25",
+    "ids": [
+     "cmuy4o383001dzz9w3dcpq9yt"
+    ],
+    "debut": "2026-10-25T16:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "om",
+     "court": "OM",
+     "nom": "Olympique de Marseille"
+    },
+    "exterieur": {
+     "cle": "le-havre",
+     "court": "Le Havre",
+     "nom": "Le Havre AC"
+    }
+   }
+  },
+  "/matchs/paris-fc-rennes-2026-10-18/": {
+   "type": "match",
+   "cle": "paris-fc-rennes-2026-10-18",
+   "date": "2026-10-18T15:15:00.000Z",
+   "empreinte": "lVMIpoTlOwesarDUTWLVzg",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "paris-fc-rennes-2026-10-18",
+    "ids": [
+     "cmuy4o2us000vzz9wjza1c2ln"
+    ],
+    "debut": "2026-10-18T15:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "paris-fc",
+     "court": "Paris FC",
+     "nom": "Paris FC"
+    },
+    "exterieur": {
+     "cle": "rennes",
+     "court": "Rennes",
+     "nom": "Stade Rennais FC"
+    }
+   }
+  },
+  "/matchs/psg-barca-2026-10-20/": {
+   "type": "match",
+   "cle": "psg-barca-2026-10-20",
+   "date": "2026-10-20T19:00:00.000Z",
+   "empreinte": "QThSBSDsw8YJgNlEzCPRkQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "psg-barca-2026-10-20",
+    "ids": [
+     "cmuy4o3bt001lzz9w12rhfcw6",
+     "cmv6e5jfu000pryqjcr3s6v8f"
+    ],
+    "debut": "2026-10-20T19:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "psg",
+     "court": "PSG",
+     "nom": "Paris Saint-Germain"
+    },
+    "exterieur": {
+     "cle": "barca",
+     "court": "Barça",
+     "nom": "FC Barcelona"
+    }
+   }
+  },
+  "/matchs/psg-ol-2026-10-25/": {
+   "type": "match",
+   "cle": "psg-ol-2026-10-25",
+   "date": "2026-10-25T19:45:00.000Z",
+   "empreinte": "rQaYjwXvGnLtni0CvfjPyQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "psg-ol-2026-10-25",
+    "ids": [
+     "cmuy4o3an001jzz9wga6hjce3"
+    ],
+    "debut": "2026-10-25T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "psg",
+     "court": "PSG",
+     "nom": "Paris Saint-Germain"
+    },
+    "exterieur": {
+     "cle": "ol",
+     "court": "OL",
+     "nom": "Olympique Lyonnais"
+    }
+   }
+  },
+  "/matchs/real-madrid-seville-2026-10-18/": {
+   "type": "match",
+   "cle": "real-madrid-seville-2026-10-18",
+   "date": "2026-10-18T19:00:00.000Z",
+   "empreinte": "0L9dePIbTfEglUNGO1Lusw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "real-madrid-seville-2026-10-18",
+    "ids": [
+     "cmv6e5jf7000nryqjjgrf6o6g"
+    ],
+    "debut": "2026-10-18T19:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "real-madrid",
+     "court": "Real Madrid",
+     "nom": "Real Madrid C.F."
+    },
+    "exterieur": {
+     "cle": "seville",
+     "court": "Séville",
+     "nom": "Sevilla FC"
+    }
+   }
+  },
+  "/matchs/rennes-strasbourg-2026-10-25/": {
+   "type": "match",
+   "cle": "rennes-strasbourg-2026-10-25",
+   "date": "2026-10-25T16:15:00.000Z",
+   "empreinte": "UOCOOPStEK4cMmLY8dAECg",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "rennes-strasbourg-2026-10-25",
+    "ids": [
+     "cmuy4o373001bzz9w6lup6lid"
+    ],
+    "debut": "2026-10-25T16:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "rennes",
+     "court": "Rennes",
+     "nom": "Stade Rennais FC"
+    },
+    "exterieur": {
+     "cle": "strasbourg",
+     "court": "Strasbourg",
+     "nom": "RC Strasbourg Alsace"
+    }
+   }
+  },
+  "/matchs/strasbourg-psg-2026-10-17/": {
+   "type": "match",
+   "cle": "strasbourg-psg-2026-10-17",
+   "date": "2026-10-17T15:15:00.000Z",
+   "empreinte": "DRUnQ_Kyr2VO5TTKS5eTnA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "strasbourg-psg-2026-10-17",
+    "ids": [
+     "cmuy4o2p5000nzz9wvfolp7bo"
+    ],
+    "debut": "2026-10-17T15:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "strasbourg",
+     "court": "Strasbourg",
+     "nom": "RC Strasbourg Alsace"
+    },
+    "exterieur": {
+     "cle": "psg",
+     "court": "PSG",
+     "nom": "Paris Saint-Germain"
+    }
+   }
+  },
+  "/matchs/sturm-graz-om-2026-10-22/": {
+   "type": "match",
+   "cle": "sturm-graz-om-2026-10-22",
+   "date": "2026-10-22T16:45:00.000Z",
+   "empreinte": "-q9oUE3WNSnsuzSj7WTicQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "sturm-graz-om-2026-10-22",
+    "ids": [
+     "cmv6e5jih000xryqjvv55d6np"
+    ],
+    "debut": "2026-10-22T16:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Europa",
+    "domicile": {
+     "cle": "sturm-graz",
+     "court": "Sturm Graz",
+     "nom": "SK Sturm Graz"
+    },
+    "exterieur": {
+     "cle": "om",
+     "court": "OM",
+     "nom": "Olympique de Marseille"
+    }
+   }
+  },
+  "/matchs/toulouse-troyes-2026-10-24/": {
+   "type": "match",
+   "cle": "toulouse-troyes-2026-10-24",
+   "date": "2026-10-24T15:15:00.000Z",
+   "empreinte": "VXDxn2nRdjk-Z8CwBIt5mw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "toulouse-troyes-2026-10-24",
+    "ids": [
+     "cmuy4o34h0015zz9wqdz2927p"
+    ],
+    "debut": "2026-10-24T15:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "toulouse",
+     "court": "Toulouse",
+     "nom": "Toulouse FC"
+    },
+    "exterieur": {
+     "cle": "troyes",
+     "court": "Troyes",
+     "nom": "ESTAC Troyes"
+    }
+   }
+  },
+  "/matchs/troyes-lens-2026-10-17/": {
+   "type": "match",
+   "cle": "troyes-lens-2026-10-17",
+   "date": "2026-10-17T18:45:00.000Z",
+   "empreinte": "QJTi7F3Z5syDKWencY_0cA",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "slug": "troyes-lens-2026-10-17",
+    "ids": [
+     "cmuy4o2rj000rzz9wf1igamhi"
+    ],
+    "debut": "2026-10-17T18:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "troyes",
+     "court": "Troyes",
+     "nom": "ESTAC Troyes"
+    },
+    "exterieur": {
+     "cle": "lens",
+     "court": "Lens",
+     "nom": "RC Lens"
+    }
+   }
+  },
+  "/regarder-le-match/": {
+   "type": "villes",
+   "cle": "villes",
+   "empreinte": "GE2bZ3zqv1-U92xGZUVcJw",
+   "change": "2026-10-16",
+   "indexable": false
+  },
+  "/regarder-le-match/lille/": {
+   "type": "ville",
+   "cle": "lille",
+   "empreinte": "qDGixNIiPjj1KDh39h5byw",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "nom": "Lille"
+   }
+  },
+  "/regarder-le-match/lyon/": {
+   "type": "ville",
+   "cle": "lyon",
+   "empreinte": "8SnqnVrHaAn4TWxDMyzLtQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "nom": "Lyon"
+   }
+  },
+  "/regarder-le-match/marseille/": {
+   "type": "ville",
+   "cle": "marseille",
+   "empreinte": "Hd95YXSVvkpoNm-x69MHJQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "nom": "Marseille"
+   }
+  },
+  "/regarder-le-match/paris/": {
+   "type": "ville",
+   "cle": "paris",
+   "empreinte": "qWgHVJbG_IDJqfSFsOEXlQ",
+   "change": "2026-10-16",
+   "indexable": false,
+   "memoire": {
+    "nom": "Paris"
+   }
+  }
+ }
+}

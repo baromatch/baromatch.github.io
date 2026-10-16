@@ -16,7 +16,7 @@ import { construireEnMemoire } from '../generateur/site.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
 import { controlerLaPage } from '../generateur/controle.mjs';
 import { echapper } from '../generateur/texte.mjs';
-import { construire } from '../generateur/construire.mjs';
+import { construire, verifierLesListes } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
 import { prevenirIndexNow, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
 
@@ -658,6 +658,32 @@ test.describe('d’un passage à l’autre', () => {
     const etatJuste = lire(sortie, 'regarder-le-match/etat.json');
     await expect(construire({ source: 'api', adresse: 'http://127.0.0.1:9', sortie, maintenant: Date.parse('2026-10-23T10:00:00Z'), racine })).rejects.toThrow(/Données illisibles/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatJuste);
+  });
+
+  test('la prudence : une liste de bars ou de soirées vide, ou la moitié des bars ou des matchs à venir perdus, n’écrit rien', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
+    const garder = ['b-zinc', 'b-comptoir'];
+    const cas = [
+      [(brut) => ({ ...brut, bars: [] }), /la liste des bars est vide, alors que 5 bars sont publiés/],
+      [(brut) => ({ ...brut, matchNights: [] }), /la liste des soirées est vide/],
+      [(brut) => ({ ...brut, bars: brut.bars.filter((b) => garder.includes(b.id) || !/^b-(gones|coin|rennes)$/.test(b.id)) }), /3 des 5 bars publiés ne sont plus dans la liste des bars/],
+      [(brut) => ({ ...brut, matches: brut.matches.slice(0, 2) }), /des \d+ matchs à venir publiés ne sont plus dans la liste des matchs/],
+    ];
+    for (const [modifier, message] of cas) {
+      const source = scenarioSans(sortie, modifier);
+      await expect(passer(sortie, '2026-10-23T09:00:00Z', { source })).rejects.toThrow(message);
+      await expect(passer(sortie, '2026-10-23T09:00:00Z', { source })).rejects.toThrow(/rien n’est écrit.*--accepter-les-suppressions/s);
+      expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
+    }
+    // Deux bars publiés, un qui part : rien ne bloque (sous le seuil). Et la case cochée accepte une liste tronquée.
+    const deuxBars = { pages: {
+      '/bar/a-paris-11/': { type: 'bar', memoire: { id: 'a' } }, '/bar/b-paris-11/': { type: 'bar', memoire: { id: 'b' } },
+    } };
+    expect(verifierLesListes({ precedent: deuxBars, donnees: { bars: [{ id: 'a' }], ecartes: [], matchs: [], recus: { bars: 1, soirees: 1 } }, maintenant: VENDREDI })).toEqual([]);
+    await passer(sortie, '2026-10-23T09:00:00Z', { source: scenarioSans(sortie, (brut) => ({ ...brut, bars: [] })), accepterLesSuppressions: true });
+    expect(lire(sortie, 'regarder-le-match/etat.json')).not.toBe(etatAvant);
   });
 
   test('le badge vivant : la prochaine soirée, ou « On diffuse le match », jamais « Réserve ta place » tant que l’appli est fermée', async () => {

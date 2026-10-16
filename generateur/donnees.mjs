@@ -256,7 +256,8 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
   for (const bar of bars) bar.soirees.sort(parDebut);
   for (const match of matchs) match.soirees.sort((a, b) => a.bar.nom.localeCompare(b.bar.nom, 'fr'));
 
-  return { maintenant, matchs, bars, soirees, ecartes, avertissements };
+  // recus : la taille des listes reçues, pour reconnaître une liste vide ou tronquée (construire.mjs).
+  return { maintenant, matchs, bars, soirees, ecartes, avertissements, recus: { bars: brut.bars.length, soirees: brut.matchNights.length } };
 };
 
 // L’offre d’une soirée, telle que le bar l’a écrite : son titre, son prix s’il est donné, et la mention santé sauf si

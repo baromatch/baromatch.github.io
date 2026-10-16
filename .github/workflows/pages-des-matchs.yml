@@ -5,7 +5,9 @@
 # l’accueil (dont les pages reprennent l’en-tête et le pied de page).
 # Si les données ne répondent pas, répondent une erreur ou ne donnent aucun match, le générateur s’arrête sans rien
 # écrire : les pages en ligne restent comme elles sont. Il refuse aussi de supprimer d’un coup plus de la moitié des
-# pages ; si c’est voulu (après une longue pause, par exemple), relance-la à la main en cochant la case.
+# pages, ou de perdre d’un coup les bars ou les soirées (liste vide) ou plus de la moitié des bars ou des matchs à
+# venir publiés (liste tronquée) ; si c’est voulu (après une longue pause, par exemple), relance-la à la main en
+# cochant la case.
 # Seuls matchs/, regarder-le-match/, bar/ et sitemap.xml sont enregistrés, avec un message clair, puis envoyés sur
 # main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
 # elle-même (d’où « pages: write »), puis prévient IndexNow des adresses indexables qui ont changé.
@@ -19,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       accepter_les_suppressions:
-        description: 'Accepter qu’un passage supprime plus de la moitié des pages'
+        description: 'Accepter qu’un passage supprime plus de la moitié des pages, ou perde la plupart des bars ou des matchs'
         type: boolean
         default: false
   push:

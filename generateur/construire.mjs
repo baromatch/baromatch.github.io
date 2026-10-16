@@ -23,12 +23,44 @@ import { construireEnMemoire } from './site.mjs';
 // Au-delà de ce nombre de pages publiées, un passage qui en supprimerait plus de la moitié s’arrête : des données
 // vides ou tronquées ne vident pas le site.
 const SEUIL_DE_PRUDENCE = 10;
+// Au-delà de ce nombre de bars publiés (ou de matchs à venir déjà publiés), en perdre plus de la moitié d’un coup
+// arrête le passage : une liste tronquée ne fait pas basculer le site. En dessous (deux bars), rien ne bloque.
+const SEUIL_DES_LISTES = 4;
+
+// Ce que l’état connaissait (les bars publiés, les matchs à venir, s’il y avait des soirées) face aux listes reçues :
+// les raisons de refuser le passage, vides si tout va bien.
+export const verifierLesListes = ({ precedent, donnees, maintenant }) => {
+  const entrees = Object.values(precedent.pages ?? {}).filter((p) => p.memoire);
+  const barsConnus = entrees.filter((p) => p.type === 'bar' && p.memoire.id && !p.memoire.disparu).map((p) => p.memoire.id);
+  const matchsConnus = entrees.filter((p) => p.type === 'match' && Date.parse(p.memoire.debut) > maintenant);
+  const avecSoirees = matchsConnus.some((p) => p.indexable);
+  const barsRecus = new Set([...donnees.bars.map((b) => b.id), ...donnees.ecartes.map((b) => b.id)]);
+  const idsDesMatchs = new Set(donnees.matchs.flatMap((m) => m.ids));
+  const barsPerdus = barsConnus.filter((id) => !barsRecus.has(id));
+  const matchsPerdus = matchsConnus.filter((p) => !(p.memoire.ids ?? []).some((id) => idsDesMatchs.has(id)));
+  const raisons = [];
+  if (barsConnus.length && donnees.recus.bars === 0) raisons.push(`la liste des bars est vide, alors que ${barsConnus.length} bars sont publiés`);
+  if (avecSoirees && donnees.recus.soirees === 0) raisons.push('la liste des soirées est vide, alors que des soirées à venir sont publiées');
+  if (barsConnus.length >= SEUIL_DES_LISTES && barsPerdus.length > barsConnus.length / 2) {
+    raisons.push(`${barsPerdus.length} des ${barsConnus.length} bars publiés ne sont plus dans la liste des bars`);
+  }
+  if (matchsConnus.length >= SEUIL_DES_LISTES && matchsPerdus.length > matchsConnus.length / 2) {
+    raisons.push(`${matchsPerdus.length} des ${matchsConnus.length} matchs à venir publiés ne sont plus dans la liste des matchs`);
+  }
+  return raisons;
+};
 
 export const construire = async ({
   source = 'api', sortie = RACINE, maintenant = Date.now(), racine = RACINE, contenu, accepterLesSuppressions = false, adresse, journal = () => {},
 } = {}) => {
   const precedent = lireLEtat(sortie);
   const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent) });
+
+  // Une liste vide ou tronquée (bars, soirées, matchs) ne fait pas basculer le site : rien n’est écrit.
+  const raisons = accepterLesSuppressions ? [] : verifierLesListes({ precedent, donnees: site.donnees, maintenant });
+  if (raisons.length) {
+    throw new Error(`Données douteuses, rien n’est écrit : ${raisons.join(' ; ')}. Si c’est voulu, relance avec --accepter-les-suppressions (ou coche la case en lançant l’Action à la main).`);
+  }
 
   // Les badges des bars, à côté de leur page.
   const fichiers = [...site.pages];

@@ -22,6 +22,7 @@ import { echapper } from '../generateur/texte.mjs';
 import { auBar } from '../generateur/jsonld.mjs';
 import { construire, verifierLesListes } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
+import { anonymiser, reduire } from '../generateur/outils/reduire-capture.mjs';
 import { prevenirIndexNow, publierLesPages, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
@@ -70,7 +71,7 @@ test.describe('les données', () => {
     for (const name of ['Bar staging', 'Sandbox Pub', 'Le Bar fictif', 'Comptoir factice', 'Démonstration', 'bar_qa', 'Le Contest']) {
       expect(raisonDEcarter({ name, address: rue }, vide), name).toBe(essai);
     }
-    expect(raisonDEcarter({ id: 'bar-arrival-qa-production', name: 'Le Comptoir', address: rue }, vide)).toBe(essai);
+    expect(raisonDEcarter({ id: 'bar-arrivee-qa-exemple', name: 'Le Comptoir', address: rue }, vide)).toBe(essai);
     expect(raisonDEcarter({ id: 'b-9', name: 'L’Aquarium', address: '1 quai de la Gare, 75013 Paris' }, vide)).toBeNull();
     expect(raisonDEcarter({ name: 'Le Quai', address: '1 quai de la Gare, 75013 Paris' }, vide)).toBeNull();
     expect(raisonDEcarter({ id: 'b-t1', name: 'Le Testament', address: rue }, vide, new Set(['b-t1']))).toBeNull();
@@ -138,10 +139,20 @@ test.describe('les données', () => {
     const donnees = await donneesDu(`capture:${CAPTURE}`, ENREGISTREMENT);
     expect(donnees.bars).toEqual([]);
     expect(donnees.soirees).toEqual([]);
-    expect(donnees.ecartes.map((e) => e.nom)).toEqual(['Bar de démo Baromatch']);
+    expect(donnees.ecartes.map((e) => e.nom)).toEqual(['Bar de démo']);
     // 79 matchs reçus, dont un en double (Ligue des champions et UEFA Champions League) : 78.
     expect(donnees.matchs).toHaveLength(78);
   });
+  test('la copie publique des listes : aucun identifiant de l’appli, le bar de démo factice, aucun vrai bar', async () => {
+    const brut = await lireLaSource(`capture:${CAPTURE}`);
+    const ids = [...brut.matches.map((m) => m.id), ...brut.bars.map((b) => b.id), ...brut.matchNights.flatMap((n) => [n.id, n.bar.id, n.match.id])];
+    expect(ids.filter((id) => !/^(?:match|soiree|bar)-\d{3}$/.test(id))).toEqual([]);
+    expect(brut.bars).toEqual([{ id: 'bar-001', name: 'Bar de démo', address: 'Site de démo - 1 rue de l’Exemple, 75001 Paris', isActive: true, features: null }]);
+    // Rendue factice une seconde fois, elle ne change pas ; un vrai bar n’y entre jamais.
+    expect(anonymiser(reduire(brut))).toEqual(brut);
+    expect(() => anonymiser({ ...brut, bars: [{ id: 'b-1', name: 'Le Zinc des Amis', address: '12 Rue Oberkampf, 75011 Paris' }] })).toThrow(/vrais bars/);
+  });
+
 
   test('les doublons : un seul match, le nom français de la compétition, toutes les soirées', async () => {
     const donnees = await donneesDu(`scenario:${SCENARIO}`, VENDREDI);

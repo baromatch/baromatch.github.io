@@ -12,6 +12,7 @@ export const CHROMIUM = process.env.CHROME_PATH || '/opt/pw-browsers/chromium';
 // 127.0.0.1 (personne d’autre sur le réseau ne lit le dépôt), sans journal (-s). cacheSecondes : 600 comme GitHub
 // Pages (max-age=600) pour les mesures, -1 (aucun cache) pour les tests. Le serveur se lance par Node et son script,
 // pas par le raccourci de node_modules/.bin, qui ne se lance pas seul sous Windows : la même commande partout.
-export const commandeServeur = (port, cacheSecondes = -1) => [
-  process.execPath, path.join(racine, 'node_modules', 'http-server', 'bin', 'http-server'), racine, '-p', String(port), '-a', '127.0.0.1', `-c${cacheSecondes}`, '-s',
+// dossier : un autre dossier que ce dépôt (les pages générées d’un scénario, construites à part).
+export const commandeServeur = (port, cacheSecondes = -1, dossier = racine) => [
+  process.execPath, path.join(racine, 'node_modules', 'http-server', 'bin', 'http-server'), dossier, '-p', String(port), '-a', '127.0.0.1', `-c${cacheSecondes}`, '-s',
 ];

@@ -1,7 +1,8 @@
 // Sert ce dépôt comme GitHub Pages (commandeServeur, environnement.mjs), et seulement lui : un port déjà pris fait
 // échouer le démarrage (un autre serveur, d’un autre dossier, y répondrait à notre place), un serveur qui s’arrête le
 // dit avec son code et ce qu’il a écrit, et le serveur n’est prêt que lorsqu’il sert l’index.html de ce dépôt.
-// options.commande remplace la commande (tests/outillage.spec.mjs y met un serveur qui s’arrête).
+// options.commande remplace la commande (tests/outillage.spec.mjs y met un serveur qui s’arrête) ; options.dossier
+// sert un autre dossier que ce dépôt (les pages générées d’un scénario), prêt quand il sert son propre index.html.
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -19,7 +20,7 @@ const verifierQueLePortEstLibre = (port) => new Promise((resoudre, rejeter) => {
   sonde.listen(port, '127.0.0.1', () => sonde.close(resoudre));
 });
 
-export const demarrerServeur = async (port, cacheSecondes = -1, { commande = commandeServeur(port, cacheSecondes) } = {}) => {
+export const demarrerServeur = async (port, cacheSecondes = -1, { dossier = racine, commande = commandeServeur(port, cacheSecondes, dossier) } = {}) => {
   await verifierQueLePortEstLibre(port);
   const [binaire, ...arguments_] = commande;
   const serveur = spawn(binaire, arguments_, { stdio: ['ignore', 'ignore', 'pipe'] });
@@ -31,7 +32,7 @@ export const demarrerServeur = async (port, cacheSecondes = -1, { commande = com
   serveur.once('error', (erreur) => { arret = erreur.message; });
 
   const adresse = `http://127.0.0.1:${port}`;
-  const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
+  const accueil = readFileSync(path.join(dossier, 'index.html'), 'utf8');
   let derniereErreur = 'aucune réponse';
   for (let essai = 0; essai < ESSAIS; essai += 1) {
     if (arret) throw new Error(`Le serveur local s’est arrêté (${arret}) : ${ecrit.trim()}`);

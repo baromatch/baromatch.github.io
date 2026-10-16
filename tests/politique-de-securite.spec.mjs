@@ -157,6 +157,9 @@ test.describe('rien ne viole la politique en parcourant les pages', () => {
         envois.push(route.request().method());
         return route.fulfill({ status: 200, contentType: 'text/html', body: '<p>Merci</p>' });
       });
+      // Mouvement réduit : l’ouverture ne bouge pas. Sans JavaScript, un clic tenté pendant que la phrase d’ouverture
+      // glisse encore restait bloqué sur « element is not stable » jusqu’à la fin du test (Chromium sous Windows).
+      await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto('/');
       await page.locator('#attente-mail').fill('paul@gmail.com');
       await page.locator('#attente button[type="submit"]').click();

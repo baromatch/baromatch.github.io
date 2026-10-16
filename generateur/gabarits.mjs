@@ -87,12 +87,16 @@ ${elements.join('\n')}
 `;
 };
 
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps }) => `${tete({ titre, description, chemin, indexable, jsonld })}${cadre.entete}
+// La typographie française, sur toute la page (titre, description, texte, données structurées) : une espace insécable
+// avant « ? », « : » et « ; », pour que le signe ne parte jamais seul à la ligne.
+export const insecables = (texte) => texte.replace(/ ([?:;])/g, '\u00A0$1');
+
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld })}${cadre.entete}
 
 <main id="contenu" class="regarder page">
 ${corps}
 </main>
-${pied({ cadre, marque, chemin, avecPresse })}`;
+${pied({ cadre, marque, chemin, avecPresse })}`);
 
 // ---------- Morceaux communs ----------
 
@@ -119,10 +123,21 @@ const prix = (centimes) => {
   return `${euros}${reste ? `,${String(reste).padStart(2, '0')}` : ''} €`;
 };
 
-// L’offre d’une soirée, telle que le bar l’a écrite, avec la mention santé dessous si elle peut contenir de l’alcool.
-export const offre = (o, textes) => (o ? `<div class="regarder-offre">
-        <p class="regarder-offre__texte"><span class="regarder-offre__etiquette">L’offre du bar</span> ${e(o.titre)}${o.prixCentimes !== null ? ` · ${prix(o.prixCentimes)}` : ''}</p>
-${o.alcool ? `        <p class="regarder-offre__sante">${e(textes.mentionSante)}</p>\n` : ''}      </div>` : '');
+// L’offre d’une soirée (loi Evin) : telle que le bar l’a écrite, avec son heure limite, si elle est sans alcool ; sinon
+// « Une offre du bar dans l’appli », sans titre ni prix. La mention santé reste dessous dès qu’une offre affichée parle
+// d’alcool (le filet de sécurité).
+export const offre = (o, textes) => {
+  if (!o) return '';
+  if (o.dansLAppli) {
+    return `<div class="regarder-offre">
+        <p class="regarder-offre__texte">${e(textes.offre.dansLAppli)}</p>
+      </div>`;
+  }
+  const suite = [o.prixCentimes !== null ? prix(o.prixCentimes) : null, o.jusqua ? textes.offre.jusqua.replace('{heure}', heureDeParis(o.jusqua)) : null].filter(Boolean);
+  return `<div class="regarder-offre">
+        <p class="regarder-offre__texte"><span class="regarder-offre__etiquette">${e(textes.offre.etiquette)}</span> ${e(o.titre)}${suite.map((s) => ` · ${e(s)}`).join('')}</p>
+${o.alcool ? `        <p class="regarder-offre__sante">${e(textes.mentionSante)}</p>\n` : ''}      </div>`;
+};
 
 // Ce que le bar dit de lui, et rien de plus.
 export const atouts = (bar, textes) => {
@@ -150,12 +165,16 @@ export const appel = (marque, textes) => {
 </div>`;
 };
 
-export const commentCaMarche = (textes) => `<section class="regarder-section" aria-labelledby="titre-comment">
+// Tant que l’appli n’est pas ouverte, au futur (« Quand l’appli ouvre, tu pourras… ») : rien n’est promis aujourd’hui.
+export const commentCaMarche = (textes, marque) => {
+  const { intro, etapes } = textes.commentCaMarche[marque.appli?.ouverte ? 'ouverte' : 'fermee'];
+  return `<section class="regarder-section" aria-labelledby="titre-comment">
   <h2 id="titre-comment">${e(textes.commentCaMarche.titre)}</h2>
-  <ol class="regarder-etapes">
-${textes.commentCaMarche.etapes.map((etape) => `    <li><strong>${e(etape.titre)}</strong> ${e(etape.texte)}</li>`).join('\n')}
+${intro ? `  <p>${e(intro)}</p>\n` : ''}  <ol class="regarder-etapes">
+${etapes.map((etape) => `    <li><strong>${e(etape.titre)}</strong> ${e(etape.texte)}</li>`).join('\n')}
   </ol>
 </section>`;
+};
 
 // « Tu tiens un bar ? » : vers la page des bars.
 export const tuTiensUnBar = (textes) => `<p class="regarder-bars-pro"><a href="/pour-les-bars.html">${e(textes.match.tuTiensUnBar)}</a> ${e(textes.match.tuTiensUnBarSuite)}</p>`;

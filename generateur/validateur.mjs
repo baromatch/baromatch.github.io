@@ -4,7 +4,7 @@
 //     propriété accepte, chaque valeur d’énumération (EventScheduled…) est de la bonne énumération ;
 //  2. ce que Google demande pour les résultats enrichis qu’il affiche (documentation de Google Search Central, pages
 //     « Event » et « Breadcrumb », mises à jour le 8 septembre 2026) : pour Event, un nom, une date de début ISO 8601,
-//     un lieu nommé avec son adresse postale, et une image ; pour BreadcrumbList, des éléments numérotés à partir de 1,
+//     un lieu nommé avec son adresse postale (une image, si elle est donnée, en adresse absolue) ; pour BreadcrumbList, des éléments numérotés à partir de 1,
 //     chacun avec son nom et son adresse (sauf le dernier). FAQPage n’est jugé que par schema.org : Google n’affiche
 //     plus ces résultats depuis mai 2026, et le validateur ne prétend suivre aucune règle de Google pour eux.
 // Il existe un validateur npm entretenu (@adobe/structured-data-validator), mais il ne juge pas Event et demande le
@@ -134,9 +134,11 @@ const validerUnEvenement = (vocabulaire, evenement, chemin, erreurs) => {
   }
   if (evenement.eventStatus !== undefined && !STATUTS_GOOGLE.includes(evenement.eventStatus)) erreurs.push(`${chemin} : eventStatus inconnu de Google`);
   if (evenement.eventAttendanceMode !== undefined && !MODES.includes(evenement.eventAttendanceMode)) erreurs.push(`${chemin} : eventAttendanceMode inconnu`);
+  // Une image, si elle est donnée, en adresse absolue ; aucune n’est exigée (Google la recommande seulement, et la
+  // veut représentative de l’évènement : mieux vaut aucune que l’image générique du site).
   const images = [].concat(evenement.image ?? []);
-  if (images.length === 0 || images.some((image) => typeof image !== 'string' || !URL_ABSOLUE.test(image))) {
-    erreurs.push(`${chemin} : Event sans image en adresse absolue (recommandé par Google, exigé ici)`);
+  if (images.some((image) => typeof image !== 'string' || !URL_ABSOLUE.test(image))) {
+    erreurs.push(`${chemin} : Event avec une image qui n’est pas une adresse absolue`);
   }
   for (const offre of [].concat(evenement.offers ?? [])) {
     for (const cle of ['url', 'price', 'priceCurrency', 'availability']) if (!rempli(offre[cle])) erreurs.push(`${chemin}.offers : ${cle} manque`);

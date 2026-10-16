@@ -4,17 +4,32 @@
 // (« Ce match est passé », sans score, vers le prochain match d’un des deux clubs), un bar qui n’est plus là aussi
 // (vers sa ville). Chaque page dit si elle est indexable ; les règles sont ici, et seulement ici.
 import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
-import { dateCourte, jourDeParis, jourEnLettres, heureDeParis } from './heure.mjs';
+import { dateCourte, heureDuJour, jourDeParis, jourEnLettres, heureDeParis } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import {
   adresseDe, cheminDeLaVille, cheminDuBar, cheminDuMatch, evenementDeLaSoiree, filDAriane, listeDesBars, pageWeb, questions, ancreDeLaSoiree,
   barOuPub,
 } from './jsonld.mjs';
+import { lignesDuBadge } from './badge.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, tuTiensUnBar, atouts } from './gabarits.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
 export const SEMAINE_JOURS = 7;
 export const CONSERVATION_MS = 30 * JOUR_MS;
+// Les seuils d’indexation, contre les pages minces : en dessous, la page existe (lisible, utile au visiteur) mais
+// porte noindex et reste hors du plan du site. Les bars comptés sont les vrais bars publiés (bars-publies.json).
+export const SEUILS = {
+  // Une page de match : au moins 2 bars qui le diffusent (un seul bar, c’est une fiche, pas une page de choix).
+  barsParMatch: 2,
+  // Une page de ville : avec un guide écrit (villes.json), dès son premier bar ; sans guide, à partir de 3 bars.
+  barsParVilleAvecGuide: 1,
+  barsParVilleSansGuide: 3,
+  // Une page de bar : noindex après 60 jours sans soirée annoncée.
+  joursSansSoireePourUnBar: 60,
+  // La semaine (/matchs/) : indexable dès qu’il existe un vrai bar publié actif, même sans soirée cette semaine (pour
+  // ne pas entrer et sortir de l’index d’une semaine à l’autre).
+  barsPourLaSemaine: 1,
+};
 
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 
@@ -40,11 +55,16 @@ const description = (...candidats) => choisir(candidats, 70, 160, ' Les bars qui
 const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
 const quandCourt = (m) => (m.heureConfirmee ? `${jourEnLettres(m.debut)} à ${heureDeParis(m.debut)}` : `${jourEnLettres(m.debut)}, heure à confirmer`);
 
-// « 2 bars à Paris, 1 bar à Lyon ».
+// « 2 bars à Paris, 1 bar à Lyon », chaque décompte un lien vers la page de sa ville.
 const barsParVille = (soirees) => {
   const villes = new Map();
-  for (const s of soirees) villes.set(s.bar.ville.nom, (villes.get(s.bar.ville.nom) ?? 0) + 1);
-  return [...villes].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'fr')).map(([ville, n]) => `${accorder(n, 'bar')} à ${ville}`).join(', ');
+  for (const s of soirees) {
+    const ville = villes.get(s.bar.ville.cle) ?? { ville: s.bar.ville, n: 0 };
+    ville.n += 1;
+    villes.set(s.bar.ville.cle, ville);
+  }
+  return [...villes.values()].sort((a, b) => b.n - a.n || a.ville.nom.localeCompare(b.ville.nom, 'fr'))
+    .map(({ ville, n }) => `<a href="${cheminDeLaVille(ville)}">${e(`${accorder(n, 'bar')} à ${ville.nom}`)}</a>`).join(', ');
 };
 
 // Les bars, groupés par ville puis par arrondissement (dans l’ordre des arrondissements).
@@ -99,7 +119,7 @@ export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false,
     const vivant = donnees.matchs.includes(match);
     const passe = !enCoursOuAVenir(match);
     const soirees = vivant ? match.soirees.filter(() => !passe) : [];
-    const indexable = vivant && !passe && soirees.length > 0;
+    const indexable = vivant && !passe && soirees.length >= SEUILS.barsParMatch;
     const prochains = prochainsDe(match).filter((m) => enCoursOuAVenir(m));
     const memoire = { slug: match.slug, ids: match.ids, debut: new Date(match.debut).toISOString(), heureConfirmee: match.heureConfirmee, competition: match.competition, domicile: match.domicile, exterieur: match.exterieur };
     const enTete = `<header class="regarder-tete">
@@ -138,7 +158,8 @@ ${enTete}
 
     const groupes = grouperParLieu(soirees, (s) => s.bar);
     const villesDuMatch = groupes.map((g) => g.ville.nom);
-    const titrePage = titre(`${nom} le ${dateCourte(match.debut)} : où voir le match — Baromatch`, `${nom} le ${dateCourte(match.debut)} : où voir le match`, `${nom} : où voir le match`);
+    const titrePage = titre(`${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match`,
+      `${nom}, ${dateCourte(match.debut)} : où voir le match`, `${nom} : où voir le match`);
     const desc = soirees.length
       ? description(
         `${nom} (${match.competition}), ${quandCourt(match)}. ${accorder(soirees.length, 'bar')} le ${soirees.length > 1 ? 'diffusent' : 'diffuse'} sur Baromatch, à ${enumerer(villesDuMatch)} : les adresses et l’heure.`,
@@ -148,13 +169,14 @@ ${enTete}
         `${nom} (${match.competition}), ${quandCourt(match)}. Aucun bar ne le diffuse encore sur Baromatch : les prochains matchs des deux clubs.`,
         `${nom}, ${quandCourt(match)}. Aucun bar ne le diffuse encore sur Baromatch : les prochains matchs des deux clubs.`,
       );
-    const listeDesSoirees = groupes.map(({ ville, quartiers }) => `  <h3 class="regarder-ville">${e(ville.nom)}</h3>
+    const listeDesSoirees = groupes.map(({ ville, quartiers }) => `  <h3 class="regarder-ville"><a href="${cheminDeLaVille(ville)}">${e(ville.nom)}</a></h3>
 ${quartiers.map(({ arrondissement, elements }) => `${arrondissement ? `  <h4 class="regarder-quartier">${e(arrondissement.libelle)}</h4>\n` : ''}  <ul class="regarder-cartes">
     ${elements.map((s) => carteDuBar(s.bar, textes, { soiree: s, niveau: arrondissement ? 5 : 4 })).join('\n    ')}
   </ul>`).join('\n')}`).join('\n');
     const sectionBars = soirees.length
       ? `<section class="regarder-section" aria-labelledby="titre-bars">
   <h2 id="titre-bars">${e(textes.match.titreBars)}</h2>
+  <p class="regarder-compte">${barsParVille(soirees)}</p>
 ${listeDesSoirees}
 ${places}  ${appel(marque, textes)}
 </section>`
@@ -179,7 +201,7 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
 ${enTete}
 ${sectionBars}
 ${sectionProchains}
-${commentCaMarche(textes)}`,
+${commentCaMarche(textes, marque)}`,
     });
   }
 
@@ -192,14 +214,20 @@ ${commentCaMarche(textes)}`,
     const midi = Date.parse(`${aujourdhui}T12:00:00Z`);
     const jours = Array.from({ length: SEMAINE_JOURS }, (_, i) => new Date(midi + i * JOUR_MS).toISOString().slice(0, 10));
     const dansLaSemaine = donnees.matchs.filter((m) => enCoursOuAVenir(m) && jours.includes(jourDeParis(m.debut))).sort((a, b) => a.debut - b.debut);
-    const indexable = dansLaSemaine.some((m) => m.soirees.length > 0);
+    const indexable = donnees.bars.length >= SEUILS.barsPourLaSemaine;
     // Chaque liste est sous le titre de son jour : la ligne ne donne que l’heure.
-    const ligne = (m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), heureSeule: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? e(barsParVille(m.soirees)) : e(textes.semaine.pasDeBar)}</span>` })}`;
+    const ligne = (m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), heureSeule: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`;
     const ceSoir = dansLaSemaine.filter((m) => jourDeParis(m.debut) === aujourdhui);
+    // Le premier bloc : « Aujourd’hui, vendredi 23 octobre » avant 17 h, « Ce soir, … » ensuite ; quand tous les matchs
+    // du jour ont commencé depuis plus de trois heures, « Fini pour ce soir », et la suite commence au lendemain.
+    const fini = ceSoir.length === 0 && donnees.matchs.some((m) => jourDeParis(m.debut) === aujourdhui && !m.statut);
+    const leSoir = heureDuJour(maintenant) >= 17;
+    const titreDuJour = fini ? textes.semaine.fini : remplir(leSoir ? textes.semaine.ceSoir : textes.semaine.aujourdhui, { jour: jourEnLettres(maintenant) });
+    const rienDuJour = fini ? textes.semaine.finiSuite : leSoir ? textes.semaine.rienCeSoir : textes.semaine.rienAujourdhui;
     const autres = jours.slice(1).map((jour) => ({ jour, matchs: dansLaSemaine.filter((m) => jourDeParis(m.debut) === jour) })).filter((j) => j.matchs.length);
     const dernierJour = jourEnLettres(Date.parse(`${jours.at(-1)}T12:00:00Z`));
     const etapes = [accueil, { nom: textes.fil.matchs, chemin }];
-    const titrePage = `${textes.semaine.titre} — Baromatch`;
+    const titrePage = textes.semaine.titrePage;
     const desc = description(
       `${dansLaSemaine.length ? accorder(dansLaSemaine.length, 'match', 'matchs') : 'Aucun match'} d’ici ${dernierJour}, à l’heure de Paris : la compétition et les bars qui diffusent chaque match sur Baromatch.`,
       `${dansLaSemaine.length ? accorder(dansLaSemaine.length, 'match', 'matchs') : 'Aucun match'} cette semaine, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.`,
@@ -213,8 +241,8 @@ ${commentCaMarche(textes)}`,
   <p class="regarder-chapeau">${e(textes.semaine.chapeau)}</p>
 </header>
 <section class="regarder-section regarder-ce-soir" aria-labelledby="titre-ce-soir">
-  <h2 id="titre-ce-soir">${e(remplir(textes.semaine.ceSoir, { jour: jourEnLettres(maintenant) }))}</h2>
-${ceSoir.length ? `  <ul class="regarder-matchs">\n${ceSoir.map(ligne).join('\n')}\n  </ul>` : `  <p>${e(textes.semaine.rienCeSoir)}</p>`}
+  <h2 id="titre-ce-soir">${e(titreDuJour)}</h2>
+${ceSoir.length ? `  <ul class="regarder-matchs">\n${ceSoir.map(ligne).join('\n')}\n  </ul>` : `  <p>${e(rienDuJour)}</p>`}
 </section>
 ${autres.length ? autres.map(({ jour, matchs }) => `<section class="regarder-section" aria-labelledby="jour-${jour}">
   <h2 id="jour-${jour}">${e(capitale(jourEnLettres(Date.parse(`${jour}T12:00:00Z`))))}</h2>
@@ -222,8 +250,9 @@ ${autres.length ? autres.map(({ jour, matchs }) => `<section class="regarder-sec
 ${matchs.map(ligne).join('\n')}
   </ul>
 </section>`).join('\n') : `<p>${e(textes.semaine.rienCetteSemaine)}</p>`}
+<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
 ${appel(marque, textes)}
-${commentCaMarche(textes)}`,
+${commentCaMarche(textes, marque)}`,
     });
   }
 
@@ -237,7 +266,7 @@ ${commentCaMarche(textes)}`,
   for (const ville of villes.values()) {
     ville.bars = donnees.bars.filter((b) => b.ville.cle === ville.cle).sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
     ville.soirees = ville.bars.flatMap((b) => b.soirees).filter((s) => enCoursOuAVenir(s.match)).sort((a, b) => a.match.debut - b.match.debut || a.bar.nom.localeCompare(b.bar.nom, 'fr'));
-    ville.indexable = ville.bars.length > 0;
+    ville.indexable = ville.bars.length >= (ville.guide ? SEUILS.barsParVilleAvecGuide : SEUILS.barsParVilleSansGuide);
     ville.quartiers = [...new Set(ville.bars.map((b) => b.quartier))];
     if (!ville.guide) avertissements.push(`Ville sans guide : ${ville.nom} (${accorder(ville.bars.length, 'bar')}). Son guide s’écrit dans generateur/contenu/villes.json.`);
   }
@@ -246,7 +275,7 @@ ${commentCaMarche(textes)}`,
     const chemin = cheminDeLaVille(ville);
     const etapes = [accueil, lesVilles, { nom: ville.nom, chemin }];
     const nomVille = ville.nom;
-    const titrePage = titre(`Où regarder le match à ${nomVille} — Baromatch`, `Où regarder le match à ${nomVille}`);
+    const titrePage = titre(`Bars foot à ${nomVille} : où regarder le match — Baromatch`, `Bars foot à ${nomVille} : où regarder le match`, `Où regarder le match à ${nomVille}`);
     const quartiers = ville.quartiers.filter((q) => q !== nomVille);
     const resume = ville.bars.length
       ? `${accorder(ville.bars.length, 'bar')} de ${nomVille} ${ville.bars.length > 1 ? 'diffusent' : 'diffuse'} le match sur Baromatch${quartiers.length ? ` (${enumerer(quartiers)})` : ''}.`
@@ -287,7 +316,12 @@ ${ville.guide.guide.map((paragraphe) => `  <p>${e(paragraphe)}</p>`).join('\n')}
   <h2 id="titre-guide">${e(remplir(textes.ville.titreSansGuide, { ville: nomVille }))}</h2>
   <p>${e(resume)} ${ville.soirees.length ? e(`${accorder(ville.soirees.length, 'soirée annoncée', 'soirées annoncées')}, la prochaine ${quandCourt(prochaineSoiree.match)} : ${nomCourt(prochaineSoiree.match)}, ${prochaineSoiree.bar.nom}.`) : e(textes.ville.sansSoiree)}</p>
 </section>`;
-    const faq = ville.guide?.faq ?? [];
+    // La FAQ commence par une question vraie, faite des données : Baromatch est-il dans cette ville, et l’appli.
+    const estIci = {
+      question: remplir(textes.ville.estIci, { ville: nomVille }),
+      reponse: `${ville.bars.length ? remplir(ville.bars.length > 1 ? textes.ville.estIciOuiPluriel : textes.ville.estIciOui, { bars: accorder(ville.bars.length, 'bar'), ville: nomVille }) : remplir(textes.ville.estIciNon, { ville: nomVille })} ${marque.appli?.ouverte ? textes.ville.appliOuverte : textes.ville.appliFermee}`,
+    };
+    const faq = [estIci, ...(ville.guide?.faq ?? [])];
     const sectionFaq = faq.length
       ? `<section class="regarder-section regarder-faq" aria-labelledby="titre-faq">
   <h2 id="titre-faq">${e(textes.ville.titreFaq)}</h2>
@@ -313,7 +347,7 @@ ${sectionBars}
 ${sectionSoirees}
 ${sectionGuide}
 ${appel(marque, textes)}
-${commentCaMarche(textes)}
+${commentCaMarche(textes, marque)}
 ${sectionFaq}
 <p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.ville.toutesLesVilles)}</a></p>`,
     });
@@ -325,7 +359,7 @@ ${sectionFaq}
     const etapes = [accueil, { nom: textes.fil.villes, chemin }];
     const liste = [...villes.values()];
     const indexable = liste.some((v) => v.indexable);
-    const titrePage = `${textes.villes.titre}, ville par ville — Baromatch`;
+    const titrePage = `${textes.villes.titre} — Baromatch`;
     const noms = liste.map((v) => v.nom);
     const desc = description(
       `${enumerer(noms)} : les bars qui diffusent le match sur Baromatch, ville par ville, et le guide des soirs de match.`,
@@ -351,23 +385,28 @@ ${liste.map((v) => `    <li class="regarder-carte">
 </section>
 <p class="regarder-retour"><a href="/matchs/">${e(textes.villes.voirLaSemaine)}</a></p>
 ${appel(marque, textes)}
-${commentCaMarche(textes)}`,
+${commentCaMarche(textes, marque)}`,
     });
   }
 
   // ---------- Les bars ----------
+  // Un bar qui sort (retiré de la liste des bars publiés, exclu, ou disparu des données) : sa page reste 30 jours, en
+  // noindex, sans son nom, son adresse ni sa position (« Ce bar n’est plus sur Baromatch. », vers sa ville), puis
+  // disparaît. L’état ne garde de lui que son identifiant, sa ville et la date de sa sortie.
   const reels = new Set(donnees.bars.map((b) => b.slug));
-  const ecartesPourDeBon = new Set(donnees.ecartes.filter((x) => x.raison !== 'bar inactif').map((x) => x.id));
-  // La liste d’exclusion vaut aussi pour un bar déjà parti des données : sa page est retirée tout de suite, et son nom
-  // et son adresse sortent de l’état.
-  const exclus = new Set((contenu.exclus ?? []).map(String));
-  const partis = anciens.bars.filter((b) => !reels.has(b.slug) && !ecartesPourDeBon.has(b.id) && !exclus.has(String(b.id)) && !exclus.has(b.slug)
+  const anciensBars = new Map(anciens.bars.map((b) => [b.slug, b]));
+  const partis = anciens.bars.filter((b) => !reels.has(b.slug) && b.ville?.cle
     && Date.parse(b.disparu ?? new Date(maintenant).toISOString()) + CONSERVATION_MS > maintenant);
   for (const bar of donnees.bars) {
     const chemin = cheminDuBar(bar);
-    const etapes = [accueil, { nom: bar.ville.nom, chemin: cheminDeLaVille(bar.ville) }, { nom: bar.nom, chemin }];
+    const etapes = [accueil, lesVilles, { nom: bar.ville.nom, chemin: cheminDeLaVille(bar.ville) }, { nom: bar.nom, chemin }];
     const soirees = bar.soirees.filter((s) => enCoursOuAVenir(s.match));
     const prochaine = soirees[0];
+    // Sa dernière soirée annoncée (ou, sans aucune, le jour où il est arrivé) : 60 jours sans soirée, et sa page sort
+    // de l’index.
+    const reperes = [...bar.soirees.map((s) => s.match.debut), Date.parse(anciensBars.get(bar.slug)?.derniereSoiree ?? '')].filter(Number.isFinite);
+    const derniereSoiree = reperes.length ? Math.max(...reperes) : maintenant;
+    const indexable = derniereSoiree + SEUILS.joursSansSoireePourUnBar * JOUR_MS > maintenant;
     const titrePage = titre(`${bar.nom}, ${bar.quartier} : les matchs diffusés — Baromatch`, `${bar.nom}, ${bar.quartier} — Baromatch`, `${bar.nom} : les matchs diffusés`, `${bar.nom} — Baromatch`, bar.nom.slice(0, 60));
     const desc = prochaine
       ? description(
@@ -390,9 +429,10 @@ ${soirees.map((s) => `    <li class="regarder-carte" id="${ancreDeLaSoiree(s.mat
 ${places.trimEnd()}`
       : `  <p>${e(textes.bar.sansSoiree)}</p>`;
     const ce = atouts(bar, textes);
+    const { apercu } = lignesDuBadge({ bar, soiree: prochaine ?? null, maintenant, marque, textes });
     ajouter({
-      type: 'bar', cle: bar.slug, date: null, chemin, indexable: true, titre: titrePage, description: desc, bar, soirees,
-      memoire: { id: bar.id, nom: bar.nom, adresse: bar.adresse, quartier: bar.quartier, ville: bar.ville },
+      type: 'bar', cle: bar.slug, date: null, chemin, indexable, titre: titrePage, description: desc, bar, soirees,
+      memoire: { id: bar.id, ville: bar.ville, derniereSoiree: new Date(derniereSoiree).toISOString() },
       jsonld: [
         pageWeb({ chemin, titre: titrePage, description: desc, about: { '@id': `${adresseDe(chemin)}#bar` } }),
         barOuPub(bar),
@@ -413,29 +453,26 @@ ${ce ? `<section class="regarder-section" aria-labelledby="titre-atouts">
 ${listeSoirees}
   ${appel(marque, textes)}
 </section>
-${codeDuBadge(bar, textes)}`,
+${codeDuBadge(bar, textes, apercu)}`,
     });
   }
   for (const bar of partis) {
     const chemin = `/bar/${bar.slug}/`;
-    const etapes = [accueil, { nom: bar.ville.nom, chemin: cheminDeLaVille(bar.ville) }, { nom: bar.nom, chemin }];
-    const titrePage = titre(`${bar.nom}, ${bar.quartier} — Baromatch`, `${bar.nom} — Baromatch`, `${bar.nom} : plus sur Baromatch`, bar.nom.slice(0, 60));
-    const desc = description(
-      `${bar.nom}, ${bar.quartier} : ${textes.bar.parti.toLowerCase().replace(/\.$/, '')}. ${remplir(textes.bar.partiSuite, { ville: bar.ville.nom })}`,
-      `${bar.nom.slice(0, 60)} : ${textes.bar.parti.toLowerCase()} Les bars qui diffusent le match sont sur la page de la ville.`,
-    );
+    const ville = { cle: bar.ville.cle, nom: bar.ville.nom };
+    const etapes = [accueil, lesVilles, { nom: ville.nom, chemin: cheminDeLaVille(ville) }, { nom: textes.bar.partiFil, chemin }];
+    const titrePage = textes.bar.parti.replace(/\.$/, '');
+    const desc = description(`${textes.bar.parti} ${remplir(textes.bar.partiSuite, { ville: ville.nom })}`, `${textes.bar.parti} Les bars qui diffusent le match sont sur la page de leur ville, sur Baromatch.`);
     ajouter({
-      type: 'bar', cle: bar.slug, date: null, chemin, indexable: false, titre: titrePage, description: desc, parti: true, bar,
-      memoire: { id: bar.id, nom: bar.nom, adresse: bar.adresse, quartier: bar.quartier, ville: bar.ville, disparu: bar.disparu ?? new Date(maintenant).toISOString() },
+      type: 'bar', cle: bar.slug, date: null, chemin, indexable: false, titre: titrePage, description: desc, parti: true, bar: null,
+      memoire: { id: bar.id, ville, disparu: bar.disparu ?? new Date(maintenant).toISOString() },
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes)],
       corps: `${fil(etapes)}
 <header class="regarder-tete">
-  <p class="regarder-surtitre">${e(bar.quartier)}</p>
-  <h1 class="regarder-titre">${e(bar.nom)}</h1>
+  <h1 class="regarder-titre">${e(textes.bar.parti)}</h1>
 </header>
 <section class="regarder-section regarder-passe" aria-labelledby="titre-parti">
-  <h2 id="titre-parti">${e(textes.bar.parti)}</h2>
-  <p>${e(remplir(textes.bar.partiSuite, { ville: bar.ville.nom }))} <a href="${cheminDeLaVille(bar.ville)}">${e(remplir(textes.ville.titre, { ville: bar.ville.nom }))}</a></p>
+  <h2 id="titre-parti">${e(remplir(textes.ville.titre, { ville: ville.nom }))}</h2>
+  <p>${e(remplir(textes.bar.partiSuite, { ville: ville.nom }))} <a href="${cheminDeLaVille(ville)}">${e(remplir(textes.ville.titre, { ville: ville.nom }))}</a></p>
 </section>`,
     });
   }
@@ -444,15 +481,15 @@ ${codeDuBadge(bar, textes)}`,
 };
 
 // Le code à coller pour le badge du bar : une image qui pointe vers sa page, sans aucun paramètre de suivi ; le texte
-// de remplacement et le lien portent le nom du bar.
-export const codeDuBadge = (bar, textes) => {
+// de remplacement et le lien portent le nom du bar. L’aperçu, sur la page, dit ce que le badge affiche aujourd’hui.
+export const codeDuBadge = (bar, textes, apercu) => {
   const adresse = adresseDe(cheminDuBar(bar));
   const nom = `${bar.nom} sur Baromatch`;
   const code = `<a href="${adresse}" title="${e(nom)}"><img src="${adresse}badge.svg" width="360" height="72" alt="${e(nom)}"></a>`;
   return `<details class="regarder-badge">
   <summary>${e(textes.bar.badgeTitre)}</summary>
   <p>${e(textes.bar.badgeTexte)}</p>
-  <img class="regarder-badge__image" src="${cheminDuBar(bar)}badge.svg" width="360" height="72" alt="${e(nom)}">
+  <img class="regarder-badge__image" src="${cheminDuBar(bar)}badge.svg" width="360" height="72" alt="${e(apercu)}">
   <label class="regarder-badge__etiquette" for="code-badge">${e(textes.bar.badgeCode)}</label>
   <textarea class="regarder-badge__code" id="code-badge" readonly rows="4">${e(code)}</textarea>
 </details>`;

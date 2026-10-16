@@ -1,5 +1,5 @@
 {
-  "_lisezMoi": "Les textes fixes des pages « Où regarder le match ». Garde les clés et les mots entre accolades ({ville}, {heure}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation, aucune promesse que l’appli ne tient pas encore.",
+  "_lisezMoi": "Les textes fixes des pages « Où regarder le match ». Garde les clés et les mots entre accolades ({ville}, {heure}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation. Tant que l’appli n’est pas ouverte, tout ce qui parle de garder sa place se dit au futur (les clés « fermee ») ; au présent quand elle l’est (les clés « ouverte »). Une espace insécable avant « ? », « : » et « ; ».",
   "appel": {
     "fermee": {
       "texte": "L’appli ouvre bientôt : préviens-moi",
@@ -13,25 +13,66 @@
   },
   "places": "Les places qui restent sont dans l’appli.",
   "mentionSante": "L’abus d’alcool est dangereux pour la santé, à consommer avec modération.",
+  "offre": {
+    "etiquette": "L’offre du bar",
+    "dansLAppli": "Une offre du bar dans l’appli",
+    "jusqua": "jusqu’à {heure}"
+  },
   "commentCaMarche": {
     "titre": "Comment ça marche",
-    "etapes": [
-      { "titre": "Choisis ton match", "texte": "Ce soir ou les jours d’après, avec l’heure du coup d’envoi." },
-      { "titre": "Trouve ton bar", "texte": "Ceux qui le diffusent près de toi, et combien de places il leur reste." },
-      { "titre": "Garde ta place", "texte": "Pour toi ou pour toute la bande, avant de sortir. Ça ne coûte rien." },
-      { "titre": "Arrive, et garde la soirée", "texte": "Un scan à l’entrée, et le bar sait que tu es là. Après, la soirée reste dans ton album, en sous-bock." }
-    ]
+    "fermee": {
+      "intro": "Quand l’appli ouvre, tu pourras :",
+      "etapes": [
+        {
+          "titre": "Choisir ton match",
+          "texte": "Ce soir ou les jours d’après, avec l’heure du coup d’envoi."
+        },
+        {
+          "titre": "Trouver ton bar",
+          "texte": "Ceux qui le diffusent près de toi."
+        },
+        {
+          "titre": "Garder ta place",
+          "texte": "Pour toi ou pour toute la bande, avant de sortir. Ça ne coûtera rien."
+        },
+        {
+          "titre": "Arriver, et garder la soirée",
+          "texte": "Un scan à l’entrée, et le bar saura que tu es là. Après, la soirée restera dans ton album, en sous-bock."
+        }
+      ]
+    },
+    "ouverte": {
+      "intro": "",
+      "etapes": [
+        {
+          "titre": "Choisis ton match",
+          "texte": "Ce soir ou les jours d’après, avec l’heure du coup d’envoi."
+        },
+        {
+          "titre": "Trouve ton bar",
+          "texte": "Ceux qui le diffusent près de toi, et combien de places il leur reste."
+        },
+        {
+          "titre": "Garde ta place",
+          "texte": "Pour toi ou pour toute la bande, avant de sortir. Ça ne coûte rien."
+        },
+        {
+          "titre": "Arrive, et garde la soirée",
+          "texte": "Un scan à l’entrée, et le bar sait que tu es là. Après, la soirée reste dans ton album, en sous-bock."
+        }
+      ]
+    }
   },
   "fil": {
     "accueil": "Accueil",
     "matchs": "Les matchs de la semaine",
-    "villes": "Où regarder le match"
+    "villes": "Les villes"
   },
   "atouts": {
     "screens": "{n} écran",
     "screensPluriel": "{n} écrans",
     "sound": "Le son du match",
-    "standing": "Des places debout",
+    "standing": "On peut regarder debout",
     "bothCamps": "Les deux camps bienvenus",
     "outdoor": "Une terrasse",
     "food": "De quoi manger"
@@ -58,10 +99,16 @@
     "ceSoir": "Ce soir, {jour}",
     "rienCeSoir": "Pas de match annoncé ce soir.",
     "pasDeBar": "Pas encore de bar",
-    "rienCetteSemaine": "Aucun match annoncé ces sept prochains jours."
+    "rienCetteSemaine": "Aucun match annoncé ces sept prochains jours.",
+    "titrePage": "Où regarder le match ce soir et cette semaine — Baromatch",
+    "aujourdhui": "Aujourd’hui, {jour}",
+    "rienAujourdhui": "Pas de match annoncé aujourd’hui.",
+    "fini": "Fini pour ce soir",
+    "finiSuite": "Les matchs de ce soir sont terminés. La suite commence demain, juste en dessous.",
+    "toutesLesVilles": "Toutes les villes"
   },
   "villes": {
-    "titre": "Où regarder le match",
+    "titre": "Les villes où regarder le match",
     "chapeau": "Ville par ville, les bars qui diffusent le match sur Baromatch, et ce qu’il faut savoir avant d’y aller.",
     "sansBar": "Pas encore de bar",
     "voirLaSemaine": "Tous les matchs de la semaine"
@@ -74,7 +121,13 @@
     "sansSoiree": "Pas de soirée annoncée pour l’instant.",
     "titreFaq": "Les questions qu’on nous pose",
     "titreSansGuide": "{ville}, les soirs de match",
-    "toutesLesVilles": "Toutes les villes"
+    "toutesLesVilles": "Toutes les villes",
+    "estIci": "Baromatch est-il à {ville} ?",
+    "estIciOui": "Oui. {bars} de {ville} diffuse le match sur Baromatch.",
+    "estIciOuiPluriel": "Oui. {bars} de {ville} diffusent le match sur Baromatch.",
+    "estIciNon": "Pas encore de bar à {ville} sur Baromatch.",
+    "appliFermee": "L’appli, elle, est en test sur Android, à Paris, et n’est pas encore ouverte : laisse ton adresse sur l’accueil, on te prévient le jour où elle ouvre.",
+    "appliOuverte": "L’appli est ouverte : tu y trouves les bars et tu gardes ta place."
   },
   "bar": {
     "titreSoirees": "Ses prochaines soirées",
@@ -84,15 +137,15 @@
     "partiSuite": "Les bars de {ville} qui diffusent le match sont sur la page de la ville.",
     "badgeTitre": "Tu tiens ce bar ? Ton badge",
     "badgeTexte": "Colle ce code sur ton site : le badge affiche ta prochaine soirée de match, mène à cette page, et se met à jour tout seul.",
-    "badgeCode": "Le code à coller"
+    "badgeCode": "Le code à coller",
+    "partiFil": "Bar retiré"
   },
   "badge": {
-    "ceSoir": "Ce soir ici · {heure}",
-    "aujourdhui": "Aujourd’hui ici · {heure}",
-    "jour": "{jour} ici · {heure}",
-    "sansHeure": "{jour} ici",
+    "jour": "{jour} · {heure}",
+    "sansHeure": "{jour} · heure à confirmer",
     "sansSoiree": "On diffuse le match",
     "marque": "sur Baromatch",
-    "reserve": "Réserve ta place"
+    "reserve": "Réserve ta place",
+    "apercu": "Aperçu du badge : {texte}"
   }
 }

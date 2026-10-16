@@ -54,3 +54,9 @@ export const joursEntre = (avant, apres) => Math.round((Date.parse(`${jourDePari
 
 // L’heure à Paris, de 0 à 23 (pour dire « ce soir » plutôt qu’« aujourd’hui »).
 export const heureDuJour = (instant) => Number(morceaux(instant, { hour: '2-digit', hourCycle: 'h23' }).hour);
+
+// « Ven. 23 oct. », « Dim. 1er nov. » : la date courte du badge, qu’une image fixe peut écrire sans mentir.
+export const dateDuBadge = (instant) => {
+  const { weekday, day, month } = morceaux(instant, { weekday: 'short', day: 'numeric', month: 'short' });
+  return `${weekday[0].toLocaleUpperCase('fr-FR')}${weekday.slice(1)} ${day === '1' ? '1er' : day} ${month}`;
+};

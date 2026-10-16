@@ -1,7 +1,7 @@
 // Des trois listes brutes (sources.mjs) aux données des pages : les vrais bars seulement, un match par match (les
 // doublons réunis), les noms courts des clubs, l’heure de Paris, la ville et l’arrondissement de chaque bar. Rien
 // n’est inventé : un renseignement absent des données reste absent des pages.
-import { pourComparer, slug } from './texte.mjs';
+import { nettoyer, pourComparer, slug } from './texte.mjs';
 import { jourDeParis } from './heure.mjs';
 
 export const HEURE_MS = 3_600_000;
@@ -32,16 +32,26 @@ const BOISSON = /\b(?:bieres?|pintes?|demis?|verres?|shots?|shooters?|cocktails?
 const GRATUIT = /\b(?:offert|gratuit|cadeau)|\boffr(?:ons|ez)\b|\b(?:t|vous)['’\s]+offr/;
 const POUSSE_A_BOIRE = [
   /\ba volonte\b/, /\bopen[\s-]*bars?\b/, /\b(?:2|deux)\s*(?:pour|=)\s*(?:1|une?)\b/, /\bpour le prix d['’\s]*une?\b/,
-  /\bachete\w*\s*,?\s*(?:\d+|une?|deux)\s+offert/, /\bhappy[\s-]*hours?\b/, /\btournees?\b/, /\ba chaque but/, /\bscores?\b/,
+  /\bachete\w*\s*,?\s*(?:\d+|une?|deux)\s+offert/, /\bhappy[\s-]*hours?\b/, /\btournees?\b/, /\ba chaque but/,
 ];
-// Pourquoi une offre ne s’affiche pas (ce qu’elle dit), ou null si elle peut s’afficher.
-export const offreInterdite = (titre) => {
-  const texte = pourComparer(titre);
+// Ce qui, dans une offre affichée, parle d’alcool : la mention santé va dessous (le filet de sécurité, puisque seule
+// une offre que le bar dit sans alcool s’affiche).
+const ALCOOL = /\b(?:bieres?|pintes?|demis?|pressions?|cocktails?|vins?|champagnes?|alcools?|aperos?|aperitifs?|spritz|mojitos?|pastis|ricard|whisky|vodka|rhum|tequila|gin|cidres?|kirs?|punch|shots?|shooters?|binouzes?)\b/;
+// Ce qui pousse à boire (loi Evin), sans accents ni capitales, ou null.
+const pousseABoire = (texte) => {
   const motif = POUSSE_A_BOIRE.find((m) => m.test(texte));
   if (motif) return texte.match(motif)[0];
   if (GRATUIT.test(texte) && BOISSON.test(texte)) return `${texte.match(GRATUIT)[0]} … ${texte.match(BOISSON)[0]}`;
   return null;
 };
+// Pourquoi une offre ne s’affiche pas (ce qu’elle dit), ou null si elle peut s’afficher : ce qui pousse à boire, et
+// aucun score.
+export const offreInterdite = (titre) => {
+  const texte = pourComparer(nettoyer(titre));
+  return pousseABoire(texte) ?? texte.match(/\bscores?\b/)?.[0] ?? null;
+};
+// Pourquoi le nom d’un bar l’écarte du site (« Happy Hour Café », « L’Open Bar »), ou null.
+export const nomInterdit = (nom) => pousseABoire(pourComparer(nettoyer(nom)));
 
 // ---------- Les clubs ----------
 
@@ -140,7 +150,7 @@ const enCapitales = (ville) => (ville.length > 2 && ville === ville.toUpperCase(
   ? ville.toLowerCase().replace(/(^|[\s'’-])(\p{L})/gu, (_, avant, lettre) => `${avant}${lettre.toUpperCase()}`)
   : ville);
 export const lireLAdresse = (adresse) => {
-  const propre = String(adresse ?? '').trim().replace(/[,\s]+(?:France|FRA?)\.?$/i, '').trim();
+  const propre = nettoyer(adresse).replace(/[,\s]+(?:France|FRA?)\.?$/i, '').trim();
   const codeEtVille = propre.match(/^(.*?)[,\s]+(\d{5})[,\s]+([^\d,][^,]*?)\s*$/);
   const villeEtCode = codeEtVille ? null : propre.match(/^(.*?)\s*,\s*([^\d,][^,]*?)\s+(\d{5})\s*$/);
   if (!codeEtVille && !villeEtCode) return null;
@@ -177,13 +187,20 @@ export const villeDe = (villes, codePostal, nomEcrit) => {
 // Pourquoi un bar n’est pas un vrai bar (null s’il en est un).
 // forces : les identifiants des bars réintégrés à la main (liste « forcer » de bars-exclus.json), dont le nom ou
 // l’adresse ressemble à un bar d’essai sans en être un.
+// Un nom qui pousse à boire écarte le bar, même réintégré à la main.
 export const raisonDEcarter = (bar, exclus, forces = new Set()) => {
   if (bar.isDemo === true) return 'bar de démonstration';
   if (bar.isActive === false) return 'bar inactif';
-  if (!forces.has(String(bar.id)) && [bar.name, bar.address, bar.id].some((texte) => MOTS_D_ESSAI.test(pourComparer(texte)))) return RAISON_D_ESSAI;
+  if (!forces.has(String(bar.id)) && [bar.name, bar.address, bar.id].some((texte) => MOTS_D_ESSAI.test(pourComparer(nettoyer(texte))))) return RAISON_D_ESSAI;
   if (exclus.has(String(bar.id))) return 'liste d’exclusion';
+  const interdit = nomInterdit(bar.name);
+  if (interdit) return `un mot que le site ne publie pas dans le nom (« ${interdit} »)`;
   return null;
 };
+// Les raisons d’écarter un bar que le journal dit (un vrai bar, peut-être, que quelqu’un doit regarder) ; il ne dit
+// que son identifiant, jamais son nom.
+const RAISONS_DITES = /^(?:adresse|ville|nom|un mot|pas dans la liste)/;
+export const RAISON_SANS_ACCORD = 'pas dans la liste des bars publiés (generateur/bars-publies.json) : il attend son accord écrit';
 
 const atoutsDe = (features) => {
   if (!features || typeof features !== 'object') return {};
@@ -192,13 +209,16 @@ const atoutsDe = (features) => {
 
 // ---------- Tout ensemble ----------
 
-// { matches, bars, matchNights } → les données des pages. contenu : clubs, competitions, villes, exclus (la liste
-// d’exclusion, adresses de page ou identifiants), forcer (les identifiants des bars réintégrés à la main), adresses
-// (les adresses de page déjà données, { adresse: identifiant du bar }, gardées dans l’état).
-export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus = [], forcer = [], adresses = {} }) => {
+// { matches, bars, matchNights } → les données des pages. contenu : clubs, competitions, villes, publies (les
+// identifiants des bars qui ont accepté par écrit d’être publiés, bars-publies.json : un vrai bar absent de cette
+// liste n’apparaît nulle part), exclus (la liste d’exclusion, par identifiant), forcer (les identifiants des bars
+// réintégrés à la main), adresses (les adresses de page déjà données, { adresse: identifiant du bar }, gardées dans
+// l’état).
+export const preparer = (brut, { maintenant, clubs, competitions, villes, publies = [], exclus = [], forcer = [], adresses = {} }) => {
   const avertissements = [];
   const index = indexerLesClubs(clubs);
   const listeExclus = new Set(exclus.map(String));
+  const listePublies = new Set(publies.map(String));
   const forces = new Set(forcer.map(String));
 
   // Les matchs : ceux de la liste, et ceux qu’une soirée cite sans qu’ils y soient.
@@ -214,8 +234,8 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
 
   // Les vrais bars, chacun avec sa ville, son arrondissement et son adresse de page. Une adresse de page est stable :
   // un bar connu (par son identifiant) garde celle de l’état, même s’il change de nom ; une adresse déjà donnée n’est
-  // jamais redonnée à un autre bar (le second prend « -2 », « -3 »… dans l’ordre des identifiants). La liste
-  // d’exclusion se lit sur l’adresse finale (« le-zinc-des-amis-paris-11-2 » marche).
+  // jamais redonnée à un autre bar (le second prend « -2 », « -3 »… dans l’ordre des identifiants). Le nom, l’adresse
+  // et l’offre sont nettoyés de leurs caractères invisibles avant tout usage.
   const prises = new Map(Object.entries(adresses).map(([adressePage, id]) => [adressePage, String(id)]));
   const slugDeLId = new Map();
   for (const [adressePage, id] of prises) if (!slugDeLId.has(id)) slugDeLId.set(id, adressePage);
@@ -229,22 +249,29 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
   const ecartes = [];
   for (const brutBar of [...brut.bars].sort((a, b) => String(a.id).localeCompare(String(b.id)))) {
     const id = String(brutBar.id);
-    const adresse = lireLAdresse(brutBar.address);
+    const nom = nettoyer(brutBar.name);
+    const propre = { ...brutBar, name: nom, address: nettoyer(brutBar.address) };
+    const adresse = lireLAdresse(propre.address);
     const ville = adresse && villeDe(villes, adresse.codePostal, adresse.ville);
-    const arrondissement = adresse && arrondissementDe(ville.cle, ville.nom, adresse.codePostal);
-    const slugPage = adresse && (slugDeLId.get(id) ?? libre(`${slug(brutBar.name)}-${arrondissement ? arrondissement.ancre : ville.cle}`, id));
-    const raison = raisonDEcarter(brutBar, listeExclus, forces) ?? (slugPage && listeExclus.has(slugPage) ? 'liste d’exclusion' : null)
-      ?? (adresse ? null : 'adresse sans code postal ni ville');
-    // Un bar exclu garde son adresse le temps du passage : le suivant du même nom prend « -2 », comme l’exclusion le dit.
+    // Une ville dont le nom ne donne aucune adresse (« 97411 *** ») : aucune page ne peut la porter.
+    const villeLisible = Boolean(ville?.cle);
+    const arrondissement = villeLisible && arrondissementDe(ville.cle, ville.nom, adresse.codePostal);
+    const slugPage = villeLisible && slug(nom) ? (slugDeLId.get(id) ?? libre(`${slug(nom)}-${arrondissement ? arrondissement.ancre : ville.cle}`, id)) : null;
+    const raison = raisonDEcarter(propre, listeExclus, forces)
+      ?? (adresse ? null : 'adresse sans code postal ni ville')
+      ?? (villeLisible ? null : 'ville illisible dans l’adresse')
+      ?? (slugPage ? null : 'nom illisible')
+      ?? (listePublies.has(id) ? null : RAISON_SANS_ACCORD);
+    // Un bar exclu garde son adresse le temps du passage : le suivant du même nom prend « -2 ».
     if (slugPage && (!raison || raison === 'liste d’exclusion')) prises.set(slugPage, id);
     if (raison) {
-      ecartes.push({ id: String(brutBar.id), nom: brutBar.name, raison, slug: slugPage ?? null });
-      if (raison.startsWith('adresse')) avertissements.push(`Bar « ${brutBar.name} » écarté : ${raison}`);
+      ecartes.push({ id, nom, raison, slug: slugPage });
+      if (RAISONS_DITES.test(raison)) avertissements.push(`Bar ${id} écarté : ${raison}`);
       continue;
     }
     bars.push({
-      id: String(brutBar.id),
-      nom: String(brutBar.name).trim(),
+      id,
+      nom,
       adresse: `${adresse.rue}, ${adresse.codePostal} ${adresse.ville}`,
       rue: adresse.rue,
       codePostal: adresse.codePostal,
@@ -260,7 +287,7 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
     });
   }
   // Les adresses données, à garder dans l’état (sans celles des bars exclus : leur nom en sort).
-  const adressesDonnees = Object.fromEntries([...prises].filter(([adressePage, id]) => !listeExclus.has(adressePage) && !listeExclus.has(id))
+  const adressesDonnees = Object.fromEntries([...prises].filter(([, id]) => !listeExclus.has(id))
     .sort(([a], [b]) => a.localeCompare(b)));
   const barDeLId = new Map(bars.map((bar) => [bar.id, bar]));
 
@@ -285,20 +312,24 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, exclus
   return { maintenant, matchs, bars, soirees, ecartes, avertissements, adresses: adressesDonnees, recus: { bars: brut.bars.length, soirees: brut.matchNights.length } };
 };
 
-// L’offre d’une soirée, telle que le bar l’a écrite : son titre, son prix s’il est donné, et la mention santé sauf si
-// le bar a dit qu’elle ne contient pas d’alcool. Une offre finie, ou qui pousse à boire, ne s’affiche pas (le passage
-// continue, avec un avertissement dans le journal).
+// L’offre d’une soirée (loi Evin) : publiée telle que le bar l’a écrite (titre, prix, heure limite) seulement si le bar
+// a dit qu’elle ne contient pas d’alcool (hasAlcohol vaut exactement false) et qu’elle ne pousse pas à boire. Sinon, à
+// sa place, « Une offre du bar dans l’appli », sans titre ni prix ({ dansLAppli: true }). Une offre finie ne se montre
+// pas. Une offre qui pousse à boire laisse un avertissement dans le journal.
 const offreDe = (offre, maintenant, bar, avertissements) => {
-  if (!offre || typeof offre.title !== 'string' || !offre.title.trim()) return null;
-  if (offre.until && Date.parse(offre.until) <= maintenant) return null;
-  const interdit = offreInterdite(offre.title);
-  if (interdit) {
-    avertissements.push(`Offre de « ${bar.nom} » non affichée : elle pousse à boire (« ${interdit} »), ce que le site ne publie pas`);
-    return null;
-  }
+  if (!offre || typeof offre.title !== 'string') return null;
+  const titre = nettoyer(offre.title);
+  if (!titre) return null;
+  const fin = offre.until ? Date.parse(offre.until) : Number.NaN;
+  if (fin <= maintenant) return null;
+  const interdit = offreInterdite(titre);
+  if (interdit) avertissements.push(`Offre de « ${bar.nom} » non affichée : elle pousse à boire (« ${interdit} »), ce que le site ne publie pas`);
+  if (interdit || offre.hasAlcohol !== false) return { dansLAppli: true };
   return {
-    titre: offre.title.trim(),
+    titre,
     prixCentimes: Number.isInteger(offre.priceCents) ? offre.priceCents : null,
-    alcool: offre.hasAlcohol !== false,
+    jusqua: Number.isNaN(fin) ? null : fin,
+    // Le filet de sécurité : une offre dite sans alcool qui en parle quand même garde la mention santé dessous.
+    alcool: ALCOOL.test(pourComparer(titre)),
   };
 };

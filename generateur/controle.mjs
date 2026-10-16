@@ -53,6 +53,12 @@ export const controlerLaPage = (p, { motsDesBars = [] } = {}) => {
   exiger(!texte.includes('!'), `un point d’exclamation : « ${texte.slice(Math.max(0, texte.indexOf('!') - 40), texte.indexOf('!') + 1)} »`);
   const interdit = texte.match(MOTS_INTERDITS);
   exiger(!interdit, `un mot que le site ne publie pas : « ${interdit?.[0]} »`);
+  // Le guide d’une ville indexable ne dit rien qui dépende du moment : c’est la FAQ, faite des données, qui le dit.
+  if (p.type === 'ville' && p.indexable) {
+    const guide = texteVisible(`<body>${html.match(/<section class="regarder-section regarder-guide"[\s\S]*?<\/section>/)?.[0] ?? ''}`);
+    const perime = guide.match(/pas encore|premiers bars/i);
+    exiger(!perime, `un guide de ville qui dépend du moment : « ${perime?.[0]} »`);
+  }
   return erreurs;
 };
 

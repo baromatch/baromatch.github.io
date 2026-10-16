@@ -7,7 +7,7 @@
 // Le passage lit les données, fabrique et contrôle toutes les pages en mémoire (site.mjs), refuse de supprimer d’un
 // coup plus de la moitié des pages déjà publiées, puis écrit seulement ce qui a changé, dans la liste blanche
 // (etat.mjs) : matchs/, regarder-le-match/, bar/ et sitemap.xml. --changees écrit, une par ligne, les adresses
-// indexables dont le contenu a changé (pour IndexNow).
+// indexables dont le contenu a changé, et celles qui ne sont plus indexables (pour IndexNow).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,7 +16,7 @@ import { RACINE } from './contenu.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
 import {
-  anciensDe, effacerUnFichier, ecrireUnFichier, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
+  anciensDe, effacerUnFichier, ecrireUnFichier, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
 } from './etat.mjs';
 import { construireEnMemoire } from './site.mjs';
 
@@ -89,15 +89,23 @@ export const construire = async ({
   const planActuel = existsSync(path.join(sortie, PLAN)) ? readFileSync(path.join(sortie, PLAN), 'utf8') : readFileSync(path.join(racine, PLAN), 'utf8');
   const plan = nouveauPlan(planActuel, etat);
 
+  // Chaque chemin vérifié avant d’écrire le moindre fichier : un seul hors de la liste blanche (une adresse vide, des
+  // capitales, « .. »), et rien n’est écrit.
+  const refuses = [...fichiers.map((f) => f.chemin), ...supprimees].filter((chemin) => !estPermis(fichierDuChemin(chemin)));
+  if (refuses.length) throw new Error(`Chemins refusés (hors de la liste blanche du générateur), rien n’est écrit : ${refuses.join(', ')}`);
+
   // Tout est prêt et contrôlé : seulement maintenant, l’écriture.
   const ecrits = fichiers.filter((f) => ecrireUnFichier(sortie, fichierDuChemin(f.chemin), f.contenu)).map((f) => f.chemin);
   for (const chemin of supprimees) effacerUnFichier(sortie, fichierDuChemin(chemin));
   ecrireUnFichier(sortie, FICHIER_ETAT, texteDeLEtat(etat));
   ecrireUnFichier(sortie, PLAN, plan);
 
-  const changees = Object.entries(etat.pages)
-    .filter(([chemin, p]) => p.indexable && chemin.endsWith('/') && p.empreinte !== precedent.pages?.[chemin]?.empreinte)
-    .map(([chemin]) => adresseDe(chemin));
+  // Pour IndexNow : les adresses indexables dont le contenu a changé, et celles qui l’étaient au passage précédent et
+  // ne le sont plus (passées en noindex, ou disparues), pour que les moteurs les relisent.
+  const changees = [
+    ...Object.entries(etat.pages).filter(([chemin, p]) => p.indexable && chemin.endsWith('/') && p.empreinte !== precedent.pages?.[chemin]?.empreinte),
+    ...Object.entries(precedent.pages ?? {}).filter(([chemin, p]) => p?.indexable && chemin.endsWith('/') && !etat.pages[chemin]?.indexable),
+  ].map(([chemin]) => adresseDe(chemin));
   const compte = {};
   for (const p of site.pages) {
     compte[p.type] ??= { pages: 0, indexables: 0 };

@@ -4,11 +4,16 @@
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
+import { chargerLeContenu } from '../../generateur/contenu.mjs';
 import { construire } from '../../generateur/construire.mjs';
 import { racine } from './environnement.mjs';
 
 export const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
 export const MAINTENANT_DU_SCENARIO = Date.parse('2026-10-23T08:00:00Z');
+// Les bars du scénario qui ont « accepté » d’être publiés (generateur/bars-publies.json est vide aujourd’hui) : les
+// vrais bars inventés, et aussi le bar de démo et un bar d’essai, pour montrer qu’être dans la liste ne les publie pas.
+export const PUBLIES_DU_SCENARIO = ['b-zinc', 'b-comptoir', 'b-gones', 'b-coin', 'b-rennes', 'b-t1', 'b-demo', 'b-x7'];
+export const contenuDuScenario = (racineDuSite = racine) => ({ ...chargerLeContenu(racineDuSite), publies: PUBLIES_DU_SCENARIO });
 
 // Les fichiers du dépôt que le site sert à ses visiteurs, et dont les pages générées ont besoin.
 const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|(?:fonts|img|\.well-known)\/.+)$/;
@@ -23,5 +28,5 @@ export const construireLeSiteDExemple = async (dossier) => {
     mkdirSync(path.dirname(path.join(dossier, fichier)), { recursive: true });
     copyFileSync(path.join(racine, fichier), path.join(dossier, fichier));
   }
-  return construire({ source: `scenario:${SCENARIO}`, sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine });
+  return construire({ source: `scenario:${SCENARIO}`, sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario() });
 };

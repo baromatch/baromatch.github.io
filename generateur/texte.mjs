@@ -36,3 +36,12 @@ export const enumerer = (elements) => {
 
 // La première lettre en capitale (« dimanche » → « Dimanche »).
 export const capitale = (texte) => (texte ? texte[0].toLocaleUpperCase('fr-FR') + texte.slice(1) : texte);
+
+// Les caractères de contrôle et invisibles (catégories Unicode Cc et Cf) retirés d’un texte venu des données, avant
+// tout usage : un retour à la ligne ou une tabulation devient une espace, le reste disparaît. Le XML du badge ne casse
+// jamais, et aucun mot interdit ne se cache derrière un caractère invisible (« happy​hour »).
+export const nettoyer = (texte) => String(texte ?? '')
+  .replace(/[\t\n\v\f\r\u0085]+/g, ' ')
+  .replace(/[\p{Cc}\p{Cf}]/gu, '')
+  .replace(/ {2,}/g, ' ')
+  .trim();

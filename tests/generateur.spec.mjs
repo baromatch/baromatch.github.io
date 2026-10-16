@@ -311,7 +311,7 @@ test.describe('les pages', () => {
     expect(match.contenu).toContain('<h1 class="regarder-titre">PSG – OL : les bars qui diffusent le match</h1>');
     expect(match.contenu).toContain('<p class="regarder-affiche">Paris Saint-Germain – Olympique Lyonnais</p>');
     expect(match.contenu).toContain('<time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time>');
-    expect(match.contenu).toContain('Les places qui restent sont dans l’appli.');
+    expect(match.contenu).not.toContain('Les places qui restent sont dans l’appli.');
     const evenements = deType(match, 'Event');
     expect(evenements.map((ev) => ev.name)).toEqual(['PSG – OL à La Cave des Gones', 'PSG – OL au Zinc des Amis']);
     // L’article du nom du bar : « Les » avant « Le », une espace après ; « La » et « L’ » gardent leur majuscule.
@@ -362,6 +362,7 @@ test.describe('les pages', () => {
   test('aucun score, aucun nombre de places, aucune réservation promise tant que l’appli est fermée', () => {
     for (const p of site.pages) {
       expect(p.contenu, p.chemin).not.toMatch(/\bscores?\b|\b3 – 1\b|places? restantes?|Réserve ta place/i);
+      expect(p.contenu, p.chemin).not.toContain('Les places qui restent sont dans l’appli.');
     }
   });
 
@@ -371,6 +372,10 @@ test.describe('les pages', () => {
     const p = autre.pages.find((x) => x.chemin === '/matchs/psg-ol-2026-10-25/');
     expect(p.contenu).toContain('<a class="capsule" href="https://magasin.exemple/baromatch-android">Réserve ta place dans l’appli · Android</a>');
     expect(p.contenu).not.toContain('préviens-moi');
+    // La phrase sur les places qui restent : seulement l’appli ouverte.
+    expect(contenu.textes.places).toBe('Les places qui restent sont dans l’appli.');
+    expect(p.contenu).toContain('<p class="regarder-note">Les places qui restent sont dans l’appli.</p>');
+    expect(autre.pages.find((x) => x.chemin === '/bar/le-zinc-des-amis-paris-11/').contenu).toContain('Les places qui restent sont dans l’appli.');
     expect(deType(p, 'Event')[0].offers).toEqual({ '@type': 'Offer', price: 0, priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: 'https://magasin.exemple/baromatch-android' });
   });
 

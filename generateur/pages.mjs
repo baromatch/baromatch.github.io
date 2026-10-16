@@ -74,6 +74,8 @@ export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false,
   const accueil = { nom: textes.fil.accueil, chemin: '/' };
   const semaine = { nom: textes.fil.matchs, chemin: '/matchs/' };
   const lesVilles = { nom: textes.fil.villes, chemin: '/regarder-le-match/' };
+  // « Les places qui restent sont dans l’appli » : seulement quand l’appli est ouverte (sinon, aucune place promise).
+  const places = marque.appli?.ouverte ? `  <p class="regarder-note">${e(textes.places)}</p>\n` : '';
 
   // ---------- Quels matchs ont une page ----------
   const anciensParSlug = new Map(anciens.matchs.map((m) => [m.slug, m]));
@@ -154,8 +156,7 @@ ${quartiers.map(({ arrondissement, elements }) => `${arrondissement ? `  <h4 cla
       ? `<section class="regarder-section" aria-labelledby="titre-bars">
   <h2 id="titre-bars">${e(textes.match.titreBars)}</h2>
 ${listeDesSoirees}
-  <p class="regarder-note">${e(textes.places)}</p>
-  ${appel(marque, textes)}
+${places}  ${appel(marque, textes)}
 </section>`
       : `<section class="regarder-section" aria-labelledby="titre-bars">
   <h2 id="titre-bars">${e(textes.match.titreBars)}</h2>
@@ -385,7 +386,7 @@ ${soirees.map((s) => `    <li class="regarder-carte" id="${ancreDeLaSoiree(s.mat
       ${offre(s.offre, textes)}
     </li>`).join('\n')}
   </ul>
-  <p class="regarder-note">${e(textes.places)}</p>`
+${places.trimEnd()}`
       : `  <p>${e(textes.bar.sansSoiree)}</p>`;
     const ce = atouts(bar, textes);
     ajouter({

@@ -1,10 +1,10 @@
 {
-  "_lisezMoi": "Les textes fixes des pages « Où regarder le match ». Garde les clés et les mots entre accolades ({ville}, {heure}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation. Tant que l’appli n’est pas ouverte, tout ce qui parle de garder sa place se dit au futur (les clés « fermee ») ; au présent quand elle l’est (les clés « ouverte »). Une espace insécable avant « ? », « : » et « ; ».",
+  "_lisezMoi": "Les textes fixes des pages « Où regarder le match ». Garde les clés et les mots entre accolades ({ville}, {heure}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation. Tant que l’appli n’est pas ouverte, tout ce qui parle de garder sa place se dit au futur (les clés « fermee ») ; au présent quand elle l’est (les clés « ouverte »). Une espace insécable avant « ? », « : » et « ; ».",
   "appel": {
     "fermee": {
       "texte": "L’appli ouvre bientôt : préviens-moi",
       "adresse": "/#attente",
-      "note": "Baromatch est en test sur Android, à Paris. Laisse ton adresse : on te prévient le jour où l’appli ouvre."
+      "note": "Baromatch est en test sur Android, à Paris. Laisse ton adresse : on te prévient le jour où l’appli ouvre."
     },
     "ouverte": {
       "texte": "Réserve ta place dans l’appli",
@@ -21,7 +21,7 @@
   "commentCaMarche": {
     "titre": "Comment ça marche",
     "fermee": {
-      "intro": "Quand l’appli ouvre, tu pourras :",
+      "intro": "Quand l’appli ouvre, tu pourras :",
       "etapes": [
         {
           "titre": "Choisir ton match",
@@ -80,14 +80,14 @@
   "match": {
     "titreBars": "Où le regarder",
     "sansBar": "Pas encore de bar pour ce match sur Baromatch",
-    "tuTiensUnBar": "Tu tiens un bar ?",
-    "tuTiensUnBarSuite": "Annonce tes matchs sur Baromatch : les fans qui cherchent où le voir te trouvent.",
-    "prochains": "{clubs} : leurs prochains matchs",
+    "tuTiensUnBar": "Tu tiens un bar ?",
+    "tuTiensUnBarSuite": "Annonce tes matchs sur Baromatch : les fans qui cherchent où le voir te trouvent.",
+    "prochains": "{clubs} : leurs prochains matchs",
     "aucunProchain": "Pas d’autre match annoncé pour l’instant.",
     "passe": "Ce match est passé",
-    "passeSuite": "Le prochain match de {club} :",
-    "passeSansSuite": "Les prochains matchs, et où les voir :",
-    "heureAConfirmer": "Le coup d’envoi n’est pas encore fixé : l’heure peut changer.",
+    "passeSuite": "Le prochain match de {club} :",
+    "passeSansSuite": "Les prochains matchs, et où les voir :",
+    "heureAConfirmer": "Le coup d’envoi n’est pas encore fixé : l’heure peut changer.",
     "plusAnnonce": "Ce match n’est plus au programme.",
     "reporte": "Match reporté",
     "annule": "Match annulé",
@@ -122,12 +122,12 @@
     "titreFaq": "Les questions qu’on nous pose",
     "titreSansGuide": "{ville}, les soirs de match",
     "toutesLesVilles": "Toutes les villes",
-    "estIci": "Baromatch est-il à {ville} ?",
+    "estIci": "Baromatch est-il à {ville} ?",
     "estIciOui": "Oui. {bars} de {ville} diffuse le match sur Baromatch.",
     "estIciOuiPluriel": "Oui. {bars} de {ville} diffusent le match sur Baromatch.",
     "estIciNon": "Pas encore de bar à {ville} sur Baromatch.",
-    "appliFermee": "L’appli, elle, est en test sur Android, à Paris, et n’est pas encore ouverte : laisse ton adresse sur l’accueil, on te prévient le jour où elle ouvre.",
-    "appliOuverte": "L’appli est ouverte : tu y trouves les bars et tu gardes ta place."
+    "appliFermee": "L’appli, elle, est en test sur Android, à Paris, et n’est pas encore ouverte : laisse ton adresse sur l’accueil, on te prévient le jour où elle ouvre.",
+    "appliOuverte": "L’appli est ouverte : tu y trouves les bars et tu gardes ta place."
   },
   "bar": {
     "titreSoirees": "Ses prochaines soirées",
@@ -135,8 +135,8 @@
     "titreAtouts": "Sur place, d’après le bar",
     "parti": "Ce bar n’est plus sur Baromatch.",
     "partiSuite": "Les bars de {ville} qui diffusent le match sont sur la page de la ville.",
-    "badgeTitre": "Tu tiens ce bar ? Ton badge",
-    "badgeTexte": "Colle ce code sur ton site : le badge affiche ta prochaine soirée de match, mène à cette page, et se met à jour tout seul.",
+    "badgeTitre": "Tu tiens ce bar ? Ton badge",
+    "badgeTexte": "Colle ce code sur ton site : le badge affiche ta prochaine soirée de match, mène à cette page, et se met à jour tout seul.",
     "badgeCode": "Le code à coller",
     "partiFil": "Bar retiré"
   },
@@ -146,6 +146,6 @@
     "sansSoiree": "On diffuse le match",
     "marque": "sur Baromatch",
     "reserve": "Réserve ta place",
-    "apercu": "Aperçu du badge : {texte}"
+    "apercu": "Aperçu du badge : {texte}"
   }
 }

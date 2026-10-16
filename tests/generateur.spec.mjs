@@ -335,6 +335,13 @@ test.describe('les pages', () => {
     expect(site.avertissements).toContain('Ville sans guide : Rennes (1 bar). Son guide s’écrit dans generateur/contenu/villes.json.');
   });
 
+  test('une espace insécable avant « ? », « : » et « ; », dans les textes fixes et sur chaque page', () => {
+    // Dans textes.json et villes.json (relus ici sans mise en forme, donc sans espace avant les « : » du JSON).
+    expect(JSON.stringify([contenu.textes, contenu.villes]).match(/.{20} [?:;]/g)).toBeNull();
+    for (const p of site.pages) expect(p.contenu.match(/.{30} [?:;]/g), p.chemin).toBeNull();
+    expect(pageDe('/matchs/lille-lens-2026-10-26/').contenu).toContain(`Tu tiens un bar${String.fromCharCode(160)}?`);
+  });
+
   test('une ville avec des bars : indexable, ses bars par arrondissement, ses soirées, sa FAQ balisée', () => {
     const paris = pageDe('/regarder-le-match/paris/');
     expect(paris.indexable).toBe(true);

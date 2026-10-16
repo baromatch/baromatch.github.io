@@ -377,7 +377,7 @@ test('robots.txt : les outils de vérification hors de l’index, le site et ses
   expect(lignes).toContain('User-agent: *');
   expect(lignes).toContain('Allow: /');
   expect(lignes).toContain(`Sitemap: ${ORIGINE}/sitemap.xml`);
-  for (const chemin of ['/tests/', '/package.json', '/package-lock.json', '/playwright.config.mjs']) {
+  for (const chemin of ['/tests/', '/package.json', '/package-lock.json', '/playwright.config.mjs', '/generateur/', '/regarder-le-match/etat.json']) {
     expect(lignes).toContain(`Disallow: ${chemin}`);
   }
 

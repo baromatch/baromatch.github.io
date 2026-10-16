@@ -24,7 +24,7 @@ const DESSIN = {
   titre: 'On diffuse le match · sur Baromatch',
 };
 const CODE = {
-  lien: 'https://baromatch.fr/regarder-le-match/',
+  lien: 'https://baromatch.fr/',
   image: 'https://baromatch.fr/badge/baromatch.svg',
   alt: 'Baromatch',
 };
@@ -93,7 +93,10 @@ test.describe('« Partager mon badge » sur « Pour les bars »', () => {
     await attendreLaPageFinie(page);
     const bloc = page.locator('section#badge');
     await expect(bloc.locator('h2')).toHaveText('Partager mon badge');
+    await expect(bloc.locator('.badge__intro')).toContainText('Ton bar est sur Baromatch ? Colle ce badge sur ton site');
     await expect(bloc.locator('.badge__intro')).toContainText('Tu ne paies rien');
+    await expect(bloc.locator('.badge__intro')).toContainText('Le badge ne pose aucun cookie et ne suit personne de notre côté.');
+    await expect(bloc.locator('.badge__intro')).not.toContainText('ils ne suivent personne');
     await expect(bloc.locator('.badge__vivant')).toHaveText(PHRASE_VIVANT);
     // L’aperçu est le badge lui-même, qui se charge.
     const apercu = bloc.locator('.badge__apercu');
@@ -107,7 +110,7 @@ test.describe('« Partager mon badge » sur « Pour les bars »', () => {
     expect((await page.request.get('/badge/story-baromatch-apercu.webp')).status()).toBe(200);
   });
 
-  test('le code à coller : un lien vers « Où regarder le match », sans suivi, et l’image du badge nommée Baromatch', async ({ page }) => {
+  test('le code à coller : un lien vers l’accueil de Baromatch, sans suivi, et l’image du badge nommée Baromatch', async ({ page }) => {
     await page.goto(PAGE);
     const code = page.locator('#badge-code');
     await expect(code).toHaveAttribute('readonly', '');
@@ -143,6 +146,31 @@ test.describe('« Partager mon badge » sur « Pour les bars »', () => {
     await expect(bouton).toHaveText('Code copié');
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(await page.locator('#badge-code').inputValue());
     await expect(bouton).toHaveText('Copier le code', { timeout: 4000 });
+  });
+
+  test('la zone d’annonce est rendue en permanence, et le message est réécrit à chaque copie pour être annoncé', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(PAGE);
+    await attendreLaPageFinie(page);
+    const retour = page.locator('#badge-retour');
+    await expect(retour).toHaveAttribute('role', 'status');
+    expect(await retour.evaluate((e) => [e.textContent, getComputedStyle(e).display])).toEqual(['', 'block']);
+    await retour.evaluate((e) => {
+      window.__contenus = [];
+      new MutationObserver(() => window.__contenus.push(e.textContent)).observe(e, { childList: true, characterData: true, subtree: true });
+    });
+    const message = 'Code copié. Colle-le sur ton site, là où le badge doit apparaître.';
+    for (let i = 0; i < 2; i += 1) {
+      await page.locator('#badge-copier').click();
+      await expect(retour).toHaveText(message);
+      if (i === 0) await page.waitForTimeout(300);
+    }
+    const contenus = await page.evaluate(() => window.__contenus);
+    // Le second message passe par une zone vidée : vide entre les deux messages.
+    const premier = contenus.indexOf(message);
+    const dernier = contenus.lastIndexOf(message);
+    expect(dernier).toBeGreaterThan(premier);
+    expect(contenus.slice(premier + 1, dernier)).toContain('');
   });
 
   test('le presse-papiers refusé : le code est sélectionné, prêt à copier, et la page le dit', async ({ page }) => {

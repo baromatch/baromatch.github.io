@@ -76,6 +76,8 @@ test('données structurées : une page « à propos » de l’Organization de l�
   await page.goto(PAGE);
   const { '@graph': graphe } = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
   const fiche = graphe.find((n) => n['@type'] === 'AboutPage');
+  // La page se suffit : elle recopie l’Organization complète de l’accueil.
+  expect(graphe.find((n) => n['@type'] === 'Organization')).toEqual(organisation);
   const fil = graphe.find((n) => n['@type'] === 'BreadcrumbList');
   expect(fiche.about['@id']).toBe(organisation['@id']);
   expect(fiche.isPartOf['@id']).toBe(`${ORIGINE}/#site`);
@@ -85,4 +87,13 @@ test('données structurées : une page « à propos » de l’Organization de l�
     [1, 'Accueil', `${ORIGINE}/`],
     [2, 'Presse', `${ORIGINE}${PAGE}`],
   ]);
+});
+
+test('le film en texte, les droits des visuels, et une adresse qui passe à la ligne à 200 %', async ({ page }) => {
+  await page.goto(PAGE);
+  await expect(page.locator('#film ~ .presse__fichiers a[href="/#film-texte"]')).toHaveText('Ce que montre le film, en texte');
+  await expect(page.locator('main')).toContainText('Logos, captures et affiche : libres d’utilisation pour parler de Baromatch.');
+  const adresses = await page.$$eval('a[href="mailto:contact@baromatch.fr"]', (liens) => liens.map((a) => a.innerHTML));
+  expect(adresses.length).toBeGreaterThan(0);
+  for (const html of adresses) expect(html).toBe('contact@<wbr>baromatch.fr');
 });

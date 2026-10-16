@@ -28,7 +28,7 @@ const CODE = {
   image: 'https://baromatch.fr/badge/baromatch.svg',
   alt: 'Baromatch',
 };
-const PHRASE_VIVANT = 'Quand ton bar est sur Baromatch, sa page a son propre badge, qui montre ton prochain match.';
+const PHRASE_VIVANT = 'Une fois ton bar sur Baromatch, sa page a son propre badge : il affiche ton prochain match, et se met à jour tout seul.';
 
 // Les tracés du verre du pied de page de l’accueil (.pied__marque) : le badge dessine le même verre.
 const traces = (source) => [...source.matchAll(/<path d="([^"]+)"/g)].map(([, d]) => d);

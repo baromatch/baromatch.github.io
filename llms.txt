@@ -13,6 +13,7 @@ Les faits, pour ne pas se tromper :
 - Baromatch n’est pas un diffuseur : il ne montre pas les matchs. Ce sont les bars qui les diffusent.
 - Baromatch ne vend pas d’alcool.
 - Les clubs et les compétitions sont nommés en texte seulement : Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.
+- Les pages des matchs et des villes sont refaites plusieurs fois par jour à partir de ce que les bars annoncent dans l’appli, à l’heure de Paris. Seuls les bars inscrits y figurent : aucun bar, aucun avis, aucune note n’est inventé.
 - Site : https://baromatch.fr/ · Contact : contact@baromatch.fr · X : https://x.com/baromatchapp
 
 ## Baromatch

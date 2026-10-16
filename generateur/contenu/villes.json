@@ -8,7 +8,7 @@
     "guide": [
       "À Paris, le stade est loin du centre. Le Parc des Princes est à la porte de Saint-Cloud, et la plupart des fans voient le PSG à l’écran. Alors la ville se répartit dans ses bars. Oberkampf et Bastille se remplissent dès la fin d’après-midi, les Grands Boulevards suivent, et chaque quartier a son bar qui monte le son au coup d’envoi. Le Paris FC, l’autre club de la ville, a aussi ses fidèles, plus discrets.",
       "Les grands rendez-vous se repèrent de loin. Le Classique contre l’OM se vit partout, dans les bars et sur le trottoir devant. Les soirs de Ligue des champions, la ville entière suit le PSG, même ceux qui ne suivent pas la Ligue 1. Paris compte aussi des supporters de tous les clubs de France et d’ailleurs, et chacun a son bar.",
-      "Un match ordinaire, arrive une demi-heure avant. Un Classique ou une demi-finale, compte une heure, davantage si vous êtes nombreux. Avant de choisir, regarde ce qui compte : un écran visible depuis ta table, le son du match plutôt que la musique du bar, assez de place pour ta bande, et un bar où les deux camps sont bienvenus. À Paris, les supporters de l’adversaire sont souvent dans la salle, et c’est très bien comme ça.",
+      "Pour un match ordinaire, arrive une demi-heure avant. Pour un Classique ou une demi-finale, compte une heure, davantage si vous êtes nombreux. Avant de choisir, regarde ce qui compte : un écran visible depuis ta table, le son du match plutôt que la musique du bar, assez de place pour ta bande, et un bar où les deux camps sont bienvenus. À Paris, les supporters de l’adversaire sont souvent dans la salle, et c’est très bien comme ça.",
       "Baromatch sert à ça. Tu choisis ton match, tu vois les bars qui le diffusent près de toi et les places qui restent, tu gardes la tienne, gratuitement, et tu arrives tranquille. L’appli est en test sur Android, à Paris, et cherche ses premiers bars. Elle n’est pas encore ouverte : laisse ton adresse sur l’accueil, on te prévient au lancement."
     ],
     "faq": [
@@ -64,7 +64,7 @@
       },
       {
         "question": "Je regarde le match près du stade ou dans le centre ?",
-        "reponse": "Près du stade, les bars se vident au coup d’envoi : ceux qui y sont ont un billet. Pour voir le match entier, reste en ville : la Presqu’île, les pentes de la Croix-Rousse, la Guillotière ou Brotteaux."
+        "reponse": "À Décines, les bars autour du stade se vident au coup d’envoi : ceux qui y sont ont un billet. Pour voir le match entier, reste en ville : la Presqu’île, les pentes de la Croix-Rousse, la Guillotière ou Brotteaux."
       }
     ]
   },
@@ -116,7 +116,7 @@
     "faq": [
       {
         "question": "Faut-il réserver pour voir le derby du Nord dans un bar à Lille ?",
-        "reponse": "Un Lille – Lens remplit les bars du centre bien avant le coup d’envoi. Arrive tôt, ou garde une place à l’avance si le bar le permet. Rendre ça simple, c’est le but de Baromatch, quand les bars de Lille y seront."
+        "reponse": "Un Lille – Lens remplit les bars du centre bien avant le coup d’envoi. Arrive tôt, ou garde une place à l’avance si le bar le permet. C’est ce que Baromatch rend simple, le jour où les bars de Lille y sont."
       },
       {
         "question": "Baromatch est déjà à Lille ?",
@@ -132,7 +132,7 @@
       },
       {
         "question": "Je regarde le match près du stade ou dans le centre ?",
-        "reponse": "Près du stade, les bars se vident au coup d’envoi : ceux qui y sont ont un billet. Pour voir le match entier, reste dans le centre : Solférino, le Vieux-Lille, Wazemmes, ou autour des gares."
+        "reponse": "Le stade est à Villeneuve-d’Ascq, et autour, les bars se vident au coup d’envoi : ceux qui y sont ont un billet. Pour voir le match entier, reste dans le centre : Solférino, le Vieux-Lille, Wazemmes, ou autour des gares."
       }
     ]
   }

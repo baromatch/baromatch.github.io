@@ -248,7 +248,7 @@ test.describe('les pages', () => {
     const p = pageDe('/matchs/lille-lens-2026-10-26/');
     expect(p.indexable).toBe(false);
     expect(robotsDe(p)).toBe('noindex');
-    expect(p.contenu).toContain('Aucun bar ne diffuse encore ce match sur Baromatch.');
+    expect(p.contenu).toContain('Pas encore de bar pour ce match sur Baromatch.');
     expect(p.contenu).toContain('<a href="/pour-les-bars.html">Tu tiens un bar ?</a>');
     expect(p.contenu).not.toMatch(/démo|Lucette/i);
     expect(deType(p, 'Event')).toEqual([]);
@@ -290,12 +290,12 @@ test.describe('les pages', () => {
     for (const chemin of ['/matchs/psg-ol-2026-10-25/', '/bar/le-zinc-des-amis-paris-11/']) {
       const p = pageDe(chemin);
       const [tete, corps] = p.contenu.split('<body>');
-      expect(corps).toMatch(new RegExp(`Pinte et planche à partager · 12 €</p>\\s*<p class="regarder-offre__sante">${MENTION}</p>`));
+      expect(corps).toMatch(new RegExp(`Pinte et planche à partager · 12 €</p>\\s*<p class="regarder-offre__sante">${MENTION}</p>`));
       expect(tete).not.toContain('Pinte');
     }
     const comptoir = pageDe('/bar/le-comptoir-du-canal-paris-10/');
     const soiree = comptoir.contenu.split('id="soiree-psg-barca-2026-10-24"')[1].split('</li>')[0];
-    expect(soiree).toContain('Menu burger et boisson fraîche · 15 €');
+    expect(soiree).toContain('Menu burger et boisson fraîche · 15 €');
     expect(soiree).not.toContain(MENTION);
     // Aucune offre dans une page de ville, un aperçu, un badge ou une donnée structurée ; l’offre au mot interdit, nulle part.
     for (const p of site.pages) {
@@ -328,7 +328,8 @@ test.describe('les pages', () => {
     expect(ceSoir).toContain('<a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
     expect(ceSoir).toContain('1 bar à Lyon');
     expect(p.contenu).toContain('<h2 id="jour-2026-10-25">Dimanche 25 octobre</h2>');
-    expect(p.contenu).toMatch(/PSG – OL<\/a> · <time[^>]*>dimanche 25 octobre · 20:45<\/time> · Ligue 1 · <span class="regarder-compte">1 bar à Lyon, 1 bar à Paris<\/span>/);
+    // Sous le titre du jour, la ligne ne répète pas la date : l’heure seule, la date complète dans datetime.
+    expect(p.contenu).toMatch(/PSG – OL<\/a> · <time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte">1 bar à Lyon, 1 bar à Paris<\/span>/);
     expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
     // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
     expect(p.contenu).not.toContain('jour-2026-10-30');

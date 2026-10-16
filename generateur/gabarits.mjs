@@ -104,7 +104,14 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
   </ol>
 </nav>`;
 
-export const quand = (match) => `<time datetime="${debutDe(match)}">${e(quandEnLettres(match.debut, match.heureConfirmee))}</time>`;
+// Le jour et l’heure (« dimanche 25 octobre · 20:45 ») ; heureSeule : l’heure seulement (« 20:45 »), quand le jour
+// est déjà le titre de la liste, comme sur la page de la semaine. La date complète reste dans l’attribut datetime.
+export const quand = (match, { heureSeule = false } = {}) => {
+  const texte = heureSeule
+    ? (match.heureConfirmee ? heureDeParis(match.debut) : 'heure à confirmer')
+    : quandEnLettres(match.debut, match.heureConfirmee);
+  return `<time datetime="${debutDe(match)}">${e(texte)}</time>`;
+};
 
 const prix = (centimes) => {
   const euros = Math.floor(centimes / 100);
@@ -114,7 +121,7 @@ const prix = (centimes) => {
 
 // L’offre d’une soirée, telle que le bar l’a écrite, avec la mention santé dessous si elle peut contenir de l’alcool.
 export const offre = (o, textes) => (o ? `<div class="regarder-offre">
-        <p class="regarder-offre__texte"><span class="regarder-offre__etiquette">L’offre du bar</span> ${e(o.titre)}${o.prixCentimes !== null ? ` · ${prix(o.prixCentimes)}` : ''}</p>
+        <p class="regarder-offre__texte"><span class="regarder-offre__etiquette">L’offre du bar</span> ${e(o.titre)}${o.prixCentimes !== null ? ` · ${prix(o.prixCentimes)}` : ''}</p>
 ${o.alcool ? `        <p class="regarder-offre__sante">${e(textes.mentionSante)}</p>\n` : ''}      </div>` : '');
 
 // Ce que le bar dit de lui, et rien de plus.
@@ -164,10 +171,11 @@ export const carteDuBar = (bar, textes, { soiree = null, niveau = 4 } = {}) => [
   '    </li>',
 ].filter(Boolean).join('\n');
 
-// Une ligne de match : son nom court (vers sa page s’il en a une), le jour et l’heure, la compétition.
-export const ligneDeMatch = (match, { avecPage, suite = '' }) => {
+// Une ligne de match : son nom court (vers sa page s’il en a une), le jour et l’heure (ou l’heure seule, sous un
+// titre qui donne déjà le jour), la compétition.
+export const ligneDeMatch = (match, { avecPage, suite = '', heureSeule = false }) => {
   const nom = `${e(match.domicile.court)} – ${e(match.exterieur.court)}`;
-  return `<li>${avecPage ? `<a href="${cheminDuMatch(match)}">${nom}</a>` : nom} · ${quand(match)} · ${e(match.competition)}${suite}</li>`;
+  return `<li>${avecPage ? `<a href="${cheminDuMatch(match)}">${nom}</a>` : nom} · ${quand(match, { heureSeule })} · ${e(match.competition)}${suite}</li>`;
 };
 
 export { accorder, capitale, e, jourEnLettres, heureDeParis, ancreDeLaSoiree, cheminDeLaVille, cheminDuBar, cheminDuMatch };

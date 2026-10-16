@@ -178,7 +178,8 @@ ${commentCaMarche(textes)}`,
     const jours = Array.from({ length: SEMAINE_JOURS }, (_, i) => new Date(midi + i * JOUR_MS).toISOString().slice(0, 10));
     const dansLaSemaine = donnees.matchs.filter((m) => enCoursOuAVenir(m) && jours.includes(jourDeParis(m.debut))).sort((a, b) => a.debut - b.debut);
     const indexable = dansLaSemaine.some((m) => m.soirees.length > 0);
-    const ligne = (m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), suite: ` · <span class="regarder-compte">${m.soirees.length ? e(barsParVille(m.soirees)) : e(textes.semaine.pasDeBar)}</span>` })}`;
+    // Chaque liste est sous le titre de son jour : la ligne ne donne que l’heure.
+    const ligne = (m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), heureSeule: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? e(barsParVille(m.soirees)) : e(textes.semaine.pasDeBar)}</span>` })}`;
     const ceSoir = dansLaSemaine.filter((m) => jourDeParis(m.debut) === aujourdhui);
     const autres = jours.slice(1).map((jour) => ({ jour, matchs: dansLaSemaine.filter((m) => jourDeParis(m.debut) === jour) })).filter((j) => j.matchs.length);
     const dernierJour = jourEnLettres(Date.parse(`${jours.at(-1)}T12:00:00Z`));

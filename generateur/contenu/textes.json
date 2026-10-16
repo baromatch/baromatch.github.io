@@ -2,13 +2,13 @@
   "_lisezMoi": "Les textes fixes des pages « Où regarder le match ». Garde les clés et les mots entre accolades ({ville}, {heure}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation, aucune promesse que l’appli ne tient pas encore.",
   "appel": {
     "fermee": {
-      "texte": "L’appli ouvre bientôt : préviens-moi",
+      "texte": "L’appli ouvre bientôt : préviens-moi",
       "adresse": "/#attente",
-      "note": "Baromatch est en test sur Android, à Paris. Laisse ton adresse, on te prévient à l’ouverture."
+      "note": "Baromatch est en test sur Android, à Paris. Laisse ton adresse : on te prévient le jour où l’appli ouvre."
     },
     "ouverte": {
       "texte": "Réserve ta place dans l’appli",
-      "note": "Ta place est gratuite. Garde-la avant de partir."
+      "note": "Ta place ne coûte rien. Garde-la avant de partir."
     }
   },
   "places": "Les places qui restent sont dans l’appli.",
@@ -16,10 +16,10 @@
   "commentCaMarche": {
     "titre": "Comment ça marche",
     "etapes": [
-      { "titre": "Choisis ton match", "texte": "Les matchs à venir, avec l’heure du coup d’envoi." },
-      { "titre": "Trouve ton bar", "texte": "Les bars qui le diffusent près de chez toi, et les places qui leur restent." },
-      { "titre": "Garde ta place", "texte": "Pour toi seul ou pour toute la bande, gratuitement, avant de partir." },
-      { "titre": "Arrive, et garde la soirée", "texte": "Le bar sait que tu es là. La soirée rejoint ton album, en sous-bock." }
+      { "titre": "Choisis ton match", "texte": "Ce soir ou les jours d’après, avec l’heure du coup d’envoi." },
+      { "titre": "Trouve ton bar", "texte": "Ceux qui le diffusent près de toi, et combien de places il leur reste." },
+      { "titre": "Garde ta place", "texte": "Pour toi ou pour toute la bande, avant de sortir. Ça ne coûte rien." },
+      { "titre": "Arrive, et garde la soirée", "texte": "Un scan à l’entrée, et le bar sait que tu es là. Après, la soirée reste dans ton album, en sous-bock." }
     ]
   },
   "fil": {
@@ -37,21 +37,21 @@
     "food": "De quoi manger"
   },
   "match": {
-    "titreBars": "Les bars qui le diffusent",
-    "sansBar": "Aucun bar ne diffuse encore ce match sur Baromatch",
+    "titreBars": "Où le regarder",
+    "sansBar": "Pas encore de bar pour ce match sur Baromatch",
     "tuTiensUnBar": "Tu tiens un bar ?",
-    "tuTiensUnBarSuite": "Diffuse tes matchs sur Baromatch et garde des places pour les fans.",
-    "prochains": "Les prochains matchs de {clubs}",
+    "tuTiensUnBarSuite": "Annonce tes matchs sur Baromatch : les fans qui cherchent où le voir te trouvent.",
+    "prochains": "{clubs} : leurs prochains matchs",
     "aucunProchain": "Pas d’autre match annoncé pour l’instant.",
     "passe": "Ce match est passé",
     "passeSuite": "Le prochain match de {club} :",
-    "passeSansSuite": "Les matchs à venir sont sur la page de la semaine.",
-    "heureAConfirmer": "L’heure du coup d’envoi n’est pas encore confirmée.",
+    "passeSansSuite": "Les prochains matchs, et où les voir :",
+    "heureAConfirmer": "Le coup d’envoi n’est pas encore fixé : l’heure peut changer.",
     "plusAnnonce": "Ce match n’est plus au programme."
   },
   "semaine": {
     "titre": "Les matchs de la semaine et où les voir",
-    "chapeau": "Les sept prochains jours, à l’heure de Paris, et les bars qui diffusent chaque match sur Baromatch.",
+    "chapeau": "Sept jours de foot à l’heure de Paris et, pour chaque match, les bars qui le diffusent sur Baromatch.",
     "ceSoir": "Ce soir, {jour}",
     "rienCeSoir": "Pas de match annoncé ce soir.",
     "pasDeBar": "Pas encore de bar",
@@ -59,7 +59,7 @@
   },
   "villes": {
     "titre": "Où regarder le match",
-    "chapeau": "Ville par ville, les bars qui diffusent le match sur Baromatch, et ce qu’il faut savoir un soir de match.",
+    "chapeau": "Ville par ville, les bars qui diffusent le match sur Baromatch, et ce qu’il faut savoir avant d’y aller.",
     "sansBar": "Pas encore de bar",
     "voirLaSemaine": "Tous les matchs de la semaine"
   },
@@ -69,19 +69,19 @@
     "sansBar": "Aucun bar de {ville} n’est encore sur Baromatch.",
     "titreSoirees": "Les prochaines soirées à {ville}",
     "sansSoiree": "Pas de soirée annoncée pour l’instant.",
-    "titreFaq": "Questions fréquentes",
+    "titreFaq": "Les questions qu’on nous pose",
     "titreSansGuide": "{ville}, les soirs de match",
     "toutesLesVilles": "Toutes les villes"
   },
   "bar": {
     "titreSoirees": "Ses prochaines soirées",
     "sansSoiree": "Pas de soirée annoncée pour l’instant.",
-    "titreAtouts": "Ce que le bar dit de lui",
+    "titreAtouts": "Sur place, d’après le bar",
     "parti": "Ce bar n’est plus sur Baromatch.",
-    "partiSuite": "Les bars qui diffusent le match à {ville} sont sur la page de la ville.",
+    "partiSuite": "Les bars de {ville} qui diffusent le match sont sur la page de la ville.",
     "badgeTitre": "Tu tiens ce bar ? Ton badge",
-    "badgeTexte": "Colle ce code sur ton site. Le badge montre ta prochaine soirée et mène à cette page. Il se met à jour tout seul.",
-    "badgeCode": "Le code du badge"
+    "badgeTexte": "Colle ce code sur ton site : le badge affiche ta prochaine soirée de match, mène à cette page, et se met à jour tout seul.",
+    "badgeCode": "Le code à coller"
   },
   "badge": {
     "ceSoir": "Ce soir ici · {heure}",

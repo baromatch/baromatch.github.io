@@ -1,6 +1,6 @@
 /* Baromatch — les pages « Où regarder le match » (matchs, villes, bars), écrites par le générateur.
    Elles reprennent styles.css (la nuit, le verre, la police, l’en-tête et le pied de page) ; ici, seulement leur
-   mise en page. L’ambre reste aux liens et à l’appel à l’action. Aucune animation. */
+   mise en page. L’ambre reste aux liens et à l’appel à l’action. Aucune animation. Les chiffres sont tabulaires. */
 
 .regarder {
   padding-top: 8px;
@@ -29,14 +29,16 @@
 
 /* ---------- Tête de page ---------- */
 
-.regarder-tete { padding: 16px 0 8px; }
+/* La tête d’une page : son surtitre en étiquette, le titre, puis le jour et l’heure, le chiffre qui compte ; un trait
+   la sépare du reste. */
+.regarder-tete { padding: 16px 0 28px; border-bottom: 1px solid var(--trait); }
 
 .regarder-surtitre {
-  margin: 0 0 6px;
+  margin: 0 0 10px;
   color: var(--texte-doux);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .regarder-titre {
@@ -54,10 +56,11 @@
 .regarder-affiche { margin: 0; color: var(--texte-doux); font-size: 1.125rem; }
 
 .regarder-quand {
-  margin: 14px 0 0;
-  font-size: clamp(1.375rem, 4.5vw, 1.875rem);
-  font-weight: 700;
-  line-height: 1.2;
+  margin: 16px 0 0;
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .regarder-chapeau { margin: 0; max-width: 40rem; color: var(--texte-doux); font-size: 1.125rem; }
@@ -66,17 +69,28 @@
 
 /* ---------- Sections ---------- */
 
-.regarder-section { margin-top: 48px; }
+.regarder-section { margin-top: 44px; }
 
 .regarder-section h2 {
   margin: 0 0 16px;
   font-size: clamp(1.375rem, 4vw, 1.75rem);
   font-weight: 750;
   line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
-.regarder-ville { margin: 28px 0 10px; font-size: 1.25rem; font-weight: 700; }
-.regarder-quartier { margin: 20px 0 10px; color: var(--texte-doux); font-size: 1.0625rem; font-weight: 650; scroll-margin-top: 24px; }
+/* La ville est un titre, le quartier une étiquette sous elle : les cartes suivent sans vide entre les deux. */
+.regarder-ville { margin: 28px 0 6px; font-size: 1.25rem; font-weight: 700; }
+.regarder-ville:first-of-type { margin-top: 0; }
+.regarder-quartier {
+  margin: 20px 0 8px;
+  color: var(--texte-discret);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  scroll-margin-top: 24px;
+}
+.regarder-ville + .regarder-quartier { margin-top: 0; }
 
 .regarder-vide { margin: 0 0 8px; font-weight: 650; }
 .regarder-bars-pro { margin: 0; color: var(--texte-doux); }
@@ -142,15 +156,17 @@
   border-radius: 12px;
   background: var(--verre-fort);
 }
-.regarder-offre__etiquette { display: block; color: var(--texte-doux); font-size: 0.8125rem; font-weight: 600; }
+.regarder-offre__etiquette { display: block; margin-bottom: 2px; color: var(--texte-doux); font-size: 0.8125rem; font-weight: 600; }
+.regarder-offre__texte { font-weight: 600; }
 .regarder-offre__sante { margin-top: 6px !important; color: var(--texte-doux); font-size: 0.8125rem; }
 
 /* ---------- Listes de matchs ---------- */
 
 .regarder-matchs { margin: 0; padding: 0; list-style: none; }
-.regarder-matchs li { padding: 12px 0; border-bottom: 1px solid var(--trait); }
+.regarder-matchs li { padding: 12px 0; border-bottom: 1px solid var(--trait); line-height: 1.5; }
 .regarder-matchs li:last-child { border-bottom: 0; }
 .regarder-matchs a { font-weight: 650; }
+.regarder-matchs time { font-weight: 650; }
 .regarder-compte { color: var(--texte-doux); }
 
 /* ---------- Appel, étapes, guide, questions ---------- */
@@ -162,7 +178,8 @@
   gap: 10px;
   margin-top: 28px;
 }
-.regarder-appel .capsule { max-width: 100%; text-align: center; }
+/* Sur deux lignes au téléphone, l’appel se coupe au milieu de la phrase, jamais dans « préviens-moi ». */
+.regarder-appel .capsule { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; text-wrap: balance; }
 .regarder-appel p { margin: 0; max-width: 40ch; color: var(--texte-doux); font-size: 0.9375rem; }
 
 .regarder-etapes { margin: 0; padding-left: 1.4em; }
@@ -173,6 +190,7 @@
 
 .regarder-faq details { border-bottom: 1px solid var(--trait); }
 .regarder-faq summary { padding: 12px 0; min-height: 44px; box-sizing: border-box; cursor: pointer; font-weight: 650; }
+.regarder-faq summary::marker, .regarder-badge summary::marker { color: var(--texte-discret); }
 .regarder-faq details p { max-width: 42rem; margin: 0 0 16px; color: var(--texte-doux); }
 
 .regarder-passe p { margin: 0 0 10px; }

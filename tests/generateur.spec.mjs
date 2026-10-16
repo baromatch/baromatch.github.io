@@ -211,7 +211,7 @@ test.describe('les données', () => {
   });
 
   test('la ville et l’arrondissement d’un bar, lus dans son adresse', async () => {
-    expect(lireLAdresse('Site QA - 99 Rue de Rivoli, 75001 Paris')).toEqual({ rue: 'Site QA - 99 Rue de Rivoli', codePostal: '75001', ville: 'Paris' });
+    expect(lireLAdresse('Site QA - 1 rue de l’Exemple, 75001 Paris')).toEqual({ rue: 'Site QA - 1 rue de l’Exemple', codePostal: '75001', ville: 'Paris' });
     expect(lireLAdresse('3 Place Sainte-Anne 35000 Rennes, France')).toEqual({ rue: '3 Place Sainte-Anne', codePostal: '35000', ville: 'Rennes' });
     expect(lireLAdresse('Quelque part à Paris')).toBeNull();
     // Un vrai bar dont l’adresse est écrite autrement ne disparaît pas ; « Paris 11e » reste juste.

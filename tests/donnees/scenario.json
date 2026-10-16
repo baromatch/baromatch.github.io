@@ -30,7 +30,7 @@
     { "id": "b-gones", "name": "La Cave des Gones", "address": "8 Rue Mercière, 69002 Lyon", "lat": 45.7622, "lng": 4.8331, "isActive": true, "features": null },
     { "id": "b-coin", "name": "Au Bon Coin", "address": "40 Rue de la Charité, 69002 Lyon", "lat": 45.7543, "lng": 4.8302, "isActive": true, "features": { "screens": 1 } },
     { "id": "b-rennes", "name": "Le Café des Sports", "address": "3 Place Sainte-Anne, 35000 Rennes", "lat": 48.1149, "lng": -1.6807, "isActive": true, "features": { "sound": true } },
-    { "id": "b-demo", "name": "Bar de démo Baromatch", "address": "Site QA - 99 Rue de Rivoli, 75001 Paris", "lat": 48.8611, "lng": 2.3358, "isActive": true, "features": null },
+    { "id": "b-demo", "name": "Bar de démo Baromatch", "address": "Site QA - 1 rue de l’Exemple, 75001 Paris", "lat": 48.8611, "lng": 2.3358, "isActive": true, "features": null },
     { "id": "b-demo-lille", "name": "Bar DÉMO Lille", "address": "10 Rue de Béthune, 59000 Lille", "isActive": true, "features": null },
     { "id": "b-isdemo", "name": "Chez Lucette", "address": "18 Rue Ordener, 75018 Paris", "isActive": true, "isDemo": true, "features": null },
     { "id": "b-inactif", "name": "Le Rideau Baissé", "address": "7 Rue de la Roquette, 75011 Paris", "isActive": false, "features": null },

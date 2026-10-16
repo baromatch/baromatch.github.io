@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { PROFILS } from './outils/marque.mjs';
 import { fichierDe, PAGES } from './outils/pages.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
@@ -239,7 +240,7 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
     expect(de('Organization')).toHaveLength(1);
     expect(organisation.name).toBe('Baromatch');
     expect(organisation.url).toBe(`${ORIGINE}/`);
-    expect(organisation.sameAs).toEqual(['https://x.com/baromatchapp']);
+    expect(organisation.sameAs).toEqual(PROFILS);
     expect(organisation.contactPoint.email).toBe('contact@baromatch.fr');
     expect(organisation.logo.startsWith(`${ORIGINE}/`)).toBe(true);
     expect(existsSync(fichierDe(new URL(organisation.logo).pathname))).toBe(true);

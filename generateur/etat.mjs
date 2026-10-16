@@ -71,10 +71,16 @@ export const anciensDe = (etat) => {
   };
 };
 
-export const nouvelEtat = (precedent, fichiers, aujourdhui) => {
+// gardees : les chemins dont la version précédente reste (une page refusée par le contrôle), repris tels quels.
+export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = []) => {
   const pages = {};
-  for (const f of [...fichiers].sort((a, b) => a.chemin.localeCompare(b.chemin))) {
+  const tous = [...fichiers, ...gardees.map((chemin) => ({ chemin, garde: true }))];
+  for (const f of tous.sort((a, b) => a.chemin.localeCompare(b.chemin))) {
     const avant = precedent.pages?.[f.chemin];
+    if (f.garde) {
+      pages[f.chemin] = avant;
+      continue;
+    }
     const marque = empreinte(f.contenu);
     pages[f.chemin] = {
       type: f.type,

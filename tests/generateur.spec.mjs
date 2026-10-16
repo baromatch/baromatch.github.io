@@ -478,6 +478,63 @@ test.describe('d’un passage à l’autre', () => {
     return `scenario:${fichier}`;
   };
 
+  test('les bornes : un nom de club ou de bar très long est coupé proprement, et « onair=1 » dans un nom n’est pas un attribut', async () => {
+    const sortie = dossierVide();
+    const longBar = 'Le Grand Comptoir Lumineux des Supporters du Faubourg Saint-Antoine, et de Bercy';
+    expect(longBar).toHaveLength(80);
+    const source = scenarioSans(sortie, (brut) => ({
+      ...brut,
+      matches: [...brut.matches, {
+        id: 'm-long', startAt: '2026-10-27T19:00:00.000Z', league: 'Premier League',
+        homeTeam: 'Wolverhampton Wanderers FC', awayTeam: 'Brighton & Hove Albion FC',
+        homeClub: { slug: 'wolverhampton-x', canonicalName: 'Wolverhampton Wanderers FC' }, awayClub: { slug: 'brighton-x', canonicalName: 'Brighton & Hove Albion FC' },
+      }],
+      bars: [...brut.bars,
+        { id: 'b-long', name: longBar, address: '30 Rue de Lappe, 75011 Paris', isActive: true },
+        { id: 'b-spot', name: 'Le Spot onair=1', address: '31 Rue de Lappe, 75011 Paris', isActive: true }],
+      matchNights: [...brut.matchNights,
+        { id: 'n-long', status: 'OPEN', bar: { id: 'b-long' }, match: { id: 'm-long' }, offer: null },
+        { id: 'n-spot', status: 'OPEN', bar: { id: 'b-spot' }, match: { id: 'm-long' }, offer: null }],
+    }));
+    const resultat = await passer(sortie, '2026-10-23T08:00:00Z', { source });
+    expect(resultat.avertissements.filter((a) => a.startsWith('Page refusée'))).toEqual([]);
+    const pageDe = (debut) => resultat.fichiers.find((f) => f.chemin.startsWith(debut) && f.chemin.endsWith('/'));
+    for (const p of [pageDe('/matchs/wolverhampton-wanderers-brighton-hove-albion-'), pageDe('/bar/le-grand-comptoir'), pageDe('/bar/le-spot-onair-1')]) {
+      expect(p, 'page publiée').toBeTruthy();
+      expect(p.titre.length, p.titre).toBeLessThanOrEqual(60);
+      expect(p.description.length, p.description).toBeLessThanOrEqual(160);
+      expect(controlerLaPage(p)).toEqual([]);
+    }
+    expect(pageDe('/matchs/wolverhampton').titre).toMatch(/[^\s,:]…$/);
+    // Un vrai attribut d’évènement reste refusé, même dans une page par ailleurs juste.
+    const spot = pageDe('/bar/le-spot-onair-1');
+    expect(controlerLaPage({ ...spot, contenu: spot.contenu.replace('<h1 ', '<h1 onclick="x()" ') }).join()).toMatch(/attribut d’évènement/);
+    expect(controlerLaPage({ ...spot, contenu: spot.contenu.replace('<h1 ', '<h1 data-x=\'a onair=1\' ') })).toEqual([]);
+  });
+
+  test('une page refusée garde sa version précédente sans arrêter le passage ; une erreur du gabarit commun l’arrête', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    const fichier = 'bar/au-bon-coin-lyon-2/index.html';
+    const avant = { page: lire(sortie, fichier), badge: lire(sortie, 'bar/au-bon-coin-lyon-2/badge.svg'), etat: etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/'] };
+    // Un texte faux sur les seules pages des bars sans soirée : elles sont refusées, les autres passent.
+    const faux = structuredClone(contenu);
+    faux.textes.bar.sansSoiree = 'Pas de soirée annoncée pour l’instant !';
+    const resultat = await passer(sortie, '2026-10-23T10:00:00Z', { contenu: faux });
+    expect(resultat.avertissements.some((a) => a.startsWith('Page refusée, sa version précédente reste en ligne : /bar/au-bon-coin-lyon-2/'))).toBe(true);
+    expect(lire(sortie, fichier)).toBe(avant.page);
+    expect(lire(sortie, 'bar/au-bon-coin-lyon-2/badge.svg')).toBe(avant.badge);
+    expect(etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/']).toEqual(avant.etat);
+    expect(plan(sortie)).toContain('/bar/au-bon-coin-lyon-2/</loc>');
+    expect(resultat.supprimees).toEqual([]);
+    // Le fil d’Ariane de chaque page faux : toutes refusées, rien n’est écrit.
+    const gabarit = structuredClone(contenu);
+    gabarit.textes.fil.accueil = 'Accueil !';
+    const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
+    await expect(passer(sortie, '2026-10-23T12:00:00Z', { contenu: gabarit })).rejects.toThrow(/Pages refusées, rien n’est écrit/);
+    expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
+  });
+
   test('un match passé : la page reste, en noindex, hors du plan du site, vers le prochain match ; puis disparaît', async () => {
     const sortie = dossierVide();
     await passer(sortie, '2026-10-21T08:00:00Z');

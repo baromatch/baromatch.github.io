@@ -39,8 +39,12 @@ export const construire = async ({
     });
   }
 
+  // Une page refusée par le contrôle garde sa version précédente (et son badge) : ni réécrite, ni effacée, son entrée
+  // de l’état est reprise telle quelle. Une page nouvelle refusée n’est simplement pas publiée.
+  const gardees = new Set(site.refusees.flatMap(({ chemin }) => [chemin, `${chemin}badge.svg`]).filter((chemin) => precedent.pages?.[chemin]));
+
   // La prudence : jamais plus de la moitié des pages publiées supprimées d’un coup.
-  const nouveaux = new Set(fichiers.map((f) => f.chemin));
+  const nouveaux = new Set([...fichiers.map((f) => f.chemin), ...gardees]);
   const anciennesPages = Object.keys(precedent.pages ?? {}).filter((chemin) => chemin.endsWith('/'));
   const supprimees = Object.keys(precedent.pages ?? {}).filter((chemin) => !nouveaux.has(chemin));
   const pagesSupprimees = supprimees.filter((chemin) => chemin.endsWith('/'));
@@ -49,7 +53,7 @@ export const construire = async ({
   }
 
   const aujourdhui = jourDeParis(maintenant);
-  const etat = nouvelEtat(precedent, fichiers, aujourdhui);
+  const etat = nouvelEtat(precedent, fichiers, aujourdhui, [...gardees]);
   const planActuel = existsSync(path.join(sortie, PLAN)) ? readFileSync(path.join(sortie, PLAN), 'utf8') : readFileSync(path.join(racine, PLAN), 'utf8');
   const plan = nouveauPlan(planActuel, etat);
 

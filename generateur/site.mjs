@@ -1,5 +1,6 @@
 // Un passage du générateur, en mémoire : lire les données, les trier, fabriquer toutes les pages, puis contrôler chacune
-// (contrôle.mjs) et valider ses données structurées (validateur.mjs). Une seule erreur arrête tout avant la moindre
+// (contrôle.mjs) et valider ses données structurées (validateur.mjs). Une page refusée est mise de côté (sa version
+// précédente reste en ligne) ; deux pages à la même adresse, ou toutes les pages refusées, arrêtent tout avant la moindre
 // écriture : les pages en ligne restent comme elles sont.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -22,13 +23,22 @@ export const construireEnMemoire = async ({
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);
   const motsDesBars = [...donnees.bars.flatMap((b) => [b.nom, b.adresse, b.rue]), ...(anciens?.bars ?? []).flatMap((b) => [b.nom, b.adresse]), ...offres];
-  const erreurs = pages.flatMap((p) => [
-    ...controlerLaPage(p, { motsDesBars }),
-    ...controlerLesOffres(p, offres),
-    ...validerLaPage(vocabulaire, p.contenu).map((erreur) => `${p.chemin} : ${erreur}`),
-  ]);
+  const erreursDe = new Map();
+  for (const p of pages) {
+    const erreurs = [
+      ...controlerLaPage(p, { motsDesBars }),
+      ...controlerLesOffres(p, offres),
+      ...validerLaPage(vocabulaire, p.contenu).map((erreur) => `${p.chemin} : ${erreur}`),
+    ];
+    if (erreurs.length) erreursDe.set(p, erreurs);
+  }
   const chemins = pages.map((p) => p.chemin);
-  for (const chemin of new Set(chemins)) if (chemins.filter((c) => c === chemin).length > 1) erreurs.push(`${chemin} : deux pages à la même adresse`);
-  if (erreurs.length) throw new Error(`Pages refusées, rien n’est écrit :\n${erreurs.join('\n')}`);
-  return { donnees, pages, cadre, contenu, avertissements: [...donnees.avertissements, ...avertissements] };
+  const doubles = [...new Set(chemins)].filter((chemin) => chemins.filter((c) => c === chemin).length > 1);
+  if (doubles.length) throw new Error(`Pages refusées, rien n’est écrit :\n${doubles.map((c) => `${c} : deux pages à la même adresse`).join('\n')}`);
+  // Toutes les pages refusées : le gabarit commun est en cause, le passage s’arrête. Sinon, une page refusée n’arrête
+  // pas les autres : sa version précédente reste en ligne (construire.mjs), et le journal le dit.
+  if (pages.length && erreursDe.size === pages.length) throw new Error(`Pages refusées, rien n’est écrit :\n${[...erreursDe.values()].flat().join('\n')}`);
+  const refusees = [...erreursDe].map(([p, erreurs]) => ({ chemin: p.chemin, erreurs }));
+  const refus = refusees.map(({ chemin, erreurs }) => `Page refusée, sa version précédente reste en ligne : ${chemin} (${erreurs.join(' ; ')})`);
+  return { donnees, pages: pages.filter((p) => !erreursDe.has(p)), refusees, cadre, contenu, avertissements: [...donnees.avertissements, ...avertissements, ...refus] };
 };

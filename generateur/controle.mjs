@@ -2,7 +2,7 @@
 // description de 70 à 160, l’adresse canonique, un seul h1, l’index permis ou non, les aperçus de partage), la
 // politique de sécurité, aucun script, et ce que la page ne dit jamais (« ! », happy hour, tournée, verre offert,
 // score). Les mots d’un bar (son nom, son adresse, son offre) sont les siens : ils sont retirés avant de chercher.
-// Une seule erreur arrête la génération.
+// Une page en erreur est refusée (site.mjs garde sa version précédente).
 import { MOTS_INTERDITS } from './donnees.mjs';
 import { CSP } from './gabarits.mjs';
 import { adresseDe } from './jsonld.mjs';
@@ -42,7 +42,10 @@ export const controlerLaPage = (p, { motsDesBars = [] } = {}) => {
   exiger(robots.length === 1 && (p.indexable ? !/noindex/.test(robots[0]) : robots[0] === 'noindex'), `robots « ${robots.join()} » pour une page ${p.indexable ? 'indexable' : 'non indexable'}`);
   exiger(tous(html, /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/g).join() === CSP, 'politique de sécurité');
   exiger([...html.matchAll(/<script\b([^>]*)>/g)].every((m) => m[1] === ' type="application/ld+json"'), 'un script autre que les données structurées');
-  exiger(!/\son[a-z]+=/i.test(html.replace(/<textarea[\s\S]*?<\/textarea>/g, '')), 'un attribut d’évènement (onclick…)');
+  // Les vrais attributs des balises, sans leurs valeurs entre guillemets : un texte (« Le Spot onair=1 »), dans la
+  // page ou dans la valeur d’un attribut, n’en est pas un.
+  const attributs = [...html.replace(/<textarea[\s\S]*?<\/textarea>/g, '').matchAll(/<[a-zA-Z][^>]*>/g)].map((m) => m[0].replace(/"[^"]*"|'[^']*'/g, '""'));
+  exiger(!attributs.some((balise) => /\son[a-z]+\s*=/i.test(balise)), 'un attribut d’évènement (onclick…)');
 
   // Ce que la page dit elle-même : sans les mots des bars, ni « ! », ni mot interdit, ni dans la tête ni dans le corps.
   let texte = `${titres.join(' ')} ${descriptions.join(' ')} ${texteVisible(html)}`;

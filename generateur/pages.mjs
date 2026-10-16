@@ -18,11 +18,24 @@ export const CONSERVATION_MS = 30 * JOUR_MS;
 
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 
-// Le premier texte dont la longueur va (un titre de 15 à 60 caractères, une description de 70 à 160) ; le contrôle
-// des pages refuse ensuite toute page dont le titre ou la description sort de ces bornes.
-const choisir = (candidats, min, max) => candidats.find((t) => t.length >= min && t.length <= max) ?? candidats.at(-1);
-const titre = (...candidats) => choisir(candidats, 15, 60);
-const description = (...candidats) => choisir(candidats, 70, 160);
+// Un texte trop long coupé proprement : à la fin d’un mot, sans ponctuation pendante, terminé par « … ».
+export const couper = (texte, max) => {
+  if (texte.length <= max) return texte;
+  const debut = texte.slice(0, max - 1);
+  const espace = debut.lastIndexOf(' ');
+  return `${(espace > max / 2 ? debut.slice(0, espace) : debut).replace(/[\s,;:.–—-]+$/u, '')}…`;
+};
+// Le premier texte dont la longueur va (un titre de 15 à 60 caractères, une description de 70 à 160). Si aucun ne va
+// (un nom de club ou de bar très long), le dernier, coupé proprement ; trop court, il prend la suite donnée. Le
+// contrôle des pages vérifie ensuite ces bornes.
+const choisir = (candidats, min, max, suite) => {
+  const juste = candidats.find((t) => t.length >= min && t.length <= max);
+  if (juste) return juste;
+  const dernier = candidats.at(-1);
+  return couper(dernier.length < min ? `${dernier}${suite}` : dernier, max);
+};
+const titre = (...candidats) => choisir(candidats, 15, 60, ' — Baromatch');
+const description = (...candidats) => choisir(candidats, 70, 160, ' Les bars qui diffusent le match, sur Baromatch.');
 
 const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
 const quandCourt = (m) => (m.heureConfirmee ? `${jourEnLettres(m.debut)} à ${heureDeParis(m.debut)}` : `${jourEnLettres(m.debut)}, heure à confirmer`);

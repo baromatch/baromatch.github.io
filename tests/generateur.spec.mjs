@@ -16,6 +16,7 @@ import { construireEnMemoire } from '../generateur/site.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
 import { controlerLaPage } from '../generateur/controle.mjs';
 import { echapper } from '../generateur/texte.mjs';
+import { auBar } from '../generateur/jsonld.mjs';
 import { construire, verifierLesListes } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
 import { prevenirIndexNow, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
@@ -302,7 +303,10 @@ test.describe('les pages', () => {
     expect(match.contenu).toContain('<time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time>');
     expect(match.contenu).toContain('Les places qui restent sont dans l’appli.');
     const evenements = deType(match, 'Event');
-    expect(evenements.map((ev) => ev.name)).toEqual(['PSG – OL à la Cave des Gones', 'PSG – OL au Zinc des Amis']);
+    expect(evenements.map((ev) => ev.name)).toEqual(['PSG – OL à La Cave des Gones', 'PSG – OL au Zinc des Amis']);
+    // L’article du nom du bar : « Les » avant « Le », une espace après ; « La » et « L’ » gardent leur majuscule.
+    const noms = ['Les Trois Frères', 'Le Zinc', 'La Lucarne', 'L’Annexe', "L'Annexe", 'Legends Pub', 'Lavomatic', 'Lesbos Café', 'Au Bon Coin'];
+    expect(noms.map(auBar)).toEqual([' aux Trois Frères', ' au Zinc', ' à La Lucarne', ' à L’Annexe', " à L'Annexe", ' à Legends Pub', ' à Lavomatic', ' à Lesbos Café', ', Au Bon Coin']);
     const zinc = evenements[1];
     expect(zinc).toMatchObject({
       startDate: '2026-10-25T20:45:00+01:00',

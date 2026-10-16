@@ -20,15 +20,16 @@ export const adresseDeLaSoiree = (soiree) => adresseDe(`${cheminDuBar(soiree.bar
 // L’heure d’un match annoncée comme provisoire n’est pas écrite : seulement le jour.
 export const debutDe = (match) => (match.heureConfirmee ? isoDeParis(match.debut) : jourDeParis(match.debut));
 
-// « au Zinc des Amis », « à la Cave des Gones », « aux Trois Frères », « à l’Escale » ; un autre nom reste entier.
+// « aux Trois Frères », « au Zinc des Amis » (« Les » lu avant « Le », toujours suivi d’une espace), « à La Cave des
+// Gones », « à L’Annexe », « à Legends Pub » : le nom reste entier, avec sa majuscule. Un nom qui commence déjà par
+// « Au », « Aux » ou « Chez » suit une virgule (« , Au Bon Coin »).
 export const auBar = (nom) => {
-  const trouve = nom.match(/^(Le|La|Les|L[’'])\s*(.*)$/);
-  if (!trouve) return `, ${nom}`;
-  const [, article, reste] = trouve;
-  if (article === 'Le') return ` au ${reste}`;
-  if (article === 'Les') return ` aux ${reste}`;
-  if (article === 'La') return ` à la ${reste}`;
-  return ` à l’${reste}`;
+  const les = nom.match(/^Les\s+(\S.*)$/);
+  if (les) return ` aux ${les[1]}`;
+  const le = nom.match(/^Le\s+(\S.*)$/);
+  if (le) return ` au ${le[1]}`;
+  if (/^(?:Au|Aux|Chez|À)\s/i.test(nom)) return `, ${nom}`;
+  return ` à ${nom}`;
 };
 
 export const barOuPub = (bar) => ({

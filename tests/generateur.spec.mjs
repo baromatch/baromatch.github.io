@@ -19,7 +19,7 @@ import { echapper } from '../generateur/texte.mjs';
 import { auBar } from '../generateur/jsonld.mjs';
 import { construire, verifierLesListes } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
-import { prevenirIndexNow, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
+import { prevenirIndexNow, publierLesPages, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
 const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
@@ -805,6 +805,52 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // La publication demandée après l’envoi ; IndexNow n’arrête jamais l’Action.
     expect(action).toMatch(/node generateur\/publier\.mjs pages\n/);
     expect(action).toMatch(/continue-on-error: true\n        run: node generateur\/publier\.mjs indexnow "\$RUNNER_TEMP\/changees\.txt"\n/);
+  });
+
+  test('la publication : redemandée si la dernière n’est pas celle de main, suivie à son adresse, puis seulement IndexNow', async () => {
+    const DEPOT = 'proprietaire/site';
+    const LATEST = `https://api.github.com/repos/${DEPOT}/pages/builds/latest`;
+    const SUIVIE = `https://api.github.com/repos/${DEPOT}/pages/builds/4242`;
+    // Un faux GitHub : chaque adresse répond la suite de réponses donnée, la dernière ensuite.
+    const fauxGitHub = (reponses) => {
+      const appels = [];
+      const appeler = async (adresse, options = {}) => {
+        appels.push(`${options.method ?? 'GET'} ${adresse}`);
+        const liste = reponses[`${options.method ?? 'GET'} ${adresse}`] ?? [];
+        const corps = liste.length > 1 ? liste.shift() : liste[0];
+        return { ok: Boolean(corps), status: corps ? 200 : 404, json: async () => corps, text: async () => '' };
+      };
+      return { appels, appeler };
+    };
+    const commun = { depot: DEPOT, jeton: 'x', attendre: async () => {}, journal: () => {} };
+    const demande = { [`POST https://api.github.com/repos/${DEPOT}/pages/builds`]: [{ url: SUIVIE, status: 'queued' }] };
+
+    // Rien d’envoyé, la dernière publication est celle de main : rien à faire.
+    let gh = fauxGitHub({ [`GET ${LATEST}`]: [{ status: 'built', commit: 'aaa' }] });
+    expect(await publierLesPages({ ...commun, ...gh, commit: 'aaa', envoye: false })).toBe('deja');
+    expect(gh.appels).toEqual([`GET ${LATEST}`]);
+    // Rien d’envoyé, mais la dernière publication est plus ancienne : redemandée, puis suivie à l’adresse renvoyée.
+    gh = fauxGitHub({ [`GET ${LATEST}`]: [{ status: 'errored', commit: 'vieux' }], ...demande, [`GET ${SUIVIE}`]: [{ status: 'building', commit: 'aaa' }, { status: 'built', commit: 'aaa' }] });
+    expect(await publierLesPages({ ...commun, ...gh, commit: 'aaa', envoye: false })).toBe('publie');
+    expect(gh.appels).toEqual([`GET ${LATEST}`, `POST https://api.github.com/repos/${DEPOT}/pages/builds`, `GET ${SUIVIE}`, `GET ${SUIVIE}`]);
+    // Envoyé : demandée tout de suite. Si l’adresse suivie est « latest », l’ancienne publication (déjà finie) ne
+    // compte pas : seule celle du dernier commit.
+    gh = fauxGitHub({ [`POST https://api.github.com/repos/${DEPOT}/pages/builds`]: [{ url: LATEST, status: 'queued' }], [`GET ${LATEST}`]: [{ status: 'built', commit: 'vieux' }, { status: 'built', commit: 'bbb' }] });
+    expect(await publierLesPages({ ...commun, ...gh, commit: 'bbb', envoye: true })).toBe('publie');
+    expect(gh.appels.filter((a) => a.startsWith('GET'))).toHaveLength(2);
+    // En erreur : une erreur. Jamais finie : « en cours », sans IndexNow.
+    gh = fauxGitHub({ ...demande, [`GET ${SUIVIE}`]: [{ status: 'errored', commit: 'ccc', error: { message: 'raté' } }] });
+    await expect(publierLesPages({ ...commun, ...gh, commit: 'ccc', envoye: true })).rejects.toThrow(/raté/);
+    gh = fauxGitHub({ ...demande, [`GET ${SUIVIE}`]: [{ status: 'building', commit: 'ccc' }] });
+    expect(await publierLesPages({ ...commun, ...gh, commit: 'ccc', envoye: true, attenteMax: 60_000 })).toBe('en cours');
+
+    // L’Action : la publication est demandée même sans envoi, avec le dernier commit de main ; IndexNow attend une
+    // publication réussie.
+    const etape = action.split('- name: Demander la publication à GitHub Pages\n')[1].split('\n\n')[0];
+    expect(etape).not.toMatch(/^ {8}if:/m);
+    expect(etape).toContain('ENVOYE: ${{ steps.envoi.outputs.envoye }}');
+    expect(etape).toContain('export COMMIT="$(git ls-remote origin refs/heads/main | cut -f1)"');
+    expect(action).toContain("if: steps.envoi.outputs.envoye == 'oui' && steps.publication.outputs.publie == 'oui'\n        continue-on-error: true\n        run: node generateur/publier.mjs indexnow");
   });
 
   test('IndexNow : la clé servie à la racine, seulement les adresses du site, une erreur qui n’arrête rien', async () => {

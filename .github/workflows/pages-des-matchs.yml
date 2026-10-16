@@ -112,14 +112,20 @@ jobs:
           echo "::error::Trois essais d’envoi sur main ont échoué."
           exit 1
 
+      # Aussi quand rien n’a été envoyé : si la dernière publication n’est pas celle du dernier commit de main (une
+      # publication ratée au passage précédent), elle est redemandée.
       - name: Demander la publication à GitHub Pages
-        if: steps.envoi.outputs.envoye == 'oui'
+        id: publication
         env:
           DEPOT: ${{ github.repository }}
           JETON_GITHUB: ${{ github.token }}
-        run: node generateur/publier.mjs pages
+          ENVOYE: ${{ steps.envoi.outputs.envoye }}
+        run: |
+          export COMMIT="$(git ls-remote origin refs/heads/main | cut -f1)"
+          node generateur/publier.mjs pages
 
+      # Seulement après une publication réussie : les moteurs liraient sinon les anciennes pages.
       - name: Prévenir IndexNow des adresses qui ont changé
-        if: steps.envoi.outputs.envoye == 'oui'
+        if: steps.envoi.outputs.envoye == 'oui' && steps.publication.outputs.publie == 'oui'
         continue-on-error: true
         run: node generateur/publier.mjs indexnow "$RUNNER_TEMP/changees.txt"

@@ -333,7 +333,13 @@ test('plan du site : un XML lisible, les pages indexables, chacune avec sa vraie
   const { entrees } = lu;
   const aujourdhui = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
   INDEXABLES.forEach(exigerLaPage);
-  const canoniques = INDEXABLES.map((p) => canoniqueDe(p.chemin));
+  // Les pages des matchs, des villes et des bars, écrites par le générateur (generateur/construire.mjs) : celles que
+  // son état dit indexables sont dans le plan du site, chacune avec son fichier ; les autres n’y sont pas.
+  const fichierEtat = duDepot('regarder-le-match', 'etat.json');
+  const etat = existsSync(fichierEtat) ? JSON.parse(readFileSync(fichierEtat, 'utf8')) : { pages: {} };
+  const generees = Object.entries(etat.pages).filter(([chemin, p]) => p.indexable && chemin.endsWith('/')).map(([chemin]) => chemin);
+  for (const chemin of generees) expect(existsSync(fichierDe(chemin)), chemin).toBe(true);
+  const canoniques = [...INDEXABLES.map((p) => canoniqueDe(p.chemin)), ...generees.map(canoniqueDe)];
 
   const adresses = entrees.map((e) => e.adresse);
   expect(new Set(adresses).size).toBe(adresses.length);
@@ -346,6 +352,7 @@ test('plan du site : un XML lisible, les pages indexables, chacune avec sa vraie
   for (const page of INDEXABLES) {
     expect(adresses, page.chemin).toContain(canoniqueDe(page.chemin));
   }
+  for (const chemin of generees) expect(adresses, chemin).toContain(canoniqueDe(chemin));
   expect(xml).not.toContain('404.html');
 
   // Une page qui affiche « Mise à jour le … » donne la même date au plan du site.

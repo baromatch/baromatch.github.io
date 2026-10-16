@@ -6,7 +6,9 @@
     "serve": "http-server . -p 4173 -a 127.0.0.1 -s -c-1",
     "test": "playwright test",
     "lighthouse": "node tests/outils/lighthouse.mjs",
-    "liens": "playwright test tests/liens.spec.mjs"
+    "liens": "playwright test tests/liens.spec.mjs",
+    "generer": "node generateur/construire.mjs",
+    "generer:capture": "node generateur/construire.mjs --source=capture:tests/donnees/capture --maintenant=2026-10-15T19:44:29Z --sortie=apercu"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.2",

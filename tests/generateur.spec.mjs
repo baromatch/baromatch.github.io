@@ -3,7 +3,7 @@
 // qu’il a le droit de toucher. Le scénario inventé (tests/donnees/scenario.json) se lit à l’heure du vendredi
 // 23 octobre 2026 ; la copie réduite des listes publiques (tests/donnees/capture) à celle de son enregistrement.
 import { test, expect } from '@playwright/test';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -16,6 +16,8 @@ import { construireEnMemoire } from '../generateur/site.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
 import { controlerLaPage } from '../generateur/controle.mjs';
 import { echapper } from '../generateur/texte.mjs';
+import { construire } from '../generateur/construire.mjs';
+import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
 const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
@@ -410,5 +412,193 @@ test.describe('le validateur et le contrôle refusent ce qui est faux', () => {
     expect(avec((h) => h.replace('</body>', '<script src="/x.js"></script></body>'))).toMatch(/un script autre/);
     // Le nom d’un bar est le sien : « Chez Max ! » ne refuse pas la page.
     expect(controlerLaPage({ ...p, contenu: p.contenu.replace('</main>', '<p>Chez Max !</p></main>') }, { motsDesBars: ['Chez Max !'] })).toEqual([]);
+  });
+});
+
+// ---------- L’état, les pages passées, le plan du site, le badge, la liste blanche ----------
+
+test.describe('d’un passage à l’autre', () => {
+  const dossiers = [];
+  const dossierVide = () => {
+    const dossier = mkdtempSync(path.join(tmpdir(), 'pages-des-matchs-'));
+    dossiers.push(dossier);
+    return dossier;
+  };
+  test.afterAll(() => { for (const dossier of dossiers) rmSync(dossier, { recursive: true, force: true }); });
+  const lire = (dossier, relatif) => readFileSync(path.join(dossier, relatif), 'utf8');
+  const etatDe = (dossier) => JSON.parse(lire(dossier, 'regarder-le-match/etat.json'));
+  const plan = (dossier) => lire(dossier, 'sitemap.xml');
+  const passer = (sortie, maintenant, options = {}) => construire({ source: `scenario:${SCENARIO}`, sortie, maintenant: Date.parse(maintenant), racine, ...options });
+  const scenarioSans = (dossier, retirer) => {
+    const brut = JSON.parse(readFileSync(SCENARIO, 'utf8'));
+    const fichier = path.join(dossier, 'scenario-modifie.json');
+    writeFileSync(fichier, JSON.stringify(retirer(brut)));
+    return `scenario:${fichier}`;
+  };
+
+  test('un match passé : la page reste, en noindex, hors du plan du site, vers le prochain match ; puis disparaît', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-21T08:00:00Z');
+    const avant = etatDe(sortie).pages['/matchs/om-lens-2026-10-22/'];
+    expect(avant).toMatchObject({ type: 'match', cle: 'om-lens-2026-10-22', date: '2026-10-22T18:45:00.000Z', change: '2026-10-21', indexable: true });
+    expect(avant.empreinte).toMatch(/^[\w-]{22}$/);
+    expect(plan(sortie)).toContain('<loc>https://baromatch.fr/matchs/om-lens-2026-10-22/</loc><lastmod>2026-10-21</lastmod>');
+
+    const resultat = await passer(sortie, '2026-10-23T08:00:00Z');
+    const page = lire(sortie, 'matchs/om-lens-2026-10-22/index.html');
+    expect(page).toContain('<meta name="robots" content="noindex">');
+    expect(page).toContain('<h2 id="titre-passe">Ce match est passé</h2>');
+    expect(page).toContain('Le prochain match de Lens : <a href="/matchs/lille-lens-2026-10-26/">Lille – Lens</a>');
+    expect(page).not.toMatch(/regarder-carte|Zinc/);
+    expect(plan(sortie)).not.toContain('om-lens');
+    const apres = etatDe(sortie).pages['/matchs/om-lens-2026-10-22/'];
+    expect(apres).toMatchObject({ indexable: false, change: '2026-10-23' });
+    // Une page qui n’a pas changé garde sa date ; le plan du site donne celle de son dernier vrai changement.
+    expect(etatDe(sortie).pages['/matchs/psg-ol-2026-10-25/'].change).toBe('2026-10-21');
+    expect(plan(sortie)).toContain('<loc>https://baromatch.fr/matchs/psg-ol-2026-10-25/</loc><lastmod>2026-10-21</lastmod>');
+    expect(resultat.changees).not.toContain('https://baromatch.fr/matchs/psg-ol-2026-10-25/');
+    expect(resultat.changees).toContain('https://baromatch.fr/matchs/');
+
+    // Le même passage refait n’écrit rien.
+    expect((await passer(sortie, '2026-10-23T08:00:00Z')).ecrits).toEqual([]);
+
+    // 30 jours après son coup d’envoi, la page disparaît, et l’état l’oublie.
+    await passer(sortie, '2026-11-22T08:00:00Z');
+    expect(existsSync(path.join(sortie, 'matchs/om-lens-2026-10-22'))).toBe(false);
+    expect(etatDe(sortie).pages['/matchs/om-lens-2026-10-22/']).toBeUndefined();
+    expect(existsSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/index.html'))).toBe(true);
+  });
+
+  test('un bar qui n’est plus dans les données : noindex, vers sa ville, puis disparaît ; un bar exclu disparaît aussitôt', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-21T08:00:00Z');
+    const sansZinc = scenarioSans(sortie, (brut) => ({ ...brut, bars: brut.bars.filter((b) => b.id !== 'b-zinc') }));
+    await construire({ source: sansZinc, sortie, maintenant: Date.parse('2026-10-23T08:00:00Z'), racine });
+    const page = lire(sortie, 'bar/le-zinc-des-amis-paris-11/index.html');
+    expect(page).toContain('<meta name="robots" content="noindex">');
+    expect(page).toContain('Ce bar n’est plus sur Baromatch.');
+    expect(page).toContain('<a href="/regarder-le-match/paris/">Où regarder le match à Paris</a>');
+    expect(plan(sortie)).not.toContain('le-zinc-des-amis');
+    expect(etatDe(sortie).pages['/bar/le-zinc-des-amis-paris-11/'].memoire.disparu).toBe('2026-10-23T08:00:00.000Z');
+    expect(lire(sortie, 'bar/le-zinc-des-amis-paris-11/badge.svg')).not.toContain('On diffuse');
+    await construire({ source: sansZinc, sortie, maintenant: Date.parse('2026-11-23T08:00:00Z'), racine });
+    expect(existsSync(path.join(sortie, 'bar/le-zinc-des-amis-paris-11'))).toBe(false);
+
+    // Un bar mis dans la liste d’exclusion ne garde pas sa page un seul passage.
+    const autre = dossierVide();
+    await passer(autre, '2026-10-21T08:00:00Z');
+    await passer(autre, '2026-10-21T09:00:00Z', { contenu: { ...contenu, exclus: ['b-coin'] } });
+    expect(existsSync(path.join(autre, 'bar/au-bon-coin-lyon-2'))).toBe(false);
+  });
+
+  test('le plan du site : les pages fixes telles quelles, les pages générées indexables seulement', async () => {
+    const sortie = dossierVide();
+    const fixe = readFileSync(path.join(racine, 'sitemap.xml'), 'utf8').replace(/\r\n/g, '\n')
+      .replace('</urlset>', '  <url><loc>https://baromatch.fr/presse.html</loc><lastmod>2026-10-14</lastmod></url>\n  <url><loc>https://baromatch.fr/matchs/vieux-match-2026-01-01/</loc><lastmod>2026-01-01</lastmod></url>\n</urlset>');
+    writeFileSync(path.join(sortie, 'sitemap.xml'), fixe);
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    const xml = plan(sortie);
+    const lignes = (texte) => texte.split('\n').filter((l) => l.includes('<url>'));
+    const fixes = lignes(fixe).filter((l) => !l.includes('/matchs/'));
+    expect(lignes(xml).slice(0, fixes.length)).toEqual(fixes);
+    expect(xml).not.toContain('vieux-match');
+    const etat = etatDe(sortie);
+    const generees = lignes(xml).slice(fixes.length).map((l) => l.match(/<loc>https:\/\/baromatch\.fr([^<]*)<\/loc>/)[1]);
+    expect(generees).toEqual(Object.keys(etat.pages).filter((c) => etat.pages[c].indexable && c.endsWith('/')));
+    for (const chemin of ['/regarder-le-match/marseille/', '/matchs/lille-lens-2026-10-26/', '/matchs/ol-angers-2026-10-31/']) expect(generees).not.toContain(chemin);
+    expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>\n<urlset')).toBe(true);
+  });
+
+  test('la liste blanche : rien d’autre que matchs/, regarder-le-match/, bar/ et sitemap.xml n’est touché', async () => {
+    const sortie = dossierVide();
+    // Un dossier qui ressemble au site : des fichiers que le générateur n’a pas le droit de toucher.
+    const temoins = { 'index.html': 'accueil', 'marque.json': '{}', 'robots.txt': 'robots', 'bar.html': 'bar', 'matchs.txt': 'm', 'regarder.css': 'css' };
+    for (const [nom, texte] of Object.entries(temoins)) writeFileSync(path.join(sortie, nom), texte);
+    const avant = new Set(readdirSync(sortie));
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    for (const [nom, texte] of Object.entries(temoins)) expect(lire(sortie, nom), nom).toBe(texte);
+    const fichiers = (dossier, prefixe = '') => readdirSync(path.join(sortie, dossier)).flatMap((nom) => {
+      const relatif = path.posix.join(dossier, nom);
+      return statSync(path.join(sortie, relatif)).isDirectory() ? fichiers(relatif) : [relatif];
+    });
+    const crees = [...readdirSync(sortie)].filter((nom) => !avant.has(nom));
+    expect(crees.sort()).toEqual(['bar', 'matchs', 'regarder-le-match', 'sitemap.xml']);
+    const tous = ['bar', 'matchs', 'regarder-le-match'].flatMap((d) => fichiers(d));
+    expect(tous.filter((relatif) => !estPermis(relatif))).toEqual([]);
+    for (const refuse of ['index.html', 'marque.json', 'robots.txt', 'tests/x.html', 'matchs/../index.html', 'bar/x/script.js', 'generateur/construire.mjs']) {
+      expect(estPermis(refuse), refuse).toBe(false);
+      expect(() => ecrireUnFichier(sortie, refuse, 'x'), refuse).toThrow(/Chemin refusé/);
+    }
+    for (const permis of ['sitemap.xml', 'regarder-le-match/etat.json', 'matchs/index.html', 'bar/le-zinc-des-amis-paris-11/badge.svg']) expect(estPermis(permis), permis).toBe(true);
+    // Le générateur lui-même n’écrit qu’en passant par cette liste.
+    const source = readFileSync(path.join(racine, 'generateur', 'construire.mjs'), 'utf8') + readFileSync(path.join(racine, 'generateur', 'etat.mjs'), 'utf8');
+    expect(source.match(/writeFileSync\(/g)).toHaveLength(2);
+    expect(source).toContain('if (typeof options.changees === \'string\') writeFileSync(options.changees');
+  });
+
+  test('la prudence : un passage qui ferait disparaître plus de la moitié des pages n’écrit rien', async () => {
+    // Les données manquantes ne vident pas le site : un match ou un bar absent garde sa page 30 jours (plus haut).
+    // Mais un passage qui supprimerait d’un coup plus de la moitié des pages publiées (ici, après une longue pause,
+    // vingt pages de matchs de septembre arrivées au bout de leurs 30 jours) s’arrête et le dit.
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    const etat = etatDe(sortie);
+    for (let i = 1; i <= 30; i += 1) {
+      const slug = `vieux-match-${i}-2026-09-01`;
+      etat.pages[`/matchs/${slug}/`] = { type: 'match', cle: slug, date: '2026-09-01T18:00:00.000Z', empreinte: 'x', change: '2026-09-01', indexable: false,
+        memoire: { slug, ids: [slug], debut: '2026-09-01T18:00:00.000Z', heureConfirmee: true, competition: 'Ligue 1', domicile: { cle: 'a', court: 'A', nom: 'A' }, exterieur: { cle: 'b', court: 'B', nom: 'B' } } };
+    }
+    writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
+    const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 50 pages publiées : rien n’est écrit/);
+    expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
+    // Voulu : relancé en le disant, le passage les supprime.
+    await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });
+    expect(Object.keys(etatDe(sortie).pages).filter((c) => c.includes('vieux-match'))).toEqual([]);
+    // Des données illisibles n’écrivent rien non plus.
+    const etatJuste = lire(sortie, 'regarder-le-match/etat.json');
+    await expect(construire({ source: 'api', adresse: 'http://127.0.0.1:9', sortie, maintenant: Date.parse('2026-10-23T10:00:00Z'), racine })).rejects.toThrow(/Données illisibles/);
+    expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatJuste);
+  });
+
+  test('le badge vivant : la prochaine soirée, ou « On diffuse le match », jamais « Réserve ta place » tant que l’appli est fermée', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    const badge = (slug) => lire(sortie, `bar/${slug}/badge.svg`);
+    const texte = (svg) => [...svg.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)].map((m) => m[1].replace(/<[^>]+>/g, ''));
+    expect(texte(badge('la-cave-des-gones-lyon-2'))).toEqual(['Ce soir ici · 20:45', 'Brest – Nice · sur Baromatch']);
+    expect(texte(badge('le-zinc-des-amis-paris-11'))).toEqual(['Samedi 24 octobre ici · 21:00', 'PSG – Barça · sur Baromatch']);
+    expect(texte(badge('au-bon-coin-lyon-2'))).toEqual(['On diffuse le match', 'sur Baromatch']);
+    const svg = badge('le-zinc-des-amis-paris-11');
+    expect(svg).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="360" height="72" viewBox="0 0 360 72" role="img" aria-labelledby="titre-badge">/);
+    expect(svg).toContain('<title id="titre-badge">Le Zinc des Amis sur Baromatch : samedi 24 octobre ici · 21:00, PSG – Barça</title>');
+    expect(svg).toContain('<rect x="0.5" y="0.5" width="359" height="71" rx="35.5" fill="#0A0B10" stroke="#FFFFFF" stroke-opacity="0.14"/>');
+    expect(svg).toContain('fill="#F7F7F9"');
+    expect(svg).toContain('<tspan fill="#FFB13D">sur Baromatch</tspan>');
+    expect(svg).toContain('font-family="\'Bricolage Grotesque\', system-ui, -apple-system, \'Segoe UI\', Roboto, Arial, sans-serif"');
+    expect(svg).toContain('stop-color="#FFB13D"');
+    for (const slug of ['la-cave-des-gones-lyon-2', 'le-zinc-des-amis-paris-11', 'au-bon-coin-lyon-2']) {
+      expect(badge(slug)).not.toMatch(/Réserve|Pinte|offre|<script|href=/i);
+    }
+    // L’appli ouverte : la dernière ligne devient « Réserve ta place sur Baromatch ».
+    const ouverte = { ...contenu, marque: { ...contenu.marque, appli: { ouverte: true, android: 'https://magasin.exemple/baromatch-android', iphone: '' } } };
+    await passer(sortie, '2026-10-23T08:00:00Z', { contenu: ouverte });
+    expect(texte(badge('la-cave-des-gones-lyon-2'))).toEqual(['Ce soir ici · 20:45 · Brest – Nice', 'Réserve ta place sur Baromatch']);
+    expect(texte(badge('au-bon-coin-lyon-2'))).toEqual(['On diffuse le match', 'Réserve ta place sur Baromatch']);
+
+    // Le code à coller : le badge et un lien vers la page du bar, au nom du bar, sans paramètre de suivi.
+    const page = lire(sortie, 'bar/au-bon-coin-lyon-2/index.html');
+    const code = page.match(/<textarea[^>]*readonly[^>]*>([^<]*)<\/textarea>/)[1];
+    expect(code).toBe(echapper('<a href="https://baromatch.fr/bar/au-bon-coin-lyon-2/" title="Au Bon Coin sur Baromatch"><img src="https://baromatch.fr/bar/au-bon-coin-lyon-2/badge.svg" width="360" height="72" alt="Au Bon Coin sur Baromatch"></a>'));
+    expect(page).toContain('<summary>Tu tiens ce bar ? Ton badge</summary>');
+  });
+
+  test('la copie enregistrée de ce soir, écrite : tout en noindex, le plan du site inchangé', async () => {
+    const sortie = dossierVide();
+    const resultat = await construire({ source: `capture:${CAPTURE}`, sortie, maintenant: ENREGISTREMENT, racine });
+    expect(resultat.changees).toEqual([]);
+    expect(Object.values(etatDe(sortie).pages).filter((p) => p.indexable)).toEqual([]);
+    expect(plan(sortie)).toBe(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8').replace(/\r\n/g, '\n'));
+    expect(existsSync(path.join(sortie, 'bar'))).toBe(false);
   });
 });

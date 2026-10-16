@@ -167,7 +167,11 @@ test.describe('le résumé Lighthouse', () => {
 
 test('chaque commande npm mène à un fichier qui existe', () => {
   const { scripts } = JSON.parse(readFileSync(path.join(racine, 'package.json'), 'utf8'));
-  const manquants = Object.entries(scripts).flatMap(([nom, commande]) => [...commande.matchAll(/(?:^|\s)((?:tests\/)[^\s]+\.m?js)/g)]
-    .map(([, fichier]) => fichier).filter((fichier) => !existsSync(path.join(racine, fichier))).map((fichier) => `${nom} : ${fichier}`));
+  // Les scripts des tests et du générateur, et les données qu’une commande donne au générateur (--source=capture:…).
+  const manquants = Object.entries(scripts).flatMap(([nom, commande]) => [
+    ...[...commande.matchAll(/(?:^|\s)((?:tests|generateur)\/[^\s]+\.m?js)/g)].map(([, fichier]) => fichier),
+    ...[...commande.matchAll(/--source=(?:capture|scenario):([^\s]+)/g)].map(([, fichier]) => fichier),
+  ].filter((fichier) => !existsSync(path.join(racine, fichier))).map((fichier) => `${nom} : ${fichier}`));
   expect(manquants).toEqual([]);
+  expect(Object.keys(scripts)).toEqual(expect.arrayContaining(['generer', 'generer:capture']));
 });

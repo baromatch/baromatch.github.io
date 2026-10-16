@@ -645,6 +645,12 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // Le droit d’écrire le dépôt et de demander la publication de Pages, rien d’autre.
     expect(action).toMatch(/\npermissions:\n  contents: write\n  pages: write\n\n/);
     expect(action).toMatch(/\nconcurrency:\n  group: pages-des-matchs\n  cancel-in-progress: false\n/);
+    // Lancée à la main depuis une autre branche, elle ne fait rien, et elle part toujours de main : jamais une autre
+    // branche envoyée sur main. Lu dans son seul travail, et dans son étape de récupération du dépôt.
+    const travaux = action.split('\njobs:\n')[1];
+    expect([...travaux.matchAll(/^ {2}[a-z-]+:$/gm)]).toHaveLength(1);
+    expect(travaux).toMatch(/^ {2}generer:\n(?: {4}#.*\n)* {4}if: github\.ref == 'refs\/heads\/main'\n/);
+    expect(travaux).toMatch(/ {6}- uses: actions\/checkout@v7\n {8}with:\n {10}ref: main\n/);
     // Des actions à leur étiquette de version (vérifiées le 16 octobre 2026), Node 22, rien à installer.
     expect([...action.matchAll(/uses: ([^\s]+)/g)].map((m) => m[1])).toEqual(['actions/checkout@v7', 'actions/setup-node@v7']);
     expect(action).toContain('node-version: 22');

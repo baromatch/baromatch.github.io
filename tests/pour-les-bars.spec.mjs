@@ -134,7 +134,7 @@ test.describe('ce que la page dit', () => {
     expect(titres[0]).toMatch(/\bmatch\b/i);
   });
 
-  test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, questions, formulaire', async ({ page }) => {
+  test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, badge, questions, formulaire', async ({ page }) => {
     await page.goto(PAGE);
     const sections = await page.$$eval('main > section', (liste) => liste.map((s) => ({
       id: s.id,
@@ -146,12 +146,14 @@ test.describe('ce que la page dit', () => {
       'Comment ça marche',
       'Ton soir de match, heure par heure',
       'Ce que tu vois des fans. Et ce que tu ne vois jamais.',
+      'Partager mon badge',
       'Les questions des bars',
       'Propose ton bar',
     ];
     expect(sections.map((s) => s.titre).filter((t) => ATTENDUES.includes(t))).toEqual(ATTENDUES);
     expect(sections.find((s) => s.titre === 'Comment ça marche').id).toBe('comment');
     expect(sections.find((s) => s.titre === 'Propose ton bar').id).toBe('proposer');
+    expect(sections.find((s) => s.titre === 'Partager mon badge').id).toBe('badge');
     await expect(page.locator('main > section').first().locator('h1')).toHaveCount(1);
   });
 

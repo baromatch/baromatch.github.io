@@ -92,10 +92,13 @@ test('les captures de l’appli : des WebP légers, de largeur raisonnable', () 
 });
 
 test.describe('l’image de story des bars', () => {
-  test('1080 × 1920, un PNG léger', () => {
+  test('1080 × 1920, un PNG léger ; son aperçu pour « Pour les bars », un WebP de 360 px', () => {
     const fichier = duDepot('badge', 'story-baromatch.png');
     expect(enTetePng(fichier)).toMatchObject({ largeur: 1080, hauteur: 1920 });
     expect(statSync(fichier).size).toBeLessThan(400 * 1024);
+    const apercu = duDepot('badge', 'story-baromatch-apercu.webp');
+    expect(tailleWebp(apercu)).toEqual({ largeur: 360, hauteur: 640 });
+    expect(statSync(apercu).size).toBeLessThan(30 * 1024);
   });
 
   test('son texte ne promet pas de réserver tant que l’appli n’est pas ouverte, et ne parle pas d’alcool', () => {

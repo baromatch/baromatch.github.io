@@ -4,7 +4,8 @@
 //   node tests/outils/images-marque.mjs [port]
 //     - les logos de la page presse en PNG, 2400 px de large, fond transparent, depuis leurs SVG (presse/) ;
 //     - l’image de story des bars (badge/story-baromatch.png, 1080 × 1920), depuis tests/outils/story-baromatch.html,
-//       enregistrée en PNG à palette (png-palette.mjs), deux fois plus légère que la capture.
+//       enregistrée en PNG à palette (png-palette.mjs), deux fois plus légère que la capture ; et son aperçu pour la
+//       page « Pour les bars » (badge/story-baromatch-apercu.webp, 360 px de large).
 //   node tests/outils/images-marque.mjs webp <image d’entrée> <fichier .webp de sortie> <largeur> [qualité de 0 à 1]
 //     - une capture réduite à cette largeur (proportions gardées) et enregistrée en WebP (qualité 0,8 par défaut).
 //
@@ -19,6 +20,7 @@ import { demarrerServeur } from './serveur.mjs';
 const LARGEUR_LOGO = 2400;
 const LOGOS = ['baromatch-logo-fond-sombre', 'baromatch-logo-fond-clair'];
 const STORY = { largeur: 1080, hauteur: 1920, page: '/tests/outils/story-baromatch.html', sortie: 'badge/story-baromatch.png' };
+const APERCU = { largeur: 360, sortie: 'badge/story-baromatch-apercu.webp' };
 
 const duDepot = (...morceaux) => path.join(racine, ...morceaux);
 
@@ -69,6 +71,7 @@ const rendreLesImages = async (port) => {
     await navigateur?.close();
     arreter();
   }
+  await versWebp(duDepot(STORY.sortie), duDepot(APERCU.sortie), APERCU.largeur, 0.8);
 };
 
 // Une image réduite par le navigateur (createImageBitmap, qualité haute) puis encodée en WebP par son canevas.

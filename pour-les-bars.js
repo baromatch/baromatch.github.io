@@ -1017,3 +1017,43 @@
   }, { rootMargin: "0px 0px -15% 0px" });
   observateur.observe(liste);
 })();
+
+/* « Partager mon badge » : le bouton « Copier le code » n’existe qu’ici (sans JavaScript, il reste caché et le code se
+   sélectionne dans sa boîte). Le presse-papiers refusé ou absent : le code est sélectionné, prêt à copier, et la page
+   le dit. */
+(function () {
+  "use strict";
+
+  var actions = document.getElementById("badge-actions");
+  var bouton = document.getElementById("badge-copier");
+  var code = document.getElementById("badge-code");
+  var retour = document.getElementById("badge-retour");
+  if (!actions || !bouton || !code || !retour) return;
+
+  var libelle = bouton.querySelector("[data-libelle]");
+  var texteBouton = libelle.textContent;
+  var minuteur = null;
+
+  function dire(texte) {
+    retour.textContent = texte;
+  }
+
+  function copieImpossible() {
+    code.focus();
+    code.select();
+    dire("Ton navigateur ne nous laisse pas copier : le code est sélectionné, copie-le toi-même.");
+  }
+
+  bouton.addEventListener("click", function () {
+    var presse = navigator.clipboard;
+    if (!presse || typeof presse.writeText !== "function") return copieImpossible();
+    presse.writeText(code.value).then(function () {
+      libelle.textContent = "Code copié";
+      dire("Code copié. Colle-le sur ton site, là où le badge doit apparaître.");
+      clearTimeout(minuteur);
+      minuteur = setTimeout(function () { libelle.textContent = texteBouton; }, 2000);
+    }, copieImpossible);
+  });
+
+  actions.hidden = false;
+})();

@@ -104,3 +104,21 @@ test('le badge d’un bar se dessine à 360 × 72', async ({ page: onglet }) => 
   await expect(image).toBeVisible();
   expect(await image.evaluate((img) => [img.complete, img.naturalWidth, img.naturalHeight])).toEqual([true, 360, 72]);
 });
+
+test('les cibles de 44 px, le chevron du fil sans alternative lue, et la boîte du code à la taille du code', async ({ page: onglet }) => {
+  await onglet.setViewportSize({ width: 360, height: 800 });
+  const mesurer = (selecteur) => onglet.locator(selecteur).evaluateAll((liens) => liens.map((a) => {
+    const { width, height } = a.getBoundingClientRect();
+    return { texte: a.textContent.trim(), width: Math.round(width), height: Math.round(height) };
+  }));
+  const tropPetits = (mesures, largeur = 0) => mesures.filter((m) => m.height < 44 || m.width < largeur);
+  await onglet.goto(`${serveur.adresse}/matchs/psg-ol-2026-10-25/`);
+  // Le fil : chaque lien fait au moins 44 px de large et de haut, et le chevron reste sur la ligne du lien qui le suit.
+  expect(tropPetits(await mesurer('.regarder-fil a'), 44)).toEqual([]);
+  expect(await onglet.locator('.regarder-fil li + li').first().evaluate((li) => getComputedStyle(li, '::before').content)).toBe('"›" / ""');
+  for (const selecteur of ['.regarder-carte__nom a', '.regarder-matchs a']) expect(tropPetits(await mesurer(selecteur)), selecteur).toEqual([]);
+  await onglet.goto(`${serveur.adresse}/regarder-le-match/paris/`);
+  expect(tropPetits(await mesurer('.regarder-retour a'))).toEqual([]);
+  await onglet.goto(`${serveur.adresse}/bar/le-zinc-des-amis-paris-11/`);
+  expect(await onglet.locator('.regarder-badge__code').evaluate((t) => getComputedStyle(t).fieldSizing)).toBe('content');
+});

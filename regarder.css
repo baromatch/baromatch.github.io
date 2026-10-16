@@ -21,9 +21,14 @@
   font-size: 0.9375rem;
   color: var(--texte-discret);
 }
-.regarder-fil li + li::before { content: "›"; margin-right: 8px; color: var(--texte-discret); }
-/* Les liens du fil se touchent du doigt sur 44 px de haut, comme ceux de l’en-tête. */
-.regarder-fil a { display: inline-block; padding: 11px 0; color: var(--texte-doux); }
+/* Chaque étape et son chevron sur une même ligne : le chevron reste collé au lien qui le suit. Le chevron est un
+   décor, son alternative est vide (un lecteur d’écran ne le lit pas) ; la première déclaration sert aux navigateurs qui
+   ne lisent pas encore la seconde. */
+.regarder-fil li { display: flex; align-items: center; }
+.regarder-fil li + li::before { content: "›"; content: "›" / ""; margin-right: 8px; color: var(--texte-discret); }
+/* Le lien, écrit en ligne, juste après le chevron (dans l’étape, il en devient le voisin direct) ; il se touche du doigt
+   sur 44 px de haut et au moins 44 px de large, comme ceux de l’en-tête. */
+.regarder-fil a { display: inline; min-width: 44px; padding: 11px 0; color: var(--texte-doux); }
 .regarder-fil a:hover { color: var(--goutte); }
 .regarder-fil [aria-current] { color: var(--texte-doux); }
 
@@ -130,7 +135,8 @@
 .regarder-carte p { margin: 0; }
 
 .regarder-carte__nom { margin: 0 0 4px; font-size: 1.1875rem; font-weight: 700; line-height: 1.25; }
-.regarder-carte__nom a { color: var(--texte); text-decoration-color: var(--ambre); }
+/* Les liens des cartes, des listes de matchs et de retour : 44 px de haut à toucher du doigt. */
+.regarder-carte__nom a { display: inline-block; padding: 10px 0; color: var(--texte); text-decoration-color: var(--ambre); }
 .regarder-carte__nom a:hover { color: var(--goutte); }
 .regarder-carte__lieu { color: var(--texte-doux); font-size: 0.9375rem; }
 
@@ -165,7 +171,7 @@
 .regarder-matchs { margin: 0; padding: 0; list-style: none; }
 .regarder-matchs li { padding: 12px 0; border-bottom: 1px solid var(--trait); line-height: 1.5; }
 .regarder-matchs li:last-child { border-bottom: 0; }
-.regarder-matchs a { font-weight: 650; }
+.regarder-matchs a { display: inline-block; padding: 10px 0; font-weight: 650; }
 .regarder-matchs time { font-weight: 650; }
 .regarder-compte { color: var(--texte-doux); }
 
@@ -195,6 +201,7 @@
 
 .regarder-passe p { margin: 0 0 10px; }
 .regarder-retour { margin: 40px 0 0; }
+.regarder-retour a { display: inline-block; padding: 10px 0; }
 
 /* ---------- Le badge d’un bar ---------- */
 
@@ -218,5 +225,7 @@
   background: var(--nuit-releve);
   color: var(--texte);
   font: 0.8125rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* La boîte prend la hauteur du code, sans ascenseur (là où le navigateur le sait). */
+  field-sizing: content;
   resize: vertical;
 }

@@ -54,12 +54,14 @@ for (const page of PAGES) {
       });
     }
 
-    test('sans JavaScript, la page est la même, et elle n’en charge aucun', async ({ browser }) => {
+    test('sans JavaScript, la page est la même, elle n’en charge aucun, et sa politique de sécurité n’arrête rien', async ({ browser }) => {
       const scripts = [];
+      const refus = [];
       const lire = async (avecScript) => {
         const contexte = await browser.newContext({ javaScriptEnabled: avecScript, viewport: { width: 360, height: 800 } });
         const onglet = await contexte.newPage();
         onglet.on('request', (requete) => { if (requete.resourceType() === 'script') scripts.push(requete.url()); });
+        onglet.on('console', (message) => { if (/Content Security Policy/i.test(message.text())) refus.push(message.text()); });
         await onglet.goto(`${serveur.adresse}${page.chemin}`);
         const texte = await onglet.locator('main').innerText();
         const titre = await onglet.locator('h1').innerText();
@@ -71,6 +73,7 @@ for (const page of PAGES) {
       expect(sans).toEqual(avec);
       expect(sans.titre.length).toBeGreaterThan(0);
       expect(scripts).toEqual([]);
+      expect(refus).toEqual([]);
     });
 
     test('chaque lien interne et chaque fichier de la page répondent, chaque ancre existe', async ({ page: onglet, request }) => {

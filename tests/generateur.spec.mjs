@@ -525,6 +525,47 @@ test.describe('d’un passage à l’autre', () => {
     expect(deux.bars.filter((b) => b.nom === 'Le Zinc des Amis').map((b) => [b.id, b.slug])).toEqual([['b-zinc', 'le-zinc-des-amis-paris-11']]);
   });
 
+  test('reporté, annulé, prolongations, marque.json et état illisible', async () => {
+    // Le jour de Paris lu morceau par morceau, jamais par le format d’une langue.
+    expect(readFileSync(path.join(racine, 'generateur', 'heure.mjs'), 'utf8')).not.toContain('en-CA');
+    expect(jourDeParis(Date.parse('2026-10-24T22:30:00Z'))).toBe('2026-10-25');
+
+    // Reporté ou annulé : l’Event le dit, la page aussi ; lisible si des bars l’annonçaient, mais hors du plan du site.
+    const sortie = dossierVide();
+    const source = scenarioSans(sortie, (brut) => ({
+      ...brut,
+      matches: brut.matches.map((m) => (m.id === 'm-psg-ol' ? { ...m, status: 'POSTPONED' } : m.id.startsWith('m-psg-barca') ? { ...m, status: 'CANCELLED' } : m)),
+    }));
+    const resultat = await passer(sortie, '2026-10-23T08:00:00Z', { source });
+    const ol = resultat.fichiers.find((f) => f.chemin === '/matchs/psg-ol-2026-10-25/');
+    expect(ol.contenu).toContain('<strong>Match reporté.</strong>');
+    expect(ol.indexable).toBe(true);
+    expect(ol.contenu).not.toContain('content="noindex"');
+    expect(ol.jsonld.filter((x) => x['@type'] === 'Event').map((x) => x.eventStatus)).toEqual(['https://schema.org/EventPostponed', 'https://schema.org/EventPostponed']);
+    const barca = resultat.fichiers.find((f) => f.chemin.startsWith('/matchs/psg-barca-'));
+    expect(barca.contenu).toContain('<strong>Match annulé.</strong>');
+    expect(barca.jsonld.find((x) => x['@type'] === 'Event').eventStatus).toBe('https://schema.org/EventCancelled');
+    expect(plan(sortie)).not.toContain('/matchs/psg-ol-2026-10-25/');
+    expect(plan(sortie)).not.toContain(barca.chemin);
+    expect(plan(sortie)).toContain('/bar/le-zinc-des-amis-paris-11/');
+
+    // Un match est passé trois heures après le coup d’envoi (20 h 45 à Paris), pas deux : prolongations, tirs au but.
+    const pageA = async (instant) => (await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: Date.parse(instant), racine })).pages.find((p) => p.chemin === '/matchs/psg-ol-2026-10-25/');
+    expect((await pageA('2026-10-25T22:30:00Z')).indexable).toBe(true);
+    expect(await pageA('2026-10-25T22:50:00Z')).toBeUndefined();
+
+    // L’appli dite ouverte sans lien de magasin : une erreur claire, rien n’est fabriqué.
+    const sansLien = { ...contenu, marque: { ...contenu.marque, appli: { ouverte: true, android: '', iphone: '' } } };
+    await expect(construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: VENDREDI, racine, contenu: sansLien })).rejects.toThrow(/marque\.json : « appli\.ouverte » est vrai, mais aucun lien de magasin/);
+
+    // Un état illisible arrête tout, sans remise à zéro.
+    for (const abime of ['', '{"pages": ', '[]']) {
+      writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), abime);
+      await expect(passer(sortie, '2026-10-23T09:00:00Z', { source }), JSON.stringify(abime)).rejects.toThrow(/etat\.json est illisible.*rien n’est écrit/);
+      expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(abime);
+    }
+  });
+
   test('les bornes : un nom de club ou de bar très long est coupé proprement, et « onair=1 » dans un nom n’est pas un attribut', async () => {
     const sortie = dossierVide();
     const longBar = 'Le Grand Comptoir Lumineux des Supporters du Faubourg Saint-Antoine, et de Bercy';

@@ -8,7 +8,11 @@ const morceaux = (instant, options) => Object.fromEntries(new Intl.DateTimeForma
   .formatToParts(new Date(instant)).filter((m) => m.type !== 'literal').map((m) => [m.type, m.value]));
 
 // « 2026-10-25 » : le jour à Paris (l’adresse d’un match, la date du plan du site).
-export const jourDeParis = (instant) => new Intl.DateTimeFormat('en-CA', { timeZone: FUSEAU }).format(new Date(instant));
+// Lu morceau par morceau (formatToParts) : le format d’une langue entière peut changer d’une version d’Intl à l’autre.
+export const jourDeParis = (instant) => {
+  const { year, month, day } = morceaux(instant, { year: 'numeric', month: '2-digit', day: '2-digit' });
+  return `${year}-${month}-${day}`;
+};
 
 // « 20:45 ».
 export const heureDeParis = (instant) => {

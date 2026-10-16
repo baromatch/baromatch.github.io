@@ -68,7 +68,7 @@ export const evenementDeLaSoiree = (soiree, { marque }) => {
     description: `${match.competition} : ${match.domicile.nom} – ${match.exterieur.nom}, diffusé${auBar(bar.nom)} (${bar.quartier}).`,
     url: adresse,
     startDate: debutDe(match),
-    eventStatus: 'https://schema.org/EventScheduled',
+    eventStatus: `https://schema.org/${{ reporte: 'EventPostponed', annule: 'EventCancelled' }[match.statut] ?? 'EventScheduled'}`,
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     image: [IMAGE],
     location: barOuPub(bar),

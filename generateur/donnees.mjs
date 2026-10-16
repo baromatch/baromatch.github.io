@@ -6,8 +6,11 @@ import { jourDeParis } from './heure.mjs';
 
 export const HEURE_MS = 3_600_000;
 export const JOUR_MS = 24 * HEURE_MS;
-// Un match se joue en deux heures environ (mi-temps comprise) : jusque-là, il est en cours, pas passé.
-export const DUREE_MATCH_MS = 2 * HEURE_MS;
+// Un match se joue en deux heures environ (mi-temps comprise), trois avec les prolongations et les tirs au but :
+// jusque-là, il est en cours, pas passé.
+export const DUREE_MATCH_MS = 3 * HEURE_MS;
+// Un match reporté ou annulé le dit (« POSTPONED », « CANCELLED » dans les données).
+const STATUTS = { POSTPONED: 'reporte', CANCELLED: 'annule' };
 // Deux matchs des deux mêmes clubs à moins de trois heures l’un de l’autre sont le même match, écrit deux fois.
 export const ECART_DOUBLON_MS = 3 * HEURE_MS;
 
@@ -82,6 +85,7 @@ const lireUnMatch = (brut, index, competitions) => {
     debut,
     // Une heure provisoire n’est pas une heure : elle ne s’affiche pas (la copie réduite le dit par heureProvisoire).
     heureConfirmee: brut.heureProvisoire !== true && (brut.kickoffStatus ?? 'CONFIRMED') === 'CONFIRMED',
+    statut: STATUTS[brut.status] ?? null,
     competition: competitionDe(competitions, brut.league ?? ''),
     competitionFrancaise: !(brut.league in competitions) || competitions[brut.league] === brut.league,
     domicile: clubDe(index, brut.homeClub, brut.homeTeam),

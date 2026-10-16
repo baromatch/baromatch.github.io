@@ -57,9 +57,21 @@ export const effacerUnFichier = (sortie, relatif) => {
 
 // ---------- L’état ----------
 
+// Pas d’état : le tout premier passage. Un état illisible (vide, abîmé, retouché à la main) arrête tout : jamais une
+// remise à zéro silencieuse, qui oublierait les pages publiées et les adresses données aux bars.
 export const lireLEtat = (sortie) => {
   const texte = lireSiPresent(path.join(sortie, FICHIER_ETAT));
-  return texte ? JSON.parse(texte) : { pages: {} };
+  if (texte === null) return { pages: {} };
+  let etat = null;
+  try {
+    etat = JSON.parse(texte);
+  } catch {
+    etat = null;
+  }
+  if (!etat || typeof etat !== 'object' || !etat.pages || typeof etat.pages !== 'object') {
+    throw new Error(`${FICHIER_ETAT} est illisible (vide, abîmé ou retouché à la main) : rien n’est écrit, les pages en ligne restent comme elles sont. Remets la version précédente de ce fichier (l’historique du dépôt la garde), puis relance.`);
+  }
+  return etat;
 };
 
 // Ce que l’état garde des pages de matchs et de bars, pour les refaire quand ils ne sont plus dans les données.
@@ -95,6 +107,7 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adress
       empreinte: marque,
       change: avant?.empreinte === marque ? avant.change : aujourdhui,
       indexable: f.indexable,
+      ...(f.horsPlan ? { horsPlan: true } : {}),
       ...(f.memoire ? { memoire: f.memoire } : {}),
     };
   }
@@ -117,7 +130,7 @@ export const nouveauPlan = (ancien, etat) => {
   if (fin === -1) throw new Error('sitemap.xml illisible : </urlset> introuvable, rien n’est écrit');
   const gardees = lignes.slice(0, fin).filter((l) => !GENEREE.test(l));
   const generees = Object.entries(etat.pages)
-    .filter(([chemin, p]) => p.indexable && chemin.endsWith('/'))
+    .filter(([chemin, p]) => p.indexable && !p.horsPlan && chemin.endsWith('/'))
     .map(([chemin, p]) => `  <url><loc>${ORIGINE}${chemin}</loc><lastmod>${p.change}</lastmod></url>`);
   return `${[...gardees, ...generees, ...lignes.slice(fin)].join('\n').replace(/\n*$/, '')}\n`;
 };

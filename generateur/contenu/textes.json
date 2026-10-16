@@ -47,7 +47,10 @@
     "passeSuite": "Le prochain match de {club} :",
     "passeSansSuite": "Les prochains matchs, et où les voir :",
     "heureAConfirmer": "Le coup d’envoi n’est pas encore fixé : l’heure peut changer.",
-    "plusAnnonce": "Ce match n’est plus au programme."
+    "plusAnnonce": "Ce match n’est plus au programme.",
+    "reporte": "Match reporté",
+    "annule": "Match annulé",
+    "statutSuite": "Vérifie auprès du bar avant de te déplacer."
   },
   "semaine": {
     "titre": "Les matchs de la semaine et où les voir",

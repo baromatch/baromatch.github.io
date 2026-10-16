@@ -107,7 +107,7 @@ export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false,
   <h1 class="regarder-titre">${e(nom)}${passe ? '' : ' : les bars qui diffusent le match'}</h1>
   <p class="regarder-affiche">${e(match.domicile.nom)} – ${e(match.exterieur.nom)}</p>
   <p class="regarder-quand">${quand(match)}</p>
-${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}</header>`;
+${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}${match.statut ? `  <p class="regarder-note"><strong>${e(textes.match[match.statut])}.</strong> ${e(textes.match.statutSuite)}</p>\n` : ''}</header>`;
 
     if (passe || !vivant) {
       // Le match est passé (ou n’est plus au programme) : la page le dit, sans score, et renvoie vers la suite.
@@ -172,7 +172,8 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
   </ul>` : `  <p>${e(textes.match.aucunProchain)}</p>`}
 </section>`;
     ajouter({
-      type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, titre: titrePage, description: desc,
+      // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
+      type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
       corps: `${fil(etapes)}
 ${enTete}

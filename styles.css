@@ -622,6 +622,29 @@ a:hover { color: var(--goutte); }
 .perdu .perdu__sans-js { margin-top: -16px; }
 .bouton-nuit.perdu__accueil { background: var(--ambre); color: var(--nuit); }
 .bouton-nuit.perdu__accueil:hover { background: #FFC163; color: var(--nuit); }
+/* Où aller depuis une page introuvable : des capsules de verre, discrètes (l’ambre reste à « Revenir à l’accueil »),
+   de 44 px au moins, comme celles du bloc « Partager ». */
+.perdu__liens { margin: 0 auto 36px; max-width: 34rem; }
+.perdu .perdu__sous-titre { margin: 0 0 12px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.01em; }
+.perdu__capsules { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; margin: 0 0 24px; padding: 0; list-style: none; }
+.perdu__capsule {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0 18px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  background: var(--verre-fort);
+  box-shadow: var(--verre-reflet);
+  color: var(--texte);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.perdu__capsule:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
 
 /* ---------- L'ouverture animée : la goutte tombe dans le verre ---------- */
 

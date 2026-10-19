@@ -58,12 +58,12 @@ test.describe('les images de partage', () => {
   });
   const lire = (relatif) => readFileSync(path.join(sortie, relatif), 'utf8');
 
-  test('une image PNG de 1200 × 630, de moins de 150 Ko, à côté de chaque page de match, de ville et de bar', () => {
+  test('une image PNG de 1200 × 630, de moins de 150 Ko, à côté de chaque page de match, de ville, de bar et de « Ce soir »', () => {
     const images = resultat.fichiers.filter((f) => f.type === 'partage');
     const types = images.map((f) => resultat.fichiers.find((p) => `${p.chemin}partage.png` === f.chemin).type);
-    expect(new Set(types)).toEqual(new Set(['match', 'ville', 'bar']));
+    expect(new Set(types)).toEqual(new Set(['match', 'ville', 'bar', 'ce-soir']));
     for (const image of images) {
-      expect(image.chemin).toMatch(/^\/(?:matchs|regarder-le-match|bar)\/[a-z0-9-]+\/partage\.png$/);
+      expect(image.chemin).toMatch(/^\/(?:(?:matchs|regarder-le-match|bar)\/[a-z0-9-]+|ce-soir)\/partage\.png$/);
       expect(lirePng(path.join(sortie, image.chemin))).toEqual({ png: true, largeur: 1200, hauteur: 630, poids: expect.any(Number) });
       expect(lirePng(path.join(sortie, image.chemin)).poids, image.chemin).toBeLessThan(150 * 1024);
     }
@@ -77,7 +77,7 @@ test.describe('les images de partage', () => {
   });
 
   test('og:image et twitter:image : l’adresse absolue de son image, ses dimensions, ce qu’elle montre', () => {
-    const pages = resultat.fichiers.filter((f) => ['match', 'ville', 'bar'].includes(f.type) && f.carte);
+    const pages = resultat.fichiers.filter((f) => ['match', 'ville', 'bar', 'ce-soir'].includes(f.type) && f.carte);
     expect(pages.length).toBeGreaterThan(10);
     for (const p of pages) {
       const html = p.contenu;
@@ -129,8 +129,43 @@ test.describe('les images de partage', () => {
   });
 
   test('la liste blanche : partage.png à côté d’une page, rien d’autre', () => {
-    for (const permis of ['matchs/psg-ol-2026-10-25/partage.png', 'regarder-le-match/paris/partage.png', 'bar/le-zinc-des-amis-paris-11/partage.png']) expect(estPermis(permis), permis).toBe(true);
-    for (const refuse of ['partage.png', 'img/partage.png', 'matchs/x/partage.jpg', 'matchs/x/autre.png', 'tests/x/partage.png', 'matchs/../partage.png']) expect(estPermis(refuse), refuse).toBe(false);
+    for (const permis of ['matchs/psg-ol-2026-10-25/partage.png', 'regarder-le-match/paris/partage.png', 'bar/le-zinc-des-amis-paris-11/partage.png', 'ce-soir/partage.png']) expect(estPermis(permis), permis).toBe(true);
+    for (const refuse of ['partage.png', 'img/partage.png', 'matchs/x/partage.jpg', 'matchs/x/autre.png', 'tests/x/partage.png', 'matchs/../partage.png', 'ce-soir/x/partage.png', 'ce-soir/autre.png']) expect(estPermis(refuse), refuse).toBe(false);
+  });
+
+  test('« Ce soir » : le jour écrit en entier, ses matchs, le vrai nombre de vrais bars (aucun sans bar), et le bloc « Partager »', async () => {
+    const carteDe = async (maintenant, { source = `scenario:${SCENARIO}`, avec = contenu } = {}) => {
+      const site = await construireEnMemoire({ source, maintenant: Date.parse(maintenant), racine, contenu: avec, images: true });
+      return site.pages.find((p) => p.chemin === '/ce-soir/');
+    };
+    // Le vendredi 23 octobre, 10 h à Paris : Brest – Nice, diffusé par un vrai bar, à Lyon.
+    const vendredi = await carteDe('2026-10-23T08:00:00Z');
+    expect(vendredi.carte).toEqual({
+      surtitre: 'Où regarder le match', titre: 'Vendredi 23 octobre', ligne: 'Brest – Nice · 20:45', ambre: '1 bar le diffuse à Lyon',
+      alt: 'Où regarder le match, vendredi 23 octobre. Brest – Nice · 20:45. 1 bar le diffuse à Lyon.',
+    });
+    expect(meta(vendredi.contenu, 'og:image')).toEqual([`${ORIGINE}/ce-soir/partage.png`]);
+    expect(meta(vendredi.contenu, 'twitter:image')).toEqual([`${ORIGINE}/ce-soir/partage.png`]);
+    expect(meta(vendredi.contenu, 'og:image:alt')).toEqual([vendredi.carte.alt]);
+    expect(vendredi.contenu.split(SCRIPT_DU_PARTAGE)).toHaveLength(2);
+    expect(vendredi.contenu).toMatch(/<\/header>\n<div class="partage" role="group" aria-label="Partager la page"/);
+    expect(controlerLaPage(vendredi)).toEqual([]);
+    // Après minuit, le samedi : son match et ses deux bars ; le match de la veille n’y est pas.
+    expect((await carteDe('2026-10-23T23:15:00Z')).carte).toMatchObject({ titre: 'Samedi 24 octobre', ligne: 'PSG – Barça · 21:00', ambre: '2 bars le diffusent à Paris' });
+    // Aucun vrai bar publié : le jour et le match, sans nombre de bars ni « où regarder ».
+    expect((await carteDe('2026-10-23T08:00:00Z', { avec: chargerLeContenu(racine) })).carte)
+      .toMatchObject({ surtitre: 'Les matchs du jour', titre: 'Vendredi 23 octobre', ligne: 'Brest – Nice · 20:45', ambre: '' });
+    // La copie des listes publiques : plusieurs matchs (leur nombre), ou aucun ce jour-là.
+    expect((await carteDe('2026-10-17T16:00:00Z', { source: `capture:${CAPTURE}`, avec: chargerLeContenu(racine) })).carte)
+      .toMatchObject({ surtitre: 'Les matchs du jour', titre: 'Samedi 17 octobre', ligne: '8 matchs au programme', ambre: '' });
+    expect((await carteDe('2026-10-15T19:44:29Z', { source: `capture:${CAPTURE}`, avec: chargerLeContenu(racine) })).carte)
+      .toEqual({ surtitre: '', titre: 'Jeudi 15 octobre', ligne: 'Pas de match annoncé', ambre: '', alt: 'Jeudi 15 octobre. Pas de match annoncé.' });
+    // Le même jour, le matin, le soir et le match fini : la même image (la page, elle, change).
+    for (const heure of ['2026-10-23T17:30:00Z', '2026-10-23T21:46:00Z']) {
+      const p = await carteDe(heure);
+      expect(p.carte, heure).toEqual(vendredi.carte);
+      expect(p.contenu, heure).not.toBe(vendredi.contenu);
+    }
   });
 });
 

@@ -23,7 +23,7 @@ const PAGES = [
   { chemin: '/bar/le-zinc-des-amis-paris-11/', nom: 'bar', partage: true },
   { chemin: '/regarder-le-match/', nom: 'villes' },
   { chemin: '/matchs/page-neutre/', nom: 'page neutre' },
-  { chemin: '/ce-soir/', nom: 'ce soir' },
+  { chemin: '/ce-soir/', nom: 'ce soir', partage: true },
 ];
 
 const portLibre = () => new Promise((resoudre) => {

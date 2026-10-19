@@ -1,5 +1,5 @@
-// Le partage d’une page de match, de ville ou de bar : son image d’aperçu (1200 × 630, celle que montrent WhatsApp,
-// iMessage, X ou un moteur à côté du lien) et le bloc « Partager » de la page.
+// Le partage d’une page de match, de ville, de bar ou de « Ce soir » : son image d’aperçu (1200 × 630, celle que
+// montrent WhatsApp, iMessage, X ou un moteur à côté du lien) et le bloc « Partager » de la page.
 // L’image est d’abord un SVG, fait ici sans rien installer : la nuit #0A0B10, la lumière ambre du bar derrière une carte
 // de verre, le verre de la marque, et le texte en Bricolage Grotesque (deux réglages fixes de la police du site, dans
 // generateur/images/polices, sous licence OFL comme elle). Chaque ligne est mesurée sur la police elle-même pour tenir
@@ -10,7 +10,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
-import { jourEnLettres, quandEnLettres } from './heure.mjs';
+import { heureDeParis, jourEnLettres, quandEnLettres } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
 import { accorder, capitale, echapper as e, enumerer, sansAccents } from './texte.mjs';
 
@@ -127,6 +127,28 @@ export const lignesDeLaCarte = (partage, textes = TEXTES, textesDuSite = {}) => 
       surtitre: match.competition, titre: nomCourt(match), ligne: capitale(quand), ambre,
       alt: phrase(`${nomCourt(match)}, ${match.competition}, ${quand}`, ambre),
     };
+  }
+  if (partage.sorte === 'ce-soir') {
+    // « Ce soir » : le jour écrit en entier (jamais « ce soir » ni « demain » : l’image reste juste toute la journée, et
+    // n’est refaite que si son texte change), les matchs de ce jour-là (un seul : son heure ; sinon leur nombre ; aucun :
+    // « Pas de match annoncé »), et le vrai nombre de vrais bars, rien sans bar.
+    const t = textes.ceSoir;
+    const { jour, matchs } = partage;
+    const joues = matchs.filter((m) => !m.statut);
+    const montres = joues.length ? joues : matchs;
+    const { nombre, villes } = barsEtVilles(joues.flatMap((m) => m.soirees));
+    const seul = montres.length === 1 ? montres[0] : null;
+    const heure = (m) => (m.heureConfirmee ? heureDeParis(m.debut) : 'heure à confirmer');
+    const ligne = seul ? `${nomCourt(seul)} · ${seul.statut ? textesDuSite.match?.[seul.statut] ?? '' : heure(seul)}`
+      : joues.length ? remplir(t.matchs, { matchs: accorder(joues.length, 'match', 'matchs') }) : t.rien;
+    const verbe = nombre > 1 ? textes.match.diffusent : textes.match.diffuse;
+    const ambre = nombre === 0 ? ''
+      : seul && villes.length <= 2 ? `${accorder(nombre, 'bar')} ${verbe} à ${enumerer(villes)}`
+        : seul ? `${accorder(nombre, 'bar')} ${verbe}`
+          : remplir(t.bars, { bars: accorder(nombre, 'bar') });
+    const surtitre = nombre ? t.surtitre : matchs.length ? t.surtitreSansBar : '';
+    const titre = capitale(jourEnLettres(jour));
+    return { surtitre, titre, ligne, ambre, alt: phrase(surtitre ? `${surtitre}, ${jourEnLettres(jour)}` : titre, ligne, ambre) };
   }
   if (partage.sorte === 'ville') {
     const { ville } = partage;

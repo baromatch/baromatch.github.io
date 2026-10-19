@@ -1,5 +1,5 @@
 {
-  "_lisezMoi": "Les textes du partage d’une page de match, de ville ou de bar : ceux de son image d’aperçu (celle que montre WhatsApp à côté du lien) et ceux du bloc « Partager ». Tutoiement, présent, phrases courtes, pas de « ! ». Le nombre de bars est toujours le vrai, écrit par le générateur ; sans bar, l’image dit seulement où le regarder, jamais « 0 bar ».",
+  "_lisezMoi": "Les textes du partage d’une page de match, de ville, de bar ou de « Ce soir » : ceux de son image d’aperçu (celle que montre WhatsApp à côté du lien) et ceux du bloc « Partager ». Tutoiement, présent, phrases courtes, pas de « ! ». Le nombre de bars est toujours le vrai, écrit par le générateur ; sans bar, l’image dit seulement où le regarder, jamais « 0 bar ». L’image de « Ce soir » écrit le jour en entier, jamais « ce soir » ni « demain » : elle reste juste toute la journée.",
   "match": {
     "diffuse": "le diffuse",
     "diffusent": "le diffusent",
@@ -14,6 +14,13 @@
   "bar": {
     "prochaine": "Prochain match : {match}",
     "sansSoiree": "On diffuse le match"
+  },
+  "ceSoir": {
+    "surtitre": "Où regarder le match",
+    "surtitreSansBar": "Les matchs du jour",
+    "matchs": "{matchs} au programme",
+    "bars": "{bars} sur Baromatch",
+    "rien": "Pas de match annoncé"
   },
   "bouton": {
     "titre": "Partager la page",

@@ -269,8 +269,8 @@ test('les places : seulement l’appli ouverte, quand les listes les donnent, à
 });
 
 test('écrite : dans la liste blanche, au plan du site et à IndexNow seulement indexable, et sortie quand elle ne l’est plus', async () => {
-  expect(estPermis('ce-soir/index.html')).toBe(true);
-  for (const refuse of ['ce-soir/autre.html', 'ce-soir/x/index.html', 'ce-soir/badge.svg', 'ce-soir/../index.html']) expect(estPermis(refuse), refuse).toBe(false);
+  for (const permis of ['ce-soir/index.html', 'ce-soir/partage.png']) expect(estPermis(permis), permis).toBe(true);
+  for (const refuse of ['ce-soir/autre.html', 'ce-soir/x/index.html', 'ce-soir/badge.svg', 'ce-soir/../index.html', 'ce-soir/x/partage.png']) expect(estPermis(refuse), refuse).toBe(false);
   const sortie = dossierVide();
   const passer = (maintenant, avec) => construire({ source: `scenario:${SCENARIO}`, sortie, maintenant: Date.parse(maintenant), racine, contenu: avec });
   const plan = () => readFileSync(path.join(sortie, 'sitemap.xml'), 'utf8');

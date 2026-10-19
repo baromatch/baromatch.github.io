@@ -8,13 +8,16 @@
 // Indexable seulement quand elle montre un vrai bar pour un match de ce soir. Sinon noindex, et elle montre quand même
 // les matchs du jour et les suivants (vers leurs pages), les villes et la liste d’attente : jamais vide, jamais un faux
 // bar. Ses données structurées : la page, son fil d’Ariane et la liste des matchs qu’elle montre, chacun vers sa page ;
-// les soirées (Event) restent sur les pages des matchs et des bars, où elles sont décrites.
+// les soirées (Event) restent sur les pages des matchs et des bars, où elles sont décrites. Comme une page de match,
+// elle a le bloc « Partager » et son image d’aperçu (partage.mjs) : le jour écrit en entier, ses matchs, le vrai nombre
+// de vrais bars.
 import { DUREE_MATCH_MS } from './donnees.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import { adresseDe, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
+import { adresseDeLImage, lignesDeLaCarte } from './partage.mjs';
 
 export const CHEMIN_CE_SOIR = '/ce-soir/';
 // Au moins un vrai bar pour un match de ce soir : la page est indexable.
@@ -57,8 +60,8 @@ const listeDesMatchs = (nom, matchs) => ({
 });
 
 // pages : celles du passage (pour savoir quel match a sa page, et quelles villes en ont une) ; nuits : la liste brute
-// des soirées, pour leurs places.
-export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, pages = [], nuits = [] }) => {
+// des soirées, pour leurs places ; images : le rendu des images de partage est là (sinon, l’image générale du site).
+export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, pages = [], nuits = [], images = false }) => {
   const { maintenant } = donnees;
   const { textes, marque } = contenu;
   const t = textes.ceSoir;
@@ -182,8 +185,14 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
     ? [listeDesMatchs(moment.matchs, ceSoir.filter(aUnePage))]
     : [listeDesMatchs(t.prochains, prochains)];
 
+  // L’image de partage : tous les matchs de ce jour-là, finis ou pas (pas celui de la veille qui se joue encore après
+  // minuit) : elle reste la même toute la journée, tant que les matchs et les bars du jour ne changent pas.
+  const partage = { sorte: 'ce-soir', jour: maintenant, matchs: donnees.matchs.filter((m) => jourDeParis(m.debut) === aujourdhui).sort(parDebut) };
+  const carte = lignesDeLaCarte(partage, undefined, textes);
+  const image = images ? { adresse: adresseDeLImage(chemin), alt: carte.alt } : null;
+
   const p = {
-    type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc,
+    type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage,
     jsonld: [pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...listes.filter((l) => l.numberOfItems > 0)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">
@@ -197,5 +206,5 @@ ${sectionVilles}
 ${appel(marque, textes)}
 ${commentCaMarche(textes, marque)}`,
   };
-  return { ...p, contenu: page({ cadre, marque, avecPresse, ...p }) };
+  return { ...p, carte, contenu: page({ cadre, marque, avecPresse, ...p, image }) };
 };

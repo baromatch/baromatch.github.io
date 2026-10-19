@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 import { champDe, simulerFormspree } from './outils/formspree.mjs';
+import { arreterLHorloge } from './outils/horloge.mjs';
 
 // toHaveText ramène chaque blanc, espace insécable compris, à une espace simple.
 const PANNE = 'L’inscription n’est pas passée. Réessaie dans un instant, ou écris à contact@baromatch.fr.';
@@ -112,8 +113,7 @@ for (const cas of [
 test('un service qui ne répond pas : au bout de 10 s, une panne avec l’adresse de secours, et l’envoi se rouvre', async ({ page }) => {
   // L’horloge de la page est simulée et arrêtée : seul runFor la fait avancer.
   const debut = new Date('2026-10-13T17:30:00+02:00').getTime();
-  await page.clock.install({ time: debut });
-  await page.clock.pauseAt(debut + 1000);
+  await arreterLHorloge(page, debut + 1000);
   const envois = await simulerFormspree(page, 'silence');
   await page.goto('/');
   await sInscrire(page);
@@ -137,8 +137,7 @@ const focusSurLaPage = (page) => page.evaluate(() => !document.activeElement || 
 
 test('pendant l’envoi, le bouton garde le focus et ignore un second appui ; « Envoi… » est dit, puis la panne au bout de 10 s', async ({ page }) => {
   const debut = new Date('2026-10-13T17:30:00+02:00').getTime();
-  await page.clock.install({ time: debut });
-  await page.clock.pauseAt(debut + 1000);
+  await arreterLHorloge(page, debut + 1000);
   const envois = await simulerFormspree(page, 'silence');
   await page.goto('/');
   await champ(page).fill('paul@exemple.fr');

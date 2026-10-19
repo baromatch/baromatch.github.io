@@ -15,10 +15,10 @@ import { arrondissementDe, clubDe, indexerLesClubs, lireLAdresse, nomInterdit, o
 import { motDAlcool } from '../generateur/alcool.mjs';
 import { heureDeParis, isoDeParis, jourDeParis, quandEnLettres } from '../generateur/heure.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
-import { SEUILS } from '../generateur/pages.mjs';
+import { fabriquerLesPages, SEUILS } from '../generateur/pages.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
 import { controlerLaPage, texteVisible } from '../generateur/controle.mjs';
-import { insecables, offre as offreAffichee } from '../generateur/gabarits.mjs';
+import { insecables, lireLeCadre, offre as offreAffichee } from '../generateur/gabarits.mjs';
 import { echapper } from '../generateur/texte.mjs';
 import { auBar } from '../generateur/jsonld.mjs';
 import { construire, verifierLesListes } from '../generateur/construire.mjs';
@@ -451,6 +451,22 @@ test.describe('les pages', () => {
     expect(pageDe('/matchs/lille-lens-2026-10-26/').contenu).toContain(`Tu tiens un bar${String.fromCharCode(160)}?`);
   });
 
+  test('l’ordre annoncé (« Comment on choisit les bars ») : la ville, l’arrondissement, puis le nom, quel que soit l’ordre reçu', async () => {
+    // Au Bon Coin et La Cave des Gones, tous deux à Lyon 2e, diffusent PSG – OL ; les soirées arrivent à l’envers.
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    brut.matchNights.push({ id: 'n-coin-psg-ol', status: 'OPEN', bar: { id: 'b-coin' }, match: { id: 'm-psg-ol' }, offer: null });
+    const donnees = preparer(brut, { maintenant: VENDREDI, ...contenu });
+    for (const m of donnees.matchs) m.soirees.reverse();
+    for (const b of donnees.bars) b.soirees.reverse();
+    donnees.bars.reverse();
+    const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre(racine) });
+    const nomsDe = (chemin) => [...pages.find((p) => p.chemin === chemin).contenu.matchAll(/<h[345] class="regarder-carte__nom"><a href="\/bar\/[^"]+">([^<]+)<\/a>/g)].map((m) => m[1]);
+    // Lyon avant Paris ; à Paris, le 10e avant le 11e (la page de la ville) ; à Lyon 2e, « Au Bon Coin » avant « La Cave des Gones ».
+    expect(nomsDe('/matchs/psg-ol-2026-10-25/')).toEqual(['Au Bon Coin', 'La Cave des Gones', 'Le Zinc des Amis']);
+    expect(nomsDe('/regarder-le-match/lyon/')).toEqual(['Au Bon Coin', 'La Cave des Gones']);
+    expect(nomsDe('/regarder-le-match/paris/')).toEqual(['Le Comptoir du Canal', 'Le Zinc des Amis']);
+  });
+
   test('une ville avec des bars : indexable, ses bars par arrondissement, ses soirées, sa FAQ balisée', () => {
     const paris = pageDe('/regarder-le-match/paris/');
     expect(paris.indexable).toBe(true);
@@ -468,6 +484,11 @@ test.describe('les pages', () => {
       { question: 'Baromatch est-il à Paris ?', reponse: `Oui. 2 bars de Paris diffusent le match sur Baromatch. ${contenu.textes.ville.appliFermee}` },
       ...contenu.villes.paris.faq,
     ];
+    // L’appli fermée : la réponse renvoie au formulaire de la liste d’attente, sur la page même, plus à l’accueil.
+    expect(contenu.marque.appli.ouverte).toBe(false);
+    expect(contenu.textes.ville.appliFermee).not.toMatch(/accueil/);
+    expect(contenu.textes.ville.appliFermee).toContain('laisse ton adresse dans le formulaire de cette page');
+    expect(paris.contenu).toContain('<form class="attente" id="attente"');
     expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text])).toEqual(questionsDeParis.map((q) => [insecables(q.question), insecables(q.reponse)]));
     for (const { question, reponse } of questionsDeParis) {
       expect(paris.contenu).toContain(`<summary>${insecables(echapper(question))}</summary>`);

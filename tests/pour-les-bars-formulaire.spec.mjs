@@ -5,6 +5,7 @@
 // les 24 h.
 import { test, expect } from '@playwright/test';
 import { AxeBuilder } from '@axe-core/playwright';
+import { arreterLHorloge } from './outils/horloge.mjs';
 
 const PAGE = '/pour-les-bars.html';
 // Le piège à robots, un champ caché que seul un robot remplit.
@@ -117,8 +118,7 @@ async function ouvrir(page, reponses = [CREEE]) {
       return fetchDeLaPage.apply(this, arguments);
     };
   }, ADRESSE);
-  await page.clock.install({ time: DEBUT });
-  await page.clock.pauseAt(DEBUT + 1000);
+  await arreterLHorloge(page, DEBUT + 1000);
   await page.goto(PAGE);
   // Le formulaire est là (son script est arrivé) : un test peut couper le réseau sans le perdre.
   await expect(page.locator('#demande')).toBeVisible();
@@ -1307,6 +1307,9 @@ test.describe('des états qui disent vrai', () => {
   test('une correction dans les 10 minutes, pour la même demande (adresse et bar) : elle ne part pas d’ici, l’e-mail la porte, et la page dit pourquoi', async ({ page }) => {
     const { envois } = await ouvrir(page, [CREEE]);
     await envoyerUneDemande(page);
+    // Comme pour les autres corrections : l’horloge n’avance qu’une fois la réussite affichée. Avancée avant la réponse
+    // (une machine chargée), elle faisait passer le délai d’attente de l’envoi, et la première demande échouait.
+    await expect(page.locator('#demande-envoyee')).toBeVisible();
     await page.clock.runFor(9 * 60 * 1000);
     await corriger(page, { phone: '+33 6 99 99 99 99', email: 'Camille@LeZinc.fr', barName: 'LE ZINC DES AMIS' });
     const statut = page.locator('#demande-statut');

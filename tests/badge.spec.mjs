@@ -160,10 +160,14 @@ test.describe('« Partager mon badge » sur « Pour les bars »', () => {
       new MutationObserver(() => window.__contenus.push(e.textContent)).observe(e, { childList: true, characterData: true, subtree: true });
     });
     const message = 'Code copié. Colle-le sur ton site, là où le badge doit apparaître.';
+    // Après la seconde copie, la zone montre déjà le premier message : attendre qu’elle « dise le message » serait vrai
+    // tout de suite, avant même que le presse-papiers réponde. On attend donc que le message ait été écrit une fois de
+    // plus que les copies d’avant.
+    const ecrits = () => page.evaluate((m) => window.__contenus.filter((c) => c === m).length, message);
     for (let i = 0; i < 2; i += 1) {
       await page.locator('#badge-copier').click();
+      await expect.poll(ecrits).toBe(i + 1);
       await expect(retour).toHaveText(message);
-      if (i === 0) await page.waitForTimeout(300);
     }
     const contenus = await page.evaluate(() => window.__contenus);
     // Le second message passe par une zone vidée : vide entre les deux messages.

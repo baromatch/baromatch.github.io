@@ -19,7 +19,13 @@ export const contenuDuScenario = (racineDuSite = racine) => ({ ...chargerLeConte
 const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|(?:fonts|img|\.well-known)\/.+)$/;
 const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|tests|generateur|node_modules)\//;
 
-export const construireLeSiteDExemple = async (dossier) => {
+// options : une autre source et une autre heure (la capture enregistrée, tests/donnees/capture), un autre contenu,
+// ou rendu: null pour se passer des images de partage.
+export const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
+export const MAINTENANT_DE_LA_CAPTURE = Date.parse('2026-10-15T19:44:29Z');
+export const construireLeSiteDExemple = async (dossier, {
+  source = `scenario:${SCENARIO}`, maintenant = MAINTENANT_DU_SCENARIO, contenu = contenuDuScenario(), ...options
+} = {}) => {
   rmSync(dossier, { recursive: true, force: true });
   mkdirSync(dossier, { recursive: true });
   const fichiers = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], { cwd: racine, encoding: 'utf8' })
@@ -28,5 +34,5 @@ export const construireLeSiteDExemple = async (dossier) => {
     mkdirSync(path.dirname(path.join(dossier, fichier)), { recursive: true });
     copyFileSync(path.join(racine, fichier), path.join(dossier, fichier));
   }
-  return construire({ source: `scenario:${SCENARIO}`, sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario() });
+  return construire({ source, sortie: dossier, maintenant, racine, contenu, ...options });
 };

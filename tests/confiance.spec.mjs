@@ -92,11 +92,23 @@ test('comment on choisit les bars : un h1, et chaque intertitre pose la question
   expect(titres.slice(1)).toEqual([
     'Quels bars sont sur Baromatch ?',
     'Quand un bar apparaît-il sur ce site ?',
+    'Dans quel ordre les bars s’affichent-ils ?',
     'D’où viennent les matchs ?',
     'Qui met à jour les places ?',
     'Qu’est-ce que Baromatch refuse ?',
     'Une erreur, un souci avec un bar ?',
   ]);
+});
+
+// L’ordre dit ici est celui que le générateur applique (tests/generateur.spec.mjs, « l’ordre annoncé ») ; aucun
+// classement payant n’existe, et la page ne parle pas du tarif des bars (encore à préciser sur « Pour les bars »).
+test('comment on choisit les bars : l’ordre d’affichage (ville, arrondissement, nom), et aucun bar ne paie sa place', async ({ page }) => {
+  await page.goto(CONFIANCE);
+  const ordre = normaliser(await page.locator('h2#ordre + p').textContent());
+  expect(ordre).toContain('les bars sont rangés par ville, puis par arrondissement');
+  expect(ordre).toContain('puis par ordre alphabétique de leur nom');
+  expect(ordre).toContain('Aucun bar ne paie pour passer devant un autre.');
+  expect(normaliser(await page.locator('h2#en-bref + ul').textContent())).toContain('Aucun bar ne paie pour passer devant un autre.');
 });
 
 test('comment on choisit les bars : l’accord écrit, et la phrase « aucun bar publié » seulement tant qu’aucun bar ne l’est', async ({ page }) => {

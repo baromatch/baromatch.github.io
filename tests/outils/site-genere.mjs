@@ -17,7 +17,7 @@ export const contenuDuScenario = (racineDuSite = racine) => ({ ...chargerLeConte
 
 // Les fichiers du dépôt que le site sert à ses visiteurs, et dont les pages générées ont besoin.
 const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|(?:fonts|img|\.well-known)\/.+)$/;
-const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|tests|generateur|node_modules)\//;
+const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|en|tests|generateur|node_modules)\//;
 
 // options : une autre source et une autre heure (la capture enregistrée, tests/donnees/capture), un autre contenu,
 // ou rendu: null pour se passer des images de partage.

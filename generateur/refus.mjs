@@ -29,8 +29,8 @@ export const TEXTES_DU_REPLI = {
 };
 
 // Les adresses de pages générées qu’un fichier cite (liens, adresse canonique, données structurées, badge) :
-// « /matchs/…/ », « /regarder-le-match/…/ », « /bar/…/ ».
-export const adressesCitees = (html) => [...new Set([...html.matchAll(/(?:https:\/\/baromatch\.fr)?(\/(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*)/g)].map((m) => m[1]))];
+// « /matchs/…/ », « /regarder-le-match/…/ », « /bar/…/ », « /en/…/ ».
+export const adressesCitees = (html) => [...new Set([...html.matchAll(/(?:https:\/\/baromatch\.fr)?(\/(?:matchs|regarder-le-match|bar|en)\/(?:[a-z0-9-]+\/)*)/g)].map((m) => m[1]))];
 
 // Pourquoi la version précédente d’une page refusée ne peut pas rester en ligne, ou null si elle le peut.
 // avant : son entrée dans l’état ; html : son contenu sur le disque (null s’il manque) ; publies : les identifiants des

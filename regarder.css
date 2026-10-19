@@ -310,3 +310,14 @@
 .regarder-agenda__adresse a { display: inline-block; padding: 11px 0; color: var(--texte-doux); }
 .regarder-carte .regarder-agenda { margin-top: 12px; }
 .regarder-tete .regarder-chapeau + .regarder-chapeau { margin-top: 8px; }
+
+/* ---------- Les pages en anglais (/en/) et leurs jumelles ---------- */
+
+/* Le lien vers l’autre langue (« English », « Version française »), en haut à droite : 44 px à toucher. */
+.regarder-langue { margin: 0; text-align: right; }
+.regarder-langue a { display: inline-block; min-width: 44px; padding: 10px 0; font-weight: 650; }
+/* La prochaine soirée d’un bar, sous sa carte : le match se touche sur 44 px. */
+.regarder-carte .regarder-carte__suite { margin-top: 10px; color: var(--texte-doux); font-size: 0.9375rem; }
+.regarder-carte__suite a { display: inline-block; padding: 11px 0; font-weight: 650; }
+/* Sur une page en anglais, le pied de page (en français) le dit d’abord, sur sa propre ligne. */
+.pied__langue { flex-basis: 100%; margin: 0; color: var(--texte-doux); }

@@ -28,8 +28,9 @@ export const lireLeCadre = (racine) => {
 
 // image : l’image de partage de la page ({ adresse, alt }), sinon l’image générale du site.
 // feuilles : les feuilles de style propres à la page, après celles de toutes les pages (affiche.css pour les affiches).
-const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [] }) => `<!doctype html>
-<html lang="fr">
+// langue : « fr », ou « en » pour une page en anglais (anglais.mjs).
+const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [], langue = 'fr' }) => `<!doctype html>
+<html lang="${langue}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -48,7 +49,7 @@ const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, f
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/regarder.css">
 ${feuilles.map((f) => `<link rel="stylesheet" href="${f}">\n`).join('')}<meta property="og:type" content="website">
-<meta property="og:locale" content="fr_FR">
+<meta property="og:locale" content="${langue === 'en' ? 'en_GB' : 'fr_FR'}">
 <meta property="og:site_name" content="Baromatch">
 <meta property="og:title" content="${e(titre)}">
 <meta property="og:description" content="${e(description)}">
@@ -63,11 +64,12 @@ ${feuilles.map((f) => `<link rel="stylesheet" href="${f}">\n`).join('')}<meta pr
 ${partage ? `${SCRIPT_DU_PARTAGE}\n` : ''}<script type="application/ld+json">${blocJsonLd(jsonld)}</script>
 </head>
 <body>
-<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+<a class="lien-evitement" href="#contenu">${langue === 'en' ? 'Skip to content' : 'Aller au contenu'}</a>
 `;
 
 // Le pied de page commun, dans l’ordre de toutes les pages (tests/outils/pied.mjs) ; « Presse » dès que la page existe.
-const pied = ({ cadre, marque, chemin, avecPresse }) => {
+// Sur une page en anglais, le même pied, dit en français (lang="fr" : ses pages le sont), sous une phrase en anglais.
+const pied = ({ cadre, marque, chemin, avecPresse, langue = 'fr' }) => {
   const x = marque.profils?.x;
   const liens = [
     ['/pour-les-bars.html', 'Pour les bars'],
@@ -84,9 +86,9 @@ const pied = ({ cadre, marque, chemin, avecPresse }) => {
   const elements = liens.map(([href, texte]) => `    <li><a href="${href}"${href === chemin ? ' aria-current="page"' : ''}>${texte}</a></li>`);
   if (x) elements.push(`    <li><a href="${e(x)}" rel="me noopener">X : @${e(x.replace(/\/+$/, '').split('/').pop())}</a></li>`);
   elements.push(`    <li><a href="mailto:${e(marque.contact)}">${e(marque.contact)}</a></li>`);
-  return `<footer class="pied page">
+  return `<footer class="pied page"${langue === 'en' ? ' lang="fr"' : ''}>
   ${cadre.piedMarque}
-  <ul class="pied__liens">
+${langue === 'en' ? '  <p class="pied__langue" lang="en">The rest of baromatch.fr is in French.</p>\n' : ''}  <ul class="pied__liens">
 ${elements.join('\n')}
   </ul>
 </footer>
@@ -99,17 +101,19 @@ ${elements.join('\n')}
 // avant « ? », « : » et « ; », pour que le signe ne parte jamais seul à la ligne.
 export const insecables = (texte) => texte.replace(/ ([?:;])/g, '\u00A0$1');
 
-// Une page qui se partage (partage) : le bloc « Partager » juste sous sa tête (la première <header> du corps).
-const avecLePartage = (corps, { partage, titre, chemin }) => (partage
-  ? corps.replace(/<header class="regarder-tete">[\s\S]*?<\/header>/, (enTete) => `${enTete}\n${blocPartager({ titre, chemin })}`)
+// Une page qui se partage (partage) : le bloc « Partager » juste sous sa tête (la première <header> du corps), avec ses
+// textes (textesDuPartage : ceux d’une page en anglais ; sinon ceux de partage.json).
+const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (partage
+  ? corps.replace(/<header class="regarder-tete">[\s\S]*?<\/header>/, (enTete) => `${enTete}\n${blocPartager({ titre, chemin }, textesDuPartage)}`)
   : corps);
 
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles })}${cadre.entete}
+// Une page en anglais (langue « en ») garde l’en-tête du site, en français : il le dit (lang="fr").
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue })}${langue === 'en' ? cadre.entete.replace('<header class="entete page">', '<header class="entete page" lang="fr">') : cadre.entete}
 
 <main id="contenu" class="regarder page">
-${avecLePartage(corps, { partage, titre, chemin })}
+${avecLePartage(corps, { partage, titre, chemin, textesDuPartage })}
 </main>
-${pied({ cadre, marque, chemin, avecPresse })}`);
+${pied({ cadre, marque, chemin, avecPresse, langue })}`);
 
 // ---------- Morceaux communs ----------
 

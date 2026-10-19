@@ -680,7 +680,8 @@ test.describe('les pages', () => {
   test('chaque page : un fil d’Ariane balisé, rattaché à l’organisation de l’accueil par son @id', () => {
     for (const p of site.pages) {
       const [fil] = deType(p, 'BreadcrumbList');
-      expect(fil.itemListElement[0], p.chemin).toMatchObject({ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' });
+      // Une page en anglais (anglais.mjs) part de « Baromatch » : l’accueil est en français.
+      expect(fil.itemListElement[0], p.chemin).toMatchObject({ position: 1, name: p.langue === 'en' ? 'Baromatch' : 'Accueil', item: 'https://baromatch.fr/' });
       if (p.type === 'bar' || p.type === 'ville') expect(fil.itemListElement[1], p.chemin).toMatchObject({ position: 2, name: 'Les villes', item: 'https://baromatch.fr/regarder-le-match/' });
       expect(fil.itemListElement.at(-1).item, p.chemin).toBe(`https://baromatch.fr${p.chemin}`);
       const principal = donneesStructurees(p)[0];
@@ -1144,7 +1145,7 @@ test.describe('d’un passage à l’autre', () => {
     expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>\n<urlset')).toBe(true);
   });
 
-  test('la liste blanche : rien d’autre que matchs/, regarder-le-match/, bar/, ce-soir/, agenda/ et sitemap.xml n’est touché', async () => {
+  test('la liste blanche : rien d’autre que matchs/, regarder-le-match/, bar/, ce-soir/, en/, agenda/ et sitemap.xml n’est touché', async () => {
     const sortie = dossierVide();
     // Un dossier qui ressemble au site : des fichiers que le générateur n’a pas le droit de toucher.
     const temoins = { 'index.html': 'accueil', 'marque.json': '{}', 'robots.txt': 'robots', 'bar.html': 'bar', 'matchs.txt': 'm', 'regarder.css': 'css' };
@@ -1157,8 +1158,8 @@ test.describe('d’un passage à l’autre', () => {
       return statSync(path.join(sortie, relatif)).isDirectory() ? fichiers(relatif) : [relatif];
     });
     const crees = [...readdirSync(sortie)].filter((nom) => !avant.has(nom));
-    expect(crees.sort()).toEqual(['agenda', 'bar', 'ce-soir', 'matchs', 'regarder-le-match', 'sitemap.xml']);
-    const tous = ['agenda', 'bar', 'ce-soir', 'matchs', 'regarder-le-match'].flatMap((d) => fichiers(d));
+    expect(crees.sort()).toEqual(['agenda', 'bar', 'ce-soir', 'en', 'matchs', 'regarder-le-match', 'sitemap.xml']);
+    const tous = ['agenda', 'bar', 'ce-soir', 'en', 'matchs', 'regarder-le-match'].flatMap((d) => fichiers(d));
     expect(tous.filter((relatif) => !estPermis(relatif))).toEqual([]);
     for (const refuse of ['index.html', 'marque.json', 'robots.txt', 'tests/x.html', 'matchs/../index.html', 'bar/x/script.js', 'generateur/construire.mjs']) {
       expect(estPermis(refuse), refuse).toBe(false);
@@ -1174,20 +1175,21 @@ test.describe('d’un passage à l’autre', () => {
   test('la prudence : un passage qui ferait disparaître plus de la moitié des pages n’écrit rien', async () => {
     // Les données manquantes ne vident pas le site : un match ou un bar absent garde sa page 30 jours (plus haut).
     // Mais un passage qui supprimerait d’un coup plus de la moitié des pages publiées (ici, après une longue pause,
-    // vingt pages de matchs de septembre arrivées au bout de leurs 30 jours) s’arrête et le dit.
+    // quarante pages de matchs de septembre arrivées au bout de leurs 30 jours) s’arrête et le dit.
     const sortie = dossierVide();
     await passer(sortie, '2026-10-23T08:00:00Z');
     const etat = etatDe(sortie);
-    for (let i = 1; i <= 30; i += 1) {
+    for (let i = 1; i <= 40; i += 1) {
       const slug = `vieux-match-${i}-2026-09-01`;
       etat.pages[`/matchs/${slug}/`] = { type: 'match', cle: slug, date: '2026-09-01T18:00:00.000Z', empreinte: 'x', change: '2026-09-01', indexable: false,
         memoire: { slug, ids: [slug], debut: '2026-09-01T18:00:00.000Z', heureConfirmee: true, competition: 'Ligue 1', domicile: { cle: 'a', court: 'A', nom: 'A' }, exterieur: { cle: 'b', court: 'B', nom: 'B' } } };
     }
     writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
-    // Les 21 pages de la semaine du scénario, plus la page agenda/ et ses 6 affiches à imprimer (celle de la semaine et
-    // une par vrai bar publié) : 28, et les 30 vieux matchs, 58.
-    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 58 pages publiées : rien n’est écrit/);
+    // Les pages du scénario : 21 en français (8 matchs, la semaine, 5 villes et leur index, 5 bars, « Ce soir »),
+    // la page agenda/, 6 affiches à imprimer (celle de la semaine, une par vrai bar publié) et 6 pages en anglais
+    // (3 guides, 3 matchs) : 34, et les 40 vieux matchs, 74 (30 vieux matchs n’en feraient plus la moitié).
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 40 des 74 pages publiées : rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
     // Voulu : relancé en le disant, le passage les supprime.
     await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });
@@ -1312,8 +1314,8 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // refait après un envoi refusé, sans le jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
     expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(3);
     expect(action.match(/node generateur\/construire\.mjs[^\n]*/g)).toHaveLength(2);
-    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir agenda sitemap.xml; do');
-    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|agenda)/|^sitemap\\.xml$'");
+    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do');
+    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$'");
     expect(action).toContain('git pull -q --rebase origin main');
     // Le jeton n’est pas gardé dans la configuration de git (le générateur tourne sans lui) : seule l’étape qui envoie
     // le reçoit pour git, le temps de l’envoi, comme actions/checkout le fait lui-même ; la demande de publication à

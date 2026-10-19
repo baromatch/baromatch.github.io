@@ -116,7 +116,7 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adress
     };
   }
   return {
-    _lisezMoi: 'L’état du générateur des pages des matchs : il l’écrit à chaque passage, ne le modifie pas à la main. Pour chaque fichier, sa sorte, son match ou son bar, l’empreinte de son contenu, la date de son dernier vrai changement (celle du plan du site) et s’il est indexable ; et l’adresse de page donnée à chaque bar, qu’il garde et qu’aucun autre ne reprend.',
+    _lisezMoi: 'L’état du générateur des pages des matchs : il l’écrit à chaque passage, ne le modifie pas à la main. Pour chaque fichier, sa sorte, son match ou son bar, les bars qu’il nomme (leurs identifiants), l’empreinte de son contenu, la date de son dernier vrai changement (celle du plan du site) et s’il est indexable ; et l’adresse de page de chaque bar publié, qu’aucun autre ne reprend. Un bar qui n’est plus publié sort de ces adresses au passage suivant ; l’adresse de sa page reste seulement le temps de sa page « n’est plus sur Baromatch » (30 jours).',
     pages,
     adresses,
   };

@@ -746,6 +746,40 @@ test.describe('d’un passage à l’autre', () => {
     expect(deux.bars.filter((b) => b.nom === 'Le Zinc des Amis').map((b) => [b.id, b.slug])).toEqual([['b-zinc', 'le-zinc-des-amis-paris-11']]);
   });
 
+  test('un bar qui n’est plus publié : l’adresse de sa page (qui porte son nom) quitte l’état public au plus tard avec sa page', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-21T08:00:00Z');
+    expect(etatDe(sortie).adresses['le-zinc-des-amis-paris-11']).toBe('b-zinc');
+    // Retiré de la liste des bars publiés : son nom quitte les adresses données ; seule sa page « n’est plus sur
+    // Baromatch » garde son adresse, le temps qu’elle existe (30 jours).
+    const sansZinc = { ...contenu, publies: PUBLIES_DU_SCENARIO.filter((id) => id !== 'b-zinc') };
+    await passer(sortie, '2026-10-22T08:00:00Z', { contenu: sansZinc });
+    expect(etatDe(sortie).adresses['le-zinc-des-amis-paris-11']).toBeUndefined();
+    expect(Object.keys(etatDe(sortie).pages).filter((chemin) => chemin.includes('zinc'))).toEqual(['/bar/le-zinc-des-amis-paris-11/', '/bar/le-zinc-des-amis-paris-11/badge.svg']);
+    // 30 jours après sa sortie, sa page disparaît, et avec elle le dernier mot de son nom dans l’état.
+    await passer(sortie, '2026-11-22T08:00:00Z', { contenu: sansZinc });
+    expect(existsSync(path.join(sortie, 'bar/le-zinc-des-amis-paris-11'))).toBe(false);
+    expect(lire(sortie, 'regarder-le-match/etat.json')).not.toMatch(/zinc/i);
+
+    // Pendant ces 30 jours, un autre bar du même nom ne prend pas son adresse : la page du premier l’occupe encore.
+    const autre = dossierVide();
+    await passer(autre, '2026-10-21T08:00:00Z');
+    await passer(autre, '2026-10-22T08:00:00Z', { contenu: sansZinc });
+    const homonyme = scenarioSans(autre, (brut) => ({ ...brut, bars: [...brut.bars, { id: 'b-zzz', name: 'Le Zinc des Amis', address: '14 Rue Oberkampf, 75011 Paris', isActive: true }] }));
+    await passer(autre, '2026-10-23T08:00:00Z', { source: homonyme, contenu: { ...sansZinc, publies: [...sansZinc.publies, 'b-zzz'] } });
+    expect(etatDe(autre).adresses).toMatchObject({ 'le-zinc-des-amis-paris-11-2': 'b-zzz' });
+    expect(lire(autre, 'bar/le-zinc-des-amis-paris-11/index.html')).toContain('Ce bar n’est plus sur Baromatch.');
+
+    // Le mode d’emploi le dit, dans les deux listes publiques.
+    const publies = JSON.parse(readFileSync(path.join(racine, 'generateur', 'bars-publies.json'), 'utf8'))._lisezMoi;
+    const exclus = JSON.parse(readFileSync(path.join(racine, 'generateur', 'bars-exclus.json'), 'utf8'))._lisezMoi;
+    for (const texte of [publies, exclus]) {
+      expect(texte).toContain('demande à ne plus apparaître');
+      expect(texte).toContain('30 jours');
+      expect(texte).toContain('etat.json');
+    }
+  });
+
   test('reporté, annulé, prolongations, marque.json et état illisible', async () => {
     // Le jour de Paris lu morceau par morceau, jamais par le format d’une langue.
     expect(readFileSync(path.join(racine, 'generateur', 'heure.mjs'), 'utf8')).not.toContain('en-CA');

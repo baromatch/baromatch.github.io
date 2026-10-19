@@ -242,9 +242,9 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, publie
   const matchDeLId = new Map(matchs.flatMap((match) => match.ids.map((id) => [id, match])));
 
   // Les vrais bars, chacun avec sa ville, son arrondissement et son adresse de page. Une adresse de page est stable :
-  // un bar connu (par son identifiant) garde celle de l’état, même s’il change de nom ; une adresse déjà donnée n’est
-  // jamais redonnée à un autre bar (le second prend « -2 », « -3 »… dans l’ordre des identifiants). Le nom, l’adresse
-  // et l’offre sont nettoyés de leurs caractères invisibles avant tout usage.
+  // un bar connu (par son identifiant) garde celle de l’état, même s’il change de nom ; une adresse donnée n’est jamais
+  // redonnée à un autre bar tant que sa page existe (le second prend « -2 », « -3 »… dans l’ordre des identifiants).
+  // Le nom, l’adresse et l’offre sont nettoyés de leurs caractères invisibles avant tout usage.
   const prises = new Map(Object.entries(adresses).map(([adressePage, id]) => [adressePage, String(id)]));
   const slugDeLId = new Map();
   for (const [adressePage, id] of prises) if (!slugDeLId.has(id)) slugDeLId.set(id, adressePage);
@@ -295,8 +295,12 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, publie
       soirees: [],
     });
   }
-  // Les adresses données, à garder dans l’état (sans celles des bars exclus : leur nom en sort).
-  const adressesDonnees = Object.fromEntries([...prises].filter(([, id]) => !listeExclus.has(id))
+  // Les adresses données, à garder dans l’état public : celles des bars publiés à ce passage, et seulement elles. Celle
+  // d’un bar qui n’est plus publié (retiré de la liste, exclu, écarté, disparu des données) porte son nom : elle en
+  // sort tout de suite. Sa page « n’est plus sur Baromatch » la garde 30 jours (son entrée dans l’état, que lit
+  // anciensDe), puis plus rien ne la nomme.
+  const publiesIci = new Set(bars.map((bar) => bar.id));
+  const adressesDonnees = Object.fromEntries([...prises].filter(([, id]) => publiesIci.has(id))
     .sort(([a], [b]) => a.localeCompare(b)));
   const barDeLId = new Map(bars.map((bar) => [bar.id, bar]));
 

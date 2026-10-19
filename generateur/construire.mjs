@@ -13,6 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { badgeDuBar } from './badge.mjs';
 import { chargerLeRendu } from './images/rendu.mjs';
+import { chargerLeQr } from './qr.mjs';
 import { cheminDeLImage, lesPolices, POIDS_MAX, svgDeLaCarte } from './partage.mjs';
 import { RACINE } from './contenu.mjs';
 import { jourDeParis } from './heure.mjs';
@@ -53,17 +54,22 @@ export const verifierLesListes = ({ precedent, donnees, maintenant }) => {
   return raisons;
 };
 
-// images : « exiger » (l’Action) arrête tout si le rendu des images de partage manque ; sinon, sans lui, chaque page
-// garde l’image générale du site, et le journal le dit. rendu : un rendu donné (les tests), ou null pour s’en passer.
+// images : « exiger » (l’Action) arrête tout si le rendu des images de partage manque, ou l’encodeur des QR codes des
+// affiches (installés ensemble, dans generateur/images) ; sinon, sans le rendu, chaque page garde l’image générale du
+// site, sans l’encodeur, les affiches ne sont pas écrites, et le journal le dit. rendu : un rendu donné (les tests), ou
+// null pour s’en passer ; qr : de même pour l’encodeur.
 export const construire = async ({
   source = 'api', sortie = RACINE, maintenant = Date.now(), racine = RACINE, contenu, accepterLesSuppressions = false, adresse, journal = () => {},
-  images, rendu,
+  images, rendu, qr,
 } = {}) => {
   const precedent = lireLEtat(sortie);
   const charge = rendu !== undefined ? { rendu, raison: 'le rendu des images est écarté' } : await chargerLeRendu({ polices: Object.values(lesPolices()) });
   if (!charge.rendu && images === 'exiger') throw new Error(`Images de partage exigées, rien n’est écrit : ${charge.raison}.`);
   if (!charge.rendu) journal(`avertissement : images de partage : ${charge.raison} ; chaque page garde l’image générale du site.`);
-  const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent), images: Boolean(charge.rendu) });
+  const encodeur = qr !== undefined ? { qr, raison: 'l’encodeur des QR codes est écarté' } : chargerLeQr();
+  if (!encodeur.qr && images === 'exiger') throw new Error(`Affiches exigées, rien n’est écrit : ${encodeur.raison}.`);
+  if (!encodeur.qr) journal(`avertissement : affiches : ${encodeur.raison} ; les affiches à imprimer ne sont pas écrites.`);
+  const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent), images: Boolean(charge.rendu), qr: encodeur.qr });
 
   // Une liste vide ou tronquée (bars, soirées, matchs) ne fait pas basculer le site : rien n’est écrit.
   const raisons = accepterLesSuppressions ? [] : verifierLesListes({ precedent, donnees: site.donnees, maintenant });

@@ -4,6 +4,7 @@
 // toutes les pages refusées, arrêtent tout avant la moindre écriture : les pages en ligne restent comme elles sont.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { fabriquerLesAffiches, lienVersLAffiche } from './affiche.mjs';
 import { fabriquerCeSoir } from './ce-soir.mjs';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
@@ -14,7 +15,7 @@ import { lireLaSource } from './sources.mjs';
 import { chargerLeVocabulaire, validerLaPage } from './validateur.mjs';
 
 export const construireEnMemoire = async ({
-  source, maintenant = Date.now(), racine = RACINE, contenu = chargerLeContenu(racine), anciens, adresse, brut, images = false,
+  source, maintenant = Date.now(), racine = RACINE, contenu = chargerLeContenu(racine), anciens, adresse, brut, images = false, qr = null,
 } = {}) => {
   // L’appli dite ouverte sans aucun lien de magasin : chaque page promettrait une place impossible à garder.
   const { appli = {} } = contenu.marque;
@@ -25,9 +26,11 @@ export const construireEnMemoire = async ({
   const donnees = preparer(listes, { maintenant, ...contenu, adresses: anciens?.adresses });
   const cadre = lireLeCadre(racine);
   const avecPresse = existsSync(path.join(racine, 'presse.html'));
-  const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens, images });
+  const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens, images, afficheDuBar: qr ? lienVersLAffiche : null });
   // « Ce soir » (/ce-soir/) : les places de ses bars viennent de la liste brute des soirées.
   pages.push(fabriquerCeSoir({ donnees, contenu, cadre, avecPresse, pages, nuits: listes.matchNights, images }));
+  // Les affiches à imprimer (affiche.mjs), seulement avec l’encodeur des QR codes (qr.mjs) : sinon, aucune.
+  pages.push(...fabriquerLesAffiches({ donnees, contenu, cadre, avecPresse, qr }));
 
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);

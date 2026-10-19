@@ -1,7 +1,7 @@
 // Lighthouse sur des exemples de pages générées, mobile et ordinateur : le scénario inventé construit dans
 // lighthouse/exemples-site/ (une copie du site autour, tests/outils/site-genere.mjs), servi comme GitHub Pages
 // (max-age=600), puis une page de ville avec des bars, une page de match avec des bars, « Ce soir » avec un vrai bar,
-// et l’accueil pour comparer.
+// l’affiche de la semaine, et l’accueil pour comparer.
 // Usage : npm run lighthouse:exemples [-- <port>]   (4275 par défaut)
 // Écrit un JSON par mesure et resume.md dans lighthouse/exemples/, que git ignore. La commande échoue (code 1) si une
 // note est sous 95.
@@ -24,6 +24,7 @@ const PAGES = [
   { chemin: '/regarder-le-match/paris/', nom: 'ville-paris' },
   { chemin: '/matchs/psg-ol-2026-10-25/', nom: 'match-psg-ol' },
   { chemin: '/ce-soir/', nom: 'ce-soir' },
+  { chemin: '/matchs/affiche/', nom: 'affiche' },
   { chemin: '/', nom: 'accueil' },
 ];
 const binaire = path.join(racine, 'node_modules', 'lighthouse', 'cli', 'index.js');

@@ -1304,12 +1304,14 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     expect([...travaux.matchAll(/^ {2}[a-z-]+:$/gm)]).toHaveLength(1);
     expect(travaux).toMatch(/^ {2}generer:\n(?: {4}#.*\n)* {4}if: github\.ref == 'refs\/heads\/main'\n/);
     expect(travaux).toMatch(/ {6}- uses: actions\/checkout@v7\n {8}with:\n {10}ref: main\n/);
-    // Des actions à leur étiquette de version (vérifiées le 16 octobre 2026), Node 22 ; une seule chose à installer, le
-    // rendu des images de partage, à sa version exacte (npm ci, sans script d’installation), avant le générateur.
+    // Des actions à leur étiquette de version (vérifiées le 16 octobre 2026), Node 22 ; une seule installation, celle de
+    // generateur/images : le rendu des images de partage et l’encodeur des QR codes des affiches, à leur version exacte
+    // (npm ci, sans script d’installation), avant le générateur.
     expect([...action.matchAll(/uses: ([^\s]+)/g)].map((m) => m[1])).toEqual(['actions/checkout@v7', 'actions/setup-node@v7']);
     expect(action).toContain('node-version: 22');
     expect([...action.matchAll(/npm [^\n]*/g)].map((m) => m[0])).toEqual(['npm ci --ignore-scripts --no-audit --no-fund']);
     expect(action).toMatch(/\n {6}- name: Installer le rendu des images de partage\n {8}working-directory: generateur\/images\n {8}run: npm ci --ignore-scripts --no-audit --no-fund\n\n {6}- name: Construire et contrôler les pages\n/);
+    expect(Object.keys(JSON.parse(readFileSync(path.join(racine, 'generateur/images/package.json'), 'utf8')).dependencies)).toEqual(['@resvg/resvg-js', 'qrcode-generator']);
     // Le générateur contre les listes publiques, les images exigées dans ses deux lancements (le second, le passage
     // refait après un envoi refusé, sans le jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
     expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(3);
@@ -1324,14 +1326,16 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     const etapes = action.split('\n      - ');
     const avecLeJeton = etapes.filter((etape) => etape.includes('github.token')).map((etape) => etape.split('\n')[0]);
     expect(avecLeJeton).toEqual(['name: Enregistrer et envoyer les pages qui ont changé', 'name: Demander la publication à GitHub Pages']);
-    // Le générateur, qui lit des données venues de dehors, ne voit jamais le jeton : dans une étape qui le reçoit (le
-    // passage refait après un envoi refusé), il tourne sans lui.
+    // Le générateur, qui lit des données venues de dehors, ne voit jamais le jeton, ni la mesure d’audience qui le
+    // précède (generateur/mesure.mjs) : dans une étape qui le reçoit (le passage refait après un envoi refusé), ils
+    // tournent sans lui. Chacun est lancé deux fois : le passage, et le passage refait.
     const lancements = etapes.flatMap((etape) => etape.split('\n').map((ligne) => ligne.trim())
-      .filter((ligne) => !ligne.startsWith('#') && ligne.includes('generateur/construire.mjs')).map((ligne) => ({ ligne, jeton: etape.includes('JETON_GITHUB') })));
-    expect(lancements.map((l) => l.jeton)).toEqual([false, true]);
-    for (const { ligne, jeton } of lancements) {
-      if (jeton) expect(ligne).toBe('env -u JETON_GITHUB node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option');
-    }
+      .filter((ligne) => !ligne.startsWith('#') && /generateur\/(?:construire|mesure)\.mjs/.test(ligne)).map((ligne) => ({ ligne, jeton: etape.includes('JETON_GITHUB') })));
+    expect(lancements.map((l) => [l.ligne.match(/generateur\/(\w+)\.mjs/)[1], l.jeton])).toEqual([['mesure', false], ['construire', false], ['mesure', true], ['construire', true]]);
+    expect(lancements.filter((l) => l.jeton).map((l) => l.ligne)).toEqual([
+      'env -u JETON_GITHUB node generateur/mesure.mjs --ecrites="$mesure"',
+      'env -u JETON_GITHUB node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option',
+    ]);
     expect(action).toContain('git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main');
     expect(action).not.toMatch(/git push|remote set-url/);
     // La publication demandée après l’envoi ; IndexNow n’arrête jamais l’Action.

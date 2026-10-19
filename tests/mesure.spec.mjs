@@ -65,7 +65,9 @@ test.describe('les pages écrites à la main', () => {
   const PAGES = pagesEcritesALaMain();
 
   test('la liste : chaque page .html servie, hors des pages générées et des outils', () => {
-    expect(PAGES).toEqual(expect.arrayContaining(['index.html', '404.html', 'confidentialite.html', 'pour-les-bars.html', 'cgu.html']));
+    expect(PAGES).toEqual(expect.arrayContaining([
+      'index.html', '404.html', 'confidentialite.html', 'pour-les-bars.html', 'cgu.html', 'presse.html', 'a-propos.html', 'comment-on-choisit-les-bars.html',
+    ]));
     expect(PAGES.filter((p) => /^(?:matchs|regarder-le-match|bar|ce-soir|en|agenda|tests|generateur|node_modules)\//.test(p))).toEqual([]);
   });
 
@@ -319,6 +321,7 @@ test.describe('avec un code', () => {
       '/': '/', '/cgu.html': '/cgu.html', '/confidentialite.html': '/confidentialite.html', '/pour-les-bars.html': '/pour-les-bars.html',
       '/matchs/psg-ol-2026-10-25/': '/matchs/psg-ol-2026-10-25/', '/regarder-le-match/paris/': '/regarder-le-match/paris/', '/ce-soir/': '/ce-soir/',
       '/matchs/': '/matchs/', '/matchs/affiche/': '/matchs/affiche/', '/agenda/': '/agenda/', '/en/': '/en/', '/t/abcdefghjkmn': '/t/',
+      '/a-propos.html': '/a-propos.html', '/comment-on-choisit-les-bars.html': '/comment-on-choisit-les-bars.html', '/404.html': '/404',
     };
     for (const [chemin, compte] of Object.entries(attendus)) {
       const avant = envois.length;

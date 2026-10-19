@@ -16,8 +16,9 @@ export const MAINTENANT_DU_SCENARIO = Date.parse('2026-10-23T08:00:00Z');
 export const PUBLIES_DU_SCENARIO = ['b-zinc', 'b-comptoir', 'b-gones', 'b-coin', 'b-rennes', 'b-t1', 'b-demo', 'b-x7'];
 export const contenuDuScenario = (racineDuSite = racine) => ({ ...chargerLeContenu(racineDuSite), publies: PUBLIES_DU_SCENARIO });
 
-// Les fichiers du dépôt que le site sert à ses visiteurs, et dont les pages générées ont besoin.
-const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|(?:fonts|img|\.well-known)\/.+)$/;
+// Les fichiers du dépôt que le site sert à ses visiteurs, et dont les pages ont besoin (les images du badge et de la
+// presse comprises : « Pour les bars » et « Presse » les montrent).
+const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|(?:fonts|img|badge|presse|\.well-known)\/.+)$/;
 const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|en|tests|generateur|node_modules)\//;
 
 // options : une autre source et une autre heure (la capture enregistrée, tests/donnees/capture), un autre contenu,

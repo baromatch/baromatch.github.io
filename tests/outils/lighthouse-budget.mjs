@@ -2,8 +2,9 @@
 // quatre catégories. Lighthouse varie avec la charge de la machine (77 à 99 sur l’accueil quand d’autres travaux
 // tournent) : une page n’échoue que si aucun de ses 3 essais n’atteint 95. Les mesures exactes, qui ne varient pas,
 // sont dans tests/budget-vitesse.spec.mjs (lancé avec les autres tests) ; cette commande, plus lente, se lance à part.
-// Les pages : l’accueil, deux pages fixes, et les pages générées du scénario inventé (tests/outils/site-genere.mjs),
-// construit dans lighthouse/budget-site/ et servi comme GitHub Pages (max-age=600).
+// Les pages : l’accueil, deux pages fixes, et les pages générées du scénario inventé (tests/outils/site-genere.mjs ; les
+// pages en anglais, agenda/ et l’affiche de la semaine comprises), construit dans lighthouse/budget-site/ et servi comme
+// GitHub Pages (max-age=600).
 // Usage : npm run lighthouse:budget [-- <port>]   (4276 par défaut)
 // Écrit chaque mesure et resume.md dans lighthouse/budget/, que git ignore. Code 1 si une page reste sous 95.
 import { execFile } from 'node:child_process';
@@ -24,6 +25,9 @@ export const PAGES = [
   { nom: 'match', chemin: '/matchs/psg-ol-2026-10-25/' },
   { nom: 'ville', chemin: '/regarder-le-match/paris/' },
   { nom: 'bar', chemin: '/bar/le-zinc-des-amis-paris-11/' },
+  { nom: 'anglais', chemin: '/en/' },
+  { nom: 'agenda', chemin: '/agenda/' },
+  { nom: 'affiche', chemin: '/matchs/affiche/' },
 ];
 
 // Les notes d’un rapport Lighthouse, sur 100.

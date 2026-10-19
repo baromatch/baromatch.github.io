@@ -11,6 +11,7 @@ import { promisify } from 'node:util';
 import { racine } from './outils/environnement.mjs';
 import { PAGES, pagesLighthouse } from './outils/pages.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
+import { meilleuresNotes, mesurerUnePage, SEUIL, sousLeSeuil } from './outils/lighthouse-budget.mjs';
 
 const executer = promisify(execFile);
 
@@ -178,6 +179,35 @@ test.describe('le résumé Lighthouse', () => {
     } finally {
       rmSync(dossier, { recursive: true, force: true });
     }
+  });
+});
+
+test.describe('le budget Lighthouse (npm run lighthouse:budget) : la meilleure de 3 notes, 95 au moins', () => {
+  const notes = (performance, autres = 100) => ({ performance, accessibility: autres, 'best-practices': autres, seo: autres });
+  const suite = (...liste) => {
+    const faites = [];
+    return { faites, mesurer: async () => { const n = liste[faites.length]; faites.push(n); return n; } };
+  };
+
+  test('un essai sous 95 sous la charge, puis un à 96 : la page tient, sans troisième essai', async () => {
+    const { faites, mesurer } = suite(notes(77), notes(96), notes(99));
+    const resultat = await mesurerUnePage(mesurer, { nom: 'accueil' });
+    expect(faites).toHaveLength(2);
+    expect(resultat.meilleures).toEqual(notes(96));
+    expect(sousLeSeuil([resultat])).toEqual([]);
+  });
+
+  test('trois essais sous 95 : la page échoue, nommée avec ses trois notes', async () => {
+    const { faites, mesurer } = suite(notes(90), notes(93), notes(91));
+    const resultat = await mesurerUnePage(mesurer, { nom: 'ville' });
+    expect(faites).toHaveLength(3);
+    expect(sousLeSeuil([resultat])).toEqual(['ville · mobile · performance 93 (essais : 90, 93, 91)']);
+  });
+
+  test('chaque catégorie compte, et 95 tout juste suffit', async () => {
+    expect(sousLeSeuil([{ page: 'bar', essais: [notes(95, 94)], meilleures: notes(95, 94) }])).toHaveLength(3);
+    expect(meilleuresNotes([notes(95, 90), notes(80, 95)])).toEqual(notes(95, 95));
+    expect(SEUIL).toBe(95);
   });
 });
 

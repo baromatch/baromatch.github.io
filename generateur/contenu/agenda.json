@@ -1,0 +1,75 @@
+{
+  "_lisezMoi": "Les textes de « Ton club dans ton agenda » : la page agenda/ qui l’explique, le lien de chaque page de match, et ce que disent les fichiers d’agenda (.ics) d’un club ou d’un match. Garde les clés et les mots entre accolades ({club}, {jour}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation. Un fichier d’agenda ne parle de bars que quand de vrais bars diffusent le match : le générateur écrit alors leur vrai nombre.",
+  "lien": "Ton club dans ton agenda",
+  "page": {
+    "titre": "Ton club dans ton agenda — Baromatch",
+    "description": "Les matchs de ton club de Ligue 1 dans l’agenda de ton téléphone, à l’heure de Paris : un abonnement par club, qui suit chaque changement d’horaire.",
+    "fil": "Ton club dans ton agenda",
+    "titrePage": "Ton club dans ton agenda",
+    "chapeau": "Abonne-toi à l’agenda de ton club : ses matchs arrivent dans le calendrier de ton téléphone.",
+    "suit": "Un horaire change, un match est reporté : ton agenda suit, sans rien refaire.",
+    "jusqua": "{competitions}, pour l’instant jusqu’au {jour}.",
+    "sansMatch": "Les prochains matchs arrivent dès qu’ils sont au programme.",
+    "coupesDEurope": "Ligue 1 et coupes d’Europe",
+    "titreClubs": "Choisis ton club",
+    "mode": "Sur iPhone ou sur Mac, touche « S’abonner ». Sur Android ou dans Outlook, copie l’adresse de ton club : la marche à suivre est juste en dessous.",
+    "sansClub": "Pas de club de Ligue 1 au programme pour l’instant.",
+    "aVenir": "{n} match à venir",
+    "aVenirPluriel": "{n} matchs à venir",
+    "aucunAVenir": "Pas de match au programme pour l’instant",
+    "sAbonner": "S’abonner",
+    "titreTelephone": "Sur ton téléphone",
+    "telephones": [
+      {
+        "titre": "iPhone, iPad et Mac",
+        "texte": "Touche « S’abonner » sous ton club. Calendrier te demande de confirmer, et c’est fait."
+      },
+      {
+        "titre": "Android et Google Agenda",
+        "texte": "L’abonnement se fait depuis un ordinateur. Sur calendar.google.com, à côté de « Autres agendas », choisis « Ajouter d’autres agendas », puis « À partir de l’URL », et colle l’adresse de ton club. Il arrive ensuite dans Google Agenda, sur ton téléphone. Pour un seul match, touche « Ajouter à mon agenda » sur sa page."
+      },
+      {
+        "titre": "Outlook",
+        "texte": "Choisis « Ajouter un calendrier », puis « S’abonner à partir du web », et colle l’adresse de ton club."
+      }
+    ],
+    "titreDedans": "Ce qu’il y a dedans",
+    "dedans": "Les matchs de ton club au programme de Baromatch : {competitions}.",
+    "horizon": "Ils arrivent quelques semaines à l’avance : pour l’instant, jusqu’au {jour}.",
+    "manque": {
+      "tout": "Pas de Coupe de France ni de match amical pour l’instant.",
+      "coupe": "Pas de Coupe de France pour l’instant.",
+      "amical": "Pas de match amical pour l’instant."
+    },
+    "efface": "Un match passé s’efface. Un match reporté ou annulé reste sept jours, marqué comme tel, puis s’efface.",
+    "heures": "Les heures sont celles de Paris. En voyage, ton téléphone les montre à l’heure d’où tu es.",
+    "retour": "Les matchs de la semaine"
+  },
+  "match": {
+    "ajouter": "Ajouter à mon agenda",
+    "suis": "Suis ton club dans ton agenda :"
+  },
+  "fichier": {
+    "nom": "{club} · Baromatch",
+    "description": "{club} : les matchs au programme de Baromatch ({competitions}), à l’heure de Paris, pour l’instant jusqu’au {jour}.",
+    "descriptionSansMatch": "{club} : pas de match au programme de Baromatch pour l’instant. Les prochains arrivent ici dès qu’ils y sont.",
+    "descriptionParti": "{club} n’est plus au programme de Baromatch en Ligue 1 : cet agenda ne reçoit plus de match.",
+    "reporteOuAnnule": "Un match reporté ou annulé reste sept jours, marqué comme tel.",
+    "heureAConfirmer": "{match} (heure à confirmer)",
+    "statuts": {
+      "reporte": "Reporté : {match}",
+      "annule": "Annulé : {match}",
+      "retire": "Plus au programme : {match}"
+    },
+    "statutsSuite": {
+      "reporte": "Match reporté.",
+      "annule": "Match annulé.",
+      "retire": "Ce match n’est plus au programme."
+    },
+    "coupDEnvoi": "Coup d’envoi {jour} à {heure}, heure de Paris.",
+    "jourSansHeure": "Le {jour}. Le coup d’envoi n’est pas encore fixé : l’heure peut changer.",
+    "barsUneVille": "{bars} le {diffuse} à {ville} sur Baromatch",
+    "barsPlusieursVilles": "{bars} le diffusent sur Baromatch ({villes})",
+    "pageDuMatch": "La page du match : {adresse}"
+  }
+}

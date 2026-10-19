@@ -1,0 +1,91 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+X-WR-CALNAME:Monaco · Baromatch
+X-WR-CALDESC:Monaco : les matchs au programme de Baromatch (Ligue 1 et Lig
+ ue Conférence)\, à l’heure de Paris\, pour l’instant jusqu’au dima
+ nche 8 novembre. Pas de Coupe de France ni de match amical pour l’instan
+ t. Un match reporté ou annulé reste sept jours\, marqué comme tel. http
+ s://baromatch.fr/agenda/
+X-PUBLISHED-TTL:PT6H
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+BEGIN:VEVENT
+UID:match-012@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261018T151500Z
+DTEND:20261018T171500Z
+SUMMARY:Lorient – Monaco
+DESCRIPTION:Ligue 1 · FC Lorient – AS Monaco\nCoup d’envoi dimanche 18
+  octobre à 17:15\, heure de Paris.\nLa page du match : https://baromatch
+ .fr/matchs/lorient-monaco-2026-10-18/
+URL:https://baromatch.fr/matchs/lorient-monaco-2026-10-18/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-024@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261022T190000Z
+DTEND:20261022T210000Z
+SUMMARY:Monaco – Fribourg
+DESCRIPTION:Ligue Conférence · AS Monaco – SC Freiburg\nCoup d’envoi 
+ jeudi 22 octobre à 21:00\, heure de Paris.\nLa page du match : https://b
+ aromatch.fr/matchs/monaco-fribourg-2026-10-22/
+URL:https://baromatch.fr/matchs/monaco-fribourg-2026-10-22/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-035@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261025T140000Z
+DTEND:20261025T160000Z
+SUMMARY:Monaco – Lille
+DESCRIPTION:Ligue 1 · AS Monaco – LOSC Lille\nCoup d’envoi dimanche 25
+  octobre à 15:00\, heure de Paris.\nLa page du match : https://baromatch
+ .fr/matchs/monaco-lille-2026-10-25/
+URL:https://baromatch.fr/matchs/monaco-lille-2026-10-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-056@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261101T161500Z
+DTEND:20261101T181500Z
+SUMMARY:Paris FC – Monaco
+DESCRIPTION:Ligue 1 · Paris FC – AS Monaco\nCoup d’envoi dimanche 1er 
+ novembre à 17:15\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-066@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261105T200000Z
+DTEND:20261105T220000Z
+SUMMARY:Monaco – Nordsjælland
+DESCRIPTION:Ligue Conférence · AS Monaco – FC Nordsjælland\nCoup d’e
+ nvoi jeudi 5 novembre à 21:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-075@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261108T161500Z
+DTEND:20261108T181500Z
+SUMMARY:Le Mans – Monaco
+DESCRIPTION:Ligue 1 · Le Mans FC – AS Monaco\nCoup d’envoi dimanche 8 
+ novembre à 17:15\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

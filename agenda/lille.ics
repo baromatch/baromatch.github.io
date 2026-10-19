@@ -1,0 +1,91 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+X-WR-CALNAME:Lille · Baromatch
+X-WR-CALDESC:Lille : les matchs au programme de Baromatch (Ligue 1 et Ligu
+ e des champions)\, à l’heure de Paris\, pour l’instant jusqu’au dim
+ anche 8 novembre. Pas de Coupe de France ni de match amical pour l’insta
+ nt. Un match reporté ou annulé reste sept jours\, marqué comme tel. htt
+ ps://baromatch.fr/agenda/
+X-PUBLISHED-TTL:PT6H
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+BEGIN:VEVENT
+UID:match-008@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261017T184500Z
+DTEND:20261017T204500Z
+SUMMARY:Lille – Brest
+DESCRIPTION:Ligue 1 · LOSC Lille – Stade Brestois 29\nCoup d’envoi sam
+ edi 17 octobre à 20:45\, heure de Paris.\nLa page du match : https://bar
+ omatch.fr/matchs/lille-brest-2026-10-17/
+URL:https://baromatch.fr/matchs/lille-brest-2026-10-17/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-020@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261021T164500Z
+DTEND:20261021T184500Z
+SUMMARY:Lille – Galatasaray
+DESCRIPTION:Ligue des champions · LOSC Lille – Galatasaray A.Ş.\nCoup d
+ ’envoi mercredi 21 octobre à 18:45\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/lille-galatasaray-2026-10-21/
+URL:https://baromatch.fr/matchs/lille-galatasaray-2026-10-21/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-035@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261025T140000Z
+DTEND:20261025T160000Z
+SUMMARY:Monaco – Lille
+DESCRIPTION:Ligue 1 · AS Monaco – LOSC Lille\nCoup d’envoi dimanche 25
+  octobre à 15:00\, heure de Paris.\nLa page du match : https://baromatch
+ .fr/matchs/monaco-lille-2026-10-25/
+URL:https://baromatch.fr/matchs/monaco-lille-2026-10-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-044@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261030T200500Z
+DTEND:20261030T220500Z
+SUMMARY:Lille – Lens
+DESCRIPTION:Ligue 1 · LOSC Lille – RC Lens\nCoup d’envoi vendredi 30 o
+ ctobre à 21:05\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-061@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261103T200000Z
+DTEND:20261103T220000Z
+SUMMARY:Bodø/Glimt – Lille
+DESCRIPTION:Ligue des champions · FK Bodø/Glimt – LOSC Lille\nCoup d’
+ envoi mardi 3 novembre à 21:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-072@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261108T140000Z
+DTEND:20261108T160000Z
+SUMMARY:Rennes – Lille
+DESCRIPTION:Ligue 1 · Stade Rennais FC – LOSC Lille\nCoup d’envoi dima
+ nche 8 novembre à 15:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

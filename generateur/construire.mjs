@@ -6,11 +6,12 @@
 // Par défaut : les listes publiques de l’appli, la racine du dépôt, l’heure de la machine.
 // Le passage lit les données, fabrique et contrôle toutes les pages en mémoire (site.mjs), refuse de supprimer d’un
 // coup plus de la moitié des pages déjà publiées, puis écrit seulement ce qui a changé, dans la liste blanche
-// (etat.mjs) : matchs/, regarder-le-match/, bar/, ce-soir/ et sitemap.xml. --changees écrit, une par ligne, les adresses
-// indexables dont le contenu a changé, et celles qui ne sont plus indexables (pour IndexNow).
+// (etat.mjs) : matchs/, regarder-le-match/, bar/, ce-soir/, agenda/ et sitemap.xml. --changees écrit, une par ligne,
+// les adresses indexables dont le contenu a changé, et celles qui ne sont plus indexables (pour IndexNow).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { fabriquerLesAgendas } from './agenda.mjs';
 import { badgeDuBar } from './badge.mjs';
 import { chargerLeRendu } from './images/rendu.mjs';
 import { cheminDeLImage, lesPolices, POIDS_MAX, svgDeLaCarte } from './partage.mjs';
@@ -102,6 +103,11 @@ export const construire = async ({
     }
   }
 
+  // Les agendas (agenda.mjs) : celui de chaque club de Ligue 1 (agenda/<club>.ics), et le fichier de chaque match à
+  // venir, à côté de sa page, même refusée (il ne dépend pas d’elle). L’état garde la version de leurs évènements.
+  const agendas = fabriquerLesAgendas({ donnees: site.donnees, pages: [...site.pages, ...site.refusees], precedent, maintenant });
+  fichiers.push(...agendas.fichiers);
+
   // La prudence : jamais plus de la moitié des pages publiées supprimées d’un coup.
   const nouveaux = new Set([...fichiers.map((f) => f.chemin), ...gardees.map((g) => g.chemin)]);
   const anciennesPages = Object.keys(precedent.pages ?? {}).filter((chemin) => chemin.endsWith('/'));
@@ -112,7 +118,7 @@ export const construire = async ({
   }
 
   const aujourdhui = jourDeParis(maintenant);
-  const etat = nouvelEtat(precedent, fichiers, aujourdhui, gardees, site.donnees.adresses);
+  const etat = nouvelEtat(precedent, fichiers, aujourdhui, gardees, site.donnees.adresses, agendas.evenements);
   const planActuel = existsSync(path.join(sortie, PLAN)) ? readFileSync(path.join(sortie, PLAN), 'utf8') : readFileSync(path.join(racine, PLAN), 'utf8');
   const plan = nouveauPlan(planActuel, etat);
 

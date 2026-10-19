@@ -282,3 +282,31 @@
 .partage [hidden] { display: none; }
 .partage__statut { flex-basis: 100%; margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
 .partage__statut:empty { display: none; }
+
+/* ---------- Ton club dans ton agenda (agenda/, et la tête d’une page de match) ---------- */
+
+/* « Ajouter à mon agenda » et « S’abonner » : une capsule de verre, comme celles du partage (l’ambre reste à l’appel à
+   l’action), de 44 px au moins. Les liens vers l’agenda d’un club et l’adresse d’un agenda se touchent sur 44 px. */
+.regarder-agenda { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin: 20px 0 0; }
+.regarder-agenda__bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  background: var(--verre-fort);
+  box-shadow: var(--verre-reflet);
+  color: var(--texte);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.regarder-agenda__bouton:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
+.regarder-agenda__clubs { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
+.regarder-agenda__clubs a { display: inline-block; padding: 11px 0; font-weight: 650; }
+.regarder-agenda__adresse { margin: 4px 0 0; font-size: 0.9375rem; overflow-wrap: anywhere; }
+.regarder-agenda__adresse a { display: inline-block; padding: 11px 0; color: var(--texte-doux); }
+.regarder-carte .regarder-agenda { margin-top: 12px; }
+.regarder-tete .regarder-chapeau + .regarder-chapeau { margin-top: 8px; }

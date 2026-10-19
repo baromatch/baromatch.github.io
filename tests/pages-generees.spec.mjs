@@ -1,6 +1,7 @@
 // Les pages générées, dans le navigateur : le scénario inventé construit dans un dossier temporaire (avec une copie du
 // site autour, tests/outils/site-genere.mjs) et servi comme GitHub Pages le sert. Sur une page de ville, une page de
-// match, la semaine, une page de bar, « Ce soir » et la page neutre (celle qui remplace une page refusée, refus.mjs) :
+// match, la semaine, une page de bar, « Ce soir », « Ton club dans ton agenda » et la page neutre (celle qui remplace
+// une page refusée, refus.mjs) :
 // aucune violation d’axe à 360 et 1280 px, rien qui dépende de JavaScript (hors du bloc « Partager », que partage.js
 // enrichit), aucun débordement horizontal à 360 px, et chaque lien interne qui répond.
 import { test, expect } from '@playwright/test';
@@ -24,6 +25,7 @@ const PAGES = [
   { chemin: '/regarder-le-match/', nom: 'villes' },
   { chemin: '/matchs/page-neutre/', nom: 'page neutre' },
   { chemin: '/ce-soir/', nom: 'ce soir', partage: true },
+  { chemin: '/agenda/', nom: 'agenda' },
 ];
 
 const portLibre = () => new Promise((resoudre) => {
@@ -158,4 +160,41 @@ test('« Ce soir » au téléphone : le match, le bar et chaque lien seul se tou
     await expect(lien, chemin).toHaveText('Où regarder le match ce soir');
     expect(Math.round((await lien.boundingBox()).height), chemin).toBeGreaterThanOrEqual(44);
   }
+});
+
+test('« Ton club dans ton agenda » : ses boutons et ses liens sur 44 px, chaque agenda servi en text/calendar, chaque lien webcal vers un agenda', async ({ page: onglet, request }) => {
+  await onglet.setViewportSize({ width: 360, height: 800 });
+  const hauteurs = (selecteur) => onglet.locator(selecteur).evaluateAll((liens) => liens.map((a) => Math.round(a.getBoundingClientRect().height)));
+  await onglet.goto(`${serveur.adresse}/agenda/`);
+  for (const selecteur of ['.regarder-agenda__bouton', '.regarder-agenda__adresse a', '.regarder-retour a']) {
+    const mesures = await hauteurs(selecteur);
+    expect(mesures.length, selecteur).toBeGreaterThan(0);
+    expect(mesures.filter((h) => h < 44), selecteur).toEqual([]);
+  }
+  const abonnements = await onglet.locator('a[href^="webcal:"]').evaluateAll((liens) => liens.map((a) => a.getAttribute('href')));
+  const adresses = await onglet.locator('.regarder-agenda__adresse a').evaluateAll((liens) => liens.map((a) => a.getAttribute('href')));
+  expect(abonnements).toHaveLength(10);
+  expect(adresses).toEqual(abonnements.map((lien) => lien.replace('webcal:', 'https:')));
+  for (const lien of abonnements) {
+    const reponse = await request.get(lien.replace('webcal://baromatch.fr', serveur.adresse));
+    expect(reponse.status(), lien).toBe(200);
+    expect(reponse.headers()['content-type'], lien).toMatch(/^text\/calendar/);
+    expect((await reponse.text()).startsWith('BEGIN:VCALENDAR\r\nVERSION:2.0\r\n'), lien).toBe(true);
+  }
+  // La page d’un match à venir : « Ajouter à mon agenda » (44 px), son fichier en text/calendar, l’agenda de ses clubs.
+  await onglet.goto(`${serveur.adresse}/matchs/psg-ol-2026-10-25/`);
+  const bouton = onglet.locator('.regarder-agenda__bouton');
+  await expect(bouton).toHaveText('Ajouter à mon agenda');
+  const boite = await bouton.boundingBox();
+  expect(Math.round(boite.height)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(boite.width)).toBeGreaterThanOrEqual(44);
+  expect((await hauteurs('.regarder-agenda__clubs a')).filter((h) => h < 44)).toEqual([]);
+  const fichier = await request.get(`${serveur.adresse}${await bouton.getAttribute('href')}`);
+  expect(fichier.status()).toBe(200);
+  expect(fichier.headers()['content-type']).toMatch(/^text\/calendar/);
+  // La page d’une ville y mène, par un lien seul de 44 px.
+  await onglet.goto(`${serveur.adresse}/regarder-le-match/paris/`);
+  const lien = onglet.locator('.regarder-suite a[href="/agenda/"]');
+  await expect(lien).toHaveText('Ton club dans ton agenda');
+  expect(Math.round((await lien.boundingBox()).height)).toBeGreaterThanOrEqual(44);
 });

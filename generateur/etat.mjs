@@ -6,7 +6,10 @@
 // générées indexables y sont, avec la date de leur dernier vrai changement.
 // La liste blanche : le générateur n’écrit et n’efface que dans matchs/, regarder-le-match/ et bar/ (des pages, des
 // badges, des images de partage), et ne touche en dehors qu’à ce-soir/ (sa page et son image) et à sitemap.xml. Tout
-// autre chemin est refusé, avant toute écriture.
+// autre chemin est refusé, avant toute écriture. Les agendas (agenda.mjs) : agenda/ (sa page et l’agenda de chaque
+// club) et le fichier d’agenda de chaque match, à côté de sa page (matchs/<match>/match.ics).
+// L’état garde aussi la mémoire des évènements des agendas (evenements) : leur version et l’instant de leur dernier
+// changement.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -15,7 +18,7 @@ import { ORIGINE } from './jsonld.mjs';
 export const FICHIER_ETAT = 'regarder-le-match/etat.json';
 export const PLAN = 'sitemap.xml';
 const DOSSIERS = ['matchs', 'regarder-le-match', 'bar'];
-const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)|ce-soir\/(?:index\.html|partage\.png))$/;
+const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)|ce-soir\/(?:index\.html|partage\.png)|matchs\/[a-z0-9-]+\/match\.ics|agenda\/(?:index\.html|[a-z0-9-]+\.ics))$/;
 
 export const estPermis = (relatif) => relatif === PLAN || relatif === FICHIER_ETAT || (PERMIS.test(relatif) && !relatif.split('/').includes('..'));
 
@@ -31,8 +34,9 @@ export const empreinte = (texte) => createHash('sha256').update(texte).digest().
 // ---------- Lire et écrire, dans la liste blanche seulement ----------
 
 const lireSiPresent = (fichier) => (existsSync(fichier) ? readFileSync(fichier, 'utf8') : null);
-// Une copie de travail sous Windows peut avoir des fins de ligne CRLF : le même contenu n’est pas réécrit.
-const memeContenu = (a, b) => a !== null && a.replace(/\r\n/g, '\n') === b;
+// Une copie de travail sous Windows peut avoir des fins de ligne CRLF : le même contenu n’est pas réécrit. Un agenda
+// (.ics) s’écrit en CRLF : le même, octet pour octet, n’est pas réécrit non plus.
+const memeContenu = (a, b) => a !== null && (a === b || a.replace(/\r\n/g, '\n') === b);
 // Une image (des octets) : la même, octet pour octet.
 const memesOctets = (fichier, octets) => existsSync(fichier) && readFileSync(fichier).equals(octets);
 
@@ -95,7 +99,8 @@ export const anciensDe = (etat) => {
 // quels, ou { chemin, entree } avec l’entrée à écrire (la date depuis laquelle elle est gardée).
 // adresses : les adresses de page données aux bars ({ adresse: identifiant }), gardées d’un passage à l’autre.
 // Chaque page dit quels bars elle nomme (bars : leurs identifiants), et si elle est la page neutre (repli).
-export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adresses = {}) => {
+// evenements : la mémoire des évènements des agendas (agenda.mjs), gardée telle quelle.
+export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adresses = {}, evenements = null) => {
   const pages = {};
   const tous = [...fichiers, ...gardees.map((g) => (typeof g === 'string' ? { chemin: g, garde: true } : { ...g, garde: true }))];
   for (const f of tous.sort((a, b) => a.chemin.localeCompare(b.chemin))) {
@@ -124,6 +129,7 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adress
     _lisezMoi: 'L’état du générateur des pages des matchs : il l’écrit à chaque passage, ne le modifie pas à la main. Pour chaque fichier, sa sorte, son match ou son bar, les bars qu’il nomme (leurs identifiants), l’empreinte de son contenu, la date de son dernier vrai changement (celle du plan du site) et s’il est indexable ; et l’adresse de page de chaque bar publié, qu’aucun autre ne reprend. Un bar qui n’est plus publié sort de ces adresses au passage suivant ; l’adresse de sa page reste seulement le temps de sa page « n’est plus sur Baromatch » (30 jours).',
     pages,
     adresses,
+    ...(evenements ? { evenements } : {}),
   };
 };
 
@@ -131,7 +137,7 @@ export const texteDeLEtat = (etat) => `${JSON.stringify(etat, null, 1)}\n`;
 
 // ---------- Le plan du site ----------
 
-const GENEREE = new RegExp(`<loc>${ORIGINE.replace(/\./g, '\\.')}/(?:matchs|regarder-le-match|bar|ce-soir)/`);
+const GENEREE = new RegExp(`<loc>${ORIGINE.replace(/\./g, '\\.')}/(?:matchs|regarder-le-match|bar|ce-soir|agenda)/`);
 
 export const nouveauPlan = (ancien, etat) => {
   const lignes = ancien.replace(/\r\n/g, '\n').split('\n');

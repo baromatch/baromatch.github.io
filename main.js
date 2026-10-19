@@ -138,11 +138,14 @@
     afficher(TEXTES.messagerie, "ok");
   }
 
+  // Une inscription réussie se dit aussi à la mesure d’audience (mesure.js, si elle est active) : seulement qu’elle a
+  // eu lieu, ni l’adresse ni la ville.
   function inscrire(courriel, ville) {
     inscrite = courriel;
     villeInscrite = ville;
     afficher(TEXTES.inscrite(courriel, ville), "ok");
     aller("inscrite");
+    document.dispatchEvent(new CustomEvent("baromatch:compter", { detail: "liste-attente" }));
   }
 
   form.addEventListener("submit", function (event) {

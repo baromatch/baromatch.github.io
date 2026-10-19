@@ -19,5 +19,10 @@
     "ouverte": false,
     "android": "",
     "iphone": ""
+  },
+  "mesure": {
+    "_lisezMoi": "La mesure d’audience du site, sans cookie. Vide, rien n’est compté et aucune page ne charge de compteur. Pour l’activer, colle entre les guillemets de « code » le code de ton compte GoatCounter (ce qui est avant « .goatcounter.com », par exemple \"baromatch\") : au passage suivant de l’Action, chaque page compte ses visites, et la page Confidentialité le dit. Pour l’arrêter, vide-le.",
+    "outil": "goatcounter",
+    "code": ""
   }
 }

@@ -884,7 +884,8 @@
     montrerLaCase();
   }
 
-  // `partie` : la demande est partie d’ici, son brouillon s’efface ; sinon (le piège), il reste dans l’onglet.
+  // `partie` : la demande est partie d’ici, son brouillon s’efface, et la mesure d’audience (mesure.js, si elle est
+  // active) apprend seulement qu’une demande est partie ; sinon (le piège), il reste dans l’onglet.
   function reussite(demande, partie) {
     derniereDemande = demande;
     if (partie) {
@@ -892,6 +893,7 @@
         moment: horloge.now(), corps: JSON.stringify(demande) };
       garderPartie(derniereReussite);
       effacerBrouillon();
+      document.dispatchEvent(new CustomEvent("baromatch:compter", { detail: "proposer-mon-bar" }));
     }
     form.reset();
     cacherResume();

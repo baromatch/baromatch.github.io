@@ -11,9 +11,12 @@
 # pages, ou de perdre d’un coup les bars ou les soirées (liste vide) ou plus de la moitié des bars ou des matchs à
 # venir publiés (liste tronquée) ; si c’est voulu (après une longue pause, par exemple), relance-la à la main en
 # cochant la case.
-# Seuls matchs/, regarder-le-match/, bar/, ce-soir/ et sitemap.xml sont enregistrés, avec un message clair, puis envoyés sur
-# main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
-# elle-même (d’où « pages: write »), puis prévient IndexNow des adresses indexables qui ont changé.
+# La mesure d’audience (« mesure » dans marque.json) : l’Action l’applique aussi aux pages écrites à la main
+# (generateur/mesure.mjs : leur politique de sécurité, la ligne de /mesure.js, et le bloc de la page Confidentialité).
+# Seuls matchs/, regarder-le-match/, bar/, ce-soir/, sitemap.xml et les pages que la mesure a réécrites sont
+# enregistrés, avec un message clair, puis envoyés sur main. Un envoi fait par le jeton de l’Action ne lance pas la
+# publication de GitHub Pages : l’Action la demande elle-même (d’où « pages: write »), puis prévient IndexNow des
+# adresses indexables qui ont changé.
 # GitHub met en pause les Actions planifiées d’un dépôt public après 60 jours sans activité : ses propres envois
 # comptent comme activité, mais si rien ne change pendant 60 jours, relance-la à la main.
 name: Pages des matchs
@@ -79,6 +82,9 @@ jobs:
 
       - name: Construire et contrôler les pages
         run: |
+          # D’abord la mesure d’audience : vide, elle ne réécrit rien ; remplie (ou vidée de nouveau), elle réécrit les
+          # pages écrites à la main, et seulement ce qui la concerne. Un code illisible arrête l’Action avant toute écriture.
+          node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"
           option=""
           if [ "$ACCEPTER" = "true" ]; then option="--accepter-les-suppressions"; fi
           node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option
@@ -99,13 +105,17 @@ jobs:
             entete="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$JETON_GITHUB" | base64 -w0)"
             git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main
           }
-          # Seulement les chemins du générateur, même si un autre fichier avait changé.
+          # Seulement les chemins du générateur et les pages que la mesure a réécrites (leur liste, écrite par
+          # generateur/mesure.mjs), même si un autre fichier avait changé.
+          mesure="$RUNNER_TEMP/mesure.txt"
+          [ -e "$mesure" ] || : > "$mesure"
           enregistrer() {
             for chemin in matchs regarder-le-match bar ce-soir sitemap.xml; do
               if [ -e "$chemin" ] || [ -n "$(git ls-files -- "$chemin")" ]; then git add -A -- "$chemin"; fi
             done
+            if [ -s "$mesure" ]; then xargs -d '\n' -a "$mesure" git add --; fi
             if git diff --cached --quiet; then return 1; fi
-            if git diff --cached --name-only | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir)/|^sitemap\.xml$'; then
+            if git diff --cached --name-only | grep -vxF -f "$mesure" | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir)/|^sitemap\.xml$'; then
               echo "::error::Un fichier hors de la liste blanche du générateur allait être enregistré."
               exit 1
             fi
@@ -128,6 +138,7 @@ jobs:
               git rebase --abort || true
               git fetch -q origin main
               git reset -q --hard FETCH_HEAD
+              env -u JETON_GITHUB node generateur/mesure.mjs --ecrites="$mesure"
               env -u JETON_GITHUB node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option
               if ! enregistrer; then
                 echo "envoye=non" >> "$GITHUB_OUTPUT"

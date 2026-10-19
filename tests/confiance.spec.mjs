@@ -139,3 +139,66 @@ test('les pages générées ont le pied de page commun, avec « À propos » et 
     expect(liens, p.chemin).toEqual(PIED);
   }
 });
+
+// La FAQ des fans sur l’accueil : chaque question visible est dans la FAQ balisée (une seule FAQPage), mot pour mot et
+// dans l’ordre ; chaque réponse dit la règle de l’appli à un niveau certain. Tant que l’appli n’est pas ouverte, la
+// première réponse le dit, et mène à la liste d’attente.
+test.describe('accueil : la FAQ des fans', () => {
+  const lireLaFaq = async (page) => {
+    await page.goto('/');
+    const noeuds = await graphe(page);
+    const faqs = noeuds.filter((n) => n['@type'] === 'FAQPage');
+    const visibles = await page.$$eval('.questions-fans details', (liste) => liste.map((details) => ({
+      question: details.querySelector('summary').textContent,
+      reponse: [...details.children].filter((e) => e.tagName !== 'SUMMARY').map((e) => e.textContent).join(' '),
+    })));
+    return { faqs, visibles: visibles.map((v) => [v.question, v.reponse].map(normaliser)) };
+  };
+
+  test('une seule FAQPage, qui répète mot pour mot chaque question et chaque réponse de la page, dans l’ordre', async ({ page }) => {
+    const { faqs, visibles } = await lireLaFaq(page);
+    expect(faqs).toHaveLength(1);
+    const [faq] = faqs;
+    expect(faq.url).toBe(`${ORIGINE}/`);
+    expect(faq.name).toBe(await page.title());
+    expect(faq.isPartOf['@id']).toBe(`${ORIGINE}/#site`);
+    expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text].map(normaliser))).toEqual(visibles);
+    expect(visibles.map(([question]) => question)).toEqual([
+      'Je peux déjà garder une place ?',
+      'C’est gratuit ?',
+      'Il faut un compte ?',
+      'Je peux venir avec des potes ?',
+      'Ma place est vraiment gardée ?',
+      'Et si j’arrive en retard ?',
+      'Comment j’annule ma place ?',
+      'Dans quelles villes ?',
+    ]);
+    for (const [, reponse] of visibles) expect(reponse).not.toContain('!');
+  });
+
+  test('les réponses disent les règles de l’appli : gratuit, code de 6 chiffres, 1 à 8, 30 minutes au plus, Paris', async ({ page }) => {
+    const { visibles } = await lireLaFaq(page);
+    const reponse = (debut) => visibles.find(([question]) => question.startsWith(debut))[1];
+    if (!MARQUE.appli.ouverte) {
+      expect(reponse('Je peux déjà')).toMatch(/^Pas encore\. Baromatch est en test sur Android, à Paris/);
+      await expect(page.locator('.questions-fans a[href="#attente"]')).toHaveText('Laisse ton adresse');
+    }
+    expect(reponse('C’est gratuit')).toMatch(/^Oui\..*Ce que tu prends au bar, tu le paies au bar\.$/);
+    expect(reponse('Il faut un compte')).toContain('code de 6 chiffres, valable 10 minutes');
+    expect(reponse('Il faut un compte')).toContain('18 ans ou plus');
+    expect(reponse('Je peux venir')).toContain('de 1 à 8');
+    expect(reponse('Et si j’arrive')).toContain('jusqu’à 30 minutes après le coup d’envoi au plus');
+    expect(reponse('Et si j’arrive')).toContain('15 minutes après, ou le coup d’envoi lui-même');
+    expect(reponse('Comment j’annule')).toContain('« Je ne viens plus », puis « Libérer »');
+    expect(reponse('Dans quelles villes')).toMatch(/^À Paris/);
+  });
+
+  test('les questions se déplient au clavier, et la réponse se lit', async ({ page }) => {
+    await page.goto('/');
+    const premiere = page.locator('.questions-fans summary').nth(1);
+    await premiere.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.questions-fans details').nth(1)).toHaveAttribute('open', '');
+    await expect(page.locator('.questions-fans details').nth(1).locator('p')).toBeVisible();
+  });
+});

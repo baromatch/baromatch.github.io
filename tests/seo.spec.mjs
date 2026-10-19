@@ -26,7 +26,7 @@ const TITRES_CHOISIS = {
 };
 const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html'];
 const TYPES_ATTENDUS = {
-  '/': ['Organization', 'WebSite', 'MobileApplication'],
+  '/': ['Organization', 'WebSite', 'MobileApplication', 'FAQPage'],
   '/boutique.html': ['FAQPage'],
   '/cgu.html': ['WebPage'],
   '/confidentialite.html': ['WebPage'],

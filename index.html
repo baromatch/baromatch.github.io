@@ -47,7 +47,18 @@
    "publisher": {"@id": "https://baromatch.fr/#organisation"}},
   {"@type": "MobileApplication", "@id": "https://baromatch.fr/#appli", "name": "Baromatch",
    "description": "Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.",
-   "applicationCategory": "LifestyleApplication", "inLanguage": "fr", "publisher": {"@id": "https://baromatch.fr/#organisation"}}
+   "applicationCategory": "LifestyleApplication", "inLanguage": "fr", "publisher": {"@id": "https://baromatch.fr/#organisation"}},
+  {"@type": "FAQPage", "@id": "https://baromatch.fr/#questions", "url": "https://baromatch.fr/", "name": "Baromatch — Trouve un bar qui diffuse ton match, à Paris", "inLanguage": "fr-FR",
+   "isPartOf": {"@id": "https://baromatch.fr/#site"}, "mainEntity": [
+    {"@type": "Question", "name": "Je peux déjà garder une place\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pas encore. Baromatch est en test sur Android, à Paris, et n’est pas encore ouvert au public. Laisse ton adresse\u00a0: on te prévient le jour où l’appli ouvre."}},
+    {"@type": "Question", "name": "C’est gratuit\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar."}},
+    {"@type": "Question", "name": "Il faut un compte\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour regarder les matchs et les bars, non. Pour garder une place, oui\u00a0: ton adresse e-mail suffit. Pas de mot de passe\u00a0: on t’envoie un code de 6\u00a0chiffres, valable 10\u00a0minutes. Il faut avoir 18\u00a0ans ou plus."}},
+    {"@type": "Question", "name": "Je peux venir avec des potes\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée\u00a0: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass\u00a0; pour les autres, ton pass compte à la porte."}},
+    {"@type": "Question", "name": "Ma place est vraiment gardée\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch\u00a0: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde."}},
+    {"@type": "Question", "name": "Et si j’arrive en retard\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Ta place est gardée jusqu’à 30\u00a0minutes après le coup d’envoi au plus. Le bar peut choisir moins\u00a0: 15\u00a0minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan."}},
+    {"@type": "Question", "name": "Comment j’annule ma place\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Dans l’appli, ouvre l’onglet «\u00a0Ta soirée\u00a0», touche «\u00a0Je ne viens plus\u00a0», puis «\u00a0Libérer\u00a0». Tu peux le faire jusqu’au dernier moment\u00a0: ta place repart à quelqu’un d’autre."}},
+    {"@type": "Question", "name": "Dans quelles villes\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "À Paris, pour commencer\u00a0: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes."}}
+  ]}
 ]}
 </script>
 </head>
@@ -149,6 +160,42 @@
         <p class="etape__texte">Chaque soirée validée devient un sous-bock, le souvenir du match, du bar et de la date, dans ton album.</p>
       </li>
     </ol>
+  </section>
+
+  <section class="questions-fans page" id="questions" aria-labelledby="titre-questions-fans">
+    <h2 class="titre-section" id="titre-questions-fans">Tes questions</h2>
+    <details>
+      <summary>Je peux déjà garder une place&nbsp;?</summary>
+      <p>Pas encore. Baromatch est en test sur Android, à Paris, et n’est pas encore ouvert au public. <a href="#attente">Laisse ton adresse</a>&nbsp;: on te prévient le jour où l’appli ouvre.</p>
+    </details>
+    <details>
+      <summary>C’est gratuit&nbsp;?</summary>
+      <p>Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar.</p>
+    </details>
+    <details>
+      <summary>Il faut un compte&nbsp;?</summary>
+      <p>Pour regarder les matchs et les bars, non. Pour garder une place, oui&nbsp;: ton adresse e-mail suffit. Pas de mot de passe&nbsp;: on t’envoie un code de 6&nbsp;chiffres, valable 10&nbsp;minutes. Il faut avoir 18&nbsp;ans ou plus.</p>
+    </details>
+    <details>
+      <summary>Je peux venir avec des potes&nbsp;?</summary>
+      <p>Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée&nbsp;: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass&nbsp;; pour les autres, ton pass compte à la porte.</p>
+    </details>
+    <details>
+      <summary>Ma place est vraiment gardée&nbsp;?</summary>
+      <p>Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch&nbsp;: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde.</p>
+    </details>
+    <details>
+      <summary>Et si j’arrive en retard&nbsp;?</summary>
+      <p>Ta place est gardée jusqu’à 30&nbsp;minutes après le coup d’envoi au plus. Le bar peut choisir moins&nbsp;: 15&nbsp;minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan.</p>
+    </details>
+    <details>
+      <summary>Comment j’annule ma place&nbsp;?</summary>
+      <p>Dans l’appli, ouvre l’onglet «&nbsp;Ta soirée&nbsp;», touche «&nbsp;Je ne viens plus&nbsp;», puis «&nbsp;Libérer&nbsp;». Tu peux le faire jusqu’au dernier moment&nbsp;: ta place repart à quelqu’un d’autre.</p>
+    </details>
+    <details>
+      <summary>Dans quelles villes&nbsp;?</summary>
+      <p>À Paris, pour commencer&nbsp;: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes.</p>
+    </details>
   </section>
 
   <section class="vitrine-accueil page" aria-labelledby="titre-boutique">

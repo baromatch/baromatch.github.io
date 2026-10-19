@@ -1,8 +1,8 @@
 // Loi Evin : le mot qui, dans le texte d’une offre de bar, nomme un alcool. La liste et la lecture sont celles de
-// l’appli (apps/api/src/modules/bars/offerAlcohol.ts du dépôt de l’appli, décision du 12 octobre 2026 : mots entiers,
-// sans accents ni capitales, pluriel compris ; « sans alcool » dit de la boisson est la seule échappatoire, « demi »
-// avant « tarif » ou « heure » n’est pas une boisson, ni « rouge » après « carton »). Le site y ajoute quelques mots
-// d’argot que l’appli n’a pas : la liste ne peut qu’écarter plus d’offres, jamais moins.
+// l’appli (décision du 12 octobre 2026 : mots entiers, sans accents ni capitales, pluriel compris ; « sans alcool » dit
+// de la boisson est la seule échappatoire, « demi » avant « tarif » ou « heure » n’est pas une boisson, ni « rouge »
+// après « carton »). Le site y ajoute quelques mots d’argot que l’appli n’a pas : la liste ne peut qu’écarter plus
+// d’offres, jamais moins.
 // Sur le site, une offre dont le texte nomme un alcool ne montre ni son titre ni son prix (donnees.mjs).
 
 // La liste de l’appli, dans son ordre (relue le 19 octobre 2026). Une mise à jour de l’appli se recopie ici.

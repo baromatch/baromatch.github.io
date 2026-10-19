@@ -285,7 +285,7 @@ test.describe('les données', () => {
   });
 
   test('loi Evin : une offre qui nomme un alcool, ou qui parle d’une remise ou d’une gratuité, ne montre ni son titre ni son prix', async () => {
-    // Les mots de l’appli, lus comme elle (les cas de son offerAlcohol.test.ts) : seul « sans alcool » y échappe.
+    // Les mots de l’appli, lus comme elle (les cas de ses propres tests) : seul « sans alcool » y échappe.
     const casDeLAppli = [
       ['Pinte 5 €', 'Pinte'], ['La pinte à 5 €', 'pinte'], ['2 DEMIS achetés, le 3e offert', 'DEMIS'], ['Bière pression 4 €', 'Bière'],
       ['biere a 4 euros', 'biere'], ['Verre de vin rouge', 'vin'], ['Rosé bien frais', 'Rosé'], ['Coupe de champagne si Paris gagne', 'champagne'],

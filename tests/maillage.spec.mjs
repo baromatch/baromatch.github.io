@@ -1,10 +1,11 @@
 // Le maillage des pages générées, sur deux sites construits de bout en bout : la capture enregistrée de l’appli (des
 // matchs, aucun bar publié : la réalité d’aujourd’hui) et le scénario inventé (de vrais bars dans trois villes : celle
-// de demain). Les règles valent pour toute page que le générateur écrit (elles lisent son état, etat.json), y compris
-// celles qu’il écrira plus tard :
+// de demain), puis ce même scénario repassé trois jours plus tard (des matchs passés). Les règles valent pour toute page
+// que le générateur écrit (elles lisent son état, etat.json : les pages en anglais, agenda/ et les affiches comprises), y
+// compris celles qu’il écrira plus tard :
 // - aucun lien interne vers une page ou une ancre qui n’existe pas ;
 // - chaque page générée se rejoint par des liens depuis l’accueil, sauf celles qui ne restent que pour les anciens liens
-//   (un match passé, un bar parti, une page neutre), en noindex ;
+//   (un match passé, en français comme en anglais, un bar parti, une page neutre), en noindex ;
 // - un match et ses bars se lient dans les deux sens, comme un bar et sa ville, une ville et ses matchs ; chaque ville
 //   mène à « Ce soir » ; la semaine mène à chaque match à venir qui a sa page ; l’index des villes, à chaque ville ;
 // - le plan du site et IndexNow ne donnent que des pages indexables (et chaque page indexable est dans le plan, sauf
@@ -18,7 +19,8 @@ import {
   CAPTURE, MAINTENANT_DE_LA_CAPTURE, MAINTENANT_DU_SCENARIO, PUBLIES_DU_SCENARIO, SCENARIO, construireLeSiteDExemple, contenuDuScenario,
 } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
-import { DUREE_MATCH_MS } from '../generateur/donnees.mjs';
+import { construire } from '../generateur/construire.mjs';
+import { DUREE_MATCH_MS, JOUR_MS } from '../generateur/donnees.mjs';
 import { estPermis, fichierDuChemin } from '../generateur/etat.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
@@ -46,6 +48,9 @@ const SITES = [
       return scenario;
     },
   },
+  // Le scénario, puis un second passage dans le même dossier trois jours plus tard : des pages de matchs passés (« Ce
+  // match est passé », « This match has been played »), en noindex, que plus rien ne cherche à rejoindre.
+  { nom: 'le scénario, trois jours plus tard (des matchs passés)', options: { maintenant: MAINTENANT_DU_SCENARIO }, ensuite: MAINTENANT_DU_SCENARIO + 3 * JOUR_MS },
 ];
 
 const decoder = (texte) => texte.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, '\'');
@@ -75,6 +80,9 @@ const pagesDu = (dossier) => {
 
 for (const site of SITES) {
   test.describe(site.nom, () => {
+    // L’heure du dernier passage ; avant : l’état du passage d’avant, s’il y en a un.
+    const maintenant = site.ensuite ?? site.options.maintenant;
+    let avant = null;
     let dossier;
     let resultat;
     let pages;
@@ -91,6 +99,12 @@ for (const site of SITES) {
         writeFileSync(options.source.slice('scenario:'.length), JSON.stringify(site.charger(JSON.parse(readFileSync(SCENARIO, 'utf8')))));
       }
       resultat = await construireLeSiteDExemple(dossier, options);
+      if (site.ensuite) {
+        avant = resultat.etat;
+        resultat = await construire({
+          source: options.source ?? `scenario:${SCENARIO}`, sortie: dossier, maintenant: site.ensuite, racine, contenu: options.contenu ?? contenuDuScenario(), rendu: null,
+        });
+      }
       pages = pagesDu(dossier);
       etat = resultat.etat;
       generees = Object.entries(etat.pages).filter(([chemin]) => chemin.endsWith('/')).map(([chemin, p]) => ({ chemin, ...p }));
@@ -99,10 +113,17 @@ for (const site of SITES) {
       if (dossier) rmSync(dossier, { recursive: true, force: true });
     });
 
-    // Une page qui ne reste que pour les anciens liens : un match passé (ou qui n’est plus au programme), un bar parti,
-    // une page neutre. Elle dit noindex, et rien ne la cherche à la rejoindre.
+    // Une page qui ne reste que pour les anciens liens : un match passé (ou qui n’est plus au programme), en français
+    // comme en anglais, un bar parti, une page neutre. Elle dit noindex, et rien ne la cherche à la rejoindre.
     const pourLesAnciensLiens = (p) => p.repli || (p.type === 'bar' && p.memoire?.disparu)
-      || (p.type === 'match' && (Date.parse(p.memoire.debut) + DUREE_MATCH_MS <= site.options.maintenant || !pages.get(p.chemin).includes('id="titre-bars"')));
+      || (['match', 'match-en'].includes(p.type) && (Date.parse(p.memoire?.debut ?? p.date) + DUREE_MATCH_MS <= maintenant || !pages.get(p.chemin).includes('id="titre-bars"')));
+
+    test('les pages en anglais, agenda/ et les affiches sont parmi les pages vérifiées', () => {
+      const sortes = new Set(generees.map((p) => p.type));
+      const avecDesBars = generees.some((p) => p.type === 'bar' && !p.memoire?.disparu);
+      for (const sorte of ['agenda', 'affiche', 'guide-en', 'match-en', ...(avecDesBars ? ['affiche-bar'] : [])]) expect(sortes.has(sorte), sorte).toBe(true);
+      expect(generees.filter((p) => pourLesAnciensLiens(p) && p.indexable).map((p) => p.chemin)).toEqual([]);
+    });
 
     test('aucun lien d’une page générée vers une page ou une ancre absente', () => {
       expect(generees.length).toBeGreaterThan(5);
@@ -162,7 +183,7 @@ for (const site of SITES) {
     });
 
     test('la semaine mène à chaque match à venir qui a sa page', () => {
-      const aVenir = generees.filter((p) => p.type === 'match' && Date.parse(p.memoire.debut) + DUREE_MATCH_MS > site.options.maintenant
+      const aVenir = generees.filter((p) => p.type === 'match' && Date.parse(p.memoire.debut) + DUREE_MATCH_MS > maintenant
         && pages.get(p.chemin).includes('id="titre-bars"'));
       expect(aVenir.length).toBeGreaterThan(0);
       const semaine = liensDeLaPage('/matchs/');
@@ -177,10 +198,11 @@ for (const site of SITES) {
       const indexables = generees.filter((p) => p.indexable && !p.horsPlan).map((p) => p.chemin);
       expect(indexables.filter((chemin) => !plan.includes(chemin))).toEqual([]);
       for (const p of generees) expect(indexable(pages.get(p.chemin)), p.chemin).toBe(Boolean(p.indexable));
-      // Un premier passage : IndexNow ne reçoit que les pages indexables, toutes.
+      // IndexNow ne reçoit que les pages indexables, et celles qui l’étaient au passage d’avant (pour que les moteurs les
+      // relisent) ; au premier passage, toutes les pages indexables.
       const changees = resultat.changees.map((adresse) => new URL(adresse).pathname);
-      expect(changees.filter((chemin) => !etat.pages[chemin]?.indexable)).toEqual([]);
-      expect(generees.filter((p) => p.indexable).map((p) => p.chemin).filter((chemin) => !changees.includes(chemin))).toEqual([]);
+      expect(changees.filter((chemin) => !etat.pages[chemin]?.indexable && !avant?.pages[chemin]?.indexable)).toEqual([]);
+      if (!avant) expect(generees.filter((p) => p.indexable).map((p) => p.chemin).filter((chemin) => !changees.includes(chemin))).toEqual([]);
     });
   });
 }

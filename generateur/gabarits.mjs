@@ -123,9 +123,9 @@ const prix = (centimes) => {
   return `${euros}${reste ? `,${String(reste).padStart(2, '0')}` : ''} €`;
 };
 
-// L’offre d’une soirée (loi Evin) : telle que le bar l’a écrite, avec son heure limite, si elle est sans alcool ; sinon
-// « Une offre du bar dans l’appli », sans titre ni prix. La mention santé reste dessous dès qu’une offre affichée parle
-// d’alcool (le filet de sécurité).
+// L’offre d’une soirée (loi Evin) : telle que le bar l’a écrite, avec son heure limite, si elle est sans alcool et n’en
+// nomme aucun ; sinon « Une offre du bar dans l’appli », sans titre ni prix (donnees.mjs). Rien d’alcoolisé n’est
+// écrit : aucune mention santé à mettre dessous.
 export const offre = (o, textes) => {
   if (!o) return '';
   if (o.dansLAppli) {
@@ -136,7 +136,7 @@ export const offre = (o, textes) => {
   const suite = [o.prixCentimes !== null ? prix(o.prixCentimes) : null, o.jusqua ? textes.offre.jusqua.replace('{heure}', heureDeParis(o.jusqua)) : null].filter(Boolean);
   return `<div class="regarder-offre">
         <p class="regarder-offre__texte"><span class="regarder-offre__etiquette">${e(textes.offre.etiquette)}</span> ${e(o.titre)}${suite.map((s) => ` · ${e(s)}`).join('')}</p>
-${o.alcool ? `        <p class="regarder-offre__sante">${e(textes.mentionSante)}</p>\n` : ''}      </div>`;
+      </div>`;
 };
 
 // Ce que le bar dit de lui, et rien de plus.

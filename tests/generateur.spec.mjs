@@ -11,7 +11,8 @@ import { racine } from './outils/environnement.mjs';
 import { contenuDuScenario, PUBLIES_DU_SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { lireLaSource } from '../generateur/sources.mjs';
-import { arrondissementDe, clubDe, indexerLesClubs, lireLAdresse, offreInterdite, preparer, raisonDEcarter, villeDe } from '../generateur/donnees.mjs';
+import { arrondissementDe, clubDe, indexerLesClubs, lireLAdresse, nomInterdit, offreInterdite, preparer, raisonDEcarter, villeDe } from '../generateur/donnees.mjs';
+import { motDAlcool } from '../generateur/alcool.mjs';
 import { isoDeParis, jourDeParis, quandEnLettres } from '../generateur/heure.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { SEUILS } from '../generateur/pages.mjs';
@@ -251,7 +252,7 @@ test.describe('les données', () => {
     // Loi Evin : une offre avec alcool (ou sans hasAlcohol à false) ne se publie pas ; à sa place, « Une offre du bar
     // dans l’appli », sans titre ni prix. Seule une offre que le bar dit sans alcool se montre, avec son heure limite.
     expect(offre('Le Zinc des Amis', 'psg-ol-2026-10-25')).toEqual({ dansLAppli: true });
-    expect(offre('Le Comptoir du Canal', 'psg-barca-2026-10-24')).toEqual({ titre: 'Menu burger et boisson fraîche', prixCentimes: 1500, jusqua: Date.parse('2026-10-24T18:00:00.000Z'), alcool: false });
+    expect(offre('Le Comptoir du Canal', 'psg-barca-2026-10-24')).toEqual({ titre: 'Menu burger et boisson fraîche', prixCentimes: 1500, jusqua: Date.parse('2026-10-24T18:00:00.000Z') });
     expect(offre('Le Comptoir du Canal', 'le-havre-psg-2026-10-30')).toEqual({ dansLAppli: true });
     const sansMot = await lireLaSource(`scenario:${SCENARIO}`);
     const burger = sansMot.matchNights.find((n) => n.id === 'n-comptoir-barca');
@@ -259,18 +260,18 @@ test.describe('les données', () => {
       burger.offer = { ...burger.offer, hasAlcohol };
       expect(preparer(sansMot, { maintenant: VENDREDI, ...contenu }).soirees.find((s) => s.id === 'n-comptoir-barca').offre, String(hasAlcohol)).toEqual({ dansLAppli: true });
     }
-    // Le filet de sécurité : une offre dite sans alcool qui en parle garde la mention santé dessous.
+    // Une offre dite sans alcool qui en nomme un ne se montre pas non plus : rien d’alcoolisé n’est jamais écrit, donc
+    // jamais de mention santé à mettre dessous.
     burger.offer = { ...burger.offer, title: 'Planche et verre de vin', hasAlcohol: false, until: null };
-    const filet = preparer(sansMot, { maintenant: VENDREDI, ...contenu }).soirees.find((s) => s.id === 'n-comptoir-barca').offre;
-    expect(filet).toMatchObject({ titre: 'Planche et verre de vin', alcool: true });
-    expect(offreAffichee(filet, contenu.textes)).toContain('<p class="regarder-offre__sante">L’abus d’alcool est dangereux pour la santé, à consommer avec modération.</p>');
+    expect(preparer(sansMot, { maintenant: VENDREDI, ...contenu }).soirees.find((s) => s.id === 'n-comptoir-barca').offre).toEqual({ dansLAppli: true });
+    expect(offreAffichee({ titre: 'Menu burger', prixCentimes: 1200, jusqua: null }, contenu.textes)).not.toContain('regarder-offre__sante');
     expect(donnees.avertissements).toEqual(['Offre de « Le Comptoir du Canal » non affichée : elle pousse à boire (« happy hour »), ce que le site ne publie pas']);
     // Loi Evin, sans accents ni capitales : la gratuité près d’une boisson, une quantité, une récompense ne
     // s’affichent pas ; le passage continue, avec un avertissement par offre écartée.
     const poussentABoire = ['Pinte offerte à chaque but du PSG', 'Tournee generale a la mi-temps', 'Shot offert', 'Deux bières pour le prix d’une',
       'Open bar pendant le match', 'Bières à volonté', '2 pour 1 sur les cocktails', 'HAPPY-HOUR', 'Une pinte achetée, une offerte', 'Boisson gratuite'];
     for (const titre of poussentABoire) expect(offreInterdite(titre), titre).not.toBeNull();
-    for (const titre of ['Pinte et planche à partager', 'Menu burger et boisson fraîche', 'Planche offerte avec le menu']) expect(offreInterdite(titre), titre).toBeNull();
+    for (const titre of ['Pinte et planche à partager', 'Menu burger et boisson fraîche']) expect(offreInterdite(titre), titre).toBeNull();
     const brut = await lireLaSource(`scenario:${SCENARIO}`);
     const zinc = brut.matchNights.find((n) => n.id === 'n-zinc-psg-ol');
     zinc.offer = { ...zinc.offer, title: 'Shot offert' };
@@ -280,6 +281,66 @@ test.describe('les données', () => {
     // Une soirée annulée ne compte pas ; une soirée complète (CLOSED) reste annoncée.
     expect(donnees.soirees.filter((s) => s.bar.nom === 'Le Comptoir du Canal' && s.match.slug === 'psg-ol-2026-10-25')).toEqual([]);
     expect(donnees.bars.find((b) => b.nom === 'La Cave des Gones').soirees.map((s) => s.match.slug)).toEqual(['brest-nice-2026-10-23', 'psg-ol-2026-10-25']);
+  });
+
+  test('loi Evin : une offre qui nomme un alcool, ou qui parle d’une remise ou d’une gratuité, ne montre ni son titre ni son prix', async () => {
+    // Les mots de l’appli, lus comme elle (les cas de son offerAlcohol.test.ts) : seul « sans alcool » y échappe.
+    const casDeLAppli = [
+      ['Pinte 5 €', 'Pinte'], ['La pinte à 5 €', 'pinte'], ['2 DEMIS achetés, le 3e offert', 'DEMIS'], ['Bière pression 4 €', 'Bière'],
+      ['biere a 4 euros', 'biere'], ['Verre de vin rouge', 'vin'], ['Rosé bien frais', 'Rosé'], ['Coupe de champagne si Paris gagne', 'champagne'],
+      ['Cocktails à 8 €', 'Cocktails'], ['Shot offert à chaque but', 'Shot'], ['Whisky coca', 'Whisky'], ['Gin tonic 9 €', 'Gin'],
+      ['Apéro jusqu’au coup d’envoi', 'Apéro'], ['Planche apéritive et 2 apéritifs', 'apéritifs'], ['Bière sans alcool 4 €', null],
+      ['Pinte de bière sans alcool', null], ['Cocktails sans alcool', null], ['Softs et boissons sans alcool', null],
+      ['Pinte 5 € ou cocktail sans alcool', 'Pinte'], ['Nachos offerts', null], ['Menu burger 12 €', null], ['Gingembre frais', null],
+      ['Ti-punch maison', 'punch'], ['Pinte ou soft sans alcool', 'Pinte'], ['Pinte (ou version sans alcool) 5 €', 'Pinte'],
+      ['Bière blonde sans alcool', null], ['Demi-tarif sur les frites', null], ['Une demi-heure offerte', null], ['Demi à 3 €', 'Demi'],
+      ['Pichet de rouge', 'Pichet'], ['Heineken 5 €', 'Heineken'], ['1664 à 6 €', '1664'], ['Jägermeister offert', 'Jägermeister'],
+      ['Happy hour 18 h – 20 h', 'Happy hour'], ['Vin, bière sans alcool', 'Vin'], ['Pinte + bière sans alcool', 'Pinte'],
+      ['Bière-pression sans alcool', null], ['Vin - bière sans alcool', 'Vin'], ['Pinte\nBière sans alcool', 'Pinte'],
+      ['Bière sans alcool', null], ['Happyhour 18 h', 'Happyhour'], ['Verre de rouge 4 €', 'rouge'], ['Kro 3 €', 'Kro'],
+      ['Panaché', 'Panaché'], ['Carton rouge : nachos offerts', null], ['Screenshot du score = café offert', null],
+    ];
+    for (const [titre, mot] of casDeLAppli) expect(motDAlcool(titre), titre).toBe(mot);
+    // L’argot que le site ajoute à la liste de l’appli.
+    expect(['Une binouze et des frites', 'Girafe à partager', 'Bibine du match'].map(motDAlcool)).toEqual(['binouze', 'Girafe', 'Bibine']);
+
+    // Cochée « sans alcool » par le bar, une offre qui nomme un alcool reste « Une offre du bar dans l’appli » : ni titre,
+    // ni prix (les exemples de la revue, et un mot coupé par un caractère invisible ou un retour à la ligne).
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    const soiree = brut.matchNights.find((n) => n.id === 'n-comptoir-barca');
+    const offreDu = (title) => {
+      soiree.offer = { title, priceCents: 500, until: null, hasAlcohol: false };
+      const donnees = preparer(brut, { maintenant: VENDREDI, ...contenu });
+      return { offre: donnees.soirees.find((s) => s.id === 'n-comptoir-barca').offre, avertissements: donnees.avertissements };
+    };
+    for (const titre of ['Pinte à 5 €', 'Bière -50% pendant le match', 'Planche et verre de vin', 'Pinte\nBière sans alcool', 'Une bi​nouze', 'APÉRO GÉANT']) {
+      expect(offreDu(titre).offre, titre).toEqual({ dansLAppli: true });
+    }
+    expect(offreDu('Bière sans alcool et burger').offre).toEqual({ titre: 'Bière sans alcool et burger', prixCentimes: 500, jusqua: null });
+
+    // Une remise ou une gratuité, même sans boisson nommée : le site ne sait pas sur quoi elle porte, il ne l’écrit pas.
+    const remises = ['Burger -20 %', '-50% sur la carte', 'Tout à 50 % pendant le match', 'Frites à moitié prix', 'Tarif réduit pendant le match',
+      'Réduction sur le menu', 'Remise de 2 € sur les planches', '-3 € sur le menu', 'Nachos offerts', 'Planche offerte avec le menu', 'Café gratuit',
+      '3 pour 2 sur les softs', 'Softs à volonté', 'Planches illimitées', 'Promo sur les burgers', 'Menu à 10 € au lieu de 15 €', 'Happyhour',
+      'Un soft par but du PSG'];
+    for (const titre of remises) expect(offreInterdite(titre), titre).not.toBeNull();
+    for (const titre of ['Menu burger et boisson fraîche', 'Planche à partager', 'Burger du match · frites maison', 'Demi-finale : planche du soir', 'Menu pour 2 à 25 €']) {
+      expect(offreInterdite(titre), titre).toBeNull();
+    }
+    const remise = offreDu('Burger -20 %');
+    expect(remise.offre).toEqual({ dansLAppli: true });
+    expect(remise.avertissements).toContain('Offre de « Le Comptoir du Canal » non affichée : elle parle d’une remise ou d’une gratuité (« -20 % »), ce que le site ne publie pas');
+    expect(offreDu('Burger, et le score en direct').avertissements).toContain('Offre de « Le Comptoir du Canal » non affichée : elle parle du score (« score »), ce que le site ne publie pas');
+    // Le nom d’un bar n’est écarté que si la remise ou la gratuité touche une boisson : « Le Réduit » reste un bar.
+    for (const nom of ['Le Réduit', 'Le Cadeau', 'La Cave à Bières', 'Le 1664', 'Les Promos']) expect(nomInterdit(nom), nom).toBeNull();
+    for (const nom of ['Les Bières à moitié prix', 'Le Shot Gratuit', 'La Pinte -50%']) expect(nomInterdit(nom), nom).not.toBeNull();
+
+    // Sur les pages : ni le titre, ni le prix ; à sa place, « Une offre du bar dans l’appli ».
+    soiree.offer = { title: 'Pinte à 5 €', priceCents: 500, until: null, hasAlcohol: false };
+    const site = await construireEnMemoire({ brut, maintenant: VENDREDI, racine, contenu });
+    for (const p of site.pages) expect(p.contenu, p.chemin).not.toMatch(/Pinte|5 €/);
+    const carte = site.pages.find((p) => p.chemin === '/bar/le-comptoir-du-canal-paris-10/').contenu.split('id="soiree-psg-barca-2026-10-24"')[1].split('</li>')[0];
+    expect(carte).toContain('<p class="regarder-offre__texte">Une offre du bar dans l’appli</p>');
   });
 
   test('une source illisible, en erreur ou sans match arrête tout', async () => {

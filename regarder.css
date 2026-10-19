@@ -164,7 +164,6 @@
 }
 .regarder-offre__etiquette { display: block; margin-bottom: 2px; color: var(--texte-doux); font-size: 0.8125rem; font-weight: 600; }
 .regarder-offre__texte { font-weight: 600; }
-.regarder-offre__sante { margin-top: 6px !important; color: var(--texte-doux); font-size: 0.8125rem; }
 
 /* ---------- Listes de matchs ---------- */
 

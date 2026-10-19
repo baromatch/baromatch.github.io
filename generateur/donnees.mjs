@@ -3,6 +3,7 @@
 // n’est inventé : un renseignement absent des données reste absent des pages.
 import { nettoyer, pourComparer, slug } from './texte.mjs';
 import { jourDeParis } from './heure.mjs';
+import { motDAlcool } from './alcool.mjs';
 
 export const HEURE_MS = 3_600_000;
 export const JOUR_MS = 24 * HEURE_MS;
@@ -26,30 +27,38 @@ const MOTS_D_ESSAI = /demo|test|essai|recette|staging|sandbox|fictif|factice|(?:
 export const RAISON_D_ESSAI = 'démo, test ou essai dans le nom, l’adresse ou l’identifiant';
 // Ce qu’aucune page ne dit, même si une offre de bar l’écrit (loi Evin, et aucun score).
 export const MOTS_INTERDITS = /happy[\s-]*hours?|tournées?|verres? offerts?|\bscores?\b/i;
-// Une offre de bar qui pousse à boire (loi Evin) ne s’affiche pas : la gratuité près d’une boisson, une quantité ou
-// une récompense. Comparée sans accents ni capitales.
+// Une offre de bar qui pousse à boire (loi Evin) ne s’affiche pas : la gratuité ou la remise près d’une boisson, une
+// quantité ou une récompense. Comparée sans accents ni capitales.
 const BOISSON = /\b(?:bieres?|pintes?|demis?|verres?|shots?|shooters?|cocktails?|vins?|champagnes?|alcools?|boissons?|consos?|consommations?|aperos?|aperitifs?|spritz|mojitos?|pastis|ricard|whisky|vodka|rhum|tequila|gin|cidres?|pressions?|bouteilles?|seaux?|pichets?|mousses?|binouzes?|kirs?|punch)\b/;
 const GRATUIT = /\b(?:offert|gratuit|cadeau)|\boffr(?:ons|ez)\b|\b(?:t|vous)['’\s]+offr/;
+// Une remise : un pourcentage, des euros en moins, moitié prix, un tarif réduit, une réduction, une promo…
+const REMISE = /-?\s*\d+(?:[.,]\d+)?\s*(?:%|pour\s*cent\b)|(?:^|[\s(])-\s*\d+(?:[.,]\d+)?\s*(?:€|euros?\b)|\bmoitie prix\b|\ba moitie\b|\bdemi[\s-]*tarif\b|\breduite?s?\b|\breductions?\b|\bremises?\b|\brabais\b|\bpromos?\b|\bpromotions?\b|\bau lieu de\b|\bhalf[\s-]*price\b/;
 const POUSSE_A_BOIRE = [
-  /\ba volonte\b/, /\bopen[\s-]*bars?\b/, /\b(?:2|deux)\s*(?:pour|=)\s*(?:1|une?)\b/, /\bpour le prix d['’\s]*une?\b/,
-  /\bachete\w*\s*,?\s*(?:\d+|une?|deux)\s+offert/, /\bhappy[\s-]*hours?\b/, /\btournees?\b/, /\ba chaque but/,
+  /\ba volonte\b/, /\ba gogo\b/, /\billimitee?s?\b/, /\bopen[\s-]*bars?\b/, /\b(?:\d+|deux|trois|quatre)\s*(?:pour|=)\s*(?:\d+|une?|deux|trois)\b/,
+  /\bpour le prix d['’\s]*une?\b/, /\bachete\w*\s*,?\s*(?:\d+|une?|deux)\s+offert/, /\bhappy[\s-]*hours?\b/, /\btournees?\b/,
+  /\b(?:a|pour) chaque but/, /\bpar but\b/,
 ];
-// Ce qui, dans une offre affichée, parle d’alcool : la mention santé va dessous (le filet de sécurité, puisque seule
-// une offre que le bar dit sans alcool s’affiche).
-const ALCOOL = /\b(?:bieres?|pintes?|demis?|pressions?|cocktails?|vins?|champagnes?|alcools?|aperos?|aperitifs?|spritz|mojitos?|pastis|ricard|whisky|vodka|rhum|tequila|gin|cidres?|kirs?|punch|shots?|shooters?|binouzes?)\b/;
 // Ce qui pousse à boire (loi Evin), sans accents ni capitales, ou null.
 const pousseABoire = (texte) => {
   const motif = POUSSE_A_BOIRE.find((m) => m.test(texte));
   if (motif) return texte.match(motif)[0];
-  if (GRATUIT.test(texte) && BOISSON.test(texte)) return `${texte.match(GRATUIT)[0]} … ${texte.match(BOISSON)[0]}`;
+  const offre = texte.match(GRATUIT) ?? texte.match(REMISE);
+  if (offre && BOISSON.test(texte)) return `${offre[0].trim()} … ${texte.match(BOISSON)[0]}`;
   return null;
 };
-// Pourquoi une offre ne s’affiche pas (ce qu’elle dit), ou null si elle peut s’afficher : ce qui pousse à boire, et
-// aucun score.
-export const offreInterdite = (titre) => {
+// Ce qu’une offre dit et que le site n’écrit pas, avec la raison : ce qui pousse à boire ; une remise ou une gratuité,
+// même sans boisson nommée (le site ne sait pas sur quoi elle porte) ; le score. Ou null.
+const ceQueLOffreDit = (titre) => {
   const texte = pourComparer(nettoyer(titre));
-  return pousseABoire(texte) ?? texte.match(/\bscores?\b/)?.[0] ?? null;
+  const pousse = pousseABoire(texte);
+  if (pousse) return { extrait: pousse, raison: 'elle pousse à boire' };
+  const offre = texte.match(GRATUIT) ?? texte.match(REMISE);
+  if (offre) return { extrait: offre[0].trim(), raison: 'elle parle d’une remise ou d’une gratuité' };
+  const score = texte.match(/\bscores?\b/);
+  return score ? { extrait: score[0], raison: 'elle parle du score' } : null;
 };
+// Pourquoi une offre ne s’affiche pas (ce qu’elle dit), ou null si elle peut s’afficher.
+export const offreInterdite = (titre) => ceQueLOffreDit(titre)?.extrait ?? null;
 // Pourquoi le nom d’un bar l’écarte du site (« Happy Hour Café », « L’Open Bar »), ou null.
 export const nomInterdit = (nom) => pousseABoire(pourComparer(nettoyer(nom)));
 
@@ -313,23 +322,25 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, publie
 };
 
 // L’offre d’une soirée (loi Evin) : publiée telle que le bar l’a écrite (titre, prix, heure limite) seulement si le bar
-// a dit qu’elle ne contient pas d’alcool (hasAlcohol vaut exactement false) et qu’elle ne pousse pas à boire. Sinon, à
-// sa place, « Une offre du bar dans l’appli », sans titre ni prix ({ dansLAppli: true }). Une offre finie ne se montre
-// pas. Une offre qui pousse à boire laisse un avertissement dans le journal.
+// a dit qu’elle ne contient pas d’alcool (hasAlcohol vaut exactement false), que son texte ne nomme aucun alcool (la
+// liste de l’appli, alcool.mjs : seul « sans alcool » y échappe, quoi que le bar ait coché) et qu’elle ne parle ni de ce
+// qui pousse à boire, ni d’une remise ou d’une gratuité, ni du score. Sinon, à sa place, « Une offre du bar dans
+// l’appli », sans titre ni prix ({ dansLAppli: true }) : rien d’alcoolisé n’est écrit, donc aucune mention santé n’est
+// à mettre dessous. Une offre finie ne se montre pas. Une offre écartée pour ce qu’elle dit laisse un avertissement.
 const offreDe = (offre, maintenant, bar, avertissements) => {
   if (!offre || typeof offre.title !== 'string') return null;
   const titre = nettoyer(offre.title);
   if (!titre) return null;
   const fin = offre.until ? Date.parse(offre.until) : Number.NaN;
   if (fin <= maintenant) return null;
-  const interdit = offreInterdite(titre);
-  if (interdit) avertissements.push(`Offre de « ${bar.nom} » non affichée : elle pousse à boire (« ${interdit} »), ce que le site ne publie pas`);
-  if (interdit || offre.hasAlcohol !== false) return { dansLAppli: true };
+  const dit = ceQueLOffreDit(titre);
+  if (dit) avertissements.push(`Offre de « ${bar.nom} » non affichée : ${dit.raison} (« ${dit.extrait} »), ce que le site ne publie pas`);
+  // Le texte tel qu’écrit (un retour à la ligne finit une boisson) et nettoyé (un caractère invisible ne coupe pas un mot).
+  const alcool = motDAlcool(offre.title) ?? motDAlcool(titre);
+  if (dit || alcool || offre.hasAlcohol !== false) return { dansLAppli: true };
   return {
     titre,
     prixCentimes: Number.isInteger(offre.priceCents) ? offre.priceCents : null,
     jusqua: Number.isNaN(fin) ? null : fin,
-    // Le filet de sécurité : une offre dite sans alcool qui en parle quand même garde la mention santé dessous.
-    alcool: ALCOOL.test(pourComparer(titre)),
   };
 };

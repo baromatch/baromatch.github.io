@@ -1307,6 +1307,9 @@ test.describe('des états qui disent vrai', () => {
   test('une correction dans les 10 minutes, pour la même demande (adresse et bar) : elle ne part pas d’ici, l’e-mail la porte, et la page dit pourquoi', async ({ page }) => {
     const { envois } = await ouvrir(page, [CREEE]);
     await envoyerUneDemande(page);
+    // Comme pour les autres corrections : l’horloge n’avance qu’une fois la réussite affichée. Avancée avant la réponse
+    // (une machine chargée), elle faisait passer le délai d’attente de l’envoi, et la première demande échouait.
+    await expect(page.locator('#demande-envoyee')).toBeVisible();
     await page.clock.runFor(9 * 60 * 1000);
     await corriger(page, { phone: '+33 6 99 99 99 99', email: 'Camille@LeZinc.fr', barName: 'LE ZINC DES AMIS' });
     const statut = page.locator('#demande-statut');

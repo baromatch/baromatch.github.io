@@ -69,9 +69,15 @@ const ecrireLeScenario = (scenario) => {
   writeFileSync(fichier, JSON.stringify(scenario));
   return `scenario:${fichier}`;
 };
-const SOURCE_CHARGEE = ecrireLeScenario(scenarioCharge());
+// Écrit à la demande : les dossiers temporaires partent après les tests d’un passage du fichier dans un processus, et
+// un passage suivant dans le même processus réécrit le scénario.
+let scenarioEcrit = null;
+const sourceChargee = () => {
+  if (!scenarioEcrit || !existsSync(scenarioEcrit.slice('scenario:'.length))) scenarioEcrit = ecrireLeScenario(scenarioCharge());
+  return scenarioEcrit;
+};
 
-const enMemoire = ({ source = SOURCE_CHARGEE, maintenant = MAINTENANT_DU_SCENARIO, avec = contenu, encodeur = qr } = {}) => construireEnMemoire({
+const enMemoire = ({ source = sourceChargee(), maintenant = MAINTENANT_DU_SCENARIO, avec = contenu, encodeur = qr } = {}) => construireEnMemoire({
   source, maintenant, racine, contenu: avec, qr: encodeur,
 });
 const pageDe = (site, chemin) => {
@@ -182,7 +188,7 @@ test('l’affiche de la semaine : indexable même sans vrai bar publié, contrô
 
   // Écrite par construire : sa place dans la liste blanche, dans le plan du site, et parmi les adresses pour IndexNow.
   const sortie = await siteAvecLeDepot();
-  const resultat = await construire({ source: SOURCE_CHARGEE, sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: sansBarPublie, rendu: null, qr });
+  const resultat = await construire({ source: sourceChargee(), sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: sansBarPublie, rendu: null, qr });
   expect(estPermis(fichierDuChemin(OUVERTE))).toBe(true);
   expect(existsSync(path.join(sortie, 'matchs', 'affiche', 'index.html'))).toBe(true);
   expect(resultat.plan).toContain('<loc>https://baromatch.fr/matchs/affiche/</loc>');
@@ -303,14 +309,14 @@ test('aucune affiche pour un bar qui n’est pas publié ; elle est effacée ave
 
   // Publié, puis plus publié : sa page passe à « n’est plus sur Baromatch », son affiche est effacée au même passage.
   const sortie = await siteAvecLeDepot();
-  const premier = await construire({ source: SOURCE_CHARGEE, sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr });
+  const premier = await construire({ source: sourceChargee(), sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr });
   const fichier = path.join(sortie, fichierDuChemin(AFFICHE_DU_ZINC));
   expect(existsSync(fichier)).toBe(true);
   expect(estPermis(fichierDuChemin(AFFICHE_DU_ZINC))).toBe(true);
   expect(premier.plan).not.toMatch(/\/bar\/[a-z0-9-]+\/affiche\//);
   expect(premier.etat.pages[AFFICHE_DU_ZINC]).toMatchObject({ type: 'affiche-bar', indexable: false, bars: ['b-zinc'] });
   const sansLeZinc = { ...contenu, publies: PUBLIES_DU_SCENARIO.filter((id) => id !== 'b-zinc') };
-  const second = await construire({ source: SOURCE_CHARGEE, sortie, maintenant: MAINTENANT_DU_SCENARIO + 3_600_000, racine, contenu: sansLeZinc, rendu: null, qr });
+  const second = await construire({ source: sourceChargee(), sortie, maintenant: MAINTENANT_DU_SCENARIO + 3_600_000, racine, contenu: sansLeZinc, rendu: null, qr });
   expect(second.supprimees).toContain(AFFICHE_DU_ZINC);
   expect(existsSync(fichier)).toBe(false);
   expect(existsSync(path.join(sortie, fichierDuChemin(ZINC)))).toBe(true);
@@ -323,10 +329,10 @@ test('sans l’encodeur des QR codes : aucune affiche, ni lien vers elles, et le
   expect(pageDe(site, ZINC).contenu).not.toContain('/affiche/');
   const journal = [];
   const sortie = await siteAvecLeDepot();
-  const resultat = await construire({ source: SOURCE_CHARGEE, sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr: null, journal: (l) => journal.push(l) });
+  const resultat = await construire({ source: sourceChargee(), sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr: null, journal: (l) => journal.push(l) });
   expect(resultat.ecrits).not.toContain(OUVERTE);
   expect(journal).toContain('avertissement : affiches : l’encodeur des QR codes est écarté ; les affiches à imprimer ne sont pas écrites.');
-  await expect(construire({ source: SOURCE_CHARGEE, sortie: await siteAvecLeDepot(), maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, images: 'exiger', rendu: { signature: 'essai', rendre: () => Buffer.from('') }, qr: null }))
+  await expect(construire({ source: sourceChargee(), sortie: await siteAvecLeDepot(), maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, images: 'exiger', rendu: { signature: 'essai', rendre: () => Buffer.from('') }, qr: null }))
     .rejects.toThrow('Affiches exigées, rien n’est écrit : l’encodeur des QR codes est écarté.');
 });
 
@@ -363,7 +369,7 @@ test.describe('dans le navigateur', () => {
     const dossier = dossierVide();
     await construireLeSiteDExemple(dossier);
     // La semaine remplie, construite par-dessus le site d’exemple.
-    await construire({ source: SOURCE_CHARGEE, sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr, accepterLesSuppressions: true });
+    await construire({ source: sourceChargee(), sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr, accepterLesSuppressions: true });
     serveur = await demarrerServeur(await portLibre(), -1, { dossier });
   });
   test.afterAll(() => serveur?.arreter());

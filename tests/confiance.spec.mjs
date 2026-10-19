@@ -9,6 +9,9 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { PIED } from './outils/pied.mjs';
+import { contenuDuScenario, MAINTENANT_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
+import { construireEnMemoire } from '../generateur/site.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
 const A_PROPOS = '/a-propos.html';
@@ -122,4 +125,17 @@ test('comment on choisit les bars : les matchs, les places tenues par le bar, et
   const refus = (await page.locator('#refus + ul > li > strong').allTextContents()).map(normaliser);
   expect(refus).toEqual(['Les faux bars.', 'Les faux avis.', 'Les chiffres inventés.', 'Ce qui pousse à boire.', 'Les écussons et les logos.', 'Le direct du match.', 'Les paris.']);
   expect(normaliser(await page.locator('#refus + ul').textContent())).toContain(`« ${MENTION_SANTE} »`);
+});
+
+// Le pied de page des pages générées (matchs, villes, bars) : le même que celui des pages fixes, les deux pages de
+// confiance comprises. Le générateur écrit son pied lui-même (generateur/gabarits.mjs) : il ne le lit pas dans l’accueil.
+test('les pages générées ont le pied de page commun, avec « À propos » et « Comment on choisit les bars »', async () => {
+  const { pages } = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario() });
+  expect(pages.length).toBeGreaterThan(0);
+  const decoder = (texte) => texte.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/[\s\u00a0]+/g, ' ').trim();
+  for (const p of pages.filter((q) => q.chemin.endsWith('/'))) {
+    const pied = p.contenu.match(/<ul class="pied__liens">([\s\S]*?)<\/ul>/)?.[1] ?? '';
+    const liens = [...pied.matchAll(/<a href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map(([, href, texte]) => [href, decoder(texte)]);
+    expect(liens, p.chemin).toEqual(PIED);
+  }
 });

@@ -60,7 +60,7 @@ const tete = ({ titre, description, chemin, indexable, jsonld }) => `<!doctype h
 <a class="lien-evitement" href="#contenu">Aller au contenu</a>
 `;
 
-// Le pied de page commun, dans l’ordre de toutes les pages ; « Presse » dès que la page existe.
+// Le pied de page commun, dans l’ordre de toutes les pages (tests/outils/pied.mjs) ; « Presse » dès que la page existe.
 const pied = ({ cadre, marque, chemin, avecPresse }) => {
   const x = marque.profils?.x;
   const liens = [
@@ -68,6 +68,8 @@ const pied = ({ cadre, marque, chemin, avecPresse }) => {
     ['/matchs/', 'Où regarder le match'],
     ['/boutique.html', 'Boutique'],
     ...(avecPresse ? [['/presse.html', 'Presse']] : []),
+    ['/a-propos.html', 'À propos'],
+    ['/comment-on-choisit-les-bars.html', 'Comment on choisit les bars'],
     ['/mentions-legales.html', 'Mentions légales'],
     ['/cgu.html', 'Règles de l’appli (CGU)'],
     ['/confidentialite.html', 'Confidentialité'],

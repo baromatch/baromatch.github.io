@@ -1,7 +1,7 @@
 // Le contrôle de chaque page avant qu’elle soit écrite : ce qu’un robot y lit (un titre de 15 à 60 caractères, une
 // description de 70 à 160, l’adresse canonique, un seul h1, l’index permis ou non, les aperçus de partage), la
 // politique de sécurité, aucun script hors du bloc « Partager », et ce que la page ne dit jamais (« ! », happy hour, tournée, verre offert,
-// score). Les mots d’un bar (son nom, son adresse, son offre) sont les siens : ils sont retirés avant de chercher.
+// score ; en anglais, aucun mot de boisson). Une page en noindex n’a pas de hreflang. Les mots d’un bar (son nom, son adresse, son offre) sont les siens : ils sont retirés avant de chercher.
 // Une page en erreur est refusée (refus.mjs dit ce qu’elle devient). Les offres ne vont jamais dans la tête d’une page,
 // par construction (pages.mjs) : une offre ordinaire (« Burger » au Burger Club) ne fait refuser aucune page.
 import { MOTS_INTERDITS } from './donnees.mjs';
@@ -12,6 +12,8 @@ import { SCRIPT_DU_PARTAGE } from './partage.mjs';
 const ENTITES = { amp: '&', lt: '<', gt: '>', quot: '"', nbsp: ' ', '#39': '\'' };
 const decoder = (texte) => texte.replace(/&(amp|lt|gt|quot|nbsp|#39);/g, (_, nom) => ENTITES[nom]);
 const tous = (html, motif) => [...html.matchAll(motif)].map((m) => decoder(m[1]));
+// Les mots de boisson qu’une page en anglais n’écrit jamais (loi Evin) : la pinte, la bière, la tournée…
+export const BOISSONS_EN_ANGLAIS = /\b(?:pints?|beers?|lagers?|ciders?|wines?|cocktails?|booze|boozy|drinks?|drinking|alcohol(?:ic)?|happy[\s-]*hours?|pub[\s-]*crawls?|on tap)\b/i;
 
 // Le texte que lit le visiteur : le corps sans ses balises, sans les données structurées ni le code du badge.
 export const texteVisible = (html) => decoder((html.split('<body>')[1] ?? '')
@@ -27,7 +29,11 @@ export const controlerLaPage = (p, { motsDesBars = [] } = {}) => {
   const erreurs = [];
   const exiger = (condition, message) => { if (!condition) erreurs.push(`${p.chemin} : ${message}`); };
 
-  exiger(html.startsWith('<!doctype html>\n<html lang="fr">'), '<html lang="fr"> attendu en tête');
+  // Une page en anglais (anglais.mjs) le dit : <html lang="en">.
+  const langue = p.langue ?? 'fr';
+  exiger(html.startsWith(`<!doctype html>\n<html lang="${langue}">`), `<html lang="${langue}"> attendu en tête`);
+  // hreflang relie deux pages indexables, jamais une page en noindex (anglais.mjs, lierLesLangues).
+  exiger(p.indexable || !html.includes('<link rel="alternate" hreflang='), 'hreflang sur une page en noindex');
   const titres = tous(html, /<title>([^<]*)<\/title>/g);
   exiger(titres.length === 1, `${titres.length} titres`);
   exiger(titres[0]?.length >= 15 && titres[0]?.length <= 60, `titre de ${titres[0]?.length} caractères (15 à 60) : « ${titres[0]} »`);
@@ -54,6 +60,9 @@ export const controlerLaPage = (p, { motsDesBars = [] } = {}) => {
   exiger(!texte.includes('!'), `un point d’exclamation : « ${texte.slice(Math.max(0, texte.indexOf('!') - 40), texte.indexOf('!') + 1)} »`);
   const interdit = texte.match(MOTS_INTERDITS);
   exiger(!interdit, `un mot que le site ne publie pas : « ${interdit?.[0]} »`);
+  // Une page en anglais ne parle jamais de boire (loi Evin) : aucun mot de boisson, hors des noms et adresses des bars.
+  const boisson = langue === 'en' ? texte.match(BOISSONS_EN_ANGLAIS) : null;
+  exiger(!boisson, `un mot de boisson sur une page en anglais : « ${boisson?.[0]} »`);
   // Le guide d’une ville indexable ne dit rien qui dépende du moment : c’est la FAQ, faite des données, qui le dit.
   if (p.type === 'ville' && p.indexable) {
     const guide = texteVisible(`<body>${html.match(/<section class="regarder-section regarder-guide"[\s\S]*?<\/section>/)?.[0] ?? ''}`);

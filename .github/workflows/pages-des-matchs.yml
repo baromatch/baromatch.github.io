@@ -1,6 +1,6 @@
 # Les pages « Où regarder le match » : la semaine (matchs/), une page par match, les villes (regarder-le-match/), une
-# page et un badge par vrai bar (bar/), « Ce soir » (ce-soir/), l’image de partage des pages de match, de ville, de bar
-# et de « Ce soir », et le plan du site.
+# page et un badge par vrai bar (bar/), « Ce soir » (ce-soir/), les pages en anglais (en/), l’image de partage des pages
+# de match, de ville, de bar et de « Ce soir », et le plan du site.
 # Le générateur (generateur/construire.mjs, Node seul ; seul le rendu des images de partage s’installe, dans
 # generateur/images) les écrit d’après les listes publiques de l’appli ; cette Action le lance toutes les 3 heures,
 # juste après minuit à Paris (pour que « Ce soir » passe au nouveau jour), à la main (onglet Actions, « Run
@@ -11,8 +11,8 @@
 # pages, ou de perdre d’un coup les bars ou les soirées (liste vide) ou plus de la moitié des bars ou des matchs à
 # venir publiés (liste tronquée) ; si c’est voulu (après une longue pause, par exemple), relance-la à la main en
 # cochant la case.
-# Seuls matchs/, regarder-le-match/, bar/, ce-soir/ et sitemap.xml sont enregistrés, avec un message clair, puis envoyés sur
-# main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
+# Seuls matchs/, regarder-le-match/, bar/, ce-soir/, en/ et sitemap.xml sont enregistrés, avec un message clair, puis
+# envoyés sur main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
 # elle-même (d’où « pages: write »), puis prévient IndexNow des adresses indexables qui ont changé.
 # GitHub met en pause les Actions planifiées d’un dépôt public après 60 jours sans activité : ses propres envois
 # comptent comme activité, mais si rien ne change pendant 60 jours, relance-la à la main.
@@ -101,11 +101,11 @@ jobs:
           }
           # Seulement les chemins du générateur, même si un autre fichier avait changé.
           enregistrer() {
-            for chemin in matchs regarder-le-match bar ce-soir sitemap.xml; do
+            for chemin in matchs regarder-le-match bar ce-soir en sitemap.xml; do
               if [ -e "$chemin" ] || [ -n "$(git ls-files -- "$chemin")" ]; then git add -A -- "$chemin"; fi
             done
             if git diff --cached --quiet; then return 1; fi
-            if git diff --cached --name-only | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir)/|^sitemap\.xml$'; then
+            if git diff --cached --name-only | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en)/|^sitemap\.xml$'; then
               echo "::error::Un fichier hors de la liste blanche du générateur allait être enregistré."
               exit 1
             fi

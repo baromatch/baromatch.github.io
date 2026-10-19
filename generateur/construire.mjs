@@ -6,7 +6,7 @@
 // Par défaut : les listes publiques de l’appli, la racine du dépôt, l’heure de la machine.
 // Le passage lit les données, fabrique et contrôle toutes les pages en mémoire (site.mjs), refuse de supprimer d’un
 // coup plus de la moitié des pages déjà publiées, puis écrit seulement ce qui a changé, dans la liste blanche
-// (etat.mjs) : matchs/, regarder-le-match/, bar/, ce-soir/ et sitemap.xml. --changees écrit, une par ligne, les adresses
+// (etat.mjs) : matchs/, regarder-le-match/, bar/, ce-soir/, en/ et sitemap.xml. --changees écrit, une par ligne, les adresses
 // indexables dont le contenu a changé, et celles qui ne sont plus indexables (pour IndexNow).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

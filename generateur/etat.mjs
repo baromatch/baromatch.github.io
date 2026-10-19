@@ -5,8 +5,8 @@
 // Le plan du site (sitemap.xml) : chaque entrée qui n’est pas une page générée est gardée telle quelle ; les pages
 // générées indexables y sont, avec la date de leur dernier vrai changement.
 // La liste blanche : le générateur n’écrit et n’efface que dans matchs/, regarder-le-match/ et bar/ (des pages, des
-// badges, des images de partage), et ne touche en dehors qu’à ce-soir/ (sa page et son image) et à sitemap.xml. Tout
-// autre chemin est refusé, avant toute écriture.
+// badges, des images de partage), et ne touche en dehors qu’à ce-soir/ (sa page et son image), à en/ (les pages en
+// anglais, rien d’autre) et à sitemap.xml. Tout autre chemin est refusé, avant toute écriture.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -14,8 +14,8 @@ import { ORIGINE } from './jsonld.mjs';
 
 export const FICHIER_ETAT = 'regarder-le-match/etat.json';
 export const PLAN = 'sitemap.xml';
-const DOSSIERS = ['matchs', 'regarder-le-match', 'bar'];
-const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)|ce-soir\/(?:index\.html|partage\.png))$/;
+const DOSSIERS = ['matchs', 'regarder-le-match', 'bar', 'en'];
+const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)|ce-soir\/(?:index\.html|partage\.png)|en\/(?:[a-z0-9-]+\/)*index\.html)$/;
 
 export const estPermis = (relatif) => relatif === PLAN || relatif === FICHIER_ETAT || (PERMIS.test(relatif) && !relatif.split('/').includes('..'));
 
@@ -131,7 +131,7 @@ export const texteDeLEtat = (etat) => `${JSON.stringify(etat, null, 1)}\n`;
 
 // ---------- Le plan du site ----------
 
-const GENEREE = new RegExp(`<loc>${ORIGINE.replace(/\./g, '\\.')}/(?:matchs|regarder-le-match|bar|ce-soir)/`);
+const GENEREE = new RegExp(`<loc>${ORIGINE.replace(/\./g, '\\.')}/(?:matchs|regarder-le-match|bar|ce-soir|en)/`);
 
 export const nouveauPlan = (ancien, etat) => {
   const lignes = ancien.replace(/\r\n/g, '\n').split('\n');

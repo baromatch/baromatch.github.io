@@ -4,6 +4,7 @@
 // toutes les pages refusées, arrêtent tout avant la moindre écriture : les pages en ligne restent comme elles sont.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { fabriquerLesPagesAnglaises, lierLesLangues } from './anglais.mjs';
 import { fabriquerCeSoir } from './ce-soir.mjs';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
@@ -28,6 +29,8 @@ export const construireEnMemoire = async ({
   const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens, images });
   // « Ce soir » (/ce-soir/) : les places de ses bars viennent de la liste brute des soirées.
   pages.push(fabriquerCeSoir({ donnees, contenu, cadre, avecPresse, pages, nuits: listes.matchNights, images }));
+  // Les pages en anglais (/en/) : des mêmes données, et des pages de matchs ci-dessus (anglais.mjs).
+  pages.push(...fabriquerLesPagesAnglaises({ donnees, contenu, cadre, avecPresse, pages, images }));
 
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);
@@ -41,12 +44,19 @@ export const construireEnMemoire = async ({
     const erreurs = controler(p);
     if (erreurs.length) erreursDe.set(p, erreurs);
   }
+  // Les jumelles (une page en français, sa version en anglais) qui passent toutes deux le contrôle : le lien de langue,
+  // et hreflang quand les deux sont indexables (anglais.mjs).
+  const liaisons = lierLesLangues(pages.filter((p) => !erreursDe.has(p)), controler);
   const chemins = pages.map((p) => p.chemin);
   const doubles = [...new Set(chemins)].filter((chemin) => chemins.filter((c) => c === chemin).length > 1);
   if (doubles.length) throw new Error(`Pages refusées, rien n’est écrit :\n${doubles.map((c) => `${c} : deux pages à la même adresse`).join('\n')}`);
-  // Toutes les pages refusées : le gabarit commun est en cause, le passage s’arrête. Sinon, une page refusée n’arrête
-  // pas les autres : refus.mjs dit ce qu’elle devient (construire.mjs), et le journal le dit.
-  if (pages.length && erreursDe.size === pages.length) throw new Error(`Pages refusées, rien n’est écrit :\n${[...erreursDe.values()].flat().join('\n')}`);
+  // Toutes les pages refusées, ou toutes celles d’une langue (en français, en anglais) : le gabarit commun est en cause,
+  // le passage s’arrête. Sinon, une page refusée n’arrête pas les autres : refus.mjs dit ce qu’elle devient
+  // (construire.mjs), et le journal le dit.
+  const langues = new Set(pages.map((p) => p.langue ?? 'fr'));
+  if ([...langues].some((langue) => pages.filter((p) => (p.langue ?? 'fr') === langue).every((p) => erreursDe.has(p)))) {
+    throw new Error(`Pages refusées, rien n’est écrit :\n${[...erreursDe.values()].flat().join('\n')}`);
+  }
   const refusees = [...erreursDe].map(([p, erreurs]) => ({ ...p, erreurs }));
-  return { donnees, pages: pages.filter((p) => !erreursDe.has(p)), refusees, cadre, contenu, avecPresse, controler, avertissements: [...donnees.avertissements, ...avertissements] };
+  return { donnees, pages: pages.filter((p) => !erreursDe.has(p)), refusees, cadre, contenu, avecPresse, controler, avertissements: [...donnees.avertissements, ...avertissements, ...liaisons] };
 };

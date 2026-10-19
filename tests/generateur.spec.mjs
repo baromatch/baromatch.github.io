@@ -659,7 +659,8 @@ test.describe('les pages', () => {
   test('chaque page : un fil d’Ariane balisé, rattaché à l’organisation de l’accueil par son @id', () => {
     for (const p of site.pages) {
       const [fil] = deType(p, 'BreadcrumbList');
-      expect(fil.itemListElement[0], p.chemin).toMatchObject({ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' });
+      // Une page en anglais (anglais.mjs) part de « Baromatch » : l’accueil est en français.
+      expect(fil.itemListElement[0], p.chemin).toMatchObject({ position: 1, name: p.langue === 'en' ? 'Baromatch' : 'Accueil', item: 'https://baromatch.fr/' });
       if (p.type === 'bar' || p.type === 'ville') expect(fil.itemListElement[1], p.chemin).toMatchObject({ position: 2, name: 'Les villes', item: 'https://baromatch.fr/regarder-le-match/' });
       expect(fil.itemListElement.at(-1).item, p.chemin).toBe(`https://baromatch.fr${p.chemin}`);
       const principal = donneesStructurees(p)[0];
@@ -1123,7 +1124,7 @@ test.describe('d’un passage à l’autre', () => {
     expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>\n<urlset')).toBe(true);
   });
 
-  test('la liste blanche : rien d’autre que matchs/, regarder-le-match/, bar/, ce-soir/ et sitemap.xml n’est touché', async () => {
+  test('la liste blanche : rien d’autre que matchs/, regarder-le-match/, bar/, ce-soir/, en/ et sitemap.xml n’est touché', async () => {
     const sortie = dossierVide();
     // Un dossier qui ressemble au site : des fichiers que le générateur n’a pas le droit de toucher.
     const temoins = { 'index.html': 'accueil', 'marque.json': '{}', 'robots.txt': 'robots', 'bar.html': 'bar', 'matchs.txt': 'm', 'regarder.css': 'css' };
@@ -1136,8 +1137,8 @@ test.describe('d’un passage à l’autre', () => {
       return statSync(path.join(sortie, relatif)).isDirectory() ? fichiers(relatif) : [relatif];
     });
     const crees = [...readdirSync(sortie)].filter((nom) => !avant.has(nom));
-    expect(crees.sort()).toEqual(['bar', 'ce-soir', 'matchs', 'regarder-le-match', 'sitemap.xml']);
-    const tous = ['bar', 'ce-soir', 'matchs', 'regarder-le-match'].flatMap((d) => fichiers(d));
+    expect(crees.sort()).toEqual(['bar', 'ce-soir', 'en', 'matchs', 'regarder-le-match', 'sitemap.xml']);
+    const tous = ['bar', 'ce-soir', 'en', 'matchs', 'regarder-le-match'].flatMap((d) => fichiers(d));
     expect(tous.filter((relatif) => !estPermis(relatif))).toEqual([]);
     for (const refuse of ['index.html', 'marque.json', 'robots.txt', 'tests/x.html', 'matchs/../index.html', 'bar/x/script.js', 'generateur/construire.mjs']) {
       expect(estPermis(refuse), refuse).toBe(false);
@@ -1153,7 +1154,8 @@ test.describe('d’un passage à l’autre', () => {
   test('la prudence : un passage qui ferait disparaître plus de la moitié des pages n’écrit rien', async () => {
     // Les données manquantes ne vident pas le site : un match ou un bar absent garde sa page 30 jours (plus haut).
     // Mais un passage qui supprimerait d’un coup plus de la moitié des pages publiées (ici, après une longue pause,
-    // vingt pages de matchs de septembre arrivées au bout de leurs 30 jours) s’arrête et le dit.
+    // trente pages de matchs de septembre arrivées au bout de leurs 30 jours) s’arrête et le dit. Les 27 pages du
+    // scénario comptent ses 6 pages en anglais (trois guides, trois matchs) : 30 des 57.
     const sortie = dossierVide();
     await passer(sortie, '2026-10-23T08:00:00Z');
     const etat = etatDe(sortie);
@@ -1164,7 +1166,7 @@ test.describe('d’un passage à l’autre', () => {
     }
     writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
-    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 51 pages publiées : rien n’est écrit/);
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 57 pages publiées : rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
     // Voulu : relancé en le disant, le passage les supprime.
     await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });
@@ -1285,8 +1287,8 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // refait après un envoi refusé, sans le jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
     expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(3);
     expect(action.match(/node generateur\/construire\.mjs[^\n]*/g)).toHaveLength(2);
-    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir sitemap.xml; do');
-    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir)/|^sitemap\\.xml$'");
+    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en sitemap.xml; do');
+    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en)/|^sitemap\\.xml$'");
     expect(action).toContain('git pull -q --rebase origin main');
     // Le jeton n’est pas gardé dans la configuration de git (le générateur tourne sans lui) : seule l’étape qui envoie
     // le reçoit pour git, le temps de l’envoi, comme actions/checkout le fait lui-même ; la demande de publication à

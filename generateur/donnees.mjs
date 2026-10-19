@@ -1,7 +1,7 @@
 // Des trois listes brutes (sources.mjs) aux données des pages : les vrais bars seulement, un match par match (les
 // doublons réunis), les noms courts des clubs, l’heure de Paris, la ville et l’arrondissement de chaque bar. Rien
 // n’est inventé : un renseignement absent des données reste absent des pages.
-import { nettoyer, pourComparer, slug } from './texte.mjs';
+import { nettoyer, pourComparer, sansAccents, slug } from './texte.mjs';
 import { jourDeParis } from './heure.mjs';
 import { motDAlcool } from './alcool.mjs';
 
@@ -19,11 +19,28 @@ export const ECART_DOUBLON_MS = 3 * HEURE_MS;
 const ATOUTS = ['screens', 'sound', 'standing', 'bothCamps', 'outdoor', 'food'];
 // Les soirées qu’un bar a vraiment annoncées (un brouillon ou une soirée annulée ne se montre pas).
 const SOIREES_ANNONCEES = new Set(['OPEN', 'CLOSED']);
-// Un bar de démonstration ou d’essai se reconnaît à un de ces mots dans son nom, son adresse ou son identifiant, sans
-// accents ni capitales, même collé à un autre mot (« TestBar », « Demo2 », « bar_test ») ; « qa » seulement seul ou
-// collé à un chiffre ou à « _ » (« QA2 Bar »), pour garder « Aquarium ». Un vrai bar écarté à tort (« Le Testament »)
-// se réintègre par son identifiant dans la liste « forcer » de bars-exclus.json.
-const MOTS_D_ESSAI = /demo|test|essai|recette|staging|sandbox|fictif|factice|(?:^|[^a-z])qa(?:[^a-z]|$)/;
+// Un bar de démonstration ou d’essai se reconnaît à un de ces mots, entier, sans accents ni capitales, dans son nom,
+// son adresse ou son identifiant. Dans un nom ou une adresse, un mot finit aussi à une majuscule, à un chiffre ou à
+// « _ » (« TestBar », « Demo2 », « QA2 Bar », « bar_test ») ; jamais un mot d’essai caché dans un autre mot (« Le
+// Démon », « Le Testament », « L’Aquarium » restent des bars). Un identifiant est opaque (« cmg4x8qa0… ») : un mot
+// d’essai n’y compte qu’entre deux séparateurs (« bar-demo-1 », « test_bar »), suivi ou non de chiffres. Un vrai bar
+// écarté à tort (« L’Essai », un bar de rugby) se réintègre par son identifiant dans la liste « forcer » de
+// bars-exclus.json ; s’il est dans bars-publies.json, le journal le dit à chaque passage.
+const MOT_D_ESSAI = /^(?:demos?|demonstrations?|tests?|essais?|qa|recettes?|staging|sandbox|fictif|fictive|fictifs|fictives|factices?)$/;
+const ID_D_ESSAI = /^(?:demos?|demonstrations?|tests?|essais?|qa|recettes?|staging|sandbox|fictif|fictive|fictifs|fictives|factices?)\d*$/;
+const motsDuTexte = (texte) => sansAccents(nettoyer(texte))
+  .replace(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])/g, ' ')
+  .toLowerCase()
+  .split(/[^a-z0-9]+/);
+// Le mot d’essai d’un bar et où il est ({ mot, ou }), ou null.
+export const motDEssai = (bar) => {
+  for (const [texte, ou] of [[bar.name, 'son nom'], [bar.address, 'son adresse']]) {
+    const mot = motsDuTexte(texte).find((m) => MOT_D_ESSAI.test(m));
+    if (mot) return { mot, ou };
+  }
+  const mot = pourComparer(nettoyer(bar.id)).split(/[^a-z0-9]+/).find((m) => ID_D_ESSAI.test(m));
+  return mot ? { mot, ou: 'son identifiant' } : null;
+};
 export const RAISON_D_ESSAI = 'démo, test ou essai dans le nom, l’adresse ou l’identifiant';
 // Ce qu’aucune page ne dit, même si une offre de bar l’écrit (loi Evin, et aucun score).
 export const MOTS_INTERDITS = /happy[\s-]*hours?|tournées?|verres? offerts?|\bscores?\b/i;
@@ -200,7 +217,7 @@ export const villeDe = (villes, codePostal, nomEcrit) => {
 export const raisonDEcarter = (bar, exclus, forces = new Set()) => {
   if (bar.isDemo === true) return 'bar de démonstration';
   if (bar.isActive === false) return 'bar inactif';
-  if (!forces.has(String(bar.id)) && [bar.name, bar.address, bar.id].some((texte) => MOTS_D_ESSAI.test(pourComparer(nettoyer(texte))))) return RAISON_D_ESSAI;
+  if (!forces.has(String(bar.id)) && motDEssai(bar)) return RAISON_D_ESSAI;
   if (exclus.has(String(bar.id))) return 'liste d’exclusion';
   const interdit = nomInterdit(bar.name);
   if (interdit) return `un mot que le site ne publie pas dans le nom (« ${interdit} »)`;
@@ -276,6 +293,12 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, publie
     if (raison) {
       ecartes.push({ id, nom, raison, slug: slugPage });
       if (RAISONS_DITES.test(raison)) avertissements.push(`Bar ${id} écarté : ${raison}`);
+      // Un bar qui a donné son accord, écarté comme bar d’essai : peut-être un vrai bar, toujours dit (son identifiant et
+      // le mot d’essai, jamais son nom).
+      if (raison === RAISON_D_ESSAI && listePublies.has(id)) {
+        const { mot, ou } = motDEssai(propre);
+        avertissements.push(`Bar ${id} écarté alors qu’il est dans la liste des bars publiés : « ${mot} » dans ${ou} le fait passer pour un bar d’essai. Si c’est un vrai bar, écris son identifiant dans « forcer » (generateur/bars-exclus.json).`);
+      }
       continue;
     }
     bars.push({

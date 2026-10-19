@@ -42,7 +42,7 @@
     { "id": "b-x6", "name": "QA2 Bar", "address": "26 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
     { "id": "b-x7", "name": "TestBar", "address": "27 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
     { "id": "b-x8", "name": "Bar recette", "address": "28 Rue de Charonne, 75011 Paris", "isActive": true, "features": null },
-    { "id": "b-t1", "name": "Le Testament", "address": "29 Rue de Charonne, 75011 Paris", "isActive": true, "features": null }
+    { "id": "b-t1", "name": "L’Essai", "address": "29 Rue de Charonne, 75011 Paris", "isActive": true, "features": null }
   ],
   "matchNights": [
     { "id": "n-zinc-psg-ol", "status": "OPEN", "bar": { "id": "b-zinc" }, "match": { "id": "m-psg-ol" },

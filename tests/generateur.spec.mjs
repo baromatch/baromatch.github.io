@@ -46,7 +46,7 @@ test.describe('les données', () => {
       'Bar DÉMO Lille': essai,
       'Chez Lucette': 'bar de démonstration',
       'Le Rideau Baissé': 'bar inactif',
-      // Les noms d’essai courants, même collés à un chiffre, à « _ » ou à un autre mot.
+      // Les noms d’essai courants, même collés à un chiffre, à « _ » ou à une majuscule.
       'Bar de démonstration': essai,
       'Bar d’essai Baromatch': essai,
       'Bar Test1': essai,
@@ -55,36 +55,55 @@ test.describe('les données', () => {
       'QA2 Bar': essai,
       TestBar: essai,
       'Bar recette': essai,
-      // Un vrai bar écarté à tort : moins grave qu’un faux bar publié, et réintégré par la liste « forcer ».
-      'Le Testament': essai,
+      // Un vrai bar écarté à tort (un bar de rugby) : moins grave qu’un faux bar publié, réintégré par la liste
+      // « forcer », et signalé dans le journal parce qu’il est dans la liste des bars publiés.
+      'L’Essai': essai,
     });
     // Aucune soirée d’un faux bar : le match de Lille, diffusé seulement par deux bars de démo, n’a pas de bar.
     const faux = new Set(donnees.ecartes.map((e) => e.id));
     expect(donnees.soirees.filter((s) => faux.has(s.bar.id))).toEqual([]);
     expect(donnees.matchs.find((m) => m.slug === 'lille-lens-2026-10-26').soirees).toEqual([]);
 
-    // Insensible aux accents et aux capitales, sans limite de mot, dans le nom, l’adresse ou l’identifiant ; « qa »
-    // seul ou collé à un chiffre ou à « _ », jamais dans « Aquarium » ; la liste d’exclusion, par identifiant ou
-    // adresse de page ; isDemo, qui n’existe pas encore dans les données, est déjà lu.
+    // Un mot d’essai entier, sans accents ni capitales, dans le nom, l’adresse ou l’identifiant ; dans un nom ou une
+    // adresse, aussi collé à une majuscule, à un chiffre ou à « _ » ; jamais dans un autre mot (« Le Démon »,
+    // « Le Testament », « L’Aquarium ») ; la liste d’exclusion, par identifiant ; isDemo, qui n’existe pas encore dans
+    // les données, est déjà lu.
     const vide = new Set();
     const rue = '1 rue de Paris, 75001 Paris';
     expect(raisonDEcarter({ name: 'Le Comptoir', address: '1 rue des Tèsts, 75001 Paris' }, vide)).toBe(essai);
     expect(raisonDEcarter({ name: 'Bar Qa', address: rue }, vide)).toBe(essai);
-    for (const name of ['Bar staging', 'Sandbox Pub', 'Le Bar fictif', 'Comptoir factice', 'Démonstration', 'bar_qa', 'Le Contest']) {
+    for (const name of ['Bar staging', 'Sandbox Pub', 'Le Bar fictif', 'Comptoir factice', 'Démonstration', 'bar_qa', 'DEMOBar', 'QABar', 'Démos du soir', 'Bar2Test3']) {
       expect(raisonDEcarter({ name, address: rue }, vide), name).toBe(essai);
     }
-    expect(raisonDEcarter({ id: 'bar-arrivee-qa-exemple', name: 'Le Comptoir', address: rue }, vide)).toBe(essai);
-    expect(raisonDEcarter({ id: 'b-9', name: 'L’Aquarium', address: '1 quai de la Gare, 75013 Paris' }, vide)).toBeNull();
+    for (const name of ['Le Démon', 'Le Testament', 'Le Contest', 'La Démocratie', 'Testarossa', 'L’Aquarium', 'Les Essaims']) {
+      expect(raisonDEcarter({ id: 'b-9', name, address: rue }, vide), name).toBeNull();
+    }
+    // Un identifiant est opaque : un mot d’essai n’y compte qu’entre deux séparateurs, suivi ou non de chiffres.
+    for (const id of ['bar-arrivee-qa-exemple', 'b-demo', 'test_bar_2', 'seed.demo1', 'QA-7']) {
+      expect(raisonDEcarter({ id, name: 'Le Comptoir', address: rue }, vide), id).toBe(essai);
+    }
+    for (const id of ['cmg4x8qa0000test5demo2k1p', 'clx7testq8a0k3', 'b-qatar', 'bar-testament-2']) {
+      expect(raisonDEcarter({ id, name: 'Le Comptoir', address: rue }, vide), id).toBeNull();
+    }
     expect(raisonDEcarter({ name: 'Le Quai', address: '1 quai de la Gare, 75013 Paris' }, vide)).toBeNull();
-    expect(raisonDEcarter({ id: 'b-t1', name: 'Le Testament', address: rue }, vide, new Set(['b-t1']))).toBeNull();
+    expect(raisonDEcarter({ id: 'b-t1', name: 'L’Essai', address: rue }, vide, new Set(['b-t1']))).toBeNull();
     expect(raisonDEcarter({ id: 'b-1', name: 'Le Quai', address: '1 quai, 75013 Paris' }, new Set(['b-1']))).toBe('liste d’exclusion');
     const force = preparer(await lireLaSource(`scenario:${SCENARIO}`), { maintenant: VENDREDI, ...contenu, forcer: ['b-t1'] });
-    expect(force.bars.map((b) => b.nom)).toContain('Le Testament');
+    expect(force.bars.map((b) => b.nom)).toContain('L’Essai');
     expect(force.bars.map((b) => b.nom)).not.toContain('TestBar');
+    // Un bar de la liste des bars publiés écarté comme bar d’essai : toujours dit dans le journal, avec son seul
+    // identifiant, le mot et la façon de le remettre ; plus rien une fois réintégré.
+    const avertissementDe = (id, mot, ou) => `Bar ${id} écarté alors qu’il est dans la liste des bars publiés : « ${mot} » dans ${ou} le fait passer pour un bar d’essai. Si c’est un vrai bar, écris son identifiant dans « forcer » (generateur/bars-exclus.json).`;
+    expect(donnees.avertissements).toEqual(expect.arrayContaining([avertissementDe('b-t1', 'essai', 'son nom'), avertissementDe('b-demo', 'demo', 'son nom'), avertissementDe('b-x7', 'test', 'son nom')]));
+    expect(donnees.avertissements.filter((a) => a.includes('bar d’essai'))).toHaveLength(3);
+    expect(donnees.avertissements.join('\n')).not.toContain('L’Essai');
+    expect(force.avertissements.filter((a) => a.startsWith('Bar b-t1 '))).toEqual([]);
     // La liste « forcer » existe dans bars-exclus.json, vide, et son mode d’emploi est écrit à côté.
     const fichierExclus = JSON.parse(readFileSync(path.join(racine, 'generateur', 'bars-exclus.json'), 'utf8'));
     expect(fichierExclus.forcer).toEqual([]);
-    expect(fichierExclus._lisezMoi).toContain('Le Testament');
+    expect(fichierExclus._lisezMoi).toContain('L’Essai');
+    expect(fichierExclus._lisezMoi).toContain('mot entier');
+    expect(fichierExclus._lisezMoi).toContain('journal');
     expect(fichierExclus._lisezMoi).toContain('forcer');
     const exclu = preparer(await lireLaSource(`scenario:${SCENARIO}`), { maintenant: VENDREDI, ...contenu, exclus: ['b-zinc'] });
     expect(exclu.bars.map((b) => b.nom)).not.toContain('Le Zinc des Amis');
@@ -266,7 +285,7 @@ test.describe('les données', () => {
     burger.offer = { ...burger.offer, title: 'Planche et verre de vin', hasAlcohol: false, until: null };
     expect(preparer(sansMot, { maintenant: VENDREDI, ...contenu }).soirees.find((s) => s.id === 'n-comptoir-barca').offre).toEqual({ dansLAppli: true });
     expect(offreAffichee({ titre: 'Menu burger', prixCentimes: 1200, jusqua: null }, contenu.textes)).not.toContain('regarder-offre__sante');
-    expect(donnees.avertissements).toEqual(['Offre de « Le Comptoir du Canal » non affichée : elle pousse à boire (« happy hour »), ce que le site ne publie pas']);
+    expect(donnees.avertissements.filter((a) => a.startsWith('Offre'))).toEqual(['Offre de « Le Comptoir du Canal » non affichée : elle pousse à boire (« happy hour »), ce que le site ne publie pas']);
     // Loi Evin, sans accents ni capitales : la gratuité près d’une boisson, une quantité, une récompense ne
     // s’affichent pas ; le passage continue, avec un avertissement par offre écartée.
     const poussentABoire = ['Pinte offerte à chaque but du PSG', 'Tournee generale a la mi-temps', 'Shot offert', 'Deux bières pour le prix d’une',

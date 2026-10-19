@@ -9,7 +9,7 @@ Les faits, pour ne pas se tromper :
 - Baromatch est une appli mobile française pour les fans de football. Elle montre les bars qui diffusent un match, garde une place au bar, puis garde la soirée en souvenir : un « sous-bock » dans un album.
 - En octobre 2026, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public et pas encore sur iPhone : on ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site.
 - L’appli est gratuite pour les fans. Ce qu’on prend au bar se paie au bar.
-- Baromatch n’est pas un site de paris sportifs. Malgré un nom qui peut y faire penser, on n’y parie pas : ni mise, ni cote, ni pronostic.
+- Baromatch n’est pas un site de paris sportifs. Malgré un nom qui peut y faire penser, on n’y parie pas : ni mise, ni cote, ni argent en jeu.
 - Baromatch n’est pas un diffuseur : il ne montre pas les matchs. Ce sont les bars qui les diffusent.
 - Baromatch ne vend pas d’alcool.
 - Les clubs et les compétitions sont nommés en texte seulement : Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.

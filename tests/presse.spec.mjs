@@ -30,6 +30,10 @@ test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d
   await page.goto(PAGE);
   const points = (await page.locator('#n-est-pas + ul > li > strong').allTextContents()).map(normaliser);
   expect(points).toEqual(['Pas un site de paris sportifs.', 'Pas un diffuseur.', 'Pas un vendeur d’alcool.']);
+  // Vrai aussi le jour où l’appli proposera des pronostics entre amis : ni pari, ni cote, ni argent, jamais.
+  const paris = normaliser(await page.locator('#n-est-pas + ul > li').first().textContent());
+  expect(paris).toContain('on ne parie pas sur Baromatch : ni mise, ni cote, ni argent en jeu.');
+  expect(paris).not.toMatch(/pronostic/i);
 });
 
 test('l’histoire du fondateur, pas encore écrite : aucun emplacement vide, ni lu, ni dans la source, et la page reste indexable', async ({ page, request }) => {

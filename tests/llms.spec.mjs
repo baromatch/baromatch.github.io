@@ -54,6 +54,9 @@ test('les faits qui évitent les erreurs : ce que Baromatch est, ce qu’il n’
   expect(texte).toContain(MARQUE.slogan);
   expect(texte).toContain(MARQUE.uneLigne);
   expect(texte).toContain('Baromatch n’est pas un site de paris sportifs.');
+  // Vrai aussi le jour où l’appli proposera des pronostics entre amis : ni pari, ni cote, ni argent, jamais.
+  expect(texte).toContain('on n’y parie pas : ni mise, ni cote, ni argent en jeu.');
+  expect(texte).not.toMatch(/pronostic/i);
   expect(texte).toContain('Baromatch n’est pas un diffuseur');
   expect(texte).toContain('Baromatch ne vend pas d’alcool.');
   expect(texte).toContain('L’appli est gratuite pour les fans.');

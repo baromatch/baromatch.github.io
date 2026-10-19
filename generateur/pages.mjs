@@ -2,7 +2,8 @@
 // 14 prochains jours (/matchs/<slug>/), les villes (/regarder-le-match/ et une page par ville), une page par vrai bar
 // (/bar/<slug>/). Les pages déjà publiées restent : un match passé garde la sienne 30 jours après son coup d’envoi
 // (« Ce match est passé », sans score, vers le prochain match d’un des deux clubs), un bar qui n’est plus là aussi
-// (vers sa ville). Chaque page dit si elle est indexable ; les règles sont ici, et seulement ici.
+// (vers sa ville). Chaque page dit si elle est indexable ; les règles sont ici, et seulement ici. Chaque page dit aussi
+// quels bars elle nomme (barsNommes, gardé dans l’état) : une page refusée qui nommerait un bar retiré ne reste pas.
 import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
 import { dateCourte, heureDuJour, jourDeParis, jourEnLettres, heureDeParis } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
@@ -196,6 +197,7 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
     ajouter({
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
+      barsNommes: soirees.map((s) => s.bar.id),
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
       corps: `${fil(etapes)}
 ${enTete}
@@ -336,6 +338,7 @@ ${faq.map(({ question, reponse }) => `  <details>
       : pageWeb({ chemin, titre: titrePage, description: desc });
     ajouter({
       type: 'ville', cle: ville.cle, date: null, chemin, indexable: ville.indexable, titre: titrePage, description: desc,
+      barsNommes: ville.bars.map((b) => b.id),
       memoire: { nom: ville.nom },
       jsonld: [principal, filDAriane(etapes), ...(ville.bars.length ? [listeDesBars(remplir(textes.ville.titreBars, { ville: nomVille }), ville.bars)] : [])],
       corps: `${fil(etapes)}
@@ -431,7 +434,7 @@ ${places.trimEnd()}`
     const ce = atouts(bar, textes);
     const { apercu } = lignesDuBadge({ bar, soiree: prochaine ?? null, maintenant, marque, textes });
     ajouter({
-      type: 'bar', cle: bar.slug, date: null, chemin, indexable, titre: titrePage, description: desc, bar, soirees,
+      type: 'bar', cle: bar.slug, date: null, chemin, indexable, titre: titrePage, description: desc, bar, soirees, barsNommes: [bar.id],
       memoire: { id: bar.id, ville: bar.ville, derniereSoiree: new Date(derniereSoiree).toISOString() },
       jsonld: [
         pageWeb({ chemin, titre: titrePage, description: desc, about: { '@id': `${adresseDe(chemin)}#bar` } }),

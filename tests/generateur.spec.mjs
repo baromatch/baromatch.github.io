@@ -24,6 +24,7 @@ import { auBar } from '../generateur/jsonld.mjs';
 import { construire, verifierLesListes } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
 import { anonymiser, reduire } from '../generateur/outils/reduire-capture.mjs';
+import { adressesCitees, raisonDeNePasGarder } from '../generateur/refus.mjs';
 import { prevenirIndexNow, publierLesPages, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
@@ -705,6 +706,16 @@ test.describe('d’un passage à l’autre', () => {
     writeFileSync(fichier, JSON.stringify(retirer(brut)));
     return `scenario:${fichier}`;
   };
+  // Les fichiers écrits par le générateur (matchs/, regarder-le-match/, bar/), relatifs au dossier.
+  const fichiersGeneres = (sortie, dossier = '') => (dossier ? readdirSync(path.join(sortie, dossier)) : ['matchs', 'regarder-le-match', 'bar'].filter((d) => existsSync(path.join(sortie, d))))
+    .flatMap((nom) => {
+      const relatif = dossier ? path.posix.join(dossier, nom) : nom;
+      return statSync(path.join(sortie, relatif)).isDirectory() ? fichiersGeneres(sortie, relatif) : [relatif];
+    });
+  // Chaque lien (et chaque adresse des données structurées) d’une page écrite vers une page générée qui n’existe pas.
+  const liensVersDesPagesAbsentes = (sortie) => fichiersGeneres(sortie).filter((f) => f.endsWith('.html'))
+    .flatMap((f) => [...lire(sortie, f).matchAll(/(?:href="|"https:\/\/baromatch\.fr)(\/(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*)/g)]
+      .map((m) => m[1]).filter((chemin) => !existsSync(path.join(sortie, chemin, 'index.html'))).map((chemin) => `${f} → ${chemin}`));
 
   test('l’adresse de page d’un bar est stable : gardée s’il change de nom, jamais redonnée, « -2 » exclu', async () => {
     const sortie = dossierVide();
@@ -810,11 +821,13 @@ test.describe('d’un passage à l’autre', () => {
     expect(controlerLaPage({ ...spot, contenu: spot.contenu.replace('<h1 ', '<h1 data-x=\'a onair=1\' ') })).toEqual([]);
   });
 
-  test('une page refusée garde sa version précédente sans arrêter le passage ; une erreur du gabarit commun l’arrête', async () => {
+  test('une page refusée garde sa version précédente 24 heures au plus sans arrêter le passage ; une erreur du gabarit commun l’arrête', async () => {
     const sortie = dossierVide();
     await passer(sortie, '2026-10-23T08:00:00Z');
     const fichier = 'bar/au-bon-coin-lyon-2/index.html';
     const avant = { page: lire(sortie, fichier), badge: lire(sortie, 'bar/au-bon-coin-lyon-2/badge.svg'), etat: etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/'] };
+    // L’état dit quels bars chaque page nomme : ici, le bar lui-même.
+    expect(avant.etat.bars).toEqual(['b-coin']);
     // Un texte faux sur les seules pages des bars sans soirée : elles sont refusées, les autres passent.
     const faux = structuredClone(contenu);
     faux.textes.bar.sansSoiree = 'Pas de soirée annoncée pour l’instant !';
@@ -822,15 +835,112 @@ test.describe('d’un passage à l’autre', () => {
     expect(resultat.avertissements.some((a) => a.startsWith('Page refusée, sa version précédente reste en ligne : /bar/au-bon-coin-lyon-2/'))).toBe(true);
     expect(lire(sortie, fichier)).toBe(avant.page);
     expect(lire(sortie, 'bar/au-bon-coin-lyon-2/badge.svg')).toBe(avant.badge);
-    expect(etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/']).toEqual(avant.etat);
+    expect(etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/']).toEqual({ ...avant.etat, gardeeDepuis: '2026-10-23T10:00:00.000Z' });
     expect(plan(sortie)).toContain('/bar/au-bon-coin-lyon-2/</loc>');
     expect(resultat.supprimees).toEqual([]);
+    // Toujours refusée le lendemain matin : gardée, depuis la même heure.
+    await passer(sortie, '2026-10-24T09:00:00Z', { contenu: faux });
+    expect(lire(sortie, fichier)).toBe(avant.page);
+    expect(etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/'].gardeeDepuis).toBe('2026-10-23T10:00:00.000Z');
+    // 24 heures après : elle vieillit, une page neutre la remplace (noindex, hors du plan du site, badge générique).
+    const lendemain = await passer(sortie, '2026-10-24T10:00:00Z', { contenu: faux });
+    expect(lendemain.avertissements).toContainEqual(expect.stringMatching(/^Page refusée, remplacée par une page neutre : \/bar\/au-bon-coin-lyon-2\/ .* sa version précédente ne reste pas : elle est gardée depuis plus de 24 heures$/));
+    const neutre = lire(sortie, fichier);
+    expect(neutre).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
+    expect(neutre).toContain('<meta name="robots" content="noindex">');
+    expect(neutre).not.toContain('Bon Coin');
+    expect(lire(sortie, 'bar/au-bon-coin-lyon-2/badge.svg')).not.toContain('Bon Coin');
+    expect(plan(sortie)).not.toContain('/bar/au-bon-coin-lyon-2/');
+    expect(etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/']).toMatchObject({ repli: true, indexable: false, bars: [], memoire: { id: 'b-coin' } });
+    expect(lendemain.changees).toContain('https://baromatch.fr/bar/au-bon-coin-lyon-2/');
+    // Le texte réparé, la vraie page revient.
+    await passer(sortie, '2026-10-24T13:00:00Z');
+    expect(lire(sortie, fichier)).toContain('<h1 class="regarder-titre">Au Bon Coin</h1>');
+    expect(etatDe(sortie).pages['/bar/au-bon-coin-lyon-2/'].repli).toBeUndefined();
     // Le fil d’Ariane de chaque page faux : toutes refusées, rien n’est écrit.
     const gabarit = structuredClone(contenu);
     gabarit.textes.fil.accueil = 'Accueil !';
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
-    await expect(passer(sortie, '2026-10-23T12:00:00Z', { contenu: gabarit })).rejects.toThrow(/Pages refusées, rien n’est écrit/);
+    await expect(passer(sortie, '2026-10-24T14:00:00Z', { contenu: gabarit })).rejects.toThrow(/Pages refusées, rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
+  });
+
+  test('une page refusée qui nomme un bar retiré ne reste pas : une page neutre la remplace, et aucun lien ne mène à une page absente', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-21T08:00:00Z');
+    expect(lire(sortie, 'matchs/psg-ol-2026-10-25/index.html')).toContain('Le Zinc des Amis');
+    // Le Zinc retire son accord, au passage même où un texte faux fait refuser chaque page de match à venir.
+    const faux = structuredClone(contenu);
+    faux.publies = PUBLIES_DU_SCENARIO.filter((id) => id !== 'b-zinc');
+    faux.textes.match.titreBars = 'Les bars qui le diffusent !';
+    const resultat = await passer(sortie, '2026-10-21T09:00:00Z', { contenu: faux });
+    // La page qui nommait le Zinc : la page neutre, sans son nom.
+    const page = lire(sortie, 'matchs/psg-ol-2026-10-25/index.html');
+    expect(page).not.toContain('Zinc');
+    expect(page).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
+    expect(page).toContain('<a href="/matchs/">Les matchs de la semaine</a>');
+    expect(page).toContain('<meta name="robots" content="noindex">');
+    expect(resultat.avertissements).toContainEqual(expect.stringMatching(/^Page refusée, remplacée par une page neutre : \/matchs\/psg-ol-2026-10-25\/ .* sa version précédente ne reste pas : elle nomme un bar qui n’est plus publié \(b-zinc\)$/));
+    // Celle qui ne nommait que des bars encore publiés garde sa version précédente.
+    expect(resultat.avertissements).toContainEqual(expect.stringMatching(/^Page refusée, sa version précédente reste en ligne : \/matchs\/brest-nice-2026-10-23\//));
+    // Son nom n’est plus nulle part : ni une page, ni un badge, ni l’état ; et chaque lien mène à une page qui existe.
+    expect(fichiersGeneres(sortie).filter((f) => lire(sortie, f).includes('Zinc des Amis'))).toEqual([]);
+    expect(liensVersDesPagesAbsentes(sortie)).toEqual([]);
+    // La page neutre garde la mémoire du match : le texte réparé, sa vraie page revient.
+    await passer(sortie, '2026-10-21T10:00:00Z', { contenu: { ...contenu, publies: faux.publies } });
+    const revenue = lire(sortie, 'matchs/psg-ol-2026-10-25/index.html');
+    expect(revenue).toContain('La Cave des Gones');
+    expect(revenue).not.toContain('Zinc');
+  });
+
+  test('une page nouvelle refusée : une page neutre à son adresse, jamais un lien vers une page absente', async () => {
+    const sortie = dossierVide();
+    const faux = structuredClone(contenu);
+    faux.textes.match.titreBars = 'Les bars qui le diffusent !';
+    const resultat = await passer(sortie, '2026-10-23T08:00:00Z', { contenu: faux });
+    expect(liensVersDesPagesAbsentes(sortie)).toEqual([]);
+    expect(lire(sortie, 'matchs/psg-ol-2026-10-25/index.html')).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
+    expect(resultat.avertissements).toContainEqual(expect.stringMatching(/^Page refusée, remplacée par une page neutre : \/matchs\/psg-ol-2026-10-25\/ .* sa version précédente ne reste pas : elle n’a pas de version précédente$/));
+    // Le passage normal, lui non plus, n’a aucun lien vers une page absente.
+    const normal = dossierVide();
+    await passer(normal, '2026-10-23T08:00:00Z');
+    expect(liensVersDesPagesAbsentes(normal)).toEqual([]);
+  });
+
+  test('une version précédente reste seulement si l’état dit quels bars elle nomme, tous publiés, et si chaque page qu’elle cite existe', () => {
+    const html = '<a href="/matchs/psg-ol-2026-10-25/">PSG – OL</a> <a href="/bar/le-zinc-des-amis-paris-11/#soiree-x">Zinc</a> "url":"https://baromatch.fr/regarder-le-match/paris/"';
+    expect(adressesCitees(html)).toEqual(['/matchs/psg-ol-2026-10-25/', '/bar/le-zinc-des-amis-paris-11/', '/regarder-le-match/paris/']);
+    const existantes = new Set(adressesCitees(html));
+    const maintenant = Date.parse('2026-10-23T08:00:00Z');
+    const sure = { avant: { type: 'match', bars: ['b-zinc'] }, html, publies: new Set(['b-zinc']), existantes, maintenant };
+    expect(raisonDeNePasGarder(sure)).toBeNull();
+    expect(raisonDeNePasGarder({ ...sure, avant: { type: 'match' } })).toBe('l’état ne dit pas quels bars elle nomme');
+    expect(raisonDeNePasGarder({ ...sure, publies: new Set() })).toBe('elle nomme un bar qui n’est plus publié (b-zinc)');
+    expect(raisonDeNePasGarder({ ...sure, existantes: new Set(['/matchs/psg-ol-2026-10-25/', '/regarder-le-match/paris/']) })).toBe('elle mène à une page qui n’existe plus (/bar/le-zinc-des-amis-paris-11/)');
+    expect(raisonDeNePasGarder({ ...sure, html: null })).toBe('elle n’a pas de version précédente');
+    expect(raisonDeNePasGarder({ ...sure, avant: { ...sure.avant, gardeeDepuis: '2026-10-22T08:00:01Z' } })).toBeNull();
+    expect(raisonDeNePasGarder({ ...sure, avant: { ...sure.avant, gardeeDepuis: '2026-10-22T08:00:00Z' } })).toBe('elle est gardée depuis plus de 24 heures');
+  });
+
+  test('une offre ordinaire ne fait refuser aucune page, et aucune offre n’est jamais dans la tête d’une page', async () => {
+    const sortie = dossierVide();
+    // Le Burger Club propose « Burger » : son nom est dans les titres de ses pages ; les autres offres deviennent uniques.
+    const source = scenarioSans(sortie, (brut) => ({
+      ...brut,
+      bars: [...brut.bars, { id: 'b-burger', name: 'Le Burger Club', address: '30 Rue de Lappe, 75011 Paris', isActive: true }],
+      matchNights: [...brut.matchNights.map((n, i) => (n.offer ? { ...n, offer: { ...n.offer, title: `Planche Zorglub ${i}`, hasAlcohol: false } } : n)),
+        { id: 'n-burger', status: 'OPEN', bar: { id: 'b-burger' }, match: { id: 'm-psg-ol' }, offer: { title: 'Burger', priceCents: 1200, until: null, hasAlcohol: false } }],
+    }));
+    const resultat = await passer(sortie, '2026-10-23T08:00:00Z', { source, contenu: { ...contenu, publies: [...PUBLIES_DU_SCENARIO, 'b-burger'] } });
+    expect(resultat.avertissements.filter((a) => a.startsWith('Page refusée'))).toEqual([]);
+    for (const fichier of ['bar/le-burger-club-paris-11/index.html', 'matchs/psg-ol-2026-10-25/index.html', 'regarder-le-match/paris/index.html']) {
+      expect(lire(sortie, fichier), fichier).toContain('Le Burger Club');
+    }
+    expect(lire(sortie, 'bar/le-burger-club-paris-11/index.html')).toContain('</span> Burger · 12 €</p>');
+    // Par construction, aucune offre dans la tête d’une page (titre, description, aperçus, données structurées).
+    expect(lire(sortie, 'bar/le-comptoir-du-canal-paris-10/index.html')).toContain('Planche Zorglub');
+    for (const f of resultat.fichiers.filter((x) => x.chemin.endsWith('/'))) expect(f.contenu.split('<body>')[0], f.chemin).not.toContain('Zorglub');
+    expect(liensVersDesPagesAbsentes(sortie)).toEqual([]);
   });
 
   test('un match passé : la page reste, en noindex, hors du plan du site, vers le prochain match ; puis disparaît', async () => {

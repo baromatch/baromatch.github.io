@@ -1,13 +1,13 @@
 // Un passage du générateur, en mémoire : lire les données, les trier, fabriquer toutes les pages, puis contrôler chacune
-// (contrôle.mjs) et valider ses données structurées (validateur.mjs). Une page refusée est mise de côté (sa version
-// précédente reste en ligne) ; deux pages à la même adresse, ou toutes les pages refusées, arrêtent tout avant la moindre
-// écriture : les pages en ligne restent comme elles sont.
+// (contrôle.mjs) et valider ses données structurées (validateur.mjs). Une page refusée est mise de côté (refus.mjs dit
+// ce qu’elle devient : sa version précédente si elle est sûre, sinon une page neutre) ; deux pages à la même adresse, ou
+// toutes les pages refusées, arrêtent tout avant la moindre écriture : les pages en ligne restent comme elles sont.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
 import { lireLeCadre } from './gabarits.mjs';
-import { controlerLaPage, controlerLesOffres } from './controle.mjs';
+import { controlerLaPage } from './controle.mjs';
 import { fabriquerLesPages } from './pages.mjs';
 import { lireLaSource } from './sources.mjs';
 import { chargerLeVocabulaire, validerLaPage } from './validateur.mjs';
@@ -28,22 +28,21 @@ export const construireEnMemoire = async ({
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);
   const motsDesBars = [...donnees.bars.flatMap((b) => [b.nom, b.adresse, b.rue]), ...(anciens?.bars ?? []).flatMap((b) => [b.nom, b.adresse]), ...offres];
+  const controler = (p) => [
+    ...controlerLaPage(p, { motsDesBars }),
+    ...validerLaPage(vocabulaire, p.contenu).map((erreur) => `${p.chemin} : ${erreur}`),
+  ];
   const erreursDe = new Map();
   for (const p of pages) {
-    const erreurs = [
-      ...controlerLaPage(p, { motsDesBars }),
-      ...controlerLesOffres(p, offres),
-      ...validerLaPage(vocabulaire, p.contenu).map((erreur) => `${p.chemin} : ${erreur}`),
-    ];
+    const erreurs = controler(p);
     if (erreurs.length) erreursDe.set(p, erreurs);
   }
   const chemins = pages.map((p) => p.chemin);
   const doubles = [...new Set(chemins)].filter((chemin) => chemins.filter((c) => c === chemin).length > 1);
   if (doubles.length) throw new Error(`Pages refusées, rien n’est écrit :\n${doubles.map((c) => `${c} : deux pages à la même adresse`).join('\n')}`);
   // Toutes les pages refusées : le gabarit commun est en cause, le passage s’arrête. Sinon, une page refusée n’arrête
-  // pas les autres : sa version précédente reste en ligne (construire.mjs), et le journal le dit.
+  // pas les autres : refus.mjs dit ce qu’elle devient (construire.mjs), et le journal le dit.
   if (pages.length && erreursDe.size === pages.length) throw new Error(`Pages refusées, rien n’est écrit :\n${[...erreursDe.values()].flat().join('\n')}`);
-  const refusees = [...erreursDe].map(([p, erreurs]) => ({ chemin: p.chemin, erreurs }));
-  const refus = refusees.map(({ chemin, erreurs }) => `Page refusée, sa version précédente reste en ligne : ${chemin} (${erreurs.join(' ; ')})`);
-  return { donnees, pages: pages.filter((p) => !erreursDe.has(p)), refusees, cadre, contenu, avertissements: [...donnees.avertissements, ...avertissements, ...refus] };
+  const refusees = [...erreursDe].map(([p, erreurs]) => ({ ...p, erreurs }));
+  return { donnees, pages: pages.filter((p) => !erreursDe.has(p)), refusees, cadre, contenu, avecPresse, controler, avertissements: [...donnees.avertissements, ...avertissements] };
 };

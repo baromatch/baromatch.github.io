@@ -1,15 +1,18 @@
 // Les pages générées, dans le navigateur : le scénario inventé construit dans un dossier temporaire (avec une copie du
 // site autour, tests/outils/site-genere.mjs) et servi comme GitHub Pages le sert. Sur une page de ville, une page de
-// match, la semaine et une page de bar : aucune violation d’axe à 360 et 1280 px, rien qui dépende de JavaScript,
-// aucun débordement horizontal à 360 px, et chaque lien interne qui répond.
+// match, la semaine, une page de bar et la page neutre (celle qui remplace une page refusée, refus.mjs) : aucune
+// violation d’axe à 360 et 1280 px, rien qui dépende de JavaScript, aucun débordement horizontal à 360 px, et chaque
+// lien interne qui répond.
 import { test, expect } from '@playwright/test';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { violationsAxe } from './outils/axe.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple } from './outils/site-genere.mjs';
+import { lireLeCadre } from '../generateur/gabarits.mjs';
+import { pageDeRepli } from '../generateur/refus.mjs';
 
 const PAGES = [
   { chemin: '/regarder-le-match/paris/', nom: 'ville avec des bars' },
@@ -18,6 +21,7 @@ const PAGES = [
   { chemin: '/matchs/', nom: 'semaine' },
   { chemin: '/bar/le-zinc-des-amis-paris-11/', nom: 'bar' },
   { chemin: '/regarder-le-match/', nom: 'villes' },
+  { chemin: '/matchs/page-neutre/', nom: 'page neutre' },
 ];
 
 const portLibre = () => new Promise((resoudre) => {
@@ -33,6 +37,12 @@ let serveur;
 test.beforeAll(async () => {
   dossier = mkdtempSync(path.join(tmpdir(), 'site-genere-'));
   await construireLeSiteDExemple(dossier);
+  // La page neutre, écrite à une adresse à elle dans le site d’exemple.
+  const neutre = pageDeRepli({ chemin: '/matchs/page-neutre/', type: 'match', cle: 'page-neutre' }, {
+    cadre: lireLeCadre(dossier), marque: JSON.parse(readFileSync(path.join(dossier, 'marque.json'), 'utf8')), avecPresse: existsSync(path.join(dossier, 'presse.html')),
+  });
+  mkdirSync(path.join(dossier, 'matchs', 'page-neutre'), { recursive: true });
+  writeFileSync(path.join(dossier, 'matchs', 'page-neutre', 'index.html'), neutre.contenu);
   serveur = await demarrerServeur(await portLibre(), -1, { dossier });
 });
 test.afterAll(() => {
@@ -119,6 +129,8 @@ test('les cibles de 44 px, le chevron du fil sans alternative lue, et la boîte 
   for (const selecteur of ['.regarder-carte__nom a', '.regarder-matchs a']) expect(tropPetits(await mesurer(selecteur)), selecteur).toEqual([]);
   await onglet.goto(`${serveur.adresse}/regarder-le-match/paris/`);
   expect(tropPetits(await mesurer('.regarder-retour a'))).toEqual([]);
+  await onglet.goto(`${serveur.adresse}/matchs/page-neutre/`);
+  for (const selecteur of ['.regarder-fil a', '.regarder-matchs a']) expect(tropPetits(await mesurer(selecteur)), selecteur).toEqual([]);
   await onglet.goto(`${serveur.adresse}/bar/le-zinc-des-amis-paris-11/`);
   expect(await onglet.locator('.regarder-badge__code').evaluate((t) => getComputedStyle(t).fieldSizing)).toBe('content');
 });

@@ -88,15 +88,17 @@ export const anciensDe = (etat) => {
   };
 };
 
-// gardees : les chemins dont la version précédente reste (une page refusée par le contrôle), repris tels quels.
+// gardees : les chemins dont la version précédente reste (une page refusée par le contrôle, refus.mjs), repris tels
+// quels, ou { chemin, entree } avec l’entrée à écrire (la date depuis laquelle elle est gardée).
 // adresses : les adresses de page données aux bars ({ adresse: identifiant }), gardées d’un passage à l’autre.
+// Chaque page dit quels bars elle nomme (bars : leurs identifiants), et si elle est la page neutre (repli).
 export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adresses = {}) => {
   const pages = {};
-  const tous = [...fichiers, ...gardees.map((chemin) => ({ chemin, garde: true }))];
+  const tous = [...fichiers, ...gardees.map((g) => (typeof g === 'string' ? { chemin: g, garde: true } : { ...g, garde: true }))];
   for (const f of tous.sort((a, b) => a.chemin.localeCompare(b.chemin))) {
     const avant = precedent.pages?.[f.chemin];
     if (f.garde) {
-      pages[f.chemin] = avant;
+      pages[f.chemin] = f.entree ?? avant;
       continue;
     }
     const marque = empreinte(f.contenu);
@@ -107,6 +109,8 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adress
       empreinte: marque,
       change: avant?.empreinte === marque ? avant.change : aujourdhui,
       indexable: f.indexable,
+      ...(f.chemin.endsWith('/') ? { bars: f.barsNommes ?? [] } : {}),
+      ...(f.repli ? { repli: true } : {}),
       ...(f.horsPlan ? { horsPlan: true } : {}),
       ...(f.memoire ? { memoire: f.memoire } : {}),
     };

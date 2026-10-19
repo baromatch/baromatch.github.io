@@ -18,6 +18,7 @@ import { adresseDe } from './jsonld.mjs';
 import {
   anciensDe, effacerUnFichier, ecrireUnFichier, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
 } from './etat.mjs';
+import { traiterLesRefus } from './refus.mjs';
 import { construireEnMemoire } from './site.mjs';
 
 // Au-delà de ce nombre de pages publiées, un passage qui en supprimerait plus de la moitié s’arrête : des données
@@ -62,21 +63,23 @@ export const construire = async ({
     throw new Error(`Données douteuses, rien n’est écrit : ${raisons.join(' ; ')}. Si c’est voulu, relance avec --accepter-les-suppressions (ou coche la case en lançant l’Action à la main).`);
   }
 
-  // Les badges des bars, à côté de leur page.
-  const fichiers = [...site.pages];
-  for (const p of site.pages.filter((x) => x.type === 'bar')) {
+  // Une page refusée par le contrôle garde sa version précédente (et son badge) seulement si elle est sûre, 24 heures au
+  // plus ; sinon, une page neutre la remplace à la même adresse (refus.mjs) : jamais un bar retiré, jamais un lien mort.
+  const refus = traiterLesRefus({ site, precedent, sortie, maintenant, controler: site.controler });
+  const avertissements = [...site.avertissements, ...refus.messages];
+  const gardees = refus.gardees;
+
+  // Les badges des bars, à côté de leur page ; le badge générique sous une page neutre.
+  const fichiers = [...site.pages, ...refus.replis];
+  for (const p of fichiers.filter((x) => x.type === 'bar')) {
     fichiers.push({
       chemin: `${p.chemin}badge.svg`, type: 'badge', cle: p.cle, indexable: false,
-      contenu: badgeDuBar({ bar: p.bar, soiree: p.soirees?.[0] ?? null, parti: Boolean(p.parti), maintenant, marque: site.contenu.marque, textes: site.contenu.textes, verre: site.cadre.verre }),
+      contenu: badgeDuBar({ bar: p.bar, soiree: p.soirees?.[0] ?? null, parti: Boolean(p.parti || p.repli), maintenant, marque: site.contenu.marque, textes: site.contenu.textes, verre: site.cadre.verre }),
     });
   }
 
-  // Une page refusée par le contrôle garde sa version précédente (et son badge) : ni réécrite, ni effacée, son entrée
-  // de l’état est reprise telle quelle. Une page nouvelle refusée n’est simplement pas publiée.
-  const gardees = new Set(site.refusees.flatMap(({ chemin }) => [chemin, `${chemin}badge.svg`]).filter((chemin) => precedent.pages?.[chemin]));
-
   // La prudence : jamais plus de la moitié des pages publiées supprimées d’un coup.
-  const nouveaux = new Set([...fichiers.map((f) => f.chemin), ...gardees]);
+  const nouveaux = new Set([...fichiers.map((f) => f.chemin), ...gardees.map((g) => g.chemin)]);
   const anciennesPages = Object.keys(precedent.pages ?? {}).filter((chemin) => chemin.endsWith('/'));
   const supprimees = Object.keys(precedent.pages ?? {}).filter((chemin) => !nouveaux.has(chemin));
   const pagesSupprimees = supprimees.filter((chemin) => chemin.endsWith('/'));
@@ -85,7 +88,7 @@ export const construire = async ({
   }
 
   const aujourdhui = jourDeParis(maintenant);
-  const etat = nouvelEtat(precedent, fichiers, aujourdhui, [...gardees], site.donnees.adresses);
+  const etat = nouvelEtat(precedent, fichiers, aujourdhui, gardees, site.donnees.adresses);
   const planActuel = existsSync(path.join(sortie, PLAN)) ? readFileSync(path.join(sortie, PLAN), 'utf8') : readFileSync(path.join(racine, PLAN), 'utf8');
   const plan = nouveauPlan(planActuel, etat);
 
@@ -112,8 +115,8 @@ export const construire = async ({
     compte[p.type].pages += 1;
     if (p.indexable) compte[p.type].indexables += 1;
   }
-  for (const avertissement of site.avertissements) journal(`avertissement : ${avertissement}`);
-  return { etat, plan, fichiers, ecrits, supprimees, changees, compte, avertissements: site.avertissements, donnees: site.donnees };
+  for (const avertissement of avertissements) journal(`avertissement : ${avertissement}`);
+  return { etat, plan, fichiers, ecrits, supprimees, changees, compte, avertissements, donnees: site.donnees };
 };
 
 // ---------- La ligne de commande ----------

@@ -2,11 +2,11 @@
 // description de 70 à 160, l’adresse canonique, un seul h1, l’index permis ou non, les aperçus de partage), la
 // politique de sécurité, aucun script, et ce que la page ne dit jamais (« ! », happy hour, tournée, verre offert,
 // score). Les mots d’un bar (son nom, son adresse, son offre) sont les siens : ils sont retirés avant de chercher.
-// Une page en erreur est refusée (site.mjs garde sa version précédente).
+// Une page en erreur est refusée (refus.mjs dit ce qu’elle devient). Les offres ne vont jamais dans la tête d’une page,
+// par construction (pages.mjs) : une offre ordinaire (« Burger » au Burger Club) ne fait refuser aucune page.
 import { MOTS_INTERDITS } from './donnees.mjs';
 import { CSP } from './gabarits.mjs';
 import { adresseDe } from './jsonld.mjs';
-import { echapper } from './texte.mjs';
 
 const ENTITES = { amp: '&', lt: '<', gt: '>', quot: '"', nbsp: ' ', '#39': '\'' };
 const decoder = (texte) => texte.replace(/&(amp|lt|gt|quot|nbsp|#39);/g, (_, nom) => ENTITES[nom]);
@@ -60,10 +60,4 @@ export const controlerLaPage = (p, { motsDesBars = [] } = {}) => {
     exiger(!perime, `un guide de ville qui dépend du moment : « ${perime?.[0]} »`);
   }
   return erreurs;
-};
-
-// Les offres des bars ne vont jamais dans un titre, une description, un aperçu ni une donnée structurée.
-export const controlerLesOffres = (p, offres) => {
-  const tete = p.contenu.split('<body>')[0];
-  return offres.filter((o) => tete.includes(o) || tete.includes(echapper(o)) || tete.includes(JSON.stringify(o).slice(1, -1))).map((o) => `${p.chemin} : l’offre « ${o} » dans la tête de la page ou ses données structurées`);
 };

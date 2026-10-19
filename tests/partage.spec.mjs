@@ -19,7 +19,7 @@ import { estPermis } from '../generateur/etat.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { lireLeCadre } from '../generateur/gabarits.mjs';
 import { controlerLaPage } from '../generateur/controle.mjs';
-import { SCRIPT_DU_PARTAGE, svgDeLaCarte } from '../generateur/partage.mjs';
+import { lesPolices, SCRIPT_DU_PARTAGE, svgDeLaCarte } from '../generateur/partage.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
 const IMAGE_DU_SITE = `${ORIGINE}/img/og-image.jpg`;
@@ -219,6 +219,72 @@ test.describe('d’un passage à l’autre', () => {
     expect(existsSync(path.join(sortie, 'matchs/om-lens-2026-10-22'))).toBe(false);
     expect(Object.keys(etatDe(sortie).pages).filter((c) => c.includes('om-lens-2026-10-22') || c.includes('le-zinc'))).toEqual([]);
     for (const image of images(sortie)) expect(existsSync(path.join(sortie, image.replace(/partage\.png$/, 'index.html'))), image).toBe(true);
+  });
+
+  // Les mots qui changent de sens avec l’heure de lecture : jamais dans une image, qui resterait fausse le lendemain.
+  const RELATIFS = /ce soir|cette nuit|demain|aujourd|hier|cette semaine|ce week-end|maintenant|en ce moment|bientôt|tout à l’heure|en direct/i;
+  const texteDessine = (svg) => [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' · ');
+
+  test('le même texte, rendu deux fois : les mêmes octets, et aucun mot qui dépend du moment de la lecture', async () => {
+    const { chargerLeRendu } = await import('../generateur/images/rendu.mjs');
+    const charger = () => chargerLeRendu({ polices: Object.values(lesPolices()) });
+    const [premier, second] = [await charger(), await charger()];
+    expect(premier.rendu.signature).toBe(second.rendu.signature);
+    const { verre } = lireLeCadre(racine);
+    const vues = [];
+    // Le scénario le matin, le soir, la nuit et le lendemain ; la copie des listes publiques, un samedi.
+    for (const [source, maintenant, avec] of [
+      [`scenario:${SCENARIO}`, '2026-10-23T08:00:00Z', contenu], [`scenario:${SCENARIO}`, '2026-10-23T18:30:00Z', contenu],
+      [`scenario:${SCENARIO}`, '2026-10-23T22:30:00Z', contenu], [`scenario:${SCENARIO}`, '2026-10-24T08:00:00Z', contenu],
+      [`capture:${CAPTURE}`, '2026-10-17T16:00:00Z', chargerLeContenu(racine)],
+    ]) {
+      const site = await construireEnMemoire({ source, maintenant: Date.parse(maintenant), racine, contenu: avec, images: true });
+      for (const p of site.pages.filter((x) => x.carte)) {
+        const svg = svgDeLaCarte(p.carte, { verre });
+        expect(svgDeLaCarte(structuredClone(p.carte), { verre }), p.chemin).toBe(svg);
+        expect(`${texteDessine(svg)} · ${p.carte.alt}`, `${p.chemin} à ${maintenant}`).not.toMatch(RELATIFS);
+        vues.push({ chemin: p.chemin, svg });
+      }
+    }
+    expect(new Set(vues.map((v) => v.chemin))).toContain('/ce-soir/');
+    // Les textes des images eux-mêmes (generateur/contenu/partage.json, hors du bloc « Partager ») : aucun non plus.
+    const { bouton, _lisezMoi, ...dessines } = JSON.parse(readFileSync(path.join(racine, 'generateur/contenu/partage.json'), 'utf8'));
+    expect(Object.keys(dessines).sort()).toEqual(['bar', 'ceSoir', 'match', 'ville']);
+    for (const [sorte, cles] of Object.entries(dessines)) for (const [cle, texte] of Object.entries(cles)) expect(texte, `${sorte}.${cle}`).not.toMatch(RELATIFS);
+    // Une image de chaque sorte, rendue deux fois par deux rendus chargés à part : octet pour octet, la même.
+    const sortes = [...new Map(vues.map((v) => [v.chemin.split('/')[1], v])).values()];
+    expect(sortes.length).toBe(4);
+    for (const { chemin, svg } of sortes) {
+      const une = premier.rendu.rendre(svg);
+      expect(une.equals(premier.rendu.rendre(svg)), chemin).toBe(true);
+      expect(une.equals(second.rendu.rendre(svg)), chemin).toBe(true);
+    }
+  });
+
+  test('une image n’est réécrite que si son texte change : le matin, le soir, la nuit et le lendemain', async () => {
+    const sortie = dossierVide();
+    const { verre } = lireLeCadre(racine);
+    // Le texte dessiné de chaque image d’un passage, par son adresse.
+    const textes = (resultat) => new Map(resultat.fichiers.filter((f) => f.carte).map((f) => [`${f.chemin}partage.png`, texteDessine(svgDeLaCarte(f.carte, { verre }))]));
+    const ecrites = (resultat) => resultat.ecrits.filter((c) => c.endsWith('partage.png')).sort();
+    let avant = await passer(sortie, '2026-10-23T08:00:00Z');
+    for (const maintenant of ['2026-10-23T17:30:00Z', '2026-10-23T22:05:00Z', '2026-10-24T08:00:00Z']) {
+      const apres = await passer(sortie, maintenant);
+      const [t1, t2] = [textes(avant), textes(apres)];
+      expect(ecrites(apres), maintenant).toEqual([...t2.keys()].filter((c) => t1.get(c) !== t2.get(c)).sort());
+      avant = apres;
+    }
+    // Le vendredi, du matin au soir : la page « Ce soir » change (« Aujourd’hui », puis « Ce soir »), pas son image ;
+    // le samedi, un autre jour, une autre image.
+    const dossier = dossierVide();
+    await passer(dossier, '2026-10-23T08:00:00Z');
+    const image = path.join(dossier, 'ce-soir/partage.png');
+    const date = statSync(image).mtimeMs;
+    const soir = await passer(dossier, '2026-10-23T17:30:00Z');
+    expect(soir.ecrits).toContain('/ce-soir/');
+    expect(soir.ecrits).not.toContain('/ce-soir/partage.png');
+    expect(statSync(image).mtimeMs).toBe(date);
+    expect((await passer(dossier, '2026-10-24T08:00:00Z')).ecrits).toContain('/ce-soir/partage.png');
   });
 
   test('une page refusée : gardée, elle garde son image ; remplacée par la page neutre, son image part avec elle', async () => {

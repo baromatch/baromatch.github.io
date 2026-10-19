@@ -50,14 +50,14 @@ const choisir = (candidats, min, max, suite) => {
   const dernier = candidats.at(-1);
   return couper(dernier.length < min ? `${dernier}${suite}` : dernier, max);
 };
-const titre = (...candidats) => choisir(candidats, 15, 60, ' — Baromatch');
-const description = (...candidats) => choisir(candidats, 70, 160, ' Les bars qui diffusent le match, sur Baromatch.');
+export const titre = (...candidats) => choisir(candidats, 15, 60, ' — Baromatch');
+export const description = (...candidats) => choisir(candidats, 70, 160, ' Les bars qui diffusent le match, sur Baromatch.');
 
 const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
 const quandCourt = (m) => (m.heureConfirmee ? `${jourEnLettres(m.debut)} à ${heureDeParis(m.debut)}` : `${jourEnLettres(m.debut)}, heure à confirmer`);
 
 // « 2 bars à Paris, 1 bar à Lyon », chaque décompte un lien vers la page de sa ville.
-const barsParVille = (soirees) => {
+export const barsParVille = (soirees) => {
   const villes = new Map();
   for (const s of soirees) {
     const ville = villes.get(s.bar.ville.cle) ?? { ville: s.bar.ville, n: 0 };
@@ -245,6 +245,7 @@ ${commentCaMarche(textes, marque)}`,
 <section class="regarder-section regarder-ce-soir" aria-labelledby="titre-ce-soir">
   <h2 id="titre-ce-soir">${e(titreDuJour)}</h2>
 ${ceSoir.length ? `  <ul class="regarder-matchs">\n${ceSoir.map(ligne).join('\n')}\n  </ul>` : `  <p>${e(rienDuJour)}</p>`}
+  <p class="regarder-suite"><a href="/ce-soir/">${e(textes.ceSoir.lien)}</a></p>
 </section>
 ${autres.length ? autres.map(({ jour, matchs }) => `<section class="regarder-section" aria-labelledby="jour-${jour}">
   <h2 id="jour-${jour}">${e(capitale(jourEnLettres(Date.parse(`${jour}T12:00:00Z`))))}</h2>
@@ -306,6 +307,7 @@ ${groupes.flatMap((g) => g.quartiers).map(({ arrondissement, elements }) => `${a
 ${ville.soirees.length ? `  <ul class="regarder-matchs">
 ${ville.soirees.slice(0, 20).map((s) => `    <li>${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))} · ${quand(s.match)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}</li>`).join('\n')}
   </ul>` : `  <p>${e(textes.ville.sansSoiree)}</p>`}
+  <p class="regarder-suite"><a href="/ce-soir/">${e(textes.ceSoir.lien)}</a></p>
 </section>`;
     // Une ville sans guide écrit : un paragraphe fait de ses vraies données (bars, quartiers, prochaines soirées).
     const prochaineSoiree = ville.soirees[0];

@@ -22,6 +22,7 @@ const PAGES = [
   { chemin: '/bar/le-zinc-des-amis-paris-11/', nom: 'bar' },
   { chemin: '/regarder-le-match/', nom: 'villes' },
   { chemin: '/matchs/page-neutre/', nom: 'page neutre' },
+  { chemin: '/ce-soir/', nom: 'ce soir' },
 ];
 
 const portLibre = () => new Promise((resoudre) => {
@@ -133,4 +134,24 @@ test('les cibles de 44 px, le chevron du fil sans alternative lue, et la boîte 
   for (const selecteur of ['.regarder-fil a', '.regarder-matchs a']) expect(tropPetits(await mesurer(selecteur)), selecteur).toEqual([]);
   await onglet.goto(`${serveur.adresse}/bar/le-zinc-des-amis-paris-11/`);
   expect(await onglet.locator('.regarder-badge__code').evaluate((t) => getComputedStyle(t).fieldSizing)).toBe('content');
+});
+
+test('« Ce soir » au téléphone : le match, le bar et chaque lien seul se touchent sur 44 px', async ({ page: onglet }) => {
+  await onglet.setViewportSize({ width: 360, height: 800 });
+  await onglet.goto(`${serveur.adresse}/ce-soir/`);
+  await expect(onglet.locator('h1')).toHaveText('Où regarder le match ce soir');
+  await expect(onglet.locator('.regarder-soir__match a')).toHaveText('Brest – Nice');
+  await expect(onglet.locator('.regarder-carte__nom a')).toHaveText('La Cave des Gones');
+  for (const selecteur of ['.regarder-soir__match a', '.regarder-carte__nom a', '.regarder-matchs a', '.regarder-suite a']) {
+    const hauteurs = await onglet.locator(selecteur).evaluateAll((liens) => liens.map((a) => Math.round(a.getBoundingClientRect().height)));
+    expect(hauteurs.length, selecteur).toBeGreaterThan(0);
+    expect(hauteurs.filter((h) => h < 44), selecteur).toEqual([]);
+  }
+  // La semaine et une ville y mènent par un lien seul, lui aussi de 44 px.
+  for (const chemin of ['/matchs/', '/regarder-le-match/paris/']) {
+    await onglet.goto(`${serveur.adresse}${chemin}`);
+    const lien = onglet.locator('.regarder-suite a[href="/ce-soir/"]');
+    await expect(lien, chemin).toHaveText('Où regarder le match ce soir');
+    expect(Math.round((await lien.boundingBox()).height), chemin).toBeGreaterThanOrEqual(44);
+  }
 });

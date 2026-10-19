@@ -4,6 +4,7 @@
 // toutes les pages refusées, arrêtent tout avant la moindre écriture : les pages en ligne restent comme elles sont.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { fabriquerCeSoir } from './ce-soir.mjs';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
 import { lireLeCadre } from './gabarits.mjs';
@@ -20,10 +21,13 @@ export const construireEnMemoire = async ({
   if (appli.ouverte && !appli.android && !appli.iphone) {
     throw new Error('marque.json : « appli.ouverte » est vrai, mais aucun lien de magasin n’est rempli (« android » ou « iphone »). Ajoute le lien de l’appli dans le magasin, ou remets « ouverte » à false : rien n’est écrit, les pages en ligne restent comme elles sont.');
   }
-  const donnees = preparer(brut ?? await lireLaSource(source, adresse ? { adresse } : {}), { maintenant, ...contenu, adresses: anciens?.adresses });
+  const listes = brut ?? await lireLaSource(source, adresse ? { adresse } : {});
+  const donnees = preparer(listes, { maintenant, ...contenu, adresses: anciens?.adresses });
   const cadre = lireLeCadre(racine);
   const avecPresse = existsSync(path.join(racine, 'presse.html'));
   const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens });
+  // « Ce soir » (/ce-soir/) : les places de ses bars viennent de la liste brute des soirées.
+  pages.push(fabriquerCeSoir({ donnees, contenu, cadre, avecPresse, pages, nuits: listes.matchNights }));
 
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);

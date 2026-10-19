@@ -106,6 +106,39 @@
     "finiSuite": "Les matchs de ce soir sont terminés. La suite commence demain, juste en dessous.",
     "toutesLesVilles": "Toutes les villes"
   },
+  "ceSoir": {
+    "fil": "Ce soir",
+    "titre": "Où regarder le match ce soir",
+    "lien": "Où regarder le match ce soir",
+    "chapeau": "Les matchs du jour à l’heure de Paris et, pour chacun, les bars qui le diffusent sur Baromatch.",
+    "soir": {
+      "moment": "ce soir",
+      "avecBars": "Ce soir, dans un bar",
+      "matchs": "Les matchs de ce soir",
+      "autres": "Les autres matchs de ce soir",
+      "sansBar": "Pas encore de bar sur Baromatch pour les matchs de ce soir."
+    },
+    "jour": {
+      "moment": "aujourd’hui",
+      "avecBars": "Aujourd’hui, dans un bar",
+      "matchs": "Les matchs d’aujourd’hui",
+      "autres": "Les autres matchs d’aujourd’hui",
+      "sansBar": "Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui."
+    },
+    "commenceA": "Commencé à",
+    "commenceLe": "Commencé le",
+    "rien": "Pas de match ce soir",
+    "rienSuite": "Aucun match n’est annoncé ce soir. Les prochains sont juste en dessous.",
+    "fini": "Fini pour ce soir",
+    "finiSuite": "Les matchs de ce soir sont terminés. Les prochains sont juste en dessous.",
+    "prochains": "Les prochains matchs",
+    "aucunProchain": "Pas d’autre match annoncé pour l’instant.",
+    "villes": "Ville par ville",
+    "villesSuite": "Les bars de chaque ville sur Baromatch, et ce qu’il faut savoir avant d’y aller.",
+    "places": "À {heure}, {n} places à réserver dans l’appli.",
+    "placesUne": "À {heure}, 1 place à réserver dans l’appli.",
+    "complet": "À {heure}, plus de place à réserver dans l’appli."
+  },
   "villes": {
     "titre": "Les villes où regarder le match",
     "chapeau": "Ville par ville, les bars qui diffusent le match sur Baromatch, et ce qu’il faut savoir avant d’y aller.",

@@ -182,11 +182,12 @@ ${etapes.map((etape) => `    <li><strong>${e(etape.titre)}</strong> ${e(etape.te
 export const tuTiensUnBar = (textes) => `<p class="regarder-bars-pro"><a href="/pour-les-bars.html">${e(textes.match.tuTiensUnBar)}</a> ${e(textes.match.tuTiensUnBarSuite)}</p>`;
 
 // La carte d’un bar : son nom (vers sa page), son quartier et son adresse, ce qu’il dit de lui ; sur la page d’un
-// match, l’offre de la soirée.
-export const carteDuBar = (bar, textes, { soiree = null, niveau = 4 } = {}) => [
+// match, l’offre de la soirée ; sur « Ce soir », ses places (une phrase déjà écrite, ou rien).
+export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = '' } = {}) => [
   '<li class="regarder-carte">',
   `      <h${niveau} class="regarder-carte__nom"><a href="${cheminDuBar(bar)}">${e(bar.nom)}</a></h${niveau}>`,
   `      <p class="regarder-carte__lieu">${e(bar.quartier)} · ${e(bar.adresse)}</p>`,
+  places && `      <p class="regarder-carte__places">${e(places)}</p>`,
   atouts(bar, textes) && `      ${atouts(bar, textes)}`,
   soiree?.offre && `      ${offre(soiree.offre, textes)}`,
   '    </li>',

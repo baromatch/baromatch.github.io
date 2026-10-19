@@ -117,7 +117,8 @@
     "rienAujourdhui": "Pas de match annoncé aujourd’hui.",
     "fini": "Fini pour ce soir",
     "finiSuite": "Les matchs de ce soir sont terminés. La suite commence demain, juste en dessous.",
-    "toutesLesVilles": "Toutes les villes"
+    "toutesLesVilles": "Toutes les villes",
+    "ensuite": "La semaine d’après"
   },
   "ceSoir": {
     "fil": "Ce soir",
@@ -164,6 +165,7 @@
     "sansBar": "Aucun bar de {ville} n’est encore sur Baromatch.",
     "titreSoirees": "Les prochaines soirées à {ville}",
     "sansSoiree": "Pas de soirée annoncée pour l’instant.",
+    "aussi": "Les autres matchs annoncés à {ville}",
     "titreFaq": "Les questions qu’on nous pose",
     "titreSansGuide": "{ville}, les soirs de match",
     "toutesLesVilles": "Toutes les villes",

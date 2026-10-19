@@ -19,6 +19,8 @@ import { adresseDeLImage, lignesDeLaCarte } from './partage.mjs';
 export const FENETRE_MS = 14 * JOUR_MS;
 export const SEMAINE_JOURS = 7;
 export const CONSERVATION_MS = 30 * JOUR_MS;
+// La page d’une ville liste ses 20 prochaines soirées ; les autres matchs diffusés n’y ont qu’un lien.
+const SOIREES_PAR_VILLE = 20;
 // Les seuils d’indexation, contre les pages minces : en dessous, la page existe (lisible, utile au visiteur) mais
 // porte noindex et reste hors du plan du site. Les bars comptés sont les vrais bars publiés (bars-publies.json).
 export const SEUILS = {
@@ -238,6 +240,10 @@ ${commentCaMarche(textes, marque)}`,
     const rienDuJour = fini ? textes.semaine.finiSuite : leSoir ? textes.semaine.rienCeSoir : textes.semaine.rienAujourdhui;
     const autres = jours.slice(1).map((jour) => ({ jour, matchs: dansLaSemaine.filter((m) => jourDeParis(m.debut) === jour) })).filter((j) => j.matchs.length);
     const dernierJour = jourEnLettres(Date.parse(`${jours.at(-1)}T12:00:00Z`));
+    // Les matchs qui ont déjà leur page, après ces sept jours (la fenêtre des pages est de 14 jours) : la semaine d’après,
+    // une ligne chacun, pour qu’aucune page de match ne reste sans lien depuis la semaine.
+    const ensuite = donnees.matchs.filter((m) => enCoursOuAVenir(m) && aUnePage(m) && !dansLaSemaine.includes(m) && jourDeParis(m.debut) > jours.at(-1))
+      .sort((a, b) => a.debut - b.debut);
     const etapes = [accueil, { nom: textes.fil.matchs, chemin }];
     const titrePage = textes.semaine.titrePage;
     const desc = description(
@@ -263,7 +269,12 @@ ${autres.length ? autres.map(({ jour, matchs }) => `<section class="regarder-sec
 ${matchs.map(ligne).join('\n')}
   </ul>
 </section>`).join('\n') : `<p>${e(textes.semaine.rienCetteSemaine)}</p>`}
-<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
+${ensuite.length ? `<section class="regarder-section" aria-labelledby="titre-ensuite">
+  <h2 id="titre-ensuite">${e(textes.semaine.ensuite)}</h2>
+  <ul class="regarder-matchs">
+${ensuite.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`).join('\n')}
+  </ul>
+</section>\n` : ''}<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
 ${appel(marque, textes)}
 ${commentCaMarche(textes, marque)}`,
     });
@@ -314,12 +325,18 @@ ${groupes.flatMap((g) => g.quartiers).map(({ arrondissement, elements }) => `${a
   <p class="regarder-vide">${e(remplir(textes.ville.sansBar, { ville: nomVille }))}</p>
   ${tuTiensUnBar(textes)}
 </section>`;
+    // Au-delà des premières soirées, les autres matchs qui ont leur page, une fois chacun : la ville mène à chacun.
+    const listes = new Set(ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => s.match.slug));
+    const autresMatchs = [...new Map(ville.soirees.filter((s) => !listes.has(s.match.slug) && aUnePage(s.match)).map((s) => [s.match.slug, s.match])).values()];
     const sectionSoirees = `<section class="regarder-section" aria-labelledby="titre-soirees">
   <h2 id="titre-soirees">${e(remplir(textes.ville.titreSoirees, { ville: nomVille }))}</h2>
 ${ville.soirees.length ? `  <ul class="regarder-matchs">
-${ville.soirees.slice(0, 20).map((s) => `    <li>${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))} · ${quand(s.match)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}</li>`).join('\n')}
+${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    <li>${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))} · ${quand(s.match)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}</li>`).join('\n')}
   </ul>` : `  <p>${e(textes.ville.sansSoiree)}</p>`}
-  <p class="regarder-suite"><a href="/ce-soir/">${e(textes.ceSoir.lien)}</a></p>
+${autresMatchs.length ? `  <h3 class="regarder-jour">${e(remplir(textes.ville.aussi, { ville: nomVille }))}</h3>
+  <ul class="regarder-matchs">
+${autresMatchs.map((m) => `    ${ligneDeMatch(m, { avecPage: true })}`).join('\n')}
+  </ul>\n` : ''}  <p class="regarder-suite"><a href="/ce-soir/">${e(textes.ceSoir.lien)}</a></p>
 </section>`;
     // Une ville sans guide écrit : un paragraphe fait de ses vraies données (bars, quartiers, prochaines soirées).
     const prochaineSoiree = ville.soirees[0];

@@ -26,6 +26,8 @@ const PAGES = [
   { chemin: '/matchs/page-neutre/', nom: 'page neutre' },
   { chemin: '/ce-soir/', nom: 'ce soir', partage: true },
   { chemin: '/agenda/', nom: 'agenda' },
+  { chemin: '/matchs/affiche/', nom: 'affiche de la semaine' },
+  { chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', nom: 'affiche d’un bar' },
 ];
 
 const portLibre = () => new Promise((resoudre) => {

@@ -27,7 +27,8 @@ export const lireLeCadre = (racine) => {
 // ---------- Tête, en-tête, pied ----------
 
 // image : l’image de partage de la page ({ adresse, alt }), sinon l’image générale du site.
-const tete = ({ titre, description, chemin, indexable, jsonld, image, partage }) => `<!doctype html>
+// feuilles : les feuilles de style propres à la page, après celles de toutes les pages (affiche.css pour les affiches).
+const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [] }) => `<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -46,7 +47,7 @@ const tete = ({ titre, description, chemin, indexable, jsonld, image, partage })
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/regarder.css">
-<meta property="og:type" content="website">
+${feuilles.map((f) => `<link rel="stylesheet" href="${f}">\n`).join('')}<meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
 <meta property="og:title" content="${e(titre)}">
@@ -103,7 +104,7 @@ const avecLePartage = (corps, { partage, titre, chemin }) => (partage
   ? corps.replace(/<header class="regarder-tete">[\s\S]*?<\/header>/, (enTete) => `${enTete}\n${blocPartager({ titre, chemin })}`)
   : corps);
 
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage })}${cadre.entete}
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles })}${cadre.entete}
 
 <main id="contenu" class="regarder page">
 ${avecLePartage(corps, { partage, titre, chemin })}

@@ -70,9 +70,10 @@ jobs:
         with:
           node-version: 22
 
-      # Le rendu des images de partage : la seule bibliothèque de l’Action, à sa version exacte (package-lock.json), sans
-      # aucun script d’installation. Rien n’en est servi aux visiteurs, rien n’en est enregistré. Sans lui, le générateur
-      # s’arrête (--images=exiger) plutôt que de retirer les images en ligne.
+      # Le rendu des images de partage et l’encodeur des QR codes des affiches : les seules bibliothèques de l’Action, à
+      # leur version exacte (package-lock.json), sans aucun script d’installation. Rien n’en est servi aux visiteurs, rien
+      # n’en est enregistré. Sans eux, le générateur s’arrête (--images=exiger) plutôt que de retirer les images ou les
+      # affiches en ligne.
       - name: Installer le rendu des images de partage
         working-directory: generateur/images
         run: npm ci --ignore-scripts --no-audit --no-fund

@@ -91,7 +91,8 @@ const grouperParLieu = (recus, barDe) => {
     .map(({ ville, quartiers }) => ({ ville, quartiers: [...quartiers.entries()].sort((a, b) => a[0] - b[0]).map(([, q]) => q) }));
 };
 
-export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false, anciens = { matchs: [], bars: [] }, images = false }) => {
+// afficheDuBar : le lien de la page d’un bar vers son affiche à imprimer (affiche.mjs), quand les affiches sont écrites.
+export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false, anciens = { matchs: [], bars: [] }, images = false, afficheDuBar = null }) => {
   const { maintenant } = donnees;
   const { textes, marque, villes: guides } = contenu;
   const enCoursOuAVenir = (m) => m.debut + DUREE_MATCH_MS > maintenant;
@@ -496,7 +497,7 @@ ${ce ? `<section class="regarder-section" aria-labelledby="titre-atouts">
 ${listeSoirees}
   ${appel(marque, textes)}
 </section>
-${codeDuBadge(bar, textes, apercu)}`,
+${codeDuBadge(bar, textes, apercu)}${afficheDuBar ? `\n${afficheDuBar(bar)}` : ''}`,
     });
   }
   for (const bar of partis) {

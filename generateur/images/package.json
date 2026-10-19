@@ -1,8 +1,9 @@
 {
   "name": "baromatch-images-de-partage",
   "private": true,
-  "description": "Le rendu des images de partage des pages générées (SVG vers PNG), installé par l’Action seulement : rien de tout ça n’est servi aux visiteurs.",
+  "description": "Le rendu des images de partage des pages générées (SVG vers PNG) et l’encodeur des QR codes des affiches à imprimer, installés par l’Action seulement : rien de tout ça n’est servi aux visiteurs.",
   "dependencies": {
-    "@resvg/resvg-js": "2.6.2"
+    "@resvg/resvg-js": "2.6.2",
+    "qrcode-generator": "2.0.4"
   }
 }

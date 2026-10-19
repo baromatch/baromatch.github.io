@@ -1,0 +1,59 @@
+{
+  "_lisezMoi": "Les textes des affiches à imprimer : l’affiche des matchs de la semaine, ouverte à tous les bars (/matchs/affiche/), et l’affiche de chaque bar publié (/bar/<bar>/affiche/). Garde les clés et les mots entre accolades ({jour}, {bar}…) : le générateur y met les vraies données. Tutoiement, présent, phrases courtes, aucun point d’exclamation. Rien sur l’alcool : ni offre, ni boisson. L’affiche ouverte dit « préparé sur baromatch.fr », jamais « partenaire » ni « sur Baromatch » : elle va aussi dans des bars qui n’y sont pas. Tant que l’appli n’est pas ouverte, l’affiche d’un bar ne promet aucune place (la clé « fermee »).",
+  "ouverte": {
+    "fil": "L’affiche de la semaine",
+    "titrePage": "Affiche des matchs de la semaine pour ton bar",
+    "description": "Les matchs des sept prochains jours, à l’heure de Paris : coche ceux que tu diffuses et imprime ton affiche en A4 ou en A3. Gratuit, sans compte.",
+    "titre": "L’affiche des matchs de la semaine",
+    "chapeau": "Pour ton comptoir ou ta vitrine. Gratuite, même si ton bar n’est pas sur Baromatch. Pas de compte, rien à envoyer : les cases que tu coches restent sur ton appareil.",
+    "modeTitre": "Comment faire",
+    "etapes": [
+      "Coche les matchs que tu diffuses. Si tu ne coches rien, tous les matchs s’impriment.",
+      "Choisis A4 ou A3, ici puis dans la fenêtre d’impression.",
+      "Imprime avec le menu de ton navigateur : Imprimer (Ctrl + P, ou Cmd + P sur Mac). Sur téléphone : Partager, puis Imprimer."
+    ],
+    "deuxPages": "Au-delà de 14 matchs, l’affiche peut passer sur deux pages.",
+    "titreFeuille": "Ton affiche",
+    "sansMatch": "Aucun match annoncé ces sept prochains jours. L’affiche se remplit dès qu’il y en a.",
+    "titreApres": "Avant d’afficher",
+    "droits": "Pour diffuser un match dans ton bar, il te faut l’abonnement de la chaîne prévu pour les lieux ouverts au public. Baromatch ne montre aucun match.",
+    "proposer": "Ton bar est à Paris ? Propose-le sur Baromatch",
+    "barInscrit": "Ton bar est sur Baromatch ? Ton affiche, déjà remplie avec tes soirées, est sur la page de ton bar."
+  },
+  "feuille": {
+    "titre": "Les matchs ici",
+    "dates": "Du {debut} au {fin}",
+    "heureAConfirmer": "Heure à confirmer",
+    "prepare": "Programme préparé sur baromatch.fr, à l’heure de Paris, le {jour}.",
+    "qr": "QR code vers baromatch.fr",
+    "adresse": "baromatch.fr"
+  },
+  "format": {
+    "legende": "Le papier",
+    "a4": "A4",
+    "a3": "A3, textes plus grands"
+  },
+  "bar": {
+    "fil": "Son affiche",
+    "lien": "Tu tiens ce bar ? Ton affiche à imprimer",
+    "titre": "L’affiche de {bar}",
+    "titrePage": "Affiche à imprimer de {bar}",
+    "chapeau": "Pour ta porte ou ton comptoir : ta prochaine soirée de match, et un QR code qui mène à la page de ton bar.",
+    "etapes": [
+      "Choisis A4 ou A3, ici puis dans la fenêtre d’impression.",
+      "Imprime avec le menu de ton navigateur : Imprimer (Ctrl + P, ou Cmd + P sur Mac). Sur téléphone : Partager, puis Imprimer."
+    ],
+    "miseAJour": "L’affiche suit tes soirées annoncées : imprime-la de nouveau quand tu en annonces d’autres.",
+    "titreFeuille": "Ton affiche",
+    "ceSoir": "Ce soir, on diffuse le match.",
+    "aujourdhui": "Aujourd’hui, on diffuse le match.",
+    "ici": "Ici, on diffuse le match.",
+    "suivantes": "Nos prochaines soirées",
+    "ouverte": "Garde ta place sur Baromatch.",
+    "ouverteSuite": "Scanne le code : nos soirées, et ta place.",
+    "fermee": "Nos soirées de match sont sur Baromatch.",
+    "fermeeSuite": "Scanne le code pour les voir.",
+    "prepare": "Affiche préparée sur baromatch.fr, à l’heure de Paris, le {jour}.",
+    "qr": "QR code vers la page de {bar} sur Baromatch"
+  }
+}

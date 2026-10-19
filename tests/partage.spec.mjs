@@ -353,7 +353,8 @@ test.describe('d’un passage à l’autre', () => {
   test('la bibliothèque du rendu : une version exacte, dans son dossier, que seule l’Action installe', () => {
     const paquet = JSON.parse(readFileSync(path.join(racine, 'generateur/images/package.json'), 'utf8'));
     const verrou = JSON.parse(readFileSync(path.join(racine, 'generateur/images/package-lock.json'), 'utf8'));
-    expect(Object.keys(paquet.dependencies)).toEqual(['@resvg/resvg-js']);
+    // Avec lui, l’encodeur des QR codes des affiches (generateur/qr.mjs, tests/affiche.spec.mjs).
+    expect(Object.keys(paquet.dependencies)).toEqual(['@resvg/resvg-js', 'qrcode-generator']);
     expect(paquet.dependencies['@resvg/resvg-js']).toMatch(/^\d+\.\d+\.\d+$/);
     expect(verrou.packages['node_modules/@resvg/resvg-js'].version).toBe(paquet.dependencies['@resvg/resvg-js']);
     expect(verrou.packages['node_modules/@resvg/resvg-js'].integrity).toMatch(/^sha512-/);

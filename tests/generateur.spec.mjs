@@ -1185,7 +1185,9 @@ test.describe('d’un passage à l’autre', () => {
     }
     writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
-    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 52 pages publiées : rien n’est écrit/);
+    // Les 21 pages de la semaine du scénario, plus la page agenda/ et ses 6 affiches à imprimer (celle de la semaine et
+    // une par vrai bar publié) : 28, et les 30 vieux matchs, 58.
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 58 pages publiées : rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
     // Voulu : relancé en le disant, le passage les supprime.
     await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });
@@ -1257,12 +1259,16 @@ test.describe('d’un passage à l’autre', () => {
     expect(page).toContain(insecables('<summary>Tu tiens ce bar ? Ton badge</summary>'));
   });
 
-  test('la copie enregistrée de ce soir, écrite : tout en noindex, le plan du site inchangé', async () => {
+  test('la copie enregistrée de ce soir, écrite : tout en noindex sauf l’affiche de la semaine, le plan du site inchangé à part elle', async () => {
     const sortie = dossierVide();
     const resultat = await construire({ source: `capture:${CAPTURE}`, sortie, maintenant: ENREGISTREMENT, racine, contenu });
-    expect(resultat.changees).toEqual([]);
-    expect(Object.values(etatDe(sortie).pages).filter((p) => p.indexable)).toEqual([]);
-    expect(plan(sortie)).toBe(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8').replace(/\r\n/g, '\n'));
+    // L’affiche de la semaine est un outil fait des vrais matchs, qui ne nomme aucun bar : indexable même sans vrai bar
+    // (tests/affiche.spec.mjs). Rien d’autre.
+    expect(resultat.changees).toEqual(['https://baromatch.fr/matchs/affiche/']);
+    expect(Object.entries(etatDe(sortie).pages).filter(([, p]) => p.indexable).map(([chemin]) => chemin)).toEqual(['/matchs/affiche/']);
+    const sansLAffiche = plan(sortie).split('\n').filter((l) => !l.includes('<loc>https://baromatch.fr/matchs/affiche/</loc>')).join('\n');
+    expect(sansLAffiche).toBe(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8').replace(/\r\n/g, '\n'));
+    expect(plan(sortie)).toContain('<loc>https://baromatch.fr/matchs/affiche/</loc>');
     expect(existsSync(path.join(sortie, 'bar'))).toBe(false);
   });
 });

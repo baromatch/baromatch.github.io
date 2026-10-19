@@ -5,8 +5,9 @@
 // generateur/images/polices, sous licence OFL comme elle). Chaque ligne est mesurée sur la police elle-même pour tenir
 // dans la carte : plus petite, puis sur deux lignes (le titre), puis coupée à la fin d’un mot (« … »). Le PNG est rendu
 // ensuite par generateur/images/rendu.mjs, que seule l’Action installe : sans lui, la page garde l’image générale.
-// Les chiffres sont les vrais : le nombre de vrais bars publiés qui diffusent le match, jamais « 0 bar » (sans bar, la
-// carte dit seulement où le regarder). Ni écusson, ni logo de club ou de compétition, ni score : des mots.
+// Les chiffres sont les vrais : le nombre de vrais bars publiés qui diffusent le match, jamais « 0 bar ». Sans vrai bar,
+// la carte ne promet rien : le match, son jour et son heure ; la ville, sans « Où regarder le match ». Ni écusson, ni
+// logo de club ou de compétition, ni score : des mots.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
@@ -119,7 +120,7 @@ export const lignesDeLaCarte = (partage, textes = TEXTES, textesDuSite = {}) => 
     const verbe = nombre > 1 ? textes.match.diffusent : textes.match.diffuse;
     const statut = match.statut ? textesDuSite.match?.[match.statut] : null;
     const ambre = statut
-      ?? (nombre === 0 ? textes.match.sansBar
+      ?? (nombre === 0 ? ''
         : villes.length <= 2 ? `${accorder(nombre, 'bar')} ${verbe} à ${enumerer(villes)}`
           : `${accorder(nombre, 'bar')} ${verbe}`);
     const quand = quandEnLettres(match.debut, match.heureConfirmee);
@@ -154,9 +155,11 @@ export const lignesDeLaCarte = (partage, textes = TEXTES, textesDuSite = {}) => 
     const { ville } = partage;
     const nombre = ville.bars.length;
     const prochaine = ville.soirees[0];
-    const ligne = nombre ? remplir(textes.ville.bars, { bars: accorder(nombre, 'bar') }) : textes.ville.sansBar;
+    // Sans vrai bar : « Les soirs de match » au-dessus du nom de la ville, et rien d’autre.
+    const surtitre = nombre ? textes.ville.surtitre : textes.ville.sansBar;
+    const ligne = nombre ? remplir(textes.ville.bars, { bars: accorder(nombre, 'bar') }) : '';
     const ambre = prochaine ? remplir(textes.ville.prochaine, { match: nomCourt(prochaine.match), quand: jourEnLettres(prochaine.match.debut) }) : '';
-    return { surtitre: textes.ville.surtitre, titre: ville.nom, ligne, ambre, alt: phrase(`${textes.ville.surtitre} à ${ville.nom}`, ligne, ambre) };
+    return { surtitre, titre: ville.nom, ligne, ambre, alt: phrase(`${surtitre} à ${ville.nom}`, ligne, ambre) };
   }
   const { bar, prochaine } = partage;
   const ligne = prochaine ? remplir(textes.bar.prochaine, { match: nomCourt(prochaine.match) }) : textes.bar.sansSoiree;

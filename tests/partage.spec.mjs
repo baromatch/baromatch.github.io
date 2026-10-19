@@ -91,18 +91,22 @@ test.describe('les images de partage', () => {
     }
   });
 
-  test('le vrai nombre de vrais bars : « 1 bar le diffuse », « 2 bars le diffusent », et sans bar, jamais « 0 bar »', () => {
+  test('le vrai nombre de vrais bars : « 1 bar le diffuse », « 2 bars le diffusent » ; sans bar, ni nombre ni promesse', () => {
     const carteDe = (chemin) => resultat.fichiers.find((f) => f.chemin === chemin).carte;
-    expect(carteDe('/matchs/lille-lens-2026-10-26/')).toMatchObject({ titre: 'Lille – Lens', ambre: 'Où le regarder à Paris' });
+    // Un match sans vrai bar : le match, son jour et son heure, rien de plus.
+    expect(carteDe('/matchs/lille-lens-2026-10-26/')).toEqual({
+      surtitre: 'Ligue 1', titre: 'Lille – Lens', ligne: 'Lundi 26 octobre · 20:00', ambre: '', alt: 'Lille – Lens, Ligue 1, lundi 26 octobre · 20:00.',
+    });
     expect(carteDe('/matchs/brest-nice-2026-10-23/')).toMatchObject({ titre: 'Brest – Nice', ambre: '1 bar le diffuse à Lyon' });
     expect(carteDe('/matchs/psg-ol-2026-10-25/')).toMatchObject({ titre: 'PSG – OL', ligne: 'Dimanche 25 octobre · 20:45', ambre: '2 bars le diffusent à Lyon et Paris' });
     expect(carteDe('/regarder-le-match/paris/')).toMatchObject({ titre: 'Paris', ligne: '2 bars sur Baromatch' });
-    expect(carteDe('/regarder-le-match/marseille/')).toMatchObject({ titre: 'Marseille', ligne: 'Le guide des soirs de match', ambre: '' });
+    // Une ville sans vrai bar : son nom, sans « Où regarder le match ».
+    expect(carteDe('/regarder-le-match/marseille/')).toEqual({ surtitre: 'Les soirs de match', titre: 'Marseille', ligne: '', ambre: '', alt: 'Les soirs de match à Marseille.' });
     expect(carteDe('/bar/au-bon-coin-lyon-2/')).toMatchObject({ titre: 'Au Bon Coin', ligne: 'On diffuse le match', ambre: '' });
     // Sur chaque page de match, le nombre de l’image est celui des cartes de bars de la page.
     for (const p of resultat.fichiers.filter((f) => f.type === 'match' && f.carte)) {
       const cartes = (p.contenu.match(/<li class="regarder-carte">/g) ?? []).length;
-      if (cartes === 0) expect(p.carte.ambre, p.chemin).toBe('Où le regarder à Paris');
+      if (cartes === 0) expect(p.carte.ambre, p.chemin).toBe('');
       else expect(p.carte.ambre, p.chemin).toMatch(new RegExp(`^${cartes} bars? le diffusen?t? à `));
     }
     // Le texte de chaque image, tel qu’il est dessiné : jamais « 0 bar », ni score, ni « ! ».
@@ -111,6 +115,8 @@ test.describe('les images de partage', () => {
       const svg = svgDeLaCarte(p.carte, { verre });
       const dessine = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' · ');
       expect(dessine, p.chemin).not.toMatch(/\b0 bars?\b|\d\s*[-–]\s*\d|!/);
+      // Une page qui ne montre aucun vrai bar : son image n’en promet pas non plus.
+      if (!/<li class="regarder-carte">/.test(p.contenu)) expect(`${dessine} · ${p.carte.alt}`, p.chemin).not.toMatch(/regarder|(?<!\p{L})bars?(?!\p{L})|guide/iu);
       expect(dessine).toContain(p.carte.titre.replace(/&/g, '&amp;'));
       expect(svg).not.toMatch(/<image|href=|https?:\/\/(?!www\.w3\.org)/);
     }
@@ -123,8 +129,9 @@ test.describe('les images de partage', () => {
     expect(site.pages.filter((p) => p.type === 'bar')).toEqual([]);
     for (const p of cartes) {
       expect(`${p.carte.ligne} ${p.carte.ambre} ${p.carte.alt}`, p.chemin).not.toMatch(/\d+ bars?\b/);
-      if (p.type === 'match') expect(p.carte.ambre).toBe('Où le regarder à Paris');
-      if (p.type === 'ville') expect([p.carte.ligne, p.carte.ambre]).toEqual(['Le guide des soirs de match', '']);
+      expect(`${p.carte.surtitre} ${p.carte.ligne} ${p.carte.ambre} ${p.carte.alt}`, p.chemin).not.toMatch(/regarder|(?<!\p{L})bars?(?!\p{L})|guide/iu);
+      if (p.type === 'match') expect(['', 'Match reporté', 'Match annulé'], p.chemin).toContain(p.carte.ambre);
+      if (p.type === 'ville') expect([p.carte.surtitre, p.carte.ligne, p.carte.ambre]).toEqual(['Les soirs de match', '', '']);
     }
   });
 

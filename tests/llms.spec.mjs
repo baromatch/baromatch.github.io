@@ -11,9 +11,9 @@ import { fichierDe } from './outils/pages.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
 const TEXTE = readFileSync(path.join(racine, 'llms.txt'), 'utf8').replace(/\r\n/g, '\n');
-// Les pages que le générateur écrit (« Ce soir », matchs de la semaine, villes) : elles arrivent avec lui, leur fichier n’est pas
-// exigé ici.
-const GENEREES = ['/ce-soir/', '/matchs/', '/regarder-le-match/'];
+// Les pages que le générateur écrit (« Ce soir », matchs de la semaine, villes, pages en anglais) : elles arrivent avec
+// lui, leur fichier n’est pas exigé ici. agenda/ et l’affiche de la semaine, déjà écrites, sont dans le dépôt.
+const GENEREES = ['/ce-soir/', '/matchs/', '/regarder-le-match/', '/en/'];
 
 test('le format de llmstxt.org : titre, résumé en citation, puis des sections de liens', () => {
   const lignes = TEXTE.split('\n');
@@ -35,7 +35,10 @@ test('le format de llmstxt.org : titre, résumé en citation, puis des sections 
 test('les liens : les pages du site (chacune avec son fichier), le contact et les profils de marque.json', () => {
   const liens = [...TEXTE.matchAll(/^- \[([^\]]+)\]\(([^)]+)\)/gm)].map(([, nom, adresse]) => ({ nom, adresse }));
   const adresses = liens.map((l) => l.adresse);
-  for (const chemin of ['/', '/pour-les-bars.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html', '/ce-soir/', '/matchs/', '/regarder-le-match/', '/cgu.html', '/confidentialite.html']) {
+  for (const chemin of [
+    '/', '/pour-les-bars.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html', '/ce-soir/', '/matchs/', '/regarder-le-match/',
+    '/agenda/', '/en/', '/matchs/affiche/', '/cgu.html', '/confidentialite.html',
+  ]) {
     expect(adresses, chemin).toContain(`${ORIGINE}${chemin}`);
   }
   expect(adresses).toContain(`mailto:${MARQUE.contact}`);

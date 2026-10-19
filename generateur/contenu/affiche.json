@@ -18,7 +18,8 @@
     "titreApres": "Avant d’afficher",
     "droits": "Pour diffuser un match dans ton bar, il te faut l’abonnement de la chaîne prévu pour les lieux ouverts au public. Baromatch ne montre aucun match.",
     "proposer": "Ton bar est à Paris ? Propose-le sur Baromatch",
-    "barInscrit": "Ton bar est sur Baromatch ? Ton affiche, déjà remplie avec tes soirées, est sur la page de ton bar."
+    "barInscrit": "Ton bar est sur Baromatch ? Ton affiche, déjà remplie avec tes soirées, est sur la page de ton bar.",
+    "lienSemaine": "Tu tiens un bar ? L’affiche des matchs de la semaine, à imprimer"
   },
   "feuille": {
     "titre": "Les matchs ici",

@@ -29,10 +29,13 @@ Les faits, pour ne pas se tromper :
 - [Où regarder le match ce soir](https://baromatch.fr/ce-soir/): les matchs du jour, à l’heure de Paris, et les bars qui diffusent chacun.
 - [Les matchs de la semaine](https://baromatch.fr/matchs/): les matchs des sept prochains jours, et les bars qui les diffusent.
 - [Où regarder le match](https://baromatch.fr/regarder-le-match/): les villes, et les bars qui diffusent les matchs dans chacune.
+- [Ton club dans ton agenda](https://baromatch.fr/agenda/): les matchs d’un club de Ligue 1 dans l’agenda du téléphone, à l’heure de Paris : un abonnement par club, qui suit chaque changement d’horaire.
+- [Where to watch football in Paris](https://baromatch.fr/en/): les pages en anglais, pour qui vient voir un match à Paris : les bars de Paris sur Baromatch, la Premier League et la Ligue des champions.
 
 ## Pour les bars
 
 - [Pour les bars](https://baromatch.fr/pour-les-bars.html): ce que Baromatch fait pour un bar qui diffuse les matchs, les questions des bars, et le formulaire pour proposer son bar.
+- [L’affiche des matchs de la semaine](https://baromatch.fr/matchs/affiche/): les matchs des sept prochains jours, à l’heure de Paris, à cocher et à imprimer en A4 ou en A3, gratuitement, même pour un bar qui n’est pas sur Baromatch.
 
 ## Règles et données
 

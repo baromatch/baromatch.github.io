@@ -333,6 +333,7 @@ test('sans l’encodeur des QR codes : aucune affiche, ni lien vers elles, et le
   const site = await enMemoire({ encodeur: null });
   expect(site.pages.filter((p) => p.type.startsWith('affiche'))).toEqual([]);
   expect(pageDe(site, ZINC).contenu).not.toContain('/affiche/');
+  expect(site.pages.filter((p) => p.contenu.includes('/affiche/')).map((p) => p.chemin)).toEqual([]);
   const journal = [];
   const sortie = await siteAvecLeDepot();
   const resultat = await construire({ source: sourceChargee(), sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr: null, journal: (l) => journal.push(l) });
@@ -352,6 +353,14 @@ test('l’Action installe l’encodeur avec le rendu des images, et enregistre l
   expect(action).toContain('--images=exiger');
   expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do');
   expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$'");
+});
+
+test('la semaine (/matchs/) mène à l’affiche de ses matchs, par un lien seul, juste avant « Toutes les villes »', async () => {
+  const semaine = pageDe(await enMemoire(), '/matchs/').contenu;
+  expect(semaine).toContain(`<p class="regarder-suite"><a href="${OUVERTE}">Tu tiens un bar\u00A0? L’affiche des matchs de la semaine, à imprimer</a></p>
+<p class="regarder-retour"><a href="/regarder-le-match/">Toutes les villes</a></p>`);
+  // Sans vrai bar publié aussi : l’affiche est ouverte à tous les bars.
+  expect(pageDe(await enMemoire({ avec: sansBarPublie }), '/matchs/').contenu).toContain(`<a href="${OUVERTE}">`);
 });
 
 test('« Partager mon badge » de la page des bars mène à l’affiche de la semaine', () => {
@@ -448,6 +457,12 @@ test.describe('dans le navigateur', () => {
       const hauteurs = await onglet.locator('label.affiche-ligne__texte, .affiche-format__choix, main .regarder-suite a').evaluateAll((el) => el.map((x) => Math.round(x.getBoundingClientRect().height)));
       expect(hauteurs.length, chemin).toBeGreaterThanOrEqual(chemin === OUVERTE ? 18 : 2);
       expect(hauteurs.filter((h) => h < 44), chemin).toEqual([]);
+    }
+    // Les liens qui y mènent, depuis la semaine et depuis la page du bar : seuls sur leur ligne, 44 px.
+    for (const [chemin, cible] of [['/matchs/', OUVERTE], [ZINC, AFFICHE_DU_ZINC]]) {
+      await onglet.goto(`${serveur.adresse}${chemin}`);
+      const boite = await onglet.locator(`main .regarder-suite a[href="${cible}"]`).boundingBox();
+      expect(Math.round(boite.height), chemin).toBeGreaterThanOrEqual(44);
     }
   });
 

@@ -91,8 +91,11 @@ const grouperParLieu = (recus, barDe) => {
     .map(({ ville, quartiers }) => ({ ville, quartiers: [...quartiers.entries()].sort((a, b) => a[0] - b[0]).map(([, q]) => q) }));
 };
 
-// afficheDuBar : le lien de la page d’un bar vers son affiche à imprimer (affiche.mjs), quand les affiches sont écrites.
-export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false, anciens = { matchs: [], bars: [] }, images = false, afficheDuBar = null }) => {
+// afficheDuBar : le lien de la page d’un bar vers son affiche à imprimer (affiche.mjs), quand les affiches sont écrites ;
+// afficheDeLaSemaine : de même, le lien de la semaine vers l’affiche de ses matchs.
+export const fabriquerLesPages = ({
+  donnees, contenu, cadre, avecPresse = false, anciens = { matchs: [], bars: [] }, images = false, afficheDuBar = null, afficheDeLaSemaine = null,
+}) => {
   const { maintenant } = donnees;
   const { textes, marque, villes: guides } = contenu;
   const enCoursOuAVenir = (m) => m.debut + DUREE_MATCH_MS > maintenant;
@@ -281,7 +284,7 @@ ${ensuite.length ? `<section class="regarder-section" aria-labelledby="titre-ens
   <ul class="regarder-matchs">
 ${ensuite.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`).join('\n')}
   </ul>
-</section>\n` : ''}<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
+</section>\n` : ''}${afficheDeLaSemaine ? `${afficheDeLaSemaine()}\n` : ''}<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
 ${appel(marque, textes)}
 ${commentCaMarche(textes, marque)}`,
     });

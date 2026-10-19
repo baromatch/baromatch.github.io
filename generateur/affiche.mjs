@@ -234,6 +234,8 @@ ${suivantes.length ? `  <h4 class="affiche-sous-titre">${e(t.suivantes)}</h4>\n$
 
 // Le lien de la page d’un bar vers son affiche (pages.mjs le reçoit seulement quand les affiches sont écrites).
 export const lienVersLAffiche = (bar) => `<p class="regarder-suite"><a href="${cheminDeLAfficheDuBar(bar)}">${e(TEXTES_DES_AFFICHES.bar.lien)}</a></p>`;
+// Le lien de la semaine (/matchs/) vers l’affiche de ses matchs, un lien seul (pages.mjs, de même).
+export const lienVersLAfficheDeLaSemaine = () => `<p class="regarder-suite"><a href="${CHEMIN_DE_L_AFFICHE}">${e(TEXTES_DES_AFFICHES.ouverte.lienSemaine)}</a></p>`;
 
 // Toutes les affiches d’un passage : l’affiche ouverte et celle de chaque vrai bar publié. Sans encodeur de QR code
 // (qr null), aucune.

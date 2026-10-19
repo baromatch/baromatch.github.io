@@ -5,7 +5,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fabriquerLaPageAgenda } from './agenda.mjs';
-import { fabriquerLesAffiches, lienVersLAffiche } from './affiche.mjs';
+import { fabriquerLesAffiches, lienVersLAffiche, lienVersLAfficheDeLaSemaine } from './affiche.mjs';
 import { fabriquerLesPagesAnglaises, lierLesLangues } from './anglais.mjs';
 import { fabriquerCeSoir } from './ce-soir.mjs';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
@@ -31,7 +31,9 @@ export const construireEnMemoire = async ({
   const donnees = preparer(listes, { maintenant, ...contenu, adresses: anciens?.adresses });
   const cadre = lireLeCadre(racine);
   const avecPresse = existsSync(path.join(racine, 'presse.html'));
-  const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens, images, afficheDuBar: qr ? lienVersLAffiche : null });
+  const { pages, avertissements } = fabriquerLesPages({
+    donnees, contenu, cadre, avecPresse, anciens, images, afficheDuBar: qr ? lienVersLAffiche : null, afficheDeLaSemaine: qr ? lienVersLAfficheDeLaSemaine : null,
+  });
   // « Ce soir » (/ce-soir/) : les places de ses bars viennent de la liste brute des soirées.
   pages.push(fabriquerCeSoir({ donnees, contenu, cadre, avecPresse, pages, nuits: listes.matchNights, images }));
   // « Ton club dans ton agenda » (/agenda/) : la page ; ses fichiers d’agenda s’écrivent à côté (construire.mjs).

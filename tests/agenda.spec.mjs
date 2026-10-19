@@ -6,6 +6,7 @@
 // liste blanche.
 import { test, expect } from '@playwright/test';
 import ICAL from 'ical.js';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -118,6 +119,17 @@ test('l’écriture iCalendar : 75 octets par ligne sans couper un caractère, l
   expect(lendemain('2026-10-25')).toBe('2026-10-26');
   expect(lendemain('2026-12-31')).toBe('2027-01-01');
   expect(lendemain('2028-02-28')).toBe('2028-02-29');
+});
+
+// ---------- Les agendas du dépôt ----------
+
+test('chaque agenda du dépôt (agenda/*.ics, matchs/*/match.ics) est un iCalendar valide, en CRLF', () => {
+  const fichiers = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', '*.ics'], { cwd: racine, encoding: 'utf8' }).split('\0').filter(Boolean);
+  expect(fichiers.filter((f) => f.startsWith('agenda/')).length).toBeGreaterThan(0);
+  for (const fichier of fichiers) {
+    expect(fichier, fichier).toMatch(/^(?:agenda\/[a-z0-9-]+\.ics|matchs\/[a-z0-9-]+\/match\.ics)$/);
+    lireEtValider(readFileSync(path.join(racine, fichier)), fichier);
+  }
 });
 
 // ---------- Les agendas du scénario ----------

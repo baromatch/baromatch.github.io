@@ -1,0 +1,65 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+X-WR-CALNAME:Le Havre · Baromatch
+X-WR-CALDESC:Le Havre : les matchs au programme de Baromatch (Ligue 1)\, 
+ à l’heure de Paris\, pour l’instant jusqu’au dimanche 8 novembre. P
+ as de Coupe de France ni de match amical pour l’instant. Un match report
+ é ou annulé reste sept jours\, marqué comme tel. https://baromatch.fr/a
+ genda/
+X-PUBLISHED-TTL:PT6H
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+BEGIN:VEVENT
+UID:match-013@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261018T151500Z
+DTEND:20261018T171500Z
+SUMMARY:Le Havre – Auxerre
+DESCRIPTION:Ligue 1 · Le Havre AC – AJ Auxerre\nCoup d’envoi dimanche 
+ 18 octobre à 17:15\, heure de Paris.\nLa page du match : https://baromat
+ ch.fr/matchs/le-havre-auxerre-2026-10-18/
+URL:https://baromatch.fr/matchs/le-havre-auxerre-2026-10-18/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-037@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261025T161500Z
+DTEND:20261025T181500Z
+SUMMARY:OM – Le Havre
+DESCRIPTION:Ligue 1 · Olympique de Marseille – Le Havre AC\nCoup d’env
+ oi dimanche 25 octobre à 17:15\, heure de Paris.\nLa page du match : htt
+ ps://baromatch.fr/matchs/om-le-havre-2026-10-25/
+URL:https://baromatch.fr/matchs/om-le-havre-2026-10-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-043@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261030T180000Z
+DTEND:20261030T200000Z
+SUMMARY:Le Havre – PSG
+DESCRIPTION:Ligue 1 · Le Havre AC – Paris Saint-Germain\nCoup d’envoi 
+ vendredi 30 octobre à 19:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:match-074@baromatch.fr
+DTSTAMP:20261016T083123Z
+SEQUENCE:0
+DTSTART:20261108T161500Z
+DTEND:20261108T181500Z
+SUMMARY:Le Havre – Lorient
+DESCRIPTION:Ligue 1 · Le Havre AC – FC Lorient\nCoup d’envoi dimanche 
+ 8 novembre à 17:15\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -79,7 +79,7 @@ test('un soir avec un vrai bar publié : indexable, le match, le bar, la date en
   const bars = sectionDe(p, 'titre-bars');
   expect(bars).toMatch(/^id="titre-bars">Aujourd’hui, dans un bar<\/h2>/);
   expect(bars).toContain('<h3 class="regarder-soir__match"><a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a></h3>');
-  expect(bars).toContain('<time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1 · <a href="/regarder-le-match/lyon/">1 bar à Lyon</a>');
+  expect(bars).toContain('<p class="regarder-soir__quand"><time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1 · 1 bar à Lyon</p>');
   expect(bars).toContain('<h4 class="regarder-carte__nom"><a href="/bar/la-cave-des-gones-lyon-2/">La Cave des Gones</a></h4>');
   expect(bars).toContain('<p class="regarder-carte__lieu">Lyon 2e · 8 Rue Mercière, 69002 Lyon</p>');
   // La description dit le jour, le nombre de vrais bars et leur ville.
@@ -88,7 +88,7 @@ test('un soir avec un vrai bar publié : indexable, le match, le bar, la date en
   expect(p.contenu).not.toMatch(/démo|TestBar|Testament/i);
   // Les prochains matchs, vers leur page, avec leurs vrais bars.
   const prochains = sectionDe(p, 'titre-prochains');
-  expect(prochains).toContain('<a href="/matchs/psg-barca-2026-10-24/">PSG – Barça</a> · <time datetime="2026-10-24T21:00:00+02:00">samedi 24 octobre · 21:00</time>');
+  expect(prochains).toContain('<h3 class="regarder-jour">Samedi 24 octobre</h3>\n  <ul class="regarder-matchs">\n    <li><a href="/matchs/psg-barca-2026-10-24/">PSG – Barça</a> · <time datetime="2026-10-24T21:00:00+02:00">21:00</time> · Ligue des champions · <span class="regarder-compte"><a href="/regarder-le-match/paris/">2 bars à Paris</a></span></li>');
   expect(prochains).not.toContain('Brest');
   expect(prochains).toContain('<a href="/matchs/">Tous les matchs de la semaine</a>');
 });
@@ -203,7 +203,7 @@ test('un jour sans aucun match : une page utile (les prochains matchs, les ville
   expect(titreDe(p)).toBe('Où regarder le match ce soir, jeudi 15 octobre — Baromatch');
   expect(sectionDe(p, 'titre-rien')).toMatch(/^id="titre-rien">Pas de match ce soir<\/h2>/);
   const prochains = sectionDe(p, 'titre-prochains');
-  expect(prochains).toContain('<a href="/matchs/le-mans-toulouse-2026-10-16/">Le Mans – Toulouse</a> · <time datetime="2026-10-16T20:45:00+02:00">vendredi 16 octobre · 20:45</time>');
+  expect(prochains).toContain('<h3 class="regarder-jour">Vendredi 16 octobre</h3>\n  <ul class="regarder-matchs">\n    <li><a href="/matchs/le-mans-toulouse-2026-10-16/">Le Mans – Toulouse</a> · <time datetime="2026-10-16T20:45:00+02:00">20:45</time>');
   expect((prochains.match(/<li>/g) ?? []).length).toBe(8);
   expect(sectionDe(p, 'titre-villes')).toContain('<a href="/regarder-le-match/paris/">');
   expect(p.contenu).toContain('<a class="capsule" href="/#attente">');

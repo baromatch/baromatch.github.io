@@ -24,6 +24,12 @@ export const PROCHAINS = 8;
 
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
+// « 2 bars à Paris, 1 bar à Lyon », en texte : chaque carte, dessous, dit déjà sa ville.
+const compteParVille = (soirees) => {
+  const villes = new Map();
+  for (const s of soirees) villes.set(s.bar.ville.nom, (villes.get(s.bar.ville.nom) ?? 0) + 1);
+  return [...villes].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'fr')).map(([ville, n]) => `${accorder(n, 'bar')} à ${ville}`).join(', ');
+};
 
 // Les places de chaque soirée, telles que les listes publiques les donnent (GET /bars/match-nights) : les places que
 // l’appli peut encore donner, « complet », et si l’on peut réserver. Une valeur absente ou illisible reste absente :
@@ -94,7 +100,7 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
     || (a.bar.arrondissement?.numero ?? 0) - (b.bar.arrondissement?.numero ?? 0) || a.bar.nom.localeCompare(b.bar.nom, 'fr');
   const blocDuMatch = (m) => `  <div class="regarder-soir">
     <h3 class="regarder-soir__match">${lien(m)}</h3>
-    <p class="regarder-soir__quand">${coupDEnvoi(m)} · ${e(m.competition)} · ${barsParVille(m.soirees)}</p>
+    <p class="regarder-soir__quand">${coupDEnvoi(m)} · ${e(m.competition)} · ${e(compteParVille(m.soirees))}</p>
     <ul class="regarder-cartes">
       ${[...m.soirees].sort(parLieu).map((s) => carteDuBar(s.bar, textes, { soiree: s, niveau: 4, places: placesDe(s) })).join('\n      ')}
     </ul>
@@ -128,11 +134,14 @@ ${ceSoir.map(ligneDuSoir).join('\n')}
   <h2 id="titre-rien">${e(fini ? t.fini : t.rien)}</h2>
   <p>${e(fini ? t.finiSuite : t.rienSuite)}</p>
 </section>`;
+  // Les prochains matchs, sous le titre de leur jour : la ligne ne donne que l’heure, comme sur la semaine.
+  const joursProchains = [...new Set(prochains.map((m) => jourDeParis(m.debut)))];
   const sectionProchains = `<section class="regarder-section" aria-labelledby="titre-prochains">
   <h2 id="titre-prochains">${e(t.prochains)}</h2>
-${prochains.length ? `  <ul class="regarder-matchs">
-${prochains.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`).join('\n')}
-  </ul>` : `  <p>${e(t.aucunProchain)}</p>`}
+${prochains.length ? joursProchains.map((j) => `  <h3 class="regarder-jour">${e(capitale(jourEnLettres(Date.parse(`${j}T12:00:00Z`))))}</h3>
+  <ul class="regarder-matchs">
+${prochains.filter((m) => jourDeParis(m.debut) === j).map((m) => `    ${ligneDeMatch(m, { avecPage: true, heureSeule: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`).join('\n')}
+  </ul>`).join('\n') : `  <p>${e(t.aucunProchain)}</p>`}
   <p class="regarder-suite"><a href="/matchs/">${e(textes.villes.voirLaSemaine)}</a></p>
 </section>`;
   // Les villes qui ont leur page : celles qui ont des vrais bars d’abord.

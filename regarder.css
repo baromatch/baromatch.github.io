@@ -240,9 +240,14 @@
 .regarder-soir__match a:hover { color: var(--goutte); }
 .regarder-soir__quand { margin: 0 0 14px; color: var(--texte-doux); }
 .regarder-soir__quand time { color: var(--texte); font-weight: 750; }
-.regarder-soir__quand a { display: inline-block; padding: 10px 0; }
 /* Les places d’un bar, à l’heure du passage : seulement l’appli ouverte. */
 .regarder-carte .regarder-carte__places { margin-top: 10px; font-weight: 650; }
+
+/* Le jour, au-dessus des prochains matchs ; le jour entier, sous le titre de la page. */
+.regarder-jour { margin: 24px 0 0; color: var(--texte-doux); font-size: 1.0625rem; font-weight: 700; }
+.regarder-section h2 + .regarder-jour { margin-top: 0; }
+.regarder-quand + .regarder-chapeau { margin-top: 8px; }
+.regarder-ce-soir > p:last-child { margin-bottom: 0; }
 
 /* Un lien seul sous un bloc (vers « Ce soir » depuis la semaine et les villes, vers la semaine) : 44 px à toucher. */
 .regarder-suite { margin: 12px 0 0; }

@@ -2,7 +2,7 @@
 // Usage :
 //   node generateur/construire.mjs [--source=api | --source=capture:<dossier> | --source=scenario:<fichier>]
 //                                  [--sortie=<dossier>] [--maintenant=<date ISO>] [--changees=<fichier>]
-//                                  [--accepter-les-suppressions]
+//                                  [--accepter-les-suppressions] [--images=exiger]
 // Par défaut : les listes publiques de l’appli, la racine du dépôt, l’heure de la machine.
 // Le passage lit les données, fabrique et contrôle toutes les pages en mémoire (site.mjs), refuse de supprimer d’un
 // coup plus de la moitié des pages déjà publiées, puis écrit seulement ce qui a changé, dans la liste blanche
@@ -12,11 +12,13 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { badgeDuBar } from './badge.mjs';
+import { chargerLeRendu } from './images/rendu.mjs';
+import { cheminDeLImage, lesPolices, POIDS_MAX, svgDeLaCarte } from './partage.mjs';
 import { RACINE } from './contenu.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
 import {
-  anciensDe, effacerUnFichier, ecrireUnFichier, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
+  anciensDe, effacerUnFichier, ecrireUnFichier, empreinte, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
 } from './etat.mjs';
 import { traiterLesRefus } from './refus.mjs';
 import { construireEnMemoire } from './site.mjs';
@@ -51,11 +53,17 @@ export const verifierLesListes = ({ precedent, donnees, maintenant }) => {
   return raisons;
 };
 
+// images : « exiger » (l’Action) arrête tout si le rendu des images de partage manque ; sinon, sans lui, chaque page
+// garde l’image générale du site, et le journal le dit. rendu : un rendu donné (les tests), ou null pour s’en passer.
 export const construire = async ({
   source = 'api', sortie = RACINE, maintenant = Date.now(), racine = RACINE, contenu, accepterLesSuppressions = false, adresse, journal = () => {},
+  images, rendu,
 } = {}) => {
   const precedent = lireLEtat(sortie);
-  const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent) });
+  const charge = rendu !== undefined ? { rendu, raison: 'le rendu des images est écarté' } : await chargerLeRendu({ polices: Object.values(lesPolices()) });
+  if (!charge.rendu && images === 'exiger') throw new Error(`Images de partage exigées, rien n’est écrit : ${charge.raison}.`);
+  if (!charge.rendu) journal(`avertissement : images de partage : ${charge.raison} ; chaque page garde l’image générale du site.`);
+  const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent), images: Boolean(charge.rendu) });
 
   // Une liste vide ou tronquée (bars, soirées, matchs) ne fait pas basculer le site : rien n’est écrit.
   const raisons = accepterLesSuppressions ? [] : verifierLesListes({ precedent, donnees: site.donnees, maintenant });
@@ -63,8 +71,9 @@ export const construire = async ({
     throw new Error(`Données douteuses, rien n’est écrit : ${raisons.join(' ; ')}. Si c’est voulu, relance avec --accepter-les-suppressions (ou coche la case en lançant l’Action à la main).`);
   }
 
-  // Une page refusée par le contrôle garde sa version précédente (et son badge) seulement si elle est sûre, 24 heures au
-  // plus ; sinon, une page neutre la remplace à la même adresse (refus.mjs) : jamais un bar retiré, jamais un lien mort.
+  // Une page refusée par le contrôle garde sa version précédente (et son badge, et son image de partage) seulement si elle
+  // est sûre, 24 heures au plus ; sinon, une page neutre la remplace à la même adresse (refus.mjs) : jamais un bar
+  // retiré, jamais un lien mort.
   const refus = traiterLesRefus({ site, precedent, sortie, maintenant, controler: site.controler });
   const avertissements = [...site.avertissements, ...refus.messages];
   const gardees = refus.gardees;
@@ -76,6 +85,21 @@ export const construire = async ({
       chemin: `${p.chemin}badge.svg`, type: 'badge', cle: p.cle, indexable: false,
       contenu: badgeDuBar({ bar: p.bar, soiree: p.soirees?.[0] ?? null, parti: Boolean(p.parti || p.repli), maintenant, marque: site.contenu.marque, textes: site.contenu.textes, verre: site.cadre.verre }),
     });
+  }
+
+  // L’image de partage de chaque page de match, de ville, de bar et de « Ce soir », à côté d’elle. Son empreinte est
+  // celle de son dessin (le SVG et le rendu) : un dessin inchangé dont le fichier est là n’est ni refait ni réécrit
+  // (contenu null). Une page neutre n’en a pas (l’image générale du site) : l’image de la page refusée part avec elle.
+  if (charge.rendu) {
+    for (const p of site.pages.filter((x) => x.carte)) {
+      const chemin = cheminDeLImage(p.chemin);
+      const svg = svgDeLaCarte(p.carte, { verre: site.cadre.verre });
+      const marque = empreinte(`${svg}\n${charge.rendu.signature}`);
+      const deja = precedent.pages?.[chemin]?.empreinte === marque && existsSync(path.join(sortie, fichierDuChemin(chemin)));
+      const png = deja ? null : charge.rendu.rendre(svg);
+      if (png && png.length > POIDS_MAX) journal(`avertissement : ${chemin} pèse ${Math.round(png.length / 1024)} Ko (plus de ${POIDS_MAX / 1024} Ko)`);
+      fichiers.push({ chemin, type: 'partage', cle: p.cle, indexable: false, empreinte: marque, contenu: png });
+    }
   }
 
   // La prudence : jamais plus de la moitié des pages publiées supprimées d’un coup.
@@ -98,7 +122,7 @@ export const construire = async ({
   if (refuses.length) throw new Error(`Chemins refusés (hors de la liste blanche du générateur), rien n’est écrit : ${refuses.join(', ')}`);
 
   // Tout est prêt et contrôlé : seulement maintenant, l’écriture.
-  const ecrits = fichiers.filter((f) => ecrireUnFichier(sortie, fichierDuChemin(f.chemin), f.contenu)).map((f) => f.chemin);
+  const ecrits = fichiers.filter((f) => f.contenu !== null && ecrireUnFichier(sortie, fichierDuChemin(f.chemin), f.contenu)).map((f) => f.chemin);
   for (const chemin of supprimees) effacerUnFichier(sortie, fichierDuChemin(chemin));
   ecrireUnFichier(sortie, FICHIER_ETAT, texteDeLEtat(etat));
   ecrireUnFichier(sortie, PLAN, plan);
@@ -143,6 +167,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       sortie: path.resolve(typeof options.sortie === 'string' ? options.sortie : RACINE),
       maintenant,
       accepterLesSuppressions: options['accepter-les-suppressions'] === true,
+      images: options.images,
       journal,
     });
     const resume = Object.entries(resultat.compte).map(([type, { pages, indexables }]) => `${type} : ${pages} (${indexables} indexables)`).join(' · ');

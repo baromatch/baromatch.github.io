@@ -4,8 +4,9 @@
 // un bar, ce qu’il faut pour refaire sa page quand il n’est plus dans les données (30 jours encore).
 // Le plan du site (sitemap.xml) : chaque entrée qui n’est pas une page générée est gardée telle quelle ; les pages
 // générées indexables y sont, avec la date de leur dernier vrai changement.
-// La liste blanche : le générateur n’écrit et n’efface que dans matchs/, regarder-le-match/ et bar/, et ne réécrit
-// que ce-soir/index.html et sitemap.xml en dehors. Tout autre chemin est refusé, avant toute écriture.
+// La liste blanche : le générateur n’écrit et n’efface que dans matchs/, regarder-le-match/ et bar/ (des pages, des
+// badges, des images de partage), et ne touche en dehors qu’à ce-soir/ (sa page et son image) et à sitemap.xml. Tout
+// autre chemin est refusé, avant toute écriture.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -14,7 +15,7 @@ import { ORIGINE } from './jsonld.mjs';
 export const FICHIER_ETAT = 'regarder-le-match/etat.json';
 export const PLAN = 'sitemap.xml';
 const DOSSIERS = ['matchs', 'regarder-le-match', 'bar'];
-const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg)|ce-soir\/index\.html)$/;
+const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)|ce-soir\/(?:index\.html|partage\.png))$/;
 
 export const estPermis = (relatif) => relatif === PLAN || relatif === FICHIER_ETAT || (PERMIS.test(relatif) && !relatif.split('/').includes('..'));
 
@@ -32,11 +33,13 @@ export const empreinte = (texte) => createHash('sha256').update(texte).digest().
 const lireSiPresent = (fichier) => (existsSync(fichier) ? readFileSync(fichier, 'utf8') : null);
 // Une copie de travail sous Windows peut avoir des fins de ligne CRLF : le même contenu n’est pas réécrit.
 const memeContenu = (a, b) => a !== null && a.replace(/\r\n/g, '\n') === b;
+// Une image (des octets) : la même, octet pour octet.
+const memesOctets = (fichier, octets) => existsSync(fichier) && readFileSync(fichier).equals(octets);
 
 export const ecrireUnFichier = (sortie, relatif, contenu) => {
   exigerPermis(relatif);
   const fichier = path.join(sortie, relatif);
-  if (memeContenu(lireSiPresent(fichier), contenu)) return false;
+  if (Buffer.isBuffer(contenu) ? memesOctets(fichier, contenu) : memeContenu(lireSiPresent(fichier), contenu)) return false;
   mkdirSync(path.dirname(fichier), { recursive: true });
   writeFileSync(fichier, contenu);
   return true;
@@ -101,7 +104,9 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adress
       pages[f.chemin] = f.entree ?? avant;
       continue;
     }
-    const marque = empreinte(f.contenu);
+    // Une image de partage porte l’empreinte de ce qui la dessine (son SVG et le rendu) : elle n’est refaite que si
+    // son dessin change.
+    const marque = f.empreinte ?? empreinte(f.contenu);
     pages[f.chemin] = {
       type: f.type,
       cle: f.cle,

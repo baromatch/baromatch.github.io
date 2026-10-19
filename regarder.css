@@ -251,3 +251,32 @@
 /* Un lien seul sous un bloc (vers « Ce soir » depuis la semaine et les villes, vers la semaine) : 44 px à toucher. */
 .regarder-suite { margin: 12px 0 0; }
 .regarder-suite a { display: inline-block; padding: 10px 0; font-weight: 650; }
+
+/* ---------- Partager la page (match, ville, bar) ---------- */
+
+/* Sous la tête de la page : des capsules de verre, discrètes (l’ambre reste à l’appel à l’action), de 44 px au moins.
+   Aucune animation : rien à couper quand le mouvement est réduit. */
+.partage { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 20px; }
+.partage__bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  background: var(--verre-fort);
+  box-shadow: var(--verre-reflet);
+  color: var(--texte);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.partage__bouton:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
+/* L’adresse de la page, en lien : sans JavaScript, ou quand la copie est refusée, elle se copie à la main. */
+.partage__lien { display: inline-block; padding: 11px 0; color: var(--texte-doux); font-size: 0.9375rem; overflow-wrap: anywhere; }
+.partage [hidden] { display: none; }
+.partage__statut { flex-basis: 100%; margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
+.partage__statut:empty { display: none; }

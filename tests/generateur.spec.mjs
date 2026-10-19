@@ -999,6 +999,7 @@ test.describe('d’un passage à l’autre', () => {
     expect(raisonDeNePasGarder({ ...sure, publies: new Set() })).toBe('elle nomme un bar qui n’est plus publié (b-zinc)');
     expect(raisonDeNePasGarder({ ...sure, existantes: new Set(['/matchs/psg-ol-2026-10-25/', '/regarder-le-match/paris/']) })).toBe('elle mène à une page qui n’existe plus (/bar/le-zinc-des-amis-paris-11/)');
     expect(raisonDeNePasGarder({ ...sure, html: null })).toBe('elle n’a pas de version précédente');
+    expect(raisonDeNePasGarder({ ...sure, imageManquante: true })).toBe('son image de partage n’est plus là');
     expect(raisonDeNePasGarder({ ...sure, avant: { ...sure.avant, gardeeDepuis: '2026-10-22T08:00:01Z' } })).toBeNull();
     expect(raisonDeNePasGarder({ ...sure, avant: { ...sure.avant, gardeeDepuis: '2026-10-22T08:00:00Z' } })).toBe('elle est gardée depuis plus de 24 heures');
   });
@@ -1263,12 +1264,16 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     expect([...travaux.matchAll(/^ {2}[a-z-]+:$/gm)]).toHaveLength(1);
     expect(travaux).toMatch(/^ {2}generer:\n(?: {4}#.*\n)* {4}if: github\.ref == 'refs\/heads\/main'\n/);
     expect(travaux).toMatch(/ {6}- uses: actions\/checkout@v7\n {8}with:\n {10}ref: main\n/);
-    // Des actions à leur étiquette de version (vérifiées le 16 octobre 2026), Node 22, rien à installer.
+    // Des actions à leur étiquette de version (vérifiées le 16 octobre 2026), Node 22 ; une seule chose à installer, le
+    // rendu des images de partage, à sa version exacte (npm ci, sans script d’installation), avant le générateur.
     expect([...action.matchAll(/uses: ([^\s]+)/g)].map((m) => m[1])).toEqual(['actions/checkout@v7', 'actions/setup-node@v7']);
     expect(action).toContain('node-version: 22');
-    expect(action).not.toMatch(/npm (ci|install)/);
-    // Le générateur contre les listes publiques ; seuls les chemins de la liste blanche sont enregistrés.
-    expect(action).toContain('node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option');
+    expect([...action.matchAll(/npm [^\n]*/g)].map((m) => m[0])).toEqual(['npm ci --ignore-scripts --no-audit --no-fund']);
+    expect(action).toMatch(/\n {6}- name: Installer le rendu des images de partage\n {8}working-directory: generateur\/images\n {8}run: npm ci --ignore-scripts --no-audit --no-fund\n\n {6}- name: Construire et contrôler les pages\n/);
+    // Le générateur contre les listes publiques, les images exigées dans ses deux lancements (le second, le passage
+    // refait après un envoi refusé, sans le jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
+    expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(3);
+    expect(action.match(/node generateur\/construire\.mjs[^\n]*/g)).toHaveLength(2);
     expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir sitemap.xml; do');
     expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir)/|^sitemap\\.xml$'");
     expect(action).toContain('git pull -q --rebase origin main');
@@ -1285,7 +1290,7 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
       .filter((ligne) => !ligne.startsWith('#') && ligne.includes('generateur/construire.mjs')).map((ligne) => ({ ligne, jeton: etape.includes('JETON_GITHUB') })));
     expect(lancements.map((l) => l.jeton)).toEqual([false, true]);
     for (const { ligne, jeton } of lancements) {
-      if (jeton) expect(ligne).toBe('env -u JETON_GITHUB node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option');
+      if (jeton) expect(ligne).toBe('env -u JETON_GITHUB node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option');
     }
     expect(action).toContain('git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main');
     expect(action).not.toMatch(/git push|remote set-url/);

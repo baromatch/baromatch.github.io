@@ -2,15 +2,18 @@
 // jamais un lien vers une page qui n’existe pas.
 // Sa version précédente reste en ligne seulement si elle est sûre : l’état dit quels bars elle nomme et chacun est
 // encore publié (un bar retiré de bars-publies.json, ou exclu, n’y reste jamais), chaque page qu’elle cite existe encore
-// après ce passage, et elle n’est pas gardée depuis plus de 24 heures (elle vieillit : jours, soirées, bars). Sinon, une
-// page neutre la remplace à la même adresse (« Cette page se met à jour », en noindex, vers les matchs et les villes),
-// et un bar y a le badge générique : les liens des autres pages mènent toujours quelque part. Le journal dit chaque cas.
+// après ce passage, l’image de partage qu’elle annonce est encore là, et elle n’est pas gardée depuis plus de 24 heures
+// (elle vieillit : jours, soirées, bars). Elle garde alors son badge et son image. Sinon, une page neutre la remplace à
+// la même adresse (« Cette page se met à jour », en noindex, vers les matchs et les villes, avec l’image générale du
+// site et sans bloc « Partager ») : son image part avec elle, et un bar y a le badge générique. Les liens des autres
+// pages mènent toujours quelque part. Le journal dit chaque cas.
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { HEURE_MS } from './donnees.mjs';
 import { fichierDuChemin } from './etat.mjs';
 import { page } from './gabarits.mjs';
 import { filDAriane, pageWeb } from './jsonld.mjs';
+import { adresseDeLImage, cheminDeLImage } from './partage.mjs';
 import { echapper as e } from './texte.mjs';
 
 export const GARDE_MAX_MS = 24 * HEURE_MS;
@@ -31,8 +34,9 @@ export const adressesCitees = (html) => [...new Set([...html.matchAll(/(?:https:
 
 // Pourquoi la version précédente d’une page refusée ne peut pas rester en ligne, ou null si elle le peut.
 // avant : son entrée dans l’état ; html : son contenu sur le disque (null s’il manque) ; publies : les identifiants des
-// bars publiés à ce passage ; existantes : les adresses des pages qui existent après ce passage.
-export const raisonDeNePasGarder = ({ avant, html, publies, existantes, maintenant }) => {
+// bars publiés à ce passage ; existantes : les adresses des pages qui existent après ce passage ; imageManquante : elle
+// annonce son image de partage, et l’état ou le disque ne l’ont plus.
+export const raisonDeNePasGarder = ({ avant, html, publies, existantes, maintenant, imageManquante = false }) => {
   if (!avant || html === null) return 'elle n’a pas de version précédente';
   if (avant.repli) return 'sa version précédente est déjà la page neutre';
   if (!Array.isArray(avant.bars)) return 'l’état ne dit pas quels bars elle nomme';
@@ -40,6 +44,7 @@ export const raisonDeNePasGarder = ({ avant, html, publies, existantes, maintena
   if (retires.length) return `elle nomme un bar qui n’est plus publié (${retires.join(', ')})`;
   const disparues = adressesCitees(html).filter((chemin) => !existantes.has(chemin));
   if (disparues.length) return `elle mène à une page qui n’existe plus (${disparues.join(', ')})`;
+  if (imageManquante) return 'son image de partage n’est plus là';
   if (avant.gardeeDepuis && maintenant - Date.parse(avant.gardeeDepuis) >= GARDE_MAX_MS) return 'elle est gardée depuis plus de 24 heures';
   return null;
 };
@@ -73,7 +78,8 @@ export const pageDeRepli = (refusee, { cadre, marque, avecPresse }) => {
   };
 };
 
-// Pour chaque page refusée : sa version précédente gardée ({ chemin, entree }, avec son badge), ou sa page neutre.
+// Pour chaque page refusée : sa version précédente gardée ({ chemin, entree }, avec son badge et son image), ou sa page
+// neutre.
 // controler : le contrôle de site.mjs, que la page neutre passe aussi (sinon, rien n’est écrit).
 export const traiterLesRefus = ({ site, precedent, sortie, maintenant, controler }) => {
   const publies = new Set(site.donnees.bars.map((b) => b.id));
@@ -85,12 +91,16 @@ export const traiterLesRefus = ({ site, precedent, sortie, maintenant, controler
     const avant = precedent.pages?.[refusee.chemin];
     const fichier = path.join(sortie, fichierDuChemin(refusee.chemin));
     const html = avant && existsSync(fichier) ? readFileSync(fichier, 'utf8') : null;
-    const raison = raisonDeNePasGarder({ avant, html, publies, existantes, maintenant });
+    const image = cheminDeLImage(refusee.chemin);
+    const imageLa = Boolean(precedent.pages?.[image]) && existsSync(path.join(sortie, fichierDuChemin(image)));
+    const imageManquante = html !== null && html.includes(adresseDeLImage(refusee.chemin)) && !imageLa;
+    const raison = raisonDeNePasGarder({ avant, html, publies, existantes, maintenant, imageManquante });
     const erreurs = refusee.erreurs.join(' ; ');
     if (!raison) {
       gardees.push({ chemin: refusee.chemin, entree: { ...avant, gardeeDepuis: avant.gardeeDepuis ?? new Date(maintenant).toISOString() } });
       const badge = `${refusee.chemin}badge.svg`;
       if (precedent.pages?.[badge]) gardees.push({ chemin: badge, entree: precedent.pages[badge] });
+      if (imageLa) gardees.push({ chemin: image, entree: precedent.pages[image] });
       messages.push(`Page refusée, sa version précédente reste en ligne : ${refusee.chemin} (${erreurs})`);
       continue;
     }

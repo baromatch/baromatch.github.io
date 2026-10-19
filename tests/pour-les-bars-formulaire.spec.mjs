@@ -5,6 +5,7 @@
 // les 24 h.
 import { test, expect } from '@playwright/test';
 import { AxeBuilder } from '@axe-core/playwright';
+import { arreterLHorloge } from './outils/horloge.mjs';
 
 const PAGE = '/pour-les-bars.html';
 // Le piège à robots, un champ caché que seul un robot remplit.
@@ -117,8 +118,7 @@ async function ouvrir(page, reponses = [CREEE]) {
       return fetchDeLaPage.apply(this, arguments);
     };
   }, ADRESSE);
-  await page.clock.install({ time: DEBUT });
-  await page.clock.pauseAt(DEBUT + 1000);
+  await arreterLHorloge(page, DEBUT + 1000);
   await page.goto(PAGE);
   // Le formulaire est là (son script est arrivé) : un test peut couper le réseau sans le perdre.
   await expect(page.locator('#demande')).toBeVisible();

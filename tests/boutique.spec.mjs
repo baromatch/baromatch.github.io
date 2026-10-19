@@ -5,6 +5,7 @@
 // vérifier. Et si boutique.js ne se lance pas, la collection s’affiche quand même, sans trou.
 import { test, expect } from '@playwright/test';
 import { champDe, simulerFormspree } from './outils/formspree.mjs';
+import { arreterLHorloge } from './outils/horloge.mjs';
 
 const SELECTION = [{ id: 'tshirt-le-verre', couleur: 'nuit', taille: 'M', quantite: 1 }];
 // Chaque échec écrit l’adresse en toutes lettres (sans messagerie installée, le lien ne s’ouvre pas) et garde le lien
@@ -143,8 +144,7 @@ for (const cas of [
 
 test('un service qui ne répond pas : au bout de 10 s, « pas partie » avec le mail, et le bouton revient', async ({ page }) => {
   const debut = new Date('2026-10-13T17:30:00+02:00').getTime();
-  await page.clock.install({ time: debut });
-  await page.clock.pauseAt(debut + 1000);
+  await arreterLHorloge(page, debut + 1000);
   await simulerFormspree(page, 'silence');
   await ouvrirAvecUneSelection(page);
   await envoyerLaSelection(page);
@@ -301,8 +301,7 @@ test('fermer la fenêtre avec une sélection rend le focus à « Voir ma sélect
 // échec, le focus est encore sur lui.
 test('pendant l’envoi, le bouton garde le focus et ignore un second appui ; « Envoi… » est dit ; après la panne, le focus y est encore', async ({ page }) => {
   const debut = new Date('2026-10-13T17:30:00+02:00').getTime();
-  await page.clock.install({ time: debut });
-  await page.clock.pauseAt(debut + 1000);
+  await arreterLHorloge(page, debut + 1000);
   const envois = await simulerFormspree(page, 'silence');
   await ouvrirAvecUneSelection(page);
   const envoyer = page.locator('#panier-form button[type="submit"]');

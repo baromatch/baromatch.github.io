@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { PIED } from './outils/pied.mjs';
+import { arreterLHorloge } from './outils/horloge.mjs';
 
 const PAGE = '/pour-les-bars.html';
 const ORIGINE = 'https://baromatch.fr';
@@ -691,8 +692,7 @@ test.describe('le premier écran d’abord', () => {
   // L’horloge de la page arrêtée : ses minuteurs n’avancent que quand le test le dit.
   const horlogeArretee = async (page) => {
     const debut = new Date('2026-10-12T16:00:00Z').getTime();
-    await page.clock.install({ time: debut });
-    await page.clock.pauseAt(debut + 1000);
+    await arreterLHorloge(page, debut + 1000);
   };
   const observateurMuet = (page) => page.addInitScript(() => {
     const Muet = function () {};

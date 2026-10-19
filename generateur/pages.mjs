@@ -12,6 +12,7 @@ import {
 } from './jsonld.mjs';
 import { lignesDuBadge } from './badge.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, tuTiensUnBar, atouts } from './gabarits.mjs';
+import { adresseDeLImage, lignesDeLaCarte } from './partage.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
 export const SEMAINE_JOURS = 7;
@@ -82,14 +83,18 @@ const grouperParLieu = (elements, barDe) => {
     .map(({ ville, quartiers }) => ({ ville, quartiers: [...quartiers.entries()].sort((a, b) => a[0] - b[0]).map(([, q]) => q) }));
 };
 
-export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false, anciens = { matchs: [], bars: [] } }) => {
+export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false, anciens = { matchs: [], bars: [] }, images = false }) => {
   const { maintenant } = donnees;
   const { textes, marque, villes: guides } = contenu;
   const enCoursOuAVenir = (m) => m.debut + DUREE_MATCH_MS > maintenant;
   const pages = [];
   const commun = { cadre, marque, avecPresse };
+  // Une page qui se partage (partage : un match, une ville ou un bar) : ce que dit son image (carte), et l’image en
+  // aperçu quand le rendu des images est là (images).
   const ajouter = (p) => {
-    pages.push({ ...p, contenu: page({ ...commun, ...p }) });
+    const carte = p.partage ? lignesDeLaCarte(p.partage, undefined, textes) : null;
+    const image = carte && images ? { adresse: adresseDeLImage(p.chemin), alt: carte.alt } : null;
+    pages.push({ ...p, carte, contenu: page({ ...commun, ...p, image }) });
   };
   const accueil = { nom: textes.fil.accueil, chemin: '/' };
   const semaine = { nom: textes.fil.matchs, chemin: '/matchs/' };
@@ -196,6 +201,7 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
     ajouter({
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
+      partage: { sorte: 'match', match, soirees },
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
       corps: `${fil(etapes)}
 ${enTete}
@@ -336,6 +342,7 @@ ${faq.map(({ question, reponse }) => `  <details>
       : pageWeb({ chemin, titre: titrePage, description: desc });
     ajouter({
       type: 'ville', cle: ville.cle, date: null, chemin, indexable: ville.indexable, titre: titrePage, description: desc,
+      partage: { sorte: 'ville', ville },
       memoire: { nom: ville.nom },
       jsonld: [principal, filDAriane(etapes), ...(ville.bars.length ? [listeDesBars(remplir(textes.ville.titreBars, { ville: nomVille }), ville.bars)] : [])],
       corps: `${fil(etapes)}
@@ -432,6 +439,7 @@ ${places.trimEnd()}`
     const { apercu } = lignesDuBadge({ bar, soiree: prochaine ?? null, maintenant, marque, textes });
     ajouter({
       type: 'bar', cle: bar.slug, date: null, chemin, indexable, titre: titrePage, description: desc, bar, soirees,
+      partage: { sorte: 'bar', bar, prochaine },
       memoire: { id: bar.id, ville: bar.ville, derniereSoiree: new Date(derniereSoiree).toISOString() },
       jsonld: [
         pageWeb({ chemin, titre: titrePage, description: desc, about: { '@id': `${adresseDe(chemin)}#bar` } }),

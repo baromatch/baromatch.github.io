@@ -23,7 +23,8 @@ export const lireLeCadre = (racine) => {
 
 // ---------- Tête, en-tête, pied ----------
 
-const tete = ({ titre, description, chemin, indexable, jsonld }) => `<!doctype html>
+// image : l’image de partage de la page ({ adresse, alt }), sinon l’image générale du site.
+const tete = ({ titre, description, chemin, indexable, jsonld, image }) => `<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -48,12 +49,13 @@ const tete = ({ titre, description, chemin, indexable, jsonld }) => `<!doctype h
 <meta property="og:title" content="${e(titre)}">
 <meta property="og:description" content="${e(description)}">
 <meta property="og:url" content="${adresseDe(chemin)}">
-<meta property="og:image" content="${IMAGE}">
+<meta property="og:image" content="${image?.adresse ?? IMAGE}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${e(IMAGE_ALT)}">
+<meta property="og:image:alt" content="${e(image?.alt ?? IMAGE_ALT)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@baromatchapp">
+<meta name="twitter:image" content="${image?.adresse ?? IMAGE}">
 <script type="application/ld+json">${blocJsonLd(jsonld)}</script>
 </head>
 <body>
@@ -91,7 +93,7 @@ ${elements.join('\n')}
 // avant « ? », « : » et « ; », pour que le signe ne parte jamais seul à la ligne.
 export const insecables = (texte) => texte.replace(/ ([?:;])/g, '\u00A0$1');
 
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld })}${cadre.entete}
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image })}${cadre.entete}
 
 <main id="contenu" class="regarder page">
 ${corps}

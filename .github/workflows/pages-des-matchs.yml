@@ -1,6 +1,7 @@
 # Les pages « Où regarder le match » : la semaine (matchs/), une page par match, les villes (regarder-le-match/), une
-# page et un badge par vrai bar (bar/), et le plan du site. Le générateur (generateur/construire.mjs, Node seul, sans
-# rien à installer) les écrit d’après les listes publiques de l’appli ; cette Action le lance toutes les 3 heures, à la
+# page et un badge par vrai bar (bar/), l’image de partage des pages de match, de ville et de bar, et le plan du site.
+# Le générateur (generateur/construire.mjs, Node seul ; seul le rendu des images de partage s’installe, dans
+# generateur/images) les écrit d’après les listes publiques de l’appli ; cette Action le lance toutes les 3 heures, à la
 # main (onglet Actions, « Run workflow »), et à chaque envoi sur main qui touche au générateur, à marque.json ou à
 # l’accueil (dont les pages reprennent l’en-tête et le pied de page).
 # Si les données ne répondent pas, répondent une erreur ou ne donnent aucun match, le générateur s’arrête sans rien
@@ -63,11 +64,18 @@ jobs:
         with:
           node-version: 22
 
+      # Le rendu des images de partage : la seule bibliothèque de l’Action, à sa version exacte (package-lock.json), sans
+      # aucun script d’installation. Rien n’en est servi aux visiteurs, rien n’en est enregistré. Sans lui, le générateur
+      # s’arrête (--images=exiger) plutôt que de retirer les images en ligne.
+      - name: Installer le rendu des images de partage
+        working-directory: generateur/images
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Construire et contrôler les pages
         run: |
           option=""
           if [ "$ACCEPTER" = "true" ]; then option="--accepter-les-suppressions"; fi
-          node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option
+          node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option
 
       - name: Enregistrer et envoyer les pages qui ont changé
         id: envoi
@@ -113,7 +121,7 @@ jobs:
               git rebase --abort || true
               git fetch -q origin main
               git reset -q --hard FETCH_HEAD
-              node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option
+              node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option
               if ! enregistrer; then
                 echo "envoye=non" >> "$GITHUB_OUTPUT"
                 exit 0

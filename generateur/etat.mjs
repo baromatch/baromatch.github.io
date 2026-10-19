@@ -14,7 +14,7 @@ import { ORIGINE } from './jsonld.mjs';
 export const FICHIER_ETAT = 'regarder-le-match/etat.json';
 export const PLAN = 'sitemap.xml';
 const DOSSIERS = ['matchs', 'regarder-le-match', 'bar'];
-const PERMIS = /^(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg)$/;
+const PERMIS = /^(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)$/;
 
 export const estPermis = (relatif) => relatif === PLAN || relatif === FICHIER_ETAT || (PERMIS.test(relatif) && !relatif.split('/').includes('..'));
 
@@ -32,11 +32,13 @@ export const empreinte = (texte) => createHash('sha256').update(texte).digest().
 const lireSiPresent = (fichier) => (existsSync(fichier) ? readFileSync(fichier, 'utf8') : null);
 // Une copie de travail sous Windows peut avoir des fins de ligne CRLF : le même contenu n’est pas réécrit.
 const memeContenu = (a, b) => a !== null && a.replace(/\r\n/g, '\n') === b;
+// Une image (des octets) : la même, octet pour octet.
+const memesOctets = (fichier, octets) => existsSync(fichier) && readFileSync(fichier).equals(octets);
 
 export const ecrireUnFichier = (sortie, relatif, contenu) => {
   exigerPermis(relatif);
   const fichier = path.join(sortie, relatif);
-  if (memeContenu(lireSiPresent(fichier), contenu)) return false;
+  if (Buffer.isBuffer(contenu) ? memesOctets(fichier, contenu) : memeContenu(lireSiPresent(fichier), contenu)) return false;
   mkdirSync(path.dirname(fichier), { recursive: true });
   writeFileSync(fichier, contenu);
   return true;
@@ -99,7 +101,9 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adress
       pages[f.chemin] = avant;
       continue;
     }
-    const marque = empreinte(f.contenu);
+    // Une image de partage porte l’empreinte de ce qui la dessine (son SVG et le rendu) : elle n’est refaite que si
+    // son dessin change.
+    const marque = f.empreinte ?? empreinte(f.contenu);
     pages[f.chemin] = {
       type: f.type,
       cle: f.cle,

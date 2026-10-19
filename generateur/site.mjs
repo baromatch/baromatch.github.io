@@ -13,7 +13,7 @@ import { lireLaSource } from './sources.mjs';
 import { chargerLeVocabulaire, validerLaPage } from './validateur.mjs';
 
 export const construireEnMemoire = async ({
-  source, maintenant = Date.now(), racine = RACINE, contenu = chargerLeContenu(racine), anciens, adresse, brut,
+  source, maintenant = Date.now(), racine = RACINE, contenu = chargerLeContenu(racine), anciens, adresse, brut, images = false,
 } = {}) => {
   // L’appli dite ouverte sans aucun lien de magasin : chaque page promettrait une place impossible à garder.
   const { appli = {} } = contenu.marque;
@@ -23,7 +23,7 @@ export const construireEnMemoire = async ({
   const donnees = preparer(brut ?? await lireLaSource(source, adresse ? { adresse } : {}), { maintenant, ...contenu, adresses: anciens?.adresses });
   const cadre = lireLeCadre(racine);
   const avecPresse = existsSync(path.join(racine, 'presse.html'));
-  const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens });
+  const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens, images });
 
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);

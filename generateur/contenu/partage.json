@@ -1,0 +1,26 @@
+{
+  "_lisezMoi": "Les textes du partage d’une page de match, de ville ou de bar : ceux de son image d’aperçu (celle que montre WhatsApp à côté du lien) et ceux du bloc « Partager ». Tutoiement, présent, phrases courtes, pas de « ! ». Le nombre de bars est toujours le vrai, écrit par le générateur ; sans bar, l’image dit seulement où le regarder, jamais « 0 bar ».",
+  "match": {
+    "diffuse": "le diffuse",
+    "diffusent": "le diffusent",
+    "sansBar": "Où le regarder à Paris"
+  },
+  "ville": {
+    "surtitre": "Où regarder le match",
+    "bars": "{bars} sur Baromatch",
+    "sansBar": "Le guide des soirs de match",
+    "prochaine": "Prochaine soirée : {match}, {quand}"
+  },
+  "bar": {
+    "prochaine": "Prochain match : {match}",
+    "sansSoiree": "On diffuse le match"
+  },
+  "bouton": {
+    "titre": "Partager la page",
+    "partager": "Partager",
+    "whatsapp": "Envoyer sur WhatsApp",
+    "copier": "Copier le lien",
+    "copie": "Lien copié.",
+    "echec": "Copie impossible : appuie longtemps sur le lien pour le copier."
+  }
+}

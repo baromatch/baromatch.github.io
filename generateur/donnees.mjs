@@ -49,8 +49,9 @@ export const MOTS_INTERDITS = /happy[\s-]*hours?|tournées?|verres? offerts?|\bs
 // quantité ou une récompense. Comparée sans accents ni capitales.
 const BOISSON = /\b(?:bieres?|pintes?|demis?|verres?|shots?|shooters?|cocktails?|vins?|champagnes?|alcools?|boissons?|consos?|consommations?|aperos?|aperitifs?|spritz|mojitos?|pastis|ricard|whisky|vodka|rhum|tequila|gin|cidres?|pressions?|bouteilles?|seaux?|pichets?|mousses?|binouzes?|kirs?|punch)\b/;
 const GRATUIT = /\b(?:offert|gratuit|cadeau)|\boffr(?:ons|ez)\b|\b(?:t|vous)['’\s]+offr/;
-// Une remise : un pourcentage, des euros en moins, moitié prix, un tarif réduit, une réduction, une promo…
-const REMISE = /-?\s*\d+(?:[.,]\d+)?\s*(?:%|pour\s*cent\b)|(?:^|[\s(])-\s*\d+(?:[.,]\d+)?\s*(?:€|euros?\b)|\bmoitie prix\b|\ba moitie\b|\bdemi[\s-]*tarif\b|\breduite?s?\b|\breductions?\b|\bremises?\b|\brabais\b|\bpromos?\b|\bpromotions?\b|\bau lieu de\b|\bhalf[\s-]*price\b/;
+// Une remise : un pourcentage en moins (« -20 % », « 50 % sur », « à 50 % », « 30 % de réduction », pas « 100 %
+// maison »), des euros en moins, moitié prix, un tarif réduit, une réduction, une promo…
+const REMISE = /-\s*\d+(?:[.,]\d+)?\s*(?:%|pour\s*cent\b)|\d+(?:[.,]\d+)?\s*(?:%|pour\s*cent\b)\s*(?:de\s+)?(?:remise|reduction|rabais|moins|off|sur)\b|\ba\s+\d+(?:[.,]\d+)?\s*(?:%|pour\s*cent\b)|(?:^|[\s(])-\s*\d+(?:[.,]\d+)?\s*(?:€|euros?\b)|\bmoitie prix\b|\ba moitie\b|\bdemi[\s-]*tarif\b|\breduite?s?\b|\breductions?\b|\bremises?\b|\brabais\b|\bpromos?\b|\bpromotions?\b|\bau lieu de\b|\bhalf[\s-]*price\b/;
 const POUSSE_A_BOIRE = [
   /\ba volonte\b/, /\ba gogo\b/, /\billimitee?s?\b/, /\bopen[\s-]*bars?\b/, /\b(?:\d+|deux|trois|quatre)\s*(?:pour|=)\s*(?:\d+|une?|deux|trois)\b/,
   /\bpour le prix d['’\s]*une?\b/, /\bachete\w*\s*,?\s*(?:\d+|une?|deux)\s+offert/, /\bhappy[\s-]*hours?\b/, /\btournees?\b/,

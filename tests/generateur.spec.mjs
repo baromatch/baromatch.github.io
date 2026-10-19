@@ -367,12 +367,12 @@ test.describe('les données', () => {
     expect(offreDu('Bière sans alcool et burger').offre).toEqual({ titre: 'Bière sans alcool et burger', prixCentimes: 500, jusqua: null });
 
     // Une remise ou une gratuité, même sans boisson nommée : le site ne sait pas sur quoi elle porte, il ne l’écrit pas.
-    const remises = ['Burger -20 %', '-50% sur la carte', 'Tout à 50 % pendant le match', 'Frites à moitié prix', 'Tarif réduit pendant le match',
+    const remises = ['Burger -20 %', '-50% sur la carte', '50 % sur les planches', '30 % de réduction', 'Tout à 50 % pendant le match', 'Frites à moitié prix', 'Tarif réduit pendant le match',
       'Réduction sur le menu', 'Remise de 2 € sur les planches', '-3 € sur le menu', 'Nachos offerts', 'Planche offerte avec le menu', 'Café gratuit',
       '3 pour 2 sur les softs', 'Softs à volonté', 'Planches illimitées', 'Promo sur les burgers', 'Menu à 10 € au lieu de 15 €', 'Happyhour',
       'Un soft par but du PSG'];
     for (const titre of remises) expect(offreInterdite(titre), titre).not.toBeNull();
-    for (const titre of ['Menu burger et boisson fraîche', 'Planche à partager', 'Burger du match · frites maison', 'Demi-finale : planche du soir', 'Menu pour 2 à 25 €']) {
+    for (const titre of ['Menu burger et boisson fraîche', 'Planche à partager', 'Burger du match · frites maison', 'Demi-finale : planche du soir', 'Menu pour 2 à 25 €', 'Burger 100 % maison']) {
       expect(offreInterdite(titre), titre).toBeNull();
     }
     const remise = offreDu('Burger -20 %');
@@ -380,7 +380,7 @@ test.describe('les données', () => {
     expect(remise.avertissements).toContain('Offre de « Le Comptoir du Canal » non affichée : elle parle d’une remise ou d’une gratuité (« -20 % »), ce que le site ne publie pas');
     expect(offreDu('Burger, et le score en direct').avertissements).toContain('Offre de « Le Comptoir du Canal » non affichée : elle parle du score (« score »), ce que le site ne publie pas');
     // Le nom d’un bar n’est écarté que si la remise ou la gratuité touche une boisson : « Le Réduit » reste un bar.
-    for (const nom of ['Le Réduit', 'Le Cadeau', 'La Cave à Bières', 'Le 1664', 'Les Promos']) expect(nomInterdit(nom), nom).toBeNull();
+    for (const nom of ['Le Réduit', 'Le Cadeau', 'La Cave à Bières', 'Le 1664', 'Les Promos', 'Le 100 % Bière']) expect(nomInterdit(nom), nom).toBeNull();
     for (const nom of ['Les Bières à moitié prix', 'Le Shot Gratuit', 'La Pinte -50%']) expect(nomInterdit(nom), nom).not.toBeNull();
 
     // Sur les pages : ni le titre, ni le prix ; à sa place, « Une offre du bar dans l’appli ».

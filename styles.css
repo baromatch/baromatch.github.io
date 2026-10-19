@@ -441,6 +441,10 @@ a:hover { color: var(--goutte); }
   .etape__titre { margin: 0 0 8px; }
 }
 
+/* Sous les étapes, le lien vers les matchs de ce soir : seul sur sa ligne, 44 px à toucher. */
+.soiree__suite { margin: 48px 0 0; }
+.soiree__suite a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
+
 /* ---------- Bars partenaires ---------- */
 
 .bars {

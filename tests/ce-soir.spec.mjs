@@ -277,11 +277,13 @@ test('écrite : dans la liste blanche, au plan du site et à IndexNow seulement 
   expect(plan().split(adresse).length - 1).toBe(1);
 });
 
-test('les liens vers « Ce soir » : depuis la semaine et chaque page de ville', async () => {
+test('les liens vers « Ce soir » : depuis l’accueil, la semaine et chaque page de ville', async () => {
   const { site } = await ceSoir();
   const lien = '<a href="/ce-soir/">Où regarder le match ce soir</a>';
   expect(site.pages.find((x) => x.chemin === '/matchs/').contenu).toContain(lien);
   const villes = site.pages.filter((x) => x.type === 'ville');
   expect(villes.length).toBeGreaterThan(3);
   for (const ville of villes) expect(ville.contenu, ville.chemin).toContain(lien);
+  // L’accueil : sous « Comment ça va marcher », un lien seul (le fichier existe : tests/liens.spec.mjs le suit).
+  expect(readFileSync(path.join(racine, 'index.html'), 'utf8')).toContain('<p class="soiree__suite"><a href="/ce-soir/">Où regarder le match ce soir</a></p>');
 });

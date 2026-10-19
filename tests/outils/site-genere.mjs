@@ -17,7 +17,7 @@ export const contenuDuScenario = (racineDuSite = racine) => ({ ...chargerLeConte
 
 // Les fichiers du dépôt que le site sert à ses visiteurs, et dont les pages générées ont besoin.
 const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|(?:fonts|img|\.well-known)\/.+)$/;
-const ECARTE = /^(?:matchs|regarder-le-match|bar|tests|generateur|node_modules)\//;
+const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|tests|generateur|node_modules)\//;
 
 export const construireLeSiteDExemple = async (dossier) => {
   rmSync(dossier, { recursive: true, force: true });

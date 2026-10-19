@@ -24,15 +24,17 @@ const TITRES_CHOISIS = {
   '/': 'Baromatch — Trouve un bar qui diffuse ton match, à Paris',
   '/boutique.html': 'La boutique Baromatch — pièces pour les soirs de match',
 };
-const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html'];
+const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html'];
 const TYPES_ATTENDUS = {
-  '/': ['Organization', 'WebSite', 'MobileApplication'],
+  '/': ['Organization', 'WebSite', 'MobileApplication', 'FAQPage'],
   '/boutique.html': ['FAQPage'],
   '/cgu.html': ['WebPage'],
   '/confidentialite.html': ['WebPage'],
   '/mentions-legales.html': ['WebPage'],
   '/supprimer-mon-compte.html': ['WebPage'],
   '/presse.html': ['AboutPage', 'BreadcrumbList'],
+  '/a-propos.html': ['AboutPage', 'BreadcrumbList'],
+  '/comment-on-choisit-les-bars.html': ['WebPage', 'BreadcrumbList'],
 };
 // Ce que le site ne peut pas promettre : ni produit en vente, ni note, ni recherche interne.
 const TYPES_INTERDITS = ['Product', 'Offer', 'AggregateOffer', 'AggregateRating', 'Review', 'SearchAction'];

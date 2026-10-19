@@ -35,7 +35,7 @@ test('le format de llmstxt.org : titre, résumé en citation, puis des sections 
 test('les liens : les pages du site (chacune avec son fichier), le contact et les profils de marque.json', () => {
   const liens = [...TEXTE.matchAll(/^- \[([^\]]+)\]\(([^)]+)\)/gm)].map(([, nom, adresse]) => ({ nom, adresse }));
   const adresses = liens.map((l) => l.adresse);
-  for (const chemin of ['/', '/pour-les-bars.html', '/presse.html', '/matchs/', '/regarder-le-match/', '/cgu.html', '/confidentialite.html']) {
+  for (const chemin of ['/', '/pour-les-bars.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html', '/matchs/', '/regarder-le-match/', '/cgu.html', '/confidentialite.html']) {
     expect(adresses, chemin).toContain(`${ORIGINE}${chemin}`);
   }
   expect(adresses).toContain(`mailto:${MARQUE.contact}`);

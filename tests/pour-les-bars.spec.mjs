@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { PIED } from './outils/pied.mjs';
+import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
 
 const PAGE = '/pour-les-bars.html';
 const ORIGINE = 'https://baromatch.fr';
@@ -22,9 +23,11 @@ const SOURCE = readFileSync('pour-les-bars.html', 'utf8');
 const PREMIER_ECRAN = SOURCE.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
 const EMPREINTE = `'sha256-${createHash('sha256').update(PREMIER_ECRAN).digest('base64')}'`;
 // La politique de la page : elle-même, des images en data: (les sources vides des images cachées) et le serveur
-// Baromatch pour la seule demande d’un bar. connect-src garde 'self' : Lighthouse lit /robots.txt depuis la page.
-const POLITIQUE = `default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
-  + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'";
+// Baromatch pour la seule demande d’un bar. connect-src garde 'self' : Lighthouse lit /robots.txt depuis la page. Quand
+// marque.json active la mesure d’audience, la page charge aussi /mesure.js, et connect-src admet son compte.
+const MESURE = mesureDuSite();
+const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
+  + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);
 
 // La loi Evin : la mention sanitaire, citée une fois, sous l’explication de l’offre du soir ; aucun mot d’alcool ailleurs.
 const MENTION = 'L’abus d’alcool est dangereux pour la santé, à consommer avec modération.';
@@ -571,7 +574,9 @@ test.describe('ce que la page charge', () => {
     expect(politique, `style-src doit porter l’empreinte du premier écran : ${EMPREINTE}`).toContain(`style-src 'self' ${EMPREINTE};`);
     expect(SOURCE.match(/<[^>]+\son[a-z]+\s*=/gi)).toBeNull();
     const scripts = [...SOURCE.matchAll(/<script\b([^>]*)>/gi)].map(([, attributs]) => attributs.trim());
-    expect(scripts.filter((a) => a !== 'type="application/ld+json"')).toEqual(['src="/pour-les-bars-amorce.js" defer']);
+    expect(scripts.filter((a) => a !== 'type="application/ld+json"')).toEqual([
+      ...(MESURE.active ? [`src="/mesure.js" data-mesure="${MESURE.adresse}" defer`] : []), 'src="/pour-les-bars-amorce.js" defer',
+    ]);
   });
 });
 

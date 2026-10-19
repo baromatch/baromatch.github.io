@@ -19,6 +19,7 @@ import { estPermis } from '../generateur/etat.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { lireLeCadre } from '../generateur/gabarits.mjs';
 import { controlerLaPage } from '../generateur/controle.mjs';
+import { mesureDuSite } from '../generateur/mesure.mjs';
 import { lesPolices, SCRIPT_DU_PARTAGE, svgDeLaCarte } from '../generateur/partage.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
@@ -375,8 +376,8 @@ test('le contrôle des pages : partage.js, et lui seul, tel quel', async () => {
   for (const autre of ['<script src="/partage.js"></script>', '<script src="/autre.js" defer></script>', '<script src="https://exemple.fr/partage.js" defer></script>', '<script>alert(1)</script>']) {
     expect(controlerLaPage({ ...p, contenu: p.contenu.replace(SCRIPT_DU_PARTAGE, autre) }).join(), autre).toMatch(/un script autre que les données structurées et le partage/);
   }
-  // La semaine n’a pas de bloc « Partager », donc pas de script.
-  expect(site.pages.find((x) => x.chemin === '/matchs/').contenu).not.toContain('<script src=');
+  // La semaine n’a pas de bloc « Partager », donc pas de script (sauf /mesure.js, si marque.json active la mesure).
+  expect(site.pages.find((x) => x.chemin === '/matchs/').contenu.match(/<script src="[^"]*"/g) ?? []).toEqual(mesureDuSite().active ? ['<script src="/mesure.js"'] : []);
 });
 
 const portLibre = () => new Promise((resoudre) => {

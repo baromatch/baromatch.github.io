@@ -70,8 +70,11 @@ export const barsParVille = (soirees) => {
     .map(({ ville, n }) => `<a href="${cheminDeLaVille(ville)}">${e(`${accorder(n, 'bar')} à ${ville.nom}`)}</a>`).join(', ');
 };
 
-// Les bars, groupés par ville puis par arrondissement (dans l’ordre des arrondissements).
-const grouperParLieu = (elements, barDe) => {
+// Les bars, groupés par ville puis par arrondissement (dans l’ordre des arrondissements), puis dans l’ordre
+// alphabétique de leur nom, quel que soit l’ordre reçu : c’est l’ordre que « Comment on choisit les bars » annonce.
+// Aucun bar ne passe devant un autre pour une autre raison.
+const grouperParLieu = (recus, barDe) => {
+  const elements = [...recus].sort((a, b) => barDe(a).nom.localeCompare(barDe(b).nom, 'fr'));
   const villes = new Map();
   for (const element of elements) {
     const bar = barDe(element);

@@ -196,6 +196,23 @@ test('la nuit : après minuit, la page passe au nouveau jour ; un match commenc�
   expect(sectionDe(tard, 'titre-bars')).toContain('PSG – Barça');
 });
 
+test('un match de ce soir reporté ou annulé : listé avec son statut, sans ses bars, et il ne rend pas la page indexable', async () => {
+  const source = scenarioModifie((brut) => ({
+    ...brut,
+    matches: brut.matches.map((m) => (m.id === 'm-ce-soir' ? { ...m, status: 'POSTPONED' } : m)),
+  }));
+  const p = await ceSoir({ source });
+  sansErreur(p);
+  expect(p.indexable).toBe(false);
+  const matchs = sectionDe(p, 'titre-matchs');
+  expect(matchs).toContain('<a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a> · <time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1 · <strong>Match reporté</strong>');
+  expect(p.contenu).not.toContain('Cave des Gones');
+  // Le bar l’annonçait : la page ne dit pas qu’il n’y a « pas encore de bar ».
+  expect(matchs).not.toContain('Pas encore de bar');
+  expect(matchs).not.toContain('Tu tiens un bar');
+  expect(p.description).toBe('Vendredi 23 octobre : 1 match aujourd’hui, à l’heure de Paris. Les prochains matchs et les bars qui les diffusent sur Baromatch.');
+});
+
 test('un jour sans aucun match : une page utile (les prochains matchs, les villes, la liste d’attente), noindex', async () => {
   const p = await ceSoir({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT });
   sansErreur(p);

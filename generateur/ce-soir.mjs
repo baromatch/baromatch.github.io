@@ -124,9 +124,9 @@ ${autres.map(ligneDuSoir).join('\n')}
     : ceSoir.length
       ? `<section class="regarder-section" aria-labelledby="titre-matchs">
   <h2 id="titre-matchs">${e(moment.matchs)}</h2>
-  <p class="regarder-vide">${e(moment.sansBar)}</p>
+${ceSoir.some((m) => !m.statut) ? `  <p class="regarder-vide">${e(moment.sansBar)}</p>
   ${tuTiensUnBar(textes)}
-  <ul class="regarder-matchs">
+` : ''}  <ul class="regarder-matchs">
 ${ceSoir.map(ligneDuSoir).join('\n')}
   </ul>
 </section>`
@@ -159,14 +159,23 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
   const jour = jourEnLettres(maintenant);
   const titrePage = titre(`${t.titre}, ${jour} — Baromatch`, `${t.titre}, ${jour}`);
   const villesDesBars = [...new Set([...soirees].sort(parLieu).map((s) => s.bar.ville.nom))];
-  const desc = avecBars.length
-    ? description(
-      `${capitale(jour)} : ${accorder(nombreDeBars, 'bar')} ${nombreDeBars > 1 ? 'diffusent' : 'diffuse'} un match ${moment.moment} sur Baromatch, ${enumerer(villesDesBars.map((v) => `à ${v}`))}. Les adresses et l’heure du coup d’envoi, à l’heure de Paris.`,
-      `${capitale(jour)} : ${accorder(nombreDeBars, 'bar')} ${nombreDeBars > 1 ? 'diffusent' : 'diffuse'} un match ${moment.moment} sur Baromatch. Les adresses et l’heure du coup d’envoi.`,
-    )
-    : ceSoir.length
-      ? description(`${capitale(jour)} : ${accorder(ceSoir.length, 'match', 'matchs')} ${moment.moment}, à l’heure de Paris. Pas encore de bar pour ${ceSoir.length > 1 ? 'les' : 'le'} voir sur Baromatch : les prochains matchs et les villes.`)
-      : description(`${capitale(jour)} : ${fini ? 'les matchs de ce soir sont finis' : 'pas de match annoncé ce soir'}. Les prochains, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.`);
+  // La description : le jour, puis ce que la page montre ce soir.
+  const decrire = () => {
+    const debut = `${capitale(jour)} : `;
+    if (avecBars.length) {
+      const diffusent = `${accorder(nombreDeBars, 'bar')} ${nombreDeBars > 1 ? 'diffusent' : 'diffuse'} un match ${moment.moment} sur Baromatch`;
+      return description(
+        `${debut}${diffusent}, ${enumerer(villesDesBars.map((v) => `à ${v}`))}. Les adresses et l’heure du coup d’envoi, à l’heure de Paris.`,
+        `${debut}${diffusent}. Les adresses et l’heure du coup d’envoi.`,
+      );
+    }
+    const matchs = `${debut}${accorder(ceSoir.length, 'match', 'matchs')} ${moment.moment}, à l’heure de Paris.`;
+    if (ceSoir.some((m) => !m.statut)) return description(`${matchs} Pas encore de bar pour ${ceSoir.length > 1 ? 'les' : 'le'} voir sur Baromatch : les prochains matchs et les villes.`);
+    // Tous les matchs de ce soir sont reportés ou annulés : la page ne dit pas « pas encore de bar ».
+    if (ceSoir.length) return description(`${matchs} Les prochains matchs et les bars qui les diffusent sur Baromatch.`);
+    return description(`${debut}${fini ? 'les matchs de ce soir sont finis' : 'pas de match annoncé ce soir'}. Les prochains, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.`);
+  };
+  const desc = decrire();
   const etapes = [{ nom: textes.fil.accueil, chemin: '/' }, { nom: t.fil, chemin }];
   // La liste des matchs que la page montre d’abord : ceux de ce soir, ou, sans eux, les prochains.
   const listes = ceSoir.length

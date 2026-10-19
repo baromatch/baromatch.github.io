@@ -189,6 +189,14 @@ test('la nuit : après minuit, la page passe au nouveau jour ; un match commenc�
   expect(bars).toContain('/bar/le-comptoir-du-canal-paris-10/');
   expect(nuit.contenu).not.toContain('Brest – Nice');
   expect(nuit.indexable).toBe(true);
+  // Samedi, 0 h 05 à Paris (le passage de l’Action juste après minuit, 22 h 05 UTC en heure d’été) : déjà le samedi, sa
+  // date entière dans le titre et sous lui, et le match de 23 h 30 qui se joue encore.
+  const minuit = await ceSoir({ source, maintenant: '2026-10-23T22:05:00Z' });
+  sansErreur(minuit);
+  expect(titreDe(minuit)).toBe('Où regarder le match ce soir, samedi 24 octobre — Baromatch');
+  expect(minuit.contenu).toContain('<p class="regarder-quand">Samedi 24 octobre</p>');
+  expect(minuit.description).toMatch(/^Samedi 24 octobre : /);
+  expect(sectionDe(minuit, 'titre-bars')).toContain('Commencé le <time datetime="2026-10-23T23:30:00+02:00">vendredi 23 octobre · 23:30</time>');
   // Samedi, 2 h 31 : le match de la veille est fini, il n’est plus listé.
   const tard = await ceSoir({ source, maintenant: '2026-10-24T00:31:00Z' });
   sansErreur(tard);

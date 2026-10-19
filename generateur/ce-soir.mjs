@@ -3,8 +3,9 @@
 // quand l’appli est ouverte et que les listes publiques les donnent.
 // « Ce soir », c’est le jour de Paris du passage : ses matchs pas encore finis (un match se joue trois heures au plus,
 // prolongations comprises, comme partout ailleurs sur le site), et un match de la veille qui se joue encore. Après
-// minuit, la page passe au nouveau jour : le premier passage d’après minuit tombe vers 1 h ou 2 h, quand les matchs de
-// la veille au soir sont finis, et qui la lit alors pense à la soirée qui vient. Un match fini n’est plus listé.
+// minuit, la page passe au nouveau jour : l’Action passe juste après minuit à Paris (0 h 05, en heure d’été comme
+// d’hiver), et qui la lit alors pense à la soirée qui vient ; un match de la veille qui se joue encore y reste
+// (« Commencé le … »). Le jour est écrit en entier dans son titre et sous lui. Un match fini n’est plus listé.
 // Indexable seulement quand elle montre un vrai bar pour un match de ce soir. Sinon noindex, et elle montre quand même
 // les matchs du jour et les suivants (vers leurs pages), les villes et la liste d’attente : jamais vide, jamais un faux
 // bar. Ses données structurées : la page, son fil d’Ariane et la liste des matchs qu’elle montre, chacun vers sa page ;

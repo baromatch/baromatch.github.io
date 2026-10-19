@@ -13,7 +13,7 @@ import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { lireLaSource } from '../generateur/sources.mjs';
 import { arrondissementDe, clubDe, indexerLesClubs, lireLAdresse, nomInterdit, offreInterdite, preparer, raisonDEcarter, villeDe } from '../generateur/donnees.mjs';
 import { motDAlcool } from '../generateur/alcool.mjs';
-import { isoDeParis, jourDeParis, quandEnLettres } from '../generateur/heure.mjs';
+import { heureDeParis, isoDeParis, jourDeParis, quandEnLettres } from '../generateur/heure.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { SEUILS } from '../generateur/pages.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
@@ -1252,7 +1252,18 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
   const action = readFileSync(path.join(racine, '.github', 'workflows', 'pages-des-matchs.yml'), 'utf8').replace(/\r\n/g, '\n');
 
   test('l’Action : quand elle tourne, ce qu’elle peut, et qu’elle ne fait qu’un passage à la fois', () => {
-    expect(action).toContain("    - cron: '17 */3 * * *'");
+    // Toutes les 3 heures, et juste après minuit à Paris, en heure d’été comme d’hiver : « Ce soir » passe au nouveau
+    // jour quelques minutes après minuit, pas vers 1 h ou 2 h.
+    const planifies = [...action.matchAll(/^ {4}- cron: '([^']+)'$/gm)].map((m) => m[1]);
+    expect(planifies).toEqual(['17 */3 * * *', '5 22 * * *', '5 23 * * *']);
+    expect(action.split('\n  workflow_dispatch:')[0].split('\n  schedule:\n')[1].split('\n').filter((l) => !l.trim().startsWith('#'))).toEqual([
+      "    - cron: '17 */3 * * *'", "    - cron: '5 22 * * *'", "    - cron: '5 23 * * *'",
+    ]);
+    const quotidiens = planifies.filter((c) => /^\d+ \d+ \* \* \*$/.test(c)).map((c) => c.split(' ').map(Number));
+    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-26', '2027-01-15']) {
+      const heures = quotidiens.map(([minute, heure]) => heureDeParis(Date.UTC(...jour.split('-').map((n, i) => Number(n) - (i === 1 ? 1 : 0)), heure, minute)));
+      expect(heures, jour).toContain('00:05');
+    }
     expect(action).toMatch(/\n  workflow_dispatch:\n/);
     expect(action).toMatch(/\n  push:\n    branches: \[main\]\n    paths:\n      - 'generateur\/\*\*'\n      - 'marque\.json'\n/);
     // Le droit d’écrire le dépôt et de demander la publication de Pages, rien d’autre.

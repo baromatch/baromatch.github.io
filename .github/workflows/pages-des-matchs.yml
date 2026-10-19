@@ -1,9 +1,11 @@
 # Les pages « Où regarder le match » : la semaine (matchs/), une page par match, les villes (regarder-le-match/), une
-# page et un badge par vrai bar (bar/), l’image de partage des pages de match, de ville et de bar, et le plan du site.
+# page et un badge par vrai bar (bar/), « Ce soir » (ce-soir/), l’image de partage des pages de match, de ville, de bar
+# et de « Ce soir », et le plan du site.
 # Le générateur (generateur/construire.mjs, Node seul ; seul le rendu des images de partage s’installe, dans
-# generateur/images) les écrit d’après les listes publiques de l’appli ; cette Action le lance toutes les 3 heures, à la
-# main (onglet Actions, « Run workflow »), et à chaque envoi sur main qui touche au générateur, à marque.json ou à
-# l’accueil (dont les pages reprennent l’en-tête et le pied de page).
+# generateur/images) les écrit d’après les listes publiques de l’appli ; cette Action le lance toutes les 3 heures,
+# juste après minuit à Paris (pour que « Ce soir » passe au nouveau jour), à la main (onglet Actions, « Run
+# workflow »), et à chaque envoi sur main qui touche au générateur, à marque.json ou à l’accueil (dont les pages
+# reprennent l’en-tête et le pied de page).
 # Si les données ne répondent pas, répondent une erreur ou ne donnent aucun match, le générateur s’arrête sans rien
 # écrire : les pages en ligne restent comme elles sont. Il refuse aussi de supprimer d’un coup plus de la moitié des
 # pages, ou de perdre d’un coup les bars ou les soirées (liste vide) ou plus de la moitié des bars ou des matchs à
@@ -19,6 +21,10 @@ name: Pages des matchs
 on:
   schedule:
     - cron: '17 */3 * * *'
+    # Juste après minuit à Paris : 22 h 05 en heure d’été, 23 h 05 en heure d’hiver (les heures sont celles de UTC). Le
+    # passage de l’autre heure tombe à 23 h 05 ou 1 h 05 à Paris, sans rien changer d’autre.
+    - cron: '5 22 * * *'
+    - cron: '5 23 * * *'
   workflow_dispatch:
     inputs:
       accepter_les_suppressions:

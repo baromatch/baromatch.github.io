@@ -1,6 +1,7 @@
 // Des trois listes brutes (sources.mjs) aux données des pages : les vrais bars seulement, un match par match (les
 // doublons réunis), les noms courts des clubs, l’heure de Paris, la ville et l’arrondissement de chaque bar. Rien
 // n’est inventé : un renseignement absent des données reste absent des pages.
+import { createHash } from 'node:crypto';
 import { nettoyer, pourComparer, sansAccents, slug } from './texte.mjs';
 import { jourDeParis } from './heure.mjs';
 import { motDAlcool } from './alcool.mjs';
@@ -98,14 +99,18 @@ export const indexerLesClubs = (clubs) => {
 };
 
 // Un club des données → { cle, court, nom } : la clé sert à l’adresse et aux doublons, « court » s’affiche partout,
-// « nom » est le nom complet.
+// « nom » est le nom complet. Un nom sans lettre latine (« Шахтар Донецьк ») ne donne aucune adresse : la clé est
+// celle que l’appli donne au club, sinon une clé stable faite du nom (« club-1a2b3c4d »), qui reconnaît le club d’un
+// match à l’autre sans le confondre avec un autre ; le match prend alors son identifiant pour adresse (sansAdresse).
 export const clubDe = (index, clubBrut, nomEquipe) => {
   const nomDansLAppli = clubBrut?.slug || slug(nomEquipe);
   const connu = index.get(nomDansLAppli);
   const nom = connu?.nom ?? clubBrut?.canonicalName ?? nomEquipe ?? '';
   if (connu) return { cle: connu.cle, court: connu.court, nom };
   const court = sansSigles(nom);
-  return { cle: slug(court), court, nom };
+  const cle = slug(court) || slug(clubBrut?.slug);
+  if (cle) return { cle, court, nom };
+  return { cle: `club-${createHash('sha256').update(nom).digest('hex').slice(0, 8)}`, court, nom, sansAdresse: true };
 };
 
 // ---------- Les matchs ----------
@@ -154,12 +159,14 @@ export const reunirLesDoublons = (matchs) => {
   return reunis;
 };
 
-// L’adresse d’un match : noms courts et jour à Paris (« psg-ol-2026-10-25 ») ; deux matchs qui la partageraient
-// prennent « -2 », « -3 » dans l’ordre de leur coup d’envoi.
+// L’adresse d’un match : noms courts et jour à Paris (« psg-ol-2026-10-25 ») ; avec un club dont le nom n’a aucune
+// lettre latine, l’identifiant du match (« match-cm1a2b3c-2026-10-26 »). Deux matchs qui la partageraient prennent
+// « -2 », « -3 » dans l’ordre de leur coup d’envoi.
 const nommerLesMatchs = (matchs) => {
   const pris = new Map();
   for (const match of matchs) {
-    const base = `${match.domicile.cle}-${match.exterieur.cle}-${jourDeParis(match.debut)}`;
+    const noms = match.domicile.sansAdresse || match.exterieur.sansAdresse ? ['match', slug(match.id)].filter(Boolean).join('-') : `${match.domicile.cle}-${match.exterieur.cle}`;
+    const base = `${noms}-${jourDeParis(match.debut)}`;
     const rang = (pris.get(base) ?? 0) + 1;
     pris.set(base, rang);
     match.slug = rang === 1 ? base : `${base}-${rang}`;

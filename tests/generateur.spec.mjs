@@ -211,6 +211,34 @@ test.describe('les données', () => {
     expect([...courts].filter((nom) => nom !== 'Paris FC' && /\b(?:FC|AC|CF|SC|AS|SSC|UD|KV|BC|SK|FK|RC|OGC|AJ)\b/.test(nom))).toEqual([]);
   });
 
+  test('un club sans lettre latine : l’adresse du match prend son identifiant, jamais « --2026-10-26 », et aucun faux doublon', async () => {
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    const PSG = { slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' };
+    brut.matches.push(
+      { id: 'cmshakhtar01', startAt: '2026-10-26T17:45:00.000Z', league: 'Ligue des champions', homeTeam: 'Шахтар Донецьк', awayTeam: 'Динамо Київ', homeClub: null, awayClub: null },
+      { id: 'cmzenit02', startAt: '2026-10-26T17:45:00.000Z', league: 'Premier League russe', homeTeam: 'Зенит', awayTeam: 'Спартак', homeClub: null, awayClub: null },
+      { id: 'cmpsg03', startAt: '2026-10-29T20:00:00.000Z', league: 'Ligue des champions', homeTeam: 'Шахтар Донецьк', awayTeam: 'Paris Saint-Germain', homeClub: null, awayClub: PSG },
+    );
+    const donnees = preparer(brut, { maintenant: VENDREDI, ...contenu });
+    const parId = (id) => donnees.matchs.find((m) => m.ids.includes(id));
+    // Deux matchs à la même heure entre clubs sans lettre latine : deux matchs, pas un doublon.
+    expect(parId('cmshakhtar01')).not.toBe(parId('cmzenit02'));
+    expect(['cmshakhtar01', 'cmzenit02', 'cmpsg03'].map((id) => parId(id).slug)).toEqual(['match-cmshakhtar01-2026-10-26', 'match-cmzenit02-2026-10-26', 'match-cmpsg03-2026-10-29']);
+    for (const m of donnees.matchs) expect(m.slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    // Le nom s’affiche tel quel, et le club se reconnaît d’un match à l’autre.
+    expect(parId('cmshakhtar01').domicile.court).toBe('Шахтар Донецьк');
+    expect(parId('cmshakhtar01').domicile.cle).toBe(parId('cmpsg03').domicile.cle);
+    expect(parId('cmshakhtar01').domicile.cle).not.toBe(parId('cmzenit02').domicile.cle);
+    // Un club que l’appli nomme en lettres latines garde l’adresse faite de ce nom.
+    expect(clubDe(indexerLesClubs(contenu.clubs), { slug: 'shakhtar-donetsk', canonicalName: 'Шахтар Донецьк' }).cle).toBe('shakhtar-donetsk');
+    // Les pages : à leur adresse, contrôlées, et le prochain match du club mène à la sienne.
+    const site = await construireEnMemoire({ brut, maintenant: VENDREDI, racine, contenu });
+    expect(site.refusees.map((p) => p.chemin)).toEqual([]);
+    const page = site.pages.find((p) => p.chemin === '/matchs/match-cmshakhtar01-2026-10-26/');
+    expect(page.contenu).toContain('<p class="regarder-affiche">Шахтар Донецьк – Динамо Київ</p>');
+    expect(page.contenu).toContain('<a href="/matchs/match-cmpsg03-2026-10-29/">Шахтар Донецьк – PSG</a>');
+  });
+
   test('l’heure de Paris, des deux côtés du changement d’heure du 25 octobre', async () => {
     // Samedi 24 : Paris est à +02:00 ; dimanche 25 après 3 h : +01:00.
     expect(quandEnLettres(Date.parse('2026-10-24T19:00:00Z'))).toBe('samedi 24 octobre · 21:00');

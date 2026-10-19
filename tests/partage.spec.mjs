@@ -1,20 +1,25 @@
 // Le partage des pages de match, de ville et de bar : leur image d’aperçu (generateur/partage.mjs, rendue par
 // generateur/images) et le bloc « Partager » (partage.js). L’image : 1200 × 630, moins de 150 Ko, à côté de sa page,
 // annoncée en og:image et twitter:image à son adresse absolue, avec le vrai nombre de bars (jamais « 0 bar »), refaite
-// seulement quand son dessin change, partie avec sa page ; sans le rendu, l’image générale du site.
+// seulement quand son dessin change, partie avec sa page ; sans le rendu, l’image générale du site. Le bloc : sans
+// JavaScript, WhatsApp et l’adresse ; avec, le bouton du téléphone s’il existe, sinon WhatsApp et « Copier le lien » ;
+// toujours l’adresse canonique, sans paramètre.
 // Le rendu est installé ici comme dans l’Action : cd generateur/images && npm ci.
 import { test, expect } from '@playwright/test';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, PUBLIES_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { construire } from '../generateur/construire.mjs';
 import { estPermis } from '../generateur/etat.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { lireLeCadre } from '../generateur/gabarits.mjs';
-import { svgDeLaCarte } from '../generateur/partage.mjs';
+import { controlerLaPage } from '../generateur/controle.mjs';
+import { SCRIPT_DU_PARTAGE, svgDeLaCarte } from '../generateur/partage.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
 const IMAGE_DU_SITE = `${ORIGINE}/img/og-image.jpg`;
@@ -160,6 +165,7 @@ test.describe('d’un passage à l’autre', () => {
     expect(existsSync(path.join(sortie, 'bar/le-zinc-des-amis-paris-11/partage.png'))).toBe(false);
     const parti = readFileSync(path.join(sortie, 'bar/le-zinc-des-amis-paris-11/index.html'), 'utf8');
     expect(meta(parti, 'og:image')).toEqual([IMAGE_DU_SITE]);
+    expect(parti).not.toContain('class="partage"');
 
     // Le match joué : sa page reste 30 jours (« Ce match est passé »), sans image ni bloc « Partager ».
     await passer(sortie, '2026-10-23T08:00:00Z', { contenu: { ...contenu, publies: PUBLIES_DU_SCENARIO.filter((id) => id !== 'b-zinc') } });
@@ -185,6 +191,8 @@ test.describe('d’un passage à l’autre', () => {
     const html = readFileSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/index.html'), 'utf8');
     expect(meta(html, 'og:image')).toEqual([IMAGE_DU_SITE]);
     expect(meta(html, 'twitter:image')).toEqual([IMAGE_DU_SITE]);
+    // Le bloc « Partager » reste : il ne dépend pas de l’image.
+    expect(html).toContain('class="partage"');
 
     const vide = dossierVide();
     await expect(passer(vide, '2026-10-21T08:00:00Z', { rendu: null, images: 'exiger' })).rejects.toThrow(/Images de partage exigées, rien n’est écrit/);
@@ -203,5 +211,162 @@ test.describe('d’un passage à l’autre', () => {
     // Les polices du rendu, avec leur licence (OFL, celle de la police du site).
     expect(readdirSync(path.join(racine, 'generateur/images/polices')).sort()).toEqual(['LICENSE-OFL.txt', 'bricolage-grotesque-texte.ttf', 'bricolage-grotesque-titre.ttf']);
     expect(readFileSync(path.join(racine, 'generateur/images/polices/LICENSE-OFL.txt'), 'utf8')).toBe(readFileSync(path.join(racine, 'fonts/LICENSE-OFL.txt'), 'utf8'));
+  });
+});
+
+// ---------- Le bloc « Partager », dans le navigateur ----------
+
+test('le contrôle des pages : partage.js, et lui seul, tel quel', async () => {
+  const site = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: Date.parse('2026-10-23T08:00:00Z'), racine, contenu });
+  const p = site.pages.find((x) => x.chemin === '/matchs/psg-ol-2026-10-25/');
+  expect(p.contenu.split(SCRIPT_DU_PARTAGE)).toHaveLength(2);
+  expect(controlerLaPage(p)).toEqual([]);
+  for (const autre of ['<script src="/partage.js"></script>', '<script src="/autre.js" defer></script>', '<script src="https://exemple.fr/partage.js" defer></script>', '<script>alert(1)</script>']) {
+    expect(controlerLaPage({ ...p, contenu: p.contenu.replace(SCRIPT_DU_PARTAGE, autre) }).join(), autre).toMatch(/un script autre que les données structurées et le partage/);
+  }
+  // La semaine n’a pas de bloc « Partager », donc pas de script.
+  expect(site.pages.find((x) => x.chemin === '/matchs/').contenu).not.toContain('<script src=');
+});
+
+const portLibre = () => new Promise((resoudre) => {
+  const sonde = createServer();
+  sonde.listen(0, '127.0.0.1', () => {
+    const { port } = sonde.address();
+    sonde.close(() => resoudre(port));
+  });
+});
+
+test.describe('le bloc « Partager »', () => {
+  let serveur;
+  test.beforeAll(async () => {
+    const dossier = dossierVide();
+    await construireLeSiteDExemple(dossier);
+    serveur = await demarrerServeur(await portLibre(), -1, { dossier });
+  });
+  test.afterAll(() => serveur?.arreter());
+
+  const MATCH = '/matchs/psg-ol-2026-10-25/';
+  const canonique = (chemin) => `${ORIGINE}${chemin}`;
+  const ouvrir = async (onglet, chemin = MATCH) => {
+    await onglet.goto(`${serveur.adresse}${chemin}`);
+    return {
+      natif: onglet.locator('.partage__natif'),
+      whatsapp: onglet.locator('.partage__whatsapp'),
+      copier: onglet.locator('.partage__copier'),
+      lien: onglet.locator('.partage__lien'),
+      statut: onglet.locator('.partage__statut'),
+    };
+  };
+  // Le bouton du téléphone, simulé : chaque partage est noté ; « refus » le fait échouer avec cette erreur.
+  const avecLeBoutonDuTelephone = (onglet, refus = null) => onglet.addInitScript((nom) => {
+    window.__partages = [];
+    Object.defineProperty(Navigator.prototype, 'share', {
+      configurable: true,
+      value: async (donnees) => {
+        window.__partages.push(donnees);
+        if (nom) throw new DOMException('refus', nom);
+      },
+    });
+  }, refus);
+  const sansLeBoutonDuTelephone = (onglet, { copieRefusee = false } = {}) => onglet.addInitScript((refusee) => {
+    delete Navigator.prototype.share;
+    window.__copies = [];
+    Object.defineProperty(Navigator.prototype, 'clipboard', {
+      configurable: true,
+      get: () => ({ writeText: async (texte) => { if (refusee) throw new DOMException('refus', 'NotAllowedError'); window.__copies.push(texte); } }),
+    });
+  }, copieRefusee);
+
+  for (const chemin of [MATCH, '/regarder-le-match/paris/', '/bar/le-zinc-des-amis-paris-11/']) {
+    test(`${chemin} : sans JavaScript, WhatsApp (le titre et l’adresse canonique) et l’adresse en lien`, async ({ browser }) => {
+      const contexte = await browser.newContext({ javaScriptEnabled: false });
+      const onglet = await contexte.newPage();
+      const { natif, whatsapp, copier, lien } = await ouvrir(onglet, chemin);
+      const titre = (await onglet.title()).replace(/ /g, ' ');
+      expect(await onglet.locator('link[rel="canonical"]').getAttribute('href')).toBe(canonique(chemin));
+      await expect(whatsapp).toBeVisible();
+      await expect(whatsapp).toHaveText('Envoyer sur WhatsApp');
+      expect(await whatsapp.getAttribute('href')).toBe(`https://wa.me/?text=${encodeURIComponent(`${titre} ${canonique(chemin)}`)}`);
+      await expect(lien).toBeVisible();
+      expect(await lien.getAttribute('href')).toBe(canonique(chemin));
+      await expect(natif).toBeHidden();
+      await expect(copier).toBeHidden();
+      // Aucun paramètre de suivi, nulle part dans le bloc.
+      const bloc = await onglet.locator('.partage').evaluate((e) => e.outerHTML);
+      expect(bloc).not.toMatch(/utm_|[?&](?:ref|source|fbclid|gclid)=|%3F/i);
+      await contexte.close();
+    });
+  }
+
+  test('avec le bouton du téléphone : « Partager » seul, au clavier, avec le titre et l’adresse canonique', async ({ page: onglet }) => {
+    await avecLeBoutonDuTelephone(onglet);
+    const { natif, whatsapp, copier, lien } = await ouvrir(onglet);
+    await expect(natif).toBeVisible();
+    await expect(natif).toHaveText('Partager');
+    await expect(whatsapp).toBeHidden();
+    await expect(copier).toBeHidden();
+    await expect(lien).toBeHidden();
+    await natif.focus();
+    await onglet.keyboard.press('Enter');
+    await expect.poll(() => onglet.evaluate(() => window.__partages)).toEqual([{ title: (await onglet.title()), url: canonique(MATCH) }]);
+  });
+
+  test('fermé sans partager : rien ne change ; refusé par le navigateur : WhatsApp et « Copier le lien »', async ({ browser }) => {
+    for (const [refus, attendu] of [['AbortError', 'natif'], ['NotAllowedError', 'autres']]) {
+      const contexte = await browser.newContext();
+      const onglet = await contexte.newPage();
+      await avecLeBoutonDuTelephone(onglet, refus);
+      const { natif, whatsapp, copier } = await ouvrir(onglet);
+      await natif.click();
+      await expect.poll(() => onglet.evaluate(() => window.__partages.length)).toBe(1);
+      if (attendu === 'natif') {
+        await expect(natif).toBeVisible();
+        await expect(whatsapp).toBeHidden();
+      } else {
+        await expect(natif).toBeHidden();
+        await expect(whatsapp).toBeVisible();
+        await expect(copier).toBeVisible();
+      }
+      await contexte.close();
+    }
+  });
+
+  test('sans le bouton du téléphone : WhatsApp et « Copier le lien », qui copie l’adresse canonique et le dit', async ({ page: onglet }) => {
+    await sansLeBoutonDuTelephone(onglet);
+    const { natif, whatsapp, copier, lien, statut } = await ouvrir(onglet);
+    await expect(natif).toBeHidden();
+    await expect(whatsapp).toBeVisible();
+    await expect(copier).toBeVisible();
+    await expect(lien).toBeHidden();
+    await expect(statut).toHaveAttribute('aria-live', 'polite');
+    await expect(statut).toHaveAttribute('role', 'status');
+    await copier.focus();
+    await onglet.keyboard.press('Enter');
+    await expect(statut).toHaveText('Lien copié.');
+    expect(await onglet.evaluate(() => window.__copies)).toEqual([canonique(MATCH)]);
+  });
+
+  test('la copie refusée : l’adresse revient en lien, et la page dit comment la copier', async ({ page: onglet }) => {
+    await sansLeBoutonDuTelephone(onglet, { copieRefusee: true });
+    const { copier, lien, statut } = await ouvrir(onglet);
+    await copier.click();
+    await expect(statut).toHaveText('Copie impossible : appuie longtemps sur le lien pour le copier.'.replace(' :', ' :'));
+    await expect(lien).toBeVisible();
+  });
+
+  test('des cibles de 44 px, sans animation, à 360 px comme au bureau', async ({ browser }) => {
+    for (const largeur of [360, 1280]) {
+      const contexte = await browser.newContext({ javaScriptEnabled: false, viewport: { width: largeur, height: 800 }, reducedMotion: 'reduce' });
+      const onglet = await contexte.newPage();
+      await ouvrir(onglet);
+      const tailles = await onglet.locator('.partage a, .partage button').evaluateAll((elements) => elements
+        .filter((e) => !e.hidden).map((e) => ({ texte: e.textContent.trim(), hauteur: Math.round(e.getBoundingClientRect().height), largeur: Math.round(e.getBoundingClientRect().width) })));
+      expect(tailles.length).toBe(2);
+      expect(tailles.filter((t) => t.hauteur < 44 || t.largeur < 44)).toEqual([]);
+      const mouvements = await onglet.locator('.partage, .partage *').evaluateAll((elements) => elements
+        .map((e) => getComputedStyle(e)).filter((s) => s.transitionDuration !== '0s' || s.animationName !== 'none').length);
+      expect(mouvements).toBe(0);
+      await contexte.close();
+    }
   });
 });

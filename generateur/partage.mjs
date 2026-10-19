@@ -2,9 +2,9 @@
 // iMessage, X ou un moteur à côté du lien) et le bloc « Partager » de la page.
 // L’image est d’abord un SVG, fait ici sans rien installer : la nuit #0A0B10, la lumière ambre du bar derrière une carte
 // de verre, le verre de la marque, et le texte en Bricolage Grotesque (deux réglages fixes de la police du site, dans
-// generateur/images/polices, sous licence OFL comme elle). Chaque ligne est mesurée sur la police elle-même, pour
-// tenir dans la carte sans jamais être coupée au milieu d’un mot. Le PNG est rendu ensuite par generateur/images/rendu.mjs,
-// que seule l’Action installe : sans lui, la page garde l’image générale du site.
+// generateur/images/polices, sous licence OFL comme elle). Chaque ligne est mesurée sur la police elle-même pour tenir
+// dans la carte : plus petite, puis sur deux lignes (le titre), puis coupée à la fin d’un mot (« … »). Le PNG est rendu
+// ensuite par generateur/images/rendu.mjs, que seule l’Action installe : sans lui, la page garde l’image générale.
 // Les chiffres sont les vrais : le nombre de vrais bars publiés qui diffusent le match, jamais « 0 bar » (sans bar, la
 // carte dit seulement où le regarder). Ni écusson, ni logo de club ou de compétition, ni score : des mots.
 import { readFileSync } from 'node:fs';

@@ -1,7 +1,8 @@
 // Les pages générées, dans le navigateur : le scénario inventé construit dans un dossier temporaire (avec une copie du
 // site autour, tests/outils/site-genere.mjs) et servi comme GitHub Pages le sert. Sur une page de ville, une page de
-// match, la semaine et une page de bar : aucune violation d’axe à 360 et 1280 px, rien qui dépende de JavaScript,
-// aucun débordement horizontal à 360 px, et chaque lien interne qui répond.
+// match, la semaine et une page de bar : aucune violation d’axe à 360 et 1280 px, rien qui dépende de JavaScript (hors
+// du bloc « Partager », que partage.js enrichit), aucun débordement horizontal à 360 px, et chaque lien interne qui
+// répond.
 import { test, expect } from '@playwright/test';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -11,12 +12,13 @@ import { violationsAxe } from './outils/axe.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple } from './outils/site-genere.mjs';
 
+// partage : la page a le bloc « Partager » (et son seul script, /partage.js).
 const PAGES = [
-  { chemin: '/regarder-le-match/paris/', nom: 'ville avec des bars' },
-  { chemin: '/matchs/psg-ol-2026-10-25/', nom: 'match avec des bars' },
-  { chemin: '/matchs/lille-lens-2026-10-26/', nom: 'match sans bar' },
+  { chemin: '/regarder-le-match/paris/', nom: 'ville avec des bars', partage: true },
+  { chemin: '/matchs/psg-ol-2026-10-25/', nom: 'match avec des bars', partage: true },
+  { chemin: '/matchs/lille-lens-2026-10-26/', nom: 'match sans bar', partage: true },
   { chemin: '/matchs/', nom: 'semaine' },
-  { chemin: '/bar/le-zinc-des-amis-paris-11/', nom: 'bar' },
+  { chemin: '/bar/le-zinc-des-amis-paris-11/', nom: 'bar', partage: true },
   { chemin: '/regarder-le-match/', nom: 'villes' },
 ];
 
@@ -54,7 +56,7 @@ for (const page of PAGES) {
       });
     }
 
-    test('sans JavaScript, la page est la même, elle n’en charge aucun, et sa politique de sécurité n’arrête rien', async ({ browser }) => {
+    test(`sans JavaScript, la page est la même, elle ne charge ${page.partage ? 'que partage.js' : 'aucun script'}, et sa politique de sécurité n’arrête rien`, async ({ browser }) => {
       const scripts = [];
       const refus = [];
       const lire = async (avecScript) => {
@@ -63,6 +65,9 @@ for (const page of PAGES) {
         onglet.on('request', (requete) => { if (requete.resourceType() === 'script') scripts.push(requete.url()); });
         onglet.on('console', (message) => { if (/Content Security Policy/i.test(message.text())) refus.push(message.text()); });
         await onglet.goto(`${serveur.adresse}${page.chemin}`);
+        // Le bloc « Partager » est le seul que JavaScript change (tests/partage.spec.mjs le suit avec et sans).
+        expect(await onglet.locator('.partage').count()).toBe(page.partage ? 1 : 0);
+        await onglet.locator('.partage').evaluateAll((blocs) => blocs.forEach((bloc) => bloc.remove()));
         const texte = await onglet.locator('main').innerText();
         const titre = await onglet.locator('h1').innerText();
         await contexte.close();
@@ -72,7 +77,7 @@ for (const page of PAGES) {
       const avec = await lire(true);
       expect(sans).toEqual(avec);
       expect(sans.titre.length).toBeGreaterThan(0);
-      expect(scripts).toEqual([]);
+      expect(scripts).toEqual(page.partage ? [`${serveur.adresse}/partage.js`] : []);
       expect(refus).toEqual([]);
     });
 

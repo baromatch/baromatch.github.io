@@ -1,11 +1,13 @@
 // Le HTML des pages générées : la tête (titre, description, adresse canonique, aperçus, données structurées, politique
-// de sécurité), l’en-tête et le pied de page du site, et le corps de chaque sorte de page. Aucun JavaScript : tout est
-// dans le HTML, lisible par un robot qui n’exécute rien. Chaque texte venu des données est échappé.
+// de sécurité), l’en-tête et le pied de page du site, et le corps de chaque sorte de page. Tout est dans le HTML,
+// lisible par un robot qui n’exécute rien ; seul le bloc « Partager » (partage.mjs) charge un fichier du site,
+// partage.js, qui l’enrichit sans rien changer au reste. Chaque texte venu des données est échappé.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { accorder, capitale, echapper as e } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
+import { blocPartager, SCRIPT_DU_PARTAGE } from './partage.mjs';
 
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'";
 const IMAGE_ALT = 'Le verre de lumière de Baromatch et la phrase : Ton match. Ton bar. Ce soir.';
@@ -24,13 +26,13 @@ export const lireLeCadre = (racine) => {
 // ---------- Tête, en-tête, pied ----------
 
 // image : l’image de partage de la page ({ adresse, alt }), sinon l’image générale du site.
-const tete = ({ titre, description, chemin, indexable, jsonld, image }) => `<!doctype html>
+const tete = ({ titre, description, chemin, indexable, jsonld, image, partage }) => `<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Page écrite par le générateur des pages des matchs (dossier generateur du dépôt), à chaque passage : une retouche
-     à la main serait effacée au suivant. Aucun script : seulement les fichiers du site. -->
+     à la main serait effacée au suivant. Aucun script écrit dans la page : seulement les fichiers du site. -->
 <meta http-equiv="Content-Security-Policy" content="${CSP}">
 <title>${e(titre)}</title>
 <meta name="description" content="${e(description)}">
@@ -56,7 +58,7 @@ const tete = ({ titre, description, chemin, indexable, jsonld, image }) => `<!do
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@baromatchapp">
 <meta name="twitter:image" content="${image?.adresse ?? IMAGE}">
-<script type="application/ld+json">${blocJsonLd(jsonld)}</script>
+${partage ? `${SCRIPT_DU_PARTAGE}\n` : ''}<script type="application/ld+json">${blocJsonLd(jsonld)}</script>
 </head>
 <body>
 <a class="lien-evitement" href="#contenu">Aller au contenu</a>
@@ -93,10 +95,15 @@ ${elements.join('\n')}
 // avant « ? », « : » et « ; », pour que le signe ne parte jamais seul à la ligne.
 export const insecables = (texte) => texte.replace(/ ([?:;])/g, '\u00A0$1');
 
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image })}${cadre.entete}
+// Une page qui se partage (partage) : le bloc « Partager » juste sous sa tête (la première <header> du corps).
+const avecLePartage = (corps, { partage, titre, chemin }) => (partage
+  ? corps.replace(/<header class="regarder-tete">[\s\S]*?<\/header>/, (enTete) => `${enTete}\n${blocPartager({ titre, chemin })}`)
+  : corps);
+
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage })}${cadre.entete}
 
 <main id="contenu" class="regarder page">
-${corps}
+${avecLePartage(corps, { partage, titre, chemin })}
 </main>
 ${pied({ cadre, marque, chemin, avecPresse })}`);
 

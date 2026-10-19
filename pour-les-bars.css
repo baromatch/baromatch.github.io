@@ -451,3 +451,5 @@
 }
 .badge__note { margin: 0; color: var(--texte-discret); font-size: 0.875rem; }
 .badge__vivant { max-width: 40rem; margin: 24px 0 0; color: var(--texte-doux); }
+/* L’affiche de la semaine, pour tous les bars (/matchs/affiche/) : sous le badge, la même voix. */
+.badge__affiche { max-width: 40rem; margin: 12px 0 0; color: var(--texte-doux); }

@@ -32,8 +32,9 @@ const adressesDuSrcset = (srcset) => {
 };
 
 // Les pages écrites par le générateur et déjà dans le dépôt (l’Action les refait) : leurs liens aussi, les liens
-// d’abonnement webcal:// compris (ils mènent à un agenda du dépôt).
-const GENEREES = [{ chemin: '/agenda/', nom: 'agenda' }];
+// d’abonnement webcal:// compris (ils mènent à un agenda du dépôt). Elles sont écrites ensemble, depuis la copie des
+// listes publiques, à l’heure du dernier passage des pages des matchs du dépôt : chaque match qu’elles citent y a sa page.
+const GENEREES = [{ chemin: '/agenda/', nom: 'agenda' }, { chemin: '/ce-soir/', nom: 'ce soir' }, { chemin: '/matchs/affiche/', nom: 'affiche de la semaine' }];
 
 for (const page of [...PAGES.filter((p) => !p.chemin.startsWith('/t/')), ...GENEREES]) {
   test(`${page.nom} : chaque lien interne et chaque image d’un srcset mènent quelque part`, async ({ page: onglet }) => {

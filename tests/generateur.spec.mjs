@@ -1198,6 +1198,14 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     const etapes = action.split('\n      - ');
     const avecLeJeton = etapes.filter((etape) => etape.includes('github.token')).map((etape) => etape.split('\n')[0]);
     expect(avecLeJeton).toEqual(['name: Enregistrer et envoyer les pages qui ont changé', 'name: Demander la publication à GitHub Pages']);
+    // Le générateur, qui lit des données venues de dehors, ne voit jamais le jeton : dans une étape qui le reçoit (le
+    // passage refait après un envoi refusé), il tourne sans lui.
+    const lancements = etapes.flatMap((etape) => etape.split('\n').map((ligne) => ligne.trim())
+      .filter((ligne) => !ligne.startsWith('#') && ligne.includes('generateur/construire.mjs')).map((ligne) => ({ ligne, jeton: etape.includes('JETON_GITHUB') })));
+    expect(lancements.map((l) => l.jeton)).toEqual([false, true]);
+    for (const { ligne, jeton } of lancements) {
+      if (jeton) expect(ligne).toBe('env -u JETON_GITHUB node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option');
+    }
     expect(action).toContain('git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main');
     expect(action).not.toMatch(/git push|remote set-url/);
     // La publication demandée après l’envoi ; IndexNow n’arrête jamais l’Action.

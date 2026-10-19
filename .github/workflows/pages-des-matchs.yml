@@ -109,11 +109,12 @@ jobs:
             fi
             echo "main a changé pendant le passage (essai $essai) : on repart de sa dernière version."
             if ! git pull -q --rebase origin main; then
-              # Les deux ont touché les mêmes lignes (le plan du site) : on refait les pages sur la nouvelle version.
+              # Les deux ont touché les mêmes lignes (le plan du site) : on refait les pages sur la nouvelle version, sans
+              # le jeton de cette étape (le générateur lit des données venues de dehors).
               git rebase --abort || true
               git fetch -q origin main
               git reset -q --hard FETCH_HEAD
-              node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option
+              env -u JETON_GITHUB node generateur/construire.mjs --source=api --changees="$RUNNER_TEMP/changees.txt" $option
               if ! enregistrer; then
                 echo "envoye=non" >> "$GITHUB_OUTPUT"
                 exit 0

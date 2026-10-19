@@ -1123,7 +1123,7 @@ test.describe('d’un passage à l’autre', () => {
     expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>\n<urlset')).toBe(true);
   });
 
-  test('la liste blanche : rien d’autre que matchs/, regarder-le-match/, bar/, ce-soir/ et sitemap.xml n’est touché', async () => {
+  test('la liste blanche : rien d’autre que matchs/, regarder-le-match/, bar/, ce-soir/, agenda/ et sitemap.xml n’est touché', async () => {
     const sortie = dossierVide();
     // Un dossier qui ressemble au site : des fichiers que le générateur n’a pas le droit de toucher.
     const temoins = { 'index.html': 'accueil', 'marque.json': '{}', 'robots.txt': 'robots', 'bar.html': 'bar', 'matchs.txt': 'm', 'regarder.css': 'css' };
@@ -1136,8 +1136,8 @@ test.describe('d’un passage à l’autre', () => {
       return statSync(path.join(sortie, relatif)).isDirectory() ? fichiers(relatif) : [relatif];
     });
     const crees = [...readdirSync(sortie)].filter((nom) => !avant.has(nom));
-    expect(crees.sort()).toEqual(['bar', 'ce-soir', 'matchs', 'regarder-le-match', 'sitemap.xml']);
-    const tous = ['bar', 'ce-soir', 'matchs', 'regarder-le-match'].flatMap((d) => fichiers(d));
+    expect(crees.sort()).toEqual(['agenda', 'bar', 'ce-soir', 'matchs', 'regarder-le-match', 'sitemap.xml']);
+    const tous = ['agenda', 'bar', 'ce-soir', 'matchs', 'regarder-le-match'].flatMap((d) => fichiers(d));
     expect(tous.filter((relatif) => !estPermis(relatif))).toEqual([]);
     for (const refuse of ['index.html', 'marque.json', 'robots.txt', 'tests/x.html', 'matchs/../index.html', 'bar/x/script.js', 'generateur/construire.mjs']) {
       expect(estPermis(refuse), refuse).toBe(false);
@@ -1164,7 +1164,7 @@ test.describe('d’un passage à l’autre', () => {
     }
     writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
-    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 51 pages publiées : rien n’est écrit/);
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 30 des 52 pages publiées : rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
     // Voulu : relancé en le disant, le passage les supprime.
     await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });
@@ -1285,8 +1285,8 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // refait après un envoi refusé, sans le jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
     expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(3);
     expect(action.match(/node generateur\/construire\.mjs[^\n]*/g)).toHaveLength(2);
-    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir sitemap.xml; do');
-    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir)/|^sitemap\\.xml$'");
+    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir agenda sitemap.xml; do');
+    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|agenda)/|^sitemap\\.xml$'");
     expect(action).toContain('git pull -q --rebase origin main');
     // Le jeton n’est pas gardé dans la configuration de git (le générateur tourne sans lui) : seule l’étape qui envoie
     // le reçoit pour git, le temps de l’envoi, comme actions/checkout le fait lui-même ; la demande de publication à

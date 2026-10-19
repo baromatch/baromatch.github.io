@@ -1,3 +1,7 @@
 # Le style en ligne de pour-les-bars.html est autorisé par son empreinte sha256 (CSP) : elle se calcule sur des fins
 # de ligne LF. Une copie de travail en CRLF changerait l’empreinte et le navigateur bloquerait le style.
 *.html text eol=lf
+
+# Les agendas (agenda/*.ics, matchs/*/match.ics) s’écrivent en CRLF, comme l’iCalendar le veut (RFC 5545) : git ne
+# touche jamais à leurs fins de ligne, ni à l’enregistrement ni à la récupération.
+*.ics -text

@@ -4,6 +4,7 @@
 // toutes les pages refusées, arrêtent tout avant la moindre écriture : les pages en ligne restent comme elles sont.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { fabriquerLaPageAgenda } from './agenda.mjs';
 import { fabriquerCeSoir } from './ce-soir.mjs';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
@@ -28,6 +29,8 @@ export const construireEnMemoire = async ({
   const { pages, avertissements } = fabriquerLesPages({ donnees, contenu, cadre, avecPresse, anciens, images });
   // « Ce soir » (/ce-soir/) : les places de ses bars viennent de la liste brute des soirées.
   pages.push(fabriquerCeSoir({ donnees, contenu, cadre, avecPresse, pages, nuits: listes.matchNights, images }));
+  // « Ton club dans ton agenda » (/agenda/) : la page ; ses fichiers d’agenda s’écrivent à côté (construire.mjs).
+  pages.push(fabriquerLaPageAgenda({ donnees, contenu, cadre, avecPresse }));
 
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);

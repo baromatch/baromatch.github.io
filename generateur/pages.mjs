@@ -11,6 +11,7 @@ import {
   adresseDe, cheminDeLaVille, cheminDuBar, cheminDuMatch, evenementDeLaSoiree, filDAriane, listeDesBars, pageWeb, questions, ancreDeLaSoiree,
   barOuPub,
 } from './jsonld.mjs';
+import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agenda.mjs';
 import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, tuTiensUnBar, atouts } from './gabarits.mjs';
@@ -113,6 +114,8 @@ export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false,
   const disparus = anciens.matchs.filter((m) => !slugsAvecPage.has(m.slug) && m.debut + CONSERVATION_MS > maintenant);
   for (const m of disparus) slugsAvecPage.add(m.slug);
   const aUnePage = (m) => slugsAvecPage.has(m.slug);
+  // Les clubs qui ont leur agenda (agenda.mjs) : la page d’un match y mène.
+  const clubsSuivis = new Set(clubsDeLigue1(donnees.matchs).map((c) => c.cle));
   const prochainsDe = (match) => donnees.matchs
     .filter((m) => m.slug !== match.slug && m.debut > Math.max(match.debut, maintenant - DUREE_MATCH_MS)
       && [m.domicile.cle, m.exterieur.cle].some((cle) => cle === match.domicile.cle || cle === match.exterieur.cle))
@@ -129,12 +132,15 @@ export const fabriquerLesPages = ({ donnees, contenu, cadre, avecPresse = false,
     const indexable = vivant && !passe && soirees.length >= SEUILS.barsParMatch;
     const prochains = prochainsDe(match).filter((m) => enCoursOuAVenir(m));
     const memoire = { slug: match.slug, ids: match.ids, debut: new Date(match.debut).toISOString(), heureConfirmee: match.heureConfirmee, competition: match.competition, domicile: match.domicile, exterieur: match.exterieur };
+    // « Ajouter à mon agenda » : un match à venir, ni reporté ni annulé ; son fichier s’écrit à côté de la page.
+    const evenement = vivant && aSonFichier(match, maintenant);
     const enTete = `<header class="regarder-tete">
   <p class="regarder-surtitre">${e(match.competition)}</p>
   <h1 class="regarder-titre">${e(nom)}${passe ? '' : ' : les bars qui diffusent le match'}</h1>
   <p class="regarder-affiche">${e(match.domicile.nom)} – ${e(match.exterieur.nom)}</p>
   <p class="regarder-quand">${quand(match)}</p>
-${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}${match.statut ? `  <p class="regarder-note"><strong>${e(textes.match[match.statut])}.</strong> ${e(textes.match.statutSuite)}</p>\n` : ''}</header>`;
+${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}${match.statut ? `  <p class="regarder-note"><strong>${e(textes.match[match.statut])}.</strong> ${e(textes.match.statutSuite)}</p>\n` : ''}  ${blocDuMatch(match, { clubsSuivis, fichier: evenement })}
+</header>`;
 
     if (passe || !vivant) {
       // Le match est passé (ou n’est plus au programme) : la page le dit, sans score, et renvoie vers la suite.
@@ -203,7 +209,7 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
     ajouter({
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
-      barsNommes: soirees.map((s) => s.bar.id),
+      barsNommes: soirees.map((s) => s.bar.id), evenement: evenement ? match : null,
       partage: { sorte: 'match', match, soirees },
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
       corps: `${fil(etapes)}
@@ -317,6 +323,7 @@ ${ville.soirees.length ? `  <ul class="regarder-matchs">
 ${ville.soirees.slice(0, 20).map((s) => `    <li>${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))} · ${quand(s.match)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}</li>`).join('\n')}
   </ul>` : `  <p>${e(textes.ville.sansSoiree)}</p>`}
   <p class="regarder-suite"><a href="/ce-soir/">${e(textes.ceSoir.lien)}</a></p>
+  ${lienVersLAgenda()}
 </section>`;
     // Une ville sans guide écrit : un paragraphe fait de ses vraies données (bars, quartiers, prochaines soirées).
     const prochaineSoiree = ville.soirees[0];

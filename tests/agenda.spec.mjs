@@ -1,9 +1,59 @@
-// L’écriture iCalendar des agendas (generateur/ical.mjs) et le validateur iCalendar strict des tests
-// (tests/outils/icalendar.mjs) : un iCalendar juste passe, chaque défaut est trouvé ; les lignes de 75 octets au plus,
-// sans couper un caractère ; les textes échappés ; les instants en UTC.
+// « Ton club dans ton agenda », sans navigateur : chaque fichier d’agenda que le générateur écrit (agenda/<club>.ics,
+// matchs/<match>/match.ics) passe un validateur iCalendar strict (tests/outils/icalendar.mjs) et se relit avec ical.js ;
+// les heures de Paris au changement d’heure, un club sans match, un match passé, reporté ou sorti des listes, un club qui
+// sort des listes, des fichiers identiques octet pour octet quand rien ne change, un UID stable quand un match change de
+// jour ; aucun texte sur les bars sans vrai bar ; la page agenda/ en noindex tant qu’aucun match n’a de vrai bar ; la
+// liste blanche.
 import { test, expect } from '@playwright/test';
-import { erreursDuCalendrier } from './outils/icalendar.mjs';
+import ICAL from 'ical.js';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { racine } from './outils/environnement.mjs';
+import { erreursDuCalendrier, lireLeCalendrier } from './outils/icalendar.mjs';
+import { contenuDuScenario, SCENARIO } from './outils/site-genere.mjs';
+import { blocDuMatch } from '../generateur/agenda.mjs';
+import { chargerLeContenu } from '../generateur/contenu.mjs';
+import { construire } from '../generateur/construire.mjs';
+import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
 import { echapperTexte, instantUtc, lendemain, plier } from '../generateur/ical.mjs';
+
+const contenu = contenuDuScenario();
+const dossiers = [];
+const dossierVide = () => {
+  const dossier = mkdtempSync(path.join(tmpdir(), 'agenda-'));
+  dossiers.push(dossier);
+  return dossier;
+};
+test.afterAll(() => { for (const dossier of dossiers) rmSync(dossier, { recursive: true, force: true }); });
+
+// Un passage du générateur sur le scénario (ou une variante), sans les images de partage.
+const passer = (sortie, maintenant, options = {}) => construire({ source: `scenario:${SCENARIO}`, sortie, maintenant: Date.parse(maintenant), racine, contenu, rendu: null, ...options });
+const variante = (dossier, changer) => {
+  const fichier = path.join(dossier, `scenario-${Math.random().toString(36).slice(2)}.json`);
+  writeFileSync(fichier, JSON.stringify(changer(JSON.parse(readFileSync(SCENARIO, 'utf8')))));
+  return `scenario:${fichier}`;
+};
+const octets = (dossier, relatif) => readFileSync(path.join(dossier, relatif));
+const etatDe = (dossier) => JSON.parse(readFileSync(path.join(dossier, 'regarder-le-match', 'etat.json'), 'utf8'));
+// Les fichiers d’agenda écrits : agenda/*.ics et matchs/*/match.ics.
+const agendasDe = (dossier) => [
+  ...(existsSync(path.join(dossier, 'agenda')) ? readdirSync(path.join(dossier, 'agenda')).filter((f) => f.endsWith('.ics')).map((f) => `agenda/${f}`) : []),
+  ...readdirSync(path.join(dossier, 'matchs')).filter((d) => existsSync(path.join(dossier, 'matchs', d, 'match.ics'))).map((d) => `matchs/${d}/match.ics`),
+].sort();
+// Un fichier lu deux fois : par le validateur strict (aucune erreur), et par ical.js (les mêmes évènements).
+const lireEtValider = (contenuDuFichier, nom = '') => {
+  const lu = lireLeCalendrier(contenuDuFichier);
+  expect(lu.erreurs, nom).toEqual([]);
+  const composant = new ICAL.Component(ICAL.parse(contenuDuFichier.toString('utf8')));
+  const evenements = composant.getAllSubcomponents('vevent').map((v) => new ICAL.Event(v));
+  expect(evenements.map((ev) => ev.uid), nom).toEqual(lu.evenements.map((ev) => ev.UID));
+  expect(evenements.map((ev) => ev.summary), nom).toEqual(lu.evenements.map((ev) => ev.SUMMARY));
+  return { ...lu, ical: evenements };
+};
+const evenementDe = (dossier, relatif, uid) => lireEtValider(octets(dossier, relatif), relatif).evenements.find((ev) => ev.UID === uid);
+// Le bloc VEVENT d’un fichier, tel quel (CRLF et plis compris).
+const blocDe = (texte, uid) => texte.split('BEGIN:VEVENT\r\n').find((bloc) => bloc.startsWith(`UID:${uid}\r\n`))?.split('END:VEVENT\r\n')[0];
 
 // ---------- Le validateur et l’écriture ----------
 
@@ -68,4 +118,318 @@ test('l’écriture iCalendar : 75 octets par ligne sans couper un caractère, l
   expect(lendemain('2026-10-25')).toBe('2026-10-26');
   expect(lendemain('2026-12-31')).toBe('2027-01-01');
   expect(lendemain('2028-02-28')).toBe('2028-02-29');
+});
+
+// ---------- Les agendas du scénario ----------
+
+test('chaque agenda du scénario est un iCalendar valide : un par club de Ligue 1, un par match à venir, le même évènement partout', async () => {
+  const sortie = dossierVide();
+  await passer(sortie, '2026-10-23T08:00:00Z');
+  const fichiers = agendasDe(sortie);
+  // Les clubs de Ligue 1 seulement (pas le Barça), et chaque match à venir de la semaine, à côté de sa page.
+  expect(fichiers.filter((f) => f.startsWith('agenda/'))).toEqual(['angers', 'auxerre', 'brest', 'le-havre', 'lens', 'lille', 'nice', 'ol', 'om', 'psg'].map((c) => `agenda/${c}.ics`));
+  expect(fichiers.filter((f) => f.startsWith('matchs/'))).toEqual([
+    'matchs/brest-nice-2026-10-23/match.ics', 'matchs/le-havre-auxerre-2026-10-25/match.ics', 'matchs/le-havre-psg-2026-10-30/match.ics', 'matchs/lille-lens-2026-10-26/match.ics',
+    'matchs/ol-angers-2026-10-31/match.ics', 'matchs/om-nice-2026-10-28/match.ics', 'matchs/psg-barca-2026-10-24/match.ics', 'matchs/psg-ol-2026-10-25/match.ics',
+  ]);
+  for (const fichier of fichiers) lireEtValider(octets(sortie, fichier), fichier);
+
+  // L’agenda du PSG : ses matchs pas encore finis, toutes compétitions, dans l’ordre ; deux heures chacun, en UTC.
+  const psg = lireEtValider(octets(sortie, 'agenda/psg.ics'));
+  expect(psg.calendrier['X-WR-CALNAME']).toBe('PSG · Baromatch');
+  expect(psg.calendrier['X-WR-CALDESC']).toBe('PSG : les matchs au programme de Baromatch (Ligue 1 et Ligue des champions), à l’heure de Paris, pour l’instant jusqu’au vendredi 20 novembre. Pas de Coupe de France ni de match amical pour l’instant. Un match reporté ou annulé reste sept jours, marqué comme tel. https://baromatch.fr/agenda/');
+  expect(psg.calendrier).toMatchObject({ VERSION: '2.0', PRODID: '-//Baromatch//Ton club dans ton agenda//FR', CALSCALE: 'GREGORIAN', 'X-PUBLISHED-TTL': 'PT6H', 'REFRESH-INTERVAL': 'PT6H' });
+  expect(psg.evenements.map((ev) => [ev.UID, ev.SUMMARY, ev.DTSTART, ev.DTEND])).toEqual([
+    ['m-psg-barca-en@baromatch.fr', 'PSG – Barça', '20261024T190000Z', '20261024T210000Z'],
+    ['m-psg-ol@baromatch.fr', 'PSG – OL', '20261025T194500Z', '20261025T214500Z'],
+    ['m-lehavre-psg@baromatch.fr', 'Le Havre – PSG', '20261030T180000Z', '20261030T200000Z'],
+    ['m-loin@baromatch.fr', 'PSG – OM', '20261120T200000Z', '20261120T220000Z'],
+  ]);
+  for (const ev of psg.evenements) {
+    expect(ev).toMatchObject({ STATUS: 'CONFIRMED', TRANSP: 'TRANSPARENT', SEQUENCE: '0', DTSTAMP: '20261023T080000Z' });
+    // Aucun lieu : le match se joue au stade, pas au bar.
+    expect(ev.LOCATION).toBeUndefined();
+  }
+  // Le texte : la compétition, les clubs, l’heure de Paris, les vrais bars et la page du match ; sans page (au-delà de
+  // 14 jours), ni adresse ni lien.
+  expect(psg.evenements[1].DESCRIPTION).toBe('Ligue 1 · Paris Saint-Germain – Olympique Lyonnais\nCoup d’envoi dimanche 25 octobre à 20:45, heure de Paris.\n2 bars le diffusent sur Baromatch (1 à Lyon, 1 à Paris) : https://baromatch.fr/matchs/psg-ol-2026-10-25/');
+  expect(psg.evenements[1].URL).toBe('https://baromatch.fr/matchs/psg-ol-2026-10-25/');
+  expect(psg.evenements[2].DESCRIPTION).toContain('1 bar le diffuse à Paris sur Baromatch : https://baromatch.fr/matchs/le-havre-psg-2026-10-30/');
+  expect(psg.evenements[3].DESCRIPTION).toBe('Ligue 1 · Paris Saint-Germain – Olympique de Marseille\nCoup d’envoi vendredi 20 novembre à 21:00, heure de Paris.');
+  expect(psg.evenements[3].URL).toBeUndefined();
+  // ical.js lit les mêmes instants.
+  expect(psg.ical.map((ev) => ev.startDate.toJSDate().toISOString())).toEqual(['2026-10-24T19:00:00.000Z', '2026-10-25T19:45:00.000Z', '2026-10-30T18:00:00.000Z', '2026-11-20T20:00:00.000Z']);
+
+  // Le même évènement, octet pour octet, dans l’agenda des deux clubs et dans le fichier du match ; un fichier de match
+  // n’a ni nom d’agenda ni description (il s’ajoute à l’agenda de chacun).
+  const blocs = ['agenda/psg.ics', 'agenda/ol.ics', 'matchs/psg-ol-2026-10-25/match.ics'].map((f) => blocDe(octets(sortie, f).toString('utf8'), 'm-psg-ol@baromatch.fr'));
+  expect(blocs[0]).toBeTruthy();
+  expect(new Set(blocs).size).toBe(1);
+  const seul = lireEtValider(octets(sortie, 'matchs/psg-ol-2026-10-25/match.ics'));
+  expect(seul.evenements).toHaveLength(1);
+  expect(seul.calendrier['X-WR-CALNAME']).toBeUndefined();
+  expect(seul.calendrier.METHOD).toBeUndefined();
+
+  // L’heure provisoire : un évènement sur la journée, « heure à confirmer ».
+  const angers = evenementDe(sortie, 'agenda/angers.ics', 'm-ol-angers@baromatch.fr');
+  expect(angers).toMatchObject({ SUMMARY: 'OL – Angers (heure à confirmer)', DTSTART: '20261031', DTEND: '20261101' });
+  expect(angers.parametres.DTSTART).toEqual({ VALUE: 'DATE' });
+  expect(angers.DESCRIPTION).toContain('Le samedi 31 octobre. Le coup d’envoi n’est pas encore fixé : l’heure peut changer.');
+  // L’état garde la version de chaque évènement, pas son texte.
+  expect(etatDe(sortie).evenements['m-psg-ol@baromatch.fr']).toMatchObject({ ids: ['m-psg-ol'], sequence: 0, modifie: '2026-10-23T08:00:00Z', slug: 'psg-ol-2026-10-25' });
+  expect(etatDe(sortie).pages['/agenda/psg.ics']).toMatchObject({ type: 'calendrier', cle: 'psg', indexable: false, memoire: { court: 'PSG', nom: 'Paris Saint-Germain' } });
+});
+
+test('l’heure de Paris au changement d’heure (25 octobre 2026) : 21 h le samedi et le dimanche donnent les bons instants UTC', async () => {
+  const sortie = dossierVide();
+  const club = (slug, canonicalName) => ({ slug, canonicalName });
+  const source = variante(sortie, (brut) => ({
+    ...brut,
+    matchNights: [],
+    matches: [
+      // 21 h à Paris le samedi 24 (heure d’été, UTC+2), 21 h le dimanche 25 (heure d’hiver, UTC+1).
+      { id: 'm-avant', startAt: '2026-10-24T19:00:00.000Z', league: 'Ligue 1', homeTeam: 'Paris Saint-Germain', awayTeam: 'Olympique de Marseille', homeClub: club('paris-saint-germain', 'Paris Saint-Germain'), awayClub: club('olympique-de-marseille', 'Olympique de Marseille') },
+      { id: 'm-apres', startAt: '2026-10-25T20:00:00.000Z', league: 'Ligue 1', homeTeam: 'Olympique Lyonnais', awayTeam: 'Paris Saint-Germain', homeClub: club('olympique-lyonnais', 'Olympique Lyonnais'), awayClub: club('paris-saint-germain', 'Paris Saint-Germain') },
+      // Une heure provisoire posée à 0 h 30 le dimanche à Paris (22 h 30 UTC le samedi) : le jour est le dimanche.
+      { id: 'm-nuit', startAt: '2026-10-24T22:30:00.000Z', league: 'Ligue 1', heureProvisoire: true, homeTeam: 'Paris Saint-Germain', awayTeam: 'RC Lens', homeClub: club('paris-saint-germain', 'Paris Saint-Germain'), awayClub: club('rc-lens', 'RC Lens') },
+    ],
+  }));
+  await passer(sortie, '2026-10-20T08:00:00Z', { source });
+  const psg = lireEtValider(octets(sortie, 'agenda/psg.ics'));
+  const parUid = Object.fromEntries(psg.evenements.map((ev) => [ev.UID, ev]));
+  expect(parUid['m-avant@baromatch.fr']).toMatchObject({ DTSTART: '20261024T190000Z', DTEND: '20261024T210000Z' });
+  expect(parUid['m-avant@baromatch.fr'].DESCRIPTION).toContain('Coup d’envoi samedi 24 octobre à 21:00, heure de Paris.');
+  expect(parUid['m-apres@baromatch.fr']).toMatchObject({ DTSTART: '20261025T200000Z', DTEND: '20261025T220000Z' });
+  expect(parUid['m-apres@baromatch.fr'].DESCRIPTION).toContain('Coup d’envoi dimanche 25 octobre à 21:00, heure de Paris.');
+  expect(parUid['m-nuit@baromatch.fr']).toMatchObject({ DTSTART: '20261025', DTEND: '20261026', SUMMARY: 'PSG – Lens (heure à confirmer)' });
+  const ical = Object.fromEntries(psg.ical.map((ev) => [ev.uid, ev]));
+  expect(ical['m-avant@baromatch.fr'].startDate.toJSDate().toISOString()).toBe('2026-10-24T19:00:00.000Z');
+  expect(ical['m-apres@baromatch.fr'].startDate.toJSDate().toISOString()).toBe('2026-10-25T20:00:00.000Z');
+  expect(ical['m-apres@baromatch.fr'].endDate.toJSDate().toISOString()).toBe('2026-10-25T22:00:00.000Z');
+  expect(ical['m-nuit@baromatch.fr'].startDate.isDate).toBe(true);
+  expect(ical['m-nuit@baromatch.fr'].startDate.toString()).toBe('2026-10-25');
+  expect(ical['m-nuit@baromatch.fr'].endDate.toString()).toBe('2026-10-26');
+  // Aucun fuseau à décrire : des instants UTC et des jours.
+  expect(octets(sortie, 'agenda/psg.ics').toString('utf8')).not.toMatch(/TZID|VTIMEZONE/);
+});
+
+test('un match passé s’efface ; un club sans match à venir garde un agenda valide et vide', async () => {
+  const sortie = dossierVide();
+  await passer(sortie, '2026-10-23T08:00:00Z');
+  expect(lireEtValider(octets(sortie, 'agenda/brest.ics')).evenements.map((ev) => ev.SUMMARY)).toEqual(['Brest – Nice']);
+  expect(existsSync(path.join(sortie, 'matchs/brest-nice-2026-10-23/match.ics'))).toBe(true);
+  // Le lendemain : Brest – Nice est passé, Brest n’a plus de match au programme.
+  await passer(sortie, '2026-10-24T08:00:00Z');
+  const brest = lireEtValider(octets(sortie, 'agenda/brest.ics'));
+  expect(brest.evenements).toEqual([]);
+  expect(brest.calendrier['X-WR-CALDESC']).toBe('Brest : pas de match au programme de Baromatch pour l’instant. Les prochains arrivent ici dès qu’ils y sont. https://baromatch.fr/agenda/');
+  expect(lireEtValider(octets(sortie, 'agenda/nice.ics')).evenements.map((ev) => ev.SUMMARY)).toEqual(['OM – Nice']);
+  // Le fichier du match passé disparaît avec le bouton ; la page mène toujours à l’agenda de ses clubs.
+  expect(existsSync(path.join(sortie, 'matchs/brest-nice-2026-10-23/match.ics'))).toBe(false);
+  const page = octets(sortie, 'matchs/brest-nice-2026-10-23/index.html').toString('utf8');
+  expect(page).not.toContain('Ajouter à mon agenda');
+  expect(page).toContain('<a href="/agenda/#club-brest">Brest</a>, <a href="/agenda/#club-nice">Nice</a>');
+  const agenda = octets(sortie, 'agenda/index.html').toString('utf8');
+  expect(agenda).toContain('<p class="regarder-carte__lieu">Stade Brestois 29 · Pas de match au programme pour l’instant</p>');
+  expect(etatDe(sortie).evenements['m-ce-soir@baromatch.fr']).toBeUndefined();
+});
+
+test('un match reporté reste sept jours, annulé (STATUS:CANCELLED), « Reporté » dans son titre, puis s’efface', async () => {
+  const sortie = dossierVide();
+  const reporte = variante(sortie, (brut) => ({ ...brut, matches: brut.matches.map((m) => (m.id === 'm-lille-lens' ? { ...m, status: 'POSTPONED' } : m)) }));
+  await passer(sortie, '2026-10-23T08:00:00Z', { source: reporte });
+  for (const club of ['lille', 'lens']) {
+    const ev = evenementDe(sortie, `agenda/${club}.ics`, 'm-lille-lens@baromatch.fr');
+    expect(ev).toMatchObject({ STATUS: 'CANCELLED', SUMMARY: 'Reporté : Lille – Lens', SEQUENCE: '0' });
+    expect(ev.DESCRIPTION).toBe('Ligue 1 · LOSC Lille – RC Lens\nCoup d’envoi lundi 26 octobre à 20:00, heure de Paris.\nMatch reporté.\nLa page du match : https://baromatch.fr/matchs/lille-lens-2026-10-26/');
+  }
+  // Pas de bouton ni de fichier pour un match reporté.
+  expect(existsSync(path.join(sortie, 'matchs/lille-lens-2026-10-26/match.ics'))).toBe(false);
+  expect(octets(sortie, 'matchs/lille-lens-2026-10-26/index.html').toString('utf8')).not.toContain('Ajouter à mon agenda');
+  expect(etatDe(sortie).evenements['m-lille-lens@baromatch.fr'].annuleLe).toBe('2026-10-23T08:00:00Z');
+  // Six jours plus tard (le match aurait dû être joué), il est toujours là ; sept jours après, il s’efface.
+  await passer(sortie, '2026-10-29T08:00:00Z', { source: reporte });
+  expect(evenementDe(sortie, 'agenda/lille.ics', 'm-lille-lens@baromatch.fr')).toMatchObject({ STATUS: 'CANCELLED', SEQUENCE: '0', DTSTAMP: '20261023T080000Z' });
+  await passer(sortie, '2026-10-30T09:00:00Z', { source: reporte });
+  expect(evenementDe(sortie, 'agenda/lille.ics', 'm-lille-lens@baromatch.fr')).toBeUndefined();
+  expect(etatDe(sortie).evenements['m-lille-lens@baromatch.fr']).toBeUndefined();
+
+  // Annulé : « Annulé ». Et un match annulé depuis longtemps (déjà passé quand on le voit) n’apparaît jamais.
+  const autre = dossierVide();
+  const annule = variante(autre, (brut) => ({ ...brut, matches: brut.matches.map((m) => (m.id === 'm-om-nice' ? { ...m, status: 'CANCELLED' } : m.id === 'm-om-lens' ? { ...m, status: 'CANCELLED' } : m)) }));
+  await passer(autre, '2026-10-23T08:00:00Z', { source: annule });
+  expect(evenementDe(autre, 'agenda/om.ics', 'm-om-nice@baromatch.fr')).toMatchObject({ STATUS: 'CANCELLED', SUMMARY: 'Annulé : OM – Nice' });
+  expect(evenementDe(autre, 'agenda/om.ics', 'm-om-lens@baromatch.fr')).toBeUndefined();
+});
+
+test('un match qui sort des listes avant d’être joué : le même évènement, annulé, « Plus au programme », sept jours', async () => {
+  const sortie = dossierVide();
+  await passer(sortie, '2026-10-23T08:00:00Z');
+  expect(evenementDe(sortie, 'agenda/om.ics', 'm-om-nice@baromatch.fr')).toMatchObject({ STATUS: 'CONFIRMED', SEQUENCE: '0', DTSTAMP: '20261023T080000Z' });
+  const sansLui = variante(sortie, (brut) => ({ ...brut, matches: brut.matches.filter((m) => m.id !== 'm-om-nice') }));
+  await passer(sortie, '2026-10-24T08:00:00Z', { source: sansLui });
+  for (const club of ['om', 'nice']) {
+    expect(evenementDe(sortie, `agenda/${club}.ics`, 'm-om-nice@baromatch.fr')).toMatchObject({
+      STATUS: 'CANCELLED', SUMMARY: 'Plus au programme : OM – Nice', SEQUENCE: '1', DTSTAMP: '20261024T080000Z', DTSTART: '20261028T190000Z',
+      // Sa page reste (« Ce match n’est plus au programme »), l’évènement y mène.
+      URL: 'https://baromatch.fr/matchs/om-nice-2026-10-28/',
+    });
+  }
+  expect(evenementDe(sortie, 'agenda/om.ics', 'm-om-nice@baromatch.fr').DESCRIPTION).toContain('Ce match n’est plus au programme.');
+  expect(existsSync(path.join(sortie, 'matchs/om-nice-2026-10-28/match.ics'))).toBe(false);
+  await passer(sortie, '2026-10-31T07:00:00Z', { source: sansLui });
+  expect(evenementDe(sortie, 'agenda/om.ics', 'm-om-nice@baromatch.fr')).toMatchObject({ STATUS: 'CANCELLED', SEQUENCE: '1' });
+  await passer(sortie, '2026-10-31T09:00:00Z', { source: sansLui });
+  expect(evenementDe(sortie, 'agenda/om.ics', 'm-om-nice@baromatch.fr')).toBeUndefined();
+  expect(etatDe(sortie).evenements['m-om-nice@baromatch.fr']).toBeUndefined();
+});
+
+test('un club qui sort des listes de Ligue 1 garde 30 jours un agenda valide qui le dit, puis il disparaît', async () => {
+  const sortie = dossierVide();
+  await passer(sortie, '2026-10-23T08:00:00Z');
+  const sansAngers = variante(sortie, (brut) => ({ ...brut, matches: brut.matches.filter((m) => m.id !== 'm-ol-angers') }));
+  await passer(sortie, '2026-10-23T09:00:00Z', { source: sansAngers });
+  const angers = lireEtValider(octets(sortie, 'agenda/angers.ics'));
+  expect(angers.calendrier['X-WR-CALDESC']).toBe('Angers n’est plus au programme de Baromatch en Ligue 1 : cet agenda ne reçoit plus de match. https://baromatch.fr/agenda/');
+  expect(angers.evenements.map((ev) => [ev.SUMMARY, ev.STATUS])).toEqual([['Plus au programme : OL – Angers', 'CANCELLED']]);
+  expect(etatDe(sortie).pages['/agenda/angers.ics'].memoire).toEqual({ court: 'Angers', nom: 'Angers SCO', parti: '2026-10-23T09:00:00Z' });
+  expect(octets(sortie, 'agenda/index.html').toString('utf8')).not.toContain('club-angers');
+  await passer(sortie, '2026-10-31T10:00:00Z', { source: sansAngers });
+  expect(lireEtValider(octets(sortie, 'agenda/angers.ics')).evenements).toEqual([]);
+  await passer(sortie, '2026-11-22T10:00:00Z', { source: sansAngers, accepterLesSuppressions: true });
+  expect(existsSync(path.join(sortie, 'agenda/angers.ics'))).toBe(false);
+  expect(etatDe(sortie).pages['/agenda/angers.ics']).toBeUndefined();
+  expect(existsSync(path.join(sortie, 'agenda/psg.ics'))).toBe(true);
+});
+
+test('rien ne change, rien n’est réécrit : les mêmes octets ; un match qui change de jour garde son UID, sa version monte', async () => {
+  // Deux passages à la même heure, dans deux dossiers vides : les mêmes fichiers, octet pour octet.
+  const [a, b] = [dossierVide(), dossierVide()];
+  await passer(a, '2026-10-23T08:00:00Z');
+  await passer(b, '2026-10-23T08:00:00Z');
+  expect(agendasDe(a)).toEqual(agendasDe(b));
+  for (const fichier of agendasDe(a)) expect(octets(a, fichier).equals(octets(b, fichier)), fichier).toBe(true);
+  // Trois heures plus tard, rien n’a changé dans les listes : aucun agenda réécrit, les mêmes octets (DTSTAMP compris).
+  const avant = Object.fromEntries(agendasDe(a).map((f) => [f, octets(a, f)]));
+  const resultat = await passer(a, '2026-10-23T11:00:00Z');
+  expect(resultat.ecrits.filter((chemin) => chemin.endsWith('.ics'))).toEqual([]);
+  for (const [fichier, contenuAvant] of Object.entries(avant)) expect(octets(a, fichier).equals(contenuAvant), fichier).toBe(true);
+
+  // PSG – OL passe au lundi : une autre adresse de page, le même évènement (UID), sa version monte, son DTSTAMP aussi ; les
+  // autres ne bougent pas.
+  const deplace = variante(a, (brut) => ({ ...brut, matches: brut.matches.map((m) => (m.id === 'm-psg-ol' ? { ...m, startAt: '2026-10-26T19:45:00.000Z' } : m)) }));
+  await passer(a, '2026-10-23T12:00:00Z', { source: deplace });
+  const psg = lireEtValider(octets(a, 'agenda/psg.ics'));
+  expect(psg.evenements.filter((ev) => ev.UID === 'm-psg-ol@baromatch.fr')).toHaveLength(1);
+  expect(psg.evenements.find((ev) => ev.UID === 'm-psg-ol@baromatch.fr')).toMatchObject({
+    DTSTART: '20261026T194500Z', SEQUENCE: '1', DTSTAMP: '20261023T120000Z', URL: 'https://baromatch.fr/matchs/psg-ol-2026-10-26/', STATUS: 'CONFIRMED',
+  });
+  expect(psg.evenements.find((ev) => ev.UID === 'm-loin@baromatch.fr')).toMatchObject({ SEQUENCE: '0', DTSTAMP: '20261023T080000Z' });
+  expect(evenementDe(a, 'matchs/psg-ol-2026-10-26/match.ics', 'm-psg-ol@baromatch.fr')).toMatchObject({ SEQUENCE: '1' });
+  // L’ancienne adresse dit « plus au programme », sans bouton : son fichier est parti.
+  expect(existsSync(path.join(a, 'matchs/psg-ol-2026-10-25/match.ics'))).toBe(false);
+});
+
+test('sans vrai bar, aucun texte d’agenda ne parle de bars, et la page agenda/ reste en noindex, hors du plan du site', async () => {
+  const sortie = dossierVide();
+  await construire({ source: `scenario:${SCENARIO}`, sortie, maintenant: Date.parse('2026-10-23T08:00:00Z'), racine, contenu: chargerLeContenu(racine), rendu: null });
+  for (const fichier of agendasDe(sortie)) {
+    const lu = lireEtValider(octets(sortie, fichier), fichier);
+    const textes = [lu.calendrier['X-WR-CALDESC'] ?? '', ...lu.evenements.flatMap((ev) => [ev.SUMMARY, ev.DESCRIPTION])].join('\n');
+    expect(textes, fichier).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffuse/iu);
+  }
+  const page = octets(sortie, 'agenda/index.html').toString('utf8');
+  expect(page).toContain('<meta name="robots" content="noindex">');
+  expect(etatDe(sortie).pages['/agenda/']).toMatchObject({ type: 'agenda', indexable: false });
+  expect(readFileSync(path.join(sortie, 'sitemap.xml'), 'utf8')).not.toContain('/agenda/');
+  // Avec de vrais bars (le scénario), la page est indexable et entre au plan du site.
+  const avec = dossierVide();
+  await passer(avec, '2026-10-23T08:00:00Z');
+  expect(octets(avec, 'agenda/index.html').toString('utf8')).toContain('<meta name="robots" content="max-image-preview:large">');
+  expect(readFileSync(path.join(avec, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/agenda/</loc><lastmod>2026-10-23</lastmod></url>');
+});
+
+test('la page agenda/ : trois lignes d’explication, les clubs, chaque téléphone, ce qu’il y a dedans et ce qui manque', async () => {
+  const sortie = dossierVide();
+  await passer(sortie, '2026-10-23T08:00:00Z');
+  const page = octets(sortie, 'agenda/index.html').toString('utf8');
+  expect(page).toContain('<title>Ton club dans ton agenda — Baromatch</title>');
+  const tete = page.match(/<header class="regarder-tete">([\s\S]*?)<\/header>/)[1];
+  expect([...tete.matchAll(/<p class="regarder-chapeau">([^<]*)<\/p>/g)].map((m) => m[1])).toEqual([
+    'Abonne-toi à l’agenda de ton club : ses matchs arrivent dans le calendrier de ton téléphone.',
+    'Un horaire change, un match est reporté : ton agenda suit, sans rien refaire.',
+    'Ligue 1 et coupes d’Europe, pour l’instant jusqu’au vendredi 20 novembre.',
+  ]);
+  // Les clubs, par leur nom court ; pour chacun, l’abonnement (webcal) et l’adresse à copier (https).
+  expect([...page.matchAll(/<li class="regarder-carte" id="club-([a-z0-9-]+)">/g)].map((m) => m[1])).toEqual(['angers', 'auxerre', 'brest', 'le-havre', 'lens', 'lille', 'nice', 'ol', 'om', 'psg']);
+  expect(page).toContain('<a class="regarder-agenda__bouton" href="webcal://baromatch.fr/agenda/psg.ics">S’abonner<span class="visuellement-cache"> : PSG</span></a>');
+  expect(page).toContain('<a href="https://baromatch.fr/agenda/psg.ics">https://baromatch.fr/agenda/psg.ics</a>');
+  expect(page).toContain('<p class="regarder-carte__lieu">Paris Saint-Germain · 4 matchs à venir</p>');
+  expect(page).toContain('<p class="regarder-carte__lieu">Angers SCO · 1 match à venir</p>');
+  expect(page).toContain('<strong>iPhone, iPad et Mac</strong>');
+  expect(page).toContain('« Autres agendas », choisis « Ajouter d’autres agendas », puis « À partir de l’URL »');
+  expect(page).toContain('« Ajouter un calendrier », puis « S’abonner à partir du web »');
+  expect(page).toContain('<p>Les matchs de ton club au programme de Baromatch : Ligue 1 et Ligue des champions.</p>');
+  expect(page).toContain('<p>Ils arrivent quelques semaines à l’avance : pour l’instant, jusqu’au vendredi 20 novembre.</p>');
+  expect(page).toContain('<p>Pas de Coupe de France ni de match amical pour l’instant.</p>');
+  // Les clubs en simples mots : ni « officiel », ni écusson, ni image.
+  const principal = page.match(/<main[\s\S]*<\/main>/)[0];
+  expect(principal).not.toMatch(/officiel|écusson|logo|<img|<svg/i);
+
+  // Une Coupe de France dans les listes : la page et l’agenda le disent, et ne disent plus qu’elle manque.
+  const avecCoupe = dossierVide();
+  const coupe = variante(avecCoupe, (brut) => ({
+    ...brut,
+    matches: [...brut.matches, { id: 'm-coupe', startAt: '2026-11-14T20:00:00.000Z', league: 'Coupe de France', homeTeam: 'Paris Saint-Germain', awayTeam: 'Olympique Lyonnais', homeClub: { slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' }, awayClub: { slug: 'olympique-lyonnais', canonicalName: 'Olympique Lyonnais' } }],
+  }));
+  await passer(avecCoupe, '2026-10-23T08:00:00Z', { source: coupe });
+  const pageCoupe = octets(avecCoupe, 'agenda/index.html').toString('utf8');
+  expect(pageCoupe).toContain('<p class="regarder-chapeau">Ligue 1, Coupe de France et Ligue des champions, pour l’instant jusqu’au vendredi 20 novembre.</p>');
+  expect(pageCoupe).toContain('<p>Pas de match amical pour l’instant.</p>');
+  expect(lireEtValider(octets(avecCoupe, 'agenda/psg.ics')).calendrier['X-WR-CALDESC']).toContain('(Ligue 1, Coupe de France et Ligue des champions)');
+});
+
+test('la page d’un match : « Ajouter à mon agenda » s’il est à venir, l’agenda de ses clubs ; la page d’une ville mène à l’agenda', async () => {
+  const sortie = dossierVide();
+  await passer(sortie, '2026-10-23T08:00:00Z');
+  const match = octets(sortie, 'matchs/psg-ol-2026-10-25/index.html').toString('utf8');
+  const tete = match.match(/<header class="regarder-tete">[\s\S]*?<\/header>/)[0];
+  expect(tete).toContain(`<div class="regarder-agenda">
+    <a class="regarder-agenda__bouton" href="/matchs/psg-ol-2026-10-25/match.ics" type="text/calendar">Ajouter à mon agenda</a>
+    <p class="regarder-agenda__clubs">Suis ton club dans ton agenda : <a href="/agenda/#club-psg">PSG</a>, <a href="/agenda/#club-ol">OL</a></p>
+  </div>`);
+  // Le Barça n’a pas d’agenda (pas en Ligue 1) : seul le PSG.
+  expect(octets(sortie, 'matchs/psg-barca-2026-10-24/index.html').toString('utf8')).toContain('Suis ton club dans ton agenda : <a href="/agenda/#club-psg">PSG</a></p>');
+  // Un match sans club de Ligue 1 : la page agenda/.
+  const autre = { slug: 'arsenal-everton-2026-10-24', domicile: { cle: 'arsenal', court: 'Arsenal' }, exterieur: { cle: 'everton', court: 'Everton' } };
+  expect(blocDuMatch(autre, { clubsSuivis: new Set(['psg']), fichier: false })).toBe(`<div class="regarder-agenda">
+    <p class="regarder-agenda__clubs"><a href="/agenda/">Ton club dans ton agenda</a></p>
+  </div>`);
+  expect(octets(sortie, 'regarder-le-match/paris/index.html').toString('utf8')).toContain('<p class="regarder-suite"><a href="/agenda/">Ton club dans ton agenda</a></p>');
+});
+
+// ---------- La liste blanche, l’écriture, git ----------
+
+test('la liste blanche : agenda/ (sa page, un .ics par club) et match.ics à côté d’une page de match, rien d’autre', () => {
+  for (const permis of ['agenda/index.html', 'agenda/psg.ics', 'agenda/le-havre.ics', 'matchs/psg-ol-2026-10-25/match.ics']) expect(estPermis(permis), permis).toBe(true);
+  for (const refuse of ['agenda/PSG.ics', 'agenda/x/psg.ics', 'agenda/psg.ics.html', 'agenda/psg.txt', 'agenda/../index.html', 'bar/x/match.ics', 'regarder-le-match/x/match.ics',
+    'matchs/a/b/match.ics', 'matchs/match.ics', 'ce-soir/match.ics', 'agenda.ics', 'matchs/x/autre.ics']) {
+    expect(estPermis(refuse), refuse).toBe(false);
+  }
+});
+
+test('un agenda (CRLF) inchangé n’est pas réécrit', () => {
+  const sortie = dossierVide();
+  const texte = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n';
+  expect(ecrireUnFichier(sortie, 'agenda/psg.ics', texte)).toBe(true);
+  expect(ecrireUnFichier(sortie, 'agenda/psg.ics', texte)).toBe(false);
+  expect(octets(sortie, 'agenda/psg.ics').toString('utf8')).toBe(texte);
+});
+
+test('git ne touche pas aux fins de ligne des agendas, et l’Action les enregistre', () => {
+  const attributs = readFileSync(path.join(racine, '.gitattributes'), 'utf8').split(/\r?\n/);
+  expect(attributs).toContain('*.ics -text');
+  const action = readFileSync(path.join(racine, '.github', 'workflows', 'pages-des-matchs.yml'), 'utf8');
+  expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir agenda sitemap.xml; do');
+  expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|agenda)/|^sitemap\\.xml$'");
 });

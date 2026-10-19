@@ -14,12 +14,15 @@ Les faits, pour ne pas se tromper :
 - Baromatch ne vend pas d’alcool.
 - Les clubs et les compétitions sont nommés en texte seulement : Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.
 - Les pages des matchs et des villes sont refaites plusieurs fois par jour à partir de ce que les bars annoncent dans l’appli, à l’heure de Paris. Seuls les bars inscrits y figurent : aucun bar, aucun avis, aucune note n’est inventé.
+- Un bar n’apparaît sur le site qu’avec son accord écrit. Les matchs viennent des calendriers officiels des compétitions ; les places, c’est le bar qui les règle, dans sa Console.
 - Site : https://baromatch.fr/ · Contact : contact@baromatch.fr · X : https://x.com/baromatchapp
 
 ## Baromatch
 
 - [Accueil](https://baromatch.fr/): ce qu’est Baromatch, le film de présentation, et la liste d’attente pour être prévenu à l’ouverture.
 - [Presse](https://baromatch.fr/presse.html): Baromatch en bref, ce qu’il n’est pas, les logos, des images de l’appli et le contact presse.
+- [À propos](https://baromatch.fr/a-propos.html): pourquoi Baromatch existe, où il en est, les règles qu’il s’impose et qui le publie.
+- [Comment on choisit les bars](https://baromatch.fr/comment-on-choisit-les-bars.html): d’où viennent les matchs, qui met à jour les places, quand un bar apparaît sur le site, et ce que Baromatch refuse (faux bars, faux avis, chiffres inventés, promotion de l’alcool, écussons, scores).
 
 ## Pour les fans
 

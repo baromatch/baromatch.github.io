@@ -34,7 +34,7 @@ test('les règles : « L’essentiel » dit combien de temps la place est gardé
 test('confidentialité : une adresse corrigée dit laquelle elle remplace, sans promettre d’effacer l’ancienne', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const texte = normaliser(await page.locator('main').innerText());
-  expect(texte).toContain('Si tu corriges ton adresse juste après l’inscription, la nouvelle inscription dit quelle adresse elle remplace.');
+  expect(texte).toContain('Si tu corriges ton adresse ou ta ville juste après l’inscription, la nouvelle inscription dit quelle adresse elle remplace.');
   expect(texte).toContain('Si tu corriges ton adresse juste après l’envoi, le nouvel envoi dit quelle adresse il remplace.');
   expect(texte).not.toMatch(/efface(r)? l’ancienne/);
 });

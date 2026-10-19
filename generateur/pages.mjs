@@ -12,6 +12,7 @@ import {
   barOuPub,
 } from './jsonld.mjs';
 import { lignesDuBadge } from './badge.mjs';
+import { listeDAttente } from './attente.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, tuTiensUnBar, atouts } from './gabarits.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
@@ -266,6 +267,8 @@ ${commentCaMarche(textes, marque)}`,
     if (!villes.has(bar.ville.cle)) villes.set(bar.ville.cle, { cle: bar.ville.cle, nom: bar.ville.nom, guide: null });
   }
   const avertissements = [];
+  // La liste d’attente d’une ville (attente.mjs) : les villes où Baromatch a déjà un bar.
+  const clesAvecBars = new Set(donnees.bars.map((b) => b.ville.cle));
   for (const ville of villes.values()) {
     ville.bars = donnees.bars.filter((b) => b.ville.cle === ville.cle).sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
     ville.soirees = ville.bars.flatMap((b) => b.soirees).filter((s) => enCoursOuAVenir(s.match)).sort((a, b) => a.match.debut - b.match.debut || a.bar.nom.localeCompare(b.bar.nom, 'fr'));
@@ -351,7 +354,7 @@ ${faq.map(({ question, reponse }) => `  <details>
 ${sectionBars}
 ${sectionSoirees}
 ${sectionGuide}
-${appel(marque, textes)}
+${!marque.appli?.ouverte || !ville.bars.length ? listeDAttente({ cle: ville.cle, nom: nomVille, textes, clesAvecBars, ouverte: marque.appli?.ouverte }) : appel(marque, textes)}
 ${commentCaMarche(textes, marque)}
 ${sectionFaq}
 <p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.ville.toutesLesVilles)}</a></p>`,

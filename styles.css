@@ -307,6 +307,35 @@ a:hover { color: var(--goutte); }
 }
 .attente__note a { color: var(--texte-doux); }
 
+/* La ville de la liste d’attente : cinq puces de 44 px, comme les choix de la boutique, et une phrase qui suit la ville
+   choisie (« Pas de date pour Lyon… »), sans script : sur l’accueil comme sur les pages de ville, qui n’en ont pas. */
+.attente__villes { margin: 16px 0 0; padding: 0; border: 0; min-width: 0; }
+.attente__villes legend { margin: 0 0 8px 4px; padding: 0; font-weight: 600; font-size: 0.9375rem; color: var(--texte); }
+.attente__options { display: flex; flex-wrap: wrap; gap: 8px; }
+.attente__ville { position: relative; }
+.attente__ville input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.attente__ville span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--champ-bord);
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--texte-doux);
+}
+.attente__ville input:checked + span { border-color: var(--ambre); background: rgba(255, 177, 61, 0.12); color: var(--texte); }
+.attente__ville input:focus-visible + span { outline: 2px solid var(--ambre); outline-offset: 2px; }
+@media (forced-colors: active) {
+  .attente__ville input:checked + span { padding: 0 14px; border: 3px solid Highlight; }
+}
+.attente__date { display: none; margin: 10px 4px 0; font-size: 0.9375rem; color: var(--texte-doux); }
+.attente:has(input[value="Lyon"]:checked) .attente__date[data-ville="Lyon"],
+.attente:has(input[value="Marseille"]:checked) .attente__date[data-ville="Marseille"],
+.attente:has(input[value="Lille"]:checked) .attente__date[data-ville="Lille"],
+.attente:has(input[value="Autre"]:checked) .attente__date[data-ville="Autre"] { display: block; }
+
 .attente__piege { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
 .attente__retour {

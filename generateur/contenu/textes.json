@@ -171,7 +171,7 @@
     "estIciOui": "Oui. {bars} de {ville} diffuse le match sur Baromatch.",
     "estIciOuiPluriel": "Oui. {bars} de {ville} diffusent le match sur Baromatch.",
     "estIciNon": "Pas encore de bar à {ville} sur Baromatch.",
-    "appliFermee": "L’appli, elle, est en test sur Android, à Paris, et n’est pas encore ouverte : laisse ton adresse sur l’accueil, on te prévient le jour où elle ouvre.",
+    "appliFermee": "L’appli, elle, est en test sur Android, à Paris, et n’est pas encore ouverte : laisse ton adresse dans le formulaire de cette page, on te prévient le jour où elle ouvre.",
     "appliOuverte": "L’appli est ouverte : tu y trouves les bars et tu gardes ta place."
   },
   "bar": {

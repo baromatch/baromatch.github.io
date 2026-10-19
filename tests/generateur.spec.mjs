@@ -468,6 +468,11 @@ test.describe('les pages', () => {
       { question: 'Baromatch est-il à Paris ?', reponse: `Oui. 2 bars de Paris diffusent le match sur Baromatch. ${contenu.textes.ville.appliFermee}` },
       ...contenu.villes.paris.faq,
     ];
+    // L’appli fermée : la réponse renvoie au formulaire de la liste d’attente, sur la page même, plus à l’accueil.
+    expect(contenu.marque.appli.ouverte).toBe(false);
+    expect(contenu.textes.ville.appliFermee).not.toMatch(/accueil/);
+    expect(contenu.textes.ville.appliFermee).toContain('laisse ton adresse dans le formulaire de cette page');
+    expect(paris.contenu).toContain('<form class="attente" id="attente"');
     expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text])).toEqual(questionsDeParis.map((q) => [insecables(q.question), insecables(q.reponse)]));
     for (const { question, reponse } of questionsDeParis) {
       expect(paris.contenu).toContain(`<summary>${insecables(echapper(question))}</summary>`);

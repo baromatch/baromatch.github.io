@@ -229,3 +229,21 @@
   field-sizing: content;
   resize: vertical;
 }
+
+/* ---------- Ce soir (/ce-soir/) ---------- */
+
+/* Un match de ce soir : son nom, l’heure du coup d’envoi en gras, puis les cartes des bars qui le diffusent. Un trait
+   sépare deux matchs. */
+.regarder-soir + .regarder-soir { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--trait); }
+.regarder-soir__match { margin: 0; font-size: 1.375rem; font-weight: 750; line-height: 1.2; letter-spacing: -0.01em; }
+.regarder-soir__match a { display: inline-block; padding: 10px 0; color: var(--texte); text-decoration-color: var(--ambre); }
+.regarder-soir__match a:hover { color: var(--goutte); }
+.regarder-soir__quand { margin: 0 0 14px; color: var(--texte-doux); }
+.regarder-soir__quand time { color: var(--texte); font-weight: 750; }
+.regarder-soir__quand a { display: inline-block; padding: 10px 0; }
+/* Les places d’un bar, à l’heure du passage : seulement l’appli ouverte. */
+.regarder-carte .regarder-carte__places { margin-top: 10px; font-weight: 650; }
+
+/* Un lien seul sous un bloc (vers « Ce soir » depuis la semaine et les villes, vers la semaine) : 44 px à toucher. */
+.regarder-suite { margin: 12px 0 0; }
+.regarder-suite a { display: inline-block; padding: 10px 0; font-weight: 650; }

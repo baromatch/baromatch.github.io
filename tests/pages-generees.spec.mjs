@@ -1,6 +1,7 @@
 // Les pages générées, dans le navigateur : le scénario inventé construit dans un dossier temporaire (avec une copie du
 // site autour, tests/outils/site-genere.mjs) et servi comme GitHub Pages le sert. Sur une page de ville, une page de
-// match, la semaine, une page de bar, « Ce soir » et la page neutre (celle qui remplace une page refusée, refus.mjs) :
+// match, la semaine, une page de bar, « Ce soir », la page neutre (celle qui remplace une page refusée, refus.mjs) et
+// les pages en anglais (anglais.mjs : Paris, les deux guides, un match indexable et un match à un seul bar de Paris) :
 // aucune violation d’axe à 360 et 1280 px, rien qui dépende de JavaScript (hors du bloc « Partager », que partage.js
 // enrichit), aucun débordement horizontal à 360 px, et chaque lien interne qui répond.
 import { test, expect } from '@playwright/test';
@@ -24,6 +25,11 @@ const PAGES = [
   { chemin: '/regarder-le-match/', nom: 'villes' },
   { chemin: '/matchs/page-neutre/', nom: 'page neutre' },
   { chemin: '/ce-soir/', nom: 'ce soir', partage: true },
+  { chemin: '/en/', nom: 'Paris en anglais', partage: true },
+  { chemin: '/en/premier-league/', nom: 'Premier League en anglais', partage: true },
+  { chemin: '/en/champions-league/', nom: 'Ligue des champions en anglais', partage: true },
+  { chemin: '/en/matches/psg-barca-2026-10-24/', nom: 'match en anglais avec des bars', partage: true },
+  { chemin: '/en/matches/le-havre-psg-2026-10-30/', nom: 'match en anglais, un bar de Paris', partage: true },
 ];
 
 const portLibre = () => new Promise((resoudre) => {
@@ -158,4 +164,31 @@ test('« Ce soir » au téléphone : le match, le bar et chaque lien seul se tou
     await expect(lien, chemin).toHaveText('Où regarder le match ce soir');
     expect(Math.round((await lien.boundingBox()).height), chemin).toBeGreaterThanOrEqual(44);
   }
+});
+
+test('les pages en anglais au téléphone : le lien de langue, le fil, les matchs et les bars se touchent sur 44 px', async ({ page: onglet }) => {
+  await onglet.setViewportSize({ width: 360, height: 800 });
+  const hauteurs = (selecteur) => onglet.locator(selecteur).evaluateAll((liens) => liens.map((a) => Math.round(a.getBoundingClientRect().height)));
+  for (const [chemin, selecteurs] of [
+    ['/en/', ['.regarder-langue a', '.regarder-matchs a', '.regarder-suite a', '.regarder-carte__nom a', '.regarder-carte__suite a']],
+    ['/en/matches/psg-barca-2026-10-24/', ['.regarder-langue a', '.regarder-fil a', '.regarder-carte__nom a', '.regarder-matchs a', '.regarder-retour a']],
+    ['/en/premier-league/', ['.regarder-fil a', '.regarder-retour a']],
+    // Les jumelles en français mènent à leur version en anglais par un lien seul, lui aussi de 44 px.
+    ['/regarder-le-match/paris/', ['.regarder-langue a']],
+    ['/matchs/psg-barca-2026-10-24/', ['.regarder-langue a']],
+  ]) {
+    await onglet.goto(`${serveur.adresse}${chemin}`);
+    for (const selecteur of selecteurs) {
+      const liste = await hauteurs(selecteur);
+      expect(liste.length, `${chemin} ${selecteur}`).toBeGreaterThan(0);
+      expect(liste.filter((h) => h < 44), `${chemin} ${selecteur}`).toEqual([]);
+    }
+  }
+  // Le lien de langue dit sa langue (lang, hreflang) et mène à la jumelle.
+  await onglet.goto(`${serveur.adresse}/regarder-le-match/paris/`);
+  await expect(onglet.locator('.regarder-langue a')).toHaveText('English');
+  expect(await onglet.locator('.regarder-langue a').evaluate((a) => [a.getAttribute('href'), a.lang, a.hreflang])).toEqual(['/en/', 'en', 'en']);
+  await onglet.goto(`${serveur.adresse}/en/`);
+  expect(await onglet.evaluate(() => [document.documentElement.lang, document.querySelector('.entete').lang, document.querySelector('.pied').lang])).toEqual(['en', 'fr', 'fr']);
+  await expect(onglet.locator('.regarder-langue a')).toHaveText('Version française');
 });

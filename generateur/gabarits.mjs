@@ -1,16 +1,21 @@
 // Le HTML des pages générées : la tête (titre, description, adresse canonique, aperçus, données structurées, politique
 // de sécurité), l’en-tête et le pied de page du site, et le corps de chaque sorte de page. Tout est dans le HTML,
 // lisible par un robot qui n’exécute rien ; seul le bloc « Partager » (partage.mjs) charge un fichier du site,
-// partage.js, qui l’enrichit sans rien changer au reste. Chaque texte venu des données est échappé.
+// partage.js, qui l’enrichit sans rien changer au reste, et la mesure d’audience, quand marque.json l’active, charge
+// /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { accorder, capitale, echapper as e } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
+import { baliseDeLaMesure, lireLaMesure, politiqueAvecLaMesure } from './mesure.mjs';
 import { blocPartager, SCRIPT_DU_PARTAGE } from './partage.mjs';
 
 // form-action : la liste d’attente des pages de ville part vers Formspree, sans JavaScript (attente.mjs).
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action https://formspree.io";
+// La politique d’une page générée selon la mesure d’audience de marque.json (mesure.mjs) : CSP, et l’adresse du compte
+// GoatCounter dans connect-src quand elle est active.
+export const politiqueDesPages = (mesure) => politiqueAvecLaMesure(CSP, mesure);
 const IMAGE_ALT = 'Le verre de lumière de Baromatch et la phrase : Ton match. Ton bar. Ce soir.';
 
 // L’en-tête et la marque du pied de page, repris tels quels de l’accueil : une retouche de l’accueil passe ici au
@@ -29,14 +34,15 @@ export const lireLeCadre = (racine) => {
 // image : l’image de partage de la page ({ adresse, alt }), sinon l’image générale du site.
 // feuilles : les feuilles de style propres à la page, après celles de toutes les pages (affiche.css pour les affiches).
 // langue : « fr », ou « en » pour une page en anglais (anglais.mjs).
-const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [], langue = 'fr' }) => `<!doctype html>
+// mesure : la mesure d’audience (mesure.mjs) ; active, la page charge /mesure.js.
+const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [], langue = 'fr', mesure }) => `<!doctype html>
 <html lang="${langue}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Page écrite par le générateur des pages des matchs (dossier generateur du dépôt), à chaque passage : une retouche
      à la main serait effacée au suivant. Aucun script écrit dans la page : seulement les fichiers du site. -->
-<meta http-equiv="Content-Security-Policy" content="${CSP}">
+<meta http-equiv="Content-Security-Policy" content="${politiqueDesPages(mesure)}">
 <title>${e(titre)}</title>
 <meta name="description" content="${e(description)}">
 <meta name="robots" content="${indexable ? 'max-image-preview:large' : 'noindex'}">
@@ -61,7 +67,7 @@ ${feuilles.map((f) => `<link rel="stylesheet" href="${f}">\n`).join('')}<meta pr
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@baromatchapp">
 <meta name="twitter:image" content="${image?.adresse ?? IMAGE}">
-${partage ? `${SCRIPT_DU_PARTAGE}\n` : ''}<script type="application/ld+json">${blocJsonLd(jsonld)}</script>
+${partage ? `${SCRIPT_DU_PARTAGE}\n` : ''}${mesure.active ? `${baliseDeLaMesure(mesure)}\n` : ''}<script type="application/ld+json">${blocJsonLd(jsonld)}</script>
 </head>
 <body>
 <a class="lien-evitement" href="#contenu">${langue === 'en' ? 'Skip to content' : 'Aller au contenu'}</a>
@@ -108,7 +114,7 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
   : corps);
 
 // Une page en anglais (langue « en ») garde l’en-tête du site, en français : il le dit (lang="fr").
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue })}${langue === 'en' ? cadre.entete.replace('<header class="entete page">', '<header class="entete page" lang="fr">') : cadre.entete}
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${langue === 'en' ? cadre.entete.replace('<header class="entete page">', '<header class="entete page" lang="fr">') : cadre.entete}
 
 <main id="contenu" class="regarder page">
 ${avecLePartage(corps, { partage, titre, chemin, textesDuPartage })}

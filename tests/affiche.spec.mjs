@@ -25,6 +25,7 @@ import { construireEnMemoire } from '../generateur/site.mjs';
 import { controlerLaPage, texteVisible } from '../generateur/controle.mjs';
 import { MOTS_INTERDITS } from '../generateur/donnees.mjs';
 import { estPermis, fichierDuChemin } from '../generateur/etat.mjs';
+import { baliseDeLaMesure, mesureDuSite } from '../generateur/mesure.mjs';
 import { chargerLeQr, MARGE_DU_QR, svgDuQr } from '../generateur/qr.mjs';
 import { chargerLeVocabulaire, validerLaPage } from '../generateur/validateur.mjs';
 
@@ -168,7 +169,7 @@ test('le QR code de l’accueil : la matrice de référence, sa marge blanche de
 
 // ---------- L’affiche de la semaine, dans le générateur ----------
 
-test('l’affiche de la semaine : indexable même sans vrai bar publié, contrôlée, sans script, et dans le plan du site', async () => {
+test('l’affiche de la semaine : indexable même sans vrai bar publié, contrôlée, sans script hors de la mesure d’audience, et dans le plan du site', async () => {
   const site = await enMemoire({ avec: sansBarPublie });
   const p = pageDe(site, OUVERTE);
   expect(site.refusees.map((r) => r.chemin)).not.toContain(OUVERTE);
@@ -184,8 +185,12 @@ test('l’affiche de la semaine : indexable même sans vrai bar publié, contrô
   expect(p.contenu.match(/<h1[\s>]/g)).toHaveLength(1);
   expect(p.contenu).toContain('<h1 class="regarder-titre">L’affiche des matchs de la semaine</h1>');
   expect(p.contenu).toContain('<link rel="stylesheet" href="/affiche.css">');
-  // Aucun script, pas même celui du bloc « Partager » : seulement les données structurées.
-  expect([...p.contenu.matchAll(/<script\b([^>]*)>/g)].map((m) => m[1])).toEqual([' type="application/ld+json"']);
+  // Aucun script, pas même celui du bloc « Partager » : seulement /mesure.js quand marque.json active la mesure
+  // d’audience (l’affiche compte ses visites comme les autres pages ; rien de ce qu’on y coche ne part), et les données
+  // structurées.
+  expect([...p.contenu.matchAll(/<script\b([^>]*)>/g)].map((m) => m[1])).toEqual([
+    ...(mesureDuSite().active ? [baliseDeLaMesure(mesureDuSite()).replace(/^<script|><\/script>$/g, '')] : []), ' type="application/ld+json"',
+  ]);
 
   // Écrite par construire : sa place dans la liste blanche, dans le plan du site, et parmi les adresses pour IndexNow.
   const sortie = await siteAvecLeDepot();
@@ -430,14 +435,15 @@ test.describe('dans le navigateur', () => {
     expect(ailleurs).toEqual([]);
   });
 
-  test('aucun script, aucune requête hors du site ; les cases, le papier et les liens se touchent sur 44 px', async ({ page: onglet }) => {
+  test('aucun script hors de la mesure d’audience, aucune requête hors du site ; les cases, le papier et les liens se touchent sur 44 px', async ({ page: onglet }) => {
     for (const chemin of [OUVERTE, AFFICHE_DU_ZINC]) {
       const ailleurs = surveiller(onglet);
       const scripts = [];
       onglet.on('request', (r) => { if (r.resourceType() === 'script') scripts.push(r.url()); });
       await onglet.setViewportSize({ width: 360, height: 800 });
       await onglet.goto(`${serveur.adresse}${chemin}`);
-      expect(scripts, chemin).toEqual([]);
+      // Seulement /mesure.js, si marque.json active la mesure d’audience (hors de baromatch.fr, elle ne compte rien).
+      expect(scripts, chemin).toEqual(mesureDuSite().active ? [`${serveur.adresse}/mesure.js`] : []);
       expect(ailleurs, chemin).toEqual([]);
       const hauteurs = await onglet.locator('label.affiche-ligne__texte, .affiche-format__choix, main .regarder-suite a').evaluateAll((el) => el.map((x) => Math.round(x.getBoundingClientRect().height)));
       expect(hauteurs.length, chemin).toBeGreaterThanOrEqual(chemin === OUVERTE ? 18 : 2);

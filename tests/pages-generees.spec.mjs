@@ -14,6 +14,7 @@ import { violationsAxe } from './outils/axe.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple } from './outils/site-genere.mjs';
 import { lireLeCadre } from '../generateur/gabarits.mjs';
+import { mesureDuSite } from '../generateur/mesure.mjs';
 import { pageDeRepli } from '../generateur/refus.mjs';
 
 // partage : la page a le bloc « Partager » (et son seul script, /partage.js).
@@ -97,7 +98,8 @@ for (const page of PAGES) {
       const avec = await lire(true);
       expect(sans).toEqual(avec);
       expect(sans.titre.length).toBeGreaterThan(0);
-      expect(scripts).toEqual(page.partage ? [`${serveur.adresse}/partage.js`] : []);
+      // Et /mesure.js, si marque.json active la mesure d’audience (hors de baromatch.fr, elle ne compte rien).
+      expect(scripts).toEqual([...(page.partage ? [`${serveur.adresse}/partage.js`] : []), ...(mesureDuSite().active ? [`${serveur.adresse}/mesure.js`] : [])]);
       expect(refus).toEqual([]);
     });
 

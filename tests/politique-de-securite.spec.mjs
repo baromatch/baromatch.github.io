@@ -1,12 +1,16 @@
 // La politique de sécurité (Content-Security-Policy, en balise meta : GitHub Pages ne permet pas d’en-tête) de chaque
 // page autre que « Pour les bars », qui a la sienne et ses tests : elle n’admet que ce que la page utilise (ses fichiers,
-// Formspree où un formulaire écrit, l’API où tablee.js lit, l’empreinte de chaque script ou style en ligne), et rien ne
-// la viole quand on parcourt la page, avec ou sans JavaScript.
+// Formspree où un formulaire écrit, l’API où tablee.js lit, le compte GoatCounter quand la mesure d’audience de
+// marque.json est active, l’empreinte de chaque script ou style en ligne), et rien ne la viole quand on parcourt la
+// page, avec ou sans JavaScript. Chaque page est jugée telle qu’elle est, et telle que l’Action l’écrirait avec un code
+// de mesure (generateur/mesure.mjs) ; tests/mesure.spec.mjs la parcourt alors dans le navigateur.
 import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { appliquerAUnePage, lireLaMesure } from '../generateur/mesure.mjs';
 import { simulerFormspree } from './outils/formspree.mjs';
 import { API_TABLEE, enTetesCors, INVITATION } from './outils/invitation.mjs';
+import { MARQUE } from './outils/marque.mjs';
 import { fichierDe } from './outils/pages.mjs';
 
 const API = 'https://api-production-8ce4.up.railway.app';
@@ -34,9 +38,17 @@ const lireLaPolitique = (html) => {
 };
 const empreinte = (texte) => `'sha256-${createHash('sha256').update(texte, 'utf8').digest('base64')}'`;
 
+// La page telle qu’elle est, avec la mesure de marque.json (arrêtée tant que son code est vide) ; et la même page
+// réécrite avec une mesure d’essai.
+const ESSAI = lireLaMesure({ mesure: { outil: 'goatcounter', code: 'essai' } });
+const CAS = [
+  { nom: 'telle quelle', mesure: lireLaMesure(MARQUE), lire: (html) => html },
+  { nom: 'avec un code de mesure', mesure: ESSAI, lire: (html) => appliquerAUnePage(html, ESSAI) },
+];
+
 for (const page of PAGES) {
-  test(`${page.chemin} : une politique qui n’admet que ce que la page utilise`, () => {
-    const html = readFileSync(fichierDe(page.chemin), 'utf8');
+  for (const { nom, mesure, lire } of CAS) test(`${page.chemin} ${nom} : une politique qui n’admet que ce que la page utilise`, () => {
+    const html = lire(readFileSync(fichierDe(page.chemin), 'utf8'));
     const { nombre, position, directives } = lireLaPolitique(html);
     expect(nombre, 'une seule balise').toBe(1);
     // Avant toute ressource : ce qui est demandé avant la balise lui échappe.
@@ -45,7 +57,7 @@ for (const page of PAGES) {
     expect(directives['base-uri']).toEqual(["'none'"]);
     expect(directives['object-src']).toEqual(["'none'"]);
     expect(directives['form-action']).toEqual(page.formulaire.length ? page.formulaire : ["'none'"]);
-    expect(directives['connect-src'] ?? ["'self'"]).toEqual(["'self'", ...page.connect]);
+    expect(directives['connect-src'] ?? ["'self'"]).toEqual(["'self'", ...page.connect, ...(mesure.active ? [mesure.origine] : [])]);
     const toutes = Object.values(directives).flat();
     expect(toutes.filter((v) => /unsafe|^\*$|^https?:$|^data:$/.test(v))).toEqual([]);
 

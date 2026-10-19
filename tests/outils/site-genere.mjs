@@ -2,10 +2,11 @@
 // styles, scripts, police, images ; ni les tests, ni le générateur, ni le film, ni les pages déjà générées), puis le
 // scénario inventé (tests/donnees/scenario.json) construit par-dessus, à l’heure du vendredi 23 octobre 2026.
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { chargerLeContenu } from '../../generateur/contenu.mjs';
 import { construire } from '../../generateur/construire.mjs';
+import { appliquerLaMesure } from '../../generateur/mesure.mjs';
 import { racine } from './environnement.mjs';
 
 export const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
@@ -21,10 +22,13 @@ const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|en|tests|generateur|nod
 
 // options : une autre source et une autre heure (la capture enregistrée, tests/donnees/capture), un autre contenu,
 // ou rendu: null pour se passer des images de partage.
+// marque : une autre carte d’identité que marque.json (la mesure d’audience active, par exemple) : écrite dans le site
+// d’exemple, ses pages écrites à la main réécrites comme l’Action le ferait (generateur/mesure.mjs), et les pages
+// générées construites avec elle.
 export const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
 export const MAINTENANT_DE_LA_CAPTURE = Date.parse('2026-10-15T19:44:29Z');
 export const construireLeSiteDExemple = async (dossier, {
-  source = `scenario:${SCENARIO}`, maintenant = MAINTENANT_DU_SCENARIO, contenu = contenuDuScenario(), ...options
+  source = `scenario:${SCENARIO}`, maintenant = MAINTENANT_DU_SCENARIO, contenu = contenuDuScenario(), marque, ...options
 } = {}) => {
   rmSync(dossier, { recursive: true, force: true });
   mkdirSync(dossier, { recursive: true });
@@ -34,5 +38,9 @@ export const construireLeSiteDExemple = async (dossier, {
     mkdirSync(path.dirname(path.join(dossier, fichier)), { recursive: true });
     copyFileSync(path.join(racine, fichier), path.join(dossier, fichier));
   }
-  return construire({ source, sortie: dossier, maintenant, racine, contenu, ...options });
+  if (marque) {
+    writeFileSync(path.join(dossier, 'marque.json'), `${JSON.stringify(marque, null, 2)}\n`);
+    appliquerLaMesure({ racine: dossier, marque });
+  }
+  return construire({ source, sortie: dossier, maintenant, racine, contenu: { ...contenu, ...(marque ? { marque } : {}) }, ...options });
 };

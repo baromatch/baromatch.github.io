@@ -10,7 +10,9 @@
     "generer": "node generateur/construire.mjs",
     "generer:capture": "node generateur/construire.mjs --source=capture:tests/donnees/capture --maintenant=2026-10-15T19:44:29Z --sortie=apercu",
     "lighthouse:exemples": "node tests/outils/lighthouse-exemples.mjs",
-    "lighthouse:budget": "node tests/outils/lighthouse-budget.mjs"
+    "lighthouse:budget": "node tests/outils/lighthouse-budget.mjs",
+    "mesure": "node generateur/mesure.mjs",
+    "lighthouse:mesure": "node tests/outils/lighthouse-mesure.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.2",

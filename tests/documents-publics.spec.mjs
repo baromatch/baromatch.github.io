@@ -145,6 +145,9 @@ const EXCEPTIONS = [
   // où la copie des tests le traduit (heureProvisoire). Les copies et le scénario des tests ne l’écrivent pas.
   ['generateur/donnees.mjs', 'nom eS2Fi_z4niw', 1],
   ['generateur/outils/reduire-capture.mjs', 'nom eS2Fi_z4niw', 1],
+  // Le drapeau de Chromium qui le fait passer à côté de l’intermédiaire réseau de la machine de test, pour joindre le
+  // serveur local à la place de baromatch.fr (Lighthouse avec la mesure d’audience) : rien sur le serveur de l’appli.
+  ['tests/outils/lighthouse-mesure.mjs', 'reseau', 1],
 ];
 
 // ---------- La recherche ----------

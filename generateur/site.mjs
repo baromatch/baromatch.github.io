@@ -12,6 +12,7 @@ import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
 import { lireLeCadre } from './gabarits.mjs';
 import { controlerLaPage } from './controle.mjs';
+import { lireLaMesure } from './mesure.mjs';
 import { fabriquerLesPages } from './pages.mjs';
 import { lireLaSource } from './sources.mjs';
 import { chargerLeVocabulaire, validerLaPage } from './validateur.mjs';
@@ -24,6 +25,8 @@ export const construireEnMemoire = async ({
   if (appli.ouverte && !appli.android && !appli.iphone) {
     throw new Error('marque.json : « appli.ouverte » est vrai, mais aucun lien de magasin n’est rempli (« android » ou « iphone »). Ajoute le lien de l’appli dans le magasin, ou remets « ouverte » à false : rien n’est écrit, les pages en ligne restent comme elles sont.');
   }
+  // Un code de mesure d’audience illisible arrête tout, avant de lire les données (mesure.mjs dit quoi corriger).
+  const mesure = lireLaMesure(contenu.marque);
   const listes = brut ?? await lireLaSource(source, adresse ? { adresse } : {});
   const donnees = preparer(listes, { maintenant, ...contenu, adresses: anciens?.adresses });
   const cadre = lireLeCadre(racine);
@@ -42,7 +45,7 @@ export const construireEnMemoire = async ({
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);
   const motsDesBars = [...donnees.bars.flatMap((b) => [b.nom, b.adresse, b.rue]), ...(anciens?.bars ?? []).flatMap((b) => [b.nom, b.adresse]), ...offres];
   const controler = (p) => [
-    ...controlerLaPage(p, { motsDesBars }),
+    ...controlerLaPage(p, { motsDesBars, mesure }),
     ...validerLaPage(vocabulaire, p.contenu).map((erreur) => `${p.chemin} : ${erreur}`),
   ];
   const erreursDe = new Map();

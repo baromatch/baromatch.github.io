@@ -21,6 +21,8 @@ const PAGES = [
   { chemin: '/mentions-legales.html', connect: [], formulaire: [] },
   { chemin: '/supprimer-mon-compte.html', connect: [], formulaire: [] },
   { chemin: '/presse.html', connect: [], formulaire: [] },
+  { chemin: '/a-propos.html', connect: [], formulaire: [] },
+  { chemin: '/comment-on-choisit-les-bars.html', connect: [], formulaire: [] },
   { chemin: '/404.html', connect: [API], formulaire: [] },
 ];
 

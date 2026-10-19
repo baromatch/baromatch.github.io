@@ -15,6 +15,8 @@ export const PAGES = [
   { chemin: '/mentions-legales.html', nom: 'mentions-legales' },
   { chemin: '/supprimer-mon-compte.html', nom: 'supprimer-mon-compte' },
   { chemin: '/presse.html', nom: 'presse' },
+  { chemin: '/a-propos.html', nom: 'a-propos' },
+  { chemin: '/comment-on-choisit-les-bars.html', nom: 'comment-on-choisit-les-bars' },
   { chemin: '/404.html', nom: '404', indexable: false },
   { chemin: '/t/abcdefghjkmn', nom: 'tablee', lighthouse: false, indexable: false },
 ];

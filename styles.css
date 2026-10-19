@@ -556,6 +556,8 @@ a:hover { color: var(--goutte); }
 }
 
 .document__date { margin: 0 0 40px; color: var(--texte-discret); font-size: 0.9375rem; }
+/* La phrase d’ouverture d’une page de texte (à propos, comment on choisit les bars) : ce qu’elle dit, en une phrase. */
+.document .document__chapeau { margin: -16px 0 0; color: var(--texte); font-size: 1.1875rem; }
 
 .document h2 {
   margin: 44px 0 10px;

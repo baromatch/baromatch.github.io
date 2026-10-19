@@ -1153,11 +1153,6 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .presse__faits dt { font-weight: 700; }
 .presse__faits dd { margin: 0; color: var(--texte-doux); }
 
-/* L’emplacement d’un texte à venir : un cadre en pointillés, qui ne se prend pas pour du contenu. */
-.presse__a-ecrire { margin-top: 16px; padding: 18px 22px; border: 2px dashed var(--verre-bord-fort); border-radius: 18px; }
-.document .presse__a-ecrire-titre { margin: 0 0 4px; color: var(--texte); font-weight: 700; }
-.document .presse__a-ecrire p:last-child { margin-bottom: 0; }
-
 .document .presse__logos, .document .presse__captures { display: grid; gap: 20px; margin: 24px 0 0; padding: 0; list-style: none; }
 .document .presse__logos > li, .document .presse__captures > li { margin: 0; }
 @media (min-width: 720px) { .document .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

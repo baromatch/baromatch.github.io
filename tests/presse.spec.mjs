@@ -1,9 +1,10 @@
 // La page presse : ce qu’est Baromatch dit avec les mots de marque.json, ce qu’il n’est pas (ni paris sportifs, ni
-// diffuseur, ni vente d’alcool), l’emplacement de l’histoire du fondateur laissé à Skander, les logos à télécharger,
-// les captures, le film et le contact. Ses données structurées la relient à l’Organization de l’accueil.
+// diffuseur, ni vente d’alcool), les logos à télécharger, les captures, le film et le contact. L’histoire du fondateur
+// n’y est pas tant qu’elle n’est pas écrite : aucun emplacement vide en ligne. Ses données structurées la relient à
+// l’Organization de l’accueil.
 // Le reste (référencement, liens, accessibilité, politique de sécurité, pied de page) vient de tests/outils/pages.mjs.
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 
@@ -31,11 +32,21 @@ test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d
   expect(points).toEqual(['Pas un site de paris sportifs.', 'Pas un diffuseur.', 'Pas un vendeur d’alcool.']);
 });
 
-test('l’histoire du fondateur : un emplacement visible et marqué, pas un faux texte', async ({ page }) => {
+test('l’histoire du fondateur, pas encore écrite : aucun emplacement vide, ni lu, ni dans la source, et la page reste indexable', async ({ page, request }) => {
+  // Ni dans la page servie (texte, commentaires, classes), ni dans aucune page HTML du dépôt.
+  const source = await (await request.get(PAGE)).text();
+  const aEcrire = /[àa] [ée]crire|[àa] compl[ée]ter|presse__a-ecrire|son fondateur arrive/i;
+  expect(source).not.toMatch(aEcrire);
+  for (const fichier of readdirSync(racine).filter((f) => f.endsWith('.html'))) {
+    expect(readFileSync(path.join(racine, fichier), 'utf8'), fichier).not.toMatch(aEcrire);
+  }
   await page.goto(PAGE);
-  const bloc = page.locator('#histoire + .presse__a-ecrire');
-  await expect(bloc).toBeVisible();
-  await expect(bloc.locator('.presse__a-ecrire-titre')).toHaveText('À écrire par Skander');
+  await expect(page.locator('#histoire')).toHaveCount(0);
+  // Chaque titre de la page a son contenu : aucun titre vide.
+  const vides = await page.$$eval('main h2', (titres) => titres.filter((h2) => !h2.nextElementSibling || /^H[12]$/.test(h2.nextElementSibling.tagName)).map((h2) => h2.textContent));
+  expect(vides).toEqual([]);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'max-image-preview:large');
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<loc>https://baromatch.fr/presse.html</loc>');
 });
 
 test('les logos : fond sombre, fond clair et icône, chacun en SVG et en PNG à télécharger', async ({ page }) => {

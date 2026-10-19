@@ -104,7 +104,7 @@ test('la note de la liste d’attente mène droit à ce qu’on fait de l’adre
   await page.goto('/');
   const lien = page.locator('.attente__note a');
   await expect(lien).toHaveAttribute('href', '/confidentialite.html#liste-attente');
-  await expect(lien).toHaveText('combien de temps on garde ton adresse');
+  await expect(lien).toHaveText('Ce qu’on garde, et combien de temps');
   await lien.click();
   await expect(page.locator('#liste-attente')).toHaveText('La liste d’attente');
   await expect(page.locator('#liste-attente')).toBeInViewport();

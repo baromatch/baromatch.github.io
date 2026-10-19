@@ -186,6 +186,8 @@
 /* Sur deux lignes au téléphone, l’appel se coupe au milieu de la phrase, jamais dans « préviens-moi ». */
 .regarder-appel .capsule { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; text-wrap: balance; }
 .regarder-appel p { margin: 0; max-width: 40ch; color: var(--texte-doux); font-size: 0.9375rem; }
+/* La liste d’attente d’une ville (generateur/attente.mjs) : le formulaire de l’accueil, aligné sur son titre. */
+.regarder-attente .attente { margin: 0; }
 
 .regarder-etapes { margin: 0; padding-left: 1.4em; }
 .regarder-etapes li { margin: 0 0 12px; color: var(--texte-doux); }

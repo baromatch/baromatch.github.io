@@ -9,7 +9,8 @@ import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
 import { blocPartager, SCRIPT_DU_PARTAGE } from './partage.mjs';
 
-export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'";
+// form-action : la liste d’attente des pages de ville part vers Formspree, sans JavaScript (attente.mjs).
+export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action https://formspree.io";
 const IMAGE_ALT = 'Le verre de lumière de Baromatch et la phrase : Ton match. Ton bar. Ce soir.';
 
 // L’en-tête et la marque du pied de page, repris tels quels de l’accueil : une retouche de l’accueil passe ici au

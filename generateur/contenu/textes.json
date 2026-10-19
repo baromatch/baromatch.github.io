@@ -11,6 +11,19 @@
       "note": "Ta place ne coûte rien. Garde-la avant de partir."
     }
   },
+  "attente": {
+    "titreArrive": "Préviens-moi quand Baromatch arrive à {ville}",
+    "titreOuvre": "Préviens-moi quand l’appli ouvre à {ville}",
+    "etiquette": "Ton adresse mail",
+    "bouton": "Me prévenir",
+    "villes": "Ta ville",
+    "pasDeDate": "Pas de date pour {ville}. On t’écrit seulement si Baromatch y arrive.",
+    "pasDeDateAutre": "Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.",
+    "plateformes": "Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.",
+    "note": "On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests.",
+    "lienNote": "Ce qu’on garde, et combien de temps",
+    "sujet": "Nouvelle inscription à la liste d’attente Baromatch"
+  },
   "places": "Les places qui restent sont dans l’appli.",
   "offre": {
     "etiquette": "L’offre du bar",

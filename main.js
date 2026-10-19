@@ -4,12 +4,15 @@
 
    Après l’inscription, l’adresse reste dans le champ et le message la rappelle : une faute se voit. « Corriger
    l’adresse » (ou taper dans le champ) rouvre l’envoi ; la nouvelle inscription porte aussi l’adresse qu’elle
-   remplace (champ « remplace »). Ce champ informe seulement le propriétaire : rien n’est remplacé ni effacé sur sa
-   seule foi (n’importe qui peut l’écrire en envoyant au formulaire), une suppression passe par confidentialite@.
+   remplace (champ « remplace »), comme une autre ville choisie après l’inscription. Ce champ informe seulement le
+   propriétaire : rien n’est remplacé ni effacé sur sa seule foi (n’importe qui peut l’écrire en envoyant au
+   formulaire), une suppression passe par confidentialite@.
 
    L’issue d’un envoi se décide en un seul endroit (transmettre) : inscrite, adresse refusée par Formspree, ou panne
    (réseau, pas de réponse en 10 s, tout autre refus). Chaque échec laisse une issue : écrire à contact@baromatch.fr.
-   (Le même texte et la même règle sont dans boutique.js : ses tests et ceux-ci vérifient les deux pages.) */
+   (Le même texte et la même règle sont dans boutique.js : ses tests et ceux-ci vérifient les deux pages.)
+
+   La ville (Paris, Lyon, Marseille, Lille ou Autre) part avec l’adresse ; le message d’inscription la reprend. */
 
 (function () {
   var form = document.getElementById("attente");
@@ -35,11 +38,14 @@
     messagerie: "Ta messagerie s’ouvre : envoie le mail et on te préviendra au lancement.",
     envoi: "Envoi…",
     note: "C’est noté",
-    inscrite: function (courriel) {
-      return "C’est noté : on t’écrit à " + courriel + " au lancement et pour les premiers tests.";
+    inscrite: function (courriel, ville) {
+      var quand = ville === "Paris" || !ville ? "au lancement et pour les premiers tests"
+        : ville === "Autre" ? "si Baromatch ouvre dans une nouvelle ville" : "si Baromatch arrive à " + ville;
+      return "C’est noté : on t’écrit à " + courriel + " " + quand + ".";
     }
   };
   var inscrite = "";
+  var villeInscrite = "";
   // Le formulaire n’a qu’un état à la fois (comme pour-les-bars.js) : « repos » (on peut envoyer), « envoi » ou
   // « inscrite » (c’est parti ; taper dans le champ ou « Corriger l’adresse » le ramène au repos). Seul `aller` le
   // change. Hors du repos, le bouton reste focalisable (aria-disabled, jamais disabled : le focus ne tombe pas sur la
@@ -120,16 +126,22 @@
     });
   }
 
-  function ouvrirLaMessagerie(courriel) {
+  function villeChoisie() {
+    var choix = form.querySelector('input[name="ville"]:checked');
+    return choix ? choix.value : "";
+  }
+
+  function ouvrirLaMessagerie(courriel, ville) {
     var sujet = encodeURIComponent("Préviens-moi au lancement");
-    var corps = encodeURIComponent("Mon adresse : " + courriel);
+    var corps = encodeURIComponent("Mon adresse : " + courriel + (ville ? "\nMa ville : " + ville : ""));
     window.location.href = "mailto:" + CONTACT + "?subject=" + sujet + "&body=" + corps;
     afficher(TEXTES.messagerie, "ok");
   }
 
-  function inscrire(courriel) {
+  function inscrire(courriel, ville) {
     inscrite = courriel;
-    afficher(TEXTES.inscrite(courriel), "ok");
+    villeInscrite = ville;
+    afficher(TEXTES.inscrite(courriel, ville), "ok");
     aller("inscrite");
   }
 
@@ -144,16 +156,17 @@
 
     var urlEnvoi = form.getAttribute("action") || "";
     // Formulaire pas encore branché : on passe par un mail.
-    if (urlEnvoi.indexOf("TON-ID-FORMSPREE") !== -1 || urlEnvoi === "") return ouvrirLaMessagerie(courriel);
+    var ville = villeChoisie();
+    if (urlEnvoi.indexOf("TON-ID-FORMSPREE") !== -1 || urlEnvoi === "") return ouvrirLaMessagerie(courriel, ville);
 
     var donnees = new FormData(form);
-    if (inscrite && inscrite !== courriel) donnees.append("remplace", inscrite);
+    if (inscrite && (inscrite !== courriel || villeInscrite !== ville)) donnees.append("remplace", inscrite);
 
     aller("envoi");
     annoncerLEnvoi();
 
     transmettre(urlEnvoi, donnees).then(function (issue) {
-      if (issue === "ok") return inscrire(courriel);
+      if (issue === "ok") return inscrire(courriel, ville);
       rouvrir();
       if (issue === "refusee") signaler(TEXTES.refusee);
       else afficher(TEXTES.panne, "erreur");
@@ -172,6 +185,11 @@
   champ.addEventListener("input", function () {
     champ.removeAttribute("aria-invalid");
     if (etat === "inscrite") rouvrir();
+  });
+
+  // Une autre ville après l’inscription rouvre l’envoi, comme une adresse corrigée.
+  form.addEventListener("change", function (event) {
+    if (event.target.name === "ville" && etat === "inscrite") rouvrir();
   });
 })();
 

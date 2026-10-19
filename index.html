@@ -81,7 +81,7 @@
       <p class="ouverture__texte">Une appli gratuite pour les fans&nbsp;: trouve un bar qui diffuse ton match et garde ta place. Elle n’est pas encore ouverte&nbsp;: rien à réserver ce soir.</p>
 
       <form class="attente" id="attente" action="https://formspree.io/f/mqpeedoj" method="POST" novalidate>
-        <label class="attente__etiquette" for="attente-mail">Préviens-moi au lancement</label>
+        <label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
         <div class="attente__ligne">
           <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
           <button class="attente__bouton" type="submit">Me prévenir</button>
@@ -90,8 +90,22 @@
         <input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
         <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
         <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
+        <fieldset class="attente__villes" aria-describedby="attente-usage">
+          <legend>Ta ville</legend>
+          <div class="attente__options">
+            <label class="attente__ville" for="attente-ville-0"><input id="attente-ville-0" type="radio" name="ville" value="Paris" checked><span>Paris</span></label>
+            <label class="attente__ville" for="attente-ville-1"><input id="attente-ville-1" type="radio" name="ville" value="Lyon"><span>Lyon</span></label>
+            <label class="attente__ville" for="attente-ville-2"><input id="attente-ville-2" type="radio" name="ville" value="Marseille"><span>Marseille</span></label>
+            <label class="attente__ville" for="attente-ville-3"><input id="attente-ville-3" type="radio" name="ville" value="Lille"><span>Lille</span></label>
+            <label class="attente__ville" for="attente-ville-4"><input id="attente-ville-4" type="radio" name="ville" value="Autre"><span>Autre</span></label>
+          </div>
+        </fieldset>
+        <p class="attente__date" data-ville="Lyon">Pas de date pour Lyon. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Marseille">Pas de date pour Marseille. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Lille">Pas de date pour Lille. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Autre">Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.</p>
         <p class="attente__plateformes">Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.</p>
-        <p class="attente__note">On t’écrit seulement pour le lancement et les premiers tests. Voir <a href="/confidentialite.html#liste-attente">combien de temps on garde ton adresse</a>.</p>
+        <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
       </form>
     </div>
   </section>

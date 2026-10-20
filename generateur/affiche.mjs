@@ -5,7 +5,7 @@
 //   coche ceux qu’il diffuse et imprime : seules les lignes cochées s’impriment, ou toutes si rien n’est coché. Tout
 //   se fait en HTML et en CSS (:has() et @media print), sans script ni formulaire, sans aucun champ de texte : rien
 //   n’est envoyé, rien n’est gardé, et rien ne peut y parler d’alcool. En pied : « Programme préparé sur
-//   baromatch.fr » et un QR code vers l’accueil, sans paramètre de suivi.
+//   baromatch.fr » et un QR code vers l’accueil, sans paramètre de suivi. Indexable dès 3 matchs à montrer.
 // - L’affiche d’un bar publié (/bar/<bar>/affiche/) : « on diffuse le match », sa prochaine soirée annoncée, ses autres
 //   soirées des sept jours, et un QR code vers sa page. Jamais pour un bar qui n’est pas publié : sa page disparaît
 //   avec lui (aucune affiche n’est écrite, l’état l’efface). Aucune offre : rien sur l’alcool.
@@ -27,6 +27,8 @@ export const CHEMIN_DE_L_AFFICHE = '/matchs/affiche/';
 export const cheminDeLAfficheDuBar = (bar) => `${cheminDuBar(bar)}affiche/`;
 // Ce que tient une feuille (A4 comme A3, l’A3 en plus grand) ; au-delà, l’affiche passe sur deux pages.
 export const LIGNES_PAR_FEUILLE = 14;
+// L’affiche de la semaine est indexable à partir de 3 matchs à montrer ; en dessous, noindex (une page mince).
+export const MATCHS_POUR_L_INDEX = 3;
 export const TEXTES_DES_AFFICHES = JSON.parse(readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 'affiche.json'), 'utf8'));
 // L’adresse du QR code de l’affiche ouverte : l’accueil, telle quelle (aucun paramètre de suivi).
 export const ADRESSE_DU_QR = adresseDe('/');
@@ -163,9 +165,10 @@ ${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant)
 </section>`;
   // Indexable même sans aucun vrai bar publié : c’est un outil, fait des vrais matchs de la semaine (leurs vraies
   // heures), qui ne dit d’aucun bar qu’il est sur Baromatch. Exception à la règle « pas de vrai bar, pas d’index »,
-  // validée par le lead (tests/affiche.spec.mjs la vérifie).
+  // validée par le lead (tests/affiche.spec.mjs la vérifie). Mais avec moins de 3 matchs à montrer, la page est mince :
+  // lisible, en noindex et hors du plan du site.
   return avecLaFeuille({
-    type: 'affiche', cle: 'affiche', date: null, chemin, indexable: true, titre: titrePage, description: desc, barsNommes: [],
+    type: 'affiche', cle: 'affiche', date: null, chemin, indexable: matchs.length >= MATCHS_POUR_L_INDEX, titre: titrePage, description: desc, barsNommes: [],
     jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes)],
     corps,
   }, { cadre, marque: contenu.marque, avecPresse });

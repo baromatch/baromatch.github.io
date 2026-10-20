@@ -102,10 +102,12 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-blanc li { height: 44px; border-bottom: 1px solid var(--trait-papier); }
 .affiche-prepare { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--encre-douce); font-size: 0.8125rem; line-height: 1.35; }
 .affiche-verre { flex: none; width: 30px; height: 30px; }
-.affiche-qr { flex: none; margin: 0; text-align: center; }
+/* L’adresse sous le code passe à la ligne : la figure ne dépasse jamais la feuille, même avec une longue adresse, et
+   ne devient jamais plus étroite que le code lui-même. */
+.affiche-qr { flex: 0 1 auto; min-width: min-content; max-width: 100%; margin: 0; text-align: center; }
 /* Le QR code garde sa marge blanche (dans son dessin) ; sur l’écran, assez grand pour être scanné sur l’aperçu. */
 .affiche-qr__code { width: 132px; height: 132px; }
-.affiche-qr__adresse { margin-top: 2px; font-size: 0.8125rem; font-weight: 700; overflow-wrap: anywhere; }
+.affiche-qr__adresse { max-width: 100%; margin-top: 2px; font-size: 0.8125rem; font-weight: 700; overflow-wrap: anywhere; }
 
 /* L’affiche d’un bar : son nom, l’annonce, son prochain match en grand, puis ses autres soirées. */
 .affiche-bar { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }

@@ -467,6 +467,28 @@ test.describe('les pages', () => {
     expect(nomsDe('/regarder-le-match/paris/')).toEqual(['Le Comptoir du Canal', 'Le Zinc des Amis']);
   });
 
+  test('l’ordre annoncé, aussi dans « Les prochaines soirées » d’une ville : l’heure, puis la ville, l’arrondissement et le nom', async () => {
+    // À la Lucarne (Paris 11e) diffuse PSG – Barça, comme le Comptoir (10e) et le Zinc (11e) : son nom passe devant le
+    // leur dans l’alphabet, son arrondissement après le 10e.
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    brut.bars.push({ id: 'b-lucarne', name: 'À la Lucarne', address: '3 Rue de Lappe, 75011 Paris', isActive: true });
+    brut.matchNights.push({ id: 'n-lucarne-barca', status: 'OPEN', bar: { id: 'b-lucarne' }, match: { id: 'm-psg-barca-fr' }, offer: null });
+    const donnees = preparer(brut, { maintenant: VENDREDI, ...contenu, publies: [...PUBLIES_DU_SCENARIO, 'b-lucarne'] });
+    for (const b of donnees.bars) b.soirees.reverse();
+    donnees.bars.reverse();
+    const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre(racine) });
+    const paris = pages.find((p) => p.chemin === '/regarder-le-match/paris/').contenu;
+    const soirees = paris.split('id="titre-soirees"')[1].split('</section>')[0];
+    const lignes = [...soirees.matchAll(/<li>(?:<a href="[^"]+">)?([^<]+)(?:<\/a>)? · <time[^>]*>[^<]*<\/time> · <a href="\/bar\/[^"]+">([^<]+)<\/a>, ([^<]+)<\/li>/g)].map((m) => `${m[1]} · ${m[2]}, ${m[3]}`);
+    expect(lignes).toEqual([
+      'PSG – Barça · Le Comptoir du Canal, Paris 10e',
+      'PSG – Barça · À la Lucarne, Paris 11e',
+      'PSG – Barça · Le Zinc des Amis, Paris 11e',
+      'PSG – OL · Le Zinc des Amis, Paris 11e',
+      'Le Havre – PSG · Le Comptoir du Canal, Paris 10e',
+    ]);
+  });
+
   test('une ville avec des bars : indexable, ses bars par arrondissement, ses soirées, sa FAQ balisée', () => {
     const paris = pageDe('/regarder-le-match/paris/');
     expect(paris.indexable).toBe(true);
@@ -652,7 +674,12 @@ test.describe('les pages', () => {
     expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
     // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
     expect(p.contenu).not.toContain('jour-2026-10-30');
-    expect(p.titre).toBe('Où regarder le match ce soir et cette semaine — Baromatch');
+    // Le titre de la page dit ce que dit son h1 (la semaine, pas « ce soir », qui a sa page), entre 15 et 60 caractères.
+    expect(p.titre).toBe('Les matchs de la semaine et où les voir — Baromatch');
+    expect(p.titre).toBe(`${contenu.textes.semaine.titre} — Baromatch`);
+    expect(p.contenu).toContain(`<h1 class="regarder-titre">${contenu.textes.semaine.titre}</h1>`);
+    expect(p.titre.length).toBeGreaterThanOrEqual(15);
+    expect(p.titre.length).toBeLessThanOrEqual(60);
     expect(p.contenu).toContain('<p class="regarder-retour"><a href="/regarder-le-match/">Toutes les villes</a></p>');
   });
 

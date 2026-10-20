@@ -90,6 +90,11 @@ const grouperParLieu = (recus, barDe) => {
   return [...villes.values()].sort((a, b) => a.ville.nom.localeCompare(b.ville.nom, 'fr'))
     .map(({ ville, quartiers }) => ({ ville, quartiers: [...quartiers.entries()].sort((a, b) => a[0] - b[0]).map(([, q]) => q) }));
 };
+// Des soirées dans l’ordre de leur coup d’envoi, un match après l’autre ; pour un même match, dans l’ordre annoncé : la
+// ville, l’arrondissement, puis le nom du bar.
+const parHeureEtLieu = (a, b) => a.match.debut - b.match.debut || a.match.slug.localeCompare(b.match.slug)
+  || a.bar.ville.nom.localeCompare(b.bar.ville.nom, 'fr') || (a.bar.arrondissement?.numero ?? 0) - (b.bar.arrondissement?.numero ?? 0)
+  || a.bar.nom.localeCompare(b.bar.nom, 'fr');
 
 // afficheDuBar : le lien de la page d’un bar vers son affiche à imprimer (affiche.mjs), quand les affiches sont écrites ;
 // afficheDeLaSemaine : de même, le lien de la semaine vers l’affiche de ses matchs.
@@ -301,7 +306,7 @@ ${commentCaMarche(textes, marque)}`,
   const clesAvecBars = new Set(donnees.bars.map((b) => b.ville.cle));
   for (const ville of villes.values()) {
     ville.bars = donnees.bars.filter((b) => b.ville.cle === ville.cle).sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
-    ville.soirees = ville.bars.flatMap((b) => b.soirees).filter((s) => enCoursOuAVenir(s.match)).sort((a, b) => a.match.debut - b.match.debut || a.bar.nom.localeCompare(b.bar.nom, 'fr'));
+    ville.soirees = ville.bars.flatMap((b) => b.soirees).filter((s) => enCoursOuAVenir(s.match)).sort(parHeureEtLieu);
     ville.indexable = ville.bars.length >= (ville.guide ? SEUILS.barsParVilleAvecGuide : SEUILS.barsParVilleSansGuide);
     ville.quartiers = [...new Set(ville.bars.map((b) => b.quartier))];
     if (!ville.guide) avertissements.push(`Ville sans guide : ${ville.nom} (${accorder(ville.bars.length, 'bar')}). Son guide s’écrit dans generateur/contenu/villes.json.`);

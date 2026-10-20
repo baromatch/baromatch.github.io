@@ -201,6 +201,10 @@
 .regarder-appel p { margin: 0; max-width: 40ch; color: var(--texte-doux); font-size: 0.9375rem; }
 /* La liste d’attente d’une ville (generateur/attente.mjs) : le formulaire de l’accueil, aligné sur son titre. */
 .regarder-attente .attente { margin: 0; }
+/* Sous la liste d’attente d’une page en anglais : l’essentiel de la confidentialité, en petit. */
+.attente__vie-privee { max-width: 40rem; margin: 14px 0 0; padding-left: 1.2em; color: var(--texte-doux); font-size: 0.875rem; }
+.attente__vie-privee li { margin: 0 0 4px; }
+.attente__vie-privee strong { color: var(--texte); }
 
 .regarder-etapes { margin: 0; padding-left: 1.4em; }
 .regarder-etapes li { margin: 0 0 12px; color: var(--texte-doux); }

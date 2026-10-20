@@ -17,6 +17,7 @@
 // (Paris time) ») ; les clubs sous leur nom des données ; l’état de l’appli dit dès la tête de chaque page.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { cheminDuFichierDuMatch } from './agenda.mjs';
 import { ENVOI_DE_LA_LISTE } from './attente.mjs';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS } from './donnees.mjs';
@@ -172,6 +173,12 @@ ${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    ${ligneDuM
   const noteDeLAppli = `  <p class="regarder-note">${e(ouverte ? remplir(t.appli.ouverte, { plateformes }) : t.appli.fermee)}</p>`;
   // Être prévenu : tant que l’appli n’est pas ouverte, la liste d’attente de Paris (l’adresse et la ville, comme sur
   // l’accueil, rien d’autre) ; ensuite, les magasins.
+  // L’essentiel de la confidentialité de la liste d’attente, en anglais (la page Confidentialité est en français) :
+  // qui, pourquoi, quoi, le prestataire, combien de temps, les droits et l’adresse à qui écrire.
+  const contact = `<a href="mailto:${e(t.attente.viePriveeContact)}">${e(t.attente.viePriveeContact)}</a>`;
+  const viePrivee = `<ul class="attente__vie-privee">
+${t.attente.viePrivee.map(([titre, texte]) => `    <li><strong>${e(titre)}</strong> ${texte.split('{contact}').map(e).join(contact)}</li>`).join('\n')}
+  </ul>`;
   const appel = ouverte
     ? `<div class="regarder-appel">
   ${[['Android', marque.appli.android], ['iPhone', marque.appli.iphone]].filter(([, lien]) => lien).map(([nom, lien]) => `<a class="capsule" href="${e(lien)}">${e(t.appel.ouverte)} · ${nom}</a>`).join('\n  ')}
@@ -190,6 +197,7 @@ ${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    ${ligneDuM
     <input type="hidden" name="ville" value="Paris">
     <p class="attente__note" id="attente-usage">${e(t.attente.note)} <a href="/confidentialite.html#liste-attente" hreflang="fr">${e(t.attente.lienNote)}</a>.</p>
   </form>
+  ${viePrivee}
 </section>`;
   const commentCaMarche = () => {
     const { intro, etapes } = t.commentCaMarche[ouverte ? 'ouverte' : 'fermee'];
@@ -227,7 +235,9 @@ ${etapes.map((etape) => `    <li><strong>${e(etape.titre)}</strong> ${e(etape.te
   <p class="regarder-surtitre">${e(competition)}</p>
   <h1 class="regarder-titre">${e(vivant ? remplir(t.match.titreH1, { match: nom }) : nom)}</h1>
   <p class="regarder-quand">${temps(match)}</p>
-${vivant && match.heureConfirmee ? `  <p class="regarder-note">${e(remplir(t.quand.royaumeUni, { heure: heureALAnglaise(match.debut, 'Europe/London') }))}</p>\n` : ''}${vivant && !match.heureConfirmee ? `  <p class="regarder-note">${e(t.match.heureAConfirmer)}</p>\n` : ''}${vivant && match.statut ? `  <p class="regarder-note"><strong>${e(t.match[match.statut])}.</strong> ${e(t.match.statutSuite)}</p>\n` : ''}${vivant ? `${noteDeLAppli}\n` : ''}</header>`;
+${vivant && match.heureConfirmee ? `  <p class="regarder-note">${e(remplir(t.quand.royaumeUni, { heure: heureALAnglaise(match.debut, 'Europe/London') }))}</p>\n` : ''}${vivant && !match.heureConfirmee ? `  <p class="regarder-note">${e(t.match.heureAConfirmer)}</p>\n` : ''}${vivant && match.statut ? `  <p class="regarder-note"><strong>${e(t.match[match.statut])}.</strong> ${e(t.match.statutSuite)}</p>\n` : ''}${vivant && fr.evenement ? `  <div class="regarder-agenda">
+    <a class="regarder-agenda__bouton" href="${cheminDuFichierDuMatch(match)}" type="text/calendar">${e(t.match.agenda)}</a>
+  </div>\n` : ''}${vivant ? `${noteDeLAppli}\n` : ''}</header>`;
 
     if (!vivant) {
       // Passé, ou plus au programme : la page le dit, sans score, et mène au prochain match d’un des deux clubs.

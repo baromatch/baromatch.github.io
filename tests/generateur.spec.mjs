@@ -557,6 +557,8 @@ test.describe('les pages', () => {
     for (const chemin of ['/regarder-le-match/marseille/', '/regarder-le-match/lille/']) {
       const p = pageDe(chemin);
       expect(p.indexable).toBe(false);
+      // Son titre ne promet pas de bars : la question de la page, son h1.
+      expect(p.titre).toMatch(/^Où regarder le match à (Marseille|Lille) — Baromatch$/);
       expect(robotsDe(p)).toBe('noindex');
       expect(p.contenu).toMatch(/Aucun bar de (Marseille|Lille) n’est encore sur Baromatch\./);
       expect(deType(p, 'FAQPage')[0].mainEntity[0].acceptedAnswer.text).toMatch(/^Pas encore de bar à (Marseille|Lille) sur Baromatch\. L’appli, elle, est en test/);
@@ -567,6 +569,12 @@ test.describe('les pages', () => {
   test('un match sans vrai bar : noindex, et le lien « Tu tiens un bar ? » vers Pour les bars', () => {
     const p = pageDe('/matchs/lille-lens-2026-10-26/');
     expect(p.indexable).toBe(false);
+    // Son titre, son h1, son aperçu et le texte envoyé sur WhatsApp ne promettent aucun bar : « où le regarder ».
+    expect(p.titre).toBe('Lille – Lens, lundi 26 octobre : où le regarder — Baromatch');
+    expect(p.contenu).toContain(insecables('<h1 class="regarder-titre">Lille – Lens : où le regarder</h1>'));
+    expect(p.contenu).toContain(`<meta property="og:title" content="${insecables(p.titre)}">`);
+    expect(p.contenu).toContain(`https://wa.me/?text=${encodeURIComponent(`${p.titre} https://baromatch.fr${p.chemin}`)}`);
+    expect(`${p.titre} ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`).not.toMatch(/bars? qui|diffus/);
     expect(robotsDe(p)).toBe('noindex');
     expect(p.contenu).toContain('Pas encore de bar pour ce match sur Baromatch.');
     expect(p.contenu).toContain(insecables('<a href="/pour-les-bars.html">Tu tiens un bar ?</a>'));
@@ -579,6 +587,7 @@ test.describe('les pages', () => {
     expect(match.indexable).toBe(true);
     expect(match.contenu).toContain(insecables('<h1 class="regarder-titre">PSG – OL : les bars qui diffusent le match</h1>'));
     expect(match.titre).toBe('PSG – OL, 25 octobre : les bars qui diffusent le match');
+    expect(match.contenu).toContain(`https://wa.me/?text=${encodeURIComponent(`${match.titre} https://baromatch.fr${match.chemin}`)}`);
     expect(pageDe('/matchs/brest-nice-2026-10-23/').indexable).toBe(false);
     // Le maillage : les villes et les décomptes mènent à la page de la ville.
     expect(match.contenu).toContain('<h3 class="regarder-ville"><a href="/regarder-le-match/lyon/">Lyon</a></h3>');
@@ -761,6 +770,13 @@ test.describe('les pages', () => {
   test('la copie enregistrée de ce soir : zéro vrai bar, donc chaque page en noindex', async () => {
     const capture = await construireEnMemoire({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT, racine, contenu });
     expect(capture.pages.filter((p) => p.indexable).map((p) => p.chemin)).toEqual([]);
+    // Aucun titre de match ni de ville ne promet de bars, en français comme en anglais, même coupé (des noms longs).
+    const sansBar = capture.pages.filter((p) => ['match', 'match-en', 'ville'].includes(p.type));
+    expect(sansBar.length).toBeGreaterThan(40);
+    for (const p of sansBar) {
+      expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, p.chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus/iu);
+      expect(p.titre.length, p.chemin).toBeLessThanOrEqual(60);
+    }
     expect(capture.pages.filter((p) => p.type === 'bar')).toEqual([]);
     expect(capture.pages.every((p) => robotsDe(p) === 'noindex')).toBe(true);
     for (const p of capture.pages) expect(p.contenu, p.chemin).not.toMatch(/démo|Rivoli/i);

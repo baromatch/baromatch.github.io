@@ -86,6 +86,8 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   const indexable = nombreDeBars >= BARS_POUR_CE_SOIR;
   const fini = ceSoir.length === 0 && donnees.matchs.some((m) => jourDeParis(m.debut) === aujourdhui && !m.statut);
   const prochains = donnees.matchs.filter((m) => !ceSoir.includes(m) && m.debut > maintenant && !m.statut && aUnePage(m)).sort(parDebut).slice(0, PROCHAINS);
+  // Les matchs à venir (après ce soir) qu’un vrai bar diffuse : la page ne parle de « bars qui les diffusent » qu’avec eux.
+  const aVenirAvecBars = donnees.matchs.filter((m) => !ceSoir.includes(m) && m.debut > maintenant && !m.statut && m.soirees.length > 0).sort(parDebut);
 
   // ---------- Les morceaux ----------
   const lien = (m) => (aUnePage(m) ? `<a href="${cheminDuMatch(m)}">${e(nomCourt(m))}</a>` : e(nomCourt(m)));
@@ -176,8 +178,9 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
     const matchs = `${debut}${accorder(ceSoir.length, 'match', 'matchs')} ${moment.moment}, à l’heure de Paris.`;
     if (ceSoir.some((m) => !m.statut)) return description(`${matchs} Pas encore de bar pour ${ceSoir.length > 1 ? 'les' : 'le'} voir sur Baromatch : les prochains matchs et les villes.`);
     // Tous les matchs de ce soir sont reportés ou annulés : la page ne dit pas « pas encore de bar ».
-    if (ceSoir.length) return description(`${matchs} Les prochains matchs et les bars qui les diffusent sur Baromatch.`);
-    return description(`${debut}${fini ? 'les matchs de ce soir sont finis' : 'pas de match annoncé ce soir'}. Les prochains, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.`);
+    // Les bars des prochains matchs, seulement s’il y en a.
+    if (ceSoir.length) return description(`${matchs} ${aVenirAvecBars.length ? 'Les prochains matchs et les bars qui les diffusent sur Baromatch.' : 'Les prochains matchs et les villes, sur Baromatch.'}`);
+    return description(`${debut}${fini ? 'les matchs de ce soir sont finis' : 'pas de match annoncé ce soir'}. ${aVenirAvecBars.length ? 'Les prochains, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.' : 'Les prochains, à l’heure de Paris, et les villes, sur Baromatch.'}`);
   };
   const desc = decrire();
   const etapes = [{ nom: textes.fil.accueil, chemin: '/' }, { nom: t.fil, chemin }];
@@ -201,7 +204,7 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
 <header class="regarder-tete">
   <h1 class="regarder-titre">${e(t.titre)}</h1>
   <p class="regarder-quand">${e(capitale(jour))}</p>
-  <p class="regarder-chapeau">${e(t.chapeau)}</p>
+  <p class="regarder-chapeau">${e(avecBars.length ? t.chapeau : aVenirAvecBars.length ? t.chapeauProchainsSoirs : t.chapeauSansBar)}</p>
 </header>
 ${sectionDuSoir}
 ${sectionProchains}

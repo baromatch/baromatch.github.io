@@ -150,9 +150,12 @@ export const fabriquerLesPages = ({
     const memoire = { slug: match.slug, ids: match.ids, debut: new Date(match.debut).toISOString(), heureConfirmee: match.heureConfirmee, competition: match.competition, domicile: match.domicile, exterieur: match.exterieur };
     // « Ajouter à mon agenda » : un match à venir, ni reporté ni annulé ; son fichier s’écrit à côté de la page.
     const evenement = vivant && aSonFichier(match, maintenant);
+    // Le titre ne promet des bars que si la page en montre : sans vrai bar, « où le regarder » ; passé ou plus au
+    // programme, le match seul.
+    const promesse = passe || !vivant ? '' : soirees.length ? ' : les bars qui diffusent le match' : ' : où le regarder';
     const enTete = `<header class="regarder-tete">
   <p class="regarder-surtitre">${e(match.competition)}</p>
-  <h1 class="regarder-titre">${e(nom)}${passe ? '' : ' : les bars qui diffusent le match'}</h1>
+  <h1 class="regarder-titre">${e(nom)}${promesse}</h1>
   <p class="regarder-affiche">${e(match.domicile.nom)} – ${e(match.exterieur.nom)}</p>
   <p class="regarder-quand">${quand(match)}</p>
 ${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}${match.statut ? `  <p class="regarder-note"><strong>${e(textes.match[match.statut])}.</strong> ${e(textes.match.statutSuite)}</p>\n` : ''}  ${blocDuMatch(match, { clubsSuivis, fichier: evenement })}
@@ -187,8 +190,13 @@ ${enTete}
 
     const groupes = grouperParLieu(soirees, (s) => s.bar);
     const villesDuMatch = groupes.map((g) => g.ville.nom);
-    const titrePage = titre(`${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match`,
-      `${nom}, ${dateCourte(match.debut)} : où voir le match`, `${nom} : où voir le match`);
+    // Le titre (et donc og:title et le texte envoyé sur WhatsApp) : « les bars qui diffusent le match » seulement avec
+    // de vrais bars ; sans, « PSG – Barça, mardi 20 octobre : où le regarder ».
+    const titrePage = soirees.length
+      ? titre(`${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match`,
+        `${nom}, ${dateCourte(match.debut)} : où voir le match`, `${nom} : où voir le match`)
+      : titre(`${nom}, ${jourEnLettres(match.debut)} : où le regarder — Baromatch`, `${nom}, ${jourEnLettres(match.debut)} : où le regarder`,
+        `${nom}, ${dateCourte(match.debut)} : où le regarder`, `${nom} : où le regarder`);
     const desc = soirees.length
       ? description(
         `${nom} (${match.competition}), ${quandCourt(match)}. ${accorder(soirees.length, 'bar')} le ${soirees.length > 1 ? 'diffusent' : 'diffuse'} sur Baromatch, à ${enumerer(villesDuMatch)} : les adresses et l’heure.`,
@@ -320,7 +328,10 @@ ${commentCaMarche(textes, marque)}`,
     const chemin = cheminDeLaVille(ville);
     const etapes = [accueil, lesVilles, { nom: ville.nom, chemin }];
     const nomVille = ville.nom;
-    const titrePage = titre(`Bars foot à ${nomVille} : où regarder le match — Baromatch`, `Bars foot à ${nomVille} : où regarder le match`, `Où regarder le match à ${nomVille}`);
+    // « Bars foot à … » seulement quand la ville en a sur Baromatch ; sans, la question de la page, son h1.
+    const titrePage = ville.bars.length
+      ? titre(`Bars foot à ${nomVille} : où regarder le match — Baromatch`, `Bars foot à ${nomVille} : où regarder le match`, `Où regarder le match à ${nomVille}`)
+      : titre(`${remplir(textes.ville.titre, { ville: nomVille })} — Baromatch`, remplir(textes.ville.titre, { ville: nomVille }));
     const quartiers = ville.quartiers.filter((q) => q !== nomVille);
     const resume = ville.bars.length
       ? `${accorder(ville.bars.length, 'bar')} de ${nomVille} ${ville.bars.length > 1 ? 'diffusent' : 'diffuse'} le match sur Baromatch${quartiers.length ? ` (${enumerer(quartiers)})` : ''}.`

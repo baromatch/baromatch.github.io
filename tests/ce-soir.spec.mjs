@@ -75,6 +75,7 @@ test('un soir avec un vrai bar publié : indexable, le match, le bar, la date en
   expect(titreDe(p)).toBe('Où regarder le match ce soir, vendredi 23 octobre');
   expect(p.contenu).toContain('<h1 class="regarder-titre">Où regarder le match ce soir</h1>');
   expect(p.contenu).toContain('<p class="regarder-quand">Vendredi 23 octobre</p>');
+  expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.ceSoir.chapeau}</p>`);
   // Avant 17 h, « Aujourd’hui » ; le match, son heure, sa compétition, ses bars par ville, puis la carte du bar.
   const bars = sectionDe(p, 'titre-bars');
   expect(bars).toMatch(/^id="titre-bars">Aujourd’hui, dans un bar<\/h2>/);
@@ -128,6 +129,9 @@ test('un jour sans vrai bar : noindex, les matchs du jour et les suivants vers l
   for (const ville of ['paris', 'lyon', 'marseille', 'lille']) expect(villes).toContain(`<a href="/regarder-le-match/${ville}/">`);
   expect(p.contenu).toContain('<a class="capsule" href="/#attente">');
   expect(p.description).toBe('Vendredi 23 octobre : 1 match aujourd’hui, à l’heure de Paris. Pas encore de bar pour le voir sur Baromatch : les prochains matchs et les villes.');
+  // Le chapeau ne promet pas les bars de chaque match : aucun ne les diffuse.
+  expect(p.contenu).toContain(`<p class="regarder-chapeau">${sansBarPublie.textes.ceSoir.chapeauSansBar}</p>`);
+  expect(texteVisible(p.contenu.split('</header>')[0])).not.toMatch(/les bars qui l(?:e|es) diffusen?t/);
   // Ni bar, ni place, ni réservation : rien que la page ne puisse tenir.
   expect(p.contenu).not.toMatch(/Cave des Gones|Zinc|Comptoir|BarOrPub|regarder-carte__nom/);
   expect(texteVisible(p.contenu)).not.toMatch(/places|réserv/i);
@@ -218,7 +222,9 @@ test('un match de ce soir reporté ou annulé : listé avec son statut, sans ses
   // Le bar l’annonçait : la page ne dit pas qu’il n’y a « pas encore de bar ».
   expect(matchs).not.toContain('Pas encore de bar');
   expect(matchs).not.toContain('Tu tiens un bar');
+  // Les prochains matchs ont de vrais bars (PSG – Barça, PSG – OL) : la description et le chapeau le disent.
   expect(p.description).toBe('Vendredi 23 octobre : 1 match aujourd’hui, à l’heure de Paris. Les prochains matchs et les bars qui les diffusent sur Baromatch.');
+  expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.ceSoir.chapeauProchainsSoirs}</p>`);
 });
 
 test('un jour sans aucun match : une page utile (les prochains matchs, les villes, la liste d’attente), noindex', async () => {
@@ -232,7 +238,9 @@ test('un jour sans aucun match : une page utile (les prochains matchs, les ville
   expect((prochains.match(/<li>/g) ?? []).length).toBe(8);
   expect(sectionDe(p, 'titre-villes')).toContain('<a href="/regarder-le-match/paris/">');
   expect(p.contenu).toContain('<a class="capsule" href="/#attente">');
-  expect(p.description).toBe('Jeudi 15 octobre : pas de match annoncé ce soir. Les prochains, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.');
+  // Aucun vrai bar : ni la description ni le chapeau ne parlent des bars qui diffusent les prochains matchs.
+  expect(p.description).toBe('Jeudi 15 octobre : pas de match annoncé ce soir. Les prochains, à l’heure de Paris, et les villes, sur Baromatch.');
+  expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.ceSoir.chapeauSansBar}</p>`);
   // Rien n’annonce ce soir : l’ItemList suit les prochains matchs, vers leurs pages.
   const [liste] = deType(p, 'ItemList');
   expect(liste.name).toBe('Les prochains matchs');

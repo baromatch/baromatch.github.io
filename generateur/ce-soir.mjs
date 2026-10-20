@@ -16,7 +16,7 @@ import { DUREE_MATCH_MS } from './donnees.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import { adresseDe, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
-import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, fil, ligneDeListe, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
 import { adresseDeLImage, lignesDeLaCarte } from './partage.mjs';
 
@@ -93,7 +93,7 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   // jour s’il a commencé la veille.
   const coupDEnvoi = (m) => {
     const memeJour = jourDeParis(m.debut) === aujourdhui;
-    const heure = quand(m, { heureSeule: memeJour });
+    const heure = quand(m, { heureSeule: memeJour, majuscule: !commence(m) });
     if (!commence(m)) return heure;
     return `${e(memeJour ? t.commenceA : t.commenceLe)} ${heure}`;
   };
@@ -109,9 +109,9 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
       ${[...m.soirees].sort(parLieu).map((s) => carteDuBar(s.bar, textes, { soiree: s, niveau: 4, places: placesDe(s) })).join('\n      ')}
     </ul>
   </div>`;
-  const ligneDuSoir = (m) => `    <li>${lien(m)} · ${coupDEnvoi(m)} · ${e(m.competition)} · ${m.statut
+  const ligneDuSoir = (m) => `    ${ligneDeListe(e(nomCourt(m)), aUnePage(m) ? cheminDuMatch(m) : null, `${coupDEnvoi(m)} · ${e(m.competition)} · ${m.statut
     ? `<strong>${e(textes.match[m.statut])}</strong>`
-    : `<span class="regarder-compte">${e(textes.semaine.pasDeBar)}</span>`}</li>`;
+    : `<span class="regarder-compte">${e(textes.semaine.pasDeBar)}</span>`}`)}`;
 
   // ---------- Les sections ----------
   const sectionDuSoir = avecBars.length
@@ -155,7 +155,7 @@ ${prochains.filter((m) => jourDeParis(m.debut) === j).map((m) => `    ${ligneDeM
   <h2 id="titre-villes">${e(t.villes)}</h2>
   <p>${e(t.villesSuite)}</p>
   <ul class="regarder-matchs">
-${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titre, { ville: v.nom }))}</a> · <span class="regarder-compte">${e(v.bars ? accorder(v.bars, 'bar') : textes.villes.sansBar)}</span></li>`).join('\n')}
+${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v.nom })), v.chemin, `<span class="regarder-compte">${e(v.bars ? accorder(v.bars, 'bar') : textes.villes.sansBar)}</span>`)}`).join('\n')}
   </ul>
 </section>` : '';
 

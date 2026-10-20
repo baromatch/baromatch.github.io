@@ -236,7 +236,7 @@ test.describe('les données', () => {
     expect(site.refusees.map((p) => p.chemin)).toEqual([]);
     const page = site.pages.find((p) => p.chemin === '/matchs/match-cmshakhtar01-2026-10-26/');
     expect(page.contenu).toContain('<p class="regarder-affiche">Шахтар Донецьк – Динамо Київ</p>');
-    expect(page.contenu).toContain('<a href="/matchs/match-cmpsg03-2026-10-29/">Шахтар Донецьк – PSG</a>');
+    expect(page.contenu).toContain('<a class="regarder-matchs__match" href="/matchs/match-cmpsg03-2026-10-29/">Шахтар Донецьк – PSG</a>');
   });
 
   test('l’heure de Paris, des deux côtés du changement d’heure du 25 octobre', async () => {
@@ -562,7 +562,7 @@ test.describe('les pages', () => {
     expect(match.contenu).toContain('<h3 class="regarder-ville"><a href="/regarder-le-match/lyon/">Lyon</a></h3>');
     expect(match.contenu).toContain('<p class="regarder-compte"><a href="/regarder-le-match/lyon/">1 bar à Lyon</a>, <a href="/regarder-le-match/paris/">1 bar à Paris</a></p>');
     expect(match.contenu).toContain('<p class="regarder-affiche">Paris Saint-Germain – Olympique Lyonnais</p>');
-    expect(match.contenu).toContain('<time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time>');
+    expect(match.contenu).toContain('<p class="regarder-quand"><time datetime="2026-10-25T20:45:00+01:00">Dimanche 25 octobre · 20:45</time></p>');
     expect(match.contenu).not.toContain('Les places qui restent sont dans l’appli.');
     const evenements = deType(match, 'Event');
     expect(evenements.map((ev) => ev.name)).toEqual(['PSG – OL à La Cave des Gones', 'PSG – OL au Zinc des Amis']);
@@ -644,11 +644,11 @@ test.describe('les pages', () => {
     expect(p.indexable).toBe(true);
     const ceSoir = p.contenu.split('id="titre-ce-soir">')[1].split('</section>')[0];
     expect(ceSoir).toMatch(/^Aujourd’hui, vendredi 23 octobre<\/h2>/);
-    expect(ceSoir).toContain('<a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
+    expect(ceSoir).toContain('<a class="regarder-matchs__match" href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
     expect(ceSoir).toContain('1 bar à Lyon');
     expect(p.contenu).toContain('<h2 id="jour-2026-10-25">Dimanche 25 octobre</h2>');
     // Sous le titre du jour, la ligne ne répète pas la date : l’heure seule, la date complète dans datetime.
-    expect(p.contenu).toMatch(/PSG – OL<\/a> · <time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
+    expect(p.contenu).toMatch(/PSG – OL<\/a> <span class="regarder-matchs__infos"><time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
     expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
     // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
     expect(p.contenu).not.toContain('jour-2026-10-30');

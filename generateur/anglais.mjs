@@ -20,12 +20,12 @@ import path from 'node:path';
 import { ENVOI_DE_LA_LISTE } from './attente.mjs';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS } from './donnees.mjs';
-import { page } from './gabarits.mjs';
+import { ligneDeListe, page } from './gabarits.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe, cheminDuBar, debutDe, filDAriane, IMAGE, listeDesBars, pageWeb } from './jsonld.mjs';
 import { couper, SEUILS } from './pages.mjs';
 import { adresseDeLImage } from './partage.mjs';
-import { echapper as e } from './texte.mjs';
+import { capitale, echapper as e } from './texte.mjs';
 
 export const TEXTES_EN = JSON.parse(readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 'en.json'), 'utf8'));
 export const CHEMINS_EN = { paris: '/en/', premierLeague: '/en/premier-league/', championsLeague: '/en/champions-league/' };
@@ -126,10 +126,13 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
     : `    <li><a href="${etape.chemin}">${e(etape.nom)}</a></li>`)).join('\n')}
   </ol>
 </nav>`;
-  const temps = (m, { heureSeule = false } = {}) => {
+  // majuscule : en tête de ligne (« Time to be confirmed »).
+  const temps = (m, { heureSeule = false, majuscule = false } = {}) => {
     const texte = heureSeule ? (m.heureConfirmee ? heureALAnglaise(m.debut) : t.quand.aConfirmerCourt) : quandALAnglaise(m, t);
-    return `<time datetime="${debutDe(m)}">${e(texte)}</time>`;
+    return `<time datetime="${debutDe(m)}">${e(majuscule ? capitale(texte) : texte)}</time>`;
   };
+  // Une ligne d’une liste de matchs : le match seul sur sa ligne, ses détails dessous (gabarits.mjs).
+  const ligneDuMatch = (m, infos) => ligneDeListe(e(nomDuMatch(m)), avecPage.has(m.slug) ? cheminEnAnglais(m.slug) : null, infos);
   const lienDuMatch = (m) => (avecPage.has(m.slug) ? `<a href="${cheminEnAnglais(m.slug)}">${e(nomDuMatch(m))}</a>` : e(nomDuMatch(m)));
   const compte = (n) => remplir(n > 1 ? t.bars.comptePluriel : t.bars.compte, { n });
   // Ce qu’on sait d’un match dans une liste : ses bars de Paris, ou son statut.
@@ -156,7 +159,7 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
   // Les matchs, sous le titre de leur jour à Paris : la ligne ne donne que l’heure.
   const parJour = (matchs) => [...new Set(matchs.map((m) => jourDeParis(m.debut)))].map((jour) => `  <h3 class="regarder-jour">${e(jourEntierALAnglaise(Date.parse(`${jour}T12:00:00Z`)))}</h3>
   <ul class="regarder-matchs">
-${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    <li>${lienDuMatch(m)} · ${temps(m, { heureSeule: true })} · ${e(competitionDe(m))} · ${etatDuMatch(m)}</li>`).join('\n')}
+${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    ${ligneDuMatch(m, `${temps(m, { heureSeule: true, majuscule: true })} · ${e(competitionDe(m))} · ${etatDuMatch(m)}`)}`).join('\n')}
   </ul>`).join('\n');
   const listeDesMatchs = (nom, matchs) => ({
     '@type': 'ItemList',
@@ -275,7 +278,7 @@ ${bars.length ? `  <p class="regarder-compte">${e(compte(bars.length))}</p>\n${c
     const sectionProchains = `<section class="regarder-section" aria-labelledby="titre-prochains">
   <h2 id="titre-prochains">${e(remplir(t.match.prochains, { clubs: `${match.domicile.nom} and ${match.exterieur.nom}` }))}</h2>
 ${prochains.length ? `  <ul class="regarder-matchs">
-${prochains.slice(0, 6).map((m) => `    <li>${lienDuMatch(m)} · ${temps(m)} · ${e(competitionDe(m))}</li>`).join('\n')}
+${prochains.slice(0, 6).map((m) => `    ${ligneDuMatch(m, `${temps(m, { majuscule: true })} · ${e(competitionDe(m))}`)}`).join('\n')}
   </ul>` : `  <p>${e(t.match.aucunProchain)}</p>`}
 </section>`;
     // L’image de la jumelle (sa carte), quand le rendu des images est là : celle que montre WhatsApp à côté du lien.

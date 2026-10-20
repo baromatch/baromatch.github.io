@@ -241,7 +241,7 @@ test('un match passé s’efface ; un club sans match à venir garde un agenda v
   expect(existsSync(path.join(sortie, 'matchs/brest-nice-2026-10-23/match.ics'))).toBe(false);
   const page = octets(sortie, 'matchs/brest-nice-2026-10-23/index.html').toString('utf8');
   expect(page).not.toContain('Ajouter à mon agenda');
-  expect(page).toContain('<a href="/agenda/#club-brest">Brest</a>, <a href="/agenda/#club-nice">Nice</a>');
+  expect(page).toContain('<a href="/agenda/#club-brest">Brest</a> <a href="/agenda/#club-nice">Nice</a>');
   const agenda = octets(sortie, 'agenda/index.html').toString('utf8');
   expect(agenda).toContain('<p class="regarder-carte__lieu">Stade Brestois 29 · Pas de match au programme pour l’instant</p>');
   expect(etatDe(sortie).evenements['m-ce-soir@baromatch.fr']).toBeUndefined();
@@ -409,7 +409,7 @@ test('la page d’un match : « Ajouter à mon agenda » s’il est à venir, l�
   const tete = match.match(/<header class="regarder-tete">[\s\S]*?<\/header>/)[0];
   expect(tete).toContain(`<div class="regarder-agenda">
     <a class="regarder-agenda__bouton" href="/matchs/psg-ol-2026-10-25/match.ics" type="text/calendar">Ajouter à mon agenda</a>
-    <p class="regarder-agenda__clubs">Suis ton club dans ton agenda : <a href="/agenda/#club-psg">PSG</a>, <a href="/agenda/#club-ol">OL</a></p>
+    <p class="regarder-agenda__clubs">Suis ton club dans ton agenda : <a href="/agenda/#club-psg">PSG</a> <a href="/agenda/#club-ol">OL</a></p>
   </div>`);
   // Le Barça n’a pas d’agenda (pas en Ligue 1) : seul le PSG.
   expect(octets(sortie, 'matchs/psg-barca-2026-10-24/index.html').toString('utf8')).toContain('Suis ton club dans ton agenda : <a href="/agenda/#club-psg">PSG</a></p>');

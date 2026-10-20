@@ -84,8 +84,10 @@
   letter-spacing: -0.01em;
 }
 
-/* La ville est un titre, le quartier une étiquette sous elle : les cartes suivent sans vide entre les deux. */
-.regarder-ville { margin: 28px 0 6px; font-size: 1.25rem; font-weight: 700; }
+/* La ville est un titre, le quartier une étiquette sous elle : les cartes suivent sans vide entre les deux. Son lien se
+   touche sur 44 px de haut ; la marge du titre le compense. */
+.regarder-ville { margin: 20px 0 0; font-size: 1.25rem; font-weight: 700; }
+.regarder-ville a { display: inline-block; box-sizing: border-box; min-width: 44px; min-height: 44px; padding: 7px 0; }
 .regarder-ville:first-of-type { margin-top: 0; }
 .regarder-quartier {
   margin: 20px 0 8px;
@@ -172,11 +174,18 @@
 /* ---------- Listes de matchs ---------- */
 
 .regarder-matchs { margin: 0; padding: 0; list-style: none; }
-.regarder-matchs li { padding: 12px 0; border-bottom: 1px solid var(--trait); line-height: 1.5; }
+.regarder-matchs li { padding: 4px 0 12px; border-bottom: 1px solid var(--trait); line-height: 1.5; }
 .regarder-matchs li:last-child { border-bottom: 0; }
 .regarder-matchs a { display: inline-block; padding: 10px 0; font-weight: 650; }
+/* Le match, seul sur sa ligne : un lien de 44 px de haut (ou son nom, sans page) ; dessous, ses détails (l’heure, la
+   compétition, les bars), en texte discret. */
+.regarder-matchs .regarder-matchs__match { display: block; box-sizing: border-box; width: fit-content; max-width: 100%; min-height: 44px; padding: 10px 0; font-weight: 650; }
+.regarder-matchs__infos { display: block; color: var(--texte-doux); }
+.regarder-matchs__infos time { color: var(--texte); }
 .regarder-matchs time { font-weight: 650; }
 .regarder-compte { color: var(--texte-doux); }
+/* Le décompte des bars par ville (« 1 bar à Lyon ») : chaque ville se touche sur 44 px de haut. */
+.regarder-compte a { display: inline-block; padding: 10px 0; }
 
 /* ---------- Appel, étapes, guide, questions ---------- */
 
@@ -309,7 +318,20 @@
 }
 .regarder-agenda__bouton:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
 .regarder-agenda__clubs { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
-.regarder-agenda__clubs a { display: inline-block; padding: 11px 0; font-weight: 650; }
+/* Chaque club, une capsule de 44 × 44 px au moins (« OL » est court) : jamais collée à sa voisine. */
+.regarder-agenda__clubs a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 2px 0;
+  padding: 0 12px;
+  border: 1px solid var(--verre-bord-fort);
+  border-radius: 999px;
+  font-weight: 650;
+}
 .regarder-agenda__adresse { margin: 4px 0 0; font-size: 0.9375rem; overflow-wrap: anywhere; }
 .regarder-agenda__adresse a { display: inline-block; padding: 11px 0; color: var(--texte-doux); }
 .regarder-carte .regarder-agenda { margin-top: 12px; }

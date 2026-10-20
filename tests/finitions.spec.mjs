@@ -44,3 +44,69 @@ test('« Une offre du bar dans l’appli » : un texte discret, sans fond ni cad
     expect(lu, chemin).toEqual({ fond: 'rgba(0, 0, 0, 0)', bord: 'none', gauche: '0px', couleur: attendu });
   }
 });
+
+// Les listes de matchs (la semaine, « Ce soir », une ville, une page de match, les pages en anglais) : le match, un
+// lien de 44 px, seul sur sa ligne ; dessous, l’heure, la compétition et les bars, sans « · » en tête. Une ligne qui
+// commence par la date commence par une capitale, partout.
+const LISTES = ['/ce-soir/', '/matchs/', '/regarder-le-match/paris/', '/regarder-le-match/lyon/', MATCH, '/en/', '/en/matches/psg-barca-2026-10-24/'];
+
+test('les listes de matchs à 360 px : le match sur sa ligne (44 px), les détails dessous, sans « · » en tête', async ({ page: onglet }) => {
+  await onglet.setViewportSize({ width: 360, height: 800 });
+  for (const chemin of LISTES) {
+    await onglet.goto(`${serveur.adresse}${chemin}`);
+    const lignes = await onglet.locator('.regarder-matchs > li').evaluateAll((liste) => liste.map((li) => {
+      const match = li.firstElementChild;
+      const infos = li.querySelector('.regarder-matchs__infos');
+      const m = match.getBoundingClientRect();
+      const i = infos?.getBoundingClientRect();
+      return {
+        texte: li.textContent.replace(/\s+/g, ' ').trim(),
+        estLeMatch: match.classList.contains('regarder-matchs__match'),
+        hauteur: match.tagName === 'A' ? Math.round(m.height) : 44,
+        infos: infos ? infos.textContent.replace(/\s+/g, ' ').trim() : null,
+        dessous: i ? i.top >= m.bottom - 1 : false,
+      };
+    }));
+    expect(lignes.length, chemin).toBeGreaterThan(0);
+    for (const l of lignes) {
+      expect(l.estLeMatch, `${chemin} : ${l.texte}`).toBe(true);
+      expect(l.hauteur, `${chemin} : ${l.texte}`).toBeGreaterThanOrEqual(44);
+      expect(l.infos, `${chemin} : ${l.texte}`).not.toBeNull();
+      expect(l.infos, `${chemin} : ${l.texte}`).not.toMatch(/^·/);
+      expect(l.infos, `${chemin} : ${l.texte}`).toMatch(/^[\p{Lu}\d]/u);
+      expect(l.dessous, `${chemin} : ${l.texte}`).toBe(true);
+    }
+  }
+});
+
+test('la date en tête de ligne prend une capitale : la tête d’un match, les soirées d’un bar, les listes', async ({ page: onglet }) => {
+  await onglet.goto(`${serveur.adresse}${MATCH}`);
+  await expect(onglet.locator('.regarder-quand')).toHaveText('Dimanche 25 octobre · 20:45');
+  await expect(onglet.locator('.regarder-matchs__infos').first()).toHaveText('Vendredi 30 octobre · 19:00 · Ligue 1');
+  await onglet.goto(`${serveur.adresse}${ZINC}`);
+  expect(await onglet.locator('#titre-soirees ~ .regarder-cartes .regarder-carte__lieu').allTextContents()).toEqual([
+    'Samedi 24 octobre · 21:00 · Ligue des champions',
+    'Dimanche 25 octobre · 20:45 · Ligue 1',
+  ]);
+});
+
+// Les cibles qui restaient sous 44 px : « 1 bar à Lyon » (le décompte des bars), le nom d’une ville au-dessus de ses
+// bars, les clubs de « Suis ton club dans ton agenda ».
+test('« 1 bar à Lyon », la ville au-dessus des bars et les clubs de l’agenda se touchent sur 44 × 44 px', async ({ page: onglet }) => {
+  await onglet.setViewportSize({ width: 360, height: 800 });
+  for (const [chemin, selecteurs] of [
+    [MATCH, ['.regarder-compte a', '.regarder-ville a', '.regarder-agenda__clubs a']],
+    ['/matchs/', ['.regarder-compte a']],
+    ['/ce-soir/', ['.regarder-compte a']],
+  ]) {
+    await onglet.goto(`${serveur.adresse}${chemin}`);
+    for (const selecteur of selecteurs) {
+      const tailles = await onglet.locator(selecteur).evaluateAll((liens) => liens.map((a) => {
+        const r = a.getBoundingClientRect();
+        return `${a.textContent.trim()} ${Math.round(r.width)}×${Math.round(r.height)}`;
+      }));
+      expect(tailles.length, `${chemin} ${selecteur}`).toBeGreaterThan(0);
+      expect(tailles.filter((t) => { const [l, h] = t.split(' ').at(-1).split('×').map(Number); return l < 44 || h < 44; }), `${chemin} ${selecteur}`).toEqual([]);
+    }
+  }
+});

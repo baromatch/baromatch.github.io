@@ -1434,8 +1434,9 @@ test.describe('d’un passage à l’autre', () => {
     // (tests/affiche.spec.mjs). Rien d’autre.
     expect(resultat.changees).toEqual(['https://baromatch.fr/matchs/affiche/']);
     expect(Object.entries(etatDe(sortie).pages).filter(([, p]) => p.indexable).map(([chemin]) => chemin)).toEqual(['/matchs/affiche/']);
-    const sansLAffiche = plan(sortie).split('\n').filter((l) => !l.includes('<loc>https://baromatch.fr/matchs/affiche/</loc>')).join('\n');
-    expect(sansLAffiche).toBe(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8').replace(/\r\n/g, '\n'));
+    // La mise à jour automatique écrit déjà l’affiche dans le sitemap.xml enregistré : on la retire des deux côtés.
+    const sansLAffiche = (xml) => xml.replace(/\r\n/g, '\n').split('\n').filter((l) => !l.includes('<loc>https://baromatch.fr/matchs/affiche/</loc>')).join('\n');
+    expect(sansLAffiche(plan(sortie))).toBe(sansLAffiche(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')));
     expect(plan(sortie)).toContain('<loc>https://baromatch.fr/matchs/affiche/</loc>');
     expect(existsSync(path.join(sortie, 'bar'))).toBe(false);
   });

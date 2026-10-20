@@ -223,8 +223,10 @@
 
 /* ---------- Le badge d’un bar ---------- */
 
+.regarder-patron { margin-top: 56px; }
+.regarder-patron .regarder-suite { margin: 0 0 12px; }
 .regarder-badge {
-  margin-top: 56px;
+  margin-top: 0;
   padding: 4px 20px 16px;
   border: 1px solid var(--verre-bord);
   border-radius: 18px;

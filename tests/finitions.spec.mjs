@@ -110,3 +110,21 @@ test('« 1 bar à Lyon », la ville au-dessus des bars et les clubs de l’agend
     }
   }
 });
+
+// La page d’un bar : un seul bloc « Tu tiens ce bar ? », qui donne l’affiche à imprimer et le badge.
+test('la page d’un bar : un seul bloc « Tu tiens ce bar ? », avec l’affiche et le badge', async ({ page: onglet }) => {
+  await onglet.setViewportSize({ width: 360, height: 800 });
+  await onglet.goto(`${serveur.adresse}${ZINC}`);
+  const texte = await onglet.locator('main').innerText();
+  expect(texte.match(/Tu tiens ce bar/g)).toHaveLength(1);
+  const bloc = onglet.locator('section.regarder-patron');
+  await expect(bloc).toHaveCount(1);
+  await expect(bloc.getByRole('heading', { level: 2 })).toHaveText('Tu tiens ce bar ?');
+  await expect(bloc.locator(`a[href="${ZINC}affiche/"]`)).toHaveText('Ton affiche à imprimer');
+  await expect(bloc.locator('details.regarder-badge summary')).toHaveText('Ton badge, pour ton site');
+  // Le lien de l’affiche se touche sur 44 px, le badge se déplie au clavier.
+  expect(Math.round((await bloc.locator(`a[href="${ZINC}affiche/"]`).boundingBox()).height)).toBeGreaterThanOrEqual(44);
+  await bloc.locator('summary').focus();
+  await onglet.keyboard.press('Enter');
+  await expect(bloc.locator('.regarder-badge__code')).toBeVisible();
+});

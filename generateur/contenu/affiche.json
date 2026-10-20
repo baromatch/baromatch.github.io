@@ -36,7 +36,7 @@
   },
   "bar": {
     "fil": "Son affiche",
-    "lien": "Tu tiens ce bar ? Ton affiche à imprimer",
+    "lien": "Ton affiche à imprimer",
     "titre": "{bar} : ton affiche",
     "titrePage": "Affiche à imprimer : {bar}",
     "chapeau": "Pour ta porte ou ton comptoir : ta prochaine soirée de match, et un QR code qui mène à la page de ton bar.",

@@ -182,7 +182,8 @@
     "titreAtouts": "Sur place, d’après le bar",
     "parti": "Ce bar n’est plus sur Baromatch.",
     "partiSuite": "Les bars de {ville} qui diffusent le match sont sur la page de la ville.",
-    "badgeTitre": "Tu tiens ce bar ? Ton badge",
+    "patron": "Tu tiens ce bar ?",
+    "badgeTitre": "Ton badge, pour ton site",
     "badgeTexte": "Colle ce code sur ton site : le badge affiche ta prochaine soirée de match, mène à cette page, et se met à jour tout seul.",
     "badgeCode": "Le code à coller",
     "partiFil": "Bar retiré"

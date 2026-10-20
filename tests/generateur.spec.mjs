@@ -1258,7 +1258,8 @@ test.describe('d’un passage à l’autre', () => {
     const page = lire(sortie, 'bar/au-bon-coin-lyon-2/index.html');
     const code = page.match(/<textarea[^>]*readonly[^>]*>([^<]*)<\/textarea>/)[1];
     expect(code).toBe(echapper('<a href="https://baromatch.fr/bar/au-bon-coin-lyon-2/" title="Au Bon Coin sur Baromatch"><img src="https://baromatch.fr/bar/au-bon-coin-lyon-2/badge.svg" width="360" height="72" alt="Au Bon Coin sur Baromatch"></a>'));
-    expect(page).toContain(insecables('<summary>Tu tiens ce bar ? Ton badge</summary>'));
+    expect(page).toContain(insecables('<h2 id="titre-patron">Tu tiens ce bar ?</h2>'));
+    expect(page).toContain('<summary>Ton badge, pour ton site</summary>');
   });
 
   test('la copie enregistrée de ce soir, écrite : tout en noindex sauf l’affiche de la semaine, le plan du site inchangé à part elle', async () => {

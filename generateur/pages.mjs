@@ -500,7 +500,7 @@ ${ce ? `<section class="regarder-section" aria-labelledby="titre-atouts">
 ${listeSoirees}
   ${appel(marque, textes)}
 </section>
-${codeDuBadge(bar, textes, apercu)}${afficheDuBar ? `\n${afficheDuBar(bar)}` : ''}`,
+${codeDuBadge(bar, textes, apercu, afficheDuBar ? afficheDuBar(bar) : '')}`,
     });
   }
   for (const bar of partis) {
@@ -527,17 +527,23 @@ ${codeDuBadge(bar, textes, apercu)}${afficheDuBar ? `\n${afficheDuBar(bar)}` : '
   return { pages, avertissements };
 };
 
-// Le code à coller pour le badge du bar : une image qui pointe vers sa page, sans aucun paramètre de suivi ; le texte
-// de remplacement et le lien portent le nom du bar. L’aperçu, sur la page, dit ce que le badge affiche aujourd’hui.
-export const codeDuBadge = (bar, textes, apercu) => {
+// « Tu tiens ce bar ? » : un seul bloc pour le patron, avec son affiche à imprimer (affiche : le lien, quand les
+// affiches sont écrites) et le code à coller pour son badge : une image qui pointe vers sa page, sans aucun paramètre
+// de suivi ; le texte de remplacement et le lien portent le nom du bar. L’aperçu, sur la page, dit ce que le badge
+// affiche aujourd’hui.
+export const codeDuBadge = (bar, textes, apercu, affiche = '') => {
   const adresse = adresseDe(cheminDuBar(bar));
   const nom = `${bar.nom} sur Baromatch`;
   const code = `<a href="${adresse}" title="${e(nom)}"><img src="${adresse}badge.svg" width="360" height="72" alt="${e(nom)}"></a>`;
-  return `<details class="regarder-badge">
-  <summary>${e(textes.bar.badgeTitre)}</summary>
-  <p>${e(textes.bar.badgeTexte)}</p>
-  <img class="regarder-badge__image" src="${cheminDuBar(bar)}badge.svg" width="360" height="72" alt="${e(apercu)}">
-  <label class="regarder-badge__etiquette" for="code-badge">${e(textes.bar.badgeCode)}</label>
-  <textarea class="regarder-badge__code" id="code-badge" readonly rows="4">${e(code)}</textarea>
-</details>`;
+  return `<section class="regarder-section regarder-patron" aria-labelledby="titre-patron">
+  <h2 id="titre-patron">${e(textes.bar.patron)}</h2>
+${affiche ? `  ${affiche}
+` : ''}  <details class="regarder-badge">
+    <summary>${e(textes.bar.badgeTitre)}</summary>
+    <p>${e(textes.bar.badgeTexte)}</p>
+    <img class="regarder-badge__image" src="${cheminDuBar(bar)}badge.svg" width="360" height="72" alt="${e(apercu)}">
+    <label class="regarder-badge__etiquette" for="code-badge">${e(textes.bar.badgeCode)}</label>
+    <textarea class="regarder-badge__code" id="code-badge" readonly rows="4">${e(code)}</textarea>
+  </details>
+</section>`;
 };

@@ -130,13 +130,13 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
     expect(en.contenu).toContain('<p class="regarder-carte__lieu">10th arrondissement · 5 Quai de Valmy, 75010 Paris</p>');
     expect(en.contenu).toContain('<ul class="regarder-atouts"><li>3 screens</li><li>Match sound on</li><li>Terrace</li></ul>');
     expect(en.contenu).not.toMatch(/regarder-offre|burger|Une offre/i);
-    expect(en.contenu).toContain('<p class="regarder-compte">2 Paris bars</p>');
+    expect(en.contenu).toContain('<p class="regarder-compte">2 bars in Paris</p>');
     // L’heure de Paris, à l’anglaise, et celle du Royaume-Uni ; le titre et l’affiche disent les clubs des données.
     expect(en.contenu).toContain('<p class="regarder-quand"><time datetime="2026-10-24T21:00:00+02:00">Sat 24 Oct, 9:00 pm (Paris time)</time></p>');
     expect(en.contenu).toContain('<p class="regarder-note">That’s 8:00 pm in the UK.</p>');
     expect(en.contenu).toContain('<h1 class="regarder-titre">Paris Saint-Germain v FC Barcelona: where to watch it in Paris</h1>');
     expect(en.titre).toBe('Paris Saint-Germain v FC Barcelona: where to watch in Paris');
-    expect(en.description).toBe('Paris Saint-Germain v FC Barcelona, Sat 24 Oct, 9:00 pm (Paris time). 2 Paris bars on Baromatch are showing it: the addresses, and kick-off in Paris time.');
+    expect(en.description).toBe('Paris Saint-Germain v FC Barcelona, Sat 24 Oct, 9:00 pm (Paris time). 2 bars in Paris on Baromatch are showing it: the addresses, and kick-off in Paris time.');
     // Le fil passe par le guide de sa compétition.
     expect(graphe(en).find((n) => n['@type'] === 'BreadcrumbList').itemListElement.map((i) => i.name)).toEqual(['Baromatch', 'Football in Paris', 'Champions League', 'Paris Saint-Germain v FC Barcelona']);
     // L’image de partage de sa jumelle, décrite en anglais.
@@ -174,10 +174,10 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
     expect(hreflangs(fr)).toEqual(paire(fr.chemin, en.chemin));
     expect(lienDeLangue(fr)).toEqual(['/en/', 'English']);
     expect(en.titre).toBe('Where to watch football in Paris — Baromatch');
-    expect(en.description).toBe('2 Paris bars on Baromatch are showing Premier League, European or PSG matches soon. Kick-off in Paris time, and the addresses.');
+    expect(en.description).toBe('2 bars in Paris on Baromatch are showing Premier League, European or PSG matches soon. Kick-off in Paris time, and the addresses.');
     // Les matchs à venir, sous leur jour ; les deux vrais bars de Paris, pas ceux de Lyon ni de Rennes.
     expect(en.contenu).toContain('<h3 class="regarder-jour">Saturday 24 October</h3>');
-    expect(en.contenu).toContain('<li><a href="/en/matches/psg-barca-2026-10-24/">Paris Saint-Germain v FC Barcelona</a> · <time datetime="2026-10-24T21:00:00+02:00">9:00 pm</time> · Champions League · <span class="regarder-compte">2 Paris bars</span></li>');
+    expect(en.contenu).toContain('<li><a class="regarder-matchs__match" href="/en/matches/psg-barca-2026-10-24/">Paris Saint-Germain v FC Barcelona</a> <span class="regarder-matchs__infos"><time datetime="2026-10-24T21:00:00+02:00">9:00 pm</time> · Champions League · <span class="regarder-compte">2 bars in Paris</span></span></li>');
     expect(en.contenu).not.toMatch(/Cave des Gones|Bon Coin|Café des Sports/);
     expect(en.barsNommes.sort()).toEqual(['b-comptoir', 'b-zinc']);
   });
@@ -258,7 +258,7 @@ test.describe('d’autres jours', () => {
     expect(pl.contenu).toContain('No Paris bar has listed this match on Baromatch yet.');
     expect(pl.contenu).toContain('Sat 17 Oct, 1:30 pm (Paris time)');
     expect(pl.contenu).toContain('That’s 12:30 pm in the UK.');
-    for (const p of en) expect(texteVisible(p.contenu), p.chemin).not.toMatch(/\d+ Paris bars?/);
+    for (const p of en) expect(texteVisible(p.contenu), p.chemin).not.toMatch(/\d+ (?:Paris bars?|bars? in Paris)/);
     expect(pageDe(site, '/en/').contenu).toContain(TEXTES_EN.paris.sansBar);
     expect(pageDe(site, '/en/champions-league/').contenu).toContain('For now, it follows the French clubs in Europe.');
   });
@@ -272,7 +272,7 @@ test.describe('d’autres jours', () => {
     expect([hreflangs(en), hreflangs(fr)]).toEqual([[], []]);
     expect(en.contenu).toContain('<time datetime="2026-10-24T16:00:00+02:00">Sat 24 Oct, 4:00 pm (Paris time)</time>');
     expect(en.contenu).toContain('That’s 3:00 pm in the UK.');
-    expect(pageDe(site, '/en/premier-league/').contenu).toContain('<a href="/en/matches/arsenal-chelsea-2026-10-24/">Arsenal FC v Chelsea FC</a> · <time datetime="2026-10-24T16:00:00+02:00">4:00 pm</time> · Premier League · <span class="regarder-compte">1 Paris bar</span>');
+    expect(pageDe(site, '/en/premier-league/').contenu).toContain('<a class="regarder-matchs__match" href="/en/matches/arsenal-chelsea-2026-10-24/">Arsenal FC v Chelsea FC</a> <span class="regarder-matchs__infos"><time datetime="2026-10-24T16:00:00+02:00">4:00 pm</time> · Premier League · <span class="regarder-compte">1 bar in Paris</span></span>');
   });
 
   test('deux vrais bars de Paris le montrent : la page du match indexable, hreflang dans les deux sens', async () => {

@@ -98,12 +98,13 @@ export const resumerLesAgendas = (donnees) => {
 // ---------- Sur la page d’un match ----------
 
 // Sous le jour et l’heure du match : « Ajouter à mon agenda » (son fichier, quand il en a un), et l’agenda de chacun de
-// ses clubs de Ligue 1 (sinon, la page agenda/). Des liens, rien qui dépende de JavaScript.
+// ses clubs de Ligue 1 (sinon, la page agenda/). Des liens, rien qui dépende de JavaScript ; chaque club, une capsule de
+// 44 px (regarder.css), sans virgule entre elles.
 export const blocDuMatch = (match, { clubsSuivis, fichier }) => {
   const t = TEXTES.match;
   const clubs = [match.domicile, match.exterieur].filter((c) => clubsSuivis.has(c.cle));
   const suite = clubs.length
-    ? `<p class="regarder-agenda__clubs">${e(t.suis)} ${clubs.map((c) => `<a href="${CHEMIN_AGENDA}#${ancreDuClub(c.cle)}">${e(c.court)}</a>`).join(', ')}</p>`
+    ? `<p class="regarder-agenda__clubs">${e(t.suis)} ${clubs.map((c) => `<a href="${CHEMIN_AGENDA}#${ancreDuClub(c.cle)}">${e(c.court)}</a>`).join(' ')}</p>`
     : `<p class="regarder-agenda__clubs"><a href="${CHEMIN_AGENDA}">${e(TEXTES.lien)}</a></p>`;
   return `<div class="regarder-agenda">
     ${fichier ? `<a class="regarder-agenda__bouton" href="${cheminDuFichierDuMatch(match)}" type="text/calendar">${e(t.ajouter)}</a>\n    ` : ''}${suite}

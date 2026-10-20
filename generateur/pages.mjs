@@ -14,7 +14,7 @@ import {
 import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agenda.mjs';
 import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
-import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, fil, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
@@ -157,7 +157,7 @@ export const fabriquerLesPages = ({
   <p class="regarder-surtitre">${e(match.competition)}</p>
   <h1 class="regarder-titre">${e(nom)}${promesse}</h1>
   <p class="regarder-affiche">${e(match.domicile.nom)} – ${e(match.exterieur.nom)}</p>
-  <p class="regarder-quand">${quand(match)}</p>
+  <p class="regarder-quand">${quand(match, { majuscule: true })}</p>
 ${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}${match.statut ? `  <p class="regarder-note"><strong>${e(textes.match[match.statut])}.</strong> ${e(textes.match.statutSuite)}</p>\n` : ''}  ${blocDuMatch(match, { clubsSuivis, fichier: evenement })}
 </header>`;
 
@@ -168,7 +168,7 @@ ${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.ma
       const suite = deplace
         ? `<p><a href="${cheminDuMatch(deplace)}">${e(nomCourt(deplace))}</a>, ${quand(deplace)}.</p>`
         : suivant
-          ? `<p>${e(remplir(textes.match.passeSuite, { club: [suivant.domicile.cle, suivant.exterieur.cle].includes(match.domicile.cle) ? match.domicile.court : match.exterieur.court }))} ${aUnePage(suivant) ? `<a href="${cheminDuMatch(suivant)}">${e(nomCourt(suivant))}</a>` : e(nomCourt(suivant))}, ${quand(suivant)}${statutDuMatch(suivant, textes)}.</p>${aUnePage(suivant) ? '' : `\n  <p><a href="/matchs/">${e(textes.fil.matchs)}</a></p>`}`
+          ? `<p>${e(textes.match.passeSuite)} ${aUnePage(suivant) ? `<a href="${cheminDuMatch(suivant)}">${e(nomCourt(suivant))}</a>` : e(nomCourt(suivant))}, ${quand(suivant)}${statutDuMatch(suivant, textes)}.</p>${aUnePage(suivant) ? '' : `\n  <p><a href="/matchs/">${e(textes.fil.matchs)}</a></p>`}`
           : `<p>${e(textes.match.passeSansSuite)} <a href="/matchs/">${e(textes.fil.matchs)}</a></p>`;
       const titrePage = titre(`${nom} du ${dateCourte(match.debut)} : match passé — Baromatch`, `${nom} du ${dateCourte(match.debut)} : match passé`, `${nom} : match passé`);
       const desc = description(
@@ -361,7 +361,7 @@ ${groupes.flatMap((g) => g.quartiers).map(({ arrondissement, elements }) => `${a
     const sectionSoirees = `<section class="regarder-section" aria-labelledby="titre-soirees">
   <h2 id="titre-soirees">${e(remplir(textes.ville.titreSoirees, { ville: nomVille }))}</h2>
 ${ville.soirees.length ? `  <ul class="regarder-matchs">
-${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    <li>${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))} · ${quand(s.match)}${statutDuMatch(s.match, textes)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}</li>`).join('\n')}
+${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    ${ligneDeListe(e(nomCourt(s.match)), aUnePage(s.match) ? cheminDuMatch(s.match) : null, `${quand(s.match, { majuscule: true })}${statutDuMatch(s.match, textes)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}`)}`).join('\n')}
   </ul>` : `  <p>${e(textes.ville.sansSoiree)}</p>`}
 ${autresMatchs.length ? `  <h3 class="regarder-jour">${e(remplir(textes.ville.aussi, { ville: nomVille }))}</h3>
   <ul class="regarder-matchs">
@@ -488,7 +488,7 @@ ${commentCaMarche(textes, marque)}`,
       ? `  <ul class="regarder-cartes">
 ${soirees.map((s) => `    <li class="regarder-carte" id="${ancreDeLaSoiree(s.match)}">
       <h3 class="regarder-carte__nom">${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))}</h3>
-      <p class="regarder-carte__lieu">${quand(s.match)} · ${e(s.match.competition)}${statutDuMatch(s.match, textes)}</p>
+      <p class="regarder-carte__lieu">${quand(s.match, { majuscule: true })} · ${e(s.match.competition)}${statutDuMatch(s.match, textes)}</p>
       ${offre(s.offre, textes)}
     </li>`).join('\n')}
   </ul>
@@ -520,7 +520,7 @@ ${ce ? `<section class="regarder-section" aria-labelledby="titre-atouts">
 ${listeSoirees}
   ${appel(marque, textes)}
 </section>
-${codeDuBadge(bar, textes, apercu)}${afficheDuBar ? `\n${afficheDuBar(bar)}` : ''}`,
+${codeDuBadge(bar, textes, apercu, afficheDuBar ? afficheDuBar(bar) : '')}`,
     });
   }
   for (const bar of partis) {
@@ -547,17 +547,23 @@ ${codeDuBadge(bar, textes, apercu)}${afficheDuBar ? `\n${afficheDuBar(bar)}` : '
   return { pages, avertissements };
 };
 
-// Le code à coller pour le badge du bar : une image qui pointe vers sa page, sans aucun paramètre de suivi ; le texte
-// de remplacement et le lien portent le nom du bar. L’aperçu, sur la page, dit ce que le badge affiche aujourd’hui.
-export const codeDuBadge = (bar, textes, apercu) => {
+// « Tu tiens ce bar ? » : un seul bloc pour le patron, avec son affiche à imprimer (affiche : le lien, quand les
+// affiches sont écrites) et le code à coller pour son badge : une image qui pointe vers sa page, sans aucun paramètre
+// de suivi ; le texte de remplacement et le lien portent le nom du bar. L’aperçu, sur la page, dit ce que le badge
+// affiche aujourd’hui.
+export const codeDuBadge = (bar, textes, apercu, affiche = '') => {
   const adresse = adresseDe(cheminDuBar(bar));
   const nom = `${bar.nom} sur Baromatch`;
   const code = `<a href="${adresse}" title="${e(nom)}"><img src="${adresse}badge.svg" width="360" height="72" alt="${e(nom)}"></a>`;
-  return `<details class="regarder-badge">
-  <summary>${e(textes.bar.badgeTitre)}</summary>
-  <p>${e(textes.bar.badgeTexte)}</p>
-  <img class="regarder-badge__image" src="${cheminDuBar(bar)}badge.svg" width="360" height="72" alt="${e(apercu)}">
-  <label class="regarder-badge__etiquette" for="code-badge">${e(textes.bar.badgeCode)}</label>
-  <textarea class="regarder-badge__code" id="code-badge" readonly rows="4">${e(code)}</textarea>
-</details>`;
+  return `<section class="regarder-section regarder-patron" aria-labelledby="titre-patron">
+  <h2 id="titre-patron">${e(textes.bar.patron)}</h2>
+${affiche ? `  ${affiche}
+` : ''}  <details class="regarder-badge">
+    <summary>${e(textes.bar.badgeTitre)}</summary>
+    <p>${e(textes.bar.badgeTexte)}</p>
+    <img class="regarder-badge__image" src="${cheminDuBar(bar)}badge.svg" width="360" height="72" alt="${e(apercu)}">
+    <label class="regarder-badge__etiquette" for="code-badge">${e(textes.bar.badgeCode)}</label>
+    <textarea class="regarder-badge__code" id="code-badge" readonly rows="4">${e(code)}</textarea>
+  </details>
+</section>`;
 };

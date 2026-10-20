@@ -15,7 +15,7 @@ import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { empreinte } from './etat.mjs';
 import { heureDeParis, jourEnLettres, quandEnLettres } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
-import { accorder, capitale, echapper as e, enumerer, sansAccents } from './texte.mjs';
+import { accorder, capitale, echapper as e, enumerer, insecables, sansAccents } from './texte.mjs';
 
 export const LARGEUR = 1200;
 export const HAUTEUR = 630;
@@ -126,7 +126,13 @@ const barsEtVilles = (soirees) => {
 
 // Les lignes de la carte : un surtitre discret, le titre, une ligne blanche, une ligne ambre (facultative) ; et sa
 // description pour qui ne voit pas l’image (alt, l’og:image:alt de la page).
+// Chaque ligne avec la typographie française (insecables) : l’espace insécable a la largeur d’une espace dans la police.
 export const lignesDeLaCarte = (partage, textes = TEXTES, textesDuSite = {}) => {
+  const lignes = lignesBrutes(partage, textes, textesDuSite);
+  return Object.fromEntries(Object.entries(lignes).map(([cle, texte]) => [cle, insecables(texte)]));
+};
+
+const lignesBrutes = (partage, textes, textesDuSite) => {
   const phrase = (...morceaux) => `${morceaux.filter(Boolean).join('. ')}.`;
   if (partage.sorte === 'match') {
     const { match, soirees } = partage;

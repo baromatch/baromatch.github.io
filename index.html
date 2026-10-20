@@ -81,15 +81,6 @@
       <p class="ouverture__texte">Une appli gratuite pour les fans&nbsp;: trouve un bar qui diffuse ton match et garde ta place. Elle n’est pas encore ouverte&nbsp;: rien à réserver ce soir.</p>
 
       <form class="attente" id="attente" action="https://formspree.io/f/mqpeedoj" method="POST" novalidate>
-        <label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
-        <div class="attente__ligne">
-          <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
-          <button class="attente__bouton" type="submit">Me prévenir</button>
-        </div>
-        <div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
-        <input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
-        <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
-        <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
         <fieldset class="attente__villes" aria-describedby="attente-usage">
           <legend>Ta ville</legend>
           <div class="attente__options">
@@ -104,6 +95,15 @@
         <p class="attente__date" data-ville="Marseille">Pas de date pour Marseille. On t’écrit seulement si Baromatch y arrive.</p>
         <p class="attente__date" data-ville="Lille">Pas de date pour Lille. On t’écrit seulement si Baromatch y arrive.</p>
         <p class="attente__date" data-ville="Autre">Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.</p>
+        <label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
+        <div class="attente__ligne">
+          <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
+          <button class="attente__bouton" type="submit">Me prévenir</button>
+        </div>
+        <div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+        <input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
+        <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
+        <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
         <p class="attente__plateformes">Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.</p>
         <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
       </form>
@@ -128,7 +128,7 @@
     <!-- Le film a une bande-son : au niveau AA (WCAG 1.2.5), il se présente comme l’alternative en images du texte qui
          suit, et chaque lecteur cite cette phrase. Le texte dit ce que le film montre à l’écran, mot pour mot, lu sur ses
          images (1.2.3) : rien d’autre. -->
-    <p class="film__note" id="film-note">Ce film reprend en images le texte «&nbsp;Ce que montre le film&nbsp;», juste dessous.</p>
+    <p class="film__note" id="film-note">Ce film reprend en images le texte «&nbsp;Ce que montre le film&nbsp;», juste dessous. Ses bars, ses places et ses chiffres sont inventés.</p>
     <details class="film__texte" id="film-texte">
       <summary>Ce que montre le film</summary>
       <ol>

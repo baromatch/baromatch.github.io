@@ -97,7 +97,7 @@
     "prochains": "{clubs} : leurs prochains matchs",
     "aucunProchain": "Pas d’autre match annoncé pour l’instant.",
     "passe": "Ce match est passé",
-    "passeSuite": "Le prochain match de {club} :",
+    "passeSuite": "Le prochain match :",
     "passeSansSuite": "Les prochains matchs, et où les voir :",
     "heureAConfirmer": "Le coup d’envoi n’est pas encore fixé : l’heure peut changer.",
     "plusAnnonce": "Ce match n’est plus au programme.",
@@ -185,7 +185,8 @@
     "titreAtouts": "Sur place, d’après le bar",
     "parti": "Ce bar n’est plus sur Baromatch.",
     "partiSuite": "Les bars de {ville} qui diffusent le match sont sur la page de la ville.",
-    "badgeTitre": "Tu tiens ce bar ? Ton badge",
+    "patron": "Tu tiens ce bar ?",
+    "badgeTitre": "Ton badge, pour ton site",
     "badgeTexte": "Colle ce code sur ton site : le badge affiche ta prochaine soirée de match, mène à cette page, et se met à jour tout seul.",
     "badgeCode": "Le code à coller",
     "partiFil": "Bar retiré"

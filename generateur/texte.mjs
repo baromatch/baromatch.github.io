@@ -37,6 +37,12 @@ export const enumerer = (elements) => {
 // La première lettre en capitale (« dimanche » → « Dimanche »).
 export const capitale = (texte) => (texte ? texte[0].toLocaleUpperCase('fr-FR') + texte.slice(1) : texte);
 
+// La typographie française : une espace insécable à l’intérieur des guillemets « », et avant « ? », « ! », « : » et
+// « ; », pour que le signe ne parte jamais seul à la ligne. Sur une page entière (gabarits.mjs), un agenda (agenda.mjs)
+// ou une ligne d’image de partage (partage.mjs) : les balises, les adresses et les commentaires n’ont jamais ces
+// espaces-là.
+export const insecables = (texte) => texte.replace(/ ([?!:;»])/g, '\u00A0$1').replace(/« /g, '«\u00A0');
+
 // Les caractères de contrôle et invisibles (catégories Unicode Cc et Cf) retirés d’un texte venu des données, avant
 // tout usage : un retour à la ligne ou une tabulation devient une espace, le reste disparaît. Le XML du badge ne casse
 // jamais, et aucun mot interdit ne se cache derrière un caractère invisible (« happy​hour »).

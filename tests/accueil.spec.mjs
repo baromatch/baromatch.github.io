@@ -258,7 +258,7 @@ test('le texte du film est juste sous lui, replié, avec chaque phrase du film d
 // WCAG 1.2.5 : le film a une bande-son, donc le texte seul ne suffit pas au niveau AA, sauf si le film se présente
 // comme l’alternative en images d’un texte de la page. Une phrase visible le dit, et chaque lecteur du film la cite
 // (aria-describedby), avec ou sans JavaScript.
-const NOTE_DU_FILM = 'Ce film reprend en images le texte « Ce que montre le film », juste dessous.';
+const NOTE_DU_FILM = 'Ce film reprend en images le texte « Ce que montre le film », juste dessous. Ses bars, ses places et ses chiffres sont inventés.';
 
 test('le film se présente comme les images du texte qui le suit, avec ou sans JavaScript', async ({ page, browser }) => {
   await page.goto('/');

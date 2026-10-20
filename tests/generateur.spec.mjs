@@ -237,7 +237,7 @@ test.describe('les données', () => {
     expect(site.refusees.map((p) => p.chemin)).toEqual([]);
     const page = site.pages.find((p) => p.chemin === '/matchs/match-cmshakhtar01-2026-10-26/');
     expect(page.contenu).toContain('<p class="regarder-affiche">Шахтар Донецьк – Динамо Київ</p>');
-    expect(page.contenu).toContain('<a href="/matchs/match-cmpsg03-2026-10-29/">Шахтар Донецьк – PSG</a>');
+    expect(page.contenu).toContain('<a class="regarder-matchs__match" href="/matchs/match-cmpsg03-2026-10-29/">Шахтар Донецьк – PSG</a>');
   });
 
   test('l’heure de Paris, des deux côtés du changement d’heure du 25 octobre', async () => {
@@ -480,7 +480,7 @@ test.describe('les pages', () => {
     const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre(racine) });
     const paris = pages.find((p) => p.chemin === '/regarder-le-match/paris/').contenu;
     const soirees = paris.split('id="titre-soirees"')[1].split('</section>')[0];
-    const lignes = [...soirees.matchAll(/<li>(?:<a href="[^"]+">)?([^<]+)(?:<\/a>)? · <time[^>]*>[^<]*<\/time> · <a href="\/bar\/[^"]+">([^<]+)<\/a>, ([^<]+)<\/li>/g)].map((m) => `${m[1]} · ${m[2]}, ${m[3]}`);
+    const lignes = [...soirees.matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]+")?>([^<]+)<\/(?:a|span)> <span class="regarder-matchs__infos"><time[^>]*>[^<]*<\/time> · <a href="\/bar\/[^"]+">([^<]+)<\/a>, ([^<]+)<\/span><\/li>/g)].map((m) => `${m[1]} · ${m[2]}, ${m[3]}`);
     expect(lignes).toEqual([
       'PSG – Barça · Le Comptoir du Canal, Paris 10e',
       'PSG – Barça · À la Lucarne, Paris 11e',
@@ -594,7 +594,7 @@ test.describe('les pages', () => {
     expect(match.contenu).toContain('<h3 class="regarder-ville"><a href="/regarder-le-match/lyon/">Lyon</a></h3>');
     expect(match.contenu).toContain('<p class="regarder-compte"><a href="/regarder-le-match/lyon/">1 bar à Lyon</a>, <a href="/regarder-le-match/paris/">1 bar à Paris</a></p>');
     expect(match.contenu).toContain('<p class="regarder-affiche">Paris Saint-Germain – Olympique Lyonnais</p>');
-    expect(match.contenu).toContain('<time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time>');
+    expect(match.contenu).toContain('<p class="regarder-quand"><time datetime="2026-10-25T20:45:00+01:00">Dimanche 25 octobre · 20:45</time></p>');
     expect(match.contenu).not.toContain('Les places qui restent sont dans l’appli.');
     const evenements = deType(match, 'Event');
     expect(evenements.map((ev) => ev.name)).toEqual(['PSG – OL à La Cave des Gones', 'PSG – OL au Zinc des Amis']);
@@ -676,11 +676,11 @@ test.describe('les pages', () => {
     expect(p.indexable).toBe(true);
     const ceSoir = p.contenu.split('id="titre-ce-soir">')[1].split('</section>')[0];
     expect(ceSoir).toMatch(/^Aujourd’hui, vendredi 23 octobre<\/h2>/);
-    expect(ceSoir).toContain('<a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
+    expect(ceSoir).toContain('<a class="regarder-matchs__match" href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
     expect(ceSoir).toContain('1 bar à Lyon');
     expect(p.contenu).toContain('<h2 id="jour-2026-10-25">Dimanche 25 octobre</h2>');
     // Sous le titre du jour, la ligne ne répète pas la date : l’heure seule, la date complète dans datetime.
-    expect(p.contenu).toMatch(/PSG – OL<\/a> · <time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
+    expect(p.contenu).toMatch(/PSG – OL<\/a> <span class="regarder-matchs__infos"><time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
     expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
     // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
     expect(p.contenu).not.toContain('jour-2026-10-30');
@@ -717,24 +717,24 @@ test.describe('les pages', () => {
     const reporte = '<strong>Match reporté</strong>';
     const annule = '<strong>Match annulé</strong>';
     // La semaine : le statut à la place des bars, ce jour-là comme la semaine d’après.
-    expect(ligneDe(page('/matchs/'), '>PSG – OL</a>')).toContain(` · ${reporte}</li>`);
+    expect(ligneDe(page('/matchs/'), '>PSG – OL</a>')).toContain(` · ${reporte}</span></li>`);
     expect(ligneDe(page('/matchs/'), '>PSG – OL</a>')).not.toContain('regarder-compte');
-    expect(ligneDe(page('/matchs/'), '>Le Havre – PSG</a>')).toContain(` · ${annule}</li>`);
+    expect(ligneDe(page('/matchs/'), '>Le Havre – PSG</a>')).toContain(` · ${annule}</span></li>`);
     expect(ligneDe(page('/matchs/'), '>PSG – Barça</a>')).not.toMatch(/Match reporté|Match annulé/);
     // « Les prochaines soirées à Paris » : chaque soirée du match.
     const soirees = page('/regarder-le-match/paris/').split('id="titre-soirees"')[1].split('</section>')[0];
     expect(ligneDe(soirees, '>PSG – OL</a>')).toMatch(new RegExp(`</time> · ${reporte} · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25">`));
     expect(ligneDe(soirees, '>Le Havre – PSG</a>')).toContain(`</time> · ${annule} · <a href="/bar/le-comptoir-du-canal-paris-10/`);
     // La page du bar : la soirée, sous son jour et sa compétition.
-    expect(page('/bar/le-zinc-des-amis-paris-11/')).toContain(`<p class="regarder-carte__lieu"><time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time> · Ligue 1 · ${reporte}</p>`);
+    expect(page('/bar/le-zinc-des-amis-paris-11/')).toContain(`<p class="regarder-carte__lieu"><time datetime="2026-10-25T20:45:00+01:00">Dimanche 25 octobre · 20:45</time> · Ligue 1 · ${reporte}</p>`);
     expect(page('/bar/le-comptoir-du-canal-paris-10/')).toContain(`· Ligue 1 · ${annule}</p>`);
     // « PSG et Barça : leurs prochains matchs », et en anglais « What’s next ».
     const prochains = page('/matchs/psg-barca-2026-10-24/').split('id="titre-prochains"')[1].split('</section>')[0];
-    expect(ligneDe(prochains, '>PSG – OL</a>')).toContain(` · Ligue 1 · ${reporte}</li>`);
-    expect(ligneDe(prochains, '>Le Havre – PSG</a>')).toContain(` · Ligue 1 · ${annule}</li>`);
+    expect(ligneDe(prochains, '>PSG – OL</a>')).toContain(` · Ligue 1 · ${reporte}</span></li>`);
+    expect(ligneDe(prochains, '>Le Havre – PSG</a>')).toContain(` · Ligue 1 · ${annule}</span></li>`);
     const enAnglais = page('/en/matches/psg-barca-2026-10-24/').split('id="titre-prochains"')[1].split('</section>')[0];
-    expect(ligneDe(enAnglais, 'Paris Saint-Germain v Olympique Lyonnais')).toContain(' · Ligue 1 · <strong>Match postponed</strong></li>');
-    expect(ligneDe(enAnglais, 'Le Havre AC v Paris Saint-Germain')).toContain(' · Ligue 1 · <strong>Match cancelled</strong></li>');
+    expect(ligneDe(enAnglais, 'Paris Saint-Germain v Olympique Lyonnais')).toContain(' · Ligue 1 · <strong>Match postponed</strong></span></li>');
+    expect(ligneDe(enAnglais, 'Le Havre AC v Paris Saint-Germain')).toContain(' · Ligue 1 · <strong>Match cancelled</strong></span></li>');
     // Le lundi, PSG – Barça est passé : « le prochain match » de sa page le dit aussi, en français et en anglais.
     const lundi = await enMemoire('2026-10-26T08:00:00Z', {
       matchs: autre.pages.filter((p) => p.type === 'match').map((p) => ({ ...p.memoire, debut: Date.parse(p.memoire.debut) })), bars: [], adresses: {},
@@ -1176,7 +1176,7 @@ test.describe('d’un passage à l’autre', () => {
     const page = lire(sortie, 'matchs/om-lens-2026-10-22/index.html');
     expect(page).toContain('<meta name="robots" content="noindex">');
     expect(page).toContain('<h2 id="titre-passe">Ce match est passé</h2>');
-    expect(page).toContain(insecables('Le prochain match de Lens : <a href="/matchs/lille-lens-2026-10-26/">Lille – Lens</a>'));
+    expect(page).toContain(insecables('Le prochain match : <a href="/matchs/lille-lens-2026-10-26/">Lille – Lens</a>'));
     expect(page).not.toMatch(/regarder-carte|Zinc/);
     expect(plan(sortie)).not.toContain('om-lens');
     const apres = etatDe(sortie).pages['/matchs/om-lens-2026-10-22/'];
@@ -1213,7 +1213,7 @@ test.describe('d’un passage à l’autre', () => {
       ['2026-10-23T08:00:00Z', () => {
         expect(ceSoir()).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
         expect(ceSoir()).toContain('<h2 id="titre-soirs">Les prochains soirs au bar</h2>\n  <h3 class="regarder-jour">Samedi 24 octobre</h3>');
-        expect(ceSoir()).toContain('Ligue des champions · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-barca-2026-10-24">Le Zinc des Amis</a> (Paris 11e)</li>');
+        expect(ceSoir()).toContain('Ligue des champions · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-barca-2026-10-24">Le Zinc des Amis</a> (Paris 11e)</span></li>');
         expect(ceSoir()).toContain('<h3 class="regarder-jour">Dimanche 25 octobre</h3>');
       }],
       // Samedi 24, 20 h : ce soir, le Zinc montre PSG – Barça.
@@ -1423,7 +1423,8 @@ test.describe('d’un passage à l’autre', () => {
     const page = lire(sortie, 'bar/au-bon-coin-lyon-2/index.html');
     const code = page.match(/<textarea[^>]*readonly[^>]*>([^<]*)<\/textarea>/)[1];
     expect(code).toBe(echapper('<a href="https://baromatch.fr/bar/au-bon-coin-lyon-2/" title="Au Bon Coin sur Baromatch"><img src="https://baromatch.fr/bar/au-bon-coin-lyon-2/badge.svg" width="360" height="72" alt="Au Bon Coin sur Baromatch"></a>'));
-    expect(page).toContain(insecables('<summary>Tu tiens ce bar ? Ton badge</summary>'));
+    expect(page).toContain(insecables('<h2 id="titre-patron">Tu tiens ce bar ?</h2>'));
+    expect(page).toContain('<summary>Ton badge, pour ton site</summary>');
   });
 
   test('la copie enregistrée de ce soir, écrite : tout en noindex sauf l’affiche de la semaine, le plan du site inchangé à part elle', async () => {

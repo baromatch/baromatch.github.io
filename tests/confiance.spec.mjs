@@ -2,7 +2,8 @@
 // les bars » (d’où viennent les matchs, qui tient les places, quand un bar apparaît sur le site, ce qu’on refuse).
 // Écrites pour être citées telles quelles : un h1, des intertitres qui posent la question, des phrases datées. Rien n’y
 // est inventé : ni l’histoire du fondateur (tant qu’il ne l’a pas écrite, la page n’en a pas, pas même un emplacement),
-// ni un bar publié (la phrase « aucun bar n’est encore publié » tient tant que generateur/bars-publies.json est vide).
+// ni un bar publié (aucune phrase datée sur les bars publiés : une page de match sans vrai bar le dit, avec les mots du
+// générateur).
 // Le reste (référencement, liens, accessibilité, contraste, cibles, texte agrandi, politique de sécurité, pied de page)
 // vient de tests/outils/pages.mjs.
 import { test, expect } from '@playwright/test';
@@ -19,7 +20,6 @@ const CONFIANCE = '/comment-on-choisit-les-bars.html';
 const lireJson = (...morceaux) => JSON.parse(readFileSync(path.join(racine, ...morceaux), 'utf8'));
 const MARQUE = lireJson('marque.json');
 const TEXTES = lireJson('generateur', 'contenu', 'textes.json');
-const PUBLIES = lireJson('generateur', 'bars-publies.json').bars;
 const MENTION_SANTE = 'L’abus d’alcool est dangereux pour la santé, à consommer avec modération.';
 const normaliser = (texte) => texte.replace(/[\s  ]+/g, ' ').trim();
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -111,20 +111,14 @@ test('comment on choisit les bars : l’ordre d’affichage (ville, arrondisseme
   expect(normaliser(await page.locator('h2#en-bref + ul').textContent())).toContain('Aucun bar ne paie pour passer devant un autre.');
 });
 
-test('comment on choisit les bars : l’accord écrit, et la phrase « aucun bar publié » seulement tant qu’aucun bar ne l’est', async ({ page }) => {
+test('comment on choisit les bars : l’accord écrit, et la phrase d’une page de match sans bar, mot pour mot', async ({ page }) => {
   await page.goto(CONFIANCE);
   const accord = normaliser(await page.locator('#accord + ul').textContent());
   expect(accord).toContain('Après son accord écrit, pas avant.');
   // Le texte d’un bar parti, mot pour mot comme le générateur l’écrit sur sa page.
-  expect(accord).toContain(`Sa page dit alors « ${TEXTES.bar.parti} » pendant 30 jours, sans son nom, puis disparaît.`);
-  const aucun = page.locator('#aucun-bar-publie');
-  if (PUBLIES.length === 0) {
-    await expect(aucun).toContainText('aucun bar n’est encore publié sur ce site');
-    // La phrase d’une page de match sans bar, mot pour mot comme le générateur l’écrit.
-    expect(normaliser(await aucun.textContent())).toContain(`« ${TEXTES.match.sansBar} »`);
-  } else {
-    await expect(aucun).toHaveCount(0);
-  }
+  expect(accord).toContain(`Sa page dit alors « ${TEXTES.bar.parti} » pendant 30 jours, puis disparaît.`);
+  // La phrase d’une page de match sans bar, mot pour mot comme le générateur l’écrit : vraie avec ou sans bar publié.
+  expect(normaliser(await page.locator('#match-sans-bar').textContent())).toContain(`« ${TEXTES.match.sansBar} »`);
 });
 
 test('comment on choisit les bars : les matchs, les places tenues par le bar, et ce qu’on refuse', async ({ page }) => {

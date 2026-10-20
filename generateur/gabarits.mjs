@@ -5,7 +5,7 @@
 // /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { accorder, capitale, echapper as e } from './texte.mjs';
+import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
 import { baliseDeLaMesure, lireLaMesure, politiqueAvecLaMesure } from './mesure.mjs';
@@ -103,9 +103,8 @@ ${elements.join('\n')}
 `;
 };
 
-// La typographie française, sur toute la page (titre, description, texte, données structurées) : une espace insécable
-// avant « ? », « : » et « ; », pour que le signe ne parte jamais seul à la ligne.
-export const insecables = (texte) => texte.replace(/ ([?:;])/g, '\u00A0$1');
+// La typographie française, sur toute la page (titre, description, texte, données structurées) : texte.mjs.
+export { insecables };
 
 // Une page qui se partage (partage) : le bloc « Partager » juste sous sa tête (la première <header> du corps), avec ses
 // textes (textesDuPartage : ceux d’une page en anglais ; sinon ceux de partage.json).
@@ -133,11 +132,12 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
 
 // Le jour et l’heure (« dimanche 25 octobre · 20:45 ») ; heureSeule : l’heure seulement (« 20:45 »), quand le jour
 // est déjà le titre de la liste, comme sur la page de la semaine. La date complète reste dans l’attribut datetime.
-export const quand = (match, { heureSeule = false } = {}) => {
+// majuscule : en tête de ligne, une capitale (« Dimanche 25 octobre · 20:45 ») ; dans une phrase, aucune.
+export const quand = (match, { heureSeule = false, majuscule = false } = {}) => {
   const texte = heureSeule
     ? (match.heureConfirmee ? heureDeParis(match.debut) : 'heure à confirmer')
     : quandEnLettres(match.debut, match.heureConfirmee);
-  return `<time datetime="${debutDe(match)}">${e(texte)}</time>`;
+  return `<time datetime="${debutDe(match)}">${e(majuscule ? capitale(texte) : texte)}</time>`;
 };
 
 const prix = (centimes) => {
@@ -152,7 +152,7 @@ const prix = (centimes) => {
 export const offre = (o, textes) => {
   if (!o) return '';
   if (o.dansLAppli) {
-    return `<div class="regarder-offre">
+    return `<div class="regarder-offre regarder-offre--appli">
         <p class="regarder-offre__texte">${e(textes.offre.dansLAppli)}</p>
       </div>`;
   }
@@ -214,15 +214,20 @@ export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = ''
   '    </li>',
 ].filter(Boolean).join('\n');
 
-// Une ligne de match : son nom court (vers sa page s’il en a une), le jour et l’heure (ou l’heure seule, sous un
-// titre qui donne déjà le jour), la compétition.
 // Un match reporté ou annulé le dit partout où il est listé : « · Match reporté » après son jour et son heure (rien pour
 // un match qui se joue comme prévu).
 export const statutDuMatch = (match, textes) => (match.statut ? ` · <strong>${e(textes.match[match.statut])}</strong>` : '');
 
-export const ligneDeMatch = (match, { avecPage, suite = '', heureSeule = false }) => {
-  const nom = `${e(match.domicile.court)} – ${e(match.exterieur.court)}`;
-  return `<li>${avecPage ? `<a href="${cheminDuMatch(match)}">${nom}</a>` : nom} · ${quand(match, { heureSeule })} · ${e(match.competition)}${suite}</li>`;
-};
+// Une ligne d’une liste de matchs (ou de villes) : sa tête, seule sur sa ligne (un lien de 44 px vers sa page, ou son
+// nom), et dessous ses détails, en tête de ligne (une capitale, aucun « · » devant). tete : du HTML déjà échappé.
+export const ligneDeListe = (tete, adresse, infos) => `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${tete}</a>` : `<span class="regarder-matchs__match">${tete}</span>`} <span class="regarder-matchs__infos">${infos}</span></li>`;
+
+// Une ligne de match : son nom court (vers sa page s’il en a une) ; dessous, le jour et l’heure (ou l’heure seule, sous
+// un titre qui donne déjà le jour), la compétition, et la suite (« · » puis les bars, ou le statut du match).
+export const ligneDeMatch = (match, { avecPage, suite = '', heureSeule = false }) => ligneDeListe(
+  `${e(match.domicile.court)} – ${e(match.exterieur.court)}`,
+  avecPage ? cheminDuMatch(match) : null,
+  `${quand(match, { heureSeule, majuscule: true })} · ${e(match.competition)}${suite}`,
+);
 
 export { accorder, capitale, e, jourEnLettres, heureDeParis, ancreDeLaSoiree, cheminDeLaVille, cheminDuBar, cheminDuMatch };

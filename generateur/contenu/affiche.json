@@ -27,7 +27,8 @@
     "heureAConfirmer": "Heure à confirmer",
     "prepare": "Programme préparé sur baromatch.fr, à l’heure de Paris, le {jour}.",
     "qr": "QR code vers baromatch.fr",
-    "adresse": "baromatch.fr"
+    "adresse": "baromatch.fr",
+    "stylo": "À compléter au stylo"
   },
   "format": {
     "legende": "Le papier",
@@ -36,9 +37,9 @@
   },
   "bar": {
     "fil": "Son affiche",
-    "lien": "Tu tiens ce bar ? Ton affiche à imprimer",
-    "titre": "L’affiche de {bar}",
-    "titrePage": "Affiche à imprimer de {bar}",
+    "lien": "Ton affiche à imprimer",
+    "titre": "{bar} : ton affiche",
+    "titrePage": "Affiche à imprimer : {bar}",
     "chapeau": "Pour ta porte ou ton comptoir : ta prochaine soirée de match, et un QR code qui mène à la page de ton bar.",
     "etapes": [
       "Choisis A4 ou A3, ici puis dans la fenêtre d’impression.",
@@ -55,6 +56,6 @@
     "fermee": "Nos soirées de match sont sur Baromatch.",
     "fermeeSuite": "Scanne le code pour les voir.",
     "prepare": "Affiche préparée sur baromatch.fr, à l’heure de Paris, le {jour}.",
-    "qr": "QR code vers la page de {bar} sur Baromatch"
+    "qr": "QR code vers la page du bar {bar} sur Baromatch"
   }
 }

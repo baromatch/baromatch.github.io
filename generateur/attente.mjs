@@ -42,20 +42,20 @@ export const listeDAttente = ({ cle, nom, textes, clesAvecBars, ouverte }) => {
   return `<section class="regarder-section regarder-attente" aria-labelledby="titre-attente">
   <h2 id="titre-attente">${e(titre)}</h2>
   <form class="attente" id="attente" action="${ENVOI_DE_LA_LISTE}" method="POST">
-    <label class="attente__etiquette" for="attente-mail">${e(t.etiquette)}</label>
-    <div class="attente__ligne">
-      <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required>
-      <button class="attente__bouton" type="submit">${e(t.bouton)}</button>
-    </div>
-    <div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
-    <input type="hidden" name="_subject" value="${e(t.sujet)}">
     <fieldset class="attente__villes" aria-describedby="attente-usage">
       <legend>${e(t.villes)}</legend>
       <div class="attente__options">
 ${options.join('\n')}
       </div>
     </fieldset>
-${phrases.join('\n')}${phrases.length ? '\n' : ''}${ouverte ? '' : `    <p class="attente__plateformes">${e(t.plateformes)}</p>\n`}    <p class="attente__note" id="attente-usage">${e(t.note)} <a href="/confidentialite.html#liste-attente">${e(t.lienNote)}</a>.</p>
+${phrases.join('\n')}${phrases.length ? '\n' : ''}    <label class="attente__etiquette" for="attente-mail">${e(t.etiquette)}</label>
+    <div class="attente__ligne">
+      <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required>
+      <button class="attente__bouton" type="submit">${e(t.bouton)}</button>
+    </div>
+    <div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+    <input type="hidden" name="_subject" value="${e(t.sujet)}">
+${ouverte ? '' : `    <p class="attente__plateformes">${e(t.plateformes)}</p>\n`}    <p class="attente__note" id="attente-usage">${e(t.note)} <a href="/confidentialite.html#liste-attente">${e(t.lienNote)}</a>.</p>
   </form>
 </section>`;
 };

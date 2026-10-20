@@ -90,12 +90,13 @@ ${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => ligne(m, { coch
   }).join('\n');
 };
 
-// Le pied : à gauche, les deux lignes à remplir au stylo (blanc), l’appel (l’affiche d’un bar) et la phrase de
-// préparation avec le verre ; à droite, le QR code et l’adresse qu’il ouvre, écrite en clair. Les lignes vides sont un
-// dessin : un lecteur d’écran ne les lit pas.
-const piedDeLaFeuille = ({ phrase, svg, adresse, appel = '', blanc = false }) => `  <div class="affiche-pied">
+// Le pied : à gauche, les deux lignes à remplir au stylo (blanc : l’indice écrit au-dessus, à l’écran seulement),
+// l’appel (l’affiche d’un bar) et la phrase de préparation avec le verre ; à droite, le QR code et l’adresse qu’il
+// ouvre, écrite en clair. Les lignes vides et leur indice sont un dessin : un lecteur d’écran ne les lit pas.
+const piedDeLaFeuille = ({ phrase, svg, adresse, appel = '', blanc = '' }) => `  <div class="affiche-pied">
     <div class="affiche-pied__texte">
-${blanc ? '      <ul class="affiche-blanc" aria-hidden="true"><li></li><li></li></ul>\n' : ''}${appel}      <p class="affiche-prepare">${VERRE}<span>${e(phrase)}</span></p>
+${blanc ? `      <p class="affiche-stylo" aria-hidden="true">${e(blanc)}</p>
+      <ul class="affiche-blanc" aria-hidden="true"><li></li><li></li></ul>\n` : ''}${appel}      <p class="affiche-prepare">${VERRE}<span>${e(phrase)}</span></p>
     </div>
     <figure class="affiche-qr">
       ${svg}
@@ -155,7 +156,7 @@ ${modeDEmploi(t.etapes, [t.deuxPages])}
     <p class="affiche-dates">${e(lesDates(joursDeLaSemaine(maintenant)))}</p>
   </div>
 ${matchs.length ? lesJours(matchs, { cochable: true }) : `  <p class="affiche-vide">${e(t.sansMatch)}</p>`}
-${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant) }), svg: svgDuQr(qr.matrice(ADRESSE_DU_QR), { etiquette: f.qr }), adresse: f.adresse, blanc: true })}
+${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant) }), svg: svgDuQr(qr.matrice(ADRESSE_DU_QR), { etiquette: f.qr }), adresse: f.adresse, blanc: f.stylo })}
   </div>
 </section>
 <section class="regarder-section" aria-labelledby="titre-apres">
@@ -202,8 +203,8 @@ export const fabriquerLAfficheDuBar = ({ bar, donnees, contenu, cadre, avecPress
   const nom = remplir(t.titrePage, { bar: bar.nom });
   const titrePage = intituler(`${nom} — Baromatch`, nom, `${bar.nom.slice(0, 40)} : son affiche`);
   const desc = decrire(
-    `${nom}, ${bar.quartier} : ${prochaine ? `sa prochaine soirée de match (${nomCourt(prochaine.match)}, ${jourEnLettres(prochaine.match.debut)})` : 'ses soirées de match'} et un QR code vers sa page Baromatch, en A4 ou en A3.`,
-    `L’affiche à imprimer de ${bar.nom.slice(0, 60)} : ses soirées de match et un QR code vers sa page Baromatch, en A4 ou en A3.`,
+    `${bar.nom}, ${bar.quartier} : son affiche à imprimer, avec ${prochaine ? `sa prochaine soirée de match (${nomCourt(prochaine.match)}, ${jourEnLettres(prochaine.match.debut)})` : 'ses soirées de match'} et un QR code vers sa page Baromatch, en A4 ou en A3.`,
+    `${bar.nom.slice(0, 60)} : son affiche à imprimer, ses soirées de match et un QR code vers sa page Baromatch, en A4 ou en A3.`,
   );
   const ouverte = Boolean(marque.appli?.ouverte);
   const appel = `      <p class="affiche-appel">${e(ouverte ? t.ouverte : t.fermee)}</p>

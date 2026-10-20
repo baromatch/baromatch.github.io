@@ -20,14 +20,15 @@
 // (Paris time) ») ; les clubs sous leur nom des données ; l’état de l’appli dit dès la tête de chaque page.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { cheminDuFichierDuMatch } from './agenda.mjs';
 import { ENVOI_DE_LA_LISTE } from './attente.mjs';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
-import { page } from './gabarits.mjs';
+import { ligneDeListe, page } from './gabarits.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe, cheminDuBar, debutDe, filDAriane, IMAGE, listeDesBars, pageWeb } from './jsonld.mjs';
 import { couper, SEUILS } from './pages.mjs';
-import { echapper as e } from './texte.mjs';
+import { capitale, echapper as e } from './texte.mjs';
 
 export const TEXTES_EN = JSON.parse(readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 'en.json'), 'utf8'));
 export const CHEMINS_EN = { paris: '/en/', premierLeague: '/en/premier-league/', championsLeague: '/en/champions-league/' };
@@ -131,10 +132,13 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
     : `    <li><a href="${etape.chemin}">${e(etape.nom)}</a></li>`)).join('\n')}
   </ol>
 </nav>`;
-  const temps = (m, { heureSeule = false } = {}) => {
+  // majuscule : en tête de ligne (« Time to be confirmed »).
+  const temps = (m, { heureSeule = false, majuscule = false } = {}) => {
     const texte = heureSeule ? (m.heureConfirmee ? heureALAnglaise(m.debut) : t.quand.aConfirmerCourt) : quandALAnglaise(m, t);
-    return `<time datetime="${debutDe(m)}">${e(texte)}</time>`;
+    return `<time datetime="${debutDe(m)}">${e(majuscule ? capitale(texte) : texte)}</time>`;
   };
+  // Une ligne d’une liste de matchs : le match seul sur sa ligne, ses détails dessous (gabarits.mjs).
+  const ligneDuMatch = (m, infos) => ligneDeListe(e(nomDuMatch(m)), avecPage.has(m.slug) ? cheminEnAnglais(m.slug) : null, infos);
   const lienDuMatch = (m) => (avecPage.has(m.slug) ? `<a href="${cheminEnAnglais(m.slug)}">${e(nomDuMatch(m))}</a>` : e(nomDuMatch(m)));
   const compte = (n) => remplir(n > 1 ? t.bars.comptePluriel : t.bars.compte, { n });
   // Un match reporté ou annulé le dit partout où il est listé : « · Match postponed » après son jour et son heure.
@@ -163,7 +167,7 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
   // Les matchs, sous le titre de leur jour à Paris : la ligne ne donne que l’heure.
   const parJour = (matchs) => [...new Set(matchs.map((m) => jourDeParis(m.debut)))].map((jour) => `  <h3 class="regarder-jour">${e(jourEntierALAnglaise(Date.parse(`${jour}T12:00:00Z`)))}</h3>
   <ul class="regarder-matchs">
-${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    <li>${lienDuMatch(m)} · ${temps(m, { heureSeule: true })} · ${e(competitionDe(m))} · ${etatDuMatch(m)}</li>`).join('\n')}
+${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    ${ligneDuMatch(m, `${temps(m, { heureSeule: true, majuscule: true })} · ${e(competitionDe(m))} · ${etatDuMatch(m)}`)}`).join('\n')}
   </ul>`).join('\n');
   const listeDesMatchs = (nom, matchs) => ({
     '@type': 'ItemList',
@@ -176,6 +180,12 @@ ${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    <li>${lien
   const noteDeLAppli = `  <p class="regarder-note">${e(ouverte ? remplir(t.appli.ouverte, { plateformes }) : t.appli.fermee)}</p>`;
   // Être prévenu : tant que l’appli n’est pas ouverte, la liste d’attente de Paris (l’adresse et la ville, comme sur
   // l’accueil, rien d’autre) ; ensuite, les magasins.
+  // L’essentiel de la confidentialité de la liste d’attente, en anglais (la page Confidentialité est en français) :
+  // qui, pourquoi, quoi, le prestataire, combien de temps, les droits et l’adresse à qui écrire.
+  const contact = `<a href="mailto:${e(t.attente.viePriveeContact)}">${e(t.attente.viePriveeContact)}</a>`;
+  const viePrivee = `<ul class="attente__vie-privee">
+${t.attente.viePrivee.map(([titre, texte]) => `    <li><strong>${e(titre)}</strong> ${texte.split('{contact}').map(e).join(contact)}</li>`).join('\n')}
+  </ul>`;
   const appel = ouverte
     ? `<div class="regarder-appel">
   ${[['Android', marque.appli.android], ['iPhone', marque.appli.iphone]].filter(([, lien]) => lien).map(([nom, lien]) => `<a class="capsule" href="${e(lien)}">${e(t.appel.ouverte)} · ${nom}</a>`).join('\n  ')}
@@ -194,6 +204,7 @@ ${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    <li>${lien
     <input type="hidden" name="ville" value="Paris">
     <p class="attente__note" id="attente-usage">${e(t.attente.note)} <a href="/confidentialite.html#liste-attente" hreflang="fr">${e(t.attente.lienNote)}</a>.</p>
   </form>
+  ${viePrivee}
 </section>`;
   const commentCaMarche = () => {
     const { intro, etapes } = t.commentCaMarche[ouverte ? 'ouverte' : 'fermee'];
@@ -231,7 +242,9 @@ ${etapes.map((etape) => `    <li><strong>${e(etape.titre)}</strong> ${e(etape.te
   <p class="regarder-surtitre">${e(competition)}</p>
   <h1 class="regarder-titre">${e(vivant ? remplir(t.match.titreH1, { match: nom }) : nom)}</h1>
   <p class="regarder-quand">${temps(match)}</p>
-${vivant && match.heureConfirmee ? `  <p class="regarder-note">${e(remplir(t.quand.royaumeUni, { heure: heureALAnglaise(match.debut, 'Europe/London') }))}</p>\n` : ''}${vivant && !match.heureConfirmee ? `  <p class="regarder-note">${e(t.match.heureAConfirmer)}</p>\n` : ''}${vivant && match.statut ? `  <p class="regarder-note"><strong>${e(t.match[match.statut])}.</strong> ${e(t.match.statutSuite)}</p>\n` : ''}${vivant ? `${noteDeLAppli}\n` : ''}</header>`;
+${vivant && match.heureConfirmee ? `  <p class="regarder-note">${e(remplir(t.quand.royaumeUni, { heure: heureALAnglaise(match.debut, 'Europe/London') }))}</p>\n` : ''}${vivant && !match.heureConfirmee ? `  <p class="regarder-note">${e(t.match.heureAConfirmer)}</p>\n` : ''}${vivant && match.statut ? `  <p class="regarder-note"><strong>${e(t.match[match.statut])}.</strong> ${e(t.match.statutSuite)}</p>\n` : ''}${vivant && fr.evenement ? `  <div class="regarder-agenda">
+    <a class="regarder-agenda__bouton" href="${cheminDuFichierDuMatch(match)}" type="text/calendar">${e(t.match.agenda)}</a>
+  </div>\n` : ''}${vivant ? `${noteDeLAppli}\n` : ''}</header>`;
 
     if (!vivant) {
       // Passé, ou plus au programme : la page le dit, sans score, et mène au prochain match d’un des deux clubs.
@@ -282,7 +295,7 @@ ${bars.length ? `  <p class="regarder-compte">${e(compte(bars.length))}</p>\n${c
     const sectionProchains = `<section class="regarder-section" aria-labelledby="titre-prochains">
   <h2 id="titre-prochains">${e(remplir(t.match.prochains, { clubs: `${match.domicile.nom} and ${match.exterieur.nom}` }))}</h2>
 ${prochains.length ? `  <ul class="regarder-matchs">
-${prochains.slice(0, 6).map((m) => `    <li>${lienDuMatch(m)} · ${temps(m)} · ${e(competitionDe(m))}${statut(m)}</li>`).join('\n')}
+${prochains.slice(0, 6).map((m) => `    ${ligneDuMatch(m, `${temps(m, { majuscule: true })} · ${e(competitionDe(m))}${statut(m)}`)}`).join('\n')}
   </ul>` : `  <p>${e(t.match.aucunProchain)}</p>`}
 </section>`;
     // L’image de la jumelle (sa carte), quand le rendu des images est là : celle que montre WhatsApp à côté du lien.

@@ -91,7 +91,7 @@ const robotsDe = (p) => p.contenu.match(/<meta name="robots" content="([^"]*)">/
 const lignesDe = (html) => [...html.matchAll(/<li class="affiche-ligne">[\s\S]*?<time class="affiche-heure[^"]*" datetime="([^"]+)">[^<]*<\/time> <span class="affiche-match">([^<]+)<\/span>/g)].map((m) => `${m[1]} ${m[2]}`);
 // Les lignes des jours de /matchs/ (le bloc du jour et les jours suivants, sans « La semaine d’après », qui mène aux
 // pages des matchs plus lointains), dans le même format.
-const lignesDeLaSemaine = (html) => [...html.split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li>(?:<a href="[^"]*">)?([^<]+?)(?:<\/a>)? · <time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
+const lignesDeLaSemaine = (html) => [...html.split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]*")?>([^<]+?)<\/(?:a|span)> <span class="regarder-matchs__infos"><time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
 // Les modules d’un QR code dessiné par svgDuQr, relus dans son SVG (marge comprise).
 const matriceDuSvg = (svg) => {
   const cote = Number(svg.match(/viewBox="0 0 (\d+) \1"/)[1]);
@@ -300,7 +300,7 @@ test('l’affiche d’un bar publié : noindex, sa prochaine soirée, ses soiré
   expect(robotsDe(p)).toBe('noindex');
   expect(p.type).toBe('affiche-bar');
   expect(p.barsNommes).toEqual(['b-zinc']);
-  expect(p.contenu).toContain('<h1 class="regarder-titre">L’affiche de Le Zinc des Amis</h1>');
+  expect(p.contenu).toContain('<h1 class="regarder-titre">Le Zinc des Amis\u00A0: ton affiche</h1>');
   expect(p.contenu).toContain('<p class="affiche-bar">Le Zinc des Amis</p>');
   // Pas ce soir : « Ici, on diffuse le match. », puis le match, son jour et son heure en entier.
   expect(p.contenu).toContain('<h3 class="affiche-titre">Ici, on diffuse le match.</h3>');
@@ -316,10 +316,10 @@ test('l’affiche d’un bar publié : noindex, sa prochaine soirée, ses soiré
   // Le QR code ouvre sa page, sans paramètre.
   const svg = p.contenu.match(/<svg class="affiche-qr__code"[\s\S]*?<\/svg>/)[0];
   expect(sansMarge(matriceDuSvg(svg))).toEqual(qr.matrice('https://baromatch.fr/bar/le-zinc-des-amis-paris-11/'));
-  expect(svg).toContain('aria-label="QR code vers la page de Le Zinc des Amis sur Baromatch"');
+  expect(svg).toContain('aria-label="QR code vers la page du bar Le Zinc des Amis sur Baromatch"');
   expect(p.contenu).toContain('<figcaption class="affiche-qr__adresse">baromatch.fr/bar/le-zinc-des-amis-paris-11/</figcaption>');
   // La page du bar mène à son affiche.
-  expect(pageDe(site, ZINC).contenu).toContain('<p class="regarder-suite"><a href="/bar/le-zinc-des-amis-paris-11/affiche/">Tu tiens ce bar\u00A0? Ton affiche à imprimer</a></p>');
+  expect(pageDe(site, ZINC).contenu).toContain('<p class="regarder-suite"><a href="/bar/le-zinc-des-amis-paris-11/affiche/">Ton affiche à imprimer</a></p>');
 });
 
 test('le jour même : « Ce soir, on diffuse le match. » ; l’appli ouverte : « Garde ta place sur Baromatch. »', async () => {
@@ -453,6 +453,24 @@ test.describe('dans le navigateur', () => {
     expect(largeur * 25 / 33 / 96 * 25.4).toBeGreaterThan(30);
     await onglet.pdf({ format: 'A4' });
     expect(ailleurs).toEqual([]);
+  });
+
+  test('à l’écran, les deux lignes vides disent « À compléter au stylo » ; à l’impression, ce mot disparaît, les lignes restent', async ({ page: onglet }) => {
+    await onglet.setViewportSize({ width: 360, height: 800 });
+    await onglet.goto(`${serveur.adresse}${OUVERTE}`);
+    const indice = onglet.locator('.affiche-stylo');
+    await expect(indice).toHaveCount(1);
+    await expect(indice).toBeVisible();
+    await expect(indice).toHaveText('À compléter au stylo');
+    // Juste au-dessus des lignes vides, dans le pied de la feuille.
+    expect(await indice.evaluate((p) => p.nextElementSibling?.classList.contains('affiche-blanc'))).toBe(true);
+    await onglet.emulateMedia({ media: 'print' });
+    await expect(indice).toBeHidden();
+    expect(await visibles(onglet, '.affiche-blanc li')).toBe(2);
+    await onglet.emulateMedia({ media: 'screen' });
+    // L’affiche d’un bar n’a pas de lignes vides : pas d’indice non plus.
+    await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
+    await expect(onglet.locator('.affiche-stylo')).toHaveCount(0);
   });
 
   test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi', async ({ page: onglet }) => {

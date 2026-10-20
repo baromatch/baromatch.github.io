@@ -158,7 +158,7 @@ ${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.ma
       const suite = deplace
         ? `<p><a href="${cheminDuMatch(deplace)}">${e(nomCourt(deplace))}</a>, ${quand(deplace)}.</p>`
         : suivant
-          ? `<p>${e(remplir(textes.match.passeSuite, { club: [suivant.domicile.cle, suivant.exterieur.cle].includes(match.domicile.cle) ? match.domicile.court : match.exterieur.court }))} ${aUnePage(suivant) ? `<a href="${cheminDuMatch(suivant)}">${e(nomCourt(suivant))}</a>` : e(nomCourt(suivant))}, ${quand(suivant)}.</p>${aUnePage(suivant) ? '' : `\n  <p><a href="/matchs/">${e(textes.fil.matchs)}</a></p>`}`
+          ? `<p>${e(textes.match.passeSuite)} ${aUnePage(suivant) ? `<a href="${cheminDuMatch(suivant)}">${e(nomCourt(suivant))}</a>` : e(nomCourt(suivant))}, ${quand(suivant)}.</p>${aUnePage(suivant) ? '' : `\n  <p><a href="/matchs/">${e(textes.fil.matchs)}</a></p>`}`
           : `<p>${e(textes.match.passeSansSuite)} <a href="/matchs/">${e(textes.fil.matchs)}</a></p>`;
       const titrePage = titre(`${nom} du ${dateCourte(match.debut)} : match passé — Baromatch`, `${nom} du ${dateCourte(match.debut)} : match passé`, `${nom} : match passé`);
       const desc = description(

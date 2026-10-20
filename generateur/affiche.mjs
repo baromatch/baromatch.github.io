@@ -199,8 +199,8 @@ export const fabriquerLAfficheDuBar = ({ bar, donnees, contenu, cadre, avecPress
   const nom = remplir(t.titrePage, { bar: bar.nom });
   const titrePage = intituler(`${nom} — Baromatch`, nom, `${bar.nom.slice(0, 40)} : son affiche`);
   const desc = decrire(
-    `${nom}, ${bar.quartier} : ${prochaine ? `sa prochaine soirée de match (${nomCourt(prochaine.match)}, ${jourEnLettres(prochaine.match.debut)})` : 'ses soirées de match'} et un QR code vers sa page Baromatch, en A4 ou en A3.`,
-    `L’affiche à imprimer de ${bar.nom.slice(0, 60)} : ses soirées de match et un QR code vers sa page Baromatch, en A4 ou en A3.`,
+    `${bar.nom}, ${bar.quartier} : son affiche à imprimer, avec ${prochaine ? `sa prochaine soirée de match (${nomCourt(prochaine.match)}, ${jourEnLettres(prochaine.match.debut)})` : 'ses soirées de match'} et un QR code vers sa page Baromatch, en A4 ou en A3.`,
+    `${bar.nom.slice(0, 60)} : son affiche à imprimer, ses soirées de match et un QR code vers sa page Baromatch, en A4 ou en A3.`,
   );
   const ouverte = Boolean(marque.appli?.ouverte);
   const appel = `      <p class="affiche-appel">${e(ouverte ? t.ouverte : t.fermee)}</p>

@@ -97,7 +97,7 @@
     "prochains": "{clubs} : leurs prochains matchs",
     "aucunProchain": "Pas d’autre match annoncé pour l’instant.",
     "passe": "Ce match est passé",
-    "passeSuite": "Le prochain match de {club} :",
+    "passeSuite": "Le prochain match :",
     "passeSansSuite": "Les prochains matchs, et où les voir :",
     "heureAConfirmer": "Le coup d’envoi n’est pas encore fixé : l’heure peut changer.",
     "plusAnnonce": "Ce match n’est plus au programme.",

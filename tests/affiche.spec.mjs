@@ -274,7 +274,7 @@ test('l’affiche d’un bar publié : noindex, sa prochaine soirée, ses soiré
   expect(robotsDe(p)).toBe('noindex');
   expect(p.type).toBe('affiche-bar');
   expect(p.barsNommes).toEqual(['b-zinc']);
-  expect(p.contenu).toContain('<h1 class="regarder-titre">L’affiche de Le Zinc des Amis</h1>');
+  expect(p.contenu).toContain('<h1 class="regarder-titre">Le Zinc des Amis\u00A0: ton affiche</h1>');
   expect(p.contenu).toContain('<p class="affiche-bar">Le Zinc des Amis</p>');
   // Pas ce soir : « Ici, on diffuse le match. », puis le match, son jour et son heure en entier.
   expect(p.contenu).toContain('<h3 class="affiche-titre">Ici, on diffuse le match.</h3>');
@@ -290,7 +290,7 @@ test('l’affiche d’un bar publié : noindex, sa prochaine soirée, ses soiré
   // Le QR code ouvre sa page, sans paramètre.
   const svg = p.contenu.match(/<svg class="affiche-qr__code"[\s\S]*?<\/svg>/)[0];
   expect(sansMarge(matriceDuSvg(svg))).toEqual(qr.matrice('https://baromatch.fr/bar/le-zinc-des-amis-paris-11/'));
-  expect(svg).toContain('aria-label="QR code vers la page de Le Zinc des Amis sur Baromatch"');
+  expect(svg).toContain('aria-label="QR code vers la page du bar Le Zinc des Amis sur Baromatch"');
   expect(p.contenu).toContain('<figcaption class="affiche-qr__adresse">baromatch.fr/bar/le-zinc-des-amis-paris-11/</figcaption>');
   // La page du bar mène à son affiche.
   expect(pageDe(site, ZINC).contenu).toContain('<p class="regarder-suite"><a href="/bar/le-zinc-des-amis-paris-11/affiche/">Tu tiens ce bar\u00A0? Ton affiche à imprimer</a></p>');

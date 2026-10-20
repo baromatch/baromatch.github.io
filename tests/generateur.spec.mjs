@@ -1059,7 +1059,7 @@ test.describe('d’un passage à l’autre', () => {
     const page = lire(sortie, 'matchs/om-lens-2026-10-22/index.html');
     expect(page).toContain('<meta name="robots" content="noindex">');
     expect(page).toContain('<h2 id="titre-passe">Ce match est passé</h2>');
-    expect(page).toContain(insecables('Le prochain match de Lens : <a href="/matchs/lille-lens-2026-10-26/">Lille – Lens</a>'));
+    expect(page).toContain(insecables('Le prochain match : <a href="/matchs/lille-lens-2026-10-26/">Lille – Lens</a>'));
     expect(page).not.toMatch(/regarder-carte|Zinc/);
     expect(plan(sortie)).not.toContain('om-lens');
     const apres = etatDe(sortie).pages['/matchs/om-lens-2026-10-22/'];

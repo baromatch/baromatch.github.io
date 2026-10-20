@@ -10,7 +10,7 @@
 // garde son évènement). Ses heures sont des instants en UTC (ical.mjs) ; une heure provisoire donne un évènement sur la
 // journée, « heure à confirmer ». Le match dure deux heures dans l’agenda. Un match passé s’efface. Un match reporté ou
 // annulé (dans les listes), ou qui en disparaît avant d’être joué, reste sept jours, annulé (STATUS:CANCELLED) et dit
-// pourquoi, puis s’efface. Aucun lieu (le match se joue au stade, pas au bar), aucune offre ; le texte ne parle de bars
+// pourquoi, puis s’efface, une fois pour toutes (l’état s’en souvient tant qu’il reste listé avec son statut). Aucun lieu (le match se joue au stade, pas au bar), aucune offre ; le texte ne parle de bars
 // que quand de vrais bars publiés diffusent le match, avec leur vrai nombre.
 // Les fichiers sont les mêmes octet pour octet tant que rien ne change : chaque évènement garde dans l’état l’empreinte
 // de son contenu, son numéro de version (SEQUENCE, qui monte à chaque vrai changement) et l’instant de ce changement
@@ -290,15 +290,24 @@ export const fabriquerLesAgendas = ({ donnees, pages, precedent = { pages: {} },
   };
   const avecFichier = new Map(pages.filter((p) => p.evenement).map((p) => [p.evenement.slug, p.evenement]));
   const evenements = [];
+  // Les évènements effacés des agendas, mais pas oubliés : un match reporté ou annulé encore dans les listes, avec son
+  // statut, après ses sept jours. L’état garde son UID, ses identifiants, l’instant où il a été annoncé reporté ou
+  // annulé et sa version (efface : rien n’est écrit pour lui) ; sans cela, il reviendrait sept jours de plus au passage
+  // suivant, comme s’il venait d’être annoncé. Il s’oublie quand il sort des listes.
+  const effaces = {};
   const idsVus = new Set(donnees.matchs.flatMap((m) => m.ids));
   for (const match of [...donnees.matchs].sort((a, b) => a.debut - b.debut || a.slug.localeCompare(b.slug))) {
     const dansUnAgenda = cles.has(match.domicile.cle) || cles.has(match.exterieur.cle);
     if (!dansUnAgenda && !avecFichier.has(match.slug)) continue;
-    const avant = match.ids.map((id) => memoire[uidParId.get(id)]).find(Boolean);
+    const uidAvant = match.ids.map((id) => uidParId.get(id)).find((uid) => uid && memoire[uid]);
+    const avant = uidAvant ? memoire[uidAvant] : undefined;
     let annuleLe = null;
     if (match.statut) {
       annuleLe = avant?.annuleLe ?? aLaSeconde(maintenant);
-      if (Date.parse(annuleLe) + GARDE_ANNULE_MS <= maintenant || !pasFini(match, Date.parse(annuleLe))) continue;
+      if (Date.parse(annuleLe) + GARDE_ANNULE_MS <= maintenant || !pasFini(match, Date.parse(annuleLe))) {
+        if (uidAvant) effaces[uidAvant] = { ids: match.ids, annuleLe, efface: true, ...(Number.isInteger(avant.sequence) ? { sequence: avant.sequence } : {}) };
+        continue;
+      }
     } else if (!pasFini(match, maintenant)) continue;
     evenements.push({ ids: match.ids, match, statut: match.statut, annuleLe, chemin: cheminSiPage(match.slug), soirees: match.soirees, clubs: [match.domicile.cle, match.exterieur.cle], fichier: avecFichier.has(match.slug) });
   }
@@ -312,7 +321,8 @@ export const fabriquerLesAgendas = ({ donnees, pages, precedent = { pages: {} },
   }
 
   // Chaque évènement écrit une fois, avec sa version : le même dans chaque fichier qui le porte.
-  const nouvelleMemoire = {};
+  const nouvelleMemoire = { ...effaces };
+  for (const uid of Object.keys(effaces)) pris.add(uid);
   for (const ev of evenements) if (ev.uid) pris.add(ev.uid);
   for (const ev of evenements) {
     ev.uid ??= choisirLUid(ev.ids);

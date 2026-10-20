@@ -264,7 +264,8 @@ test('un match reporté reste sept jours, annulé (STATUS:CANCELLED), « Report�
   expect(evenementDe(sortie, 'agenda/lille.ics', 'm-lille-lens@baromatch.fr')).toMatchObject({ STATUS: 'CANCELLED', SEQUENCE: '0', DTSTAMP: '20261023T080000Z' });
   await passer(sortie, '2026-10-30T09:00:00Z', { source: reporte });
   expect(evenementDe(sortie, 'agenda/lille.ics', 'm-lille-lens@baromatch.fr')).toBeUndefined();
-  expect(etatDe(sortie).evenements['m-lille-lens@baromatch.fr']).toBeUndefined();
+  // Effacé, pas oublié : tant qu’il reste dans les listes avec son statut, l’état garde quand il a été annoncé reporté.
+  expect(etatDe(sortie).evenements['m-lille-lens@baromatch.fr']).toEqual({ ids: ['m-lille-lens'], annuleLe: '2026-10-23T08:00:00Z', efface: true, sequence: 0 });
 
   // Annulé : « Annulé ». Et un match annulé depuis longtemps (déjà passé quand on le voit) n’apparaît jamais.
   const autre = dossierVide();
@@ -272,6 +273,37 @@ test('un match reporté reste sept jours, annulé (STATUS:CANCELLED), « Report�
   await passer(autre, '2026-10-23T08:00:00Z', { source: annule });
   expect(evenementDe(autre, 'agenda/om.ics', 'm-om-nice@baromatch.fr')).toMatchObject({ STATUS: 'CANCELLED', SUMMARY: 'Annulé : OM – Nice' });
   expect(evenementDe(autre, 'agenda/om.ics', 'm-om-lens@baromatch.fr')).toBeUndefined();
+});
+
+test('un match reporté plus de sept jours à l’avance : effacé après sept jours, il ne revient pas tant qu’il reste listé reporté', async () => {
+  // PSG – OM, le vendredi 20 novembre, annoncé reporté le vendredi 23 octobre et toujours dans les listes ensuite.
+  const sortie = dossierVide();
+  const reporte = variante(sortie, (brut) => ({ ...brut, matches: brut.matches.map((m) => (m.id === 'm-loin' ? { ...m, status: 'POSTPONED' } : m)) }));
+  await passer(sortie, '2026-10-23T08:00:00Z', { source: reporte });
+  expect(evenementDe(sortie, 'agenda/psg.ics', 'm-loin@baromatch.fr')).toMatchObject({ STATUS: 'CANCELLED', SUMMARY: 'Reporté\u00A0: PSG – OM', SEQUENCE: '0' });
+  // Sept jours après l’annonce, il s’efface des agendas de ses deux clubs.
+  await passer(sortie, '2026-10-30T09:00:00Z', { source: reporte });
+  for (const club of ['psg', 'om']) expect(evenementDe(sortie, `agenda/${club}.ics`, 'm-loin@baromatch.fr'), club).toBeUndefined();
+  // Les jours suivants, il ne revient pas pour sept jours de plus.
+  for (const instant of ['2026-10-30T12:00:00Z', '2026-10-31T09:00:00Z', '2026-11-08T09:00:00Z']) {
+    await passer(sortie, instant, { source: reporte });
+    for (const club of ['psg', 'om']) expect(evenementDe(sortie, `agenda/${club}.ics`, 'm-loin@baromatch.fr'), `${club} à ${instant}`).toBeUndefined();
+    expect(etatDe(sortie).evenements['m-loin@baromatch.fr'], instant).toEqual({ ids: ['m-loin'], annuleLe: '2026-10-23T08:00:00Z', efface: true, sequence: 0 });
+  }
+  // Remis au programme : le même évènement revient, confirmé, sa version au-dessus de celle qui l’annulait.
+  await passer(sortie, '2026-11-09T09:00:00Z');
+  expect(evenementDe(sortie, 'agenda/psg.ics', 'm-loin@baromatch.fr')).toMatchObject({ STATUS: 'CONFIRMED', SUMMARY: 'PSG – OM', SEQUENCE: '1', DTSTAMP: '20261109T090000Z' });
+  expect(etatDe(sortie).evenements['m-loin@baromatch.fr'].efface).toBeUndefined();
+  // Sorti des listes, l’effacé s’oublie.
+  const autre = dossierVide();
+  const sansLui = variante(autre, (brut) => ({ ...brut, matches: brut.matches.filter((m) => m.id !== 'm-loin') }));
+  const reporteAilleurs = variante(autre, (brut) => ({ ...brut, matches: brut.matches.map((m) => (m.id === 'm-loin' ? { ...m, status: 'POSTPONED' } : m)) }));
+  await passer(autre, '2026-10-23T08:00:00Z', { source: reporteAilleurs });
+  await passer(autre, '2026-10-31T09:00:00Z', { source: reporteAilleurs });
+  expect(etatDe(autre).evenements['m-loin@baromatch.fr']).toMatchObject({ efface: true });
+  await passer(autre, '2026-11-01T09:00:00Z', { source: sansLui });
+  expect(etatDe(autre).evenements['m-loin@baromatch.fr']).toBeUndefined();
+  expect(evenementDe(autre, 'agenda/psg.ics', 'm-loin@baromatch.fr')).toBeUndefined();
 });
 
 test('un match qui sort des listes avant d’être joué : le même évènement, annulé, « Plus au programme », sept jours', async () => {

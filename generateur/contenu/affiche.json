@@ -27,7 +27,8 @@
     "heureAConfirmer": "Heure à confirmer",
     "prepare": "Programme préparé sur baromatch.fr, à l’heure de Paris, le {jour}.",
     "qr": "QR code vers baromatch.fr",
-    "adresse": "baromatch.fr"
+    "adresse": "baromatch.fr",
+    "stylo": "À compléter au stylo"
   },
   "format": {
     "legende": "Le papier",

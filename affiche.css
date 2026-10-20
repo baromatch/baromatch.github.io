@@ -98,6 +98,8 @@ label.affiche-ligne__texte { cursor: pointer; }
 /* Le pied : les lignes au stylo, l’appel et la phrase de préparation à gauche, le QR code à droite. */
 .affiche-pied { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; margin-top: 12px; }
 .affiche-pied__texte { flex: 1 1 16rem; min-width: 0; }
+/* « À compléter au stylo » : à l’écran seulement, au-dessus des lignes vides ; l’affiche imprimée n’a que les lignes. */
+.affiche-stylo { margin: 0; color: var(--encre-douce); font-size: 0.8125rem; font-weight: 600; }
 .affiche-blanc { margin: 0 0 16px; padding: 0; list-style: none; }
 .affiche-blanc li { height: 44px; border-bottom: 1px solid var(--trait-papier); }
 .affiche-prepare { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--encre-douce); font-size: 0.8125rem; line-height: 1.35; }
@@ -137,7 +139,7 @@ label.affiche-ligne__texte { cursor: pointer; }
   :root { color-scheme: light; }
   html, body { background: #FFFFFF; color: #000000; }
   /* Seulement la feuille : ni l’en-tête du site, ni son pied, ni le mode d’emploi, ni les cases. */
-  body > :not(main), main > :not(.affiche-zone), .affiche-zone > :not(.affiche), .affiche-case { display: none !important; }
+  body > :not(main), main > :not(.affiche-zone), .affiche-zone > :not(.affiche), .affiche-case, .affiche-stylo { display: none !important; }
   main.page { max-width: none; margin: 0; padding: 0; }
   .affiche-zone { margin: 0; }
   /* La feuille remplit la page (un peu moins que sa hauteur, marges comprises, en A4 comme en A3) : le pied et son QR

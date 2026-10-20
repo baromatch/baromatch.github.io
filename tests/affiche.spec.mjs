@@ -429,6 +429,24 @@ test.describe('dans le navigateur', () => {
     expect(ailleurs).toEqual([]);
   });
 
+  test('à l’écran, les deux lignes vides disent « À compléter au stylo » ; à l’impression, ce mot disparaît, les lignes restent', async ({ page: onglet }) => {
+    await onglet.setViewportSize({ width: 360, height: 800 });
+    await onglet.goto(`${serveur.adresse}${OUVERTE}`);
+    const indice = onglet.locator('.affiche-stylo');
+    await expect(indice).toHaveCount(1);
+    await expect(indice).toBeVisible();
+    await expect(indice).toHaveText('À compléter au stylo');
+    // Juste au-dessus des lignes vides, dans le pied de la feuille.
+    expect(await indice.evaluate((p) => p.nextElementSibling?.classList.contains('affiche-blanc'))).toBe(true);
+    await onglet.emulateMedia({ media: 'print' });
+    await expect(indice).toBeHidden();
+    expect(await visibles(onglet, '.affiche-blanc li')).toBe(2);
+    await onglet.emulateMedia({ media: 'screen' });
+    // L’affiche d’un bar n’a pas de lignes vides : pas d’indice non plus.
+    await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
+    await expect(onglet.locator('.affiche-stylo')).toHaveCount(0);
+  });
+
   test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi', async ({ page: onglet }) => {
     const ailleurs = surveiller(onglet);
     await onglet.goto(`${serveur.adresse}${OUVERTE}`);

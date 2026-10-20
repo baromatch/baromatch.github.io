@@ -88,7 +88,8 @@ const refus = (reason) => reponse(400, { ok: false, statusCode: 400, reason, mes
 // Ouvre la page, horloge arrêtée, avec un serveur simulé. `reponses` est consommée dans l’ordre (la dernière
 // sert ensuite à chaque fois) : { status, json }, 'coupure' (échec réseau), 'silence' (jamais de réponse) ou
 // une fonction qui reçoit la route. Rend les demandes reçues, toutes les adresses demandées et les erreurs.
-async function ouvrir(page, reponses = [CREEE]) {
+// feuille : attendre aussi pour-les-bars.css appliquée (sauf pour un test qui la retient).
+async function ouvrir(page, reponses = [CREEE], { feuille = true } = {}) {
   const envois = [];
   const adresses = [];
   const erreurs = [];
@@ -122,8 +123,10 @@ async function ouvrir(page, reponses = [CREEE]) {
   await arreterLHorloge(page, DEBUT + 1000);
   // Le HTML lu, pas « load » : une feuille que le test retient peut retenir « load » (ralentirLaPremiereImage).
   await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
-  // Le formulaire est là (son script est arrivé) : un test peut couper le réseau sans le perdre.
+  // Le formulaire est là (son script est arrivé), et sa feuille : un test peut couper le réseau sans perdre ni l’un ni
+  // l’autre.
   await expect(page.locator('#demande')).toBeVisible();
+  if (feuille) await expect.poll(() => page.evaluate(() => [...document.styleSheets].some((f) => f.href?.endsWith('/pour-les-bars.css')))).toBe(true);
   return { envois, adresses, erreurs };
 }
 
@@ -166,6 +169,13 @@ async function attendreEnvois(page, envois, nombre) {
 // axe attend des minuteurs de la page : l’horloge simulée repart avant l’analyse.
 async function analyser(page) {
   await page.clock.resume();
+  // Un bouton qui change d’état prend son nouveau fond en 150 ms (une transition) et son texte d’un coup : axe lit l’état
+  // posé, une fois finies les transitions et animations en cours du formulaire, sinon il mesure un texte déjà clair sur
+  // un fond encore ambre. Celles qui tournent sans fin (le petit verre qui se remplit pendant l’envoi) ne comptent pas ;
+  // une transition remplacée par une autre est annulée (AbortError), l’autre est attendue.
+  await page.locator('#proposer').evaluate((zone) => Promise.all(zone.getAnimations({ subtree: true })
+    .filter((animation) => animation.playState === 'running' && animation.effect?.getComputedTiming().endTime !== Infinity)
+    .map((animation) => animation.finished.catch((erreur) => { if (erreur.name !== 'AbortError') throw erreur; }))));
   const resultat = await new AxeBuilder({ page }).include('#proposer').withTags(NORMES).analyze();
   return resultat.violations.map((v) => `${v.id} : ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`);
 }
@@ -733,7 +743,7 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
     const retenue = new Promise((resoudre) => { lacher = resoudre; });
     const imageArrivee = await ralentirLaPremiereImage(page);
     await page.route('**/pour-les-bars.css', async (route) => { await retenue; await route.continue(); });
-    await ouvrir(page);
+    await ouvrir(page, [CREEE], { feuille: false });
     const horsEcran = () => page.locator(PIEGE).evaluate((champ) => {
       const boite = champ.getBoundingClientRect();
       return boite.right <= 0 || boite.bottom <= 0 || boite.left >= window.innerWidth || boite.width * boite.height <= 1;
@@ -1484,7 +1494,7 @@ test.describe('un seul état à la fois', () => {
   test('le bouton d’envoi s’efface à l’étape de l’e-mail sans attendre pour-les-bars.css', async ({ page }) => {
     const imageArrivee = await ralentirLaPremiereImage(page);
     await page.route('**/pour-les-bars.css', () => {});
-    await ouvrir(page, [reponse(404, {})]);
+    await ouvrir(page, [reponse(404, {})], { feuille: false });
     await envoyerUneDemande(page);
     await attendreMessage(page.locator('#demande-statut'), TEXTES.courriel);
     await expect(page.locator('#demande-envoyer')).toBeHidden();
@@ -1684,6 +1694,11 @@ test.describe('accessibilité du formulaire (axe)', () => {
     test(`à ${largeur} px, hors ligne avec l’e-mail en second choix, puis la messagerie ouverte`, async ({ page, context }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await ouvrir(page);
+      // Les transitions dix fois plus lentes, comme sur une machine chargée (1,5 s au lieu de 150 ms) : axe ne lit les
+      // couleurs qu’une fois l’état posé (analyser), jamais un bouton à mi-chemin entre deux fonds.
+      const cdp = await context.newCDPSession(page);
+      await cdp.send('Animation.enable');
+      await cdp.send('Animation.setPlaybackRate', { playbackRate: 0.1 });
       await context.setOffline(true);
       await envoyerUneDemande(page);
       await attendreMessage(page.locator('#demande-statut'), TEXTES.horsLigne);

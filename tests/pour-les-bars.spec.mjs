@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { PIED } from './outils/pied.mjs';
+import { ralentirLaPremiereImage } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
 
@@ -657,8 +658,9 @@ test.describe('le premier écran d’abord', () => {
   // sur 4G lente (environ 2,95 s avant comme après) : gardé parce qu’une feuille bloquée ne retient plus le formulaire.
   test('après le premier affichage, pour-les-bars.css et le script partent ensemble ; le formulaire s’affiche sans attendre la feuille, avec le bord de ses champs', async ({ page }) => {
     await suivreLeFormulaire(page);
+    const imageArrivee = await ralentirLaPremiereImage(page);
     const lacher = await retenir(page, '**/pour-les-bars.css');
-    await page.goto(PAGE);
+    await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
     await formulaireAffiche(page);
     const m = await moments(page);
     expect(m.affichage).not.toBeNull();
@@ -670,6 +672,7 @@ test.describe('le premier écran d’abord', () => {
     expect(await page.evaluate(() => [...document.styleSheets].some((f) => f.href?.endsWith('/pour-les-bars.css')))).toBe(false);
     expect(await page.locator('#demande-bar').evaluate((c) => getComputedStyle(c).borderTopColor)).toBe('rgba(255, 255, 255, 0.34)');
     lacher();
+    await imageArrivee();
   });
 
   test('arrivé sur une ancre (#proposer, depuis une affiche), la feuille et le script partent sans attendre le premier affichage, ensemble', async ({ page }) => {
@@ -736,9 +739,11 @@ test.describe('le premier écran d’abord', () => {
   });
 
   test('l’amorce garde la place du formulaire par un attribut data-attente que le style de la page rend invisible, jamais par un style écrit', async ({ page }) => {
+    // Le script retenu pendant que la page charge encore : on n’attend que le HTML lu, puis la demande du script.
+    const imageArrivee = await ralentirLaPremiereImage(page);
     const lacher = await retenir(page, '**/pour-les-bars.js');
     const demande = page.waitForRequest('**/pour-les-bars.js');
-    await page.goto(PAGE);
+    await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
     await demande;
     const formulaire = page.locator('#demande');
     await expect(formulaire).toHaveAttribute('data-attente', '');
@@ -748,6 +753,7 @@ test.describe('le premier écran d’abord', () => {
     await formulaireAffiche(page);
     await expect(formulaire).not.toHaveAttribute('data-attente');
     await expect(formulaire).not.toHaveAttribute('style');
+    await imageArrivee();
   });
 
   test('pour-les-bars.js toujours pas là au bout de 12 s : la place est rendue au chemin e-mail ; arrivé ensuite, il affiche le formulaire et efface le secours', async ({ page }) => {

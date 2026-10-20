@@ -5,6 +5,7 @@
 // les 24 h.
 import { test, expect } from '@playwright/test';
 import { AxeBuilder } from '@axe-core/playwright';
+import { ralentirLaPremiereImage } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 
 const PAGE = '/pour-les-bars.html';
@@ -119,7 +120,8 @@ async function ouvrir(page, reponses = [CREEE]) {
     };
   }, ADRESSE);
   await arreterLHorloge(page, DEBUT + 1000);
-  await page.goto(PAGE);
+  // Le HTML lu, pas « load » : une feuille que le test retient peut retenir « load » (ralentirLaPremiereImage).
+  await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
   // Le formulaire est là (son script est arrivé) : un test peut couper le réseau sans le perdre.
   await expect(page.locator('#demande')).toBeVisible();
   return { envois, adresses, erreurs };
@@ -729,6 +731,7 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
   test('le piège : jamais atteint au clavier, et hors de l’écran avant comme après pour-les-bars.css', async ({ page }) => {
     let lacher;
     const retenue = new Promise((resoudre) => { lacher = resoudre; });
+    const imageArrivee = await ralentirLaPremiereImage(page);
     await page.route('**/pour-les-bars.css', async (route) => { await retenue; await route.continue(); });
     await ouvrir(page);
     const horsEcran = () => page.locator(PIEGE).evaluate((champ) => {
@@ -747,6 +750,7 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
     }
     expect(parcourus).toContain('demande-envoyer');
     expect(parcourus).not.toContain(PIEGE.slice(1));
+    await imageArrivee();
   });
 
   test('la page ouverte depuis plus de 24 h : elle demande à être rechargée, rien ne part, et ce qui est écrit revient', async ({ page }) => {
@@ -1478,12 +1482,14 @@ test.describe('un seul état à la fois', () => {
   });
 
   test('le bouton d’envoi s’efface à l’étape de l’e-mail sans attendre pour-les-bars.css', async ({ page }) => {
+    const imageArrivee = await ralentirLaPremiereImage(page);
     await page.route('**/pour-les-bars.css', () => {});
     await ouvrir(page, [reponse(404, {})]);
     await envoyerUneDemande(page);
     await attendreMessage(page.locator('#demande-statut'), TEXTES.courriel);
     await expect(page.locator('#demande-envoyer')).toBeHidden();
     await expect(page.locator('#demande-courriel-lien')).toBeFocused();
+    await imageArrivee();
   });
 
   test('« Le réseau est lent » se compte depuis le départ de la demande, pas depuis le clic : une demande retenue 3 s ne le montre pas 1 s après son départ', async ({ page }) => {

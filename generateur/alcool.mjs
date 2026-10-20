@@ -214,7 +214,7 @@ const INVISIBLES = /[\p{Cf}\u{34F}\u{115F}\u{1160}\u{17B4}\u{17B5}\u{180E}\u{280
 const QUE_DE_L_INVISIBLE = /^[\p{Cf}\u{180E}\u{2800}]+$/u;
 // Les lettres que la décomposition Unicode ne sépare pas de leur accent.
 const LETTRES = { ø: 'o', æ: 'ae', œ: 'oe', ß: 'ss', ł: 'l', đ: 'd', ı: 'i', ð: 'd', þ: 'th', ħ: 'h', ŀ: 'l' };
-// Un mot tel que l’appli le compare (offerAlcohol.ts) : minuscules, sans accents. Seul ce mot-là peut excuser une
+// Un mot tel que l’appli le compare : minuscules, sans accents. Seul ce mot-là peut excuser une
 // boisson (« sans alcool », « demi-tarif »).
 const commeLAppli = (mot) => mot.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 // Un texte tel que le site le compare pour trouver un alcool : en NFKC (« Ｂｉèｒｅ », « 𝐁𝐢è𝐫𝐞 » deviennent « Bière »),

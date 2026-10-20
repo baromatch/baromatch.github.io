@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k3c002lryqjrdiqxy7e@baromatch.fr
+DTSTAMP:20261020T213523Z
+SEQUENCE:1
+DTSTART:20261103T200000Z
+DTEND:20261103T220000Z
+SUMMARY:Villarreal – PSG
+DESCRIPTION:Ligue des champions · Villarreal CF – Paris Saint-Germain\nC
+ oup d’envoi mardi 3 novembre à 21:00\, heure de Paris.\nLa page du matc
+ h : https://baromatch.fr/matchs/villarreal-psg-2026-11-03/
+URL:https://baromatch.fr/matchs/villarreal-psg-2026-11-03/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k2p002jryqjyhm5jlup@baromatch.fr
+DTSTAMP:20261020T213523Z
+SEQUENCE:1
+DTSTART:20261103T200000Z
+DTEND:20261103T220000Z
+SUMMARY:Bodø/Glimt – Lille
+DESCRIPTION:Ligue des champions · FK Bodø/Glimt – LOSC Lille\nCoup d’
+ envoi mardi 3 novembre à 21:00\, heure de Paris.\nLa page du match : htt
+ ps://baromatch.fr/matchs/bodo-glimt-lille-2026-11-03/
+URL:https://baromatch.fr/matchs/bodo-glimt-lille-2026-11-03/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -51,7 +51,7 @@ test('confidentialité : « En bref » en tête, avec la durée de conservation,
     ['#combien-de-temps', 'Combien de temps on garde tes données'],
     ['#liste-attente', 'ton adresse de la liste d’attente'],
     ['/supprimer-mon-compte.html', 'Supprimer ton compte'],
-    ['mailto:confidentialite@baromatch.fr', 'confidentialite@baromatch.fr'],
+    ['mailto:contact@baromatch.fr', 'contact@baromatch.fr'],
   ]);
   await expect(page.locator('#combien-de-temps')).toHaveText('Combien de temps');
   // « En bref » se lit sans faire défiler longtemps : son haut est dans les deux premiers écrans.

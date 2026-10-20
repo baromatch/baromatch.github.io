@@ -305,7 +305,7 @@ test('la confidentialité dit ce qu’on garde (l’adresse et la ville), pourqu
   expect(texte).toContain('Les inscriptions (ton adresse et ta ville) passent par Formspree');
   // Le formulaire des pages de ville et des pages en anglais part sans JavaScript : la page qui suit est celle de Formspree.
   expect(texte).toContain('Depuis une page de ville ou une page en anglais, l’inscription part directement chez Formspree, qui affiche ensuite sa propre page de confirmation.');
-  await expect(section.locator('a[href="mailto:confidentialite@baromatch.fr"]')).toHaveCount(1);
+  await expect(section.locator('a[href="mailto:contact@baromatch.fr"]')).toHaveCount(1);
   expect(texte).not.toContain('rien d’autre.');
   // La date de la page, et celle du plan du site.
   await expect(page.locator('.document__date')).toHaveText('Mise à jour le 20 octobre 2026');

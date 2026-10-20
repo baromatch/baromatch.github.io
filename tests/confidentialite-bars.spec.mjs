@@ -14,20 +14,24 @@ test('la section des bars dit la durée, le brouillon de l’onglet, à qui écr
     return morceaux.join(' ').replace(/\s+/g, ' ');
   });
   for (const attendu of ['12 mois', 'onglet', 'contact@baromatch.fr', 'CNIL', 'sans ton adresse IP', 'export', 'Resend']) expect(section).toContain(attendu);
+  // Une seule adresse pour toute demande sur ses données : l’ancienne adresse dédiée n’est plus nommée.
+  expect(section).not.toContain('confidentialite@');
   // Le brouillon ne s’efface pas quand la demande part par la messagerie : la page ne le promet pas.
   expect(section).not.toContain('il s’efface quand ta demande part');
   expect(section).toContain('quand ta demande part depuis cette page');
-  // Le mail qui nous prévient d’une demande est effacé au bout de 12 mois, lui aussi.
-  expect(section).toMatch(/mail qui nous prévient[^.]*12 mois/);
-  // Resend nommé, la section dit d’elle-même ce qui encadre un transfert hors de l’Union européenne, et renvoie à
-  // la liste des prestataires où la page l’explique déjà.
-  expect(section).toMatch(/Resend est l’un de nos prestataires techniques[^.]*hors de l’Union européenne[^.]*clauses contractuelles types/);
-  const renvoi = page.locator('#bars ~ ul a[href="#qui-voit-quoi"]');
+  // Au bout de 12 mois, la demande et le mail qui nous a prévenus sont effacés à la main : la page ne promet pas
+  // d’effacement automatique.
+  expect(section).toMatch(/12 mois à partir de ta demande\. Au bout de ce délai, on efface nous-mêmes ta demande[^.]*mail qui nous a prévenus/);
+  expect(section).not.toMatch(/automatique/);
+  // Resend nommé, avec son pays, et un renvoi à la liste des prestataires. Aucune garantie de transfert n’est
+  // annoncée tant qu’elle n’est pas établie.
+  expect(section).toContain('Resend est l’un de nos prestataires techniques, établi aux États-Unis');
+  expect(section).not.toMatch(/clauses contractuelles types|mécanisme équivalent/);
+  const renvoi = page.locator('#bars ~ ul a[href="#prestataires"]');
   await expect(renvoi).toHaveCount(1);
-  await expect(page.locator('#qui-voit-quoi')).toHaveText('Qui voit quoi');
-  await expect(page.locator('#qui-voit-quoi + ul')).toContainText('clauses contractuelles types');
+  await expect(page.locator('#prestataires')).toHaveText('Nos prestataires');
   // La liste des prestataires dit que Resend envoie aussi le mail qui nous prévient d’une demande de bar.
-  await expect(page.locator('#qui-voit-quoi + ul')).toContainText('Resend, qui envoie les mails avec ton code de connexion, et le mail qui nous prévient d’une demande de bar ; CARTO');
+  await expect(page.locator('#prestataires + ul')).toContainText('Resend envoie le mail avec ton code de connexion, et le mail qui nous prévient d’une demande de bar. États-Unis.');
 });
 
 // La section « Les demandes des bars » de la page Confidentialité dit le texte validé par le propriétaire, qui décrit
@@ -72,21 +76,20 @@ test.describe('la page Confidentialité dit, mot pour mot, le texte attendu sur 
       + 'elle n’est que sur le serveur, sans heure d’envoi. '
       + 'Aucun écran de l’appli ni de la console des bars ne montre ta demande. '
       + 'Rien n’est vendu ni loué. '
-      + 'Resend est l’un de nos prestataires techniques (voir « Qui voit quoi ») : quand l’un d’eux est établi hors de l’Union européenne, '
-      + 'le transfert de données vers lui est encadré par les clauses contractuelles types de la Commission européenne ou un mécanisme équivalent.',
-    // Ni les journaux ni les rapports d’erreurs ne portent le contenu d’une demande.
-    'Journaux et rapports d’erreurs':
-      'les journaux du serveur ne contiennent aucun champ du formulaire, et les rapports d’erreurs envoyés à Sentry '
-      + '(le service qui reçoit nos rapports de plantage, voir « Les rapports de plantage ») partent sans le contenu de ta demande. '
-      + 'Quand un envoi échoue, le journal et Sentry reçoivent seulement le numéro de la demande dans la base et le type d’échec.',
+      + 'Resend est l’un de nos prestataires techniques, établi aux États-Unis (voir « Nos prestataires »).',
+    // Les journaux ne portent pas le contenu d’une demande ; aucun rapport d’erreurs ne part chez un service extérieur.
+    'Journaux du serveur':
+      'ils ne contiennent aucun champ du formulaire. '
+      + 'Quand un envoi échoue, le journal reçoit seulement le numéro de la demande dans la base et le type d’échec.',
     // La page : le repli par la messagerie du visiteur.
     'Si le formulaire ne répond pas':
       'la page te propose d’envoyer ta demande depuis ta propre messagerie : elle arrive alors dans notre boîte contact@baromatch.fr.',
-    // La durée, sur le serveur et dans la boîte mail.
+    // La durée, sur le serveur et dans la boîte mail : un effacement fait à la main, tant que l’effacement automatique
+    // n’est pas en route.
     'Combien de temps':
-      '12 mois à partir de ta demande, puis elle est effacée automatiquement. '
-      + 'L’effacement automatique ne touche que notre serveur : le mail qui nous prévient d’une demande, et une demande arrivée par mail, '
-      + 'sont effacés de notre boîte à part, au bout de 12 mois aussi. '
+      '12 mois à partir de ta demande. '
+      + 'Au bout de ce délai, on efface nous-mêmes ta demande de notre serveur, '
+      + 'et de notre boîte le mail qui nous a prévenus (ou ta demande, si elle est arrivée par mail). '
       + 'Resend garde ses propres journaux, selon ses propres conditions.',
     // La page : le brouillon de l’onglet (stockage de session), puis, une fois la demande partie, ce que pour-les-bars.js
     // garde de la dernière demande (baromatch-demande-bar-partie : l’adresse, le bar, l’heure ; 10 minutes).
@@ -100,7 +103,7 @@ test.describe('la page Confidentialité dit, mot pour mot, le texte attendu sur 
       + 'Passé ces 10 minutes, la page ne s’en sert plus et les efface ; au plus tard, ils disparaissent quand tu fermes l’onglet.',
     // Les droits, traités à la main ; « sous un mois » est aussi dans « Tes droits ».
     'Voir, corriger ou effacer ta demande':
-      'écris à confidentialite@baromatch.fr. C’est traité à la main, sous un mois. '
+      'écris à contact@baromatch.fr. C’est traité à la main, sous un mois. '
       + 'Une demande n’est reliée à aucun compte, et le formulaire ne vérifie aucune adresse : '
       + 'n’importe qui peut y taper celle d’un autre, ou se tromper dans la sienne. '
       + 'Aucun compte, quels que soient son rôle et son adresse, ne montre donc ni n’efface une demande tout seul : '
@@ -168,18 +171,19 @@ test.describe('la page Confidentialité dit, mot pour mot, le texte attendu sur 
     expect(brut).toContain('Ce qu’on collecte :');
   });
 
-  test('les liens : confidentialite@baromatch.fr seul pour voir ou effacer, contact@ seulement pour le repli, Qui voit quoi et Les rapports de plantage', async ({ page }) => {
+  test('les liens : contact@baromatch.fr pour voir ou effacer et pour le repli, Nos prestataires, la CNIL', async ({ page }) => {
     const { liens, texte } = await lireLesBars(page);
-    // Aucune adresse contact@ pour voir, corriger ou effacer : un seul lien mailto, et c’est confidentialite@.
+    // Une seule adresse pour les données : le lien pour voir, corriger ou effacer est contact@, et le repli la nomme aussi.
     const mails = liens.filter((href) => href.startsWith('mailto:'));
-    expect(mails).toEqual(['mailto:confidentialite@baromatch.fr']);
-    expect(texte.match(/contact@baromatch\.fr/g)).toHaveLength(1);
-    // Un renvoi à « Qui voit quoi » (Resend, et le serveur), un à « Les rapports de plantage » (Sentry), la CNIL.
-    expect(liens.filter((href) => href === '#qui-voit-quoi')).toHaveLength(1);
-    expect(liens.filter((href) => href === '#plantages')).toHaveLength(1);
+    expect(mails).toEqual(['mailto:contact@baromatch.fr']);
+    expect(texte.match(/contact@baromatch\.fr/g)).toHaveLength(2);
+    expect(texte).not.toContain('confidentialite@');
+    // Un renvoi à « Nos prestataires » (Resend), la CNIL ; plus de renvoi aux rapports d’erreurs, qui ne partent nulle part.
+    expect(liens.filter((href) => href === '#prestataires')).toHaveLength(1);
+    expect(liens.filter((href) => href === '#plantages')).toHaveLength(0);
     expect(liens.filter((href) => href.startsWith('https://'))).toEqual(['https://www.cnil.fr']);
-    await expect(page.locator('#plantages')).toHaveText('Les rapports de plantage');
-    await expect(page.locator('#qui-voit-quoi')).toHaveText('Qui voit quoi');
+    await expect(page.locator('#plantages')).toHaveText('Les rapports d’erreurs');
+    await expect(page.locator('#prestataires')).toHaveText('Nos prestataires');
     // « On te répond sous un mois » : la page s’y engage aussi dans « Tes droits ».
     await expect(page.locator('h2', { hasText: 'Tes droits' }).locator('xpath=following-sibling::p[1]')).toContainText('On te répond sous un mois.');
   });

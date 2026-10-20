@@ -15,12 +15,12 @@ import { fabriquerLesAgendas } from './agenda.mjs';
 import { badgeDuBar } from './badge.mjs';
 import { chargerLeRendu } from './images/rendu.mjs';
 import { chargerLeQr } from './qr.mjs';
-import { cheminDeLImage, lesPolices, POIDS_MAX, svgDeLaCarte } from './partage.mjs';
+import { cheminDeLImage, empreinteDuDessin, lesPolices, POIDS_MAX, svgDeLaCarte } from './partage.mjs';
 import { RACINE } from './contenu.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
 import {
-  anciensDe, effacerUnFichier, ecrireUnFichier, empreinte, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
+  anciensDe, effacerUnFichier, ecrireUnFichier, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
 } from './etat.mjs';
 import { traiterLesRefus } from './refus.mjs';
 import { construireEnMemoire } from './site.mjs';
@@ -70,7 +70,7 @@ export const construire = async ({
   const encodeur = qr !== undefined ? { qr, raison: 'l’encodeur des QR codes est écarté' } : chargerLeQr();
   if (!encodeur.qr && images === 'exiger') throw new Error(`Affiches exigées, rien n’est écrit : ${encodeur.raison}.`);
   if (!encodeur.qr) journal(`avertissement : affiches : ${encodeur.raison} ; les affiches à imprimer ne sont pas écrites.`);
-  const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent), images: Boolean(charge.rendu), qr: encodeur.qr });
+  const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent), images: charge.rendu ? { signature: charge.rendu.signature } : false, qr: encodeur.qr });
 
   // Une liste vide ou tronquée (bars, soirées, matchs) ne fait pas basculer le site : rien n’est écrit.
   const raisons = accepterLesSuppressions ? [] : verifierLesListes({ precedent, donnees: site.donnees, maintenant });
@@ -96,12 +96,14 @@ export const construire = async ({
 
   // L’image de partage de chaque page de match, de ville, de bar et de « Ce soir », à côté d’elle. Son empreinte est
   // celle de son dessin (le SVG et le rendu) : un dessin inchangé dont le fichier est là n’est ni refait ni réécrit
-  // (contenu null). Une page neutre n’en a pas (l’image générale du site) : l’image de la page refusée part avec elle.
+  // (contenu null). La tête de la page l’annonce avec sa version, le début de cette même empreinte (partage.mjs,
+  // imageDeLaCarte) : « partage.png?v=… » ne change que si l’image change. Une page neutre n’en a pas (l’image générale
+  // du site) : l’image de la page refusée part avec elle.
   if (charge.rendu) {
     for (const p of site.pages.filter((x) => x.carte)) {
       const chemin = cheminDeLImage(p.chemin);
       const svg = svgDeLaCarte(p.carte, { verre: site.cadre.verre });
-      const marque = empreinte(`${svg}\n${charge.rendu.signature}`);
+      const marque = empreinteDuDessin(svg, charge.rendu.signature);
       const deja = precedent.pages?.[chemin]?.empreinte === marque && existsSync(path.join(sortie, fichierDuChemin(chemin)));
       const png = deja ? null : charge.rendu.rendre(svg);
       if (png && png.length > POIDS_MAX) journal(`avertissement : ${chemin} pèse ${Math.round(png.length / 1024)} Ko (plus de ${POIDS_MAX / 1024} Ko)`);

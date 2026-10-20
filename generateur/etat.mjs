@@ -82,12 +82,15 @@ export const lireLEtat = (sortie) => {
   return etat;
 };
 
-// Ce que l’état garde des pages de matchs et de bars, pour les refaire quand ils ne sont plus dans les données.
+// Ce que l’état garde des pages de matchs et de bars, pour les refaire quand ils ne sont plus dans les données, et des
+// guides en anglais.
 export const anciensDe = (etat) => {
   const entrees = Object.values(etat.pages ?? {});
   return {
     matchs: entrees.filter((p) => p.type === 'match' && p.memoire).map((p) => ({ ...p.memoire, debut: Date.parse(p.memoire.debut) })),
     bars: entrees.filter((p) => p.type === 'bar' && p.memoire).map((p) => ({ ...p.memoire, slug: p.cle })),
+    // Ce que les guides en anglais gardent (anglais.mjs : le dernier match d’une compétition montré à Paris).
+    guides: Object.fromEntries(entrees.filter((p) => p.type === 'guide-en' && p.memoire).map((p) => [p.cle, p.memoire])),
     // Les adresses de page déjà données à un bar (les anciens états ne les avaient que par leurs pages).
     adresses: {
       ...Object.fromEntries(entrees.filter((p) => p.type === 'bar' && p.memoire?.id).map((p) => [p.cle, p.memoire.id])),

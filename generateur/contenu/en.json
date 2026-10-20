@@ -114,7 +114,7 @@
     "titreMatchs": "The matches, in Paris time",
     "sansMatch": "No Premier League match in Baromatch’s calendar for the next two weeks.",
     "titreBars": "Paris bars showing them",
-    "sansBar": "No Paris bar has listed a Premier League match on Baromatch yet.",
+    "sansBar": "For now, no Paris bar on Baromatch has listed an upcoming Premier League match.",
     "descriptionAvecBars": "The Premier League matches in Baromatch’s calendar and the {bars} showing them, with kick-off in Paris time, one hour ahead of the UK.",
     "descriptionSansBar": "The Premier League matches in Baromatch’s calendar for the next two weeks, with kick-off in Paris time, one hour ahead of the UK."
   },
@@ -127,7 +127,7 @@
     "sansMatch": "No Champions League match in Baromatch’s calendar for the next two weeks.",
     "titreAutres": "Also in Europe: Europa League and Conference League",
     "titreBars": "Paris bars showing them",
-    "sansBar": "No Paris bar has listed a European match on Baromatch yet.",
+    "sansBar": "For now, no Paris bar on Baromatch has listed an upcoming European match.",
     "descriptionAvecBars": "The Champions League matches in Baromatch’s calendar and the {bars} showing them, with kick-off in Paris time.",
     "descriptionSansBar": "The Champions League matches in Baromatch’s calendar for the next two weeks, with kick-off in Paris time. No Paris bar is listed for them yet."
   },

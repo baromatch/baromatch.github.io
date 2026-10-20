@@ -3,7 +3,8 @@
 // L’image est d’abord un SVG, fait ici sans rien installer : la nuit #0A0B10, la lumière ambre du bar derrière une carte
 // de verre, le verre de la marque, et le texte en Bricolage Grotesque (deux réglages fixes de la police du site, dans
 // generateur/images/polices, sous licence OFL comme elle). Chaque ligne est mesurée sur la police elle-même pour tenir
-// dans la carte : plus petite, puis sur deux lignes (le titre), puis coupée à la fin d’un mot (« … »). Le PNG est rendu
+// dans la carte : plus petite, puis sur deux lignes (le titre), puis coupée à la fin d’un mot (« … ») ; un texte qu’elle ne
+// sait pas dessiner (un nom en grec ou en cyrillique) ne fait pas d’image, la page garde l’image générale. Le PNG est rendu
 // ensuite par generateur/images/rendu.mjs, que seule l’Action installe : sans lui, la page garde l’image générale.
 // Les chiffres sont les vrais : le nombre de vrais bars publiés qui diffusent le match, jamais « 0 bar ». Sans vrai bar,
 // la carte ne promet rien : le match, son jour et son heure ; la ville, sans « Où regarder le match ». Ni écusson, ni
@@ -11,6 +12,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
+import { empreinte } from './etat.mjs';
 import { heureDeParis, jourEnLettres, quandEnLettres } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
 import { accorder, capitale, echapper as e, enumerer, sansAccents } from './texte.mjs';
@@ -83,7 +85,19 @@ const lirePolice = (fichier, famille) => {
       const simple = sansAccents(lettre);
       return [...simple].every((l) => glyphes.has(l.codePointAt(0))) ? simple : '';
     }).join('').replace(/ {2,}/g, ' ').trim(),
+    // Chaque caractère du texte se dessine : la police l’a, ou elle a sa lettre sans accent (les blancs ne comptent pas).
+    // Une écriture qu’elle n’a pas (grec, cyrillique, arabe…) : non.
+    dessine: (texte) => [...texte].every((lettre) => /\s/u.test(lettre) || glyphes.has(lettre.codePointAt(0))
+      || (sansAccents(lettre) !== '' && [...sansAccents(lettre)].every((l) => glyphes.has(l.codePointAt(0))))),
   };
+};
+
+// Une carte que les polices de l’image dessinent en entier, chaque ligne avec la sienne. Un nom de club ou de bar écrit
+// dans une écriture qu’elles n’ont pas disparaîtrait de l’image (« – » à la place du match) : la page prend alors
+// l’image générale du site (pages.mjs, ce-soir.mjs).
+export const carteDessinable = (lignes) => {
+  const { titre, texte } = lesPolices();
+  return titre.dessine(String(lignes.titre ?? '')) && ['surtitre', 'ligne', 'ambre'].every((cle) => texte.dessine(String(lignes[cle] ?? '')));
 };
 
 let polices = null;
@@ -300,6 +314,17 @@ export const cheminDeLImage = (cheminDeLaPage) => `${cheminDeLaPage}${NOM_DU_FIC
 // Le seul script d’une page générée (hors données structurées) : un fichier du site, permis par sa politique de sécurité.
 export const SCRIPT_DU_PARTAGE = '<script src="/partage.js" defer></script>';
 export const adresseDeLImage = (cheminDeLaPage) => `${adresseDe(cheminDeLaPage)}${NOM_DU_FICHIER}`;
+// L’empreinte d’une image : celle de son dessin (le SVG) et du rendu (sa signature), que l’état garde (construire.mjs).
+export const empreinteDuDessin = (svg, signature = '') => empreinte(`${svg}\n${signature}`);
+// La longueur de la version dans l’adresse de l’image (« partage.png?v=… »).
+export const LONGUEUR_DE_LA_VERSION = 10;
+// L’image de partage d’une page, telle que sa tête l’annonce (og:image, twitter:image) : son adresse avec sa version, le
+// début de son empreinte. WhatsApp ou Facebook gardent l’aperçu d’une adresse : une image qui change change d’adresse,
+// et l’aperçu se refait ; une image inchangée garde la sienne. signature : celle du rendu des images.
+export const imageDeLaCarte = (cheminDeLaPage, carte, { verre, signature = '' }) => {
+  const marque = empreinteDuDessin(svgDeLaCarte(carte, { verre }), signature);
+  return { adresse: `${adresseDeLImage(cheminDeLaPage)}?v=${marque.slice(0, LONGUEUR_DE_LA_VERSION)}`, alt: carte.alt, empreinte: marque };
+};
 
 // Le bloc « Partager », sous la tête de la page. Sans JavaScript : « Envoyer sur WhatsApp » (le titre et l’adresse de la
 // page, rien d’autre) et l’adresse elle-même, en lien. Avec (partage.js) : le bouton « Partager » du téléphone quand il

@@ -26,6 +26,7 @@ import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
 import { anonymiser, reduire } from '../generateur/outils/reduire-capture.mjs';
 import { adressesCitees, raisonDeNePasGarder } from '../generateur/refus.mjs';
 import { prevenirIndexNow, publierLesPages, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
+import { TEXTES_EN } from '../generateur/anglais.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
 const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
@@ -467,6 +468,28 @@ test.describe('les pages', () => {
     expect(nomsDe('/regarder-le-match/paris/')).toEqual(['Le Comptoir du Canal', 'Le Zinc des Amis']);
   });
 
+  test('l’ordre annoncé, aussi dans « Les prochaines soirées » d’une ville : l’heure, puis la ville, l’arrondissement et le nom', async () => {
+    // À la Lucarne (Paris 11e) diffuse PSG – Barça, comme le Comptoir (10e) et le Zinc (11e) : son nom passe devant le
+    // leur dans l’alphabet, son arrondissement après le 10e.
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    brut.bars.push({ id: 'b-lucarne', name: 'À la Lucarne', address: '3 Rue de Lappe, 75011 Paris', isActive: true });
+    brut.matchNights.push({ id: 'n-lucarne-barca', status: 'OPEN', bar: { id: 'b-lucarne' }, match: { id: 'm-psg-barca-fr' }, offer: null });
+    const donnees = preparer(brut, { maintenant: VENDREDI, ...contenu, publies: [...PUBLIES_DU_SCENARIO, 'b-lucarne'] });
+    for (const b of donnees.bars) b.soirees.reverse();
+    donnees.bars.reverse();
+    const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre(racine) });
+    const paris = pages.find((p) => p.chemin === '/regarder-le-match/paris/').contenu;
+    const soirees = paris.split('id="titre-soirees"')[1].split('</section>')[0];
+    const lignes = [...soirees.matchAll(/<li>(?:<a href="[^"]+">)?([^<]+)(?:<\/a>)? · <time[^>]*>[^<]*<\/time> · <a href="\/bar\/[^"]+">([^<]+)<\/a>, ([^<]+)<\/li>/g)].map((m) => `${m[1]} · ${m[2]}, ${m[3]}`);
+    expect(lignes).toEqual([
+      'PSG – Barça · Le Comptoir du Canal, Paris 10e',
+      'PSG – Barça · À la Lucarne, Paris 11e',
+      'PSG – Barça · Le Zinc des Amis, Paris 11e',
+      'PSG – OL · Le Zinc des Amis, Paris 11e',
+      'Le Havre – PSG · Le Comptoir du Canal, Paris 10e',
+    ]);
+  });
+
   test('une ville avec des bars : indexable, ses bars par arrondissement, ses soirées, sa FAQ balisée', () => {
     const paris = pageDe('/regarder-le-match/paris/');
     expect(paris.indexable).toBe(true);
@@ -535,6 +558,8 @@ test.describe('les pages', () => {
     for (const chemin of ['/regarder-le-match/marseille/', '/regarder-le-match/lille/']) {
       const p = pageDe(chemin);
       expect(p.indexable).toBe(false);
+      // Son titre ne promet pas de bars : la question de la page, son h1.
+      expect(p.titre).toMatch(/^Où regarder le match à (Marseille|Lille) — Baromatch$/);
       expect(robotsDe(p)).toBe('noindex');
       expect(p.contenu).toMatch(/Aucun bar de (Marseille|Lille) n’est encore sur Baromatch\./);
       expect(deType(p, 'FAQPage')[0].mainEntity[0].acceptedAnswer.text).toMatch(/^Pas encore de bar à (Marseille|Lille) sur Baromatch\. L’appli, elle, est en test/);
@@ -545,6 +570,12 @@ test.describe('les pages', () => {
   test('un match sans vrai bar : noindex, et le lien « Tu tiens un bar ? » vers Pour les bars', () => {
     const p = pageDe('/matchs/lille-lens-2026-10-26/');
     expect(p.indexable).toBe(false);
+    // Son titre, son h1, son aperçu et le texte envoyé sur WhatsApp ne promettent aucun bar : « où le regarder ».
+    expect(p.titre).toBe('Lille – Lens, lundi 26 octobre : où le regarder — Baromatch');
+    expect(p.contenu).toContain(insecables('<h1 class="regarder-titre">Lille – Lens : où le regarder</h1>'));
+    expect(p.contenu).toContain(`<meta property="og:title" content="${insecables(p.titre)}">`);
+    expect(p.contenu).toContain(`https://wa.me/?text=${encodeURIComponent(`${p.titre} https://baromatch.fr${p.chemin}`)}`);
+    expect(`${p.titre} ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`).not.toMatch(/bars? qui|diffus/);
     expect(robotsDe(p)).toBe('noindex');
     expect(p.contenu).toContain('Pas encore de bar pour ce match sur Baromatch.');
     expect(p.contenu).toContain(insecables('<a href="/pour-les-bars.html">Tu tiens un bar ?</a>'));
@@ -557,6 +588,7 @@ test.describe('les pages', () => {
     expect(match.indexable).toBe(true);
     expect(match.contenu).toContain(insecables('<h1 class="regarder-titre">PSG – OL : les bars qui diffusent le match</h1>'));
     expect(match.titre).toBe('PSG – OL, 25 octobre : les bars qui diffusent le match');
+    expect(match.contenu).toContain(`https://wa.me/?text=${encodeURIComponent(`${match.titre} https://baromatch.fr${match.chemin}`)}`);
     expect(pageDe('/matchs/brest-nice-2026-10-23/').indexable).toBe(false);
     // Le maillage : les villes et les décomptes mènent à la page de la ville.
     expect(match.contenu).toContain('<h3 class="regarder-ville"><a href="/regarder-le-match/lyon/">Lyon</a></h3>');
@@ -652,7 +684,12 @@ test.describe('les pages', () => {
     expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
     // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
     expect(p.contenu).not.toContain('jour-2026-10-30');
-    expect(p.titre).toBe('Où regarder le match ce soir et cette semaine — Baromatch');
+    // Le titre de la page dit ce que dit son h1 (la semaine, pas « ce soir », qui a sa page), entre 15 et 60 caractères.
+    expect(p.titre).toBe('Les matchs de la semaine et où les voir — Baromatch');
+    expect(p.titre).toBe(`${contenu.textes.semaine.titre} — Baromatch`);
+    expect(p.contenu).toContain(`<h1 class="regarder-titre">${contenu.textes.semaine.titre}</h1>`);
+    expect(p.titre.length).toBeGreaterThanOrEqual(15);
+    expect(p.titre.length).toBeLessThanOrEqual(60);
     expect(p.contenu).toContain('<p class="regarder-retour"><a href="/regarder-le-match/">Toutes les villes</a></p>');
   });
 
@@ -667,6 +704,47 @@ test.describe('les pages', () => {
     const fini = await blocA('2026-10-23T21:46:00Z');
     expect(fini).toMatch(/^Fini pour ce soir<\/h2>/);
     expect(fini).not.toContain('Brest');
+  });
+
+  test('un match reporté ou annulé le dit partout où il est listé : la semaine, la ville, le bar, les prochains matchs, en anglais aussi', async () => {
+    // PSG – OL (dimanche 25, le Zinc) reporté ; Le Havre – PSG (vendredi 30, le Comptoir) annulé.
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    brut.matches = brut.matches.map((m) => (m.id === 'm-psg-ol' ? { ...m, status: 'POSTPONED' } : m.id === 'm-lehavre-psg' ? { ...m, status: 'CANCELLED' } : m));
+    const enMemoire = (instant, anciens) => construireEnMemoire({ brut: structuredClone(brut), maintenant: Date.parse(instant), racine, contenu, anciens });
+    const autre = await enMemoire('2026-10-23T08:00:00Z');
+    const page = (chemin) => autre.pages.find((p) => p.chemin === chemin).contenu;
+    const ligneDe = (html, debut) => html.split('\n').find((l) => l.includes(debut));
+    const reporte = '<strong>Match reporté</strong>';
+    const annule = '<strong>Match annulé</strong>';
+    // La semaine : le statut à la place des bars, ce jour-là comme la semaine d’après.
+    expect(ligneDe(page('/matchs/'), '>PSG – OL</a>')).toContain(` · ${reporte}</li>`);
+    expect(ligneDe(page('/matchs/'), '>PSG – OL</a>')).not.toContain('regarder-compte');
+    expect(ligneDe(page('/matchs/'), '>Le Havre – PSG</a>')).toContain(` · ${annule}</li>`);
+    expect(ligneDe(page('/matchs/'), '>PSG – Barça</a>')).not.toMatch(/Match reporté|Match annulé/);
+    // « Les prochaines soirées à Paris » : chaque soirée du match.
+    const soirees = page('/regarder-le-match/paris/').split('id="titre-soirees"')[1].split('</section>')[0];
+    expect(ligneDe(soirees, '>PSG – OL</a>')).toMatch(new RegExp(`</time> · ${reporte} · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25">`));
+    expect(ligneDe(soirees, '>Le Havre – PSG</a>')).toContain(`</time> · ${annule} · <a href="/bar/le-comptoir-du-canal-paris-10/`);
+    // La page du bar : la soirée, sous son jour et sa compétition.
+    expect(page('/bar/le-zinc-des-amis-paris-11/')).toContain(`<p class="regarder-carte__lieu"><time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time> · Ligue 1 · ${reporte}</p>`);
+    expect(page('/bar/le-comptoir-du-canal-paris-10/')).toContain(`· Ligue 1 · ${annule}</p>`);
+    // « PSG et Barça : leurs prochains matchs », et en anglais « What’s next ».
+    const prochains = page('/matchs/psg-barca-2026-10-24/').split('id="titre-prochains"')[1].split('</section>')[0];
+    expect(ligneDe(prochains, '>PSG – OL</a>')).toContain(` · Ligue 1 · ${reporte}</li>`);
+    expect(ligneDe(prochains, '>Le Havre – PSG</a>')).toContain(` · Ligue 1 · ${annule}</li>`);
+    const enAnglais = page('/en/matches/psg-barca-2026-10-24/').split('id="titre-prochains"')[1].split('</section>')[0];
+    expect(ligneDe(enAnglais, 'Paris Saint-Germain v Olympique Lyonnais')).toContain(' · Ligue 1 · <strong>Match postponed</strong></li>');
+    expect(ligneDe(enAnglais, 'Le Havre AC v Paris Saint-Germain')).toContain(' · Ligue 1 · <strong>Match cancelled</strong></li>');
+    // Le lundi, PSG – Barça est passé : « le prochain match » de sa page le dit aussi, en français et en anglais.
+    const lundi = await enMemoire('2026-10-26T08:00:00Z', {
+      matchs: autre.pages.filter((p) => p.type === 'match').map((p) => ({ ...p.memoire, debut: Date.parse(p.memoire.debut) })), bars: [], adresses: {},
+    });
+    const passe = lundi.pages.find((p) => p.chemin === '/matchs/psg-barca-2026-10-24/').contenu;
+    expect(passe).toContain(`<a href="/matchs/le-havre-psg-2026-10-30/">Le Havre – PSG</a>, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre · 19:00</time> · ${annule}.</p>`);
+    const passeEnAnglais = lundi.pages.find((p) => p.chemin === '/en/matches/psg-barca-2026-10-24/').contenu;
+    expect(passeEnAnglais).toContain('Le Havre AC v Paris Saint-Germain</a>, <time datetime="2026-10-30T19:00:00+01:00">Fri 30 Oct, 7:00 pm (Paris time)</time> · <strong>Match cancelled</strong>.</p>');
+    // Chaque page passe toujours le contrôle.
+    expect([...autre.refusees, ...lundi.refusees]).toEqual([]);
   });
 
   test('un bar sans soirée annoncée reste indexable et le dit', () => {
@@ -693,6 +771,13 @@ test.describe('les pages', () => {
   test('la copie enregistrée de ce soir : zéro vrai bar, donc chaque page en noindex', async () => {
     const capture = await construireEnMemoire({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT, racine, contenu });
     expect(capture.pages.filter((p) => p.indexable).map((p) => p.chemin)).toEqual([]);
+    // Aucun titre de match ni de ville ne promet de bars, en français comme en anglais, même coupé (des noms longs).
+    const sansBar = capture.pages.filter((p) => ['match', 'match-en', 'ville'].includes(p.type));
+    expect(sansBar.length).toBeGreaterThan(40);
+    for (const p of sansBar) {
+      expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, p.chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus/iu);
+      expect(p.titre.length, p.chemin).toBeLessThanOrEqual(60);
+    }
     expect(capture.pages.filter((p) => p.type === 'bar')).toEqual([]);
     expect(capture.pages.every((p) => robotsDe(p) === 'noindex')).toBe(true);
     for (const p of capture.pages) expect(p.contenu, p.chemin).not.toMatch(/démo|Rivoli/i);
@@ -775,15 +860,16 @@ test.describe('d’un passage à l’autre', () => {
     writeFileSync(fichier, JSON.stringify(retirer(brut)));
     return `scenario:${fichier}`;
   };
-  // Les fichiers écrits par le générateur (matchs/, regarder-le-match/, bar/), relatifs au dossier.
-  const fichiersGeneres = (sortie, dossier = '') => (dossier ? readdirSync(path.join(sortie, dossier)) : ['matchs', 'regarder-le-match', 'bar'].filter((d) => existsSync(path.join(sortie, d))))
+  // Les fichiers écrits par le générateur (matchs/ et l’affiche de la semaine, regarder-le-match/, bar/ et les affiches des
+  // bars, ce-soir/, en/, agenda/), relatifs au dossier.
+  const fichiersGeneres = (sortie, dossier = '') => (dossier ? readdirSync(path.join(sortie, dossier)) : ['matchs', 'regarder-le-match', 'bar', 'ce-soir', 'en', 'agenda'].filter((d) => existsSync(path.join(sortie, d))))
     .flatMap((nom) => {
       const relatif = dossier ? path.posix.join(dossier, nom) : nom;
       return statSync(path.join(sortie, relatif)).isDirectory() ? fichiersGeneres(sortie, relatif) : [relatif];
     });
   // Chaque lien (et chaque adresse des données structurées) d’une page écrite vers une page générée qui n’existe pas.
   const liensVersDesPagesAbsentes = (sortie) => fichiersGeneres(sortie).filter((f) => f.endsWith('.html'))
-    .flatMap((f) => [...lire(sortie, f).matchAll(/(?:href="|"https:\/\/baromatch\.fr)(\/(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*)/g)]
+    .flatMap((f) => [...lire(sortie, f).matchAll(/(?:href="|"https:\/\/baromatch\.fr)(\/(?:matchs|regarder-le-match|bar|ce-soir|en|agenda)\/(?:[a-z0-9-]+\/)*)/g)]
       .map((m) => m[1]).filter((chemin) => !existsSync(path.join(sortie, chemin, 'index.html'))).map((chemin) => `${f} → ${chemin}`));
 
   test('l’adresse de page d’un bar est stable : gardée s’il change de nom, jamais redonnée, « -2 » exclu', async () => {
@@ -996,6 +1082,37 @@ test.describe('d’un passage à l’autre', () => {
     expect(revenue).not.toContain('Zinc');
   });
 
+  test('« Ce soir », une page en anglais, refusées au passage où un bar qu’elles nomment est retiré : leur version précédente ne reste pas', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    // « Ce soir » nomme La Cave des Gones (Brest – Nice), /en/ le Zinc et le Comptoir ; l’état le dit.
+    expect(lire(sortie, 'ce-soir/index.html')).toContain('La Cave des Gones');
+    expect(etatDe(sortie).pages['/ce-soir/'].bars).toEqual(['b-gones']);
+    expect(lire(sortie, 'en/index.html')).toContain('Le Zinc des Amis');
+    expect(etatDe(sortie).pages['/en/'].bars.sort()).toEqual(['b-comptoir', 'b-zinc']);
+    // Les autres pages qui ne nomment aucun bar le disent aussi : la semaine, l’agenda, l’affiche de la semaine.
+    for (const chemin of ['/matchs/', '/agenda/', '/matchs/affiche/']) expect(etatDe(sortie).pages[chemin].bars, chemin).toEqual([]);
+    expect(etatDe(sortie).pages['/bar/la-cave-des-gones-lyon-2/affiche/'].bars).toEqual(['b-gones']);
+    // La Cave des Gones et le Zinc retirent leur accord, au passage même où un texte faux fait refuser « Ce soir » et le
+    // guide de Paris en anglais.
+    const faux = structuredClone(contenu);
+    faux.publies = PUBLIES_DU_SCENARIO.filter((id) => id !== 'b-gones' && id !== 'b-zinc');
+    faux.textes.ceSoir.fil = 'Ce soir !';
+    faux.anglais = { ...structuredClone(TEXTES_EN), paris: { ...TEXTES_EN.paris, chapeau: `${TEXTES_EN.paris.chapeau} !` } };
+    const resultat = await passer(sortie, '2026-10-23T09:00:00Z', { contenu: faux });
+    for (const [chemin, bar] of [['/ce-soir/', 'b-gones'], ['/en/', 'b-zinc']]) {
+      expect(resultat.avertissements, chemin).toContainEqual(expect.stringMatching(new RegExp(`^Page refusée, remplacée par une page neutre : ${chemin} .* elle nomme un bar qui n’est plus publié \\([^)]*${bar}[^)]*\\)$`)));
+    }
+    for (const fichier of ['ce-soir/index.html', 'en/index.html']) {
+      expect(lire(sortie, fichier), fichier).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
+      expect(lire(sortie, fichier), fichier).toContain('<meta name="robots" content="noindex">');
+    }
+    // Leurs noms ne sont plus nulle part (pages, affiches, agendas, en anglais) ; chaque lien mène à une page qui existe.
+    expect(fichiersGeneres(sortie).filter((f) => /La Cave des Gones|Le Zinc des Amis/.test(lire(sortie, f)))).toEqual([]);
+    expect(fichiersGeneres(sortie)).toEqual(expect.arrayContaining(['ce-soir/index.html', 'en/index.html', 'agenda/index.html', 'matchs/affiche/index.html']));
+    expect(liensVersDesPagesAbsentes(sortie)).toEqual([]);
+  });
+
   test('une page nouvelle refusée : une page neutre à son adresse, jamais un lien vers une page absente', async () => {
     const sortie = dossierVide();
     const faux = structuredClone(contenu);
@@ -1080,6 +1197,54 @@ test.describe('d’un passage à l’autre', () => {
     expect(existsSync(path.join(sortie, 'matchs/om-lens-2026-10-22'))).toBe(false);
     expect(etatDe(sortie).pages['/matchs/om-lens-2026-10-22/']).toBeUndefined();
     expect(existsSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/index.html'))).toBe(true);
+  });
+
+  test('un seul vrai bar publié, une semaine de passages : « Ce soir », agenda/ et les guides en anglais n’entrent ni ne sortent de l’index', async () => {
+    // Le Zinc des Amis (Paris 11e), seul publié : il montre PSG – Barça (Ligue des champions, samedi 24) et PSG – OL
+    // (dimanche 25), rien d’autre. Aucun match de Premier League dans le scénario.
+    const sortie = dossierVide();
+    const unBar = { ...contenu, publies: ['b-zinc'] };
+    const guides = ['/ce-soir/', '/agenda/', '/en/', '/en/champions-league/', '/en/premier-league/'];
+    const attendu = { '/ce-soir/': true, '/agenda/': true, '/en/': true, '/en/champions-league/': true, '/en/premier-league/': false };
+    const drapeaux = () => Object.fromEntries(guides.map((chemin) => [chemin, etatDe(sortie).pages[chemin].indexable]));
+    const ceSoir = () => lire(sortie, 'ce-soir/index.html');
+    const passages = [
+      // Vendredi 23, 10 h : ce soir, Brest – Nice, sans bar ; samedi et dimanche, le Zinc.
+      ['2026-10-23T08:00:00Z', () => {
+        expect(ceSoir()).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
+        expect(ceSoir()).toContain('<h2 id="titre-soirs">Les prochains soirs au bar</h2>\n  <h3 class="regarder-jour">Samedi 24 octobre</h3>');
+        expect(ceSoir()).toContain('Ligue des champions · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-barca-2026-10-24">Le Zinc des Amis</a> (Paris 11e)</li>');
+        expect(ceSoir()).toContain('<h3 class="regarder-jour">Dimanche 25 octobre</h3>');
+      }],
+      // Samedi 24, 20 h : ce soir, le Zinc montre PSG – Barça.
+      ['2026-10-24T18:00:00Z', () => {
+        expect(ceSoir()).toContain('<h2 id="titre-bars">Ce soir, dans un bar</h2>');
+        expect(ceSoir()).not.toContain('id="titre-soirs"');
+      }],
+      // Lundi 26, mercredi 28, vendredi 30 : plus aucune soirée annoncée. Rien n’est promis.
+      ['2026-10-26T08:00:00Z'], ['2026-10-28T19:00:00Z'], ['2026-10-30T08:00:00Z', () => {
+        expect(ceSoir()).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
+        expect(ceSoir()).not.toMatch(/Zinc|regarder-carte__nom|id="titre-soirs"/);
+        expect(lire(sortie, 'en/champions-league/index.html')).toContain('For now, no Paris bar on Baromatch has listed an upcoming European match.');
+        expect(lire(sortie, 'en/champions-league/index.html')).not.toContain('<meta name="robots" content="noindex">');
+      }],
+    ];
+    for (const [quand, verifier] of passages) {
+      await passer(sortie, quand, { contenu: unBar, rendu: null });
+      expect(drapeaux(), quand).toEqual(attendu);
+      for (const chemin of guides) expect(plan(sortie).includes(`<loc>https://baromatch.fr${chemin}</loc>`), `${chemin} ${quand}`).toBe(attendu[chemin]);
+      verifier?.();
+    }
+    // Le guide de la Ligue des champions garde le coup d’envoi du dernier match qu’un bar de Paris a montré : 30 jours
+    // après, il sort de l’index ; /en/, « Ce soir » et agenda/ restent (le Zinc est toujours publié).
+    expect(etatDe(sortie).pages['/en/champions-league/'].memoire).toEqual({ derniereSoiree: '2026-10-24T19:00:00.000Z' });
+    await passer(sortie, '2026-11-23T18:00:00Z', { contenu: unBar, rendu: null });
+    expect(drapeaux()).toEqual(attendu);
+    await passer(sortie, '2026-11-23T20:00:00Z', { contenu: unBar, rendu: null });
+    expect(drapeaux()).toEqual({ ...attendu, '/en/champions-league/': false });
+    // Sans aucun vrai bar publié : tout en noindex.
+    await passer(sortie, '2026-11-24T08:00:00Z', { contenu: { ...contenu, publies: [] }, rendu: null, accepterLesSuppressions: true });
+    expect(drapeaux()).toEqual(Object.fromEntries(guides.map((chemin) => [chemin, false])));
   });
 
   test('un bar qui sort (disparu des données, retiré de la liste des bars publiés, exclu) : sans son nom, en noindex, vers sa ville, puis disparaît', async () => {

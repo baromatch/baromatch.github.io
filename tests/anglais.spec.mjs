@@ -140,8 +140,9 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
     // Le fil passe par le guide de sa compétition.
     expect(graphe(en).find((n) => n['@type'] === 'BreadcrumbList').itemListElement.map((i) => i.name)).toEqual(['Baromatch', 'Football in Paris', 'Champions League', 'Paris Saint-Germain v FC Barcelona']);
     // L’image de partage de sa jumelle, décrite en anglais.
-    expect(meta(en.contenu, 'og:image')).toEqual([`${ORIGINE}/matchs/psg-barca-2026-10-24/partage.png`]);
-    expect(meta(en.contenu, 'twitter:image')).toEqual([`${ORIGINE}/matchs/psg-barca-2026-10-24/partage.png`]);
+    expect(meta(en.contenu, 'og:image')[0]).toMatch(/^https:\/\/baromatch\.fr\/matchs\/psg-barca-2026-10-24\/partage\.png\?v=[\w-]{10}$/);
+    expect(meta(en.contenu, 'og:image')).toEqual(meta(fr.contenu, 'og:image'));
+    expect(meta(en.contenu, 'twitter:image')).toEqual(meta(fr.contenu, 'og:image'));
     expect(meta(en.contenu, 'og:image:alt')).toEqual(['The match card: Paris Saint-Germain v FC Barcelona, Sat 24 Oct, 9:00 pm (Paris time).']);
   });
 
@@ -193,7 +194,8 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
     expect(pl.indexable).toBe(false);
     expect(robotsDe(pl)).toBe('noindex');
     expect(pl.contenu).toContain('No Premier League match in Baromatch’s calendar for the next two weeks.');
-    expect(pl.contenu).toContain('No Paris bar has listed a Premier League match on Baromatch yet.');
+    // « For now », pas « yet » : vrai aussi quand un bar en a montré un, passé depuis (le guide reste alors 30 jours indexable).
+    expect(pl.contenu).toContain('For now, no Paris bar on Baromatch has listed an upcoming Premier League match.');
     expect(pl.description).toBe('The Premier League matches in Baromatch’s calendar for the next two weeks, with kick-off in Paris time, one hour ahead of the UK.');
     // Les guides prennent l’image générale du site, décrite en anglais.
     for (const guide of [ldc, pl, pageDe(site, '/en/')]) {
@@ -399,6 +401,28 @@ test.describe('le contrôle et l’écriture', () => {
     expect(Object.keys(etat().pages).filter((c) => c.includes('psg-barca'))).toEqual([]);
     // Les guides restent.
     expect(existsSync(path.join(sortie, 'en', 'premier-league', 'index.html'))).toBe(true);
+  });
+
+  test('le guide de la Premier League : indexable tant qu’un bar de Paris montre un de ses matchs, puis 30 jours encore', async () => {
+    const sortie = dossierVide();
+    const source = avecUnMatchDePremierLeague(['b-zinc']);
+    const passer = (maintenant) => construire({ source, sortie, maintenant: Date.parse(maintenant), racine, contenu, rendu: null });
+    const guide = () => JSON.parse(readFileSync(path.join(sortie, 'regarder-le-match', 'etat.json'), 'utf8')).pages['/en/premier-league/'];
+    await passer('2026-10-23T08:00:00Z');
+    expect(guide()).toMatchObject({ type: 'guide-en', indexable: true, memoire: { derniereSoiree: '2026-10-24T14:00:00.000Z' } });
+    // Le lundi 26 : Arsenal – Chelsea est passé, aucun bar de Paris ne montre de match de Premier League. Le guide le dit,
+    // et reste indexable : il ne sort pas de l’index d’un week-end à l’autre.
+    await passer('2026-10-26T08:00:00Z');
+    expect(guide()).toMatchObject({ indexable: true, memoire: { derniereSoiree: '2026-10-24T14:00:00.000Z' } });
+    expect(readFileSync(path.join(sortie, 'sitemap.xml'), 'utf8')).toContain('<loc>https://baromatch.fr/en/premier-league/</loc>');
+    const page = readFileSync(path.join(sortie, 'en', 'premier-league', 'index.html'), 'utf8');
+    expect(page).toContain('For now, no Paris bar on Baromatch has listed an upcoming Premier League match.');
+    expect(page).not.toContain('Le Zinc des Amis');
+    // 30 jours après le coup d’envoi : noindex, hors du plan du site, et IndexNow le sait.
+    const apres = await passer('2026-11-23T15:00:00Z');
+    expect(guide().indexable).toBe(false);
+    expect(apres.changees).toContain(`${ORIGINE}/en/premier-league/`);
+    expect(readFileSync(path.join(sortie, 'sitemap.xml'), 'utf8')).not.toContain('/en/premier-league/');
   });
 
   test('un match retiré du programme : « no longer in the calendar », en noindex, comme sa jumelle', async () => {

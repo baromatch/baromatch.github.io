@@ -41,7 +41,7 @@ export const construireEnMemoire = async ({
   // Les affiches à imprimer (affiche.mjs), seulement avec l’encodeur des QR codes (qr.mjs) : sinon, aucune.
   pages.push(...fabriquerLesAffiches({ donnees, contenu, cadre, avecPresse, qr }));
   // Les pages en anglais (/en/) : des mêmes données, et des pages de matchs ci-dessus (anglais.mjs).
-  pages.push(...fabriquerLesPagesAnglaises({ donnees, contenu, cadre, avecPresse, pages, images }));
+  pages.push(...fabriquerLesPagesAnglaises({ donnees, contenu, cadre, avecPresse, pages, images, anciens }));
 
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);

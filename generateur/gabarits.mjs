@@ -216,6 +216,10 @@ export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = ''
 
 // Une ligne de match : son nom court (vers sa page s’il en a une), le jour et l’heure (ou l’heure seule, sous un
 // titre qui donne déjà le jour), la compétition.
+// Un match reporté ou annulé le dit partout où il est listé : « · Match reporté » après son jour et son heure (rien pour
+// un match qui se joue comme prévu).
+export const statutDuMatch = (match, textes) => (match.statut ? ` · <strong>${e(textes.match[match.statut])}</strong>` : '');
+
 export const ligneDeMatch = (match, { avecPage, suite = '', heureSeule = false }) => {
   const nom = `${e(match.domicile.court)} – ${e(match.exterieur.court)}`;
   return `<li>${avecPage ? `<a href="${cheminDuMatch(match)}">${nom}</a>` : nom} · ${quand(match, { heureSeule })} · ${e(match.competition)}${suite}</li>`;

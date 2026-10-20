@@ -2,7 +2,7 @@
 // - L’affiche de la semaine (/matchs/affiche/), pour tous les bars : les matchs des sept jours de /matchs/, sans les
 //   reportés ni les annulés ; on coche, on imprime ; aucun formulaire, aucun champ de texte, rien ne part ailleurs que
 //   sur le site. Indexable même sans aucun vrai bar publié : c’est un outil, pas une liste de bars (l’exception validée
-//   par le lead, vérifiée ici).
+//   par le lead, vérifiée ici) ; mais en noindex avec moins de 3 matchs à montrer.
 // - L’affiche d’un bar publié (/bar/<bar>/affiche/) : sa prochaine soirée, ses autres soirées de la semaine, un QR code
 //   vers sa page ; noindex ; jamais pour un bar qui n’est pas publié, et effacée quand il ne l’est plus.
 // À l’impression : seulement la feuille, seulement les lignes cochées (toutes si rien n’est coché), une seule page en A4
@@ -200,6 +200,32 @@ test('l’affiche de la semaine : indexable même sans vrai bar publié, contrô
   expect(resultat.plan).toContain('<loc>https://baromatch.fr/matchs/affiche/</loc>');
   expect(resultat.changees).toContain('https://baromatch.fr/matchs/affiche/');
   expect(resultat.etat.pages[OUVERTE]).toMatchObject({ type: 'affiche', cle: 'affiche', indexable: true, bars: [] });
+});
+
+test('moins de 3 matchs à montrer : l’affiche de la semaine reste lisible, mais en noindex et hors du plan du site', async () => {
+  // Le scénario réduit à quelques matchs : deux dans la semaine du vendredi 23 (Brest – Nice, PSG – OL), un reporté qui
+  // ne compte pas, puis un troisième (Lille – Lens).
+  const avecLesMatchs = (ids, reporte = null) => {
+    const brut = JSON.parse(readFileSync(SCENARIO, 'utf8'));
+    return ecrireLeScenario({ ...brut, matches: brut.matches.filter((m) => ids.includes(m.id)).map((m) => (m.id === reporte ? { ...m, status: 'POSTPONED' } : m)) });
+  };
+  const deux = avecLesMatchs(['m-ce-soir', 'm-psg-ol', 'm-lille-lens'], 'm-lille-lens');
+  const p = pageDe(await enMemoire({ source: deux, avec: sansBarPublie }), OUVERTE);
+  expect(lignesDe(p.contenu)).toHaveLength(2);
+  expect(p.indexable).toBe(false);
+  expect(robotsDe(p)).toBe('noindex');
+  expect(controlerLaPage(p)).toEqual([]);
+  const sortie = await siteAvecLeDepot();
+  const resultat = await construire({ source: deux, sortie, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: sansBarPublie, rendu: null, qr });
+  expect(resultat.plan).not.toContain('/matchs/affiche/');
+  expect(resultat.etat.pages[OUVERTE]).toMatchObject({ type: 'affiche', indexable: false });
+  // Trois matchs à montrer : indexable, et au plan du site.
+  const trois = avecLesMatchs(['m-ce-soir', 'm-psg-ol', 'm-lille-lens']);
+  const q = pageDe(await enMemoire({ source: trois, avec: sansBarPublie }), OUVERTE);
+  expect(lignesDe(q.contenu)).toHaveLength(3);
+  expect(q.indexable).toBe(true);
+  const ensuite = await construire({ source: trois, sortie, maintenant: MAINTENANT_DU_SCENARIO + 3_600_000, racine, contenu: sansBarPublie, rendu: null, qr });
+  expect(ensuite.plan).toContain('<loc>https://baromatch.fr/matchs/affiche/</loc>');
 });
 
 // Un dossier de sortie qui a ce qu’il faut au générateur (l’accueil et le plan du site du dépôt).

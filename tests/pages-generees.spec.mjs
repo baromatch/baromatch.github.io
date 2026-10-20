@@ -58,8 +58,8 @@ test.beforeAll(async () => {
   writeFileSync(path.join(dossier, 'matchs', 'page-neutre', 'index.html'), neutre.contenu);
   serveur = await demarrerServeur(await portLibre(), -1, { dossier });
 });
-test.afterAll(() => {
-  serveur?.arreter();
+test.afterAll(async () => {
+  await serveur?.arreter();
   if (dossier) rmSync(dossier, { recursive: true, force: true });
 });
 

@@ -49,8 +49,20 @@ test.describe('le serveur local', () => {
       const servie = await (await fetch(`${adresse}/`)).text();
       expect(servie).toBe(readFileSync(path.join(racine, 'index.html'), 'utf8'));
     } finally {
-      arreter();
+      await arreter();
     }
+  });
+
+  // arreter() rend une promesse, tenue quand le serveur s’est arrêté pour de bon : qui reprend son port juste après (un
+  // test, la commande des captures qui se termine) ne tombe plus sur lui, même sur une machine chargée.
+  test('arreter() attend la fin du serveur : son port se reprend dès que la promesse est tenue', async () => {
+    const port = await portLibre();
+    const { arreter } = await demarrerServeur(port);
+    const arret = arreter();
+    expect(arret).toBeInstanceOf(Promise);
+    await arret;
+    const second = await demarrerServeur(port);
+    await second.arreter();
   });
 });
 
@@ -68,7 +80,7 @@ test('les captures : Chromium introuvable, la commande échoue et le serveur loc
     expect(sortie.code).not.toBe(0);
     // Le port se reprend : plus rien n’y écoute (sans le correctif, le serveur local y répondait encore).
     const { arreter } = await demarrerServeur(port);
-    arreter();
+    await arreter();
   } finally {
     rmSync(dossier, { recursive: true, force: true });
   }
@@ -85,6 +97,23 @@ test('les captures : un Chromium qui ne se lance pas arrête quand même le serv
   try {
     await expect(capturer({ sortie: dossier, port: 9, demarrer, lancer })).rejects.toThrow(/simulé/);
     expect(arrets).toBe(1);
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+  }
+});
+
+// La commande des captures ne rend la main qu’une fois le serveur local arrêté (arreter() tenu) : sinon elle se termine
+// pendant qu’il tient encore son port, et qui le reprend aussitôt (le test plus haut) le trouve pris.
+test('les captures attendent que le serveur local soit arrêté avant de rendre la main', async () => {
+  const { capturer } = await import('./outils/captures.mjs');
+  const dossier = mkdtempSync(path.join(tmpdir(), 'captures-'));
+  let arrete = false;
+  const arreter = () => new Promise((resoudre) => { setTimeout(() => { arrete = true; resoudre(); }, 200); });
+  const demarrer = async () => ({ adresse: 'http://127.0.0.1:9', arreter });
+  const lancer = async () => { throw new Error('Chromium introuvable (simulé)'); };
+  try {
+    await expect(capturer({ sortie: dossier, port: 9, demarrer, lancer })).rejects.toThrow(/simulé/);
+    expect(arrete).toBe(true);
   } finally {
     rmSync(dossier, { recursive: true, force: true });
   }

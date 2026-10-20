@@ -413,7 +413,7 @@ test.describe('dans le navigateur', () => {
     await construire({ source: sourceChargee(), sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr, accepterLesSuppressions: true });
     serveur = await demarrerServeur(await portLibre(), -1, { dossier });
   });
-  test.afterAll(() => serveur?.arreter());
+  test.afterAll(async () => { await serveur?.arreter(); });
 
   // Chaque requête de la page, au chargement, à l’impression et pendant le PDF : toutes vers le site.
   const surveiller = (onglet) => {

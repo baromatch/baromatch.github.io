@@ -176,8 +176,8 @@ test.describe('les pages de ville', () => {
     });
     serveur = await demarrerServeur(port, -1, { dossier });
   });
-  test.afterAll(() => {
-    serveur?.arreter();
+  test.afterAll(async () => {
+    await serveur?.arreter();
     if (dossier) rmSync(dossier, { recursive: true, force: true });
   });
 
@@ -278,8 +278,8 @@ test.describe('l’ordre du formulaire', () => {
     });
     serveur = await demarrerServeur(port, -1, { dossier });
   });
-  test.afterAll(() => {
-    serveur?.arreter();
+  test.afterAll(async () => {
+    await serveur?.arreter();
     if (dossier) rmSync(dossier, { recursive: true, force: true });
   });
 

@@ -78,7 +78,7 @@ const principal = async () => {
     };
     for (const page of PAGES) resultats.push(await mesurerUnePage(mesurer, page));
   } finally {
-    arreter();
+    await arreter();
   }
   const lignes = ['| Page | Essais | Performance | Accessibilité | Bonnes pratiques | SEO |', '|---|---|---|---|---|---|',
     ...resultats.map((r) => `| ${r.page} | ${r.essais.length} | ${CATEGORIES.map((c) => `${r.meilleures[c]} (${r.essais.map((n) => n[c]).join(', ')})`).join(' | ')} |`)];

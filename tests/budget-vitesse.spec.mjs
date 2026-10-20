@@ -95,9 +95,9 @@ test.beforeAll(async () => {
     sites.at(-1).serveur = await demarrerServeur(await portLibre(), -1, { dossier });
   }
 });
-test.afterAll(() => {
+test.afterAll(async () => {
   for (const { dossier, serveur } of sites) {
-    serveur?.arreter();
+    await serveur?.arreter();
     rmSync(dossier, { recursive: true, force: true });
   }
 });

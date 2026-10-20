@@ -23,8 +23,8 @@ test.beforeAll(async () => {
   await construireLeSiteDExemple(dossier, { rendu: null });
   serveur = await demarrerServeur(await portLibre(), -1, { dossier });
 });
-test.afterAll(() => {
-  serveur?.arreter();
+test.afterAll(async () => {
+  await serveur?.arreter();
   if (dossier) rmSync(dossier, { recursive: true, force: true });
 });
 

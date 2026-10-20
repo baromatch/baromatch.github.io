@@ -22,7 +22,8 @@ export const capturer = async ({
   mkdirSync(sortie, { recursive: true });
   const { adresse, arreter } = await demarrer(port);
   // Le navigateur se lance dans le try : s’il ne démarre pas (Chromium absent ou cassé), le finally arrête quand même le
-  // serveur local, qui sinon resterait seul sur son port après la fin de la commande.
+  // serveur local, qui sinon resterait seul sur son port après la fin de la commande ; et la commande attend qu’il soit
+  // arrêté (son port libre) avant de rendre la main.
   let navigateur = null;
   try {
     navigateur = await lancer({ executablePath: CHROMIUM });
@@ -44,7 +45,7 @@ export const capturer = async ({
     }
   } finally {
     await navigateur?.close();
-    arreter();
+    await arreter();
   }
 };
 

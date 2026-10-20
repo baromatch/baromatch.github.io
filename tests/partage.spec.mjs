@@ -461,7 +461,7 @@ test.describe('le bloc « Partager »', () => {
     await construireLeSiteDExemple(dossier);
     serveur = await demarrerServeur(await portLibre(), -1, { dossier });
   });
-  test.afterAll(() => serveur?.arreter());
+  test.afterAll(async () => { await serveur?.arreter(); });
 
   const MATCH = '/matchs/psg-ol-2026-10-25/';
   const canonique = (chemin) => `${ORIGINE}${chemin}`;

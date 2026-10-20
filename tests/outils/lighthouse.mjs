@@ -78,7 +78,7 @@ const mesurerTout = async () => {
       for (const appareil of APPAREILS) await lancer(adresse, page, appareil);
     }
   } finally {
-    arreter();
+    await arreter();
   }
 };
 

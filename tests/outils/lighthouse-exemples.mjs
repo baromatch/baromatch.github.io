@@ -45,7 +45,7 @@ const principal = async () => {
       }
     }
   } finally {
-    arreter();
+    await arreter();
   }
   const resultats = PAGES.flatMap((page) => APPAREILS.map((appareil) => {
     const rapport = JSON.parse(readFileSync(jsonDe(page, appareil), 'utf8'));

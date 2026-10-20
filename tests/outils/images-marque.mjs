@@ -69,7 +69,7 @@ const rendreLesImages = async (port) => {
     console.log(`${STORY.sortie} : ${STORY.largeur} × ${STORY.hauteur}, ${Math.round(png.length / 1024)} Ko (capture : ${Math.round(capture.length / 1024)} Ko)`);
   } finally {
     await navigateur?.close();
-    arreter();
+    await arreter();
   }
   await versWebp(duDepot(STORY.sortie), duDepot(APERCU.sortie), APERCU.largeur, 0.8);
 };

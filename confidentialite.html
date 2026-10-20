@@ -118,13 +118,13 @@
   <ul>
     <li>Ton camp pour une place (l’une des deux équipes, ou «&nbsp;Juste le match&nbsp;») n’est enregistré que si tu le dis. Tu peux le changer jusqu’au coup d’envoi.</li>
     <li><strong>Il n’est visible que par toi et les personnes de ta tablée.</strong></li>
-    <li>Sur la page du bar, les fans voient l’ambiance de la salle seulement à partir de 5&nbsp;réponses, en parts arrondies à la dizaine. L’équipe du bar voit les mêmes parts et le nombre de réponses, jamais qui est pour qui. Avec très peu de réponses, un bar pourrait deviner le camp de quelqu’un.</li>
+    <li>Sur la page du bar, les fans voient l’ambiance de la salle seulement à partir de 5&nbsp;réponses, en parts arrondies à la dizaine. L’équipe du bar voit les mêmes parts et le nombre de réponses, jamais qui est pour qui. Le bar peut masquer l’ambiance aux fans. Avec très peu de réponses, un bar pourrait deviner le camp de quelqu’un.</li>
   </ul>
 
   <h3 id="pass">Le pass et le code d’arrivée</h3>
   <ul>
     <li>Chaque place a un numéro de pass de 4&nbsp;chiffres, tiré au hasard et propre à la soirée («&nbsp;Pass n°&nbsp;0412&nbsp;»). À la porte, l’équipe peut le taper&nbsp;: elle voit ton pseudo, combien vous êtes et ton heure d’arrivée.</li>
-    <li>Ton code d’arrivée à 6&nbsp;chiffres permet aussi à l’équipe d’un bar de te retrouver à la porte&nbsp;: elle voit alors ton pseudo. C’est ce code que porte le QR de ton pass, pas le numéro du soir. Ce code ne change pas d’une soirée à l’autre&nbsp;: garde-le pour la porte du bar, et ne partage pas de capture d’écran de ton pass.</li>
+    <li>Ton code d’arrivée à 6&nbsp;chiffres permet aussi à l’équipe d’un bar de te retrouver à la porte&nbsp;: elle voit alors ton pseudo. C’est ce code que porte le QR de ton pass, pas le numéro du soir. Ce code ne change pas d’une soirée à l’autre, et l’équipe de n’importe quel bar Baromatch peut s’en servir pour te retrouver&nbsp;: ne partage pas de capture d’écran de ton pass.</li>
     <li>Si tu supprimes ton compte, ton numéro de pass reste sur l’ancienne réservation, sans ton pseudo ni ton adresse mail.</li>
   </ul>
 
@@ -141,9 +141,10 @@
   <h3 id="notifications">Les notifications</h3>
   <ul>
     <li><strong>Les rappels de tes soirées</strong> (place gardée, coup d’envoi) sont programmés par ton téléphone lui-même. Ils s’affichent en entier sur l’écran verrouillé&nbsp;: le match, le bar, l’heure, les minutes à pied.</li>
-    <li><strong>Notre serveur n’envoie aucune notification pour l’instant&nbsp;:</strong> seules tes soirées sonnent, depuis ton téléphone. Avant que ça change, cette page le dira.</li>
+    <li><strong>Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant&nbsp;:</strong> seules tes soirées sonnent, depuis ton téléphone. Avant que ça change, cette page le dira.</li>
+    <li><strong>Dans l’appli</strong>, l’écran des notifications peut te montrer une place qui se libère, ou une soirée qui ouvre pour un match que tu veux voir.</li>
     <li><strong>Le jeton de notifications&nbsp;:</strong> si tu autorises les notifications et que tu es connecté, ton téléphone donne à l’appli un jeton, l’adresse qui permet de lui envoyer une notification. L’appli l’enregistre sur notre serveur avec ton compte. Le jeton ne sert plus quand tu te déconnectes, et il est effacé si tu supprimes ton compte.</li>
-    <li><strong>Tes choix, dans Réglages&nbsp;:</strong> «&nbsp;Mes soirées&nbsp;», gardé sur ton téléphone. Les autres choix sont gardés avec ton compte&nbsp;: «&nbsp;Les matchs de mon club&nbsp;», coupé tant que tu ne l’allumes pas&nbsp;; «&nbsp;Offres des bars&nbsp;», allumé au départ, et tu peux le couper&nbsp;; les soirées ouvertes pour un match que tu veux voir, allumé au départ. Ces notifications-là ne sont pas envoyées pour l’instant.</li>
+    <li><strong>Tes choix, dans Réglages&nbsp;:</strong> «&nbsp;Mes soirées&nbsp;», gardé sur ton téléphone. Les autres choix sont gardés avec ton compte&nbsp;: «&nbsp;Les matchs de mon club&nbsp;», coupé tant que tu ne l’allumes pas&nbsp;; «&nbsp;Offres des bars&nbsp;», allumé au départ, et tu peux le couper&nbsp;; les soirées ouvertes pour un match que tu veux voir, allumé au départ. Aucune de ces notifications n’arrive sur ton téléphone pour l’instant.</li>
     <li>Tu peux tout couper dans les réglages de ton téléphone.</li>
   </ul>
 
@@ -151,20 +152,20 @@
   <p>À chaque ouverture, l’appli demande au serveur de mises à jour d’Expo s’il existe une nouvelle version de son code, et la télécharge si besoin. Elle envoie le système du téléphone, la version de l’appli et de la mise à jour en cours, et un identifiant tiré au hasard par Expo à l’installation, sans lien avec ton compte. Comme tout serveur, Expo voit l’adresse IP de la connexion. Si l’appli a planté à l’ouverture précédente, le début du message d’erreur part aussi. Aucun compte, aucun mail, aucune position. Baromatch ne garde rien de ces demandes.</p>
 
   <h3 id="plantages">Les rapports d’erreurs</h3>
-  <p>Aujourd’hui, ni l’appli ni notre serveur n’envoient de rapport d’erreurs à un service extérieur. Si on en met un en place, cette page le décrira d’abord.</p>
+  <p>Aujourd’hui, aucun service de suivi des erreurs ne reçoit de rapport de l’appli ni de notre serveur. Seul le début d’un message d’erreur part chez Expo, si l’appli a planté à l’ouverture précédente (<a href="#mises-a-jour">voir «&nbsp;Les mises à jour de l’appli&nbsp;»</a>). Si on met en place un service de suivi des erreurs, cette page le décrira d’abord.</p>
 
   <h3 id="prestataires">Nos prestataires</h3>
   <ul>
-    <li><strong>Railway</strong> héberge notre serveur, notre base de données et la mémoire temporaire du serveur, en Europe (Pays-Bas). Ses journaux gardent l’adresse IP des connexions et l’adresse des pages demandées. Railway est une société américaine.</li>
+    <li><strong>Railway</strong> héberge notre serveur, notre base de données et la mémoire temporaire du serveur, en Europe (Pays-Bas). Ses journaux gardent l’adresse IP des connexions et l’adresse des pages demandées, qui peut contenir l’identifiant de ton compte. Railway est une société américaine.</li>
     <li><strong>Resend</strong> envoie le mail avec ton code de connexion, et le mail qui nous prévient d’une demande de bar. États-Unis.</li>
     <li><strong>CARTO</strong> fournit le fond de carte (<a href="#position">voir «&nbsp;Ta position et la carte&nbsp;»</a>). États-Unis.</li>
     <li><strong>Expo</strong> fournit les mises à jour de l’appli (<a href="#mises-a-jour">voir plus haut</a>). États-Unis.</li>
     <li><strong>La Géoplateforme de l’IGN</strong>, le service d’adresses de l’État, trouve les adresses que tu cherches. France&nbsp;: pas de transfert.</li>
-    <li><strong>Formspree</strong> reçoit les inscriptions du site (liste d’attente, boutique). États-Unis.</li>
+    <li><strong>Formspree</strong> reçoit les inscriptions du site (liste d’attente, boutique), et en garde sa propre copie, selon ses propres conditions. États-Unis.</li>
     <li><strong>GitHub</strong> héberge le site. États-Unis.</li>
     <li><strong>L’hébergeur de notre boîte mail</strong> reçoit les mails que tu nous écris.</li>
   </ul>
-  <p>Avec ces sociétés américaines, tes données peuvent être transférées hors de l’Union européenne, notamment aux États-Unis. Pour savoir ce qui encadre un transfert, ou en avoir une copie, écris-nous à <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>.</p>
+  <p>Avec ces sociétés américaines, tes données peuvent être transférées hors de l’Union européenne, notamment aux États-Unis. Pour toute question sur ces transferts, écris-nous à <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>.</p>
 
   <h3 id="combien-de-temps">Combien de temps</h3>
   <p>Certaines durées seront appliquées par un effacement automatique, qui n’est pas encore en route. Pour celles-là, la page dit ce qui se passe aujourd’hui, puis la durée prévue.</p>
@@ -177,7 +178,7 @@
     <li>Les matchs que tu veux voir&nbsp;: aujourd’hui, tant que ton compte existe. Prévu&nbsp;: effacés 30&nbsp;jours après le match.</li>
     <li>Tes sessions de connexion&nbsp;: aujourd’hui, tant que ton compte existe. Prévu&nbsp;: effacées 30&nbsp;jours après leur fin.</li>
     <li>L’adresse IP et l’appareil, dans les sessions et les traces de sécurité&nbsp;: aujourd’hui, tant que ton compte existe. Prévu&nbsp;: effacés au bout de 6&nbsp;mois.</li>
-    <li>Les traces de sécurité elles-mêmes, et les signalements&nbsp;: pour l’instant, sans durée fixée.</li>
+    <li>Les traces de sécurité elles-mêmes (y compris celles d’une demande de code faite sans créer de compte), et les signalements&nbsp;: pour l’instant, sans durée fixée.</li>
     <li>Les empreintes des vues d’offres&nbsp;: aujourd’hui, sans durée fixée. Prévu&nbsp;: effacées un jour après le coup d’envoi&nbsp;; le bar garde seulement le total.</li>
     <li>Ce que tu tapes dans la recherche d’adresse&nbsp;: les adresses trouvées sont gardées 5&nbsp;minutes.</li>
     <li>Des copies techniques de réponses récentes, pour éviter les doublons&nbsp;: 24&nbsp;heures au plus.</li>
@@ -191,12 +192,13 @@
   <p>Dans l’appli&nbsp;: Réglages, puis «&nbsp;Supprimer mon compte&nbsp;». Sans l’appli&nbsp;: écris à <a href="mailto:contact@baromatch.fr?subject=Suppression%20de%20compte">contact@baromatch.fr</a> depuis l’adresse de ton compte, avec pour objet «&nbsp;Suppression de compte&nbsp;». On le fait sous un mois au plus et on te le confirme (<a href="/supprimer-mon-compte.html">voir la page «&nbsp;Supprimer ton compte&nbsp;»</a>).</p>
   <ul>
     <li><strong>Tout de suite&nbsp;:</strong> ton adresse mail, ton pseudo, ton club, ta langue, ta confirmation d’âge, tes choix de notifications et ton code d’arrivée sont effacés. Tes sessions, tes jetons de notifications, les matchs que tu voulais voir, ta liste d’attente, tes notifications et ta photo, si tu en avais une, sont supprimés. Tes places à venir sont annulées et rendues aux autres fans. L’adresse IP et l’appareil sont effacés de tes traces de sécurité.</li>
-    <li><strong>Gardé sans ton nom, mais pas anonyme&nbsp;:</strong> tes anciennes places et arrivées restent comptées dans les totaux des bars. Elles restent rattachées au même identifiant technique de compte, vidé de ton adresse mail et de ton pseudo. On en retire ton heure d’arrivée prévue, ton camp et l’empreinte de ton appareil. Ces données sont pseudonymisées&nbsp;: quelqu’un qui a gardé cet identifiant (par exemple un bar où tu as réservé, qui l’a reçu) pourrait encore les relier à toi. Ton numéro de pass reste. Les traces de sécurité restent, sans adresse IP ni appareil. Pour l’instant, ces lignes sont gardées sans durée fixée.</li>
+    <li><strong>Gardé sans ton nom, mais pas anonyme&nbsp;:</strong> tes anciennes places et arrivées restent comptées dans les totaux des bars. Elles restent rattachées au même identifiant technique de compte, vidé de ton adresse mail et de ton pseudo. On en retire ton heure d’arrivée prévue, ton camp et l’empreinte de ton appareil. Ces données sont pseudonymisées&nbsp;: quelqu’un qui a gardé cet identifiant (par exemple un bar où tu as réservé, qui l’a reçu) pourrait encore les relier à toi. Ton numéro de pass reste. Les traces de sécurité restent, sans adresse IP ni appareil, avec une empreinte de ton adresse mail. Pour l’instant, ces lignes sont gardées sans durée fixée.</li>
     <li><strong>Dans nos sauvegardes&nbsp;:</strong> une copie peut rester jusqu’à ce que la sauvegarde expire, puis disparaît.</li>
     <li><strong>Sur ton téléphone&nbsp;:</strong> l’appli efface ce qu’elle gardait (ton compte, tes places, ton album, tes choix) et repart de zéro. Si tu as téléchargé tes données, le fichier reste là où tu l’as enregistré, et une copie peut rester dans la mémoire de l’appli tant que tu ne la désinstalles pas. Un rappel déjà programmé pour une place peut encore s’afficher.</li>
     <li><strong>Chez nos prestataires&nbsp;:</strong> leurs copies techniques (les journaux d’envoi chez Resend, les journaux de Railway) s’effacent selon leurs propres durées.</li>
     <li>Pendant 24&nbsp;heures au plus, des copies techniques de réponses récentes peuvent rester dans la mémoire temporaire du serveur.</li>
-    <li>Tu peux recréer un compte plus tard avec la même adresse&nbsp;: ce sera un compte neuf, sans ton historique.</li>
+    <li>Pour un compte supprimé avant le 5&nbsp;octobre 2026, certaines lignes (sessions avec adresse IP et appareil, jetons de notifications, matchs voulus) restent jusqu’à ce que notre effacement automatique soit en route.</li>
+    <li>Tu peux recréer un compte plus tard avec la même adresse&nbsp;: ce sera un compte neuf, sans tes places ni ton album.</li>
   </ul>
 
   <h3>Sécurité</h3>
@@ -290,7 +292,7 @@
   </ul>
 
   <h2>Si cette page change</h2>
-  <p>On te prévient dans l’appli avant tout changement important. La date en haut de la page dit quand elle a changé pour la dernière fois.</p>
+  <p>On te prévient avant tout changement important, par mail ou dans l’appli. La date en haut de la page dit quand elle a changé pour la dernière fois.</p>
 </main>
 <footer class="pied page">
   <div class="pied__marque"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="pd-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="pd-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="pd-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#pd-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#pd-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#pd-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg><span>© 2026 Baromatch</span></div>

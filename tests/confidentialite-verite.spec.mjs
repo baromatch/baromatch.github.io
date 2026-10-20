@@ -33,9 +33,9 @@ test('la page Confidentialité ne décrit comme destinataire ni Sentry, ni Mapbo
   const texte = await texteDe(page, '/confidentialite.html');
   expect(texte).not.toMatch(/Sentry|Mapbox|Firebase|Google|Anthropic/);
   // Les rapports d’erreurs : rien ne part aujourd’hui, et la page le décrira d’abord.
-  await expect(page.locator('#plantages + p')).toHaveText(/ni l’appli ni notre serveur n’envoient de rapport d’erreurs à un service extérieur/);
+  await expect(page.locator('#plantages + p')).toHaveText(/aucun service de suivi des erreurs ne reçoit de rapport de l’appli ni de notre serveur/);
   // Les notifications : seuls les rappels programmés par le téléphone.
-  await expect(page.locator('#notifications + ul')).toContainText('Notre serveur n’envoie aucune notification pour l’instant');
+  await expect(page.locator('#notifications + ul')).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
   // Les photos : fermées, et la page sera mise à jour avant.
   expect(texte).toContain('Les photos de profil ne sont pas ouvertes pour l’instant.');
   expect(texte).toContain('Avant de les ouvrir, on mettra cette page à jour');
@@ -45,7 +45,7 @@ test('la page Confidentialité : l’hébergement aux Pays-Bas, et aucune garant
   const texte = await texteDe(page, '/confidentialite.html');
   await expect(page.locator('#prestataires + ul')).toContainText('en Europe (Pays-Bas)');
   expect(texte).not.toMatch(/clauses contractuelles types|Data Privacy Framework|mécanisme équivalent|pour notre compte/);
-  expect(texte).toContain('Pour savoir ce qui encadre un transfert, ou en avoir une copie, écris-nous');
+  expect(texte).toContain('Pour toute question sur ces transferts, écris-nous');
 });
 
 test('la page Confidentialité : les durées que l’effacement automatique appliquera disent ce qui se passe aujourd’hui', async ({ page }) => {
@@ -68,6 +68,7 @@ test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, 
   expect(texte).toContain('ta place en liste d’attente, tes notifications, et ta photo si tu en avais une');
   expect(texte).toContain('ta langue');
   expect(texte).toContain('Ces données sont pseudonymisées');
-  expect(texte).not.toMatch(/Personne ne peut plus les relier à toi|au bout de 6 mois/);
+  expect(texte).not.toMatch(/Personne ne peut plus les relier à toi|au bout de 6 mois|sans ton historique/);
+  expect(texte).toContain('sans adresse IP ni appareil, avec une empreinte de ton adresse mail');
   await expect(page.locator('.document__date')).toHaveText('Mise à jour le 20 octobre 2026');
 });

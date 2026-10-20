@@ -166,7 +166,7 @@ ${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant)
 </section>`;
   // Indexable même sans aucun vrai bar publié : c’est un outil, fait des vrais matchs de la semaine (leurs vraies
   // heures), qui ne dit d’aucun bar qu’il est sur Baromatch. Exception à la règle « pas de vrai bar, pas d’index »,
-  // validée par le lead (tests/affiche.spec.mjs la vérifie). Mais avec moins de 3 matchs à montrer, la page est mince :
+  // voulue (tests/affiche.spec.mjs la vérifie). Mais avec moins de 3 matchs à montrer, la page est mince :
   // lisible, en noindex et hors du plan du site.
   return avecLaFeuille({
     type: 'affiche', cle: 'affiche', date: null, chemin, indexable: matchs.length >= MATCHS_POUR_L_INDEX, titre: titrePage, description: desc, barsNommes: [],

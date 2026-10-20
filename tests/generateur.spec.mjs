@@ -624,7 +624,7 @@ test.describe('les pages', () => {
     expect(deType(pageDe('/matchs/psg-barca-2026-10-24/'), 'Event')[0].startDate).toBe('2026-10-24T21:00:00+02:00');
   });
 
-  test('les offres : dans le corps seulement, avec la mention santé sauf sans alcool', () => {
+  test('les offres : dans le corps seulement ; une offre avec alcool, ni titre ni prix ni mention', () => {
     const MENTION = 'L’abus d’alcool est dangereux pour la santé, à consommer avec modération.';
     // L’offre avec alcool du Zinc : « Une offre du bar dans l’appli », sans titre, sans prix.
     for (const chemin of ['/matchs/psg-ol-2026-10-25/', '/bar/le-zinc-des-amis-paris-11/']) {

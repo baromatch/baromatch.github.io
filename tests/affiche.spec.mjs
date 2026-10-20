@@ -1,8 +1,8 @@
 // Les affiches à imprimer (generateur/affiche.mjs, affiche.css) : un seul moteur, deux entrées.
 // - L’affiche de la semaine (/matchs/affiche/), pour tous les bars : les matchs des sept jours de /matchs/, sans les
 //   reportés ni les annulés ; on coche, on imprime ; aucun formulaire, aucun champ de texte, rien ne part ailleurs que
-//   sur le site. Indexable même sans aucun vrai bar publié : c’est un outil, pas une liste de bars (l’exception validée
-//   par le lead, vérifiée ici) ; mais en noindex avec moins de 3 matchs à montrer.
+//   sur le site. Indexable même sans aucun vrai bar publié : c’est un outil, pas une liste de bars (l’exception voulue,
+//   vérifiée ici) ; mais en noindex avec moins de 3 matchs à montrer.
 // - L’affiche d’un bar publié (/bar/<bar>/affiche/) : sa prochaine soirée, ses autres soirées de la semaine, un QR code
 //   vers sa page ; noindex ; jamais pour un bar qui n’est pas publié, et effacée quand il ne l’est plus.
 // À l’impression : seulement la feuille, seulement les lignes cochées (toutes si rien n’est coché), une seule page en A4

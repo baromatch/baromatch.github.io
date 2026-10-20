@@ -1,7 +1,7 @@
 // Loi Evin, le filtre des offres de bar (generateur/alcool.mjs, et offreDe dans generateur/donnees.mjs) : quand un bar
 // dit qu’une offre est sans alcool (hasAlcohol: false), le site n’écrit son titre que s’il ne nomme ni n’évoque un
 // alcool, ne pousse pas à boire, n’a que des caractères permis et ne met pas de prix sur une boisson sans nom. Les
-// titres de l’avocat du diable (un mot d’alcool déguisé, écrit dans une autre langue ou une autre écriture, coupé, collé,
+// titres piégés (un mot d’alcool déguisé, écrit dans une autre langue ou une autre écriture, coupé, collé,
 // mal orthographié, en emoji ; une incitation à boire), tous écartés ; des offres sans danger, toujours publiées ; celles
 // que la prudence écarte quand même, écrites ici pour qu’on sache ce qu’elle coûte. Chaque lecture du filtre écarte
 // seule ce qu’elle doit écarter.
@@ -30,7 +30,7 @@ const lecteurDOffres = async () => {
 };
 const ECARTEE = { dansLAppli: true };
 
-// Les titres de l’avocat du diable (deux passages) : publiés par un filtre précédent, tous écartés maintenant.
+// Les titres piégés (deux séries) : publiés par un filtre précédent, tous écartés maintenant.
 const DEGUISES = [
   // Un mot d’alcool déguisé : chiffres, lettres répétées, caractères invisibles, coupé, pleine chasse, lettres
   // mathématiques, cyrillique, collé, un « l » pour un « I ».
@@ -130,7 +130,7 @@ const ECARTEES_PAR_PRUDENCE = [
 ];
 
 test.describe('loi Evin : les offres cochées « sans alcool »', () => {
-  test('chaque titre de l’avocat du diable est écarté : ni titre, ni prix', async () => {
+  test('chaque titre piégé est écarté : ni titre, ni prix', async () => {
     const offreDu = await lecteurDOffres();
     const publies = [...DEGUISES, ...QUI_POUSSENT, ...BOISSONS_AVEC_UN_PRIX].filter((titre) => offreDu(titre).dansLAppli !== true);
     expect(publies).toEqual([]);

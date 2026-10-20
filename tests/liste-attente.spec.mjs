@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
-import { champDe, simulerFormspree } from './outils/formspree.mjs';
+import { champDe, FORMSPREE, simulerFormspree } from './outils/formspree.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 
 // toHaveText ramène chaque blanc, espace insécable compris, à une espace simple.
@@ -71,8 +71,17 @@ test('après l’inscription, l’adresse est rappelée et on peut la corriger',
 
 test('taper dans le champ après l’inscription rouvre l’envoi', async ({ page }) => {
   await simulerFormspree(page);
+  // Un service d’envoi lent, comme sur une machine chargée : la réponse arrive 0,5 s après la demande.
+  await page.route(FORMSPREE, async (route) => {
+    await new Promise((resoudre) => { setTimeout(resoudre, 500); });
+    await route.fallback();
+  });
   await page.goto('/');
   await sInscrire(page, 'paul@gmail.com');
+  // L’inscription faite, pas seulement partie : pendant « Envoi… », le bouton est déjà inactif, et ce qu’on tape alors
+  // ne rouvre rien.
+  await expect(retour(page)).toHaveText(INSCRITE('paul@gmail.com'));
+  await expect(bouton(page)).toHaveText('C’est noté');
   await expect(bouton(page)).toBeDisabled();
   await champ(page).press('End');
   await champ(page).pressSequentially('x');

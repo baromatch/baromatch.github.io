@@ -152,7 +152,7 @@ const prix = (centimes) => {
 export const offre = (o, textes) => {
   if (!o) return '';
   if (o.dansLAppli) {
-    return `<div class="regarder-offre">
+    return `<div class="regarder-offre regarder-offre--appli">
         <p class="regarder-offre__texte">${e(textes.offre.dansLAppli)}</p>
       </div>`;
   }

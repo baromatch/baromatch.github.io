@@ -164,6 +164,10 @@
 }
 .regarder-offre__etiquette { display: block; margin-bottom: 2px; color: var(--texte-doux); font-size: 0.8125rem; font-weight: 600; }
 .regarder-offre__texte { font-weight: 600; }
+/* Une offre que le site ne montre pas (« Une offre du bar dans l’appli ») : un texte discret, comme l’étiquette d’une
+   offre, sans fond ni cadre : rien qui ressemble à un bouton. */
+.regarder-offre--appli { margin-top: 10px; padding: 0; border-radius: 0; background: none; }
+.regarder-offre--appli .regarder-offre__texte { color: var(--texte-doux); font-size: 0.875rem; }
 
 /* ---------- Listes de matchs ---------- */
 

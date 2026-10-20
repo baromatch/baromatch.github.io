@@ -41,6 +41,12 @@ test.describe('le réglage de marque.json', () => {
   test('vide, la mesure est arrêtée ; un code, ou l’adresse du compte collée telle quelle, l’active', () => {
     expect(MARQUE.mesure).toEqual(expect.objectContaining({ outil: 'goatcounter', code: expect.any(String) }));
     expect(MARQUE.mesure._lisezMoi).toMatch(/GoatCounter/);
+    // La page Confidentialité n’est vraie qu’avec ces réglages du compte : ils sont écrits là où l’on active la mesure,
+    // avec l’accord de sous-traitance à demander d’abord.
+    for (const reglage of ['accord de sous-traitance', '« Referrer » et « Sessions »', '« Individual pageviews »', '730 jours', 'tableau de bord', 'privé']) {
+      expect(MARQUE.mesure._lisezMoi, reglage).toContain(reglage);
+    }
+    expect(MARQUE.mesure._lisezMoi.indexOf('accord de sous-traitance')).toBeLessThan(MARQUE.mesure._lisezMoi.indexOf('colle'));
     for (const marque of [SANS, {}, { mesure: {} }, { mesure: { code: '  ' } }, { mesure: { outil: 'autre', code: '' } }]) {
       expect(lireLaMesure(marque)).toEqual({ active: false });
     }

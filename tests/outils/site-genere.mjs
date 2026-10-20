@@ -41,7 +41,7 @@ export const construireLeSiteDExemple = async (dossier, {
   }
   if (marque) {
     writeFileSync(path.join(dossier, 'marque.json'), `${JSON.stringify(marque, null, 2)}\n`);
-    appliquerLaMesure({ racine: dossier, marque });
+    appliquerLaMesure({ racine: dossier, marque, maintenant });
   }
   return construire({ source, sortie: dossier, maintenant, racine, contenu: { ...contenu, ...(marque ? { marque } : {}) }, ...options });
 };

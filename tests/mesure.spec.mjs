@@ -14,7 +14,7 @@ import { construireLeSiteDExemple, contenuDuScenario, SCENARIO } from './outils/
 import { controlerLaPage } from '../generateur/controle.mjs';
 import { politiqueDesPages } from '../generateur/gabarits.mjs';
 import {
-  appliquerAUnePage, appliquerLaMesure, baliseDeLaMesure, lireLaMesure, MESURE_ARRETEE, pagesEcritesALaMain, politiqueAvecLaMesure, TEXTES_DE_LA_MESURE,
+  appliquerAUnePage, appliquerLaMesure, baliseDeLaMesure, dateDeMiseAJour, lireLaMesure, MESURE_ARRETEE, pagesEcritesALaMain, politiqueAvecLaMesure, TEXTES_DE_LA_MESURE,
 } from '../generateur/mesure.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
@@ -136,6 +136,8 @@ test.describe('les pages écrites à la main', () => {
 
   test('la ligne de commande : tout est contrôlé avant d’écrire, une page douteuse arrête tout', () => {
     const dossier = mkdtempSync(path.join(tmpdir(), 'mesure-'));
+    // Seule la date affichée de Confidentialité change en plus de la mesure (le test suivant la vérifie).
+    const sansLaDate = (html) => html.replace(/<p class="document__date">[^<]*<\/p>/, '<p class="document__date"></p>');
     try {
       for (const p of ['index.html', 'cgu.html', 'confidentialite.html']) writeFileSync(path.join(dossier, p), sansMesure(p));
       // Les pages que le générateur écrit (matchs/, en/, agenda/…), déjà dans le dépôt.
@@ -153,7 +155,7 @@ test.describe('les pages écrites à la main', () => {
       expect(appliquerLaMesure({ racine: dossier }).changees).toEqual([]);
       writeFileSync(path.join(dossier, 'marque.json'), JSON.stringify(SANS));
       expect(appliquerLaMesure({ racine: dossier }).changees).toEqual(['cgu.html', 'confidentialite.html', 'index.html']);
-      for (const p of ['index.html', 'cgu.html', 'confidentialite.html']) expect(readFileSync(path.join(dossier, p), 'utf8')).toBe(sansMesure(p));
+      for (const p of ['index.html', 'cgu.html', 'confidentialite.html']) expect(sansLaDate(readFileSync(path.join(dossier, p), 'utf8'))).toBe(sansLaDate(sansMesure(p)));
 
       // Deux politiques dans une page : rien n’est écrit, nulle part.
       const meta = politiqueDe(sansMesure('cgu.html'))[0];
@@ -166,6 +168,44 @@ test.describe('les pages écrites à la main', () => {
       writeFileSync(path.join(dossier, 'marque.json'), JSON.stringify({ ...AVEC, mesure: { code: 'x y' } }));
       expect(() => appliquerLaMesure({ racine: dossier })).toThrow(/n’est pas un code GoatCounter/);
       expect(readFileSync(path.join(dossier, 'index.html'), 'utf8')).toBe(sansMesure('index.html'));
+    } finally {
+      rmSync(dossier, { recursive: true, force: true });
+    }
+  });
+
+  test('la mesure démarre ou s’arrête : Confidentialité prend la date du jour à Paris, et le plan du site aussi ; sinon, rien', () => {
+    const dossier = mkdtempSync(path.join(tmpdir(), 'mesure-date-'));
+    const date = () => readFileSync(path.join(dossier, 'confidentialite.html'), 'utf8').match(/<p class="document__date">([^<]*)<\/p>/)[1];
+    const plan = () => readFileSync(path.join(dossier, 'sitemap.xml'), 'utf8');
+    const ligne = (jour) => `  <url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>${jour}</lastmod></url>`;
+    const avecLaMarque = (marque, maintenant) => {
+      writeFileSync(path.join(dossier, 'marque.json'), JSON.stringify(marque));
+      return appliquerLaMesure({ racine: dossier, maintenant: Date.parse(maintenant) }).changees;
+    };
+    try {
+      for (const p of ['index.html', 'confidentialite.html']) writeFileSync(path.join(dossier, p), sansMesure(p));
+      const depart = date();
+      writeFileSync(path.join(dossier, 'sitemap.xml'), lire('sitemap.xml'));
+      expect(plan()).toContain(ligne(lire('sitemap.xml').match(/confidentialite\.html<\/loc><lastmod>([^<]*)</)[1]));
+      // Arrêtée, et rien ne change : la date reste.
+      expect(avecLaMarque(SANS, '2026-11-01T10:00:00Z')).toEqual([]);
+      expect(date()).toBe(depart);
+      // Elle démarre le 1er novembre : la page et le plan du site le disent.
+      expect(avecLaMarque(AVEC, '2026-11-01T10:00:00Z')).toEqual(['confidentialite.html', 'index.html', 'sitemap.xml']);
+      expect(date()).toBe('Mise à jour le 1er novembre 2026');
+      expect(plan()).toContain(ligne('2026-11-01'));
+      // Un autre compte, plus tard : les pages changent d’adresse de compte, mais le texte de Confidentialité ne change
+      // pas, sa date non plus, ni le plan du site.
+      expect(avecLaMarque({ ...AVEC, mesure: { code: 'autre-compte' } }, '2026-11-20T10:00:00Z')).toEqual(['confidentialite.html', 'index.html']);
+      expect(date()).toBe('Mise à jour le 1er novembre 2026');
+      expect(plan()).toContain(ligne('2026-11-01'));
+      // Elle s’arrête le 15 décembre à 23 h 30 UTC, déjà le 16 à Paris.
+      expect(avecLaMarque(SANS, '2026-12-15T23:30:00Z')).toEqual(['confidentialite.html', 'index.html', 'sitemap.xml']);
+      expect(date()).toBe('Mise à jour le 16 décembre 2026');
+      expect(plan()).toContain(ligne('2026-12-16'));
+      // Le reste du plan du site ne bouge pas.
+      expect(plan().split('\n').filter((l) => !l.includes('confidentialite.html'))).toEqual(lire('sitemap.xml').split('\n').filter((l) => !l.includes('confidentialite.html')));
+      expect(dateDeMiseAJour(Date.parse('2027-03-09T12:00:00Z'))).toBe('Mise à jour le 9 mars 2027');
     } finally {
       rmSync(dossier, { recursive: true, force: true });
     }

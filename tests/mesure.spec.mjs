@@ -14,9 +14,11 @@ import { construireLeSiteDExemple, contenuDuScenario, SCENARIO } from './outils/
 import { controlerLaPage } from '../generateur/controle.mjs';
 import { politiqueDesPages } from '../generateur/gabarits.mjs';
 import {
-  appliquerAUnePage, appliquerLaMesure, baliseDeLaMesure, lireLaMesure, MESURE_ARRETEE, pagesEcritesALaMain, politiqueAvecLaMesure, TEXTES_DE_LA_MESURE,
+  appliquerAUnePage, appliquerLaMesure, baliseDeLaMesure, dateDeMiseAJour, lireLaMesure, MESURE_ARRETEE, pagesEcritesALaMain, politiqueAvecLaMesure, TEXTES_DE_LA_MESURE,
 } from '../generateur/mesure.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
+import { construire } from '../generateur/construire.mjs';
+import { raisonDeNePasGarder } from '../generateur/refus.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 
 const MARQUE = JSON.parse(readFileSync(path.join(racine, 'marque.json'), 'utf8'));
@@ -41,6 +43,13 @@ test.describe('le réglage de marque.json', () => {
   test('vide, la mesure est arrêtée ; un code, ou l’adresse du compte collée telle quelle, l’active', () => {
     expect(MARQUE.mesure).toEqual(expect.objectContaining({ outil: 'goatcounter', code: expect.any(String) }));
     expect(MARQUE.mesure._lisezMoi).toMatch(/GoatCounter/);
+    // La page Confidentialité n’est vraie qu’avec ces réglages du compte : ils sont écrits là où l’on active la mesure,
+    // avec l’accord de sous-traitance à demander d’abord.
+    // Les noms sont ceux de l’écran des réglages de GoatCounter (en anglais).
+    for (const reglage of ['accord de sous-traitance', '« Data collection »', '« Referrer » et « Sessions »', '« Individual pageviews » décoché', '« Data retention in days ») à 730 jours', 'tableau de bord privé', '« Dashboard viewable by » sur « Only logged in users »']) {
+      expect(MARQUE.mesure._lisezMoi, reglage).toContain(reglage);
+    }
+    expect(MARQUE.mesure._lisezMoi.indexOf('accord de sous-traitance')).toBeLessThan(MARQUE.mesure._lisezMoi.indexOf('colle'));
     for (const marque of [SANS, {}, { mesure: {} }, { mesure: { code: '  ' } }, { mesure: { outil: 'autre', code: '' } }]) {
       expect(lireLaMesure(marque)).toEqual({ active: false });
     }
@@ -136,6 +145,8 @@ test.describe('les pages écrites à la main', () => {
 
   test('la ligne de commande : tout est contrôlé avant d’écrire, une page douteuse arrête tout', () => {
     const dossier = mkdtempSync(path.join(tmpdir(), 'mesure-'));
+    // Seule la date affichée de Confidentialité change en plus de la mesure (le test suivant la vérifie).
+    const sansLaDate = (html) => html.replace(/<p class="document__date">[^<]*<\/p>/, '<p class="document__date"></p>');
     try {
       for (const p of ['index.html', 'cgu.html', 'confidentialite.html']) writeFileSync(path.join(dossier, p), sansMesure(p));
       // Les pages que le générateur écrit (matchs/, en/, agenda/…), déjà dans le dépôt.
@@ -153,7 +164,7 @@ test.describe('les pages écrites à la main', () => {
       expect(appliquerLaMesure({ racine: dossier }).changees).toEqual([]);
       writeFileSync(path.join(dossier, 'marque.json'), JSON.stringify(SANS));
       expect(appliquerLaMesure({ racine: dossier }).changees).toEqual(['cgu.html', 'confidentialite.html', 'index.html']);
-      for (const p of ['index.html', 'cgu.html', 'confidentialite.html']) expect(readFileSync(path.join(dossier, p), 'utf8')).toBe(sansMesure(p));
+      for (const p of ['index.html', 'cgu.html', 'confidentialite.html']) expect(sansLaDate(readFileSync(path.join(dossier, p), 'utf8'))).toBe(sansLaDate(sansMesure(p)));
 
       // Deux politiques dans une page : rien n’est écrit, nulle part.
       const meta = politiqueDe(sansMesure('cgu.html'))[0];
@@ -171,11 +182,49 @@ test.describe('les pages écrites à la main', () => {
     }
   });
 
-  test('l’Action applique la mesure avant le générateur, aux deux passages, et n’enregistre en plus que les pages qu’elle a réécrites', () => {
+  test('la mesure démarre ou s’arrête : Confidentialité prend la date du jour à Paris, et le plan du site aussi ; sinon, rien', () => {
+    const dossier = mkdtempSync(path.join(tmpdir(), 'mesure-date-'));
+    const date = () => readFileSync(path.join(dossier, 'confidentialite.html'), 'utf8').match(/<p class="document__date">([^<]*)<\/p>/)[1];
+    const plan = () => readFileSync(path.join(dossier, 'sitemap.xml'), 'utf8');
+    const ligne = (jour) => `  <url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>${jour}</lastmod></url>`;
+    const avecLaMarque = (marque, maintenant) => {
+      writeFileSync(path.join(dossier, 'marque.json'), JSON.stringify(marque));
+      return appliquerLaMesure({ racine: dossier, maintenant: Date.parse(maintenant) }).changees;
+    };
+    try {
+      for (const p of ['index.html', 'confidentialite.html']) writeFileSync(path.join(dossier, p), sansMesure(p));
+      const depart = date();
+      writeFileSync(path.join(dossier, 'sitemap.xml'), lire('sitemap.xml'));
+      expect(plan()).toContain(ligne(lire('sitemap.xml').match(/confidentialite\.html<\/loc><lastmod>([^<]*)</)[1]));
+      // Arrêtée, et rien ne change : la date reste.
+      expect(avecLaMarque(SANS, '2026-11-01T10:00:00Z')).toEqual([]);
+      expect(date()).toBe(depart);
+      // Elle démarre le 1er novembre : la page et le plan du site le disent.
+      expect(avecLaMarque(AVEC, '2026-11-01T10:00:00Z')).toEqual(['confidentialite.html', 'index.html', 'sitemap.xml']);
+      expect(date()).toBe('Mise à jour le 1er novembre 2026');
+      expect(plan()).toContain(ligne('2026-11-01'));
+      // Un autre compte, plus tard : les pages changent d’adresse de compte, mais le texte de Confidentialité ne change
+      // pas, sa date non plus, ni le plan du site.
+      expect(avecLaMarque({ ...AVEC, mesure: { code: 'autre-compte' } }, '2026-11-20T10:00:00Z')).toEqual(['confidentialite.html', 'index.html']);
+      expect(date()).toBe('Mise à jour le 1er novembre 2026');
+      expect(plan()).toContain(ligne('2026-11-01'));
+      // Elle s’arrête le 15 décembre à 23 h 30 UTC, déjà le 16 à Paris.
+      expect(avecLaMarque(SANS, '2026-12-15T23:30:00Z')).toEqual(['confidentialite.html', 'index.html', 'sitemap.xml']);
+      expect(date()).toBe('Mise à jour le 16 décembre 2026');
+      expect(plan()).toContain(ligne('2026-12-16'));
+      // Le reste du plan du site ne bouge pas.
+      expect(plan().split('\n').filter((l) => !l.includes('confidentialite.html'))).toEqual(lire('sitemap.xml').split('\n').filter((l) => !l.includes('confidentialite.html')));
+      expect(dateDeMiseAJour(Date.parse('2027-03-09T12:00:00Z'))).toBe('Mise à jour le 9 mars 2027');
+    } finally {
+      rmSync(dossier, { recursive: true, force: true });
+    }
+  });
+
+  test('l’Action applique la mesure juste avant le générateur, une fois, et n’enregistre en plus que les pages qu’elle a réécrites', () => {
     const action = lire('.github/workflows/pages-des-matchs.yml');
     const lignes = action.split('\n').map((l) => l.trim()).filter((l) => !l.startsWith('#'));
     const mesures = lignes.map((l, i) => [l, i]).filter(([l]) => l.includes('generateur/mesure.mjs'));
-    expect(mesures.map(([l]) => l)).toEqual(['node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"', 'env -u JETON_GITHUB node generateur/mesure.mjs --ecrites="$mesure"']);
+    expect(mesures.map(([l]) => l)).toEqual(['node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"']);
     const generateurs = lignes.map((l, i) => [l, i]).filter(([l]) => l.includes('node generateur/construire.mjs'));
     expect(mesures.map(([, i]) => i + (lignes[i + 1]?.startsWith('option=') ? 3 : 1))).toEqual(generateurs.map(([, i]) => i));
     expect(action).toContain('mesure="$RUNNER_TEMP/mesure.txt"');
@@ -231,6 +280,43 @@ test.describe('les pages générées', () => {
     expect(controler((h) => h.replace(`connect-src 'self' ${ORIGINE};`, "connect-src 'self';"))).toMatch(/politique de sécurité/);
     // La même page, la mesure arrêtée : refusée (la balise, la politique).
     expect(controlerLaPage(p, { mesure: MESURE_ARRETEE }).join('\n')).toMatch(/politique de sécurité[\s\S]*1 balises de la mesure d’audience pour une mesure arrêtée/);
+  });
+
+  test('une page refusée ne garde jamais une version précédente qui compte autrement que marque.json', async () => {
+    const raison = 'sa mesure d’audience n’est plus celle de marque.json';
+    const AUTRE = lireLaMesure({ mesure: { code: 'autre-compte' } });
+    const html = (mesure) => `<meta http-equiv="Content-Security-Policy" content="${politiqueDesPages(mesure)}">\n${baliseDeLaMesure(mesure)}\n<a href="/matchs/">Matchs</a>`;
+    const sure = { avant: { type: 'match', bars: [] }, publies: new Set(), existantes: new Set(['/matchs/']), maintenant: MAINTENANT };
+    expect(raisonDeNePasGarder({ ...sure, html: html(MESURE_ARRETEE), mesure: MESURE_ARRETEE })).toBeNull();
+    expect(raisonDeNePasGarder({ ...sure, html: html(ACTIVE), mesure: ACTIVE })).toBeNull();
+    // Arrêtée depuis, démarrée depuis, ou un autre compte.
+    expect(raisonDeNePasGarder({ ...sure, html: html(ACTIVE), mesure: MESURE_ARRETEE })).toBe(raison);
+    expect(raisonDeNePasGarder({ ...sure, html: html(MESURE_ARRETEE), mesure: ACTIVE })).toBe(raison);
+    expect(raisonDeNePasGarder({ ...sure, html: html(AUTRE), mesure: ACTIVE })).toBe(raison);
+    // La balise sans le compte dans la politique, ou le compte sans la balise.
+    expect(raisonDeNePasGarder({ ...sure, html: `${html(MESURE_ARRETEE)}\n${baliseDeLaMesure(ACTIVE)}`, mesure: ACTIVE })).toBe(raison);
+    expect(raisonDeNePasGarder({ ...sure, html: html(ACTIVE).replace(baliseDeLaMesure(ACTIVE), ''), mesure: ACTIVE })).toBe(raison);
+
+    // Le passage : la mesure s’arrête au moment où les pages des bars sans soirée sont refusées. Aucune ne garde le
+    // compteur : chacune devient la page neutre, sans mesure.
+    const sortie = mkdtempSync(path.join(tmpdir(), 'mesure-refus-'));
+    try {
+      const passer = (marque, quand, textes = contenuDuScenario().textes) => construire({
+        source: `scenario:${SCENARIO}`, sortie, maintenant: Date.parse(quand), racine, contenu: { ...contenuDuScenario(), marque, textes },
+      });
+      await passer(AVEC, '2026-10-23T08:00:00Z');
+      const fichier = path.join(sortie, 'bar', 'au-bon-coin-lyon-2', 'index.html');
+      expect(readFileSync(fichier, 'utf8')).toContain(baliseDeLaMesure(ACTIVE));
+      const faux = structuredClone(contenuDuScenario().textes);
+      faux.bar.sansSoiree = 'Pas de soirée annoncée pour l’instant !';
+      const resultat = await passer(SANS, '2026-10-23T10:00:00Z', faux);
+      expect(resultat.avertissements).toContainEqual(expect.stringMatching(/^Page refusée, remplacée par une page neutre : \/bar\/au-bon-coin-lyon-2\/ .* sa version précédente ne reste pas : sa mesure d’audience n’est plus celle de marque\.json$/));
+      expect(readFileSync(fichier, 'utf8')).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
+      expect(resultat.fichiers.filter((f) => typeof f.contenu === 'string' && /mesure\.js|goatcounter/.test(f.contenu)).map((f) => f.chemin)).toEqual([]);
+      expect(readFileSync(fichier, 'utf8')).not.toMatch(/mesure\.js|goatcounter/);
+    } finally {
+      rmSync(sortie, { recursive: true, force: true });
+    }
   });
 
   test('un code illisible dans marque.json arrête le passage avant toute page', async () => {

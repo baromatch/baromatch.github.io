@@ -6,12 +6,15 @@
 //   (controle.mjs) l’exige exactement.
 // - Les pages écrites à la main (index.html, cgu.html…) sont réécrites ici, à chaque passage de l’Action
 //   (node generateur/mesure.mjs) : leur politique de sécurité, la ligne de /mesure.js juste avant </head> et, dans
-//   confidentialite.html, le bloc qui dit si le site compte ses visites (generateur/contenu/mesure.json). Rien d’autre :
-//   une page réécrite, une fois sa mesure retirée, redevient exactement ce qu’elle était, sinon rien n’est écrit.
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+//   confidentialite.html, le bloc qui dit si le site compte ses visites (generateur/contenu/mesure.json). Quand ce bloc
+//   change (la mesure démarre ou s’arrête), la page prend la date du jour à Paris (« Mise à jour le … ») et le plan du
+//   site aussi (sitemap.xml, sa ligne). Rien d’autre : une page réécrite, une fois sa mesure et sa date retirées,
+//   redevient exactement ce qu’elle était, sinon rien n’est écrit.
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DOSSIER_GENERATEUR, RACINE } from './contenu.mjs';
+import { dateCourte, jourDeParis } from './heure.mjs';
 
 export const TEXTES_DE_LA_MESURE = JSON.parse(readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 'mesure.json'), 'utf8'));
 
@@ -101,6 +104,19 @@ const META = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/g;
 // Le bloc de confidentialite.html qui dit si le site compte ses visites, entre ses deux commentaires.
 const BLOC = /(<!-- mesure : début[\s\S]*?-->\n)([\s\S]*?)(\n[ \t]*<!-- mesure : fin -->)/;
 export const texteDuBloc = (mesure) => TEXTES_DE_LA_MESURE.confidentialite[mesure.active ? 'active' : 'arretee'].join('\n');
+const blocDe = (html) => html.match(BLOC)?.[2] ?? null;
+
+// La date affichée d’une page (« Mise à jour le 1er novembre 2026 »), à Paris, et la même sans elle.
+const DATE_AFFICHEE = /(<p class="document__date">)[^<]*(<\/p>)/;
+export const dateDeMiseAJour = (maintenant) => `Mise à jour le ${dateCourte(maintenant)} ${jourDeParis(maintenant).slice(0, 4)}`;
+const sansLaDate = (html) => html.replace(DATE_AFFICHEE, '$1$2');
+// La ligne d’une page dans le plan du site, d’après son adresse canonique : sa date devient celle du jour à Paris.
+const daterDansLePlan = (plan, html, maintenant) => {
+  const adresse = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
+  if (!adresse) return plan;
+  return plan.split('\n').map((ligne) => (ligne.includes(`<url><loc>${adresse}</loc><lastmod>`)
+    ? ligne.replace(/<lastmod>[^<]*<\/lastmod>/, `<lastmod>${jourDeParis(maintenant)}</lastmod>`) : ligne)).join('\n');
+};
 
 // Les scripts d’une page autres que /mesure.js et les données structurées : un fichier, ou un script écrit dans la page.
 const aDAutresScripts = (html) => [...html.replace(UNE_BALISE, '').matchAll(/<script\b([^>]*)>/g)]
@@ -132,17 +148,25 @@ export const pagesEcritesALaMain = (racine = RACINE, dossier = '') => readdirSyn
   })
   .sort();
 
-// Chaque page écrite à la main, avec la mesure de marque.json : toutes contrôlées avant d’en écrire une seule. Rend
-// les pages changées (leur chemin relatif).
-export const appliquerLaMesure = ({ racine = RACINE, marque = JSON.parse(readFileSync(path.join(racine, 'marque.json'), 'utf8')) } = {}) => {
+// Chaque page écrite à la main, avec la mesure de marque.json : toutes contrôlées avant d’en écrire une seule. Une page
+// dont le bloc de la mesure change (Confidentialité, quand la mesure démarre ou s’arrête) prend la date du jour à Paris,
+// et sa ligne du plan du site aussi. Rend les fichiers changés (leur chemin relatif ; sitemap.xml compris).
+export const appliquerLaMesure = ({ racine = RACINE, marque = JSON.parse(readFileSync(path.join(racine, 'marque.json'), 'utf8')), maintenant = Date.now() } = {}) => {
   const mesure = lireLaMesure(marque);
-  const arretee = (html) => appliquerAUnePage(html, MESURE_ARRETEE);
+  const arretee = (html) => sansLaDate(appliquerAUnePage(html, MESURE_ARRETEE));
+  const fichierDuPlan = path.join(racine, 'sitemap.xml');
+  const planAvant = existsSync(fichierDuPlan) ? readFileSync(fichierDuPlan, 'utf8') : null;
+  let plan = planAvant;
   const changees = [];
   const erreurs = [];
   for (const relatif of pagesEcritesALaMain(racine)) {
     const avant = readFileSync(path.join(racine, relatif), 'utf8');
     try {
-      const apres = appliquerAUnePage(avant, mesure);
+      let apres = appliquerAUnePage(avant, mesure);
+      if (blocDe(apres) !== blocDe(avant) && DATE_AFFICHEE.test(apres)) {
+        apres = apres.replace(DATE_AFFICHEE, `$1${dateDeMiseAJour(maintenant)}$2`);
+        if (plan !== null) plan = daterDansLePlan(plan, apres, maintenant);
+      }
       if (arretee(apres) !== arretee(avant)) throw new Error('la page changerait ailleurs que dans sa mesure');
       if (apres !== avant) changees.push({ relatif, apres });
     } catch (erreur) {
@@ -150,6 +174,7 @@ export const appliquerLaMesure = ({ racine = RACINE, marque = JSON.parse(readFil
     }
   }
   if (erreurs.length) throw new Error(`Mesure d’audience : rien n’est écrit.\n${erreurs.join('\n')}`);
+  if (plan !== planAvant) changees.push({ relatif: 'sitemap.xml', apres: plan });
   for (const { relatif, apres } of changees) writeFileSync(path.join(racine, relatif), apres);
   return { mesure, changees: changees.map((c) => c.relatif) };
 };

@@ -21,7 +21,7 @@
     "iphone": ""
   },
   "mesure": {
-    "_lisezMoi": "La mesure d’audience du site, sans cookie. Vide, rien n’est compté et aucune page ne charge de compteur. Pour l’activer, colle entre les guillemets de « code » le code de ton compte GoatCounter (ce qui est avant « .goatcounter.com », par exemple \"baromatch\") : au passage suivant de l’Action, chaque page compte ses visites, et la page Confidentialité le dit. Pour l’arrêter, vide-le.",
+    "_lisezMoi": "La mesure d’audience du site, sans cookie. Vide, rien n’est compté et aucune page ne charge de compteur. Avant de l’activer, deux choses, sinon la page Confidentialité ne dit plus vrai. 1. Demande d’abord l’accord de sous-traitance à GoatCounter (le contrat qui encadre ce qu’il fait des visites pour toi ; par mail à support@goatcounter.com) et garde-le. 2. Dans les réglages de ton compte GoatCounter : dans la collecte des données (« Data collection »), coche seulement « Referrer » et « Sessions » ; laisse « Individual pageviews » décoché ; mets la durée de conservation (« Data retention in days ») à 730 jours ; et garde le tableau de bord privé : « Dashboard viewable by » sur « Only logged in users », jamais « Anyone ». Ensuite, colle entre les guillemets de « code » le code de ton compte GoatCounter (ce qui est avant « .goatcounter.com », par exemple \"baromatch\") : au passage suivant de l’Action, chaque page compte ses visites, et la page Confidentialité le dit, datée du jour. Pour l’arrêter, vide-le : ça prend effet au premier passage réussi de l’Action (tant que les données des matchs ne répondent pas, rien ne change, et Confidentialité dit toujours vrai).",
     "outil": "goatcounter",
     "code": ""
   }

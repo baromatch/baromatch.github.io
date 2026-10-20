@@ -249,9 +249,11 @@ test('la confidentialité dit ce qu’on garde (l’adresse et la ville), pourqu
   expect(texte).toContain('te prévenir quand Baromatch ouvre dans ta ville');
   expect(texte).toContain('Pour Lyon, Marseille, Lille ou une autre ville, qui n’ont pas de date : jusqu’à l’ouverture de Baromatch dans cette ville, et 12 mois au plus après ton inscription.');
   expect(texte).toContain('Les inscriptions (ton adresse et ta ville) passent par Formspree');
+  // Le formulaire des pages de ville et des pages en anglais part sans JavaScript : la page qui suit est celle de Formspree.
+  expect(texte).toContain('Depuis une page de ville ou une page en anglais, l’inscription part directement chez Formspree, qui affiche ensuite sa propre page de confirmation.');
   await expect(section.locator('a[href="mailto:confidentialite@baromatch.fr"]')).toHaveCount(1);
   expect(texte).not.toContain('rien d’autre.');
   // La date de la page, et celle du plan du site.
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 19 octobre 2026');
-  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-10-19</lastmod></url>');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 20 octobre 2026');
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-10-20</lastmod></url>');
 });

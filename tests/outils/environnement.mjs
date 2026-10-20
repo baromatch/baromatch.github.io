@@ -1,12 +1,22 @@
 // Ce que les outils de vérification partagent : la racine du dépôt (chaque fichier se lit par rapport à elle, jamais par
 // rapport au dossier d’où l’on lance la commande), le Chromium de la machine et la commande du serveur local.
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { chromium } from '@playwright/test';
 
 export const racine = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-// Le Chromium de la machine (aucun téléchargement) ; CHROME_PATH le remplace ailleurs.
-export const CHROMIUM = process.env.CHROME_PATH || '/opt/pw-browsers/chromium';
+// Le Chromium de la machine, sans rien télécharger : CHROME_PATH s’il est donné ; sinon celui déjà installé dans
+// /opt/pw-browsers ; sinon celui que Playwright a installé lui-même (npx playwright install chromium : c’est ce que fait
+// l’Action des vérifications, .github/workflows/verifications.yml, sur une machine de GitHub).
+export const CHROMIUM_INSTALLE = '/opt/pw-browsers/chromium';
+export const cheminDeChromium = ({ env = process.env, existe = existsSync, dePlaywright = () => chromium.executablePath() } = {}) => {
+  if (env.CHROME_PATH) return env.CHROME_PATH;
+  if (existe(CHROMIUM_INSTALLE)) return CHROMIUM_INSTALLE;
+  return dePlaywright();
+};
+export const CHROMIUM = cheminDeChromium();
 
 // Le site servi comme GitHub Pages : les fichiers tels quels, et 404.html pour une adresse inconnue ; seulement sur
 // 127.0.0.1 (personne d’autre sur le réseau ne lit le dépôt), sans journal (-s). cacheSecondes : 600 comme GitHub

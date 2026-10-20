@@ -2,12 +2,14 @@
 // « Pages des matchs » : son étape d’envoi, la seule qui reçoit le jeton, est lancée telle quelle (le script lu dans le
 // fichier de l’Action) dans des dépôts git jetables, avec un main qui change pendant le passage. Elle ne lance que git :
 // un « node » piégé dans le PATH note chaque appel, et aucun n’est permis.
+// « Vérifications » : les tests du site sur chaque demande de fusion vers main et chaque envoi sur une autre branche,
+// sans secret ni droit d’écrire, avec le Chromium de Playwright.
 import { test, expect } from '@playwright/test';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { racine } from './outils/environnement.mjs';
+import { cheminDeChromium, CHROMIUM_INSTALLE, racine } from './outils/environnement.mjs';
 
 const lireLAction = (nom) => readFileSync(path.join(racine, '.github', 'workflows', nom), 'utf8').replace(/\r\n/g, '\n');
 
@@ -168,5 +170,56 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     } finally {
       d.ranger();
     }
+  });
+});
+
+test.describe('« Vérifications » : les tests du site sur GitHub', () => {
+  const action = lireLAction('verifications.yml');
+  const lignes = action.split('\n').filter((l) => !l.trim().startsWith('#'));
+  const sansCommentaires = lignes.join('\n');
+
+  test('quand elle tourne : une demande de fusion vers main, un envoi sur une autre branche que main', () => {
+    expect(sansCommentaires.split('\non:\n')[1].split('\n\n')[0]).toBe('  pull_request:\n    branches: [main]\n  push:\n    branches-ignore: [main]');
+    expect(sansCommentaires).not.toMatch(/pull_request_target|workflow_run|schedule:|workflow_dispatch/);
+  });
+
+  test('ce qu’elle peut : lire le dépôt, rien d’autre ; aucun secret, aucun jeton', () => {
+    expect(sansCommentaires).toMatch(/\npermissions:\n  contents: read\n\n/);
+    expect(sansCommentaires.match(/permissions:/g)).toHaveLength(1);
+    expect(sansCommentaires).not.toMatch(/secrets\.|github\.token|_TOKEN|JETON/);
+    // La seule expression : le nom de la branche, pour arrêter les vérifications d’un envoi remplacé.
+    expect([...sansCommentaires.matchAll(/\$\{\{([^}]*)\}\}/g)].map((m) => m[1].trim())).toEqual(['github.ref']);
+    expect(sansCommentaires).toContain('\nconcurrency:\n  group: verifications-${{ github.ref }}\n  cancel-in-progress: true\n');
+    expect(sansCommentaires).toMatch(/ {6}- uses: actions\/checkout@v7\n {8}with:\n {10}persist-credentials: false\n/);
+  });
+
+  test('ce qu’elle lance : les installations exactes sans script, Chromium de Playwright, puis tous les tests, en 30 minutes au plus', () => {
+    const travaux = sansCommentaires.split('\njobs:\n')[1];
+    expect([...travaux.matchAll(/^ {2}[a-z-]+:$/gm)].map((m) => m[0].trim())).toEqual(['verifier:']);
+    expect(travaux).toContain('    runs-on: ubuntu-latest\n    timeout-minutes: 30\n');
+    expect(travaux).toContain('node-version: 22');
+    expect([...travaux.matchAll(/run: (.*)/g)].map((m) => m[1])).toEqual([
+      'npm ci --ignore-scripts --no-audit --no-fund',
+      'npm ci --ignore-scripts --no-audit --no-fund',
+      'npx playwright install --with-deps chromium',
+      'npx playwright test',
+    ]);
+    expect(travaux).toMatch(/\n {8}working-directory: generateur\/images\n {8}run: npm ci --ignore-scripts --no-audit --no-fund\n/);
+  });
+
+  test('les mêmes actions, à la même étiquette, que « Pages des matchs »', () => {
+    const actions = (texte) => [...texte.matchAll(/uses: ([^\s]+)/g)].map((m) => m[1]);
+    // Étiquettes vérifiées le 20 octobre 2026 : actions/checkout v7 (v7.0.1) et actions/setup-node v7 (v7.1.0).
+    expect(actions(action)).toEqual(['actions/checkout@v7', 'actions/setup-node@v7']);
+    expect(actions(lireLAction('pages-des-matchs.yml'))).toEqual(actions(action));
+  });
+
+  test('Chromium : CHROME_PATH, sinon celui déjà installé sur la machine, sinon celui de Playwright', () => {
+    const dePlaywright = () => '/cache/ms-playwright/chromium/chrome';
+    expect(cheminDeChromium({ env: { CHROME_PATH: '/autre/chrome' }, existe: () => true, dePlaywright })).toBe('/autre/chrome');
+    expect(cheminDeChromium({ env: {}, existe: (chemin) => chemin === CHROMIUM_INSTALLE, dePlaywright })).toBe(CHROMIUM_INSTALLE);
+    expect(cheminDeChromium({ env: {}, existe: () => false, dePlaywright })).toBe('/cache/ms-playwright/chromium/chrome');
+    // Par défaut, celui que Playwright attend : un vrai chemin, celui que « npx playwright install chromium » remplit.
+    expect(cheminDeChromium({ env: {}, existe: () => false })).toMatch(/chrom/i);
   });
 });

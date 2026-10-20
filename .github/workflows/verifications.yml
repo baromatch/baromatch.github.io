@@ -1,0 +1,47 @@
+# Les vérifications du site (Playwright, le dossier tests/) : à chaque demande de fusion vers main, et à chaque envoi
+# sur une autre branche que main. Elles ne font que lire le dépôt : aucun secret, aucun droit d’écrire, rien n’est
+# publié ni envoyé. Un nouvel envoi sur la même branche arrête les vérifications en cours de la précédente.
+# Les outils de vérification (package.json) et, comme dans « Pages des matchs », le rendu des images de partage et
+# l’encodeur des QR codes (generateur/images) s’installent à leur version exacte (package-lock.json), sans aucun script
+# d’installation. Chromium est celui de Playwright, installé ici avec ce qu’il lui faut pour tourner ; sur la machine
+# de travail, tests/outils/environnement.mjs prend celui qui y est déjà.
+name: Vérifications
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verifications-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Installer les outils de vérification
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Installer le rendu des images de partage
+        working-directory: generateur/images
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Installer Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Lancer les vérifications
+        run: npx playwright test

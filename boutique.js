@@ -5,7 +5,7 @@
    écrit à l’ouverture. Après l’envoi, l’adresse est rappelée ; « Corriger l’adresse » remet la sélection et l’adresse
    dans le formulaire, et le nouvel envoi porte l’adresse qu’il remplace (champ « remplace »). Ce champ informe
    seulement le propriétaire : rien n’est remplacé ni effacé sur sa seule foi (n’importe qui peut l’écrire en envoyant
-   au formulaire), une suppression passe par confidentialite@baromatch.fr.
+   au formulaire), une suppression passe par contact@baromatch.fr.
    Chaque échec d’envoi (pas de réponse en 10 s, coupure, refus) offre d’envoyer la sélection par mail, et écrit
    l’adresse contact@baromatch.fr en toutes lettres ; seul un refus de Formspree qui nomme l’adresse dit de la vérifier
    (même règle que la liste d’attente, main.js).

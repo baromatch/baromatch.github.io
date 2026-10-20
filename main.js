@@ -6,7 +6,7 @@
    l’adresse » (ou taper dans le champ) rouvre l’envoi ; la nouvelle inscription porte aussi l’adresse qu’elle
    remplace (champ « remplace »), comme une autre ville choisie après l’inscription. Ce champ informe seulement le
    propriétaire : rien n’est remplacé ni effacé sur sa seule foi (n’importe qui peut l’écrire en envoyant au
-   formulaire), une suppression passe par confidentialite@.
+   formulaire), une suppression passe par contact@baromatch.fr.
 
    L’issue d’un envoi se décide en un seul endroit (transmettre) : inscrite, adresse refusée par Formspree, ou panne
    (réseau, pas de réponse en 10 s, tout autre refus). Chaque échec laisse une issue : écrire à contact@baromatch.fr.

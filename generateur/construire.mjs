@@ -97,7 +97,8 @@ export const construire = async ({
   // L’image de partage de chaque page de match, de ville, de bar et de « Ce soir », à côté d’elle. Son empreinte est
   // celle de son dessin (le SVG et le rendu) : un dessin inchangé dont le fichier est là n’est ni refait ni réécrit
   // (contenu null). La tête de la page l’annonce avec sa version, le début de cette même empreinte (partage.mjs,
-  // imageDeLaCarte) : « partage.png?v=… » ne change que si l’image change. Une page neutre n’en a pas (l’image générale du site) : l’image de la page refusée part avec elle.
+  // imageDeLaCarte) : « partage.png?v=… » ne change que si l’image change. Une page neutre n’en a pas (l’image générale
+  // du site) : l’image de la page refusée part avec elle.
   if (charge.rendu) {
     for (const p of site.pages.filter((x) => x.carte)) {
       const chemin = cheminDeLImage(p.chemin);

@@ -43,5 +43,10 @@ jobs:
       - name: Installer Chromium
         run: npx playwright install --with-deps chromium
 
+      # Un test lit la dernière image du film avec ffmpeg (tests/seo.spec.mjs) : sans lui, ce test serait sauté. La liste
+      # des paquets vient d’être mise à jour par l’étape d’avant.
+      - name: Installer ffmpeg
+        run: sudo apt-get install -y --no-install-recommends ffmpeg
+
       - name: Lancer les vérifications
         run: npx playwright test

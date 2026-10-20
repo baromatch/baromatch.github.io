@@ -9,17 +9,20 @@
 // faite de sa jumelle française et vit comme elle : les 14 prochains jours, puis « This match has been played » 30 jours
 // en noindex, puis plus rien (construire.mjs efface ce que l’état connaît et que le passage n’écrit plus).
 // L’index : une page de match, avec au moins 2 vrais bars de Paris (la règle des pages de match, SEUILS.barsParMatch) ;
-// un guide (/en/ et les deux compétitions), seulement quand au moins un vrai bar de Paris montre un match à venir de ce
-// qu’il couvre : jamais un guide vide dans l’index. hreflang (fr ↔ en, x-default vers le français) seulement entre deux
-// jumelles indexables qui passent le contrôle, et le lien visible « English » / « Version française » dès qu’elles le
-// passent (lierLesLangues, appelé par site.mjs après le contrôle).
+// /en/, dès que Paris a un vrai bar publié (la règle de sa jumelle, la page de Paris : pages.mjs), qu’il montre un match
+// choisi ou pas ; le guide d’une compétition, tant qu’un vrai bar de Paris montre un de ses matchs à venir, puis 30 jours
+// encore après le coup d’envoi du dernier (l’état le garde : memoire.derniereSoiree), tant que Paris a un vrai bar.
+// Aucun n’entre ni ne sort de l’index d’un soir à l’autre, et jamais un guide sans bar à Paris dans l’index. hreflang
+// (fr ↔ en, x-default vers le français) seulement entre deux jumelles indexables qui passent le contrôle, et le lien
+// visible « English » / « Version française » dès qu’elles le passent (lierLesLangues, appelé par site.mjs après le
+// contrôle).
 // Ni offre de bar, ni mot de boisson (loi Evin), ni score ; l’heure de Paris écrite à l’anglaise (« Sat 24 Oct, 9:00 pm
 // (Paris time) ») ; les clubs sous leur nom des données ; l’état de l’appli dit dès la tête de chaque page.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { ENVOI_DE_LA_LISTE } from './attente.mjs';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
-import { DUREE_MATCH_MS } from './donnees.mjs';
+import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
 import { page } from './gabarits.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe, cheminDuBar, debutDe, filDAriane, IMAGE, listeDesBars, pageWeb } from './jsonld.mjs';
@@ -34,6 +37,8 @@ const VILLE = 'paris';
 const PARIS_EN_FRANCAIS = '/regarder-le-match/paris/';
 // Le championnat dont les clubs sont « les clubs français » (pour dire que le calendrier européen les suit).
 const CHAMPIONNAT_FRANCAIS = 'Ligue 1';
+// Le guide d’une compétition reste indexable 30 jours après le dernier de ses matchs qu’un vrai bar de Paris a montré.
+export const GRACE_DES_GUIDES_MS = 30 * JOUR_MS;
 
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 
@@ -92,8 +97,9 @@ const description = (...candidats) => choisir(candidats, 70, 160, ' Paris bars s
 // ---------- Les pages ----------
 
 // pages : celles du passage en français (les pages de matchs, dont celles des matchs passés) ; images : le rendu des
-// images de partage est là (une page de match reprend alors l’image de sa jumelle).
-export const fabriquerLesPagesAnglaises = ({ donnees, contenu, cadre, avecPresse = false, pages = [], images = false }) => {
+// images de partage est là (une page de match reprend alors l’image de sa jumelle) ; anciens : ce que l’état garde des
+// guides (anciensDe, etat.mjs).
+export const fabriquerLesPagesAnglaises = ({ donnees, contenu, cadre, avecPresse = false, pages = [], images = false, anciens = {} }) => {
   const t = contenu.anglais ?? TEXTES_EN;
   const { marque, textes, competitions = {} } = contenu;
   const { maintenant } = donnees;
@@ -302,12 +308,12 @@ ${retour}`,
     ? `\n      <p class="regarder-carte__suite">${e(t.bars.prochaine)} ${lienDuMatch(soiree.match)}, ${temps(soiree.match)}${statut(soiree.match)}.</p>`
     : `\n      <p class="regarder-carte__suite">${e(t.bars.sansSoiree)}</p>`);
   const soireeDuGuide = (bar, matchs) => bar.soirees.find((s) => enCoursOuAVenir(s.match) && (!matchs || matchs.includes(s.match)));
-  const ajouterUnGuide = ({ cle, chemin, jumelle, tg, matchs, sections, apres = '', bars, cartes: cartesDuGuide, sansBar }) => {
+  const ajouterUnGuide = ({ cle, chemin, jumelle, tg, matchs, sections, apres = '', bars, cartes: cartesDuGuide, sansBar, indexable, memoire = null }) => {
     const titrePage = `${tg.titre} — Baromatch`;
     const desc = description(bars.length ? remplir(tg.descriptionAvecBars, { bars: compte(bars.length), verbe: bars.length > 1 ? 'are' : 'is' }) : tg.descriptionSansBar);
     const etapes = chemin === CHEMINS_EN.paris ? [accueil, paris] : [accueil, paris, { nom: tg.titre, chemin }];
     ajouter({
-      type: 'guide-en', cle, ...(jumelle ? { jumelle } : {}), chemin, indexable: bars.length >= 1, titre: titrePage, description: desc,
+      type: 'guide-en', cle, ...(jumelle ? { jumelle } : {}), chemin, indexable, ...(memoire ? { memoire } : {}), titre: titrePage, description: desc,
       barsNommes: cartesDuGuide.map((c) => c.bar.id), partage: true,
       jsonld: [
         pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc, inLanguage: 'en' }),
@@ -339,10 +345,22 @@ ${commentCaMarche()}${chemin === CHEMINS_EN.paris ? '' : `\n${retour}`}`,
 ${matchs.length ? parJour(matchs) : `  <p>${e(vide)}</p>`}${suite}
 </section>`;
 
+  // Les vrais bars publiés de Paris. Le guide d’une compétition : indexable tant que l’un d’eux montre un de ses matchs à
+  // venir, puis 30 jours après le coup d’envoi du dernier (gardé dans l’état), et jamais sans vrai bar à Paris.
+  const barsDeParis = donnees.bars.filter((b) => b.ville.cle === VILLE).sort(parLieu);
+  const indexDuGuide = (cle, matchs) => {
+    const reperes = [...matchs.filter((m) => barsDe([m]).length).map((m) => m.debut), Date.parse(anciens.guides?.[cle]?.derniereSoiree ?? '')].filter(Number.isFinite);
+    const derniere = reperes.length ? Math.max(...reperes) : null;
+    return {
+      indexable: barsDeParis.length > 0 && derniere !== null && derniere + GRACE_DES_GUIDES_MS > maintenant,
+      memoire: derniere === null ? null : { derniereSoiree: new Date(derniere).toISOString() },
+    };
+  };
+
   // Paris : tous ses vrais bars, chacun avec sa prochaine soirée ; les matchs choisis à venir ; ce qu’il faut savoir.
+  // Indexable comme sa jumelle, la page de Paris (pages.mjs) : avec son guide écrit, dès son premier vrai bar.
   {
     const tp = t.paris;
-    const barsDeParis = donnees.bars.filter((b) => b.ville.cle === VILLE).sort(parLieu);
     const sections = `${sectionDesMatchs('titre-matchs', tp.titreMatchs, aVenir, tp.sansMatch, `
   <p class="regarder-suite"><a href="${CHEMINS_EN.premierLeague}">${e(t.premierLeague.titre)}</a></p>
   <p class="regarder-suite"><a href="${CHEMINS_EN.championsLeague}">${e(t.championsLeague.titre)}</a></p>`)}`;
@@ -353,6 +371,7 @@ ${tp.conseils.map((conseil) => `  <p>${e(conseil)}</p>`).join('\n')}
 </section>`;
     ajouterUnGuide({
       cle: VILLE, chemin: CHEMINS_EN.paris, jumelle: PARIS_EN_FRANCAIS, tg: tp, matchs: aVenir, sections, apres, bars: barsDe(aVenir), sansBar: tp.sansBar,
+      indexable: barsDeParis.length >= (contenu.villes?.[VILLE] ? SEUILS.barsParVilleAvecGuide : SEUILS.barsParVilleSansGuide),
       cartes: barsDeParis.map((bar) => ({ bar, soiree: soireeDuGuide(bar) })),
     });
   }
@@ -363,7 +382,7 @@ ${tp.conseils.map((conseil) => `  <p>${e(conseil)}</p>`).join('\n')}
     const matchs = aVenir.filter((m) => sorte(m) === 'premier-league');
     const bars = barsDe(matchs);
     ajouterUnGuide({
-      cle: 'premier-league', chemin: CHEMINS_EN.premierLeague, tg: tp, matchs, bars, sansBar: tp.sansBar,
+      cle: 'premier-league', chemin: CHEMINS_EN.premierLeague, tg: tp, matchs, bars, sansBar: tp.sansBar, ...indexDuGuide('premier-league', matchs),
       sections: sectionDesMatchs('titre-matchs', tp.titreMatchs, matchs, tp.sansMatch, `
   <p class="regarder-note">${e(tp.selection)}</p>
   <p class="regarder-note">${e(tp.heure)}</p>`),
@@ -383,7 +402,7 @@ ${tp.conseils.map((conseil) => `  <p>${e(conseil)}</p>`).join('\n')}
     const bars = barsDe(ligue);
     const montres = barsDe([...ligue, ...autres]);
     ajouterUnGuide({
-      cle: 'champions-league', chemin: CHEMINS_EN.championsLeague, tg: tp, matchs: [...ligue, ...autres], bars, sansBar: tp.sansBar,
+      cle: 'champions-league', chemin: CHEMINS_EN.championsLeague, tg: tp, matchs: [...ligue, ...autres], bars, sansBar: tp.sansBar, ...indexDuGuide('champions-league', ligue),
       sections: `${sectionDesMatchs('titre-matchs', tp.titreMatchs, ligue, tp.sansMatch, `
   <p class="regarder-note">${e(tp.selection)}${toutFrancais ? ` ${e(tp.clubsFrancais)}` : ''}</p>`)}${autres.length ? `
 ${sectionDesMatchs('titre-autres', tp.titreAutres, autres, '')}` : ''}`,

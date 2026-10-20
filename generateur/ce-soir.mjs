@@ -6,25 +6,31 @@
 // minuit, la page passe au nouveau jour : l’Action passe juste après minuit à Paris (0 h 05, en heure d’été comme
 // d’hiver), et qui la lit alors pense à la soirée qui vient ; un match de la veille qui se joue encore y reste
 // (« Commencé le … »). Le jour est écrit en entier dans son titre et sous lui. Un match fini n’est plus listé.
-// Indexable seulement quand elle montre un vrai bar pour un match de ce soir. Sinon noindex, et elle montre quand même
-// les matchs du jour et les suivants (vers leurs pages), les villes et la liste d’attente : jamais vide, jamais un faux
-// bar. Ses données structurées : la page, son fil d’Ariane et la liste des matchs qu’elle montre, chacun vers sa page ;
-// les soirées (Event) restent sur les pages des matchs et des bars, où elles sont décrites. Comme une page de match,
-// elle a le bloc « Partager » et son image d’aperçu (partage.mjs) : le jour écrit en entier, ses matchs, le vrai nombre
-// de vrais bars.
+// Indexable dès qu’un vrai bar publié est sur le site, même un soir où aucun ne diffuse de match : elle n’entre ni ne
+// sort de l’index d’un soir à l’autre. Un soir sans bar, elle le dit, et montre les prochains soirs qu’un vrai bar a
+// annoncés (le jour, le match, le nom du bar vers sa soirée). Sans aucun vrai bar sur le site, noindex. Elle montre
+// toujours les matchs du jour et les suivants (vers leurs pages), les villes et la liste d’attente : jamais vide,
+// jamais un faux bar, jamais un bar qu’elle n’a pas. Ses données structurées : la page, son fil d’Ariane et la liste
+// des matchs qu’elle montre, chacun vers sa page ; les soirées (Event) restent sur les pages des matchs et des bars, où
+// elles sont décrites. Comme une page de match, elle a le bloc « Partager » et son image d’aperçu (partage.mjs) : le jour
+// écrit en entier, ses matchs, le vrai nombre de vrais bars.
 import { DUREE_MATCH_MS } from './donnees.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
-import { adresseDe, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
+import { adresseDe, ancreDeLaSoiree, cheminDuBar, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 
 export const CHEMIN_CE_SOIR = '/ce-soir/';
-// Au moins un vrai bar pour un match de ce soir : la page est indexable.
+// Au moins un vrai bar publié sur le site : la page est indexable, ce soir comme les soirs sans bar.
 export const BARS_POUR_CE_SOIR = 1;
 // Les prochains matchs montrés sous ceux de ce soir.
 export const PROCHAINS = 8;
+// Un soir sans bar : les prochains soirs qu’un vrai bar a annoncés, et les bars nommés pour chaque match (au-delà, leur
+// nombre, vers la page du match).
+export const SOIRS_AU_BAR = 3;
+export const BARS_PAR_SOIR = 5;
 
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
@@ -83,7 +89,7 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   const autres = ceSoir.filter((m) => !avecBars.includes(m));
   const soirees = avecBars.flatMap((m) => m.soirees);
   const nombreDeBars = new Set(soirees.map((s) => s.bar.id)).size;
-  const indexable = nombreDeBars >= BARS_POUR_CE_SOIR;
+  const indexable = donnees.bars.length >= BARS_POUR_CE_SOIR;
   const fini = ceSoir.length === 0 && donnees.matchs.some((m) => jourDeParis(m.debut) === aujourdhui && !m.statut);
   const prochains = donnees.matchs.filter((m) => !ceSoir.includes(m) && m.debut > maintenant && !m.statut && aUnePage(m)).sort(parDebut).slice(0, PROCHAINS);
   // Les matchs à venir (après ce soir) qu’un vrai bar diffuse : la page ne parle de « bars qui les diffusent » qu’avec eux.
@@ -150,6 +156,25 @@ ${prochains.filter((m) => jourDeParis(m.debut) === j).map((m) => `    ${ligneDeM
   </ul>`).join('\n') : `  <p>${e(t.aucunProchain)}</p>`}
   <p class="regarder-suite"><a href="/matchs/">${e(textes.villes.voirLaSemaine)}</a></p>
 </section>`;
+  // Un soir sans bar : les prochains soirs qu’un vrai bar a annoncés, sous le titre de leur jour ; pour chaque match, les
+  // bars qui le diffusent (vers leur soirée, sur leur page), dans l’ordre annoncé (ville, arrondissement, nom).
+  const joursAuBar = avecBars.length ? [] : [...new Set(aVenirAvecBars.map((m) => jourDeParis(m.debut)))].slice(0, SOIRS_AU_BAR);
+  const soirsAuBar = joursAuBar.flatMap((j) => aVenirAvecBars.filter((m) => jourDeParis(m.debut) === j));
+  const nommeesDu = (m) => [...m.soirees].sort(parLieu).slice(0, BARS_PAR_SOIR);
+  const lesBarsDu = (m) => {
+    const nommees = nommeesDu(m);
+    const reste = m.soirees.length - nommees.length;
+    const autres = `et ${accorder(reste, 'autre bar', 'autres bars')}`;
+    return `${nommees.map((s) => `<a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(m)}">${e(s.bar.nom)}</a> (${e(s.bar.quartier)})`).join(', ')}${reste
+      ? ` ${aUnePage(m) ? `<a href="${cheminDuMatch(m)}">${e(autres)}</a>` : e(autres)}` : ''}`;
+  };
+  const sectionSoirsAuBar = joursAuBar.length ? `<section class="regarder-section" aria-labelledby="titre-soirs">
+  <h2 id="titre-soirs">${e(t.soirsAuBar)}</h2>
+${joursAuBar.map((j) => `  <h3 class="regarder-jour">${e(capitale(jourEnLettres(Date.parse(`${j}T12:00:00Z`))))}</h3>
+  <ul class="regarder-matchs">
+${soirsAuBar.filter((m) => jourDeParis(m.debut) === j).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), heureSeule: true, suite: ` · ${lesBarsDu(m)}` })}`).join('\n')}
+  </ul>`).join('\n')}
+</section>\n` : '';
   // Les villes qui ont leur page : celles qui ont des vrais bars d’abord.
   const villes = pages.filter((p) => p.type === 'ville').map((p) => ({ chemin: p.chemin, nom: p.memoire?.nom ?? p.cle, bars: donnees.bars.filter((b) => b.ville.cle === p.cle).length }))
     .sort((a, b) => b.bars - a.bars || a.nom.localeCompare(b.nom, 'fr'));
@@ -176,7 +201,8 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
       );
     }
     const matchs = `${debut}${accorder(ceSoir.length, 'match', 'matchs')} ${moment.moment}, à l’heure de Paris.`;
-    if (ceSoir.some((m) => !m.statut)) return description(`${matchs} Pas encore de bar pour ${ceSoir.length > 1 ? 'les' : 'le'} voir sur Baromatch : les prochains matchs et les villes.`);
+    // Pas encore de bar ce soir : les prochains soirs au bar, s’il y en a.
+    if (ceSoir.some((m) => !m.statut)) return description(`${matchs} Pas encore de bar pour ${ceSoir.length > 1 ? 'les' : 'le'} voir sur Baromatch : ${joursAuBar.length ? 'les prochains soirs au bar, et les villes.' : 'les prochains matchs et les villes.'}`);
     // Tous les matchs de ce soir sont reportés ou annulés : la page ne dit pas « pas encore de bar ».
     // Les bars des prochains matchs, seulement s’il y en a.
     if (ceSoir.length) return description(`${matchs} ${aVenirAvecBars.length ? 'Les prochains matchs et les bars qui les diffusent sur Baromatch.' : 'Les prochains matchs et les villes, sur Baromatch.'}`);
@@ -197,9 +223,9 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
   const carte = carteDessinable(lignes) ? lignes : null;
   const image = images && carte ? imageDeLaCarte(chemin, carte, { verre: cadre.verre, signature: images.signature }) : null;
 
-  // Les bars que la page nomme (leurs cartes), gardés dans l’état comme pour toute page qui nomme des bars : refusée au
-  // passage où l’un d’eux est retiré, sa version précédente ne reste pas (refus.mjs).
-  const barsNommes = [...new Set(soirees.map((s) => s.bar.id))].sort();
+  // Les bars que la page nomme (leurs cartes, et ceux des prochains soirs au bar), gardés dans l’état comme pour toute
+  // page qui nomme des bars : refusée au passage où l’un d’eux est retiré, sa version précédente ne reste pas (refus.mjs).
+  const barsNommes = [...new Set([...soirees, ...soirsAuBar.flatMap(nommeesDu)].map((s) => s.bar.id))].sort();
   const p = {
     type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage, barsNommes,
     jsonld: [pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...listes.filter((l) => l.numberOfItems > 0)],
@@ -210,7 +236,7 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
   <p class="regarder-chapeau">${e(avecBars.length ? t.chapeau : aVenirAvecBars.length ? t.chapeauProchainsSoirs : t.chapeauSansBar)}</p>
 </header>
 ${sectionDuSoir}
-${sectionProchains}
+${sectionSoirsAuBar}${sectionProchains}
 ${sectionVilles}
 ${appel(marque, textes)}
 ${commentCaMarche(textes, marque)}`,

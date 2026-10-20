@@ -14,7 +14,8 @@
 // que quand de vrais bars publiés diffusent le match, avec leur vrai nombre.
 // Les fichiers sont les mêmes octet pour octet tant que rien ne change : chaque évènement garde dans l’état l’empreinte
 // de son contenu, son numéro de version (SEQUENCE, qui monte à chaque vrai changement) et l’instant de ce changement
-// (DTSTAMP). La page agenda/ reste en noindex tant qu’aucun match de ces agendas n’a de vrai bar.
+// (DTSTAMP). La page agenda/ est indexable dès qu’un vrai bar publié est sur le site (qu’un de ces matchs ait un bar
+// ou pas : elle n’entre ni ne sort de l’index d’une semaine à l’autre) ; sans aucun vrai bar, noindex.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
@@ -35,6 +36,8 @@ export const DUREE_DANS_L_AGENDA_MS = 2 * HEURE_MS;
 export const GARDE_ANNULE_MS = 7 * JOUR_MS;
 // L’agenda d’un club qui sort des listes reste 30 jours, vide, puis disparaît.
 export const GARDE_CLUB_MS = 30 * JOUR_MS;
+// La page agenda/ est indexable dès ce nombre de vrais bars publiés sur le site.
+export const BARS_POUR_L_AGENDA = 1;
 const PRODID = '-//Baromatch//Ton club dans ton agenda//FR';
 const DOMAINE = 'baromatch.fr';
 // Les coupes d’Europe, dites ensemble sur la page ; l’ordre des compétitions, Ligue 1 d’abord.
@@ -73,7 +76,7 @@ const pasFini = (m, maintenant) => m.debut + DUREE_MATCH_MS > maintenant;
 export const aSonFichier = (match, maintenant) => !match.statut && match.debut > maintenant;
 
 // Ce que disent les agendas : les clubs, leurs matchs à venir (ni reportés ni annulés), les compétitions, le dernier jour
-// au programme, ce qui manque aux listes (la Coupe de France, les matchs amicaux), et si un de ces matchs a un vrai bar.
+// au programme, et ce qui manque aux listes (la Coupe de France, les matchs amicaux).
 export const resumerLesAgendas = (donnees) => {
   const { maintenant } = donnees;
   const clubs = clubsDeLigue1(donnees.matchs);
@@ -89,7 +92,6 @@ export const resumerLesAgendas = (donnees) => {
     competitions: trierLesCompetitions(suivis.map((m) => m.competition)),
     horizon: suivis.length ? Math.max(...suivis.map((m) => m.debut)) : null,
     manque: coupe && amical ? null : coupe ? 'amical' : amical ? 'coupe' : 'tout',
-    avecBars: suivis.some((m) => m.soirees.length > 0),
   };
 };
 
@@ -145,7 +147,7 @@ export const fabriquerLaPageAgenda = ({ donnees, contenu, cadre, avecPresse = fa
   const etapes = [{ nom: textes.fil.accueil, chemin: '/' }, { nom: t.fil, chemin }];
   const p = {
     // Elle ne nomme aucun bar (barsNommes vide, gardé dans l’état comme pour toute page).
-    type: 'agenda', cle: 'agenda', date: null, chemin, indexable: resume.avecBars, titre: t.titre, description: t.description, barsNommes: [],
+    type: 'agenda', cle: 'agenda', date: null, chemin, indexable: donnees.bars.length >= BARS_POUR_L_AGENDA, titre: t.titre, description: t.description, barsNommes: [],
     jsonld: [pageWeb({ chemin, titre: t.titre, description: t.description }), filDAriane(etapes)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">

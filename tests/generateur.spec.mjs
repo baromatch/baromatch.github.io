@@ -1199,6 +1199,54 @@ test.describe('d’un passage à l’autre', () => {
     expect(existsSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/index.html'))).toBe(true);
   });
 
+  test('un seul vrai bar publié, une semaine de passages : « Ce soir », agenda/ et les guides en anglais n’entrent ni ne sortent de l’index', async () => {
+    // Le Zinc des Amis (Paris 11e), seul publié : il montre PSG – Barça (Ligue des champions, samedi 24) et PSG – OL
+    // (dimanche 25), rien d’autre. Aucun match de Premier League dans le scénario.
+    const sortie = dossierVide();
+    const unBar = { ...contenu, publies: ['b-zinc'] };
+    const guides = ['/ce-soir/', '/agenda/', '/en/', '/en/champions-league/', '/en/premier-league/'];
+    const attendu = { '/ce-soir/': true, '/agenda/': true, '/en/': true, '/en/champions-league/': true, '/en/premier-league/': false };
+    const drapeaux = () => Object.fromEntries(guides.map((chemin) => [chemin, etatDe(sortie).pages[chemin].indexable]));
+    const ceSoir = () => lire(sortie, 'ce-soir/index.html');
+    const passages = [
+      // Vendredi 23, 10 h : ce soir, Brest – Nice, sans bar ; samedi et dimanche, le Zinc.
+      ['2026-10-23T08:00:00Z', () => {
+        expect(ceSoir()).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
+        expect(ceSoir()).toContain('<h2 id="titre-soirs">Les prochains soirs au bar</h2>\n  <h3 class="regarder-jour">Samedi 24 octobre</h3>');
+        expect(ceSoir()).toContain('Ligue des champions · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-barca-2026-10-24">Le Zinc des Amis</a> (Paris 11e)</li>');
+        expect(ceSoir()).toContain('<h3 class="regarder-jour">Dimanche 25 octobre</h3>');
+      }],
+      // Samedi 24, 20 h : ce soir, le Zinc montre PSG – Barça.
+      ['2026-10-24T18:00:00Z', () => {
+        expect(ceSoir()).toContain('<h2 id="titre-bars">Ce soir, dans un bar</h2>');
+        expect(ceSoir()).not.toContain('id="titre-soirs"');
+      }],
+      // Lundi 26, mercredi 28, vendredi 30 : plus aucune soirée annoncée. Rien n’est promis.
+      ['2026-10-26T08:00:00Z'], ['2026-10-28T19:00:00Z'], ['2026-10-30T08:00:00Z', () => {
+        expect(ceSoir()).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
+        expect(ceSoir()).not.toMatch(/Zinc|regarder-carte__nom|id="titre-soirs"/);
+        expect(lire(sortie, 'en/champions-league/index.html')).toContain('For now, no Paris bar on Baromatch has listed an upcoming European match.');
+        expect(lire(sortie, 'en/champions-league/index.html')).not.toContain('<meta name="robots" content="noindex">');
+      }],
+    ];
+    for (const [quand, verifier] of passages) {
+      await passer(sortie, quand, { contenu: unBar, rendu: null });
+      expect(drapeaux(), quand).toEqual(attendu);
+      for (const chemin of guides) expect(plan(sortie).includes(`<loc>https://baromatch.fr${chemin}</loc>`), `${chemin} ${quand}`).toBe(attendu[chemin]);
+      verifier?.();
+    }
+    // Le guide de la Ligue des champions garde le coup d’envoi du dernier match qu’un bar de Paris a montré : 30 jours
+    // après, il sort de l’index ; /en/, « Ce soir » et agenda/ restent (le Zinc est toujours publié).
+    expect(etatDe(sortie).pages['/en/champions-league/'].memoire).toEqual({ derniereSoiree: '2026-10-24T19:00:00.000Z' });
+    await passer(sortie, '2026-11-23T18:00:00Z', { contenu: unBar, rendu: null });
+    expect(drapeaux()).toEqual(attendu);
+    await passer(sortie, '2026-11-23T20:00:00Z', { contenu: unBar, rendu: null });
+    expect(drapeaux()).toEqual({ ...attendu, '/en/champions-league/': false });
+    // Sans aucun vrai bar publié : tout en noindex.
+    await passer(sortie, '2026-11-24T08:00:00Z', { contenu: { ...contenu, publies: [] }, rendu: null, accepterLesSuppressions: true });
+    expect(drapeaux()).toEqual(Object.fromEntries(guides.map((chemin) => [chemin, false])));
+  });
+
   test('un bar qui sort (disparu des données, retiré de la liste des bars publiés, exclu) : sans son nom, en noindex, vers sa ville, puis disparaît', async () => {
     const verifierLaSortie = (dossier, quand) => {
       const page = lire(dossier, 'bar/le-zinc-des-amis-paris-11/index.html');

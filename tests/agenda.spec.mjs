@@ -2,8 +2,8 @@
 // matchs/<match>/match.ics) passe un validateur iCalendar strict (tests/outils/icalendar.mjs) et se relit avec ical.js ;
 // les heures de Paris au changement d’heure, un club sans match, un match passé, reporté ou sorti des listes, un club qui
 // sort des listes, des fichiers identiques octet pour octet quand rien ne change, un UID stable quand un match change de
-// jour ; aucun texte sur les bars sans vrai bar ; la page agenda/ en noindex tant qu’aucun match n’a de vrai bar ; la
-// liste blanche.
+// jour ; aucun texte sur les bars sans vrai bar ; la page agenda/ en noindex tant qu’aucun vrai bar n’est publié, et
+// indexable dès le premier, d’une semaine à l’autre (tests/generateur.spec.mjs) ; la liste blanche.
 import { test, expect } from '@playwright/test';
 import ICAL from 'ical.js';
 import { execFileSync } from 'node:child_process';
@@ -386,11 +386,15 @@ test('sans vrai bar, aucun texte d’agenda ne parle de bars, et la page agenda/
   expect(page).toContain('<meta name="robots" content="noindex">');
   expect(etatDe(sortie).pages['/agenda/']).toMatchObject({ type: 'agenda', indexable: false });
   expect(readFileSync(path.join(sortie, 'sitemap.xml'), 'utf8')).not.toContain('/agenda/');
-  // Avec de vrais bars (le scénario), la page est indexable et entre au plan du site.
+  // Avec de vrais bars (le scénario), la page est indexable et entre au plan du site, même quand aucun match de ces
+  // agendas n’a plus de bar (le samedi 31, après la dernière soirée annoncée, Le Havre – PSG).
   const avec = dossierVide();
   await passer(avec, '2026-10-23T08:00:00Z');
   expect(octets(avec, 'agenda/index.html').toString('utf8')).toContain('<meta name="robots" content="max-image-preview:large">');
   expect(readFileSync(path.join(avec, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/agenda/</loc><lastmod>2026-10-23</lastmod></url>');
+  await passer(avec, '2026-10-31T08:00:00Z');
+  expect(octets(avec, 'agenda/index.html').toString('utf8')).toContain('<meta name="robots" content="max-image-preview:large">');
+  expect(readFileSync(path.join(avec, 'sitemap.xml'), 'utf8')).toContain('<loc>https://baromatch.fr/agenda/</loc>');
 });
 
 test('la page agenda/ : trois lignes d’explication, les clubs, chaque téléphone, ce qu’il y a dedans et ce qui manque', async () => {

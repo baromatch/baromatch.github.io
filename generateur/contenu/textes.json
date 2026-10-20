@@ -149,6 +149,7 @@
     "finiSuite": "Les matchs de ce soir sont terminés. Les prochains sont juste en dessous.",
     "prochains": "Les prochains matchs",
     "aucunProchain": "Pas d’autre match annoncé pour l’instant.",
+    "soirsAuBar": "Les prochains soirs au bar",
     "villes": "Ville par ville",
     "villesSuite": "Les bars de chaque ville sur Baromatch, et ce qu’il faut savoir avant d’y aller.",
     "places": "À {heure}, {n} places à réserver dans l’appli.",

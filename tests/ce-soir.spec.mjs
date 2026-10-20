@@ -1,7 +1,8 @@
 // La page « Ce soir » (/ce-soir/), écrite par le générateur à chaque passage, sans navigateur : les matchs de ce soir à
 // l’heure de Paris et, pour chacun, les vrais bars publiés qui le diffusent, avec leurs places seulement quand l’appli
-// est ouverte et que les listes publiques les donnent. Indexable seulement un soir où elle montre un vrai bar ; sinon
-// noindex, et elle montre les matchs du soir et les suivants, les villes et la liste d’attente : jamais vide.
+// est ouverte et que les listes publiques les donnent. Indexable dès qu’un vrai bar publié est sur le site, même un soir
+// sans bar (elle le dit, et montre les prochains soirs au bar) ; sans aucun vrai bar, noindex. Elle montre toujours les
+// matchs du soir et les suivants, les villes et la liste d’attente : jamais vide, jamais un bar qu’elle n’a pas.
 // Le scénario inventé (tests/donnees/scenario.json) et la copie réduite des listes publiques (tests/donnees/capture),
 // lus à l’heure qu’on leur donne.
 import { test, expect } from '@playwright/test';
@@ -9,7 +10,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
-import { contenuDuScenario } from './outils/site-genere.mjs';
+import { contenuDuScenario, PUBLIES_DU_SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { construire } from '../generateur/construire.mjs';
@@ -139,6 +140,46 @@ test('un jour sans vrai bar : noindex, les matchs du jour et les suivants vers l
   expect(deType(p, 'ItemList')[0].itemListElement.map((i) => i.url)).toEqual(['https://baromatch.fr/matchs/brest-nice-2026-10-23/']);
 });
 
+test('un soir sans bar, avec des vrais bars publiés : indexable, elle le dit, et montre les prochains soirs au bar', async () => {
+  // La Cave des Gones, seul bar de Brest – Nice, n’est pas publiée : ce soir, aucun bar ; les autres vrais bars le sont.
+  const p = await ceSoir({ avec: { ...contenu, publies: PUBLIES_DU_SCENARIO.filter((id) => id !== 'b-gones') } });
+  sansErreur(p);
+  expect(p.indexable).toBe(true);
+  expect(robotsDe(p)).toBe('max-image-preview:large');
+  // Ce soir : le match du jour, et « pas encore de bar », en clair ; aucune carte de bar.
+  expect(p.contenu).not.toContain('id="titre-bars"');
+  expect(p.contenu).not.toContain('regarder-carte__nom');
+  const matchs = sectionDe(p, 'titre-matchs');
+  expect(matchs).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
+  expect(matchs).toContain('<a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a> · <time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1 · <span class="regarder-compte">Pas encore de bar</span>');
+  // Les trois prochains soirs qu’un vrai bar a annoncés : le jour, le match vers sa page, chaque bar vers sa soirée, dans
+  // l’ordre annoncé (ville, arrondissement, nom).
+  const soirs = sectionDe(p, 'titre-soirs');
+  expect(soirs).toMatch(/^id="titre-soirs">Les prochains soirs au bar<\/h2>/);
+  expect([...soirs.matchAll(/<h3 class="regarder-jour">([^<]+)<\/h3>/g)].map((m) => m[1])).toEqual(['Samedi 24 octobre', 'Dimanche 25 octobre', 'Vendredi 30 octobre']);
+  expect(soirs).toContain('<li><a href="/matchs/psg-barca-2026-10-24/">PSG – Barça</a> · <time datetime="2026-10-24T21:00:00+02:00">21:00</time> · Ligue des champions · <a href="/bar/le-comptoir-du-canal-paris-10/#soiree-psg-barca-2026-10-24">Le Comptoir du Canal</a> (Paris 10e), <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-barca-2026-10-24">Le Zinc des Amis</a> (Paris 11e)</li>');
+  expect(soirs).toContain('<li><a href="/matchs/psg-ol-2026-10-25/">PSG – OL</a> · <time datetime="2026-10-25T20:45:00+01:00">20:45</time> · Ligue 1 · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25">Le Zinc des Amis</a> (Paris 11e)</li>');
+  expect(soirs).toContain('<a href="/bar/le-comptoir-du-canal-paris-10/#soiree-le-havre-psg-2026-10-30">Le Comptoir du Canal</a> (Paris 10e)</li>');
+  expect(soirs).not.toContain('Cave des Gones');
+  // Ces bars, la page les nomme : l’état le saura (une version refusée ne garde pas un bar retiré).
+  expect(p.barsNommes).toEqual(['b-comptoir', 'b-rennes', 'b-zinc']);
+  // La description et le chapeau ne promettent que ce qu’elle montre.
+  expect(p.description).toBe('Vendredi 23 octobre : 1 match aujourd’hui, à l’heure de Paris. Pas encore de bar pour le voir sur Baromatch : les prochains soirs au bar, et les villes.');
+  expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.ceSoir.chapeauProchainsSoirs}</p>`);
+  // Au-delà de cinq bars pour un match, leur nombre, vers la page du match ; les bars nommés seulement dans l’état.
+  const source = scenarioModifie((brut) => ({
+    ...brut,
+    matchNights: [...brut.matchNights.filter((n) => n.id !== 'n-gones-ce-soir'), ...['b-gones', 'b-coin', 'b-rennes', 'b-t1'].map((bar) => ({ id: `n-${bar}-barca`, status: 'OPEN', bar: { id: bar }, match: { id: 'm-psg-barca-fr' }, offer: null }))],
+  }));
+  const nombreux = await ceSoir({ source, avec: { ...contenu, forcer: ['b-t1'] } });
+  sansErreur(nombreux);
+  const barca = sectionDe(nombreux, 'titre-soirs').split('\n').find((ligne) => ligne.includes('PSG – Barça'));
+  expect((barca.match(/<a href="\/bar\//g) ?? []).length).toBe(5);
+  expect(barca).toMatch(/\) <a href="\/matchs\/psg-barca-2026-10-24\/">et 1 autre bar<\/a><\/li>$/);
+  const lies = new Set([...sectionDe(nombreux, 'titre-soirs').matchAll(/<a href="\/bar\/([^/]+)\//g)].map((m) => m[1]));
+  expect(nombreux.barsNommes).toHaveLength(lies.size);
+});
+
 test('la copie des listes publiques, un samedi soir : le bar de démo n’est jamais un bar, noindex, les matchs pas finis', async () => {
   // Samedi 17 octobre, 18 h à Paris : Strasbourg – PSG (17 h 15) se joue encore, Everton – Chelsea (13 h 30) est fini.
   const p = await ceSoir({ source: `capture:${CAPTURE}`, maintenant: '2026-10-17T16:00:00Z' });
@@ -160,13 +201,15 @@ test('un match fini n’est plus listé ; il l’est encore tant qu’il peut se
   expect(encore.indexable).toBe(true);
   expect(sectionDe(encore, 'titre-bars')).toMatch(/^id="titre-bars">Ce soir, dans un bar<\/h2>/);
   expect(sectionDe(encore, 'titre-bars')).toContain('Commencé à <time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1');
-  // 23 h 46 : fini. La page le dit, ne montre plus aucun bar, et passe en noindex ; la suite est dessous.
+  // 23 h 46 : fini. La page le dit, ne montre plus de bar pour ce soir, et reste indexable (des vrais bars sont publiés) ;
+  // dessous, les prochains soirs au bar, puis la suite.
   const fini = await ceSoir({ maintenant: '2026-10-23T21:46:00Z' });
   sansErreur(fini);
-  expect(fini.indexable).toBe(false);
+  expect(fini.indexable).toBe(true);
   expect(fini.contenu).not.toContain('Brest – Nice</a>');
   expect(fini.contenu).not.toContain('regarder-carte__nom');
   expect(sectionDe(fini, 'titre-rien')).toMatch(/^id="titre-rien">Fini pour ce soir<\/h2>\n {2}<p>Les matchs de ce soir sont terminés. Les prochains sont juste en dessous.<\/p>/);
+  expect(sectionDe(fini, 'titre-soirs')).toContain('<h3 class="regarder-jour">Samedi 24 octobre</h3>');
   expect(sectionDe(fini, 'titre-prochains')).toContain('PSG – Barça');
   // OM – Lens, la veille, n’y est jamais.
   for (const p of [encore, fini]) expect(p.contenu).not.toContain('OM – Lens');
@@ -208,17 +251,21 @@ test('la nuit : après minuit, la page passe au nouveau jour ; un match commenc�
   expect(sectionDe(tard, 'titre-bars')).toContain('PSG – Barça');
 });
 
-test('un match de ce soir reporté ou annulé : listé avec son statut, sans ses bars, et il ne rend pas la page indexable', async () => {
+test('un match de ce soir reporté ou annulé : listé avec son statut, sans ses bars ; la page dit les prochains soirs au bar', async () => {
   const source = scenarioModifie((brut) => ({
     ...brut,
     matches: brut.matches.map((m) => (m.id === 'm-ce-soir' ? { ...m, status: 'POSTPONED' } : m)),
   }));
   const p = await ceSoir({ source });
   sansErreur(p);
-  expect(p.indexable).toBe(false);
+  // Indexable : des vrais bars sont publiés, même si aucun ne montre un match ce soir.
+  expect(p.indexable).toBe(true);
+  expect(p.contenu).not.toContain('id="titre-bars"');
+  expect(sectionDe(p, 'titre-soirs')).toContain('/bar/le-zinc-des-amis-paris-11/#soiree-psg-barca-2026-10-24');
   const matchs = sectionDe(p, 'titre-matchs');
   expect(matchs).toContain('<a href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a> · <time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1 · <strong>Match reporté</strong>');
-  expect(p.contenu).not.toContain('Cave des Gones');
+  expect(matchs).not.toContain('Cave des Gones');
+  expect(sectionDe(p, 'titre-soirs')).not.toContain('brest-nice');
   // Le bar l’annonçait : la page ne dit pas qu’il n’y a « pas encore de bar ».
   expect(matchs).not.toContain('Pas encore de bar');
   expect(matchs).not.toContain('Tu tiens un bar');

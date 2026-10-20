@@ -17,6 +17,8 @@ import {
   appliquerAUnePage, appliquerLaMesure, baliseDeLaMesure, dateDeMiseAJour, lireLaMesure, MESURE_ARRETEE, pagesEcritesALaMain, politiqueAvecLaMesure, TEXTES_DE_LA_MESURE,
 } from '../generateur/mesure.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
+import { construire } from '../generateur/construire.mjs';
+import { raisonDeNePasGarder } from '../generateur/refus.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 
 const MARQUE = JSON.parse(readFileSync(path.join(racine, 'marque.json'), 'utf8'));
@@ -277,6 +279,43 @@ test.describe('les pages générées', () => {
     expect(controler((h) => h.replace(`connect-src 'self' ${ORIGINE};`, "connect-src 'self';"))).toMatch(/politique de sécurité/);
     // La même page, la mesure arrêtée : refusée (la balise, la politique).
     expect(controlerLaPage(p, { mesure: MESURE_ARRETEE }).join('\n')).toMatch(/politique de sécurité[\s\S]*1 balises de la mesure d’audience pour une mesure arrêtée/);
+  });
+
+  test('une page refusée ne garde jamais une version précédente qui compte autrement que marque.json', async () => {
+    const raison = 'sa mesure d’audience n’est plus celle de marque.json';
+    const AUTRE = lireLaMesure({ mesure: { code: 'autre-compte' } });
+    const html = (mesure) => `<meta http-equiv="Content-Security-Policy" content="${politiqueDesPages(mesure)}">\n${baliseDeLaMesure(mesure)}\n<a href="/matchs/">Matchs</a>`;
+    const sure = { avant: { type: 'match', bars: [] }, publies: new Set(), existantes: new Set(['/matchs/']), maintenant: MAINTENANT };
+    expect(raisonDeNePasGarder({ ...sure, html: html(MESURE_ARRETEE), mesure: MESURE_ARRETEE })).toBeNull();
+    expect(raisonDeNePasGarder({ ...sure, html: html(ACTIVE), mesure: ACTIVE })).toBeNull();
+    // Arrêtée depuis, démarrée depuis, ou un autre compte.
+    expect(raisonDeNePasGarder({ ...sure, html: html(ACTIVE), mesure: MESURE_ARRETEE })).toBe(raison);
+    expect(raisonDeNePasGarder({ ...sure, html: html(MESURE_ARRETEE), mesure: ACTIVE })).toBe(raison);
+    expect(raisonDeNePasGarder({ ...sure, html: html(AUTRE), mesure: ACTIVE })).toBe(raison);
+    // La balise sans le compte dans la politique, ou le compte sans la balise.
+    expect(raisonDeNePasGarder({ ...sure, html: `${html(MESURE_ARRETEE)}\n${baliseDeLaMesure(ACTIVE)}`, mesure: ACTIVE })).toBe(raison);
+    expect(raisonDeNePasGarder({ ...sure, html: html(ACTIVE).replace(baliseDeLaMesure(ACTIVE), ''), mesure: ACTIVE })).toBe(raison);
+
+    // Le passage : la mesure s’arrête au moment où les pages des bars sans soirée sont refusées. Aucune ne garde le
+    // compteur : chacune devient la page neutre, sans mesure.
+    const sortie = mkdtempSync(path.join(tmpdir(), 'mesure-refus-'));
+    try {
+      const passer = (marque, quand, textes = contenuDuScenario().textes) => construire({
+        source: `scenario:${SCENARIO}`, sortie, maintenant: Date.parse(quand), racine, contenu: { ...contenuDuScenario(), marque, textes },
+      });
+      await passer(AVEC, '2026-10-23T08:00:00Z');
+      const fichier = path.join(sortie, 'bar', 'au-bon-coin-lyon-2', 'index.html');
+      expect(readFileSync(fichier, 'utf8')).toContain(baliseDeLaMesure(ACTIVE));
+      const faux = structuredClone(contenuDuScenario().textes);
+      faux.bar.sansSoiree = 'Pas de soirée annoncée pour l’instant !';
+      const resultat = await passer(SANS, '2026-10-23T10:00:00Z', faux);
+      expect(resultat.avertissements).toContainEqual(expect.stringMatching(/^Page refusée, remplacée par une page neutre : \/bar\/au-bon-coin-lyon-2\/ .* sa version précédente ne reste pas : sa mesure d’audience n’est plus celle de marque\.json$/));
+      expect(readFileSync(fichier, 'utf8')).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
+      expect(resultat.fichiers.filter((f) => typeof f.contenu === 'string' && /mesure\.js|goatcounter/.test(f.contenu)).map((f) => f.chemin)).toEqual([]);
+      expect(readFileSync(fichier, 'utf8')).not.toMatch(/mesure\.js|goatcounter/);
+    } finally {
+      rmSync(sortie, { recursive: true, force: true });
+    }
   });
 
   test('un code illisible dans marque.json arrête le passage avant toute page', async () => {

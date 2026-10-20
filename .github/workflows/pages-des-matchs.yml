@@ -14,6 +14,10 @@
 # cochant la case.
 # La mesure d’audience (« mesure » dans marque.json) : l’Action l’applique aussi aux pages écrites à la main
 # (generateur/mesure.mjs : leur politique de sécurité, la ligne de /mesure.js, et le bloc de la page Confidentialité).
+# Elle ne change qu’avec un passage réussi du générateur, qu’on la démarre ou qu’on l’arrête : si les données ne
+# répondent pas, rien n’est enregistré, et toutes les pages, Confidentialité comprise, gardent la mesure d’avant
+# jusqu’au premier passage qui réussit. Enregistrer seules les pages écrites à la main ferait dire à Confidentialité
+# « pas de mesure d’audience » pendant que les pages des matchs comptent encore.
 # Seuls matchs/, regarder-le-match/, bar/, ce-soir/, en/ (les pages en anglais), agenda/ (« Ton club dans ton
 # agenda »), sitemap.xml et les pages que la mesure a réécrites sont enregistrés, avec un message clair, puis envoyés
 # sur main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande

@@ -2,8 +2,9 @@
 // jamais un lien vers une page qui n’existe pas.
 // Sa version précédente reste en ligne seulement si elle est sûre : l’état dit quels bars elle nomme et chacun est
 // encore publié (un bar retiré de bars-publies.json, ou exclu, n’y reste jamais), chaque page qu’elle cite existe encore
-// après ce passage, l’image de partage qu’elle annonce est encore là, et elle n’est pas gardée depuis plus de 24 heures
-// (elle vieillit : jours, soirées, bars). Elle garde alors son badge et son image. Sinon, une page neutre la remplace à
+// après ce passage, l’image de partage qu’elle annonce est encore là, elle compte ses visites exactement comme
+// marque.json le dit (la mesure d’audience, mesure.mjs : arrêtée, elle n’en garde aucune trace), et elle n’est pas
+// gardée depuis plus de 24 heures (elle vieillit : jours, soirées, bars). Elle garde alors son badge et son image. Sinon, une page neutre la remplace à
 // la même adresse (« Cette page se met à jour », en noindex, vers les matchs et les villes, avec l’image générale du
 // site et sans bloc « Partager ») : son image part avec elle, et un bar y a le badge générique. Les liens des autres
 // pages mènent toujours quelque part. Le journal dit chaque cas.
@@ -13,6 +14,7 @@ import { HEURE_MS } from './donnees.mjs';
 import { fichierDuChemin } from './etat.mjs';
 import { page } from './gabarits.mjs';
 import { filDAriane, pageWeb } from './jsonld.mjs';
+import { baliseDeLaMesure, lireLaMesure, mesureDuSite } from './mesure.mjs';
 import { adresseDeLImage, cheminDeLImage } from './partage.mjs';
 import { echapper as e } from './texte.mjs';
 
@@ -32,11 +34,21 @@ export const TEXTES_DU_REPLI = {
 // « /matchs/…/ », « /regarder-le-match/…/ », « /bar/…/ », « /en/…/ ».
 export const adressesCitees = (html) => [...new Set([...html.matchAll(/(?:https:\/\/baromatch\.fr)?(\/(?:matchs|regarder-le-match|bar|en)\/(?:[a-z0-9-]+\/)*)/g)].map((m) => m[1]))];
 
+// La page compte ses visites comme la mesure le dit : active, exactement sa balise de /mesure.js et son compte, seul,
+// dans la politique de sécurité ; arrêtée, ni l’une ni l’autre.
+const suitLaMesure = (html, mesure) => {
+  const balises = html.match(/<script src="\/mesure\.js"[^>]*><\/script>/g) ?? [];
+  const politique = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]*)">/)?.[1] ?? '';
+  const comptes = politique.match(/https:\/\/[a-z0-9-]+\.goatcounter\.com/g) ?? [];
+  if (!mesure.active) return balises.length === 0 && comptes.length === 0;
+  return balises.length === 1 && balises[0] === baliseDeLaMesure(mesure) && comptes.length === 1 && comptes[0] === mesure.origine;
+};
+
 // Pourquoi la version précédente d’une page refusée ne peut pas rester en ligne, ou null si elle le peut.
 // avant : son entrée dans l’état ; html : son contenu sur le disque (null s’il manque) ; publies : les identifiants des
 // bars publiés à ce passage ; existantes : les adresses des pages qui existent après ce passage ; imageManquante : elle
-// annonce son image de partage, et l’état ou le disque ne l’ont plus.
-export const raisonDeNePasGarder = ({ avant, html, publies, existantes, maintenant, imageManquante = false }) => {
+// annonce son image de partage, et l’état ou le disque ne l’ont plus ; mesure : la mesure d’audience de ce passage.
+export const raisonDeNePasGarder = ({ avant, html, publies, existantes, maintenant, imageManquante = false, mesure = mesureDuSite() }) => {
   if (!avant || html === null) return 'elle n’a pas de version précédente';
   if (avant.repli) return 'sa version précédente est déjà la page neutre';
   if (!Array.isArray(avant.bars)) return 'l’état ne dit pas quels bars elle nomme';
@@ -45,6 +57,7 @@ export const raisonDeNePasGarder = ({ avant, html, publies, existantes, maintena
   const disparues = adressesCitees(html).filter((chemin) => !existantes.has(chemin));
   if (disparues.length) return `elle mène à une page qui n’existe plus (${disparues.join(', ')})`;
   if (imageManquante) return 'son image de partage n’est plus là';
+  if (!suitLaMesure(html, mesure)) return 'sa mesure d’audience n’est plus celle de marque.json';
   if (avant.gardeeDepuis && maintenant - Date.parse(avant.gardeeDepuis) >= GARDE_MAX_MS) return 'elle est gardée depuis plus de 24 heures';
   return null;
 };
@@ -84,6 +97,7 @@ export const pageDeRepli = (refusee, { cadre, marque, avecPresse }) => {
 export const traiterLesRefus = ({ site, precedent, sortie, maintenant, controler }) => {
   const publies = new Set(site.donnees.bars.map((b) => b.id));
   const existantes = new Set([...site.pages, ...site.refusees].map((p) => p.chemin));
+  const mesure = lireLaMesure(site.contenu.marque);
   const gardees = [];
   const replis = [];
   const messages = [];
@@ -94,7 +108,7 @@ export const traiterLesRefus = ({ site, precedent, sortie, maintenant, controler
     const image = cheminDeLImage(refusee.chemin);
     const imageLa = Boolean(precedent.pages?.[image]) && existsSync(path.join(sortie, fichierDuChemin(image)));
     const imageManquante = html !== null && html.includes(adresseDeLImage(refusee.chemin)) && !imageLa;
-    const raison = raisonDeNePasGarder({ avant, html, publies, existantes, maintenant, imageManquante });
+    const raison = raisonDeNePasGarder({ avant, html, publies, existantes, maintenant, imageManquante, mesure });
     const erreurs = refusee.erreurs.join(' ; ');
     if (!raison) {
       gardees.push({ chemin: refusee.chemin, entree: { ...avant, gardeeDepuis: avant.gardeeDepuis ?? new Date(maintenant).toISOString() } });

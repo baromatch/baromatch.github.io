@@ -114,6 +114,18 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     expect(script).not.toMatch(/reset -q --hard|git clean|env -u/);
   });
 
+  test('un générateur arrêté n’enregistre rien, pas même les pages que la mesure a réécrites', () => {
+    // L’étape d’envoi suit celle qui construit, sans condition : un passage raté (les données ne répondent pas) ne
+    // l’atteint jamais. La mesure d’audience démarre ou s’arrête donc avec un passage réussi, toutes pages ensemble,
+    // et l’en-tête de l’Action le dit.
+    const action = lireLAction('pages-des-matchs.yml');
+    const etapes = action.split('\n      - ').map((e) => e.split('\n')[0]);
+    expect(etapes.indexOf(`name: ${ENVOI}`)).toBe(etapes.indexOf('name: Construire et contrôler les pages') + 1);
+    const envoi = action.split(`\n      - name: ${ENVOI}\n`)[1].split('\n        run: |')[0];
+    expect(envoi).not.toMatch(/^ {8}if:/m);
+    expect(action.split('\nname:')[0]).toContain('Elle ne change qu’avec un passage réussi du générateur, qu’on la démarre ou qu’on l’arrête');
+  });
+
   test('main a changé ailleurs que dans les pages : les pages partent par-dessus, et seulement elles', () => {
     const d = preparer();
     try {

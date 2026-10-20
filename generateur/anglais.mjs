@@ -132,6 +132,8 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
   };
   const lienDuMatch = (m) => (avecPage.has(m.slug) ? `<a href="${cheminEnAnglais(m.slug)}">${e(nomDuMatch(m))}</a>` : e(nomDuMatch(m)));
   const compte = (n) => remplir(n > 1 ? t.bars.comptePluriel : t.bars.compte, { n });
+  // Un match reporté ou annulé le dit partout où il est listé : « · Match postponed » après son jour et son heure.
+  const statut = (m) => (m.statut ? ` · <strong>${e(t.match[m.statut])}</strong>` : '');
   // Ce qu’on sait d’un match dans une liste : ses bars de Paris, ou son statut.
   const etatDuMatch = (m) => (m.statut
     ? `<strong>${e(t.match[m.statut])}</strong>`
@@ -232,7 +234,7 @@ ${vivant && match.heureConfirmee ? `  <p class="regarder-note">${e(remplir(t.qua
       const etat = passe ? t.match.passe : t.match.plusAnnonce;
       const club = suivant && ([suivant.domicile.cle, suivant.exterieur.cle].includes(match.domicile.cle) ? match.domicile.nom : match.exterieur.nom);
       const suite = suivant
-        ? `<p>${e(remplir(t.match.passeSuite, { club }))} ${lienDuMatch(suivant)}, ${temps(suivant)}.</p>`
+        ? `<p>${e(remplir(t.match.passeSuite, { club }))} ${lienDuMatch(suivant)}, ${temps(suivant)}${statut(suivant)}.</p>`
         : `<p>${e(t.match.passeSansSuite)} <a href="${CHEMINS_EN.paris}">${e(t.retour)}</a></p>`;
       const titrePage = titre(`${nom}, ${jourALAnglaise(match.debut)}: match played — Baromatch`, `${nom}: match played`, nom);
       const desc = description(
@@ -275,7 +277,7 @@ ${bars.length ? `  <p class="regarder-compte">${e(compte(bars.length))}</p>\n${c
     const sectionProchains = `<section class="regarder-section" aria-labelledby="titre-prochains">
   <h2 id="titre-prochains">${e(remplir(t.match.prochains, { clubs: `${match.domicile.nom} and ${match.exterieur.nom}` }))}</h2>
 ${prochains.length ? `  <ul class="regarder-matchs">
-${prochains.slice(0, 6).map((m) => `    <li>${lienDuMatch(m)} · ${temps(m)} · ${e(competitionDe(m))}</li>`).join('\n')}
+${prochains.slice(0, 6).map((m) => `    <li>${lienDuMatch(m)} · ${temps(m)} · ${e(competitionDe(m))}${statut(m)}</li>`).join('\n')}
   </ul>` : `  <p>${e(t.match.aucunProchain)}</p>`}
 </section>`;
     // L’image de la jumelle (sa carte), quand le rendu des images est là : celle que montre WhatsApp à côté du lien.
@@ -298,7 +300,7 @@ ${retour}`,
   // bars : les vrais bars de Paris qui montrent un match à venir du guide (son index, sa description) ; cartes : les bars
   // montrés, chacun avec sa prochaine soirée du guide.
   const prochaineLigne = (soiree) => (soiree
-    ? `\n      <p class="regarder-carte__suite">${e(t.bars.prochaine)} ${lienDuMatch(soiree.match)}, ${temps(soiree.match)}.</p>`
+    ? `\n      <p class="regarder-carte__suite">${e(t.bars.prochaine)} ${lienDuMatch(soiree.match)}, ${temps(soiree.match)}${statut(soiree.match)}.</p>`
     : `\n      <p class="regarder-carte__suite">${e(t.bars.sansSoiree)}</p>`);
   const soireeDuGuide = (bar, matchs) => bar.soirees.find((s) => enCoursOuAVenir(s.match) && (!matchs || matchs.includes(s.match)));
   const ajouterUnGuide = ({ cle, chemin, jumelle, tg, matchs, sections, apres = '', bars, cartes: cartesDuGuide, sansBar }) => {

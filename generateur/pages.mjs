@@ -14,7 +14,7 @@ import {
 import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agenda.mjs';
 import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
-import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, tuTiensUnBar, atouts } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
 import { adresseDeLImage, lignesDeLaCarte } from './partage.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
@@ -163,7 +163,7 @@ ${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.ma
       const suite = deplace
         ? `<p><a href="${cheminDuMatch(deplace)}">${e(nomCourt(deplace))}</a>, ${quand(deplace)}.</p>`
         : suivant
-          ? `<p>${e(remplir(textes.match.passeSuite, { club: [suivant.domicile.cle, suivant.exterieur.cle].includes(match.domicile.cle) ? match.domicile.court : match.exterieur.court }))} ${aUnePage(suivant) ? `<a href="${cheminDuMatch(suivant)}">${e(nomCourt(suivant))}</a>` : e(nomCourt(suivant))}, ${quand(suivant)}.</p>${aUnePage(suivant) ? '' : `\n  <p><a href="/matchs/">${e(textes.fil.matchs)}</a></p>`}`
+          ? `<p>${e(remplir(textes.match.passeSuite, { club: [suivant.domicile.cle, suivant.exterieur.cle].includes(match.domicile.cle) ? match.domicile.court : match.exterieur.court }))} ${aUnePage(suivant) ? `<a href="${cheminDuMatch(suivant)}">${e(nomCourt(suivant))}</a>` : e(nomCourt(suivant))}, ${quand(suivant)}${statutDuMatch(suivant, textes)}.</p>${aUnePage(suivant) ? '' : `\n  <p><a href="/matchs/">${e(textes.fil.matchs)}</a></p>`}`
           : `<p>${e(textes.match.passeSansSuite)} <a href="/matchs/">${e(textes.fil.matchs)}</a></p>`;
       const titrePage = titre(`${nom} du ${dateCourte(match.debut)} : match passé — Baromatch`, `${nom} du ${dateCourte(match.debut)} : match passé`, `${nom} : match passé`);
       const desc = description(
@@ -217,7 +217,7 @@ ${places}  ${appel(marque, textes)}
     const sectionProchains = `<section class="regarder-section" aria-labelledby="titre-prochains">
   <h2 id="titre-prochains">${e(remplir(textes.match.prochains, { clubs }))}</h2>
 ${prochains.length ? `  <ul class="regarder-matchs">
-${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m) })}`).join('\n')}
+${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), suite: statutDuMatch(m, textes) })}`).join('\n')}
   </ul>` : `  <p>${e(textes.match.aucunProchain)}</p>`}
 </section>`;
     ajouter({
@@ -245,7 +245,9 @@ ${commentCaMarche(textes, marque)}`,
     const dansLaSemaine = donnees.matchs.filter((m) => enCoursOuAVenir(m) && jours.includes(jourDeParis(m.debut))).sort((a, b) => a.debut - b.debut);
     const indexable = donnees.bars.length >= SEUILS.barsPourLaSemaine;
     // Chaque liste est sous le titre de son jour : la ligne ne donne que l’heure.
-    const ligne = (m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), heureSeule: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`;
+    // Un match reporté ou annulé dit son statut à la place de ses bars.
+    const etatDuMatch = (m) => statutDuMatch(m, textes) || ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>`;
+    const ligne = (m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), heureSeule: true, suite: etatDuMatch(m) })}`;
     const ceSoir = dansLaSemaine.filter((m) => jourDeParis(m.debut) === aujourdhui);
     // Le premier bloc : « Aujourd’hui, vendredi 23 octobre » avant 17 h, « Ce soir, … » ensuite ; quand tous les matchs
     // du jour ont commencé depuis plus de trois heures, « Fini pour ce soir », et la suite commence au lendemain.
@@ -287,7 +289,7 @@ ${matchs.map(ligne).join('\n')}
 ${ensuite.length ? `<section class="regarder-section" aria-labelledby="titre-ensuite">
   <h2 id="titre-ensuite">${e(textes.semaine.ensuite)}</h2>
   <ul class="regarder-matchs">
-${ensuite.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`).join('\n')}
+${ensuite.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: etatDuMatch(m) })}`).join('\n')}
   </ul>
 </section>\n` : ''}${afficheDeLaSemaine ? `${afficheDeLaSemaine()}\n` : ''}<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
 ${appel(marque, textes)}
@@ -346,11 +348,11 @@ ${groupes.flatMap((g) => g.quartiers).map(({ arrondissement, elements }) => `${a
     const sectionSoirees = `<section class="regarder-section" aria-labelledby="titre-soirees">
   <h2 id="titre-soirees">${e(remplir(textes.ville.titreSoirees, { ville: nomVille }))}</h2>
 ${ville.soirees.length ? `  <ul class="regarder-matchs">
-${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    <li>${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))} · ${quand(s.match)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}</li>`).join('\n')}
+${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    <li>${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))} · ${quand(s.match)}${statutDuMatch(s.match, textes)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}</li>`).join('\n')}
   </ul>` : `  <p>${e(textes.ville.sansSoiree)}</p>`}
 ${autresMatchs.length ? `  <h3 class="regarder-jour">${e(remplir(textes.ville.aussi, { ville: nomVille }))}</h3>
   <ul class="regarder-matchs">
-${autresMatchs.map((m) => `    ${ligneDeMatch(m, { avecPage: true })}`).join('\n')}
+${autresMatchs.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: statutDuMatch(m, textes) })}`).join('\n')}
   </ul>\n` : ''}  <p class="regarder-suite"><a href="/ce-soir/">${e(textes.ceSoir.lien)}</a></p>
   ${lienVersLAgenda()}
 </section>`;
@@ -473,7 +475,7 @@ ${commentCaMarche(textes, marque)}`,
       ? `  <ul class="regarder-cartes">
 ${soirees.map((s) => `    <li class="regarder-carte" id="${ancreDeLaSoiree(s.match)}">
       <h3 class="regarder-carte__nom">${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))}</h3>
-      <p class="regarder-carte__lieu">${quand(s.match)} · ${e(s.match.competition)}</p>
+      <p class="regarder-carte__lieu">${quand(s.match)} · ${e(s.match.competition)}${statutDuMatch(s.match, textes)}</p>
       ${offre(s.offre, textes)}
     </li>`).join('\n')}
   </ul>

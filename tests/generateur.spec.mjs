@@ -696,6 +696,47 @@ test.describe('les pages', () => {
     expect(fini).not.toContain('Brest');
   });
 
+  test('un match reporté ou annulé le dit partout où il est listé : la semaine, la ville, le bar, les prochains matchs, en anglais aussi', async () => {
+    // PSG – OL (dimanche 25, le Zinc) reporté ; Le Havre – PSG (vendredi 30, le Comptoir) annulé.
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    brut.matches = brut.matches.map((m) => (m.id === 'm-psg-ol' ? { ...m, status: 'POSTPONED' } : m.id === 'm-lehavre-psg' ? { ...m, status: 'CANCELLED' } : m));
+    const enMemoire = (instant, anciens) => construireEnMemoire({ brut: structuredClone(brut), maintenant: Date.parse(instant), racine, contenu, anciens });
+    const autre = await enMemoire('2026-10-23T08:00:00Z');
+    const page = (chemin) => autre.pages.find((p) => p.chemin === chemin).contenu;
+    const ligneDe = (html, debut) => html.split('\n').find((l) => l.includes(debut));
+    const reporte = '<strong>Match reporté</strong>';
+    const annule = '<strong>Match annulé</strong>';
+    // La semaine : le statut à la place des bars, ce jour-là comme la semaine d’après.
+    expect(ligneDe(page('/matchs/'), '>PSG – OL</a>')).toContain(` · ${reporte}</li>`);
+    expect(ligneDe(page('/matchs/'), '>PSG – OL</a>')).not.toContain('regarder-compte');
+    expect(ligneDe(page('/matchs/'), '>Le Havre – PSG</a>')).toContain(` · ${annule}</li>`);
+    expect(ligneDe(page('/matchs/'), '>PSG – Barça</a>')).not.toMatch(/Match reporté|Match annulé/);
+    // « Les prochaines soirées à Paris » : chaque soirée du match.
+    const soirees = page('/regarder-le-match/paris/').split('id="titre-soirees"')[1].split('</section>')[0];
+    expect(ligneDe(soirees, '>PSG – OL</a>')).toMatch(new RegExp(`</time> · ${reporte} · <a href="/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25">`));
+    expect(ligneDe(soirees, '>Le Havre – PSG</a>')).toContain(`</time> · ${annule} · <a href="/bar/le-comptoir-du-canal-paris-10/`);
+    // La page du bar : la soirée, sous son jour et sa compétition.
+    expect(page('/bar/le-zinc-des-amis-paris-11/')).toContain(`<p class="regarder-carte__lieu"><time datetime="2026-10-25T20:45:00+01:00">dimanche 25 octobre · 20:45</time> · Ligue 1 · ${reporte}</p>`);
+    expect(page('/bar/le-comptoir-du-canal-paris-10/')).toContain(`· Ligue 1 · ${annule}</p>`);
+    // « PSG et Barça : leurs prochains matchs », et en anglais « What’s next ».
+    const prochains = page('/matchs/psg-barca-2026-10-24/').split('id="titre-prochains"')[1].split('</section>')[0];
+    expect(ligneDe(prochains, '>PSG – OL</a>')).toContain(` · Ligue 1 · ${reporte}</li>`);
+    expect(ligneDe(prochains, '>Le Havre – PSG</a>')).toContain(` · Ligue 1 · ${annule}</li>`);
+    const enAnglais = page('/en/matches/psg-barca-2026-10-24/').split('id="titre-prochains"')[1].split('</section>')[0];
+    expect(ligneDe(enAnglais, 'Paris Saint-Germain v Olympique Lyonnais')).toContain(' · Ligue 1 · <strong>Match postponed</strong></li>');
+    expect(ligneDe(enAnglais, 'Le Havre AC v Paris Saint-Germain')).toContain(' · Ligue 1 · <strong>Match cancelled</strong></li>');
+    // Le lundi, PSG – Barça est passé : « le prochain match » de sa page le dit aussi, en français et en anglais.
+    const lundi = await enMemoire('2026-10-26T08:00:00Z', {
+      matchs: autre.pages.filter((p) => p.type === 'match').map((p) => ({ ...p.memoire, debut: Date.parse(p.memoire.debut) })), bars: [], adresses: {},
+    });
+    const passe = lundi.pages.find((p) => p.chemin === '/matchs/psg-barca-2026-10-24/').contenu;
+    expect(passe).toContain(`<a href="/matchs/le-havre-psg-2026-10-30/">Le Havre – PSG</a>, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre · 19:00</time> · ${annule}.</p>`);
+    const passeEnAnglais = lundi.pages.find((p) => p.chemin === '/en/matches/psg-barca-2026-10-24/').contenu;
+    expect(passeEnAnglais).toContain('Le Havre AC v Paris Saint-Germain</a>, <time datetime="2026-10-30T19:00:00+01:00">Fri 30 Oct, 7:00 pm (Paris time)</time> · <strong>Match cancelled</strong>.</p>');
+    // Chaque page passe toujours le contrôle.
+    expect([...autre.refusees, ...lundi.refusees]).toEqual([]);
+  });
+
   test('un bar sans soirée annoncée reste indexable et le dit', () => {
     const p = pageDe('/bar/au-bon-coin-lyon-2/');
     expect(p.indexable).toBe(true);

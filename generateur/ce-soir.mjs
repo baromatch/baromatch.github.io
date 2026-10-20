@@ -197,8 +197,11 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
   const carte = carteDessinable(lignes) ? lignes : null;
   const image = images && carte ? imageDeLaCarte(chemin, carte, { verre: cadre.verre, signature: images.signature }) : null;
 
+  // Les bars que la page nomme (leurs cartes), gardés dans l’état comme pour toute page qui nomme des bars : refusée au
+  // passage où l’un d’eux est retiré, sa version précédente ne reste pas (refus.mjs).
+  const barsNommes = [...new Set(soirees.map((s) => s.bar.id))].sort();
   const p = {
-    type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage,
+    type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage, barsNommes,
     jsonld: [pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...listes.filter((l) => l.numberOfItems > 0)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">

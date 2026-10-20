@@ -144,7 +144,8 @@ export const fabriquerLaPageAgenda = ({ donnees, contenu, cadre, avecPresse = fa
   ];
   const etapes = [{ nom: textes.fil.accueil, chemin: '/' }, { nom: t.fil, chemin }];
   const p = {
-    type: 'agenda', cle: 'agenda', date: null, chemin, indexable: resume.avecBars, titre: t.titre, description: t.description,
+    // Elle ne nomme aucun bar (barsNommes vide, gardé dans l’état comme pour toute page).
+    type: 'agenda', cle: 'agenda', date: null, chemin, indexable: resume.avecBars, titre: t.titre, description: t.description, barsNommes: [],
     jsonld: [pageWeb({ chemin, titre: t.titre, description: t.description }), filDAriane(etapes)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">

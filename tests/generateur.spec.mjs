@@ -26,6 +26,7 @@ import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
 import { anonymiser, reduire } from '../generateur/outils/reduire-capture.mjs';
 import { adressesCitees, raisonDeNePasGarder } from '../generateur/refus.mjs';
 import { prevenirIndexNow, publierLesPages, reglagesIndexNow, requeteIndexNow } from '../generateur/publier.mjs';
+import { TEXTES_EN } from '../generateur/anglais.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
 const CAPTURE = path.join(racine, 'tests', 'donnees', 'capture');
@@ -859,15 +860,16 @@ test.describe('d’un passage à l’autre', () => {
     writeFileSync(fichier, JSON.stringify(retirer(brut)));
     return `scenario:${fichier}`;
   };
-  // Les fichiers écrits par le générateur (matchs/, regarder-le-match/, bar/), relatifs au dossier.
-  const fichiersGeneres = (sortie, dossier = '') => (dossier ? readdirSync(path.join(sortie, dossier)) : ['matchs', 'regarder-le-match', 'bar'].filter((d) => existsSync(path.join(sortie, d))))
+  // Les fichiers écrits par le générateur (matchs/ et l’affiche de la semaine, regarder-le-match/, bar/ et les affiches des
+  // bars, ce-soir/, en/, agenda/), relatifs au dossier.
+  const fichiersGeneres = (sortie, dossier = '') => (dossier ? readdirSync(path.join(sortie, dossier)) : ['matchs', 'regarder-le-match', 'bar', 'ce-soir', 'en', 'agenda'].filter((d) => existsSync(path.join(sortie, d))))
     .flatMap((nom) => {
       const relatif = dossier ? path.posix.join(dossier, nom) : nom;
       return statSync(path.join(sortie, relatif)).isDirectory() ? fichiersGeneres(sortie, relatif) : [relatif];
     });
   // Chaque lien (et chaque adresse des données structurées) d’une page écrite vers une page générée qui n’existe pas.
   const liensVersDesPagesAbsentes = (sortie) => fichiersGeneres(sortie).filter((f) => f.endsWith('.html'))
-    .flatMap((f) => [...lire(sortie, f).matchAll(/(?:href="|"https:\/\/baromatch\.fr)(\/(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*)/g)]
+    .flatMap((f) => [...lire(sortie, f).matchAll(/(?:href="|"https:\/\/baromatch\.fr)(\/(?:matchs|regarder-le-match|bar|ce-soir|en|agenda)\/(?:[a-z0-9-]+\/)*)/g)]
       .map((m) => m[1]).filter((chemin) => !existsSync(path.join(sortie, chemin, 'index.html'))).map((chemin) => `${f} → ${chemin}`));
 
   test('l’adresse de page d’un bar est stable : gardée s’il change de nom, jamais redonnée, « -2 » exclu', async () => {
@@ -1078,6 +1080,37 @@ test.describe('d’un passage à l’autre', () => {
     const revenue = lire(sortie, 'matchs/psg-ol-2026-10-25/index.html');
     expect(revenue).toContain('La Cave des Gones');
     expect(revenue).not.toContain('Zinc');
+  });
+
+  test('« Ce soir », une page en anglais, refusées au passage où un bar qu’elles nomment est retiré : leur version précédente ne reste pas', async () => {
+    const sortie = dossierVide();
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    // « Ce soir » nomme La Cave des Gones (Brest – Nice), /en/ le Zinc et le Comptoir ; l’état le dit.
+    expect(lire(sortie, 'ce-soir/index.html')).toContain('La Cave des Gones');
+    expect(etatDe(sortie).pages['/ce-soir/'].bars).toEqual(['b-gones']);
+    expect(lire(sortie, 'en/index.html')).toContain('Le Zinc des Amis');
+    expect(etatDe(sortie).pages['/en/'].bars.sort()).toEqual(['b-comptoir', 'b-zinc']);
+    // Les autres pages qui ne nomment aucun bar le disent aussi : la semaine, l’agenda, l’affiche de la semaine.
+    for (const chemin of ['/matchs/', '/agenda/', '/matchs/affiche/']) expect(etatDe(sortie).pages[chemin].bars, chemin).toEqual([]);
+    expect(etatDe(sortie).pages['/bar/la-cave-des-gones-lyon-2/affiche/'].bars).toEqual(['b-gones']);
+    // La Cave des Gones et le Zinc retirent leur accord, au passage même où un texte faux fait refuser « Ce soir » et le
+    // guide de Paris en anglais.
+    const faux = structuredClone(contenu);
+    faux.publies = PUBLIES_DU_SCENARIO.filter((id) => id !== 'b-gones' && id !== 'b-zinc');
+    faux.textes.ceSoir.fil = 'Ce soir !';
+    faux.anglais = { ...structuredClone(TEXTES_EN), paris: { ...TEXTES_EN.paris, chapeau: `${TEXTES_EN.paris.chapeau} !` } };
+    const resultat = await passer(sortie, '2026-10-23T09:00:00Z', { contenu: faux });
+    for (const [chemin, bar] of [['/ce-soir/', 'b-gones'], ['/en/', 'b-zinc']]) {
+      expect(resultat.avertissements, chemin).toContainEqual(expect.stringMatching(new RegExp(`^Page refusée, remplacée par une page neutre : ${chemin} .* elle nomme un bar qui n’est plus publié \\([^)]*${bar}[^)]*\\)$`)));
+    }
+    for (const fichier of ['ce-soir/index.html', 'en/index.html']) {
+      expect(lire(sortie, fichier), fichier).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
+      expect(lire(sortie, fichier), fichier).toContain('<meta name="robots" content="noindex">');
+    }
+    // Leurs noms ne sont plus nulle part (pages, affiches, agendas, en anglais) ; chaque lien mène à une page qui existe.
+    expect(fichiersGeneres(sortie).filter((f) => /La Cave des Gones|Le Zinc des Amis/.test(lire(sortie, f)))).toEqual([]);
+    expect(fichiersGeneres(sortie)).toEqual(expect.arrayContaining(['ce-soir/index.html', 'en/index.html', 'agenda/index.html', 'matchs/affiche/index.html']));
+    expect(liensVersDesPagesAbsentes(sortie)).toEqual([]);
   });
 
   test('une page nouvelle refusée : une page neutre à son adresse, jamais un lien vers une page absente', async () => {

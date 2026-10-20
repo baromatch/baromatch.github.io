@@ -57,7 +57,8 @@ const DEGUISES = [
   'Crémant', 'Cava', 'Lambrusco', 'Rosé pamplemousse', 'Vin chaud', 'Glühwein', 'Sangria', 'Kir', 'Kir royal', 'Une 8.6', 'G&T 8 €', 'J&B coca',
   'Afterwork jusqu’à 20 h', 'Mimosa', 'Génépi', 'Poire williams', 'Trou normand', 'Blue lagoon', 'White Claw', 'Hard seltzer', 'Spumante', 'Vinho verde',
   'Wein', 'Piwo', 'Poiré', 'Houblon local', 'Microbrasserie', 'Cuvée du patron', 'Un 51', 'Le 51 bien frais', 'Gueule de bois', 'Pompette',
-  'Bourré', 'Éméché', 'Murge', 'Saoul', 'Soûl', 'Ivresse', 'Tchin tchin', 'Cheers', 'Flip cup', 'Beer pong',
+  'Bourré', 'Éméché', 'Murge', 'Saoul', 'Soûl', 'Ivresse', 'Tchin tchin', 'Cheers', 'Flip cup', 'Beer pong', 'Soirée dégustation', 'Grand cru',
+  'Œnologie et planche', 'Le vigneron invité', 'Une chopine', 'A cold one', 'Monaco-grenadine', 'Un 102',
   // Les marques.
   'Moretti', 'Peroni', 'Estrella', 'Mort Subite', 'Brewdog', 'Desperados', 'Kro', 'Grim', 'Grimb', '1664', 'Seize-soixante-quatre', 'Une 33 export',
   'Tourtel', 'Kronenbourg 0,0', 'Heineken 0.0', 'Leffe ruby', 'La Chouffe',
@@ -92,7 +93,7 @@ const QUI_POUSSENT = [
 // Une boisson sans nom (« boisson », « consommation », « rafraîchissement ») avec un prix : dans le titre, ou celui que
 // le bar donne (la page l’écrit juste après le titre ; le lecteur met 5 € par défaut).
 const BOISSONS_AVEC_UN_PRIX = ['Boisson 2 €', 'Menu burger + boisson 15 €', 'Boisson du match', 'Boisson fraîche', 'Une boisson au choix',
-  'Rafraîchissement 2 €', 'Consommation du soir', 'Refreshments', 'Beverage 3 €', 'B o i s s o n du match'];
+  'Rafraîchissement 2 €', 'Consommation du soir', 'Refreshments', 'Beverage 3 €', 'B o i s s o n du match', 'Breuvage du match'];
 
 // Des offres sans danger, publiées telles quelles (dont des mots proches d’un alcool : « Pintade », « Gingembre »,
 // « Mousse au chocolat », « Carton jaune », « Triple cheeseburger », « PSG-Monaco », « gluten free », « Pain de

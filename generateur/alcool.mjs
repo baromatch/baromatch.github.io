@@ -58,7 +58,10 @@ const MOTS_DU_SITE = [
   'grimb', 'digeos?', 'gnoles?', 'champ', 'arrosee?s?', 'afterworks?', 'soif', 'assoiffee?s?', 'ivres?', 'pompettes?',
   'tchin', 'tchintchin', 'cheers', 'spiritueux', 'rouquins?', 'picrates?', 'communards?', 'litrons?', 'cuvees?',
   'houblons?', 'houblonnee?s?', 'microbrasseries?', 'brasseurs?', 'ivresses?', 'emechee?s?', 'saoule?s?', 'murges?',
-  'bourree?s?', 'rousses?', 'bierpong', 'beerpong', 'prost', 'skol',
+  'bourree?s?', 'rousses?', 'bierpong', 'beerpong', 'prost', 'skol', 'chopines?', 'tonneaux?', 'barriques?',
+  // La dégustation, la cave, la vigne, la distillerie, le bar à cocktails.
+  'degustations?', 'oenologi\\w*', 'sommelier\\w*', 'cavistes?', 'zythologi\\w*', 'vignobles?', 'vigneron\\w*', 'cepages?',
+  'millesimee?s?', 'distilleries?', 'distillery', 'mixologi\\w*', 'mixologues?',
   // Des fautes courantes, que la faute de frappe (une lettre) ne rattrape pas.
   'coktails?', 'coctails?', 'cocktels?', 'coquetels?', 'wisky', 'wiskies', 'wiskey', 'tekilas?', 'tequilla', 'vodcas?',
   'wodkas?', 'sprits', 'mohitos?', 'aperitives?', 'aperitifes?', 'liquores?',
@@ -68,7 +71,7 @@ const MOTS_DU_SITE = [
   'hangovers?', 'brewskis?', 'brewery', 'breweries', 'brewpubs?', 'brewers?', 'taprooms?', 'hops', 'hoppy', 'bevvy',
   'bevvies', 'plonk', 'hooch', 'moonshine', 'spirits', 'nightcaps?', 'sundowners?', 'porters?', 'radlers?', 'shandy',
   'shandies', 'mimosas?', 'boulevardiers?', 'sazeracs?', 'juleps?', 'kamikazes?', 'pornstar', 'cosmos?', 'michelada',
-  'calimocho', 'kalimotxo', 'tinto', 'batidas?',
+  'calimocho', 'kalimotxo', 'tinto', 'batidas?', 'suds', 'mead', 'dipas?', 'pisang', 'midori', 'amarula', 'sauza',
   // Les bières : styles, langues, marques.
   'birras?', 'cervezas?', 'cervejas?', 'bier', 'pivo', 'piwo', 'ipas?', 'neipas?', 'pils', 'pilsners?', 'pilsens?',
   'krieks?', 'gueuzes?', 'geuzes?', 'lambics?', 'tripels', 'triples?', 'quadrupels?', 'quadruples?', 'dubbels?', 'weiss',
@@ -90,7 +93,8 @@ const MOTS_DU_SITE = [
   'suntory', 'yamazaki', 'hennessy', 'martell', 'courvoisier', 'cointreau', 'marnier', 'kahlua', 'disaronno',
   'frangelico', 'chartreuse', 'benedictine', 'izarra', 'fernet', 'underberg', 'casanis', 'byrrh', 'dubonnet', 'noilly',
   'cinzano', 'pimms?', 'passoa', 'zubrowka', 'eristoff', 'poliakov', 'sobieski', 'ciroc', 'gordons', 'havana', 'kraken',
-  'bumbu', 'diplomatico', 'damoiseau', 'cuervo', 'olmeca', 'tanqueray', 'hendricks', 'beefeater', 'jager', 'jagerbombs?',
+  'bumbu', 'zacapa', 'neisson', 'glenmorangie', 'macallan', 'ardbeg', 'aberlour', 'bowmore', 'bushmills', 'tullamore',
+  'redbreast', 'heine', 'diplomatico', 'damoiseau', 'cuervo', 'olmeca', 'tanqueray', 'hendricks', 'beefeater', 'jager', 'jagerbombs?',
   // Les cocktails.
   'hugo', 'mules?', 'planteurs?', 'caipis?', 'caipiroskas?', 'cosmopolitans?', 'gimlets?', 'grogs?', 'b52', 'tipunchs?',
   'gintonics?',
@@ -114,7 +118,7 @@ export const MOTS_D_UN_VERRE = [
   'tankards?', 'chasers?',
 ];
 // Une boisson qui ne dit pas ce qu’elle est : publiée seule, écartée avec un prix (boissonAvecUnPrix).
-export const MOTS_D_UNE_BOISSON = ['boissons?', 'consommations?', 'rafraichissements?', 'beverages?', 'refreshments?'];
+export const MOTS_D_UNE_BOISSON = ['boissons?', 'consommations?', 'rafraichissements?', 'breuvages?', 'elixirs?', 'beverages?', 'refreshments?'];
 
 // Le mot sans ses lettres répétées (« bieeere » → « biere ») : comparé à la liste resserrée de la même façon.
 const resserrer = (mot) => mot.replace(/(\p{L})\1+/gu, '$1');
@@ -154,16 +158,18 @@ const EXPRESSIONS_DE_BOISSON = [
   'laurent perrier', 'loic raison', 'licor 43', 'cutty sark', 'famous grouse', 'monkey shoulder', 'poire williams',
   'vieille prune', 'blue curacao', 'creme de cassis', 'creme de mure', 'creme de peche', 'triple sec', 'trou normand',
   'feuille morte', 'eau de vie', 'eaux de vie', 'tord boyaux', 'pousse cafe', 'on tap', 'hard seltzer',
-  'seize soixante quatre', 'don papa', 'trois rivieres', 'flip cup',
+  'seize soixante quatre', 'don papa', 'trois rivieres', 'flip cup', 'grand cru', 'grands crus', 'premier cru',
+  'premiers crus', 'cold one', 'cold ones', 'tia maria', 'southern comfort', 'makers mark', 'bombay sapphire', 'monkey 47',
+  'don julio',
 ].map((e) => e.split(' '));
 const EXPRESSIONS_QUI_POUSSENT = [
   'happy hour', 'happy hours', 'heure heureuse', 'heures heureuses', 'after work', 'after works', 'cul sec', 'pub crawl',
   'gueule de bois',
 ].map((e) => e.split(' '));
-// Ce qui nomme un alcool sans être un mot : « G&T », « V&T », « J&B », « B-52 », « une 8.6 », « un 51 », et les emoji
+// Ce qui nomme un alcool sans être un mot : « G&T », « V&T », « J&B », « B-52 », « une 8.6 », « un 51 », « un 102 », et les emoji
 // des boissons d’alcool (le premier filet : un emoji ne passe déjà pas la liste des caractères permis).
 const MOTIFS_D_ALCOOL = [
-  /\b[gvj]\s*&\s*[tb]\b/, /\bb\s*-?\s*52\b/, /\b8[.,]6\b/, /\b(?:un|une|le|du|au|ton|mon) 51\b(?!\s*(?:€|eur|%|cl|ans?\b|min))/,
+  /\b[gvj]\s*&\s*[tb]\b/, /\bb\s*-?\s*52\b/, /\b8[.,]6\b/, /\b(?:un|une|le|du|au|ton|mon) (?:51|102)\b(?!\s*(?:€|eur|%|cl|ans?\b|min))/,
   // « Sans alcool », puis un clin d’œil qui le reprend : « ou pas », « ou presque », « ou avec ».
   /\bsans alcool\W+(?:\w+\W+){0,2}?(?:ou|or) (?:pas|presque|avec|non|not|plus)\b/,
   // Le degré d’alcool : « 5 % vol », « 8 degrés », « 12° ».
@@ -197,7 +203,7 @@ const MIMOSA_A_MANGER = new Set(['oeuf', 'oeufs', 'œuf', 'œufs']);
 const BOISSONS_QUI_SONT_DES_CLUBS = new Set(['porto', 'monaco', 'bordeaux']);
 const AVANT_UN_CLUB = new Set(['fc', 'as', 'asm', 'girondins', 'contre', 'vs', 'versus', 'v', 'face']);
 const APRES_UN_CLUB = new Set(['contre', 'vs', 'versus', 'v']);
-const COCKTAIL_APRES = new Set(['tonic', 'blanc', 'rouge', 'rose', 'flip']);
+const COCKTAIL_APRES = new Set(['tonic', 'blanc', 'rouge', 'rose', 'flip', 'grenadine', 'menthe', 'citron', 'peche', 'cassis', 'sirop', 'orgeat']);
 const AFFICHE = /[-–—/]/;
 
 // ---------- Lire un mot comme un humain le lit ----------

@@ -139,19 +139,22 @@ test.describe('l’accueil', () => {
 
 test.describe('les pages de ville', () => {
   // Les vraies villes, sans aucun bar (les données enregistrées) : chacune a sa ville choisie, et le formulaire de
-  // l’accueil, mot pour mot, des villes jusqu’à la note.
+  // l’accueil, mot pour mot : les villes, et la fin, de la phrase sur l’appli jusqu’à la note.
   test('chaque ville de la capture : le formulaire de l’accueil, sa ville choisie, la même adresse d’envoi', async () => {
     const { pages } = await construireEnMemoire({ source: `capture:${path.join(racine, 'tests', 'donnees', 'capture')}`, maintenant: Date.parse('2026-10-15T19:44:29Z'), racine });
     const villes = pages.filter((p) => p.type === 'ville');
     expect(villes.map((p) => p.chemin)).toEqual(['/regarder-le-match/paris/', '/regarder-le-match/lyon/', '/regarder-le-match/marseille/', '/regarder-le-match/lille/']);
     const action = ACCUEIL.match(/<form class="attente" id="attente" action="([^"]+)" method="POST"/)?.[1];
     expect(action).toBe(ENVOI_DE_LA_LISTE);
-    const finDeLAccueil = normaliser(ACCUEIL.match(/<fieldset class="attente__villes"[\s\S]*?<\/form>/)[0]).replace(' checked', '');
+    // Les villes et leurs phrases (avant l’adresse), puis la fin du formulaire (après le bouton), mot pour mot.
+    const blocs = (html) => [/<fieldset class="attente__villes"[\s\S]*?<label class="attente__etiquette"/, /<p class="attente__plateformes">[\s\S]*?<\/form>/]
+      .map((motif) => normaliser(html.match(motif)[0]).replace(' checked', ''));
+    const finDeLAccueil = blocs(ACCUEIL);
     for (const [i, p] of villes.entries()) {
       const html = p.contenu;
       expect(html, p.chemin).toContain(`<form class="attente" id="attente" action="${ENVOI_DE_LA_LISTE}" method="POST">`);
       expect([...html.matchAll(/value="(\w+)" checked/g)].map((m) => m[1]), p.chemin).toEqual([VILLES[i]]);
-      expect(normaliser(html.match(/<fieldset class="attente__villes"[\s\S]*?<\/form>/)[0]).replace(' checked', ''), p.chemin).toBe(finDeLAccueil);
+      expect(blocs(html), p.chemin).toEqual(finDeLAccueil);
       // Le champ piège et l’objet du mail, ceux de l’accueil.
       for (const champ of [/<input id="attente-piege"[^>]*>/, /<input type="hidden" name="_subject"[^>]*>/]) expect(html.match(champ)?.[0]).toBe(ACCUEIL.match(champ)?.[0]);
       expect(html).toContain(i === 0 ? '<h2 id="titre-attente">Préviens-moi quand l’appli ouvre à Paris</h2>' : `<h2 id="titre-attente">Préviens-moi quand Baromatch arrive à ${VILLES[i]}</h2>`);
@@ -236,6 +239,57 @@ test.describe('les pages de ville', () => {
       await page.getByRole('radio', { name: 'Lille' }).check();
       expect(await violationsAxe(page)).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    });
+  }
+});
+
+// « Ta ville » se choisit d’abord, puis l’adresse et le bouton : dans l’ordre de lecture comme au clavier, sur l’accueil
+// et sur les pages de ville. La ville choisie se voit sans la couleur : une coche dessinée devant son nom.
+const verifierLOrdre = async (onglet, choisie) => {
+  expect(await onglet.locator('#attente').evaluate((f) => {
+    const avant = (a, b) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const villes = f.querySelector('.attente__villes');
+    return [avant(villes, f.querySelector('.attente__etiquette')), avant(villes, f.querySelector('#attente-mail')), avant(villes, f.querySelector('button[type="submit"]'))];
+  })).toEqual([true, true, true]);
+  // Au clavier : la ville choisie, puis le champ de l’adresse, puis le bouton.
+  await onglet.getByRole('radio', { name: choisie }).focus();
+  await onglet.keyboard.press('Tab');
+  await expect(onglet.locator('#attente-mail')).toBeFocused();
+  await onglet.keyboard.press('Tab');
+  await expect(onglet.locator('#attente button[type="submit"]')).toBeFocused();
+  // Une coche devant la ville choisie, aucune devant les autres.
+  const coches = await onglet.locator('.attente__ville span').evaluateAll((puces) => puces.map((p) => {
+    const avant = getComputedStyle(p, '::before');
+    return avant.content !== 'none' && parseFloat(avant.width) > 0;
+  }));
+  expect(coches).toEqual(VILLES.map((v) => v === choisie));
+};
+
+test.describe('l’ordre du formulaire', () => {
+  test.use({ reducedMotion: 'reduce' });
+  let dossier;
+  let serveur;
+  test.beforeAll(async () => {
+    dossier = mkdtempSync(path.join(tmpdir(), 'site-ordre-'));
+    await construireLeSiteDExemple(dossier);
+    const port = await new Promise((resoudre) => {
+      const sonde = createServer();
+      sonde.listen(0, '127.0.0.1', () => { const { port: libre } = sonde.address(); sonde.close(() => resoudre(libre)); });
+    });
+    serveur = await demarrerServeur(port, -1, { dossier });
+  });
+  test.afterAll(() => {
+    serveur?.arreter();
+    if (dossier) rmSync(dossier, { recursive: true, force: true });
+  });
+
+  for (const [chemin, choisie] of [['/', 'Paris'], ['/regarder-le-match/marseille/', 'Marseille']]) {
+    test(`${chemin} : « Ta ville » avant l’adresse et le bouton, au clavier aussi ; une coche sur la ville choisie`, async ({ page }) => {
+      await page.setViewportSize({ width: 360, height: 800 });
+      await page.goto(`${serveur.adresse}${chemin}`);
+      await verifierLOrdre(page, choisie);
+      await page.getByRole('radio', { name: 'Lille' }).check();
+      expect(await page.locator('.attente__ville span').evaluateAll((puces) => puces.map((p) => getComputedStyle(p, '::before').content !== 'none'))).toEqual(VILLES.map((v) => v === 'Lille'));
     });
   }
 });

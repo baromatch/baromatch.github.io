@@ -91,7 +91,7 @@ const robotsDe = (p) => p.contenu.match(/<meta name="robots" content="([^"]*)">/
 const lignesDe = (html) => [...html.matchAll(/<li class="affiche-ligne">[\s\S]*?<time class="affiche-heure[^"]*" datetime="([^"]+)">[^<]*<\/time> <span class="affiche-match">([^<]+)<\/span>/g)].map((m) => `${m[1]} ${m[2]}`);
 // Les lignes des jours de /matchs/ (le bloc du jour et les jours suivants, sans « La semaine d’après », qui mène aux
 // pages des matchs plus lointains), dans le même format.
-const lignesDeLaSemaine = (html) => [...html.split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li>(?:<a href="[^"]*">)?([^<]+?)(?:<\/a>)? · <time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
+const lignesDeLaSemaine = (html) => [...html.split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]*")?>([^<]+?)<\/(?:a|span)> <span class="regarder-matchs__infos"><time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
 // Les modules d’un QR code dessiné par svgDuQr, relus dans son SVG (marge comprise).
 const matriceDuSvg = (svg) => {
   const cote = Number(svg.match(/viewBox="0 0 (\d+) \1"/)[1]);
@@ -293,7 +293,7 @@ test('l’affiche d’un bar publié : noindex, sa prochaine soirée, ses soiré
   expect(svg).toContain('aria-label="QR code vers la page du bar Le Zinc des Amis sur Baromatch"');
   expect(p.contenu).toContain('<figcaption class="affiche-qr__adresse">baromatch.fr/bar/le-zinc-des-amis-paris-11/</figcaption>');
   // La page du bar mène à son affiche.
-  expect(pageDe(site, ZINC).contenu).toContain('<p class="regarder-suite"><a href="/bar/le-zinc-des-amis-paris-11/affiche/">Tu tiens ce bar\u00A0? Ton affiche à imprimer</a></p>');
+  expect(pageDe(site, ZINC).contenu).toContain('<p class="regarder-suite"><a href="/bar/le-zinc-des-amis-paris-11/affiche/">Ton affiche à imprimer</a></p>');
 });
 
 test('le jour même : « Ce soir, on diffuse le match. » ; l’appli ouverte : « Garde ta place sur Baromatch. »', async () => {

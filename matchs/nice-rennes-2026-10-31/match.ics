@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jtm001tryqjjh7k07oq@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261031T161500Z
+DTEND:20261031T181500Z
+SUMMARY:Nice – Rennes
+DESCRIPTION:Ligue 1 · OGC Nice – Stade Rennais FC\nCoup d’envoi samedi
+  31 octobre à 17:15\, heure de Paris.\nLa page du match : https://baroma
+ tch.fr/matchs/nice-rennes-2026-10-31/
+URL:https://baromatch.fr/matchs/nice-rennes-2026-10-31/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

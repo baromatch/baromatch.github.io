@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5js3001pryqjp1pab0mv@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261031T130000Z
+DTEND:20261031T150000Z
+SUMMARY:Levante – Atlético
+DESCRIPTION:LaLiga · Levante UD – Atlético de Madrid\nCoup d’envoi sa
+ medi 31 octobre à 14:00\, heure de Paris.\nLa page du match : https://ba
+ romatch.fr/matchs/levante-atletico-2026-10-31/
+URL:https://baromatch.fr/matchs/levante-atletico-2026-10-31/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

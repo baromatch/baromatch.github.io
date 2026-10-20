@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jre001nryqjhxfxhvya@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261031T123000Z
+DTEND:20261031T143000Z
+SUMMARY:Chelsea – Man United
+DESCRIPTION:Premier League · Chelsea FC – Manchester United\nCoup d’en
+ voi samedi 31 octobre à 13:30\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/chelsea-man-united-2026-10-31/
+URL:https://baromatch.fr/matchs/chelsea-man-united-2026-10-31/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jw90021ryqj9dneojj6@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261031T194500Z
+DTEND:20261031T214500Z
+SUMMARY:OL – Angers
+DESCRIPTION:Ligue 1 · Olympique Lyonnais – Angers SCO\nCoup d’envoi sa
+ medi 31 octobre à 20:45\, heure de Paris.\nLa page du match : https://ba
+ romatch.fr/matchs/ol-angers-2026-10-31/
+URL:https://baromatch.fr/matchs/ol-angers-2026-10-31/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

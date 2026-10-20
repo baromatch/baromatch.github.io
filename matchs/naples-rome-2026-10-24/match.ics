@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jm00017ryqj0ecs7n5p@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261024T160000Z
+DTEND:20261024T180000Z
+SUMMARY:Naples – Rome
+DESCRIPTION:Serie A · SSC Napoli – AS Roma\nCoup d’envoi samedi 24 oct
+ obre à 18:00\, heure de Paris.\nLa page du match : https://baromatch.fr/
+ matchs/naples-rome-2026-10-24/
+URL:https://baromatch.fr/matchs/naples-rome-2026-10-24/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

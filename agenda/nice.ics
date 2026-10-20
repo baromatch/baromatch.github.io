@@ -11,22 +11,8 @@ X-WR-CALDESC:Nice : les matchs au programme de Baromatch (Ligue 1)\, à l
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:match-015@baromatch.fr
-DTSTAMP:20261016T083123Z
-SEQUENCE:0
-DTSTART:20261018T184500Z
-DTEND:20261018T204500Z
-SUMMARY:OL – Nice
-DESCRIPTION:Ligue 1 · Olympique Lyonnais – OGC Nice\nCoup d’envoi dima
- nche 18 octobre à 20:45\, heure de Paris.\nLa page du match : https://ba
- romatch.fr/matchs/ol-nice-2026-10-18/
-URL:https://baromatch.fr/matchs/ol-nice-2026-10-18/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:match-026@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmuy4o33f0013zz9wrv3oiom0@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261023T184500Z
 DTEND:20261023T204500Z
@@ -39,20 +25,22 @@ STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:match-048@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmv6e5jtm001tryqjjh7k07oq@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261031T161500Z
 DTEND:20261031T181500Z
 SUMMARY:Nice – Rennes
 DESCRIPTION:Ligue 1 · OGC Nice – Stade Rennais FC\nCoup d’envoi samedi
-  31 octobre à 17:15\, heure de Paris.
+  31 octobre à 17:15\, heure de Paris.\nLa page du match : https://baroma
+ tch.fr/matchs/nice-rennes-2026-10-31/
+URL:https://baromatch.fr/matchs/nice-rennes-2026-10-31/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:match-073@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmv6e5kaj0037ryqjgkn2obzb@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261108T161500Z
 DTEND:20261108T181500Z

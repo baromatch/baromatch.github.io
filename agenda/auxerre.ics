@@ -11,22 +11,8 @@ X-WR-CALDESC:Auxerre : les matchs au programme de Baromatch (Ligue 1)\, à
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:match-013@baromatch.fr
-DTSTAMP:20261016T083123Z
-SEQUENCE:0
-DTSTART:20261018T151500Z
-DTEND:20261018T171500Z
-SUMMARY:Le Havre – Auxerre
-DESCRIPTION:Ligue 1 · Le Havre AC – AJ Auxerre\nCoup d’envoi dimanche 
- 18 octobre à 17:15\, heure de Paris.\nLa page du match : https://baromat
- ch.fr/matchs/le-havre-auxerre-2026-10-18/
-URL:https://baromatch.fr/matchs/le-havre-auxerre-2026-10-18/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:match-038@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmuy4o38u001fzz9wv9c9xi8d@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261025T161500Z
 DTEND:20261025T181500Z
@@ -39,20 +25,22 @@ STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:match-055@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmv6e5jye0027ryqjnwjxlrnx@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261101T140000Z
 DTEND:20261101T160000Z
 SUMMARY:Strasbourg – Auxerre
 DESCRIPTION:Ligue 1 · RC Strasbourg Alsace – AJ Auxerre\nCoup d’envoi 
- dimanche 1er novembre à 15:00\, heure de Paris.
+ dimanche 1er novembre à 15:00\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/strasbourg-auxerre-2026-11-01/
+URL:https://baromatch.fr/matchs/strasbourg-auxerre-2026-11-01/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:match-069@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmv6e5k7s002zryqjmqat0nt8@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261107T161500Z
 DTEND:20261107T181500Z

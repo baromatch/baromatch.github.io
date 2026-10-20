@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jgj000rryqjd3m8s710@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261021T164500Z
+DTEND:20261021T184500Z
+SUMMARY:Lille – Galatasaray
+DESCRIPTION:Ligue des champions · LOSC Lille – Galatasaray A.Ş.\nCoup d
+ ’envoi mercredi 21 octobre à 18:45\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/lille-galatasaray-2026-10-21/
+URL:https://baromatch.fr/matchs/lille-galatasaray-2026-10-21/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -11,22 +11,8 @@ X-WR-CALDESC:Le Mans : les matchs au programme de Baromatch (Ligue 1)\, à
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:match-001@baromatch.fr
-DTSTAMP:20261016T083123Z
-SEQUENCE:0
-DTSTART:20261016T184500Z
-DTEND:20261016T204500Z
-SUMMARY:Le Mans – Toulouse
-DESCRIPTION:Ligue 1 · Le Mans FC – Toulouse FC\nCoup d’envoi vendredi 
- 16 octobre à 20:45\, heure de Paris.\nLa page du match : https://baromat
- ch.fr/matchs/le-mans-toulouse-2026-10-16/
-URL:https://baromatch.fr/matchs/le-mans-toulouse-2026-10-16/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:match-038@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmuy4o38u001fzz9wv9c9xi8d@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261025T161500Z
 DTEND:20261025T181500Z
@@ -39,20 +25,22 @@ STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:match-050@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmv6e5jv2001xryqji904wews@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261031T194500Z
 DTEND:20261031T214500Z
 SUMMARY:Troyes – Le Mans
 DESCRIPTION:Ligue 1 · ESTAC Troyes – Le Mans FC\nCoup d’envoi samedi 3
- 1 octobre à 20:45\, heure de Paris.
+ 1 octobre à 20:45\, heure de Paris.\nLa page du match : https://baromatc
+ h.fr/matchs/troyes-le-mans-2026-10-31/
+URL:https://baromatch.fr/matchs/troyes-le-mans-2026-10-31/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:match-075@baromatch.fr
-DTSTAMP:20261016T083123Z
+UID:cmv6e5kc4003bryqjgzpuwjeh@baromatch.fr
+DTSTAMP:20261020T104807Z
 SEQUENCE:0
 DTSTART:20261108T161500Z
 DTEND:20261108T181500Z

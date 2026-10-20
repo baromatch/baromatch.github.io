@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jmn0019ryqjgpesydcl@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261024T163000Z
+DTEND:20261024T183000Z
+SUMMARY:Dortmund – Francfort
+DESCRIPTION:Bundesliga · Borussia Dortmund – Eintracht Frankfurt\nCoup d
+ ’envoi samedi 24 octobre à 18:30\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/dortmund-francfort-2026-10-24/
+URL:https://baromatch.fr/matchs/dortmund-francfort-2026-10-24/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

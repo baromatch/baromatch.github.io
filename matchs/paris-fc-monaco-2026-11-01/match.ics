@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jyz0029ryqj5d7aps9v@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261101T161500Z
+DTEND:20261101T181500Z
+SUMMARY:Paris FC – Monaco
+DESCRIPTION:Ligue 1 · Paris FC – AS Monaco\nCoup d’envoi dimanche 1er 
+ novembre à 17:15\, heure de Paris.\nLa page du match : https://baromatch
+ .fr/matchs/paris-fc-monaco-2026-11-01/
+URL:https://baromatch.fr/matchs/paris-fc-monaco-2026-11-01/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmuy4o3bt001lzz9w12rhfcw6@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261020T190000Z
+DTEND:20261020T210000Z
+SUMMARY:PSG – Barça
+DESCRIPTION:Ligue des champions · Paris Saint-Germain – FC Barcelona\nCo
+ up d’envoi mardi 20 octobre à 21:00\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/psg-barca-2026-10-20/
+URL:https://baromatch.fr/matchs/psg-barca-2026-10-20/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

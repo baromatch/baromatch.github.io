@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jxk0025ryqjov71pp1p@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261031T200000Z
+DTEND:20261031T220000Z
+SUMMARY:Barça – Deportivo Alavés
+DESCRIPTION:LaLiga · FC Barcelona – Deportivo Alavés\nCoup d’envoi sa
+ medi 31 octobre à 21:00\, heure de Paris.\nLa page du match : https://ba
+ romatch.fr/matchs/barca-deportivo-alaves-2026-10-31/
+URL:https://baromatch.fr/matchs/barca-deportivo-alaves-2026-10-31/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

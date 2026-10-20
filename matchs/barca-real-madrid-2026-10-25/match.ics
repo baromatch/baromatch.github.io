@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5joo001fryqjd3flf26x@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261025T200000Z
+DTEND:20261025T220000Z
+SUMMARY:Barça – Real Madrid
+DESCRIPTION:LaLiga · FC Barcelona – Real Madrid C.F.\nCoup d’envoi dim
+ anche 25 octobre à 21:00\, heure de Paris.\nLa page du match : https://b
+ aromatch.fr/matchs/barca-real-madrid-2026-10-25/
+URL:https://baromatch.fr/matchs/barca-real-madrid-2026-10-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

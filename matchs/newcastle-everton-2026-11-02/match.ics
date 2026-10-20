@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k1s002hryqj2vuxwdgo@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261102T200000Z
+DTEND:20261102T220000Z
+SUMMARY:Newcastle – Everton
+DESCRIPTION:Premier League · Newcastle United FC – Everton FC\nCoup d’
+ envoi lundi 2 novembre à 21:00\, heure de Paris.\nLa page du match : htt
+ ps://baromatch.fr/matchs/newcastle-everton-2026-11-02/
+URL:https://baromatch.fr/matchs/newcastle-everton-2026-11-02/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

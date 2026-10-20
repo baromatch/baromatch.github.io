@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k09002dryqjbeqv604m@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261101T194500Z
+DTEND:20261101T214500Z
+SUMMARY:OM – Toulouse
+DESCRIPTION:Ligue 1 · Olympique de Marseille – Toulouse FC\nCoup d’env
+ oi dimanche 1er novembre à 20:45\, heure de Paris.\nLa page du match : h
+ ttps://baromatch.fr/matchs/om-toulouse-2026-11-01/
+URL:https://baromatch.fr/matchs/om-toulouse-2026-11-01/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmuy4o36d0019zz9w74csusip@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261025T140000Z
+DTEND:20261025T160000Z
+SUMMARY:Monaco – Lille
+DESCRIPTION:Ligue 1 · AS Monaco – LOSC Lille\nCoup d’envoi dimanche 25
+  octobre à 15:00\, heure de Paris.\nLa page du match : https://baromatch
+ .fr/matchs/monaco-lille-2026-10-25/
+URL:https://baromatch.fr/matchs/monaco-lille-2026-10-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jye0027ryqjnwjxlrnx@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261101T140000Z
+DTEND:20261101T160000Z
+SUMMARY:Strasbourg – Auxerre
+DESCRIPTION:Ligue 1 · RC Strasbourg Alsace – AJ Auxerre\nCoup d’envoi 
+ dimanche 1er novembre à 15:00\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/strasbourg-auxerre-2026-11-01/
+URL:https://baromatch.fr/matchs/strasbourg-auxerre-2026-11-01/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

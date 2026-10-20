@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jud001vryqjg1ftnofd@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261031T173000Z
+DTEND:20261031T193000Z
+SUMMARY:Bayern – Dortmund
+DESCRIPTION:Bundesliga · FC Bayern München – Borussia Dortmund\nCoup d
+ ’envoi samedi 31 octobre à 18:30\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/bayern-dortmund-2026-10-31/
+URL:https://baromatch.fr/matchs/bayern-dortmund-2026-10-31/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

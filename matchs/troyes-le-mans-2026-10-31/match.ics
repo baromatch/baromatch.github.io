@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jv2001xryqji904wews@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261031T194500Z
+DTEND:20261031T214500Z
+SUMMARY:Troyes – Le Mans
+DESCRIPTION:Ligue 1 · ESTAC Troyes – Le Mans FC\nCoup d’envoi samedi 3
+ 1 octobre à 20:45\, heure de Paris.\nLa page du match : https://baromatc
+ h.fr/matchs/troyes-le-mans-2026-10-31/
+URL:https://baromatch.fr/matchs/troyes-le-mans-2026-10-31/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

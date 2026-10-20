@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5jjt0011ryqjfdp9xljj@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261022T190000Z
+DTEND:20261022T210000Z
+SUMMARY:Hoffenheim – OL
+DESCRIPTION:Ligue Europa · TSG Hoffenheim – Olympique Lyonnais\nCoup d
+ ’envoi jeudi 22 octobre à 21:00\, heure de Paris.\nLa page du match : 
+ https://baromatch.fr/matchs/hoffenheim-ol-2026-10-22/
+URL:https://baromatch.fr/matchs/hoffenheim-ol-2026-10-22/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

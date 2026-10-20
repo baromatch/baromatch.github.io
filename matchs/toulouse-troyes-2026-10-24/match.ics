@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmuy4o34h0015zz9wqdz2927p@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261024T151500Z
+DTEND:20261024T171500Z
+SUMMARY:Toulouse – Troyes
+DESCRIPTION:Ligue 1 · Toulouse FC – ESTAC Troyes\nCoup d’envoi samedi 
+ 24 octobre à 17:15\, heure de Paris.\nLa page du match : https://baromat
+ ch.fr/matchs/toulouse-troyes-2026-10-24/
+URL:https://baromatch.fr/matchs/toulouse-troyes-2026-10-24/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

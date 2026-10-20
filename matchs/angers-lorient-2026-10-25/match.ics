@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmuy4o39m001hzz9w17du388d@baromatch.fr
+DTSTAMP:20261020T104807Z
+SEQUENCE:0
+DTSTART:20261025T161500Z
+DTEND:20261025T181500Z
+SUMMARY:Angers – Lorient
+DESCRIPTION:Ligue 1 · Angers SCO – FC Lorient\nCoup d’envoi dimanche 2
+ 5 octobre à 17:15\, heure de Paris.\nLa page du match : https://baromatc
+ h.fr/matchs/angers-lorient-2026-10-25/
+URL:https://baromatch.fr/matchs/angers-lorient-2026-10-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

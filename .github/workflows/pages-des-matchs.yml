@@ -18,6 +18,8 @@
 # agenda »), sitemap.xml et les pages que la mesure a réécrites sont enregistrés, avec un message clair, puis envoyés
 # sur main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
 # elle-même (d’où « pages: write »), puis prévient IndexNow des adresses indexables qui ont changé.
+# Si main change pendant un passage, les pages partent par-dessus sa nouvelle version ; si ce changement touche les
+# mêmes lignes (le plan du site), le passage s’arrête sans erreur ni envoi, et le passage suivant refait les pages.
 # GitHub met en pause les Actions planifiées d’un dépôt public après 60 jours sans activité : ses propres envois
 # comptent comme activité, mais si rien ne change pendant 60 jours, relance-la à la main.
 name: Pages des matchs
@@ -97,12 +99,10 @@ jobs:
           JETON_GITHUB: ${{ github.token }}
         run: |
           set -eu
-          option=""
-          if [ "$ACCEPTER" = "true" ]; then option="--accepter-les-suppressions"; fi
           git config user.name "Pages des matchs"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # L’envoi s’authentifie le temps d’une commande, comme actions/checkout le fait lui-même (un en-tête http), sans
-          # rien écrire dans la configuration de git ; le dépôt est public : le reste (pull, fetch) se lit sans jeton.
+          # rien écrire dans la configuration de git ; le dépôt est public : la nouvelle version de main se lit sans jeton.
           envoyer() {
             entete="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$JETON_GITHUB" | base64 -w0)"
             git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main
@@ -134,18 +134,16 @@ jobs:
               exit 0
             fi
             echo "main a changé pendant le passage (essai $essai) : on repart de sa dernière version."
-            if ! git pull -q --rebase origin main; then
-              # Les deux ont touché les mêmes lignes (le plan du site) : on refait les pages sur la nouvelle version, sans
-              # le jeton de cette étape (le générateur lit des données venues de dehors).
+            # Cette étape a le jeton : elle ne lance que git, jamais le générateur ni la mesure (ils lisent des données
+            # venues de dehors, et un programme lancé ici pourrait lire le jeton, même retiré de son environnement).
+            # Si main a touché les mêmes lignes (le plan du site), rien n’est refait ici : le passage s’arrête sans
+            # erreur et sans rien envoyer, et le passage suivant refait les pages sur la nouvelle version de main.
+            # --autostash : un fichier changé hors de la liste blanche (jamais enregistré) n’empêche pas de repartir de main.
+            if ! git pull -q --rebase --autostash origin main; then
               git rebase --abort || true
-              git fetch -q origin main
-              git reset -q --hard FETCH_HEAD
-              env -u JETON_GITHUB node generateur/mesure.mjs --ecrites="$mesure"
-              env -u JETON_GITHUB node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option
-              if ! enregistrer; then
-                echo "envoye=non" >> "$GITHUB_OUTPUT"
-                exit 0
-              fi
+              echo "::notice::main a changé pendant le passage : le passage suivant refera les pages."
+              echo "envoye=non" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
           done
           echo "::error::Trois essais d’envoi sur main ont échoué."

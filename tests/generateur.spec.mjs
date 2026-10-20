@@ -1312,13 +1312,13 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     expect([...action.matchAll(/npm [^\n]*/g)].map((m) => m[0])).toEqual(['npm ci --ignore-scripts --no-audit --no-fund']);
     expect(action).toMatch(/\n {6}- name: Installer le rendu des images de partage\n {8}working-directory: generateur\/images\n {8}run: npm ci --ignore-scripts --no-audit --no-fund\n\n {6}- name: Construire et contrôler les pages\n/);
     expect(Object.keys(JSON.parse(readFileSync(path.join(racine, 'generateur/images/package.json'), 'utf8')).dependencies)).toEqual(['@resvg/resvg-js', 'qrcode-generator']);
-    // Le générateur contre les listes publiques, les images exigées dans ses deux lancements (le second, le passage
-    // refait après un envoi refusé, sans le jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
-    expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(3);
-    expect(action.match(/node generateur\/construire\.mjs[^\n]*/g)).toHaveLength(2);
+    // Le générateur contre les listes publiques, les images exigées, lancé une seule fois (jamais dans l’étape qui a le
+    // jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
+    expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(2);
+    expect(action.match(/node generateur\/construire\.mjs[^\n]*/g)).toHaveLength(1);
     expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do');
     expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$'");
-    expect(action).toContain('git pull -q --rebase origin main');
+    expect(action).toContain('git pull -q --rebase --autostash origin main');
     // Le jeton n’est pas gardé dans la configuration de git (le générateur tourne sans lui) : seule l’étape qui envoie
     // le reçoit pour git, le temps de l’envoi, comme actions/checkout le fait lui-même ; la demande de publication à
     // Pages le reçoit aussi (elle appelle l’API de GitHub, pas git).
@@ -1326,16 +1326,14 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     const etapes = action.split('\n      - ');
     const avecLeJeton = etapes.filter((etape) => etape.includes('github.token')).map((etape) => etape.split('\n')[0]);
     expect(avecLeJeton).toEqual(['name: Enregistrer et envoyer les pages qui ont changé', 'name: Demander la publication à GitHub Pages']);
-    // Le générateur, qui lit des données venues de dehors, ne voit jamais le jeton, ni la mesure d’audience qui le
-    // précède (generateur/mesure.mjs) : dans une étape qui le reçoit (le passage refait après un envoi refusé), ils
-    // tournent sans lui. Chacun est lancé deux fois : le passage, et le passage refait.
+    // Le générateur, qui lit des données venues de dehors, et la mesure d’audience qui le précède
+    // (generateur/mesure.mjs) ne tournent jamais dans une étape qui reçoit le jeton : retiré de leur environnement, il
+    // resterait lisible (/proc). Chacun est lancé une fois, dans l’étape sans jeton ; un envoi refusé ne les relance pas
+    // (tests/actions.spec.mjs lance l’étape d’envoi elle-même).
     const lancements = etapes.flatMap((etape) => etape.split('\n').map((ligne) => ligne.trim())
       .filter((ligne) => !ligne.startsWith('#') && /generateur\/(?:construire|mesure)\.mjs/.test(ligne)).map((ligne) => ({ ligne, jeton: etape.includes('JETON_GITHUB') })));
-    expect(lancements.map((l) => [l.ligne.match(/generateur\/(\w+)\.mjs/)[1], l.jeton])).toEqual([['mesure', false], ['construire', false], ['mesure', true], ['construire', true]]);
-    expect(lancements.filter((l) => l.jeton).map((l) => l.ligne)).toEqual([
-      'env -u JETON_GITHUB node generateur/mesure.mjs --ecrites="$mesure"',
-      'env -u JETON_GITHUB node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option',
-    ]);
+    expect(lancements.map((l) => [l.ligne.match(/generateur\/(\w+)\.mjs/)[1], l.jeton])).toEqual([['mesure', false], ['construire', false]]);
+    expect(action).not.toContain('env -u');
     expect(action).toContain('git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main');
     expect(action).not.toMatch(/git push|remote set-url/);
     // La publication demandée après l’envoi ; IndexNow n’arrête jamais l’Action.

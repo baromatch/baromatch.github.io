@@ -171,11 +171,11 @@ test.describe('les pages écrites à la main', () => {
     }
   });
 
-  test('l’Action applique la mesure avant le générateur, aux deux passages, et n’enregistre en plus que les pages qu’elle a réécrites', () => {
+  test('l’Action applique la mesure juste avant le générateur, une fois, et n’enregistre en plus que les pages qu’elle a réécrites', () => {
     const action = lire('.github/workflows/pages-des-matchs.yml');
     const lignes = action.split('\n').map((l) => l.trim()).filter((l) => !l.startsWith('#'));
     const mesures = lignes.map((l, i) => [l, i]).filter(([l]) => l.includes('generateur/mesure.mjs'));
-    expect(mesures.map(([l]) => l)).toEqual(['node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"', 'env -u JETON_GITHUB node generateur/mesure.mjs --ecrites="$mesure"']);
+    expect(mesures.map(([l]) => l)).toEqual(['node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"']);
     const generateurs = lignes.map((l, i) => [l, i]).filter(([l]) => l.includes('node generateur/construire.mjs'));
     expect(mesures.map(([, i]) => i + (lignes[i + 1]?.startsWith('option=') ? 3 : 1))).toEqual(generateurs.map(([, i]) => i));
     expect(action).toContain('mesure="$RUNNER_TEMP/mesure.txt"');

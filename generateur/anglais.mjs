@@ -24,7 +24,6 @@ import { page } from './gabarits.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe, cheminDuBar, debutDe, filDAriane, IMAGE, listeDesBars, pageWeb } from './jsonld.mjs';
 import { couper, SEUILS } from './pages.mjs';
-import { adresseDeLImage } from './partage.mjs';
 import { echapper as e } from './texte.mjs';
 
 export const TEXTES_EN = JSON.parse(readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 'en.json'), 'utf8'));
@@ -281,7 +280,7 @@ ${prochains.slice(0, 6).map((m) => `    <li>${lienDuMatch(m)} · ${temps(m)} · 
   </ul>` : `  <p>${e(t.match.aucunProchain)}</p>`}
 </section>`;
     // L’image de la jumelle (sa carte), quand le rendu des images est là : celle que montre WhatsApp à côté du lien.
-    const image = images && fr.carte ? { adresse: adresseDeLImage(fr.chemin), alt: remplir(t.match.alt, { match: nom, quand }) } : null;
+    const image = images && fr.imageDePartage ? { adresse: fr.imageDePartage.adresse, alt: remplir(t.match.alt, { match: nom, quand }) } : null;
     ajouter({
       type: 'match-en', cle: match.slug, jumelle: fr.chemin, date: new Date(match.debut).toISOString(), chemin, indexable, horsPlan: Boolean(match.statut),
       titre: titrePage, description: desc, barsNommes: bars.map((b) => b.id), partage: true, image,

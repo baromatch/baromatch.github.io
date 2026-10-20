@@ -15,7 +15,7 @@ import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agen
 import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
-import { adresseDeLImage, carteDessinable, lignesDeLaCarte } from './partage.mjs';
+import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
 export const SEMAINE_JOURS = 7;
@@ -112,8 +112,8 @@ export const fabriquerLesPages = ({
   const ajouter = (p) => {
     const lignes = p.partage ? lignesDeLaCarte(p.partage, undefined, textes) : null;
     const carte = lignes && carteDessinable(lignes) ? lignes : null;
-    const image = carte && images ? { adresse: adresseDeLImage(p.chemin), alt: carte.alt } : null;
-    pages.push({ ...p, carte, contenu: page({ ...commun, ...p, image }) });
+    const image = carte && images ? imageDeLaCarte(p.chemin, carte, { verre: cadre.verre, signature: images.signature }) : null;
+    pages.push({ ...p, carte, ...(image ? { imageDePartage: image } : {}), contenu: page({ ...commun, ...p, image }) });
   };
   const accueil = { nom: textes.fil.accueil, chemin: '/' };
   const semaine = { nom: textes.fil.matchs, chemin: '/matchs/' };

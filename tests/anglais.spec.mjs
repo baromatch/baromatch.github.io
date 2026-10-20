@@ -140,8 +140,9 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
     // Le fil passe par le guide de sa compétition.
     expect(graphe(en).find((n) => n['@type'] === 'BreadcrumbList').itemListElement.map((i) => i.name)).toEqual(['Baromatch', 'Football in Paris', 'Champions League', 'Paris Saint-Germain v FC Barcelona']);
     // L’image de partage de sa jumelle, décrite en anglais.
-    expect(meta(en.contenu, 'og:image')).toEqual([`${ORIGINE}/matchs/psg-barca-2026-10-24/partage.png`]);
-    expect(meta(en.contenu, 'twitter:image')).toEqual([`${ORIGINE}/matchs/psg-barca-2026-10-24/partage.png`]);
+    expect(meta(en.contenu, 'og:image')[0]).toMatch(/^https:\/\/baromatch\.fr\/matchs\/psg-barca-2026-10-24\/partage\.png\?v=[\w-]{10}$/);
+    expect(meta(en.contenu, 'og:image')).toEqual(meta(fr.contenu, 'og:image'));
+    expect(meta(en.contenu, 'twitter:image')).toEqual(meta(fr.contenu, 'og:image'));
     expect(meta(en.contenu, 'og:image:alt')).toEqual(['The match card: Paris Saint-Germain v FC Barcelona, Sat 24 Oct, 9:00 pm (Paris time).']);
   });
 

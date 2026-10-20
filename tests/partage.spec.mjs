@@ -77,12 +77,15 @@ test.describe('les images de partage', () => {
     expect(existsSync(path.join(sortie, 'regarder-le-match/partage.png'))).toBe(false);
   });
 
-  test('og:image et twitter:image : l’adresse absolue de son image, ses dimensions, ce qu’elle montre', () => {
+  test('og:image et twitter:image : l’adresse absolue de son image et sa version, ses dimensions, ce qu’elle montre', () => {
     const pages = resultat.fichiers.filter((f) => ['match', 'ville', 'bar', 'ce-soir'].includes(f.type) && f.carte);
     expect(pages.length).toBeGreaterThan(10);
     for (const p of pages) {
       const html = p.contenu;
-      const adresse = `${ORIGINE}${p.chemin}partage.png`;
+      // La version : le début de l’empreinte de l’image, celle que l’état garde.
+      const version = resultat.etat.pages[`${p.chemin}partage.png`].empreinte.slice(0, 10);
+      expect(version, p.chemin).toMatch(/^[\w-]{10}$/);
+      const adresse = `${ORIGINE}${p.chemin}partage.png?v=${version}`;
       expect(meta(html, 'og:image'), p.chemin).toEqual([adresse]);
       expect(meta(html, 'twitter:image'), p.chemin).toEqual([adresse]);
       expect(meta(html, 'og:image:width')).toEqual(['1200']);
@@ -192,8 +195,8 @@ test.describe('les images de partage', () => {
       surtitre: 'Où regarder le match', titre: 'Vendredi 23 octobre', ligne: 'Brest – Nice · 20:45', ambre: '1 bar le diffuse à Lyon',
       alt: 'Où regarder le match, vendredi 23 octobre. Brest – Nice · 20:45. 1 bar le diffuse à Lyon.',
     });
-    expect(meta(vendredi.contenu, 'og:image')).toEqual([`${ORIGINE}/ce-soir/partage.png`]);
-    expect(meta(vendredi.contenu, 'twitter:image')).toEqual([`${ORIGINE}/ce-soir/partage.png`]);
+    expect(meta(vendredi.contenu, 'og:image')[0]).toMatch(/^https:\/\/baromatch\.fr\/ce-soir\/partage\.png\?v=[\w-]{10}$/);
+    expect(meta(vendredi.contenu, 'twitter:image')).toEqual(meta(vendredi.contenu, 'og:image'));
     expect(meta(vendredi.contenu, 'og:image:alt')).toEqual([vendredi.carte.alt]);
     expect(vendredi.contenu.split(SCRIPT_DU_PARTAGE)).toHaveLength(2);
     expect(vendredi.contenu).toMatch(/<\/header>\n<div class="partage" role="group" aria-label="Partager la page"/);
@@ -328,6 +331,28 @@ test.describe('d’un passage à l’autre', () => {
     expect((await passer(dossier, '2026-10-24T08:00:00Z')).ecrits).toContain('/ce-soir/partage.png');
   });
 
+  test('l’image annoncée par la page porte sa version : la même tant que l’image ne change pas, une autre quand elle change', async () => {
+    const sortie = dossierVide();
+    const lire = (relatif) => readFileSync(path.join(sortie, relatif), 'utf8');
+    const versionDe = (chemin) => etatDe(sortie).pages[`${chemin}partage.png`].empreinte.slice(0, 10);
+    await passer(sortie, '2026-10-23T08:00:00Z');
+    const matin = { ceSoir: meta(lire('ce-soir/index.html'), 'og:image'), rennes: meta(lire('regarder-le-match/rennes/index.html'), 'og:image') };
+    expect(matin.ceSoir).toEqual([`${ORIGINE}/ce-soir/partage.png?v=${versionDe('/ce-soir/')}`]);
+    expect(meta(lire('ce-soir/index.html'), 'twitter:image')).toEqual(matin.ceSoir);
+    // Le soir : la page « Ce soir » change (« Ce soir » au lieu d’« Aujourd’hui »), pas son image : la même adresse.
+    const soir = await passer(sortie, '2026-10-23T17:30:00Z');
+    expect(soir.ecrits).toContain('/ce-soir/');
+    expect(meta(lire('ce-soir/index.html'), 'og:image')).toEqual(matin.ceSoir);
+    // Le lendemain : une autre image, une autre adresse (l’aperçu se refait) ; Rennes, inchangée, garde la sienne.
+    const lendemain = await passer(sortie, '2026-10-24T08:00:00Z');
+    expect(lendemain.ecrits).toContain('/ce-soir/partage.png');
+    expect(meta(lire('ce-soir/index.html'), 'og:image')).not.toEqual(matin.ceSoir);
+    expect(meta(lire('ce-soir/index.html'), 'og:image')).toEqual([`${ORIGINE}/ce-soir/partage.png?v=${versionDe('/ce-soir/')}`]);
+    expect(meta(lire('regarder-le-match/rennes/index.html'), 'og:image')).toEqual(matin.rennes);
+    // Le texte de remplacement, lui, ne change pas de forme : ce que l’image montre, sans version.
+    expect(meta(lire('ce-soir/index.html'), 'og:image:alt')[0]).toMatch(/^Où regarder le match, samedi 24 octobre\. /);
+  });
+
   test('une page refusée : gardée, elle garde son image ; remplacée par la page neutre, son image part avec elle', async () => {
     const sortie = dossierVide();
     await passer(sortie, '2026-10-21T08:00:00Z');
@@ -343,7 +368,7 @@ test.describe('d’un passage à l’autre', () => {
     expect(resultat.avertissements).toContainEqual(expect.stringMatching(/^Page refusée, sa version précédente reste en ligne : \/matchs\/brest-nice-2026-10-23\//));
     expect(octets('matchs/brest-nice-2026-10-23/partage.png').equals(brest.image)).toBe(true);
     expect(etatDe(sortie).pages['/matchs/brest-nice-2026-10-23/partage.png']).toEqual(brest.etat);
-    expect(meta(readFileSync(path.join(sortie, 'matchs/brest-nice-2026-10-23/index.html'), 'utf8'), 'og:image')).toEqual([`${ORIGINE}/matchs/brest-nice-2026-10-23/partage.png`]);
+    expect(meta(readFileSync(path.join(sortie, 'matchs/brest-nice-2026-10-23/index.html'), 'utf8'), 'og:image')).toEqual([`${ORIGINE}/matchs/brest-nice-2026-10-23/partage.png?v=${brest.etat.empreinte.slice(0, 10)}`]);
     // PSG – OL nommait le Zinc : la page neutre, avec l’image générale du site, sans bloc « Partager » ; son image part.
     const neutre = readFileSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/index.html'), 'utf8');
     expect(neutre).toContain('<h1 class="regarder-titre">Cette page se met à jour</h1>');
@@ -368,7 +393,7 @@ test.describe('d’un passage à l’autre', () => {
     // Le texte réparé : la vraie page revient, avec une image neuve.
     await passer(sortie, '2026-10-21T11:00:00Z', { contenu: { ...contenu, publies: faux.publies } });
     expect(existsSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/partage.png'))).toBe(true);
-    expect(meta(readFileSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/index.html'), 'utf8'), 'og:image')).toEqual([`${ORIGINE}/matchs/psg-ol-2026-10-25/partage.png`]);
+    expect(meta(readFileSync(path.join(sortie, 'matchs/psg-ol-2026-10-25/index.html'), 'utf8'), 'og:image')).toEqual([`${ORIGINE}/matchs/psg-ol-2026-10-25/partage.png?v=${etatDe(sortie).pages['/matchs/psg-ol-2026-10-25/partage.png'].empreinte.slice(0, 10)}`]);
   });
 
   test('sans le rendu des images : l’image générale du site et un avertissement ; exigé (l’Action), rien n’est écrit', async () => {

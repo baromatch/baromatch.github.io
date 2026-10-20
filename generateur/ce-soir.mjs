@@ -18,7 +18,7 @@ import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import { adresseDe, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
-import { adresseDeLImage, carteDessinable, lignesDeLaCarte } from './partage.mjs';
+import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 
 export const CHEMIN_CE_SOIR = '/ce-soir/';
 // Au moins un vrai bar pour un match de ce soir : la page est indexable.
@@ -192,7 +192,7 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
   // Une carte que les polices de l’image ne dessinent pas en entier (un match en cyrillique) : l’image générale du site.
   const lignes = lignesDeLaCarte(partage, undefined, textes);
   const carte = carteDessinable(lignes) ? lignes : null;
-  const image = images && carte ? { adresse: adresseDeLImage(chemin), alt: carte.alt } : null;
+  const image = images && carte ? imageDeLaCarte(chemin, carte, { verre: cadre.verre, signature: images.signature }) : null;
 
   const p = {
     type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage,
@@ -209,5 +209,5 @@ ${sectionVilles}
 ${appel(marque, textes)}
 ${commentCaMarche(textes, marque)}`,
   };
-  return { ...p, carte, contenu: page({ cadre, marque, avecPresse, ...p, image }) };
+  return { ...p, carte, ...(image ? { imageDePartage: image } : {}), contenu: page({ cadre, marque, avecPresse, ...p, image }) };
 };

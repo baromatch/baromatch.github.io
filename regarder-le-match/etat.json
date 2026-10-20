@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "cTQI-aF5rjmihXUA8ImvPg",
+   "empreinte": "3yg4AdlU7uAolxjnHVGXmw",
    "change": "2026-10-20",
    "indexable": false,
    "bars": []
@@ -411,7 +411,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "gbqvvrzVZuANDrOPUuCyZw",
+   "empreinte": "iN4pYkKRt2q-oewFHtcqhg",
    "change": "2026-10-20",
    "indexable": false,
    "bars": []

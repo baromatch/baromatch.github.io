@@ -50,7 +50,7 @@
     { "id": "n-zinc-barca", "status": "OPEN", "bar": { "id": "b-zinc" }, "match": { "id": "m-psg-barca-fr" }, "offer": null },
     { "id": "n-zinc-barca-double", "status": "OPEN", "bar": { "id": "b-zinc" }, "match": { "id": "m-psg-barca-en" }, "offer": null },
     { "id": "n-comptoir-barca", "status": "OPEN", "bar": { "id": "b-comptoir" }, "match": { "id": "m-psg-barca-en" },
-      "offer": { "title": "Menu burger et boisson fraîche", "priceCents": 1500, "until": "2026-10-24T18:00:00.000Z", "hasAlcohol": false } },
+      "offer": { "title": "Menu burger et frites maison", "priceCents": 1500, "until": "2026-10-24T18:00:00.000Z", "hasAlcohol": false } },
     { "id": "n-comptoir-om-lens", "status": "OPEN", "bar": { "id": "b-comptoir" }, "match": { "id": "m-om-lens" }, "offer": null },
     { "id": "n-comptoir-psg-ol", "status": "CANCELLED", "bar": { "id": "b-comptoir" }, "match": { "id": "m-psg-ol" }, "offer": null },
     { "id": "n-comptoir-havre", "status": "OPEN", "bar": { "id": "b-comptoir" }, "match": { "id": "m-lehavre-psg" },

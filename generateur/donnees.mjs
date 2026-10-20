@@ -4,7 +4,7 @@
 import { createHash } from 'node:crypto';
 import { nettoyer, pourComparer, sansAccents, slug } from './texte.mjs';
 import { jourDeParis } from './heure.mjs';
-import { motDAlcool } from './alcool.mjs';
+import { boissonAvecUnPrix, caractereNonPermis, incitationABoire, motDAlcool, prixOffert } from './alcool.mjs';
 
 export const HEURE_MS = 3_600_000;
 export const JOUR_MS = 24 * HEURE_MS;
@@ -357,21 +357,24 @@ export const preparer = (brut, { maintenant, clubs, competitions, villes, publie
 };
 
 // L’offre d’une soirée (loi Evin) : publiée telle que le bar l’a écrite (titre, prix, heure limite) seulement si le bar
-// a dit qu’elle ne contient pas d’alcool (hasAlcohol vaut exactement false), que son texte ne nomme aucun alcool (la
-// liste de l’appli, alcool.mjs : seul « sans alcool » y échappe, quoi que le bar ait coché) et qu’elle ne parle ni de ce
-// qui pousse à boire, ni d’une remise ou d’une gratuité, ni du score. Sinon, à sa place, « Une offre du bar dans
-// l’appli », sans titre ni prix ({ dansLAppli: true }) : rien d’alcoolisé n’est écrit, donc aucune mention santé n’est
-// à mettre dessous. Une offre finie ne se montre pas. Une offre écartée pour ce qu’elle dit laisse un avertissement.
+// a dit qu’elle ne contient pas d’alcool (hasAlcohol vaut exactement false), que son texte ne nomme ni n’évoque aucun
+// alcool (alcool.mjs : la liste de l’appli et celle du site, lues aussi en « leet », coupées ou collées ; seul « sans
+// alcool » y échappe, quoi que le bar ait coché), qu’il n’a que des caractères permis (ni emoji, ni autre écriture),
+// qu’il ne parle ni de ce qui pousse à boire, ni d’une remise ou d’une gratuité, ni du score, que son prix n’est pas de
+// 0 € (une gratuité) et qu’il ne met pas de prix sur une boisson sans nom (« Boisson du match » à 2 €, dans le titre ou
+// à côté). Sinon, à sa place, « Une offre du bar dans l’appli », sans titre ni prix ({ dansLAppli: true }) : rien
+// d’alcoolisé n’est écrit, donc aucune mention santé n’est à mettre dessous. Une offre finie ne se montre pas. Une offre
+// écartée pour ce qu’elle dit (ce qui pousse à boire, une remise, une gratuité, le score) laisse un avertissement.
 const offreDe = (offre, maintenant, bar, avertissements) => {
   if (!offre || typeof offre.title !== 'string') return null;
-  const titre = nettoyer(offre.title);
+  const titre = nettoyer(offre.title).normalize('NFC');
   if (!titre) return null;
   const fin = offre.until ? Date.parse(offre.until) : Number.NaN;
   if (fin <= maintenant) return null;
-  const dit = ceQueLOffreDit(titre);
+  const dit = ceQueLOffreDit(titre) ?? incitationABoire(titre) ?? prixOffert(offre.priceCents);
   if (dit) avertissements.push(`Offre de « ${bar.nom} » non affichée : ${dit.raison} (« ${dit.extrait} »), ce que le site ne publie pas`);
   // Le texte tel qu’écrit (un retour à la ligne finit une boisson) et nettoyé (un caractère invisible ne coupe pas un mot).
-  const alcool = motDAlcool(offre.title) ?? motDAlcool(titre);
+  const alcool = motDAlcool(offre.title) ?? motDAlcool(titre) ?? boissonAvecUnPrix(titre, offre.priceCents) ?? caractereNonPermis(titre);
   if (dit || alcool || offre.hasAlcohol !== false) return { dansLAppli: true };
   return {
     titre,

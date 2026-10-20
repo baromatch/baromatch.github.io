@@ -4,10 +4,10 @@
 // encore publié (un bar retiré de bars-publies.json, ou exclu, n’y reste jamais), chaque page qu’elle cite existe encore
 // après ce passage, l’image de partage qu’elle annonce est encore là, elle compte ses visites exactement comme
 // marque.json le dit (la mesure d’audience, mesure.mjs : arrêtée, elle n’en garde aucune trace), et elle n’est pas
-// gardée depuis plus de 24 heures (elle vieillit : jours, soirées, bars). Elle garde alors son badge et son image. Sinon, une page neutre la remplace à
-// la même adresse (« Cette page se met à jour », en noindex, vers les matchs et les villes, avec l’image générale du
-// site et sans bloc « Partager ») : son image part avec elle, et un bar y a le badge générique. Les liens des autres
-// pages mènent toujours quelque part. Le journal dit chaque cas.
+// gardée depuis plus de 24 heures (elle vieillit : jours, soirées, bars). Elle garde alors son badge et son image.
+// Sinon, une page neutre la remplace à la même adresse (« Cette page se met à jour », en noindex, vers les matchs et
+// les villes, avec l’image générale du site et sans bloc « Partager ») : son image part avec elle, et un bar y a le
+// badge générique. Les liens des autres pages mènent toujours quelque part. Le journal dit chaque cas.
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { HEURE_MS } from './donnees.mjs';

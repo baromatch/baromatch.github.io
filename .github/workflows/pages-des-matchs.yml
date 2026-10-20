@@ -142,7 +142,8 @@ jobs:
             # venues de dehors, et un programme lancé ici pourrait lire le jeton, même retiré de son environnement).
             # Si main a touché les mêmes lignes (le plan du site), rien n’est refait ici : le passage s’arrête sans
             # erreur et sans rien envoyer, et le passage suivant refait les pages sur la nouvelle version de main.
-            # --autostash : un fichier changé hors de la liste blanche (jamais enregistré) n’empêche pas de repartir de main.
+            # --autostash : un fichier changé hors de la liste blanche (jamais enregistré) n’empêche pas de repartir
+            # de main.
             if ! git pull -q --rebase --autostash origin main; then
               git rebase --abort || true
               echo "::notice::main a changé pendant le passage : le passage suivant refera les pages."

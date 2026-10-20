@@ -15,7 +15,7 @@ import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agen
 import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
-import { adresseDeLImage, lignesDeLaCarte } from './partage.mjs';
+import { adresseDeLImage, carteDessinable, lignesDeLaCarte } from './partage.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
 export const SEMAINE_JOURS = 7;
@@ -107,9 +107,11 @@ export const fabriquerLesPages = ({
   const pages = [];
   const commun = { cadre, marque, avecPresse };
   // Une page qui se partage (partage : un match, une ville ou un bar) : ce que dit son image (carte), et l’image en
-  // aperçu quand le rendu des images est là (images).
+  // aperçu quand le rendu des images est là (images). Une carte que les polices de l’image ne dessinent pas en entier
+  // (un nom en cyrillique) : pas d’image à elle, l’image générale du site.
   const ajouter = (p) => {
-    const carte = p.partage ? lignesDeLaCarte(p.partage, undefined, textes) : null;
+    const lignes = p.partage ? lignesDeLaCarte(p.partage, undefined, textes) : null;
+    const carte = lignes && carteDessinable(lignes) ? lignes : null;
     const image = carte && images ? { adresse: adresseDeLImage(p.chemin), alt: carte.alt } : null;
     pages.push({ ...p, carte, contenu: page({ ...commun, ...p, image }) });
   };

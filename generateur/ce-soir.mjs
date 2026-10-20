@@ -18,7 +18,7 @@ import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import { adresseDe, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
-import { adresseDeLImage, lignesDeLaCarte } from './partage.mjs';
+import { adresseDeLImage, carteDessinable, lignesDeLaCarte } from './partage.mjs';
 
 export const CHEMIN_CE_SOIR = '/ce-soir/';
 // Au moins un vrai bar pour un match de ce soir : la page est indexable.
@@ -189,8 +189,10 @@ ${villes.map((v) => `    <li><a href="${v.chemin}">${e(remplir(textes.ville.titr
   // L’image de partage : tous les matchs de ce jour-là, finis ou pas (pas celui de la veille qui se joue encore après
   // minuit) : elle reste la même toute la journée, tant que les matchs et les bars du jour ne changent pas.
   const partage = { sorte: 'ce-soir', jour: maintenant, matchs: donnees.matchs.filter((m) => jourDeParis(m.debut) === aujourdhui).sort(parDebut) };
-  const carte = lignesDeLaCarte(partage, undefined, textes);
-  const image = images ? { adresse: adresseDeLImage(chemin), alt: carte.alt } : null;
+  // Une carte que les polices de l’image ne dessinent pas en entier (un match en cyrillique) : l’image générale du site.
+  const lignes = lignesDeLaCarte(partage, undefined, textes);
+  const carte = carteDessinable(lignes) ? lignes : null;
+  const image = images && carte ? { adresse: adresseDeLImage(chemin), alt: carte.alt } : null;
 
   const p = {
     type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage,

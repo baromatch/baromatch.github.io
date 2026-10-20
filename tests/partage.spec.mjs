@@ -6,7 +6,7 @@
 // toujours l’adresse canonique, sans paramètre.
 // Le rendu est installé ici comme dans l’Action : cd generateur/images && npm ci.
 import { test, expect } from '@playwright/test';
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -134,6 +134,46 @@ test.describe('les images de partage', () => {
       if (p.type === 'match') expect(['', 'Match reporté', 'Match annulé'], p.chemin).toContain(p.carte.ambre);
       if (p.type === 'ville') expect([p.carte.surtitre, p.carte.ligne, p.carte.ambre]).toEqual(['Les soirs de match', '', '']);
     }
+  });
+
+  test('un nom que les polices de l’image ne dessinent pas (grec, cyrillique) : l’image générale du site, jamais une image où il manque', async () => {
+    const sortie = dossierVide();
+    const fichier = path.join(sortie, 'scenario.json');
+    const brut = JSON.parse(readFileSync(SCENARIO, 'utf8'));
+    const PSG = { slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' };
+    brut.matches.push(
+      // Le mardi 27, seul match du jour : Шахтар Донецьк – PSG, montré par le Zinc ; le jeudi 29, Ολυμπιακός – PSG.
+      { id: 'cmshakhtar', startAt: '2026-10-27T17:45:00.000Z', league: 'Ligue des champions', homeTeam: 'Шахтар Донецьк', awayTeam: 'Paris Saint-Germain', homeClub: null, awayClub: PSG },
+      { id: 'cmolympiakos', startAt: '2026-10-29T17:45:00.000Z', league: 'Ligue Europa', homeTeam: 'Ολυμπιακός', awayTeam: 'Paris Saint-Germain', homeClub: null, awayClub: PSG },
+      // Un nom latin à accents que la police n’a pas (« ş ») : dessiné sans son accent, l’image reste.
+      { id: 'm-besiktas', startAt: '2026-10-28T17:45:00.000Z', league: 'Ligue Europa', homeTeam: 'Beşiktaş JK', awayTeam: 'Olympique de Marseille', homeClub: null, awayClub: { slug: 'olympique-de-marseille', canonicalName: 'Olympique de Marseille' } },
+    );
+    brut.bars.push({ id: 'b-taverna', name: 'Taverna Ελληνική', address: '9 Rue de Lappe, 75011 Paris', isActive: true });
+    brut.matchNights.push({ id: 'n-zinc-shakhtar', status: 'OPEN', bar: { id: 'b-zinc' }, match: { id: 'cmshakhtar' }, offer: null });
+    writeFileSync(fichier, JSON.stringify(brut));
+    const avec = { ...contenu, publies: [...PUBLIES_DU_SCENARIO, 'b-taverna'] };
+    const site = await construireEnMemoire({ source: `scenario:${fichier}`, maintenant: Date.parse('2026-10-27T08:00:00Z'), racine, contenu: avec, images: true });
+    const pageDe = (chemin) => site.pages.find((p) => p.chemin === chemin);
+    const sansImage = ['/matchs/match-cmshakhtar-2026-10-27/', '/matchs/match-cmolympiakos-2026-10-29/', '/bar/taverna-paris-11/', '/ce-soir/', '/en/matches/match-cmshakhtar-2026-10-27/'];
+    for (const chemin of sansImage) {
+      const p = pageDe(chemin);
+      expect(p, chemin).toBeTruthy();
+      expect(p.carte ?? null, chemin).toBeNull();
+      expect(meta(p.contenu, 'og:image'), chemin).toEqual([IMAGE_DU_SITE]);
+      expect(meta(p.contenu, 'twitter:image'), chemin).toEqual([IMAGE_DU_SITE]);
+      // Le bloc « Partager » reste : il ne dépend pas de l’image.
+      expect(p.contenu, chemin).toContain('class="partage"');
+      expect(controlerLaPage(p), chemin).toEqual([]);
+    }
+    // Le match à accents garde son image, le nom dessiné sans l’accent qui manque.
+    const besiktas = pageDe('/matchs/besiktas-om-2026-10-28/');
+    expect(besiktas.carte).toMatchObject({ titre: 'Beşiktaş – OM' });
+    expect(meta(besiktas.contenu, 'og:image')[0]).toMatch(new RegExp(`^${ORIGINE}/matchs/besiktas-om-2026-10-28/partage\\.png`));
+    // Écrit : aucune image pour ces pages.
+    const resultat = await construire({ source: `scenario:${fichier}`, sortie, maintenant: Date.parse('2026-10-27T08:00:00Z'), racine, contenu: avec });
+    const images = resultat.fichiers.filter((f) => f.type === 'partage').map((f) => f.chemin);
+    expect(images).toContain('/matchs/besiktas-om-2026-10-28/partage.png');
+    for (const chemin of sansImage) expect(images, chemin).not.toContain(`${chemin}partage.png`);
   });
 
   test('la liste blanche : partage.png à côté d’une page, rien d’autre', () => {

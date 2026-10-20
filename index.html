@@ -9,6 +9,8 @@
      tests/politique-de-securite.spec.mjs donne la nouvelle. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-sdE1IA7xkRAGohjqCy/Z+CUnLnFuMm9NC71+35yRanQ='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
 <meta name="google-site-verification" content="nBxxD8vbrngLKD1Te1fRcbC8tGC2-gwezW9NG9urIaw" />
+<!-- Bing Webmaster Tools : remplace la ligne suivante par la balise de vérification que Bing donne (elle commence par <meta name="msvalidate.01"). -->
+<!-- BING_SITE_VERIFICATION -->
 <title>Baromatch — Trouve un bar qui diffuse ton match, à Paris</title>
 <meta name="description" content="Choisis ton match, trouve un bar qui le diffuse, garde ta place et retrouve ta soirée dans ton album. Baromatch arrive bientôt à Paris.">
 <meta name="robots" content="max-image-preview:large">
@@ -37,13 +39,26 @@
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@graph": [
   {"@type": "Organization", "@id": "https://baromatch.fr/#organisation", "name": "Baromatch", "url": "https://baromatch.fr/",
-   "logo": "https://baromatch.fr/apple-touch-icon.png", "sameAs": ["https://x.com/baromatchapp"],
+   "slogan": "Ton match. Ton bar. Ce soir.",
+   "description": "Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. En test sur Android, à Paris.",
+   "logo": "https://baromatch.fr/presse/baromatch-icone.png", "email": "contact@baromatch.fr", "sameAs": ["https://x.com/baromatchapp"],
    "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "contact@baromatch.fr", "availableLanguage": "fr"}},
   {"@type": "WebSite", "@id": "https://baromatch.fr/#site", "name": "Baromatch", "url": "https://baromatch.fr/", "inLanguage": "fr-FR",
    "publisher": {"@id": "https://baromatch.fr/#organisation"}},
   {"@type": "MobileApplication", "@id": "https://baromatch.fr/#appli", "name": "Baromatch",
    "description": "Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.",
-   "applicationCategory": "LifestyleApplication", "inLanguage": "fr", "publisher": {"@id": "https://baromatch.fr/#organisation"}}
+   "applicationCategory": "LifestyleApplication", "inLanguage": "fr", "publisher": {"@id": "https://baromatch.fr/#organisation"}},
+  {"@type": "FAQPage", "@id": "https://baromatch.fr/#questions", "url": "https://baromatch.fr/", "name": "Baromatch — Trouve un bar qui diffuse ton match, à Paris", "inLanguage": "fr-FR",
+   "isPartOf": {"@id": "https://baromatch.fr/#site"}, "mainEntity": [
+    {"@type": "Question", "name": "Je peux déjà garder une place\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pas encore. Baromatch est en test sur Android, à Paris, et n’est pas encore ouvert au public. Laisse ton adresse\u00a0: on te prévient le jour où l’appli ouvre."}},
+    {"@type": "Question", "name": "C’est gratuit\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar."}},
+    {"@type": "Question", "name": "Il faut un compte\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour regarder les matchs et les bars, non. Pour garder une place, oui\u00a0: ton adresse e-mail suffit. Pas de mot de passe\u00a0: on t’envoie un code de 6\u00a0chiffres, valable 10\u00a0minutes. Il faut avoir 18\u00a0ans ou plus."}},
+    {"@type": "Question", "name": "Je peux venir avec des potes\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée\u00a0: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass\u00a0; pour les autres, ton pass compte à la porte."}},
+    {"@type": "Question", "name": "Ma place est vraiment gardée\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch\u00a0: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde."}},
+    {"@type": "Question", "name": "Et si j’arrive en retard\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Ta place est gardée jusqu’à 30\u00a0minutes après le coup d’envoi au plus. Le bar peut choisir moins\u00a0: 15\u00a0minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan."}},
+    {"@type": "Question", "name": "Comment j’annule ma place\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Dans l’appli, ouvre l’onglet «\u00a0Ta soirée\u00a0», touche «\u00a0Je ne viens plus\u00a0», puis «\u00a0Libérer\u00a0». Tu peux le faire jusqu’au dernier moment\u00a0: ta place repart à quelqu’un d’autre."}},
+    {"@type": "Question", "name": "Dans quelles villes\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "À Paris, pour commencer\u00a0: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes."}}
+  ]}
 ]}
 </script>
 </head>
@@ -66,7 +81,21 @@
       <p class="ouverture__texte">Une appli gratuite pour les fans&nbsp;: trouve un bar qui diffuse ton match et garde ta place. Elle n’est pas encore ouverte&nbsp;: rien à réserver ce soir.</p>
 
       <form class="attente" id="attente" action="https://formspree.io/f/mqpeedoj" method="POST" novalidate>
-        <label class="attente__etiquette" for="attente-mail">Préviens-moi au lancement</label>
+        <fieldset class="attente__villes" aria-describedby="attente-usage">
+          <legend>Ta ville</legend>
+          <div class="attente__options">
+            <label class="attente__ville" for="attente-ville-0"><input id="attente-ville-0" type="radio" name="ville" value="Paris" checked><span>Paris</span></label>
+            <label class="attente__ville" for="attente-ville-1"><input id="attente-ville-1" type="radio" name="ville" value="Lyon"><span>Lyon</span></label>
+            <label class="attente__ville" for="attente-ville-2"><input id="attente-ville-2" type="radio" name="ville" value="Marseille"><span>Marseille</span></label>
+            <label class="attente__ville" for="attente-ville-3"><input id="attente-ville-3" type="radio" name="ville" value="Lille"><span>Lille</span></label>
+            <label class="attente__ville" for="attente-ville-4"><input id="attente-ville-4" type="radio" name="ville" value="Autre"><span>Autre</span></label>
+          </div>
+        </fieldset>
+        <p class="attente__date" data-ville="Lyon">Pas de date pour Lyon. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Marseille">Pas de date pour Marseille. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Lille">Pas de date pour Lille. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Autre">Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.</p>
+        <label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
         <div class="attente__ligne">
           <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
           <button class="attente__bouton" type="submit">Me prévenir</button>
@@ -76,7 +105,7 @@
         <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
         <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
         <p class="attente__plateformes">Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.</p>
-        <p class="attente__note">On t’écrit seulement pour le lancement et les premiers tests. Voir <a href="/confidentialite.html#liste-attente">combien de temps on garde ton adresse</a>.</p>
+        <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
       </form>
     </div>
   </section>
@@ -99,7 +128,7 @@
     <!-- Le film a une bande-son : au niveau AA (WCAG 1.2.5), il se présente comme l’alternative en images du texte qui
          suit, et chaque lecteur cite cette phrase. Le texte dit ce que le film montre à l’écran, mot pour mot, lu sur ses
          images (1.2.3) : rien d’autre. -->
-    <p class="film__note" id="film-note">Ce film reprend en images le texte «&nbsp;Ce que montre le film&nbsp;», juste dessous.</p>
+    <p class="film__note" id="film-note">Ce film reprend en images le texte «&nbsp;Ce que montre le film&nbsp;», juste dessous. Ses bars, ses places et ses chiffres sont inventés.</p>
     <details class="film__texte" id="film-texte">
       <summary>Ce que montre le film</summary>
       <ol>
@@ -145,6 +174,43 @@
         <p class="etape__texte">Chaque soirée validée devient un sous-bock, le souvenir du match, du bar et de la date, dans ton album.</p>
       </li>
     </ol>
+    <p class="soiree__suite"><a href="/ce-soir/">Où regarder le match ce soir</a></p>
+  </section>
+
+  <section class="questions-fans page" id="questions" aria-labelledby="titre-questions-fans">
+    <h2 class="titre-section" id="titre-questions-fans">Tes questions</h2>
+    <details>
+      <summary>Je peux déjà garder une place&nbsp;?</summary>
+      <p>Pas encore. Baromatch est en test sur Android, à Paris, et n’est pas encore ouvert au public. <a href="#attente">Laisse ton adresse</a>&nbsp;: on te prévient le jour où l’appli ouvre.</p>
+    </details>
+    <details>
+      <summary>C’est gratuit&nbsp;?</summary>
+      <p>Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar.</p>
+    </details>
+    <details>
+      <summary>Il faut un compte&nbsp;?</summary>
+      <p>Pour regarder les matchs et les bars, non. Pour garder une place, oui&nbsp;: ton adresse e-mail suffit. Pas de mot de passe&nbsp;: on t’envoie un code de 6&nbsp;chiffres, valable 10&nbsp;minutes. Il faut avoir 18&nbsp;ans ou plus.</p>
+    </details>
+    <details>
+      <summary>Je peux venir avec des potes&nbsp;?</summary>
+      <p>Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée&nbsp;: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass&nbsp;; pour les autres, ton pass compte à la porte.</p>
+    </details>
+    <details>
+      <summary>Ma place est vraiment gardée&nbsp;?</summary>
+      <p>Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch&nbsp;: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde.</p>
+    </details>
+    <details>
+      <summary>Et si j’arrive en retard&nbsp;?</summary>
+      <p>Ta place est gardée jusqu’à 30&nbsp;minutes après le coup d’envoi au plus. Le bar peut choisir moins&nbsp;: 15&nbsp;minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan.</p>
+    </details>
+    <details>
+      <summary>Comment j’annule ma place&nbsp;?</summary>
+      <p>Dans l’appli, ouvre l’onglet «&nbsp;Ta soirée&nbsp;», touche «&nbsp;Je ne viens plus&nbsp;», puis «&nbsp;Libérer&nbsp;». Tu peux le faire jusqu’au dernier moment&nbsp;: ta place repart à quelqu’un d’autre.</p>
+    </details>
+    <details>
+      <summary>Dans quelles villes&nbsp;?</summary>
+      <p>À Paris, pour commencer&nbsp;: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes.</p>
+    </details>
   </section>
 
   <section class="vitrine-accueil page" aria-labelledby="titre-boutique">
@@ -172,7 +238,11 @@
   <div class="pied__marque"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="pd-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="pd-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="pd-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#pd-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#pd-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#pd-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg><span>© 2026 Baromatch</span></div>
   <ul class="pied__liens">
     <li><a href="/pour-les-bars.html">Pour les bars</a></li>
+    <li><a href="/matchs/">Où regarder le match</a></li>
     <li><a href="/boutique.html">Boutique</a></li>
+    <li><a href="/presse.html">Presse</a></li>
+    <li><a href="/a-propos.html">À propos</a></li>
+    <li><a href="/comment-on-choisit-les-bars.html">Comment on choisit les bars</a></li>
     <li><a href="/mentions-legales.html">Mentions légales</a></li>
     <li><a href="/cgu.html">Règles de l’appli (CGU)</a></li>
     <li><a href="/confidentialite.html">Confidentialité</a></li>

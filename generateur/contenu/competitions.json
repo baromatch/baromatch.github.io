@@ -1,0 +1,12 @@
+{
+  "_lisezMoi": "Le nom français de chaque compétition, quand l’appli en donne un autre. À gauche le nom reçu, à droite le nom affiché. Deux matchs identiques sous deux noms (« UEFA Champions League » et « Ligue des champions ») n’en font qu’un, avec le nom français.",
+  "UEFA Champions League": "Ligue des champions",
+  "Champions League": "Ligue des champions",
+  "UEFA Europa League": "Ligue Europa",
+  "Europa League": "Ligue Europa",
+  "UEFA Conference League": "Ligue Conférence",
+  "UEFA Europa Conference League": "Ligue Conférence",
+  "Conference League": "Ligue Conférence",
+  "Coupe de France": "Coupe de France",
+  "Trophée des Champions": "Trophée des champions"
+}

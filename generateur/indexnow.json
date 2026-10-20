@@ -1,0 +1,6 @@
+{
+  "_lisezMoi": "La clé IndexNow du site : publique par nature, elle est servie à la racine (/<clé>.txt, qui ne contient qu’elle) pour prouver à Bing et aux autres moteurs que les adresses envoyées sont bien les nôtres. Pour en changer, remplace la clé ici et renomme le fichier de la racine.",
+  "cle": "5f9ec811-b9ef-46d8-8265-6ca0d92125ec",
+  "hote": "baromatch.fr",
+  "adresse": "https://api.indexnow.org/indexnow"
+}

@@ -9,8 +9,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { racine } from './outils/environnement.mjs';
-import { PAGES } from './outils/pages.mjs';
+import { PAGES, pagesLighthouse } from './outils/pages.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
+import { meilleuresNotes, mesurerUnePage, SEUIL, sousLeSeuil } from './outils/lighthouse-budget.mjs';
 
 const executer = promisify(execFile);
 
@@ -48,8 +49,86 @@ test.describe('le serveur local', () => {
       const servie = await (await fetch(`${adresse}/`)).text();
       expect(servie).toBe(readFileSync(path.join(racine, 'index.html'), 'utf8'));
     } finally {
-      arreter();
+      await arreter();
     }
+  });
+
+  // arreter() rend une promesse, tenue quand le serveur s’est arrêté pour de bon : qui reprend son port juste après (un
+  // test, la commande des captures qui se termine) ne tombe plus sur lui, même sur une machine chargée.
+  test('arreter() attend la fin du serveur : son port se reprend dès que la promesse est tenue', async () => {
+    const port = await portLibre();
+    const { arreter } = await demarrerServeur(port);
+    const arret = arreter();
+    expect(arret).toBeInstanceOf(Promise);
+    await arret;
+    const second = await demarrerServeur(port);
+    await second.arreter();
+  });
+});
+
+// Les captures : un Chromium qui ne se lance pas arrête la commande, et le serveur local avec elle (son port est libre
+// juste après), au lieu de le laisser tourner seul. Sous Linux et macOS, seul le correctif l’arrête (sans lui, ce test
+// échoue : le port reste pris) ; sous Windows, le système arrête aussi le serveur avec la commande.
+test('les captures : Chromium introuvable, la commande échoue et le serveur local s’arrête', async () => {
+  const port = await portLibre();
+  const dossier = mkdtempSync(path.join(tmpdir(), 'captures-'));
+  const OUTIL = path.join(racine, 'tests', 'outils', 'captures.mjs');
+  try {
+    const sortie = await executer(process.execPath, [OUTIL, dossier, String(port)], {
+      cwd: tmpdir(), env: { ...process.env, CHROME_PATH: path.join(dossier, 'pas-de-chromium') },
+    }).then(() => ({ code: 0 }), (erreur) => ({ code: erreur.code }));
+    expect(sortie.code).not.toBe(0);
+    // Le port se reprend : plus rien n’y écoute (sans le correctif, le serveur local y répondait encore).
+    const { arreter } = await demarrerServeur(port);
+    await arreter();
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+  }
+});
+
+// Le même correctif, éprouvé sur tous les systèmes : Chromium simulé qui ne se lance pas, serveur simulé qui compte ses
+// arrêts. Sans le correctif (lancement hors du try), le serveur n’est jamais arrêté et ce test échoue, Windows compris.
+test('les captures : un Chromium qui ne se lance pas arrête quand même le serveur local, sur tout système', async () => {
+  const { capturer } = await import('./outils/captures.mjs');
+  const dossier = mkdtempSync(path.join(tmpdir(), 'captures-'));
+  let arrets = 0;
+  const demarrer = async () => ({ adresse: 'http://127.0.0.1:9', arreter: () => { arrets += 1; } });
+  const lancer = async () => { throw new Error('Chromium introuvable (simulé)'); };
+  try {
+    await expect(capturer({ sortie: dossier, port: 9, demarrer, lancer })).rejects.toThrow(/simulé/);
+    expect(arrets).toBe(1);
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+  }
+});
+
+// La commande des captures ne rend la main qu’une fois le serveur local arrêté (arreter() tenu) : sinon elle se termine
+// pendant qu’il tient encore son port, et qui le reprend aussitôt (le test plus haut) le trouve pris.
+test('les captures attendent que le serveur local soit arrêté avant de rendre la main', async () => {
+  const { capturer } = await import('./outils/captures.mjs');
+  const dossier = mkdtempSync(path.join(tmpdir(), 'captures-'));
+  let arrete = false;
+  const arreter = () => new Promise((resoudre) => { setTimeout(() => { arrete = true; resoudre(); }, 200); });
+  const demarrer = async () => ({ adresse: 'http://127.0.0.1:9', arreter });
+  const lancer = async () => { throw new Error('Chromium introuvable (simulé)'); };
+  try {
+    await expect(capturer({ sortie: dossier, port: 9, demarrer, lancer })).rejects.toThrow(/simulé/);
+    expect(arrete).toBe(true);
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+  }
+});
+
+test.describe('les pages que Lighthouse mesure', () => {
+  test('chaque page de la liste a son fichier : toutes sont mesurées, sauf lighthouse: false', () => {
+    expect(pagesLighthouse().map((page) => page.nom)).toEqual(PAGES.filter((page) => page.lighthouse !== false).map((page) => page.nom));
+  });
+
+  test('une page sans fichier : la commande échoue tout de suite en la nommant, au lieu de la sauter', () => {
+    const pages = [{ chemin: '/', nom: 'accueil' }, { chemin: '/pour-les-bars.html', nom: 'pour-les-bars' }];
+    const existe = (fichier) => !fichier.endsWith('pour-les-bars.html');
+    expect(() => pagesLighthouse(pages, existe)).toThrow(/pour-les-bars.html/);
+    expect(pagesLighthouse(pages, () => true)).toHaveLength(2);
   });
 });
 
@@ -132,9 +211,42 @@ test.describe('le résumé Lighthouse', () => {
   });
 });
 
+test.describe('le budget Lighthouse (npm run lighthouse:budget) : la meilleure de 3 notes, 95 au moins', () => {
+  const notes = (performance, autres = 100) => ({ performance, accessibility: autres, 'best-practices': autres, seo: autres });
+  const suite = (...liste) => {
+    const faites = [];
+    return { faites, mesurer: async () => { const n = liste[faites.length]; faites.push(n); return n; } };
+  };
+
+  test('un essai sous 95 sous la charge, puis un à 96 : la page tient, sans troisième essai', async () => {
+    const { faites, mesurer } = suite(notes(77), notes(96), notes(99));
+    const resultat = await mesurerUnePage(mesurer, { nom: 'accueil' });
+    expect(faites).toHaveLength(2);
+    expect(resultat.meilleures).toEqual(notes(96));
+    expect(sousLeSeuil([resultat])).toEqual([]);
+  });
+
+  test('trois essais sous 95 : la page échoue, nommée avec ses trois notes', async () => {
+    const { faites, mesurer } = suite(notes(90), notes(93), notes(91));
+    const resultat = await mesurerUnePage(mesurer, { nom: 'ville' });
+    expect(faites).toHaveLength(3);
+    expect(sousLeSeuil([resultat])).toEqual(['ville · mobile · performance 93 (essais : 90, 93, 91)']);
+  });
+
+  test('chaque catégorie compte, et 95 tout juste suffit', async () => {
+    expect(sousLeSeuil([{ page: 'bar', essais: [notes(95, 94)], meilleures: notes(95, 94) }])).toHaveLength(3);
+    expect(meilleuresNotes([notes(95, 90), notes(80, 95)])).toEqual(notes(95, 95));
+    expect(SEUIL).toBe(95);
+  });
+});
+
 test('chaque commande npm mène à un fichier qui existe', () => {
   const { scripts } = JSON.parse(readFileSync(path.join(racine, 'package.json'), 'utf8'));
-  const manquants = Object.entries(scripts).flatMap(([nom, commande]) => [...commande.matchAll(/(?:^|\s)((?:tests\/)[^\s]+\.m?js)/g)]
-    .map(([, fichier]) => fichier).filter((fichier) => !existsSync(path.join(racine, fichier))).map((fichier) => `${nom} : ${fichier}`));
+  // Les scripts des tests et du générateur, et les données qu’une commande donne au générateur (--source=capture:…).
+  const manquants = Object.entries(scripts).flatMap(([nom, commande]) => [
+    ...[...commande.matchAll(/(?:^|\s)((?:tests|generateur)\/[^\s]+\.m?js)/g)].map(([, fichier]) => fichier),
+    ...[...commande.matchAll(/--source=(?:capture|scenario):([^\s]+)/g)].map(([, fichier]) => fichier),
+  ].filter((fichier) => !existsSync(path.join(racine, fichier))).map((fichier) => `${nom} : ${fichier}`));
   expect(manquants).toEqual([]);
+  expect(Object.keys(scripts)).toEqual(expect.arrayContaining(['generer', 'generer:capture']));
 });

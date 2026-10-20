@@ -7,7 +7,8 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
-import { champDe, simulerFormspree } from './outils/formspree.mjs';
+import { champDe, FORMSPREE, simulerFormspree } from './outils/formspree.mjs';
+import { arreterLHorloge } from './outils/horloge.mjs';
 
 // toHaveText ramène chaque blanc, espace insécable compris, à une espace simple.
 const PANNE = 'L’inscription n’est pas passée. Réessaie dans un instant, ou écris à contact@baromatch.fr.';
@@ -70,8 +71,17 @@ test('après l’inscription, l’adresse est rappelée et on peut la corriger',
 
 test('taper dans le champ après l’inscription rouvre l’envoi', async ({ page }) => {
   await simulerFormspree(page);
+  // Un service d’envoi lent, comme sur une machine chargée : la réponse arrive 0,5 s après la demande.
+  await page.route(FORMSPREE, async (route) => {
+    await new Promise((resoudre) => { setTimeout(resoudre, 500); });
+    await route.fallback();
+  });
   await page.goto('/');
   await sInscrire(page, 'paul@gmail.com');
+  // L’inscription faite, pas seulement partie : pendant « Envoi… », le bouton est déjà inactif, et ce qu’on tape alors
+  // ne rouvre rien.
+  await expect(retour(page)).toHaveText(INSCRITE('paul@gmail.com'));
+  await expect(bouton(page)).toHaveText('C’est noté');
   await expect(bouton(page)).toBeDisabled();
   await champ(page).press('End');
   await champ(page).pressSequentially('x');
@@ -112,8 +122,7 @@ for (const cas of [
 test('un service qui ne répond pas : au bout de 10 s, une panne avec l’adresse de secours, et l’envoi se rouvre', async ({ page }) => {
   // L’horloge de la page est simulée et arrêtée : seul runFor la fait avancer.
   const debut = new Date('2026-10-13T17:30:00+02:00').getTime();
-  await page.clock.install({ time: debut });
-  await page.clock.pauseAt(debut + 1000);
+  await arreterLHorloge(page, debut + 1000);
   const envois = await simulerFormspree(page, 'silence');
   await page.goto('/');
   await sInscrire(page);
@@ -137,8 +146,7 @@ const focusSurLaPage = (page) => page.evaluate(() => !document.activeElement || 
 
 test('pendant l’envoi, le bouton garde le focus et ignore un second appui ; « Envoi… » est dit, puis la panne au bout de 10 s', async ({ page }) => {
   const debut = new Date('2026-10-13T17:30:00+02:00').getTime();
-  await page.clock.install({ time: debut });
-  await page.clock.pauseAt(debut + 1000);
+  await arreterLHorloge(page, debut + 1000);
   const envois = await simulerFormspree(page, 'silence');
   await page.goto('/');
   await champ(page).fill('paul@exemple.fr');

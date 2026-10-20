@@ -1,0 +1,1187 @@
+[
+ {
+  "id": "match-001",
+  "startAt": "2026-10-16T18:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Le Mans FC",
+  "awayTeam": "Toulouse FC",
+  "homeClub": {
+   "slug": "le-mans-fc",
+   "canonicalName": "Le Mans FC"
+  },
+  "awayClub": {
+   "slug": "toulouse-fc",
+   "canonicalName": "Toulouse FC"
+  }
+ },
+ {
+  "id": "match-002",
+  "startAt": "2026-10-17T11:30:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Everton FC",
+  "awayTeam": "Chelsea FC",
+  "homeClub": {
+   "slug": "everton-fc",
+   "canonicalName": "Everton FC"
+  },
+  "awayClub": {
+   "slug": "chelsea-fc",
+   "canonicalName": "Chelsea FC"
+  }
+ },
+ {
+  "id": "match-003",
+  "startAt": "2026-10-17T12:00:00.000Z",
+  "league": "LaLiga",
+  "homeTeam": "RCD Espanyol de Barcelona",
+  "awayTeam": "Atlético de Madrid",
+  "homeClub": {
+   "slug": "rcd-espanyol-de-barcelona",
+   "canonicalName": "RCD Espanyol de Barcelona"
+  },
+  "awayClub": {
+   "slug": "atletico-de-madrid",
+   "canonicalName": "Atlético de Madrid"
+  }
+ },
+ {
+  "id": "match-004",
+  "startAt": "2026-10-17T15:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "RC Strasbourg Alsace",
+  "awayTeam": "Paris Saint-Germain",
+  "homeClub": {
+   "slug": "rc-strasbourg-alsace",
+   "canonicalName": "RC Strasbourg Alsace"
+  },
+  "awayClub": {
+   "slug": "paris-saint-germain",
+   "canonicalName": "Paris Saint-Germain"
+  }
+ },
+ {
+  "id": "match-005",
+  "startAt": "2026-10-17T16:30:00.000Z",
+  "league": "Bundesliga",
+  "homeTeam": "FC Bayern München",
+  "awayTeam": "RB Leipzig",
+  "homeClub": {
+   "slug": "fc-bayern-munchen",
+   "canonicalName": "FC Bayern München"
+  },
+  "awayClub": {
+   "slug": "rb-leipzig",
+   "canonicalName": "RB Leipzig"
+  }
+ },
+ {
+  "id": "match-006",
+  "startAt": "2026-10-17T16:30:00.000Z",
+  "league": "LaLiga",
+  "homeTeam": "Real Betis Balompié",
+  "awayTeam": "FC Barcelona",
+  "homeClub": {
+   "slug": "real-betis-balompie",
+   "canonicalName": "Real Betis Balompié"
+  },
+  "awayClub": {
+   "slug": "fc-barcelona",
+   "canonicalName": "FC Barcelona"
+  }
+ },
+ {
+  "id": "match-007",
+  "startAt": "2026-10-17T16:30:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Newcastle United FC",
+  "awayTeam": "Aston Villa",
+  "homeClub": {
+   "slug": "newcastle-united-fc",
+   "canonicalName": "Newcastle United FC"
+  },
+  "awayClub": {
+   "slug": "aston-villa",
+   "canonicalName": "Aston Villa"
+  }
+ },
+ {
+  "id": "match-008",
+  "startAt": "2026-10-17T18:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "LOSC Lille",
+  "awayTeam": "Stade Brestois 29",
+  "homeClub": {
+   "slug": "losc-lille",
+   "canonicalName": "LOSC Lille"
+  },
+  "awayClub": {
+   "slug": "stade-brestois-29",
+   "canonicalName": "Stade Brestois 29"
+  }
+ },
+ {
+  "id": "match-009",
+  "startAt": "2026-10-17T18:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "ESTAC Troyes",
+  "awayTeam": "RC Lens",
+  "homeClub": {
+   "slug": "estac-troyes",
+   "canonicalName": "ESTAC Troyes"
+  },
+  "awayClub": {
+   "slug": "rc-lens",
+   "canonicalName": "RC Lens"
+  }
+ },
+ {
+  "id": "match-010",
+  "startAt": "2026-10-18T13:00:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Angers SCO",
+  "awayTeam": "Olympique de Marseille",
+  "homeClub": {
+   "slug": "angers-sco",
+   "canonicalName": "Angers SCO"
+  },
+  "awayClub": {
+   "slug": "olympique-de-marseille",
+   "canonicalName": "Olympique de Marseille"
+  }
+ },
+ {
+  "id": "match-011",
+  "startAt": "2026-10-18T15:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Paris FC",
+  "awayTeam": "Stade Rennais FC",
+  "homeClub": {
+   "slug": "paris-fc",
+   "canonicalName": "Paris FC"
+  },
+  "awayClub": {
+   "slug": "stade-rennais-fc",
+   "canonicalName": "Stade Rennais FC"
+  }
+ },
+ {
+  "id": "match-012",
+  "startAt": "2026-10-18T15:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "FC Lorient",
+  "awayTeam": "AS Monaco",
+  "homeClub": {
+   "slug": "fc-lorient",
+   "canonicalName": "FC Lorient"
+  },
+  "awayClub": {
+   "slug": "as-monaco",
+   "canonicalName": "AS Monaco"
+  }
+ },
+ {
+  "id": "match-013",
+  "startAt": "2026-10-18T15:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Havre AC",
+  "awayTeam": "AJ Auxerre",
+  "homeClub": {
+   "slug": "havre-ac",
+   "canonicalName": "Havre AC"
+  },
+  "awayClub": {
+   "slug": "aj-auxerre",
+   "canonicalName": "AJ Auxerre"
+  }
+ },
+ {
+  "id": "match-014",
+  "startAt": "2026-10-18T16:00:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "AC Milan",
+  "awayTeam": "Atalanta BC",
+  "homeClub": {
+   "slug": "ac-milan",
+   "canonicalName": "AC Milan"
+  },
+  "awayClub": {
+   "slug": "atalanta-bc",
+   "canonicalName": "Atalanta BC"
+  }
+ },
+ {
+  "id": "match-015",
+  "startAt": "2026-10-18T18:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Olympique Lyonnais",
+  "awayTeam": "OGC Nice",
+  "homeClub": {
+   "slug": "olympique-lyonnais",
+   "canonicalName": "Olympique Lyonnais"
+  },
+  "awayClub": {
+   "slug": "ogc-nice",
+   "canonicalName": "OGC Nice"
+  }
+ },
+ {
+  "id": "match-016",
+  "startAt": "2026-10-18T18:45:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "Juventus FC",
+  "awayTeam": "SS Lazio",
+  "homeClub": {
+   "slug": "juventus-fc",
+   "canonicalName": "Juventus FC"
+  },
+  "awayClub": {
+   "slug": "ss-lazio",
+   "canonicalName": "SS Lazio"
+  }
+ },
+ {
+  "id": "match-017",
+  "startAt": "2026-10-18T19:00:00.000Z",
+  "league": "LaLiga",
+  "homeTeam": "Real Madrid C.F.",
+  "awayTeam": "Sevilla FC",
+  "homeClub": {
+   "slug": "real-madrid-c-f",
+   "canonicalName": "Real Madrid C.F."
+  },
+  "awayClub": {
+   "slug": "sevilla-fc",
+   "canonicalName": "Sevilla FC"
+  }
+ },
+ {
+  "id": "match-018",
+  "startAt": "2026-10-20T19:00:00.000Z",
+  "league": "UEFA Champions League",
+  "homeTeam": "Paris Saint-Germain",
+  "awayTeam": "FC Barcelona",
+  "homeClub": {
+   "slug": "paris-saint-germain",
+   "canonicalName": "Paris Saint-Germain"
+  },
+  "awayClub": {
+   "slug": "fc-barcelona",
+   "canonicalName": "FC Barcelona"
+  }
+ },
+ {
+  "id": "match-019",
+  "startAt": "2026-10-20T19:00:00.000Z",
+  "league": "Ligue des champions",
+  "homeTeam": "Paris Saint-Germain",
+  "awayTeam": "FC Barcelona",
+  "homeClub": {
+   "slug": "paris-saint-germain",
+   "canonicalName": "Paris Saint-Germain"
+  },
+  "awayClub": {
+   "slug": "fc-barcelona",
+   "canonicalName": "FC Barcelona"
+  }
+ },
+ {
+  "id": "match-020",
+  "startAt": "2026-10-21T16:45:00.000Z",
+  "league": "Ligue des champions",
+  "homeTeam": "LOSC Lille",
+  "awayTeam": "Galatasaray A.Ş.",
+  "homeClub": {
+   "slug": "losc-lille",
+   "canonicalName": "LOSC Lille"
+  },
+  "awayClub": {
+   "slug": "galatasaray-a-s",
+   "canonicalName": "Galatasaray A.Ş."
+  }
+ },
+ {
+  "id": "match-021",
+  "startAt": "2026-10-21T19:00:00.000Z",
+  "league": "Ligue des champions",
+  "homeTeam": "Club Brugge KV",
+  "awayTeam": "RC Lens",
+  "homeClub": {
+   "slug": "club-brugge-kv",
+   "canonicalName": "Club Brugge KV"
+  },
+  "awayClub": {
+   "slug": "rc-lens",
+   "canonicalName": "RC Lens"
+  }
+ },
+ {
+  "id": "match-022",
+  "startAt": "2026-10-22T16:45:00.000Z",
+  "league": "Ligue Europa",
+  "homeTeam": "Juventus FC",
+  "awayTeam": "Stade Rennais FC",
+  "homeClub": {
+   "slug": "juventus-fc",
+   "canonicalName": "Juventus FC"
+  },
+  "awayClub": {
+   "slug": "stade-rennais-fc",
+   "canonicalName": "Stade Rennais FC"
+  }
+ },
+ {
+  "id": "match-023",
+  "startAt": "2026-10-22T16:45:00.000Z",
+  "league": "Ligue Europa",
+  "homeTeam": "SK Sturm Graz",
+  "awayTeam": "Olympique de Marseille",
+  "homeClub": {
+   "slug": "sk-sturm-graz",
+   "canonicalName": "SK Sturm Graz"
+  },
+  "awayClub": {
+   "slug": "olympique-de-marseille",
+   "canonicalName": "Olympique de Marseille"
+  }
+ },
+ {
+  "id": "match-024",
+  "startAt": "2026-10-22T19:00:00.000Z",
+  "league": "Ligue Conférence",
+  "homeTeam": "AS Monaco",
+  "awayTeam": "SC Freiburg",
+  "homeClub": {
+   "slug": "as-monaco",
+   "canonicalName": "AS Monaco"
+  },
+  "awayClub": {
+   "slug": "sc-freiburg",
+   "canonicalName": "SC Freiburg"
+  }
+ },
+ {
+  "id": "match-025",
+  "startAt": "2026-10-22T19:00:00.000Z",
+  "league": "Ligue Europa",
+  "homeTeam": "TSG Hoffenheim",
+  "awayTeam": "Olympique Lyonnais",
+  "homeClub": {
+   "slug": "tsg-hoffenheim",
+   "canonicalName": "TSG Hoffenheim"
+  },
+  "awayClub": {
+   "slug": "olympique-lyonnais",
+   "canonicalName": "Olympique Lyonnais"
+  }
+ },
+ {
+  "id": "match-026",
+  "startAt": "2026-10-23T18:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Stade Brestois 29",
+  "awayTeam": "OGC Nice",
+  "homeClub": {
+   "slug": "stade-brestois-29",
+   "canonicalName": "Stade Brestois 29"
+  },
+  "awayClub": {
+   "slug": "ogc-nice",
+   "canonicalName": "OGC Nice"
+  }
+ },
+ {
+  "id": "match-027",
+  "startAt": "2026-10-24T11:30:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Aston Villa",
+  "awayTeam": "Manchester City",
+  "homeClub": {
+   "slug": "aston-villa",
+   "canonicalName": "Aston Villa"
+  },
+  "awayClub": {
+   "slug": "manchester-city",
+   "canonicalName": "Manchester City"
+  }
+ },
+ {
+  "id": "match-028",
+  "startAt": "2026-10-24T14:00:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Arsenal FC",
+  "awayTeam": "Everton FC",
+  "homeClub": {
+   "slug": "arsenal-fc",
+   "canonicalName": "Arsenal FC"
+  },
+  "awayClub": {
+   "slug": "everton-fc",
+   "canonicalName": "Everton FC"
+  }
+ },
+ {
+  "id": "match-029",
+  "startAt": "2026-10-24T15:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Toulouse FC",
+  "awayTeam": "ESTAC Troyes",
+  "homeClub": {
+   "slug": "toulouse-fc",
+   "canonicalName": "Toulouse FC"
+  },
+  "awayClub": {
+   "slug": "estac-troyes",
+   "canonicalName": "ESTAC Troyes"
+  }
+ },
+ {
+  "id": "match-030",
+  "startAt": "2026-10-24T16:00:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "SSC Napoli",
+  "awayTeam": "AS Roma",
+  "homeClub": {
+   "slug": "ssc-napoli",
+   "canonicalName": "SSC Napoli"
+  },
+  "awayClub": {
+   "slug": "as-roma",
+   "canonicalName": "AS Roma"
+  }
+ },
+ {
+  "id": "match-031",
+  "startAt": "2026-10-24T16:30:00.000Z",
+  "league": "Bundesliga",
+  "homeTeam": "Borussia Dortmund",
+  "awayTeam": "Eintracht Frankfurt",
+  "homeClub": {
+   "slug": "borussia-dortmund",
+   "canonicalName": "Borussia Dortmund"
+  },
+  "awayClub": {
+   "slug": "eintracht-frankfurt",
+   "canonicalName": "Eintracht Frankfurt"
+  }
+ },
+ {
+  "id": "match-032",
+  "startAt": "2026-10-24T16:30:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Chelsea FC",
+  "awayTeam": "Tottenham Hotspur",
+  "homeClub": {
+   "slug": "chelsea-fc",
+   "canonicalName": "Chelsea FC"
+  },
+  "awayClub": {
+   "slug": "tottenham-hotspur",
+   "canonicalName": "Tottenham Hotspur"
+  }
+ },
+ {
+  "id": "match-033",
+  "startAt": "2026-10-24T18:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "RC Lens",
+  "awayTeam": "Paris FC",
+  "homeClub": {
+   "slug": "rc-lens",
+   "canonicalName": "RC Lens"
+  },
+  "awayClub": {
+   "slug": "paris-fc",
+   "canonicalName": "Paris FC"
+  }
+ },
+ {
+  "id": "match-034",
+  "startAt": "2026-10-25T11:30:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "FC Internazionale Milano",
+  "awayTeam": "ACF Fiorentina",
+  "homeClub": {
+   "slug": "fc-internazionale-milano",
+   "canonicalName": "FC Internazionale Milano"
+  },
+  "awayClub": {
+   "slug": "acf-fiorentina",
+   "canonicalName": "ACF Fiorentina"
+  }
+ },
+ {
+  "id": "match-035",
+  "startAt": "2026-10-25T14:00:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "AS Monaco",
+  "awayTeam": "LOSC Lille",
+  "homeClub": {
+   "slug": "as-monaco",
+   "canonicalName": "AS Monaco"
+  },
+  "awayClub": {
+   "slug": "losc-lille",
+   "canonicalName": "LOSC Lille"
+  }
+ },
+ {
+  "id": "match-036",
+  "startAt": "2026-10-25T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Stade Rennais FC",
+  "awayTeam": "RC Strasbourg Alsace",
+  "homeClub": {
+   "slug": "stade-rennais-fc",
+   "canonicalName": "Stade Rennais FC"
+  },
+  "awayClub": {
+   "slug": "rc-strasbourg-alsace",
+   "canonicalName": "RC Strasbourg Alsace"
+  }
+ },
+ {
+  "id": "match-037",
+  "startAt": "2026-10-25T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Olympique de Marseille",
+  "awayTeam": "Havre AC",
+  "homeClub": {
+   "slug": "olympique-de-marseille",
+   "canonicalName": "Olympique de Marseille"
+  },
+  "awayClub": {
+   "slug": "havre-ac",
+   "canonicalName": "Havre AC"
+  }
+ },
+ {
+  "id": "match-038",
+  "startAt": "2026-10-25T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "AJ Auxerre",
+  "awayTeam": "Le Mans FC",
+  "homeClub": {
+   "slug": "aj-auxerre",
+   "canonicalName": "AJ Auxerre"
+  },
+  "awayClub": {
+   "slug": "le-mans-fc",
+   "canonicalName": "Le Mans FC"
+  }
+ },
+ {
+  "id": "match-039",
+  "startAt": "2026-10-25T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Angers SCO",
+  "awayTeam": "FC Lorient",
+  "homeClub": {
+   "slug": "angers-sco",
+   "canonicalName": "Angers SCO"
+  },
+  "awayClub": {
+   "slug": "fc-lorient",
+   "canonicalName": "FC Lorient"
+  }
+ },
+ {
+  "id": "match-040",
+  "startAt": "2026-10-25T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Paris Saint-Germain",
+  "awayTeam": "Olympique Lyonnais",
+  "homeClub": {
+   "slug": "paris-saint-germain",
+   "canonicalName": "Paris Saint-Germain"
+  },
+  "awayClub": {
+   "slug": "olympique-lyonnais",
+   "canonicalName": "Olympique Lyonnais"
+  }
+ },
+ {
+  "id": "match-041",
+  "startAt": "2026-10-25T20:00:00.000Z",
+  "league": "LaLiga",
+  "homeTeam": "FC Barcelona",
+  "awayTeam": "Real Madrid C.F.",
+  "homeClub": {
+   "slug": "fc-barcelona",
+   "canonicalName": "FC Barcelona"
+  },
+  "awayClub": {
+   "slug": "real-madrid-c-f",
+   "canonicalName": "Real Madrid C.F."
+  }
+ },
+ {
+  "id": "match-042",
+  "startAt": "2026-10-29T19:45:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "ACF Fiorentina",
+  "awayTeam": "Atalanta BC",
+  "homeClub": {
+   "slug": "acf-fiorentina",
+   "canonicalName": "ACF Fiorentina"
+  },
+  "awayClub": {
+   "slug": "atalanta-bc",
+   "canonicalName": "Atalanta BC"
+  }
+ },
+ {
+  "id": "match-043",
+  "startAt": "2026-10-30T18:00:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Le Havre AC",
+  "awayTeam": "Paris Saint-Germain",
+  "homeClub": {
+   "slug": "le-havre-ac",
+   "canonicalName": "Le Havre AC"
+  },
+  "awayClub": {
+   "slug": "paris-saint-germain",
+   "canonicalName": "Paris Saint-Germain"
+  }
+ },
+ {
+  "id": "match-044",
+  "startAt": "2026-10-30T20:05:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "LOSC Lille",
+  "awayTeam": "RC Lens",
+  "homeClub": {
+   "slug": "losc-lille",
+   "canonicalName": "LOSC Lille"
+  },
+  "awayClub": {
+   "slug": "rc-lens",
+   "canonicalName": "RC Lens"
+  }
+ },
+ {
+  "id": "match-045",
+  "startAt": "2026-10-31T12:30:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Chelsea FC",
+  "awayTeam": "Manchester United",
+  "homeClub": {
+   "slug": "chelsea-fc",
+   "canonicalName": "Chelsea FC"
+  },
+  "awayClub": {
+   "slug": "manchester-united",
+   "canonicalName": "Manchester United"
+  }
+ },
+ {
+  "id": "match-046",
+  "startAt": "2026-10-31T13:00:00.000Z",
+  "league": "LaLiga",
+  "homeTeam": "Levante UD",
+  "awayTeam": "Atlético de Madrid",
+  "homeClub": {
+   "slug": "levante-ud",
+   "canonicalName": "Levante UD"
+  },
+  "awayClub": {
+   "slug": "atletico-de-madrid",
+   "canonicalName": "Atlético de Madrid"
+  }
+ },
+ {
+  "id": "match-047",
+  "startAt": "2026-10-31T14:30:00.000Z",
+  "league": "Bundesliga",
+  "homeTeam": "Bayer 04 Leverkusen",
+  "awayTeam": "VfB Stuttgart",
+  "homeClub": {
+   "slug": "bayer-04-leverkusen",
+   "canonicalName": "Bayer 04 Leverkusen"
+  },
+  "awayClub": {
+   "slug": "vfb-stuttgart",
+   "canonicalName": "VfB Stuttgart"
+  }
+ },
+ {
+  "id": "match-048",
+  "startAt": "2026-10-31T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "OGC Nice",
+  "awayTeam": "Stade Rennais FC",
+  "homeClub": {
+   "slug": "ogc-nice",
+   "canonicalName": "OGC Nice"
+  },
+  "awayClub": {
+   "slug": "stade-rennais-fc",
+   "canonicalName": "Stade Rennais FC"
+  }
+ },
+ {
+  "id": "match-049",
+  "startAt": "2026-10-31T17:30:00.000Z",
+  "league": "Bundesliga",
+  "homeTeam": "FC Bayern München",
+  "awayTeam": "Borussia Dortmund",
+  "homeClub": {
+   "slug": "fc-bayern-munchen",
+   "canonicalName": "FC Bayern München"
+  },
+  "awayClub": {
+   "slug": "borussia-dortmund",
+   "canonicalName": "Borussia Dortmund"
+  }
+ },
+ {
+  "id": "match-050",
+  "startAt": "2026-10-31T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "ESTAC Troyes",
+  "awayTeam": "Le Mans FC",
+  "homeClub": {
+   "slug": "estac-troyes",
+   "canonicalName": "ESTAC Troyes"
+  },
+  "awayClub": {
+   "slug": "le-mans-fc",
+   "canonicalName": "Le Mans FC"
+  }
+ },
+ {
+  "id": "match-051",
+  "startAt": "2026-10-31T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "FC Lorient",
+  "awayTeam": "Stade Brestois 29",
+  "homeClub": {
+   "slug": "fc-lorient",
+   "canonicalName": "FC Lorient"
+  },
+  "awayClub": {
+   "slug": "stade-brestois-29",
+   "canonicalName": "Stade Brestois 29"
+  }
+ },
+ {
+  "id": "match-052",
+  "startAt": "2026-10-31T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Olympique Lyonnais",
+  "awayTeam": "Angers SCO",
+  "homeClub": {
+   "slug": "olympique-lyonnais",
+   "canonicalName": "Olympique Lyonnais"
+  },
+  "awayClub": {
+   "slug": "angers-sco",
+   "canonicalName": "Angers SCO"
+  }
+ },
+ {
+  "id": "match-053",
+  "startAt": "2026-10-31T19:45:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "AC Milan",
+  "awayTeam": "FC Internazionale Milano",
+  "homeClub": {
+   "slug": "ac-milan",
+   "canonicalName": "AC Milan"
+  },
+  "awayClub": {
+   "slug": "fc-internazionale-milano",
+   "canonicalName": "FC Internazionale Milano"
+  }
+ },
+ {
+  "id": "match-054",
+  "startAt": "2026-10-31T20:00:00.000Z",
+  "league": "LaLiga",
+  "homeTeam": "FC Barcelona",
+  "awayTeam": "Deportivo Alavés",
+  "homeClub": {
+   "slug": "fc-barcelona",
+   "canonicalName": "FC Barcelona"
+  },
+  "awayClub": {
+   "slug": "deportivo-alaves",
+   "canonicalName": "Deportivo Alavés"
+  }
+ },
+ {
+  "id": "match-055",
+  "startAt": "2026-11-01T14:00:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "RC Strasbourg Alsace",
+  "awayTeam": "AJ Auxerre",
+  "homeClub": {
+   "slug": "rc-strasbourg-alsace",
+   "canonicalName": "RC Strasbourg Alsace"
+  },
+  "awayClub": {
+   "slug": "aj-auxerre",
+   "canonicalName": "AJ Auxerre"
+  }
+ },
+ {
+  "id": "match-056",
+  "startAt": "2026-11-01T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Paris FC",
+  "awayTeam": "AS Monaco",
+  "homeClub": {
+   "slug": "paris-fc",
+   "canonicalName": "Paris FC"
+  },
+  "awayClub": {
+   "slug": "as-monaco",
+   "canonicalName": "AS Monaco"
+  }
+ },
+ {
+  "id": "match-057",
+  "startAt": "2026-11-01T16:30:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Liverpool FC",
+  "awayTeam": "Arsenal FC",
+  "homeClub": {
+   "slug": "liverpool-fc",
+   "canonicalName": "Liverpool FC"
+  },
+  "awayClub": {
+   "slug": "arsenal-fc",
+   "canonicalName": "Arsenal FC"
+  }
+ },
+ {
+  "id": "match-058",
+  "startAt": "2026-11-01T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Olympique de Marseille",
+  "awayTeam": "Toulouse FC",
+  "homeClub": {
+   "slug": "olympique-de-marseille",
+   "canonicalName": "Olympique de Marseille"
+  },
+  "awayClub": {
+   "slug": "toulouse-fc",
+   "canonicalName": "Toulouse FC"
+  }
+ },
+ {
+  "id": "match-059",
+  "startAt": "2026-11-01T19:45:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "Juventus FC",
+  "awayTeam": "SSC Napoli",
+  "homeClub": {
+   "slug": "juventus-fc",
+   "canonicalName": "Juventus FC"
+  },
+  "awayClub": {
+   "slug": "ssc-napoli",
+   "canonicalName": "SSC Napoli"
+  }
+ },
+ {
+  "id": "match-060",
+  "startAt": "2026-11-02T20:00:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Newcastle United FC",
+  "awayTeam": "Everton FC",
+  "homeClub": {
+   "slug": "newcastle-united-fc",
+   "canonicalName": "Newcastle United FC"
+  },
+  "awayClub": {
+   "slug": "everton-fc",
+   "canonicalName": "Everton FC"
+  }
+ },
+ {
+  "id": "match-061",
+  "startAt": "2026-11-03T20:00:00.000Z",
+  "league": "Ligue des champions",
+  "homeTeam": "FK Bodø/Glimt",
+  "awayTeam": "LOSC Lille",
+  "homeClub": {
+   "slug": "fk-bod-glimt",
+   "canonicalName": "FK Bodø/Glimt"
+  },
+  "awayClub": {
+   "slug": "losc-lille",
+   "canonicalName": "LOSC Lille"
+  }
+ },
+ {
+  "id": "match-062",
+  "startAt": "2026-11-03T20:00:00.000Z",
+  "league": "Ligue des champions",
+  "homeTeam": "Villarreal CF",
+  "awayTeam": "Paris Saint-Germain",
+  "homeClub": {
+   "slug": "villarreal-cf",
+   "canonicalName": "Villarreal CF"
+  },
+  "awayClub": {
+   "slug": "paris-saint-germain",
+   "canonicalName": "Paris Saint-Germain"
+  }
+ },
+ {
+  "id": "match-063",
+  "startAt": "2026-11-04T20:00:00.000Z",
+  "league": "Ligue des champions",
+  "homeTeam": "RC Lens",
+  "awayTeam": "Como 1907",
+  "homeClub": {
+   "slug": "rc-lens",
+   "canonicalName": "RC Lens"
+  },
+  "awayClub": {
+   "slug": "como-1907",
+   "canonicalName": "Como 1907"
+  }
+ },
+ {
+  "id": "match-064",
+  "startAt": "2026-11-05T17:45:00.000Z",
+  "league": "Ligue Europa",
+  "homeTeam": "Real Sociedad de Fútbol",
+  "awayTeam": "Olympique Lyonnais",
+  "homeClub": {
+   "slug": "real-sociedad-de-futbol",
+   "canonicalName": "Real Sociedad de Fútbol"
+  },
+  "awayClub": {
+   "slug": "olympique-lyonnais",
+   "canonicalName": "Olympique Lyonnais"
+  }
+ },
+ {
+  "id": "match-065",
+  "startAt": "2026-11-05T17:45:00.000Z",
+  "league": "Ligue Europa",
+  "homeTeam": "Stade Rennais FC",
+  "awayTeam": "Olympiacos FC",
+  "homeClub": {
+   "slug": "stade-rennais-fc",
+   "canonicalName": "Stade Rennais FC"
+  },
+  "awayClub": {
+   "slug": "olympiacos-fc",
+   "canonicalName": "Olympiacos FC"
+  }
+ },
+ {
+  "id": "match-066",
+  "startAt": "2026-11-05T20:00:00.000Z",
+  "league": "Ligue Conférence",
+  "homeTeam": "AS Monaco",
+  "awayTeam": "FC Nordsjælland",
+  "homeClub": {
+   "slug": "as-monaco",
+   "canonicalName": "AS Monaco"
+  },
+  "awayClub": {
+   "slug": "fc-nordsj-lland",
+   "canonicalName": "FC Nordsjælland"
+  }
+ },
+ {
+  "id": "match-067",
+  "startAt": "2026-11-05T20:00:00.000Z",
+  "league": "Ligue Europa",
+  "homeTeam": "Bayer 04 Leverkusen",
+  "awayTeam": "Olympique de Marseille",
+  "homeClub": {
+   "slug": "bayer-04-leverkusen",
+   "canonicalName": "Bayer 04 Leverkusen"
+  },
+  "awayClub": {
+   "slug": "olympique-de-marseille",
+   "canonicalName": "Olympique de Marseille"
+  }
+ },
+ {
+  "id": "match-068",
+  "startAt": "2026-11-06T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Toulouse FC",
+  "awayTeam": "RC Strasbourg Alsace",
+  "homeClub": {
+   "slug": "toulouse-fc",
+   "canonicalName": "Toulouse FC"
+  },
+  "awayClub": {
+   "slug": "rc-strasbourg-alsace",
+   "canonicalName": "RC Strasbourg Alsace"
+  }
+ },
+ {
+  "id": "match-069",
+  "startAt": "2026-11-07T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "AJ Auxerre",
+  "awayTeam": "Paris FC",
+  "homeClub": {
+   "slug": "aj-auxerre",
+   "canonicalName": "AJ Auxerre"
+  },
+  "awayClub": {
+   "slug": "paris-fc",
+   "canonicalName": "Paris FC"
+  }
+ },
+ {
+  "id": "match-070",
+  "startAt": "2026-11-07T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Paris Saint-Germain",
+  "awayTeam": "ESTAC Troyes",
+  "homeClub": {
+   "slug": "paris-saint-germain",
+   "canonicalName": "Paris Saint-Germain"
+  },
+  "awayClub": {
+   "slug": "estac-troyes",
+   "canonicalName": "ESTAC Troyes"
+  }
+ },
+ {
+  "id": "match-071",
+  "startAt": "2026-11-08T11:30:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "SSC Napoli",
+  "awayTeam": "SS Lazio",
+  "homeClub": {
+   "slug": "ssc-napoli",
+   "canonicalName": "SSC Napoli"
+  },
+  "awayClub": {
+   "slug": "ss-lazio",
+   "canonicalName": "SS Lazio"
+  }
+ },
+ {
+  "id": "match-072",
+  "startAt": "2026-11-08T14:00:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Stade Rennais FC",
+  "awayTeam": "LOSC Lille",
+  "homeClub": {
+   "slug": "stade-rennais-fc",
+   "canonicalName": "Stade Rennais FC"
+  },
+  "awayClub": {
+   "slug": "losc-lille",
+   "canonicalName": "LOSC Lille"
+  }
+ },
+ {
+  "id": "match-073",
+  "startAt": "2026-11-08T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Angers SCO",
+  "awayTeam": "OGC Nice",
+  "homeClub": {
+   "slug": "angers-sco",
+   "canonicalName": "Angers SCO"
+  },
+  "awayClub": {
+   "slug": "ogc-nice",
+   "canonicalName": "OGC Nice"
+  }
+ },
+ {
+  "id": "match-074",
+  "startAt": "2026-11-08T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Le Havre AC",
+  "awayTeam": "FC Lorient",
+  "homeClub": {
+   "slug": "le-havre-ac",
+   "canonicalName": "Le Havre AC"
+  },
+  "awayClub": {
+   "slug": "fc-lorient",
+   "canonicalName": "FC Lorient"
+  }
+ },
+ {
+  "id": "match-075",
+  "startAt": "2026-11-08T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Le Mans FC",
+  "awayTeam": "AS Monaco",
+  "homeClub": {
+   "slug": "le-mans-fc",
+   "canonicalName": "Le Mans FC"
+  },
+  "awayClub": {
+   "slug": "as-monaco",
+   "canonicalName": "AS Monaco"
+  }
+ },
+ {
+  "id": "match-076",
+  "startAt": "2026-11-08T16:15:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "Stade Brestois 29",
+  "awayTeam": "Olympique Lyonnais",
+  "homeClub": {
+   "slug": "stade-brestois-29",
+   "canonicalName": "Stade Brestois 29"
+  },
+  "awayClub": {
+   "slug": "olympique-lyonnais",
+   "canonicalName": "Olympique Lyonnais"
+  }
+ },
+ {
+  "id": "match-077",
+  "startAt": "2026-11-08T16:30:00.000Z",
+  "league": "Premier League",
+  "homeTeam": "Manchester United",
+  "awayTeam": "Aston Villa",
+  "homeClub": {
+   "slug": "manchester-united",
+   "canonicalName": "Manchester United"
+  },
+  "awayClub": {
+   "slug": "aston-villa",
+   "canonicalName": "Aston Villa"
+  }
+ },
+ {
+  "id": "match-078",
+  "startAt": "2026-11-08T19:45:00.000Z",
+  "league": "Ligue 1",
+  "homeTeam": "RC Lens",
+  "awayTeam": "Olympique de Marseille",
+  "homeClub": {
+   "slug": "rc-lens",
+   "canonicalName": "RC Lens"
+  },
+  "awayClub": {
+   "slug": "olympique-de-marseille",
+   "canonicalName": "Olympique de Marseille"
+  }
+ },
+ {
+  "id": "match-079",
+  "startAt": "2026-11-08T19:45:00.000Z",
+  "league": "Serie A",
+  "homeTeam": "ACF Fiorentina",
+  "awayTeam": "Juventus FC",
+  "homeClub": {
+   "slug": "acf-fiorentina",
+   "canonicalName": "ACF Fiorentina"
+  },
+  "awayClub": {
+   "slug": "juventus-fc",
+   "canonicalName": "Juventus FC"
+  }
+ }
+]

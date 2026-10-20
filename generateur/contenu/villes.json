@@ -1,0 +1,123 @@
+{
+  "_lisezMoi": "Les guides « Où regarder le match » par ville : pour chaque ville, sa clé en minuscules sans accent, son nom, les préfixes de ses codes postaux, une accroche (90 à 150 caractères), un titre, les paragraphes du guide (180 à 280 mots, vrais pour cette ville et aucune autre) et sa FAQ ; pour ajouter une ville, copie un bloc et réécris chaque champ. Rien qui dépende du moment (« pas encore », « ses premiers bars », « l’appli n’est pas ouverte ») et aucune place promise : le générateur ajoute lui-même en tête de la FAQ la question « Baromatch est-il à … ? », avec le vrai nombre de bars et l’état de l’appli.",
+  "paris": {
+    "nom": "Paris",
+    "codesPostaux": ["75"],
+    "accroche": "Le PSG, le Classique, les soirs de Ligue des champions : à Paris, le match se regarde aussi dans les bars, d’Oberkampf à la porte de Saint-Cloud.",
+    "titreGuide": "Paris, les soirs où le match prend la ville",
+    "guide": [
+      "À Paris, le stade est loin du centre. Le Parc des Princes est à la porte de Saint-Cloud, et la plupart des fans voient le PSG à l’écran. Alors la ville se répartit dans ses bars. Oberkampf et Bastille se remplissent dès la fin d’après-midi, les Grands Boulevards suivent, et chaque quartier a son bar qui monte le son au coup d’envoi. Le Paris FC, l’autre club de la ville, a aussi ses fidèles, plus discrets.",
+      "Les grands rendez-vous se repèrent de loin. Le Classique contre l’OM se vit partout, dans les bars et sur le trottoir devant. Les soirs de Ligue des champions, la ville entière suit le PSG, même ceux qui ne suivent pas la Ligue 1. Paris compte aussi des supporters de tous les clubs de France et d’ailleurs, et chacun a son bar.",
+      "Pour un match ordinaire, arrive une demi-heure avant. Pour un Classique ou une demi-finale, compte une heure, davantage si vous êtes nombreux. Avant de choisir, regarde ce qui compte : un écran visible depuis ta table, le son du match plutôt que la musique du bar, assez de place pour ta bande, et un bar où les deux camps sont bienvenus. À Paris, les supporters de l’adversaire sont souvent dans la salle, et c’est très bien comme ça.",
+      "Sur Baromatch, chaque bar dit lui-même quels matchs il diffuse, avec son adresse et l’heure de Paris. Tu choisis ton match, tu vois les bars qui le passent près de toi, et tu choisis le tien. Le PSG, l’OM, la Ligue des champions ou un match de Premier League un samedi après-midi : il y a toujours un écran quelque part dans la ville."
+    ],
+    "faq": [
+      {
+        "question": "Faut-il arriver tôt pour voir le Classique dans un bar à Paris ?",
+        "reponse": "Oui. Les bars qui diffusent un PSG – OM sont pleins bien avant le coup d’envoi. Compte une heure d’avance, davantage si vous êtes nombreux, et appelle le bar avant de venir en bande."
+      },
+      {
+        "question": "C’est payant ?",
+        "reponse": "Non. Baromatch est gratuit pour les fans. Ce que tu prends au bar, tu le paies au bar, comme d’habitude."
+      },
+      {
+        "question": "Je peux venir avec des amis qui sont pour l’autre équipe ?",
+        "reponse": "Oui, et c’est souvent ce qui fait la soirée. Beaucoup de bars parisiens accueillent les deux camps sans que ça pose question. Pour un match tendu, choisis un bar qui le dit clairement, et évite ceux dont la salle est acquise à un seul club."
+      },
+      {
+        "question": "Je supporte l’OM et je vis à Paris, je trouve un bar ?",
+        "reponse": "Oui. Paris compte beaucoup de Marseillais, et des bars où l’on suit l’OM plus que le PSG. Sur Baromatch, chaque bar dit quels matchs il diffuse : tu choisis ton match, et tu vois qui le passe près de toi."
+      }
+    ]
+  },
+  "lyon": {
+    "nom": "Lyon",
+    "codesPostaux": ["69001", "69002", "69003", "69004", "69005", "69006", "69007", "69008", "69009"],
+    "accroche": "À Lyon, le stade est à Décines et le match se regarde en ville : Presqu’île, pentes de la Croix-Rousse, Guillotière. Le guide des soirs de Gones.",
+    "titreGuide": "Lyon, un soir de match entre Rhône et Saône",
+    "guide": [
+      "À Lyon, le stade est à Décines, à l’est, hors de la ville. Un soir de match, il y a ceux qui prennent le tram et ceux qui restent. Les seconds ont la Presqu’île, les pentes de la Croix-Rousse et la Guillotière, où les bars allument l’écran bien avant le coup d’envoi. Ici, on se dit Gones, et un soir d’OL se reconnaît au rouge et bleu sur les terrasses des Terreaux.",
+      "Le match que la ville attend, c’est le derby contre Saint-Étienne. Les deux villes sont voisines, et les saisons où les deux clubs se croisent, les bars lyonnais se remplissent comme pour une finale, avec des Verts dans la salle, souvent. Les soirs d’Europe ont leur public. L’équipe féminine de l’OL aussi : elle est parmi les plus titrées du continent, et la ville la suit vraiment.",
+      "Un soir ordinaire, une demi-heure d’avance suffit. Un derby ou un grand soir d’Europe, compte une bonne heure, et préviens le bar si vous êtes une bande. Sur place, trois choses : l’écran depuis la chaise où tu vas t’asseoir, le son du match et pas celui de la salle d’à côté, et la réponse du patron quand tu demandes si les Verts sont bienvenus. Si elle vient vite, tu es au bon endroit.",
+      "Sur Baromatch, chaque bar dit lui-même quels matchs il diffuse, avec son adresse et l’heure de Paris. Un derby, un soir d’Europe ou un match de l’OL féminin : tu choisis ton match, et cette page montre les bars de Lyon qui le passent, quartier par quartier."
+    ],
+    "faq": [
+      {
+        "question": "Faut-il arriver tôt pour voir le derby dans un bar à Lyon ?",
+        "reponse": "Oui. Un OL – Saint-Étienne remplit les bars de la Presqu’île et des pentes bien avant le coup d’envoi. Compte une bonne heure d’avance, et préviens le bar si vous êtes une bande."
+      },
+      {
+        "question": "C’est payant ?",
+        "reponse": "Non. Baromatch est gratuit pour les fans. Ce que tu prends au bar, tu le paies au bar."
+      },
+      {
+        "question": "Je peux venir avec des amis qui sont pour Saint-Étienne ?",
+        "reponse": "Oui. Hors derby, la plupart des bars lyonnais accueillent les deux camps sans y penser. Un soir de derby, choisis un bar qui le dit clairement, et garde les chants pour le stade."
+      },
+      {
+        "question": "Je regarde le match près du stade ou dans le centre ?",
+        "reponse": "À Décines, les bars autour du stade se vident au coup d’envoi : ceux qui y sont ont un billet. Pour voir le match entier, reste en ville : la Presqu’île, les pentes de la Croix-Rousse, la Guillotière ou Brotteaux."
+      }
+    ]
+  },
+  "marseille": {
+    "nom": "Marseille",
+    "codesPostaux": ["13001", "13002", "13003", "13004", "13005", "13006", "13007", "13008", "13009", "13010", "13011", "13012", "13013", "13014", "13015", "13016"],
+    "accroche": "À Marseille, l’OM se regarde partout, du Vieux-Port au Cours Julien, pas seulement au Vélodrome. Comment vivre un soir de match dans un bar d’ici.",
+    "titreGuide": "Marseille, la ville entière regarde l’OM",
+    "guide": [
+      "À Marseille, le match ne se regarde pas, il se vit, et pas seulement au Vélodrome. Un soir d’OM, la ville ralentit. Les terrasses du Cours Julien, les bars du Vieux-Port, ceux de Castellane, d’Endoume ou de Saint-Barnabé tournent l’écran vers la rue, et la rue regarde avec eux. Le bleu et le blanc sont partout, jusque sur les balcons.",
+      "Le Classique contre Paris est le soir de l’année, et il y en a deux. Le match se joue au stade, mais il se commente dans chaque bar de la ville, et longtemps après le coup de sifflet final. L’Olympico contre Lyon et les soirs d’Europe suivent de près. Et 1993 n’est jamais loin dans les conversations : ici, l’histoire du club fait partie de la soirée.",
+      "Un soir d’OM, n’arrive pas à l’heure du coup d’envoi : les bonnes tables partent une heure avant, et plus pour un Classique. Vérifie l’écran depuis ta place, et le son : à Marseille, le match se regarde avec le commentaire, et souvent avec la salle qui commente par-dessus. Si tu viens avec quelqu’un de l’autre camp, choisis un bar qui accueille les deux, et dis-le en arrivant : on vous chambre, mais on vous fait de la place.",
+      "Sur Baromatch, chaque bar dit lui-même quels matchs il diffuse, avec son adresse et l’heure de Paris. Un Classique, un Olympico ou un soir d’Europe : tu choisis ton match, et cette page montre les bars de Marseille qui le passent, quartier par quartier."
+    ],
+    "faq": [
+      {
+        "question": "Faut-il arriver tôt pour voir OM – PSG dans un bar à Marseille ?",
+        "reponse": "Oui, très tôt. Un Classique remplit les bars du centre bien avant le coup d’envoi : compte au moins une heure d’avance, et appelle le bar si vous êtes nombreux."
+      },
+      {
+        "question": "C’est payant ?",
+        "reponse": "Non. Baromatch est gratuit pour les fans. Ce que tu prends au bar, tu le paies au bar."
+      },
+      {
+        "question": "Je supporte Paris, je peux regarder le Classique dans un bar à Marseille ?",
+        "reponse": "Les soirs de Classique, un arrêté de la préfecture interdit souvent aux supporters parisiens d’être dans une grande partie de la ville. Avant de venir, vérifie sur le site de la préfecture des Bouches-du-Rhône ce qui est permis ce soir-là. Et si tu viens, ne porte pas tes couleurs."
+      },
+      {
+        "question": "L’OM joue à l’extérieur, la ville suit quand même ?",
+        "reponse": "Plus que jamais. Un match à l’extérieur, c’est le soir où tous les supporters restent en ville : les bars qui le diffusent sont pleins, surtout pour un Classique ou un soir d’Europe."
+      }
+    ]
+  },
+  "lille": {
+    "nom": "Lille",
+    "codesPostaux": ["59000", "59160", "59260", "59777", "59800"],
+    "accroche": "Le LOSC à Villeneuve-d’Ascq, le derby contre Lens, les soirs d’Europe : à Lille, le match se regarde rue Solférino, dans le Vieux-Lille et à Wazemmes.",
+    "titreGuide": "Lille, les Dogues, Lens et les soirs d’Europe",
+    "guide": [
+      "À Lille, le stade est à Villeneuve-d’Ascq, au bout de la ligne de métro, et beaucoup regardent le LOSC depuis le centre. Les soirs de match, Solférino et Masséna, le Vieux-Lille et Wazemmes allument les écrans tôt. Lille est une ville étudiante : les bars sont jeunes, serrés et bruyants, et les Dogues y ont leurs habitudes.",
+      "Le match de l’année, c’est le derby du Nord contre Lens. Les deux villes sont voisines, beaucoup de Lensois vivent ou travaillent à Lille, et les saisons où les deux clubs se croisent, chaque bar devient un bout de stade : rouge et blanc d’un côté, sang et or de l’autre, souvent à la même table. Les soirs d’Europe du LOSC ont leur monde aussi. Et comme la Belgique est à côté, un France – Belgique se regarde ici avec deux accents.",
+      "Pour un match ordinaire, une demi-heure d’avance suffit. Pour le derby, compte une heure, plus si vous êtes nombreux, et préviens le bar. Puis choisis avec les yeux et les oreilles : l’écran depuis ta place, le son du match plutôt que la musique du bar, et un patron qui dit sans hésiter que les deux camps sont bienvenus. Un Lille – Lens se vit mieux dans un bar qui l’a annoncé d’avance.",
+      "Sur Baromatch, chaque bar dit lui-même quels matchs il diffuse, avec son adresse et l’heure de Paris. Un derby du Nord, un soir d’Europe du LOSC ou un France – Belgique : tu choisis ton match, et cette page montre les bars de Lille qui le passent."
+    ],
+    "faq": [
+      {
+        "question": "Faut-il arriver tôt pour voir le derby du Nord dans un bar à Lille ?",
+        "reponse": "Oui. Un Lille – Lens remplit les bars du centre bien avant le coup d’envoi. Compte une heure d’avance, et préviens le bar si vous êtes nombreux."
+      },
+      {
+        "question": "C’est payant ?",
+        "reponse": "Non. Baromatch est gratuit pour les fans. Ce que tu prends au bar, tu le paies au bar."
+      },
+      {
+        "question": "Je suis pour Lens, je peux regarder le match dans un bar à Lille ?",
+        "reponse": "Oui, et tu ne seras pas seul : Lille compte beaucoup de supporters de Lens. Choisis un bar qui accueille les deux camps, surtout un soir de derby, et la soirée se passe bien."
+      },
+      {
+        "question": "Je regarde le match près du stade ou dans le centre ?",
+        "reponse": "Le stade est à Villeneuve-d’Ascq, et autour, les bars se vident au coup d’envoi : ceux qui y sont ont un billet. Pour voir le match entier, reste dans le centre : Solférino, le Vieux-Lille, Wazemmes, ou autour des gares."
+      }
+    ]
+  }
+}

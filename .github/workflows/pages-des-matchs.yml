@@ -1,0 +1,173 @@
+# Les pages « Où regarder le match » : la semaine (matchs/), une page par match, les villes (regarder-le-match/), une
+# page et un badge par vrai bar (bar/), « Ce soir » (ce-soir/), les pages en anglais (en/), les agendas (agenda/ et le
+# fichier de chaque match), les affiches à imprimer (matchs/affiche/ et celle de chaque vrai bar), l’image de partage
+# des pages de match, de ville, de bar et de « Ce soir », et le plan du site.
+# Le générateur (generateur/construire.mjs, Node seul ; seuls le rendu des images de partage et l’encodeur des QR codes
+# s’installent, dans generateur/images) les écrit d’après les listes publiques de l’appli ; cette Action le lance
+# toutes les 3 heures, juste après minuit à Paris (pour que « Ce soir » passe au nouveau jour), à la main (onglet
+# Actions, « Run workflow »), et à chaque envoi sur main qui touche au générateur, à marque.json ou à l’accueil (dont
+# les pages reprennent l’en-tête et le pied de page).
+# Si les données ne répondent pas, répondent une erreur ou ne donnent aucun match, le générateur s’arrête sans rien
+# écrire : les pages en ligne restent comme elles sont. Il refuse aussi de supprimer d’un coup plus de la moitié des
+# pages, ou de perdre d’un coup les bars ou les soirées (liste vide) ou plus de la moitié des bars ou des matchs à
+# venir publiés (liste tronquée) ; si c’est voulu (après une longue pause, par exemple), relance-la à la main en
+# cochant la case.
+# La mesure d’audience (« mesure » dans marque.json) : l’Action l’applique aussi aux pages écrites à la main
+# (generateur/mesure.mjs : leur politique de sécurité, la ligne de /mesure.js, et le bloc de la page Confidentialité).
+# Elle ne change qu’avec un passage réussi du générateur, qu’on la démarre ou qu’on l’arrête : si les données ne
+# répondent pas, rien n’est enregistré, et toutes les pages, Confidentialité comprise, gardent la mesure d’avant
+# jusqu’au premier passage qui réussit. Enregistrer seules les pages écrites à la main ferait dire à Confidentialité
+# « pas de mesure d’audience » pendant que les pages des matchs comptent encore.
+# Seuls matchs/, regarder-le-match/, bar/, ce-soir/, en/ (les pages en anglais), agenda/ (« Ton club dans ton
+# agenda »), sitemap.xml et les pages que la mesure a réécrites sont enregistrés, avec un message clair, puis envoyés
+# sur main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
+# elle-même (d’où « pages: write »), puis prévient IndexNow des adresses indexables qui ont changé.
+# Si main change pendant un passage, les pages partent par-dessus sa nouvelle version ; si ce changement touche les
+# mêmes lignes (le plan du site), le passage s’arrête sans erreur ni envoi, et le passage suivant refait les pages.
+# GitHub met en pause les Actions planifiées d’un dépôt public après 60 jours sans activité : ses propres envois
+# comptent comme activité, mais si rien ne change pendant 60 jours, relance-la à la main.
+name: Pages des matchs
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+    # Juste après minuit à Paris : 22 h 05 en heure d’été, 23 h 05 en heure d’hiver (les heures sont celles de UTC). Le
+    # passage de l’autre heure tombe à 23 h 05 ou 1 h 05 à Paris, sans rien changer d’autre.
+    - cron: '5 22 * * *'
+    - cron: '5 23 * * *'
+  workflow_dispatch:
+    inputs:
+      accepter_les_suppressions:
+        description: 'Accepter qu’un passage supprime plus de la moitié des pages, ou perde la plupart des bars ou des matchs'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - 'generateur/**'
+      - 'marque.json'
+      - 'index.html'
+      - 'presse.html'
+      - '.github/workflows/pages-des-matchs.yml'
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: pages-des-matchs
+  cancel-in-progress: false
+
+jobs:
+  generer:
+    # Lancée à la main depuis une autre branche, l’Action ne fait rien : elle n’envoie jamais une autre branche sur
+    # main. Et elle part toujours de main, quelle que soit la branche choisie.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ACCEPTER: ${{ inputs.accepter_les_suppressions }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          # Le jeton n’est pas gardé dans la configuration de git : le générateur, qui lit des données venues de dehors,
+          # tourne sans lui. Seule l’étape qui envoie les pages le reçoit, pour son seul envoi.
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Le rendu des images de partage et l’encodeur des QR codes des affiches : les seules bibliothèques de l’Action, à
+      # leur version exacte (package-lock.json), sans aucun script d’installation. Rien n’en est servi aux visiteurs, rien
+      # n’en est enregistré. Sans eux, le générateur s’arrête (--images=exiger) plutôt que de retirer les images ou les
+      # affiches en ligne.
+      - name: Installer le rendu des images de partage
+        working-directory: generateur/images
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Construire et contrôler les pages
+        run: |
+          # D’abord la mesure d’audience : vide, elle ne réécrit rien ; remplie (ou vidée de nouveau), elle réécrit les
+          # pages écrites à la main, et seulement ce qui la concerne. Un code illisible arrête l’Action avant toute écriture.
+          node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"
+          option=""
+          if [ "$ACCEPTER" = "true" ]; then option="--accepter-les-suppressions"; fi
+          node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option
+
+      - name: Enregistrer et envoyer les pages qui ont changé
+        id: envoi
+        env:
+          JETON_GITHUB: ${{ github.token }}
+        run: |
+          set -eu
+          git config user.name "Pages des matchs"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # L’envoi s’authentifie le temps d’une commande, comme actions/checkout le fait lui-même (un en-tête http), sans
+          # rien écrire dans la configuration de git ; le dépôt est public : la nouvelle version de main se lit sans jeton.
+          envoyer() {
+            entete="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$JETON_GITHUB" | base64 -w0)"
+            git -c "http.https://github.com/.extraheader=$entete" push -q origin HEAD:main
+          }
+          # Seulement les chemins du générateur et les pages que la mesure a réécrites (leur liste, écrite par
+          # generateur/mesure.mjs), même si un autre fichier avait changé.
+          mesure="$RUNNER_TEMP/mesure.txt"
+          [ -e "$mesure" ] || : > "$mesure"
+          enregistrer() {
+            for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do
+              if [ -e "$chemin" ] || [ -n "$(git ls-files -- "$chemin")" ]; then git add -A -- "$chemin"; fi
+            done
+            if [ -s "$mesure" ]; then xargs -d '\n' -a "$mesure" git add --; fi
+            if git diff --cached --quiet; then return 1; fi
+            if git diff --cached --name-only | grep -vxF -f "$mesure" | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\.xml$'; then
+              echo "::error::Un fichier hors de la liste blanche du générateur allait être enregistré."
+              exit 1
+            fi
+            git commit -q -m "Pages des matchs : mise à jour du $(TZ=Europe/Paris date '+%d/%m/%Y à %H:%M')"
+          }
+          if ! enregistrer; then
+            echo "Rien n’a changé : aucune page à enregistrer."
+            echo "envoye=non" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          for essai in 1 2 3; do
+            if envoyer; then
+              echo "envoye=oui" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "main a changé pendant le passage (essai $essai) : on repart de sa dernière version."
+            # Cette étape a le jeton : elle ne lance que git, jamais le générateur ni la mesure (ils lisent des données
+            # venues de dehors, et un programme lancé ici pourrait lire le jeton, même retiré de son environnement).
+            # Si main a touché les mêmes lignes (le plan du site), rien n’est refait ici : le passage s’arrête sans
+            # erreur et sans rien envoyer, et le passage suivant refait les pages sur la nouvelle version de main.
+            # --autostash : un fichier changé hors de la liste blanche (jamais enregistré) n’empêche pas de repartir
+            # de main.
+            if ! git pull -q --rebase --autostash origin main; then
+              git rebase --abort || true
+              echo "::notice::main a changé pendant le passage : le passage suivant refera les pages."
+              echo "envoye=non" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "::error::Trois essais d’envoi sur main ont échoué."
+          exit 1
+
+      # Aussi quand rien n’a été envoyé : si la dernière publication n’est pas celle du dernier commit de main (une
+      # publication ratée au passage précédent), elle est redemandée.
+      - name: Demander la publication à GitHub Pages
+        id: publication
+        env:
+          DEPOT: ${{ github.repository }}
+          JETON_GITHUB: ${{ github.token }}
+          ENVOYE: ${{ steps.envoi.outputs.envoye }}
+        run: |
+          export COMMIT="$(git ls-remote origin refs/heads/main | cut -f1)"
+          node generateur/publier.mjs pages
+
+      # Seulement après une publication réussie : les moteurs liraient sinon les anciennes pages.
+      - name: Prévenir IndexNow des adresses qui ont changé
+        if: steps.envoi.outputs.envoye == 'oui' && steps.publication.outputs.publie == 'oui'
+        continue-on-error: true
+        run: node generateur/publier.mjs indexnow "$RUNNER_TEMP/changees.txt"

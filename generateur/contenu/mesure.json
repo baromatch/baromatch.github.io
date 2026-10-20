@@ -1,0 +1,29 @@
+{
+  "_lisezMoi": "Ce que la page Confidentialité dit de la mesure d’audience du site, dans les deux cas : « arretee » quand le code de « mesure » est vide dans marque.json (rien ne se charge), « active » quand il est rempli (GoatCounter compte les visites). generateur/mesure.mjs recopie le bon texte dans confidentialite.html, entre « mesure : début » et « mesure : fin », à chaque passage de l’Action : c’est ici qu’on le change. Le texte « active » suppose les réglages du compte GoatCounter : seulement « Referrer » et « Sessions » cochés dans la collecte, et « Data retention » à 730 jours. Le bloc « mesure-refus » est le bouton qui permet de refuser la mesure : /mesure.js le montre et le fait marcher.",
+  "confidentialite": {
+    "arretee": [
+      "  <h3>Ce que le site ne fait pas</h3>",
+      "  <p>Pas de cookies, pas de mesure d’audience, pas de publicité, aucun outil de suivi. Les polices sont hébergées sur le site lui-même&nbsp;: ta visite n’est transmise à aucun autre service.</p>"
+    ],
+    "active": [
+      "  <h3>Ce que le site ne fait pas</h3>",
+      "  <p>Pas de cookies, pas de publicité, rien qui te suit d’un site à l’autre. Les polices sont hébergées sur le site lui-même.</p>",
+      "",
+      "  <h3 id=\"mesure\">La mesure d’audience</h3>",
+      "  <p>Pour savoir quelles pages servent, le site compte ses visites avec GoatCounter, un outil de mesure d’audience sans cookie, hébergé en Finlande et en Allemagne et exploité depuis l’Irlande.</p>",
+      "  <ul>",
+      "    <li><strong>Ce qui part&nbsp;:</strong> l’adresse de la page, sans rien après un «&nbsp;?&nbsp;» (le lien d’une tablée compte seulement «&nbsp;/t/&nbsp;», jamais son code), et le site d’où tu viens, réduit à son nom (par exemple www.google.com). Quand tu touches un lien vers l’appli ou vers la liste d’attente, quand tu t’inscris à la liste d’attente ou quand un bar envoie sa demande, le nom de ce geste part aussi, avec l’adresse de la page&nbsp;: jamais ce que tu as écrit. Comme toute demande sur internet, celle-ci arrive avec ton adresse IP et le nom de ton navigateur.</li>",
+      "    <li><strong>Ce que GoatCounter en garde&nbsp;:</strong> des totaux, page par page&nbsp;: le nombre de visites et de gestes, et les sites d’où viennent les visites. Rien sur toi&nbsp;: ni ton adresse IP, ni ton navigateur, ni ton pays, ni aucun identifiant. Pour compter une seule fois la même visite, il garde en mémoire, 8&nbsp;heures au plus, le lien entre ton adresse IP, ton navigateur et un numéro tiré au hasard&nbsp;; ce lien n’est jamais enregistré.</li>",
+      "    <li><strong>Rien sur ton appareil&nbsp;:</strong> ni cookie, ni identifiant. Rien ne te suit sur un autre site ou une autre appli.</li>",
+      "    <li><strong>Pour qui&nbsp;:</strong> seulement Baromatch. Les totaux ne sont ni publics, ni vendus, ni croisés avec la liste d’attente ou d’autres données.</li>",
+      "    <li><strong>Combien de temps&nbsp;:</strong> les totaux sont effacés au bout de 24&nbsp;mois, et des sauvegardes de GoatCounter 30&nbsp;jours plus tard.</li>",
+      "    <li><strong>Sur quelle base&nbsp;:</strong> notre intérêt légitime à savoir quelles pages servent. La mesure est réglée pour suivre les conditions que la CNIL pose à une mesure d’audience sans consentement.</li>",
+      "    <li><strong>Ne pas être compté&nbsp;:</strong> si ton navigateur envoie le signal «&nbsp;Do Not Track&nbsp;» ou «&nbsp;Global Privacy Control&nbsp;», ou si JavaScript est coupé, rien n’est compté. Tu peux aussi refuser la mesure ici, pour ce navigateur&nbsp;: ton choix est gardé dans son stockage local (une seule clé, «&nbsp;baromatch:mesure&nbsp;»), et rien n’est envoyé.</li>",
+      "  </ul>",
+      "  <div class=\"mesure-refus\" id=\"mesure-refus\" data-refuser=\"Ne plus compter mes visites\" data-accepter=\"Compter de nouveau mes visites\" data-refuse=\"C’est noté&nbsp;: tes visites ne sont plus comptées sur ce navigateur.\" data-accepte=\"C’est noté&nbsp;: tes visites sont de nouveau comptées sur ce navigateur.\" data-signal=\"Ton navigateur demande déjà de ne pas être suivi&nbsp;: tes visites ne sont pas comptées.\" data-echec=\"Ton navigateur ne garde pas ce choix. Active «&nbsp;Do Not Track&nbsp;» ou «&nbsp;Global Privacy Control&nbsp;» dans ses réglages.\" hidden>",
+      "    <button class=\"capsule\" type=\"button\" id=\"mesure-refus-bouton\">Ne plus compter mes visites</button>",
+      "    <p class=\"mesure-refus__statut\" id=\"mesure-refus-statut\" role=\"status\"></p>",
+      "  </div>"
+    ]
+  }
+}

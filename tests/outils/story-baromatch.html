@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- L’image de story Instagram des bars (/badge/story-baromatch.png, 1080 × 1920), dessinée ici et rendue par
+     tests/outils/images-marque.mjs. Les 270 px du haut et les 340 px du bas restent vides : Instagram y pose ses
+     boutons et la réponse. Rien sur l’alcool, aucun écusson : le verre de la marque, la nuit, l’ambre. Rien de promis
+     non plus : tant que l’appli n’est pas ouverte au public, l’image ne dit pas « réserve ». -->
+<title>Story Baromatch</title>
+<style>
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque.woff2") format("woff2");
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 33%, rgba(255, 177, 61, 0.26), rgba(255, 177, 61, 0) 42%),
+    radial-gradient(circle at 12% 4%, rgba(46, 96, 170, 0.34), rgba(46, 96, 170, 0) 38%),
+    #0A0B10;
+  color: #F7F7F9;
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  text-align: center;
+}
+.contenu {
+  position: absolute;
+  top: 270px;
+  bottom: 340px;
+  left: 90px;
+  right: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.verre { width: 420px; height: 420px; margin-top: 40px; overflow: visible; }
+h1 {
+  margin: 40px 0 0;
+  font-size: 118px;
+  font-weight: 800;
+  font-stretch: 88%;
+  font-variation-settings: "opsz" 72;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+}
+p { margin: 48px 0 0; font-size: 62px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; }
+.ambre { color: #FFB13D; }
+.pied { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.pied img { width: 460px; height: auto; }
+.pied span { font-size: 38px; font-weight: 600; color: rgba(247, 247, 249, 0.74); }
+</style>
+</head>
+<body>
+<div class="contenu">
+  <svg class="verre" viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="v" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="b"><circle cx="100" cy="100" r="67"/></clipPath><radialGradient id="h" cx="0.5" cy="0.55" r="0.5"><stop offset="0" stop-color="#FFB13D" stop-opacity="0.55"/><stop offset="0.55" stop-color="#FFB13D" stop-opacity="0.18"/><stop offset="1" stop-color="#FFB13D" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="108" r="100" fill="url(#h)"/><g clip-path="url(#b)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#a)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#v)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg>
+  <h1>Ce soir, on diffuse le match.</h1>
+  <p>On est <span class="ambre">sur&nbsp;Baromatch.</span></p>
+  <div class="pied">
+    <img src="/presse/baromatch-logo-fond-sombre.svg" alt="Baromatch">
+    <span>baromatch.fr</span>
+  </div>
+</div>
+</body>
+</html>

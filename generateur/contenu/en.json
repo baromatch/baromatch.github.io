@@ -1,0 +1,176 @@
+{
+  "_lisezMoi": "Les textes des pages en anglais (/en/), pour les touristes et les expatriés à Paris : écrits pour eux, pas traduits mot à mot. Anglais britannique, phrases courtes, aucun « ! », jamais « score » ni « places », aucun mot de boisson (loi Evin : ni pinte, ni bière, ni verre, ni pub crawl). Garde les clés et les mots entre accolades ({clubs}, {heure}…) : le générateur y met les vraies données. « selection » dit quelles compétitions ont leurs pages de match en anglais (le nom affiché en français, à gauche), « clubsSuivis » quels clubs aussi (leur clé de clubs.json). « appli » dit l’état de l’appli, à garder vrai : elle se règle en anglais (elle suit la langue du téléphone).",
+  "competitions": {
+    "Premier League": "Premier League",
+    "Ligue des champions": "Champions League",
+    "Ligue Europa": "Europa League",
+    "Ligue Conférence": "Conference League",
+    "Ligue 1": "Ligue 1",
+    "Coupe de France": "Coupe de France",
+    "Trophée des champions": "Trophée des Champions"
+  },
+  "selection": {
+    "Premier League": "premier-league",
+    "Ligue des champions": "champions-league",
+    "Ligue Europa": "europe",
+    "Ligue Conférence": "europe"
+  },
+  "clubsSuivis": ["psg"],
+  "langue": {
+    "anglais": "English",
+    "francais": "Version française"
+  },
+  "fil": {
+    "ariane": "Breadcrumb",
+    "accueil": "Baromatch",
+    "paris": "Football in Paris",
+    "premierLeague": "Premier League",
+    "championsLeague": "Champions League"
+  },
+  "appli": {
+    "fermee": "Good to know: the Baromatch app is still in testing, on Android only, in Paris. It works in English as well as French, and you don’t need it to use these pages.",
+    "ouverte": "Good to know: the Baromatch app works in English as well as French, on {plateformes}."
+  },
+  "appel": {
+    "ouverte": "Get the app",
+    "ouverteNote": "Holding your spot is free. Do it before you head out."
+  },
+  "attente": {
+    "titre": "Get an email when the app opens in Paris",
+    "etiquette": "Your email",
+    "exemple": "you@example.com",
+    "bouton": "Notify me",
+    "note": "We only write when Baromatch opens in Paris, and about early tests.",
+    "lienNote": "What we keep, and for how long (in French)",
+    "viePriveeContact": "confidentialite@baromatch.fr",
+    "viePrivee": [
+      ["Who:", "Baromatch, and only Baromatch."],
+      ["Why:", "to email you when the app opens in Paris, and about early tests."],
+      ["What:", "your email address, and Paris as your city. Nothing else."],
+      ["On what basis:", "your consent. You can withdraw it at any time."],
+      ["Who handles it:", "sign-ups go through Formspree, Inc., a provider based in the USA, which forwards them to our inbox for us. Your data is never sold or rented."],
+      ["How long:", "until the app launches in Paris, then 12 months at most."],
+      ["Your rights:", "to see, correct or delete your data, or to leave the list, write to {contact} from the address you signed up with. We delete it within a month. You can also complain to the CNIL, the French data protection authority."]
+    ]
+  },
+  "commentCaMarche": {
+    "titre": "How Baromatch works",
+    "fermee": {
+      "intro": "When the app opens, you’ll be able to:",
+      "etapes": [
+        { "titre": "Pick your match", "texte": "Tonight or later in the week, with the kick-off time." },
+        { "titre": "Find your bar", "texte": "The ones showing it near you." },
+        { "titre": "Hold your spot", "texte": "For you or your whole group, before you head out. It won’t cost a thing." },
+        { "titre": "Arrive, and keep the night", "texte": "Scan in at the door so the bar knows you’re there. Afterwards, the night stays in your album as a coaster." }
+      ]
+    },
+    "ouverte": {
+      "intro": "",
+      "etapes": [
+        { "titre": "Pick your match", "texte": "Tonight or later in the week, with the kick-off time." },
+        { "titre": "Find your bar", "texte": "The ones showing it near you, and how many spots they have left." },
+        { "titre": "Hold your spot", "texte": "For you or your whole group, before you head out. It’s free." },
+        { "titre": "Arrive, and keep the night", "texte": "Scan in at the door so the bar knows you’re there. Afterwards, the night stays in your album as a coaster." }
+      ]
+    }
+  },
+  "atouts": {
+    "screens": "{n} screen",
+    "screensPluriel": "{n} screens",
+    "sound": "Match sound on",
+    "standing": "Standing room",
+    "bothCamps": "Both sets of fans welcome",
+    "outdoor": "Terrace",
+    "food": "Food served"
+  },
+  "bars": {
+    "enFrancais": "Each bar’s own page is in French.",
+    "prochaine": "Next match night:",
+    "sansSoiree": "No match night announced for now.",
+    "tuTiensUnBar": "Run a bar in Paris?",
+    "tuTiensUnBarSuite": "List your match nights on Baromatch. The page for bars is in French.",
+    "compte": "{n} bar in Paris",
+    "comptePluriel": "{n} bars in Paris",
+    "pasDeBar": "No Paris bar listed yet"
+  },
+  "quand": {
+    "heureDeParis": "(Paris time)",
+    "aConfirmer": "kick-off time to be confirmed",
+    "aConfirmerCourt": "time to be confirmed",
+    "royaumeUni": "That’s {heure} in the UK."
+  },
+  "paris": {
+    "titre": "Where to watch football in Paris",
+    "chapeau": "Visiting, or living here? This is Baromatch’s short guide in English: the Premier League, European and PSG matches coming up, in Paris time, and the Paris bars that have told us they’re showing them.",
+    "titreBars": "Paris bars on Baromatch",
+    "sansBar": "No Paris bar is listed on Baromatch yet. We only list a bar once it has said yes, so for now this list is empty rather than guessed.",
+    "titreMatchs": "Coming up, in Paris time",
+    "sansMatch": "No Premier League, European or PSG match in Baromatch’s calendar for the next two weeks.",
+    "titreConseils": "Match night in a Paris bar",
+    "conseils": [
+      "Times on these pages are Paris time. Paris is one hour ahead of the UK all year round, so a 3 pm kick-off in England is 4 pm here.",
+      "Big matches draw a crowd. If you want a seat facing a screen, get there well before kick-off.",
+      "Commentary is usually in French: matches in France are shown by French channels.",
+      "Baromatch only lists what bars tell us. If you want to be sure a match is on, ask the bar before you go."
+    ],
+    "descriptionAvecBars": "{bars} on Baromatch {verbe} showing Premier League, European or PSG matches soon. Kick-off in Paris time, and the addresses.",
+    "descriptionSansBar": "Premier League, European and PSG matches coming up, with kick-off in Paris time. No Paris bar is listed on Baromatch yet."
+  },
+  "premierLeague": {
+    "titre": "Premier League in Paris bars",
+    "chapeau": "Following your team from Paris? Here are the Premier League matches in Baromatch’s calendar for the next two weeks, in Paris time, and the Paris bars that have told us they’re showing them.",
+    "selection": "Baromatch’s calendar has a selection of Premier League matches, not every one.",
+    "heure": "Paris is one hour ahead of the UK: a 3 pm kick-off in England is 4 pm here.",
+    "titreMatchs": "The matches, in Paris time",
+    "sansMatch": "No Premier League match in Baromatch’s calendar for the next two weeks.",
+    "titreBars": "Paris bars showing them",
+    "sansBar": "For now, no Paris bar on Baromatch has listed an upcoming Premier League match.",
+    "descriptionAvecBars": "The Premier League matches in Baromatch’s calendar and the {bars} showing them, with kick-off in Paris time, one hour ahead of the UK.",
+    "descriptionSansBar": "The Premier League matches in Baromatch’s calendar for the next two weeks, with kick-off in Paris time, one hour ahead of the UK."
+  },
+  "championsLeague": {
+    "titre": "Champions League nights in Paris",
+    "chapeau": "The Champions League matches in Baromatch’s calendar for the next two weeks, in Paris time, and the Paris bars that have told us they’re showing them.",
+    "selection": "Baromatch’s calendar has a selection of Champions League matches, not every one.",
+    "clubsFrancais": "For now, it follows the French clubs in Europe.",
+    "titreMatchs": "Champions League, in Paris time",
+    "sansMatch": "No Champions League match in Baromatch’s calendar for the next two weeks.",
+    "titreAutres": "Also in Europe: Europa League and Conference League",
+    "titreBars": "Paris bars showing them",
+    "sansBar": "For now, no Paris bar on Baromatch has listed an upcoming European match.",
+    "descriptionAvecBars": "The Champions League matches in Baromatch’s calendar and the {bars} showing them, with kick-off in Paris time.",
+    "descriptionSansBar": "The Champions League matches in Baromatch’s calendar for the next two weeks, with kick-off in Paris time. No Paris bar is listed for them yet."
+  },
+  "match": {
+    "titreH1": "{match}: where to watch it in Paris",
+    "agenda": "Add to calendar",
+    "titreBars": "Paris bars showing it",
+    "sansBar": "No Paris bar has listed this match on Baromatch yet.",
+    "ailleurs": "Bars in other French cities showing it are on the",
+    "ailleursLien": "French version of this page",
+    "prochains": "What’s next for {clubs}",
+    "aucunProchain": "No other match in the calendar for now.",
+    "passe": "This match has been played",
+    "passeSuite": "Next for {club}:",
+    "passeSansSuite": "The next matches, and where to watch them:",
+    "plusAnnonce": "This match is no longer in the calendar",
+    "heureAConfirmer": "The kick-off time isn’t fixed yet and may change.",
+    "reporte": "Match postponed",
+    "annule": "Match cancelled",
+    "statutSuite": "Check with the bar before you go.",
+    "descriptionAvecBars": "{match}, {quand}. {bars} on Baromatch {verbe} showing it: the addresses, and kick-off in Paris time.",
+    "descriptionSansBar": "{match}, {quand}. No Paris bar has listed it on Baromatch yet: kick-off in Paris time, and what’s next.",
+    "descriptionPasse": "{match}, {quand}. {etat}: the next matches of both clubs, and where to watch them in Paris.",
+    "alt": "The match card: {match}, {quand}."
+  },
+  "retour": "Where to watch football in Paris",
+  "imageAlt": "Baromatch’s glass of light and its line: Ton match. Ton bar. Ce soir.",
+  "partage": {
+    "titre": "Share this page",
+    "partager": "Share",
+    "whatsapp": "Send on WhatsApp",
+    "copier": "Copy link",
+    "copie": "Link copied.",
+    "echec": "Couldn’t copy: press and hold the link to copy it."
+  }
+}

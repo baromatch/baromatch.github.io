@@ -1,0 +1,189 @@
+[
+ {
+  "id": "soiree-001",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-001"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-002",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-002"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-003",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-003"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-004",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-004"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-005",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-005"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-006",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-006"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-007",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-007"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-008",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-008"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-009",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-009"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-010",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-010"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-011",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-011"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-012",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-012"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-013",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-013"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-014",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-015"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-015",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-018"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-016",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-037"
+  },
+  "offer": null
+ },
+ {
+  "id": "soiree-017",
+  "status": "OPEN",
+  "bar": {
+   "id": "bar-001"
+  },
+  "match": {
+   "id": "match-040"
+  },
+  "offer": null
+ }
+]

@@ -11,6 +11,21 @@ export const attendreLaPageFinie = async (onglet) => {
   });
 };
 
+// « Pour les bars » lente, comme sur une machine chargée : sa première image retenue 1,5 s. Le premier affichage vient
+// alors avant « load », et l’amorce demande la feuille et le script pendant que la page charge encore ; une feuille ou
+// un script que le test retient retient alors « load » aussi. Un tel test n’attend que le HTML lu (goto avec
+// waitUntil: 'domcontentloaded'), jamais « load ». Rend de quoi attendre que l’image soit partie vers la page, ce que le
+// test fait avant de finir.
+export const ralentirLaPremiereImage = async (onglet) => {
+  const envois = [];
+  await onglet.route('**/img/bars/console-telephone-ce-soir-*.webp', (route) => {
+    const envoi = new Promise((resoudre) => { setTimeout(resoudre, 1_500); }).then(() => route.continue());
+    envois.push(envoi);
+    return envoi;
+  });
+  return () => Promise.all(envois);
+};
+
 // Les images paresseuses (loading="lazy") ne se chargent qu’en approchant de l’écran : la page défile jusqu’en bas,
 // revient en haut, puis chaque image affichée est chargée (une image cachée à cette largeur ne se charge jamais).
 // Pour une capture pleine page qui montre toutes les images, ou pour vérifier qu’elles se chargent.

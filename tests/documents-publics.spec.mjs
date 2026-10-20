@@ -140,6 +140,14 @@ const EXCEPTIONS = [
   // formulation retenue par empreinte, permise là où le visiteur la lit.
   ['cgu.html', 'empreinte 4:JZkyjmaxHcw', 1],
   ['confidentialite.html', 'empreinte 4:JZkyjmaxHcw', 1],
+  // Le générateur des pages des matchs lit, dans la liste publique des matchs, le renseignement qui dit qu’une heure
+  // de coup d’envoi n’est que provisoire, pour ne jamais l’afficher comme sûre : une fois là où il le lit, une fois là
+  // où la copie des tests le traduit (heureProvisoire). Les copies et le scénario des tests ne l’écrivent pas.
+  ['generateur/donnees.mjs', 'nom eS2Fi_z4niw', 1],
+  ['generateur/outils/reduire-capture.mjs', 'nom eS2Fi_z4niw', 1],
+  // Le drapeau de Chromium qui le fait passer à côté de l’intermédiaire réseau de la machine de test, pour joindre le
+  // serveur local à la place de baromatch.fr (Lighthouse avec la mesure d’audience) : rien sur le serveur de l’appli.
+  ['tests/outils/lighthouse-mesure.mjs', 'reseau', 1],
 ];
 
 // ---------- La recherche ----------
@@ -195,7 +203,7 @@ test('la liste des fichiers publiés vient de git, et ce fichier en fait partie'
 });
 
 test('chaque exception vise un fichier publié, et un motif ou une empreinte de ce fichier', () => {
-  const cles = [...FORMES, ...PROTECTIONS].map(({ cle }) => cle).concat(EMPREINTES.map(([n, e]) => `empreinte ${n}:${e}`));
+  const cles = [...FORMES, ...PROTECTIONS].map(({ cle }) => cle).concat(EMPREINTES.map(([n, e]) => `empreinte ${n}:${e}`), NOMS.map((nom) => `nom ${nom}`));
   for (const [fichier, cle, nombre] of EXCEPTIONS) {
     expect(FICHIERS, fichier).toContain(fichier);
     expect(cles, `${fichier} : ${cle}`).toContain(cle);

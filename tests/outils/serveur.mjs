@@ -1,7 +1,10 @@
 // Sert ce dépôt comme GitHub Pages (commandeServeur, environnement.mjs), et seulement lui : un port déjà pris fait
 // échouer le démarrage (un autre serveur, d’un autre dossier, y répondrait à notre place), un serveur qui s’arrête le
 // dit avec son code et ce qu’il a écrit, et le serveur n’est prêt que lorsqu’il sert l’index.html de ce dépôt.
-// options.commande remplace la commande (tests/outillage.spec.mjs y met un serveur qui s’arrête).
+// options.commande remplace la commande (tests/outillage.spec.mjs y met un serveur qui s’arrête) ; options.dossier
+// sert un autre dossier que ce dépôt (les pages générées d’un scénario), prêt quand il sert son propre index.html.
+// arreter() rend une promesse, tenue quand le serveur s’est arrêté pour de bon (« close » : son port est libre) ; chaque
+// appelant l’attend, sinon une commande peut se terminer, ou un test reprendre le port, pendant qu’il le tient encore.
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -19,7 +22,7 @@ const verifierQueLePortEstLibre = (port) => new Promise((resoudre, rejeter) => {
   sonde.listen(port, '127.0.0.1', () => sonde.close(resoudre));
 });
 
-export const demarrerServeur = async (port, cacheSecondes = -1, { commande = commandeServeur(port, cacheSecondes) } = {}) => {
+export const demarrerServeur = async (port, cacheSecondes = -1, { dossier = racine, commande = commandeServeur(port, cacheSecondes, dossier) } = {}) => {
   await verifierQueLePortEstLibre(port);
   const [binaire, ...arguments_] = commande;
   const serveur = spawn(binaire, arguments_, { stdio: ['ignore', 'ignore', 'pipe'] });
@@ -29,22 +32,27 @@ export const demarrerServeur = async (port, cacheSecondes = -1, { commande = com
   // « close » plutôt que « exit » : il vient après la fin de ce que le serveur a écrit.
   serveur.once('close', (code, signal) => { arret = `code ${code ?? signal}`; });
   serveur.once('error', (erreur) => { arret = erreur.message; });
+  const ferme = new Promise((resoudre) => { serveur.once('close', () => resoudre()); });
+  const arreter = () => {
+    serveur.kill();
+    return ferme;
+  };
 
   const adresse = `http://127.0.0.1:${port}`;
-  const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
+  const accueil = readFileSync(path.join(dossier, 'index.html'), 'utf8');
   let derniereErreur = 'aucune réponse';
   for (let essai = 0; essai < ESSAIS; essai += 1) {
     if (arret) throw new Error(`Le serveur local s’est arrêté (${arret}) : ${ecrit.trim()}`);
     try {
       const reponse = await fetch(`${adresse}/index.html`);
       const texte = await reponse.text();
-      if (reponse.ok && texte === accueil) return { adresse, arreter: () => serveur.kill() };
+      if (reponse.ok && texte === accueil) return { adresse, arreter };
       derniereErreur = reponse.ok ? 'index.html n’est pas celui de ce dépôt' : `index.html répond ${reponse.status}`;
     } catch (erreur) {
       derniereErreur = erreur.cause?.code ?? erreur.message; // le serveur démarre encore
     }
     await new Promise((resoudre) => setTimeout(resoudre, PAUSE_MS));
   }
-  serveur.kill();
+  await arreter();
   throw new Error(`Le serveur local n’a pas démarré sur le port ${port} (${derniereErreur}). ${ecrit.trim()}`);
 };

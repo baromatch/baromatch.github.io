@@ -1,11 +1,12 @@
 // Gratuit, combien de temps, comment supprimer son compte : un fan trouve les trois réponses en moins d’une minute.
-// Le pied de page mène à « Supprimer mon compte » et dit que les règles de l’appli sont
+// Le pied de page commun (tests/outils/pied.mjs) mène à « Supprimer mon compte » et dit que les règles de l’appli sont
 // les CGU ; « L’essentiel » des règles dit combien de temps la place est gardée et comment supprimer son compte ;
 // la page Confidentialité s’ouvre sur « En bref », avec des liens vers la durée de conservation, la suppression du
 // compte et l’adresse à qui écrire. La page « Pour les bars » a le même pied de page que les autres.
 import { test, expect } from '@playwright/test';
 import { couperLAPI } from './outils/invitation.mjs';
 import { PAGES } from './outils/pages.mjs';
+import { PIED } from './outils/pied.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 
@@ -14,16 +15,7 @@ for (const page of PAGES) {
     await couperLAPI(onglet);
     await onglet.goto(page.chemin);
     const liens = await onglet.$$eval('.pied__liens a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent.replace(/\s+/g, ' ').trim()]));
-    expect(liens).toEqual([
-      ['/pour-les-bars.html', 'Pour les bars'],
-      ['/boutique.html', 'Boutique'],
-      ['/mentions-legales.html', 'Mentions légales'],
-      ['/cgu.html', 'Règles de l’appli (CGU)'],
-      ['/confidentialite.html', 'Confidentialité'],
-      ['/supprimer-mon-compte.html', 'Supprimer mon compte'],
-      ['https://x.com/baromatchapp', 'X : @baromatchapp'],
-      ['mailto:contact@baromatch.fr', 'contact@baromatch.fr'],
-    ]);
+    expect(liens).toEqual(PIED);
   });
 }
 
@@ -42,7 +34,7 @@ test('les règles : « L’essentiel » dit combien de temps la place est gardé
 test('confidentialité : une adresse corrigée dit laquelle elle remplace, sans promettre d’effacer l’ancienne', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const texte = normaliser(await page.locator('main').innerText());
-  expect(texte).toContain('Si tu corriges ton adresse juste après l’inscription, la nouvelle inscription dit quelle adresse elle remplace.');
+  expect(texte).toContain('Si tu corriges ton adresse ou ta ville juste après l’inscription, la nouvelle inscription dit quelle adresse elle remplace.');
   expect(texte).toContain('Si tu corriges ton adresse juste après l’envoi, le nouvel envoi dit quelle adresse il remplace.');
   expect(texte).not.toMatch(/efface(r)? l’ancienne/);
 });

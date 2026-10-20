@@ -31,7 +31,12 @@ const adressesDuSrcset = (srcset) => {
   return adresses;
 };
 
-for (const page of PAGES.filter((p) => !p.chemin.startsWith('/t/'))) {
+// Les pages écrites par le générateur et déjà dans le dépôt (l’Action les refait) : leurs liens aussi, les liens
+// d’abonnement webcal:// compris (ils mènent à un agenda du dépôt). Elles sont écrites ensemble, depuis la copie des
+// listes publiques, à l’heure du dernier passage des pages des matchs du dépôt : chaque match qu’elles citent y a sa page.
+const GENEREES = [{ chemin: '/agenda/', nom: 'agenda' }, { chemin: '/ce-soir/', nom: 'ce soir' }, { chemin: '/matchs/affiche/', nom: 'affiche de la semaine' }];
+
+for (const page of [...PAGES.filter((p) => !p.chemin.startsWith('/t/')), ...GENEREES]) {
   test(`${page.nom} : chaque lien interne et chaque image d’un srcset mènent quelque part`, async ({ page: onglet }) => {
     expect(existsSync(fichierDe(page.chemin)), `${page.chemin} : aucun fichier ${fichierDe(page.chemin)}`).toBe(true);
     await onglet.goto(page.chemin);
@@ -46,7 +51,7 @@ for (const page of PAGES.filter((p) => !p.chemin.startsWith('/t/'))) {
         if (!/^mailto:[^@\s]+@[^@\s]+/.test(lien)) casses.push(lien);
         continue;
       }
-      if (/^https?:\/\//.test(lien) && !lien.startsWith(ORIGINE)) continue;
+      if (/^(?:https?|webcal):\/\//.test(lien) && !lien.replace(/^webcal:/, 'https:').startsWith(ORIGINE)) continue;
       if (lien.startsWith('data:')) continue;
       const url = new URL(lien, `${ORIGINE}${page.chemin}`);
       const fichier = fichierDe(url.pathname);

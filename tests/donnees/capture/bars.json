@@ -1,0 +1,9 @@
+[
+ {
+  "id": "bar-001",
+  "name": "Bar de démo",
+  "address": "Site de démo - 1 rue de l’Exemple, 75001 Paris",
+  "isActive": true,
+  "features": null
+ }
+]

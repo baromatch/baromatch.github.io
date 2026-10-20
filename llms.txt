@@ -1,0 +1,54 @@
+# Baromatch
+
+> Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. En test sur Android, à Paris.
+
+Ton match. Ton bar. Ce soir. Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.
+
+Les faits, pour ne pas se tromper :
+
+- Baromatch est une appli mobile française pour les fans de football. Elle montre les bars qui diffusent un match, garde une place au bar, puis garde la soirée en souvenir : un « sous-bock » dans un album.
+- En octobre 2026, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public et pas encore sur iPhone : on ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site et sur chaque page de ville.
+- L’appli est gratuite pour les fans. Ce qu’on prend au bar se paie au bar.
+- Baromatch n’est pas un site de paris sportifs. Malgré un nom qui peut y faire penser, on n’y parie pas : ni mise, ni cote, ni argent en jeu.
+- Baromatch n’est pas un diffuseur : il ne montre pas les matchs. Ce sont les bars qui les diffusent.
+- Baromatch ne vend pas d’alcool.
+- Les clubs et les compétitions sont nommés en texte seulement : Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.
+- Les pages des matchs et des villes sont refaites plusieurs fois par jour à partir de ce que les bars annoncent dans l’appli, à l’heure de Paris. Seuls les bars inscrits y figurent : aucun bar, aucun avis, aucune note n’est inventé.
+- Un bar n’apparaît sur le site qu’avec son accord écrit. Les matchs viennent des calendriers officiels des compétitions ; les places, c’est le bar qui les règle, dans sa Console.
+- Site : https://baromatch.fr/ · Contact : contact@baromatch.fr · X : https://x.com/baromatchapp
+
+## Baromatch
+
+- [Accueil](https://baromatch.fr/): ce qu’est Baromatch, le film de présentation, et la liste d’attente pour être prévenu à l’ouverture.
+- [Presse](https://baromatch.fr/presse.html): Baromatch en bref, ce qu’il n’est pas, les logos, des images de l’appli et le contact presse.
+- [À propos](https://baromatch.fr/a-propos.html): pourquoi Baromatch existe, où il en est, les règles qu’il s’impose et qui le publie.
+- [Comment on choisit les bars](https://baromatch.fr/comment-on-choisit-les-bars.html): d’où viennent les matchs, qui met à jour les places, quand un bar apparaît sur le site, et ce que Baromatch refuse (faux bars, faux avis, chiffres inventés, promotion de l’alcool, écussons, scores).
+
+## Pour les fans
+
+- [Où regarder le match ce soir](https://baromatch.fr/ce-soir/): les matchs du jour, à l’heure de Paris, et les bars qui diffusent chacun.
+- [Les matchs de la semaine](https://baromatch.fr/matchs/): les matchs des sept prochains jours, et les bars qui les diffusent.
+- [Où regarder le match](https://baromatch.fr/regarder-le-match/): les villes, et les bars qui diffusent les matchs dans chacune.
+- [Ton club dans ton agenda](https://baromatch.fr/agenda/): les matchs d’un club de Ligue 1 dans l’agenda du téléphone, à l’heure de Paris : un abonnement par club, qui suit chaque changement d’horaire.
+- [Where to watch football in Paris](https://baromatch.fr/en/): les pages en anglais, pour qui vient voir un match à Paris : les bars de Paris sur Baromatch, la Premier League et la Ligue des champions.
+
+## Pour les bars
+
+- [Pour les bars](https://baromatch.fr/pour-les-bars.html): ce que Baromatch fait pour un bar qui diffuse les matchs, les questions des bars, et le formulaire pour proposer son bar.
+- [L’affiche des matchs de la semaine](https://baromatch.fr/matchs/affiche/): les matchs des sept prochains jours, à l’heure de Paris, à cocher et à imprimer en A4 ou en A3, gratuitement, même pour un bar qui n’est pas sur Baromatch.
+
+## Règles et données
+
+- [Règles de l’appli (CGU)](https://baromatch.fr/cgu.html): les conditions d’utilisation de l’appli.
+- [Confidentialité](https://baromatch.fr/confidentialite.html): les données que Baromatch garde, combien de temps, et comment les effacer.
+- [Supprimer mon compte](https://baromatch.fr/supprimer-mon-compte.html): comment supprimer son compte et ses données.
+
+## Contact
+
+- [contact@baromatch.fr](mailto:contact@baromatch.fr): pour écrire à Baromatch, presse comprise.
+- [X : @baromatchapp](https://x.com/baromatchapp): le compte de Baromatch sur X.
+
+## Optional
+
+- [Mentions légales](https://baromatch.fr/mentions-legales.html): qui édite et qui héberge le site.
+- [Boutique](https://baromatch.fr/boutique.html): les pièces Baromatch pour les soirs de match, à prix indicatifs : rien n’est encore en vente.

@@ -1,0 +1,4 @@
+{
+  "_lisezMoi": "Les bars qui ont accepté par écrit d’être publiés sur baromatch.fr. Un vrai bar qui n’est pas dans cette liste n’apparaît nulle part sur le site : ni sa page, ni sa carte, ni un décompte, ni son badge. Skander : ajoute l’identifiant d’un bar dans « bars », entre guillemets, seulement après son accord écrit (un courriel suffit, garde-le). Pour trouver son identifiant ou pour l’ajouter, demande-le à Claude. N’écris jamais ici un nom ni une adresse de page : ce fichier est public. Un bar qui demande à ne plus apparaître (ou dont l’accord prend fin) : enlève son identifiant de « bars », c’est tout. Au passage suivant (moins de 3 heures), son nom, son adresse et ses soirées quittent toutes les pages, son badge et etat.json, sauf l’adresse de sa page, qui contient son nom (baromatch.fr/bar/…) : elle répond encore « Ce bar n’est plus sur Baromatch. », sans rien d’autre, pendant 30 jours, puis disparaît elle aussi.",
+  "bars": []
+}

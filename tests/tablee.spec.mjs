@@ -5,6 +5,7 @@
 // incomplète) y ajoute la définition d’une tablée et « Réessayer ». L’heure se lit « Ce soir, coup d’envoi à 21 h ».
 // L’API ne répond qu’à https://baromatch.fr : depuis www ou http, la page y renvoie d’abord, même chemin.
 import { test, expect } from '@playwright/test';
+import { arreterLHorloge as arreterLHorlogeA } from './outils/horloge.mjs';
 import { API_TABLEE, enTetesCors, INVITATION } from './outils/invitation.mjs';
 
 const LIEN = '/t/abcdefghjkmn';
@@ -42,8 +43,7 @@ const ouvrir = async (page, ...reponses) => {
 
 // L’horloge de la page simulée et arrêtée : seul runFor fait partir les minuteurs.
 const arreterLHorloge = async (page) => {
-  await page.clock.install({ time: MAINTENANT });
-  await page.clock.pauseAt(MAINTENANT.getTime() + 1000);
+  await arreterLHorlogeA(page, MAINTENANT.getTime() + 1000);
 };
 
 const visibles = (page) => page.locator('#tablee').evaluate((t) => [...t.querySelectorAll('h1, h2, p, dt, dd, a, button')]

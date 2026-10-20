@@ -6,6 +6,10 @@ import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
+import { PIED } from './outils/pied.mjs';
+import { ralentirLaPremiereImage } from './outils/attente.mjs';
+import { arreterLHorloge } from './outils/horloge.mjs';
+import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
 
 const PAGE = '/pour-les-bars.html';
 const ORIGINE = 'https://baromatch.fr';
@@ -21,9 +25,11 @@ const SOURCE = readFileSync('pour-les-bars.html', 'utf8');
 const PREMIER_ECRAN = SOURCE.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
 const EMPREINTE = `'sha256-${createHash('sha256').update(PREMIER_ECRAN).digest('base64')}'`;
 // La politique de la page : elle-même, des images en data: (les sources vides des images cachées) et le serveur
-// Baromatch pour la seule demande d’un bar. connect-src garde 'self' : Lighthouse lit /robots.txt depuis la page.
-const POLITIQUE = `default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
-  + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'";
+// Baromatch pour la seule demande d’un bar. connect-src garde 'self' : Lighthouse lit /robots.txt depuis la page. Quand
+// marque.json active la mesure d’audience, la page charge aussi /mesure.js, et connect-src admet son compte.
+const MESURE = mesureDuSite();
+const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
+  + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);
 
 // La loi Evin : la mention sanitaire, citée une fois, sous l’explication de l’offre du soir ; aucun mot d’alcool ailleurs.
 const MENTION = 'L’abus d’alcool est dangereux pour la santé, à consommer avec modération.';
@@ -133,7 +139,7 @@ test.describe('ce que la page dit', () => {
     expect(titres[0]).toMatch(/\bmatch\b/i);
   });
 
-  test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, questions, formulaire', async ({ page }) => {
+  test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, badge, questions, formulaire', async ({ page }) => {
     await page.goto(PAGE);
     const sections = await page.$$eval('main > section', (liste) => liste.map((s) => ({
       id: s.id,
@@ -145,12 +151,14 @@ test.describe('ce que la page dit', () => {
       'Comment ça marche',
       'Ton soir de match, heure par heure',
       'Ce que tu vois des fans. Et ce que tu ne vois jamais.',
+      'Partager mon badge',
       'Les questions des bars',
       'Propose ton bar',
     ];
     expect(sections.map((s) => s.titre).filter((t) => ATTENDUES.includes(t))).toEqual(ATTENDUES);
     expect(sections.find((s) => s.titre === 'Comment ça marche').id).toBe('comment');
     expect(sections.find((s) => s.titre === 'Propose ton bar').id).toBe('proposer');
+    expect(sections.find((s) => s.titre === 'Partager mon badge').id).toBe('badge');
     await expect(page.locator('main > section').first().locator('h1')).toHaveCount(1);
   });
 
@@ -165,8 +173,7 @@ test.describe('ce que la page dit', () => {
     // nommées, et « Supprimer mon compte » après « Confidentialité ».
     const pied = await page.$$eval('.pied__liens a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent]));
     expect(pied[0]).toEqual(['/pour-les-bars.html', 'Pour les bars']);
-    expect(pied.map(([href]) => href)).toEqual(['/pour-les-bars.html', '/boutique.html', '/mentions-legales.html', '/cgu.html',
-      '/confidentialite.html', '/supprimer-mon-compte.html', 'https://x.com/baromatchapp', 'mailto:contact@baromatch.fr']);
+    expect(pied.map(([href]) => href)).toEqual(PIED.map(([href]) => href));
   });
 
   test('les données structurées : le fil d’Ariane et la FAQ, qui répète mot pour mot chaque question de la page, rien d’autre', async ({ page }) => {
@@ -569,7 +576,9 @@ test.describe('ce que la page charge', () => {
     expect(politique, `style-src doit porter l’empreinte du premier écran : ${EMPREINTE}`).toContain(`style-src 'self' ${EMPREINTE};`);
     expect(SOURCE.match(/<[^>]+\son[a-z]+\s*=/gi)).toBeNull();
     const scripts = [...SOURCE.matchAll(/<script\b([^>]*)>/gi)].map(([, attributs]) => attributs.trim());
-    expect(scripts.filter((a) => a !== 'type="application/ld+json"')).toEqual(['src="/pour-les-bars-amorce.js" defer']);
+    expect(scripts.filter((a) => a !== 'type="application/ld+json"')).toEqual([
+      ...(MESURE.active ? [`src="/mesure.js" data-mesure="${MESURE.adresse}" defer`] : []), 'src="/pour-les-bars-amorce.js" defer',
+    ]);
   });
 });
 
@@ -649,8 +658,9 @@ test.describe('le premier écran d’abord', () => {
   // sur 4G lente (environ 2,95 s avant comme après) : gardé parce qu’une feuille bloquée ne retient plus le formulaire.
   test('après le premier affichage, pour-les-bars.css et le script partent ensemble ; le formulaire s’affiche sans attendre la feuille, avec le bord de ses champs', async ({ page }) => {
     await suivreLeFormulaire(page);
+    const imageArrivee = await ralentirLaPremiereImage(page);
     const lacher = await retenir(page, '**/pour-les-bars.css');
-    await page.goto(PAGE);
+    await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
     await formulaireAffiche(page);
     const m = await moments(page);
     expect(m.affichage).not.toBeNull();
@@ -662,6 +672,7 @@ test.describe('le premier écran d’abord', () => {
     expect(await page.evaluate(() => [...document.styleSheets].some((f) => f.href?.endsWith('/pour-les-bars.css')))).toBe(false);
     expect(await page.locator('#demande-bar').evaluate((c) => getComputedStyle(c).borderTopColor)).toBe('rgba(255, 255, 255, 0.34)');
     lacher();
+    await imageArrivee();
   });
 
   test('arrivé sur une ancre (#proposer, depuis une affiche), la feuille et le script partent sans attendre le premier affichage, ensemble', async ({ page }) => {
@@ -689,8 +700,7 @@ test.describe('le premier écran d’abord', () => {
   // L’horloge de la page arrêtée : ses minuteurs n’avancent que quand le test le dit.
   const horlogeArretee = async (page) => {
     const debut = new Date('2026-10-12T16:00:00Z').getTime();
-    await page.clock.install({ time: debut });
-    await page.clock.pauseAt(debut + 1000);
+    await arreterLHorloge(page, debut + 1000);
   };
   const observateurMuet = (page) => page.addInitScript(() => {
     const Muet = function () {};
@@ -729,9 +739,11 @@ test.describe('le premier écran d’abord', () => {
   });
 
   test('l’amorce garde la place du formulaire par un attribut data-attente que le style de la page rend invisible, jamais par un style écrit', async ({ page }) => {
+    // Le script retenu pendant que la page charge encore : on n’attend que le HTML lu, puis la demande du script.
+    const imageArrivee = await ralentirLaPremiereImage(page);
     const lacher = await retenir(page, '**/pour-les-bars.js');
     const demande = page.waitForRequest('**/pour-les-bars.js');
-    await page.goto(PAGE);
+    await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
     await demande;
     const formulaire = page.locator('#demande');
     await expect(formulaire).toHaveAttribute('data-attente', '');
@@ -741,6 +753,7 @@ test.describe('le premier écran d’abord', () => {
     await formulaireAffiche(page);
     await expect(formulaire).not.toHaveAttribute('data-attente');
     await expect(formulaire).not.toHaveAttribute('style');
+    await imageArrivee();
   });
 
   test('pour-les-bars.js toujours pas là au bout de 12 s : la place est rendue au chemin e-mail ; arrivé ensuite, il affiche le formulaire et efface le secours', async ({ page }) => {

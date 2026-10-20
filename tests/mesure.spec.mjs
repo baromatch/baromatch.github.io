@@ -45,7 +45,8 @@ test.describe('le réglage de marque.json', () => {
     expect(MARQUE.mesure._lisezMoi).toMatch(/GoatCounter/);
     // La page Confidentialité n’est vraie qu’avec ces réglages du compte : ils sont écrits là où l’on active la mesure,
     // avec l’accord de sous-traitance à demander d’abord.
-    for (const reglage of ['accord de sous-traitance', '« Referrer » et « Sessions »', '« Individual pageviews »', '730 jours', 'tableau de bord', 'privé']) {
+    // Les noms sont ceux de l’écran des réglages de GoatCounter (en anglais).
+    for (const reglage of ['accord de sous-traitance', '« Data collection »', '« Referrer » et « Sessions »', '« Individual pageviews » décoché', '« Data retention in days ») à 730 jours', 'tableau de bord privé', '« Dashboard viewable by » sur « Only logged in users »']) {
       expect(MARQUE.mesure._lisezMoi, reglage).toContain(reglage);
     }
     expect(MARQUE.mesure._lisezMoi.indexOf('accord de sous-traitance')).toBeLessThan(MARQUE.mesure._lisezMoi.indexOf('colle'));

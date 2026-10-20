@@ -29,7 +29,7 @@ test('une offre qui parle d’alcool : jamais affichée sur le site, la mention 
   await page.goto(CONFIANCE);
   const boire = normaliser(await page.locator('#refus + ul > li', { hasText: 'Ce qui pousse à boire.' }).textContent());
   expect(boire).toContain(`Sur ce site, une offre de bar qui parle d’alcool ne s’affiche jamais : la page dit seulement « ${TEXTES.offre.dansLAppli} ».`);
-  expect(boire).toContain(`Dans l’appli, elle s’affiche avec, dessous : « ${MENTION_SANTE} »`);
+  expect(boire).toContain(`Dans l’appli, une offre que le bar marque « contient de l’alcool » s’affiche avec, dessous : « ${MENTION_SANTE} »`);
   expect(boire).not.toContain('on écrit');
 });
 

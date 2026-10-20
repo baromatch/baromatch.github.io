@@ -300,7 +300,7 @@ test.describe('les données', () => {
     // Loi Evin : une offre avec alcool (ou sans hasAlcohol à false) ne se publie pas ; à sa place, « Une offre du bar
     // dans l’appli », sans titre ni prix. Seule une offre que le bar dit sans alcool se montre, avec son heure limite.
     expect(offre('Le Zinc des Amis', 'psg-ol-2026-10-25')).toEqual({ dansLAppli: true });
-    expect(offre('Le Comptoir du Canal', 'psg-barca-2026-10-24')).toEqual({ titre: 'Menu burger et boisson fraîche', prixCentimes: 1500, jusqua: Date.parse('2026-10-24T18:00:00.000Z') });
+    expect(offre('Le Comptoir du Canal', 'psg-barca-2026-10-24')).toEqual({ titre: 'Menu burger et frites maison', prixCentimes: 1500, jusqua: Date.parse('2026-10-24T18:00:00.000Z') });
     expect(offre('Le Comptoir du Canal', 'le-havre-psg-2026-10-30')).toEqual({ dansLAppli: true });
     const sansMot = await lireLaSource(`scenario:${SCENARIO}`);
     const burger = sansMot.matchNights.find((n) => n.id === 'n-comptoir-barca');
@@ -337,7 +337,7 @@ test.describe('les données', () => {
       ['Pinte 5 €', 'Pinte'], ['La pinte à 5 €', 'pinte'], ['2 DEMIS achetés, le 3e offert', 'DEMIS'], ['Bière pression 4 €', 'Bière'],
       ['biere a 4 euros', 'biere'], ['Verre de vin rouge', 'vin'], ['Rosé bien frais', 'Rosé'], ['Coupe de champagne si Paris gagne', 'champagne'],
       ['Cocktails à 8 €', 'Cocktails'], ['Shot offert à chaque but', 'Shot'], ['Whisky coca', 'Whisky'], ['Gin tonic 9 €', 'Gin'],
-      ['Apéro jusqu’au coup d’envoi', 'Apéro'], ['Planche apéritive et 2 apéritifs', 'apéritifs'], ['Bière sans alcool 4 €', null],
+      ['Apéro jusqu’au coup d’envoi', 'Apéro'], ['Planche apéritive et 2 apéritifs', 'apéritive'], ['Bière sans alcool 4 €', null],
       ['Pinte de bière sans alcool', null], ['Cocktails sans alcool', null], ['Softs et boissons sans alcool', null],
       ['Pinte 5 € ou cocktail sans alcool', 'Pinte'], ['Nachos offerts', null], ['Menu burger 12 €', null], ['Gingembre frais', null],
       ['Ti-punch maison', 'punch'], ['Pinte ou soft sans alcool', 'Pinte'], ['Pinte (ou version sans alcool) 5 €', 'Pinte'],
@@ -603,7 +603,7 @@ test.describe('les pages', () => {
     }
     const comptoir = pageDe('/bar/le-comptoir-du-canal-paris-10/');
     const soiree = comptoir.contenu.split('id="soiree-psg-barca-2026-10-24"')[1].split('</li>')[0];
-    expect(soiree).toContain('Menu burger et boisson fraîche · 15\u00A0€ · jusqu’à 20:00');
+    expect(soiree).toContain('Menu burger et frites maison · 15\u00A0€ · jusqu’à 20:00');
     expect(soiree).not.toContain(MENTION);
     // Aucune offre dans une page de ville, un aperçu, un badge ou une donnée structurée ; l’offre au mot interdit, nulle part.
     for (const p of site.pages) {

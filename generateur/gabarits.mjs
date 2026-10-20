@@ -5,7 +5,7 @@
 // /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { accorder, capitale, echapper as e } from './texte.mjs';
+import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
 import { baliseDeLaMesure, lireLaMesure, politiqueAvecLaMesure } from './mesure.mjs';
@@ -103,9 +103,8 @@ ${elements.join('\n')}
 `;
 };
 
-// La typographie française, sur toute la page (titre, description, texte, données structurées) : une espace insécable
-// avant « ? », « : » et « ; », pour que le signe ne parte jamais seul à la ligne.
-export const insecables = (texte) => texte.replace(/ ([?:;])/g, '\u00A0$1');
+// La typographie française, sur toute la page (titre, description, texte, données structurées) : texte.mjs.
+export { insecables };
 
 // Une page qui se partage (partage) : le bloc « Partager » juste sous sa tête (la première <header> du corps), avec ses
 // textes (textesDuPartage : ceux d’une page en anglais ; sinon ceux de partage.json).

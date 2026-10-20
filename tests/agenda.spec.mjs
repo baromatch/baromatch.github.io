@@ -17,6 +17,7 @@ import { blocDuMatch } from '../generateur/agenda.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { construire } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
+import { insecables } from '../generateur/texte.mjs';
 import { echapperTexte, instantUtc, lendemain, plier } from '../generateur/ical.mjs';
 
 const contenu = contenuDuScenario();
@@ -379,8 +380,8 @@ test('la page agenda/ : trois lignes d’explication, les clubs, chaque téléph
   expect(page).toContain('<p class="regarder-carte__lieu">Paris Saint-Germain · 4 matchs à venir</p>');
   expect(page).toContain('<p class="regarder-carte__lieu">Angers SCO · 1 match à venir</p>');
   expect(page).toContain('<strong>iPhone, iPad et Mac</strong>');
-  expect(page).toContain('« Autres agendas », choisis « Ajouter d’autres agendas », puis « À partir de l’URL »');
-  expect(page).toContain('« Ajouter un calendrier », puis « S’abonner à partir du web »');
+  expect(page).toContain(insecables('« Autres agendas », choisis « Ajouter d’autres agendas », puis « À partir de l’URL »'));
+  expect(page).toContain(insecables('« Ajouter un calendrier », puis « S’abonner à partir du web »'));
   expect(page).toContain('<p>Les matchs de ton club au programme de Baromatch : Ligue 1 et Ligue des champions.</p>');
   expect(page).toContain('<p>Ils arrivent quelques semaines à l’avance : pour l’instant, jusqu’au vendredi 20 novembre.</p>');
   expect(page).toContain('<p>Pas de Coupe de France ni de match amical pour l’instant.</p>');

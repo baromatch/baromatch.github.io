@@ -87,7 +87,7 @@ test.describe('les images de partage', () => {
       expect(meta(html, 'twitter:image'), p.chemin).toEqual([adresse]);
       expect(meta(html, 'og:image:width')).toEqual(['1200']);
       expect(meta(html, 'og:image:height')).toEqual(['630']);
-      expect(meta(html, 'og:image:alt')).toEqual([p.carte.alt]);
+      expect(meta(html, 'og:image:alt')).toEqual([p.carte.alt.replace(/\u00A0/g, ' ')]);
       expect(existsSync(path.join(sortie, p.chemin, 'partage.png'))).toBe(true);
     }
   });

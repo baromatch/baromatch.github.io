@@ -252,7 +252,7 @@ test.describe('les pages générées', () => {
     expect(avec.refusees).toEqual([]);
     expect(avec.pages.length).toBe(sans.pages.length);
     // Toutes les sortes de pages : les affiches, l’agenda et les pages en anglais comprises.
-    expect(new Set(avec.pages.map((p) => p.type))).toEqual(new Set(['match', 'semaine', 'villes', 'ville', 'bar', 'ce-soir', 'agenda', 'affiche', 'affiche-bar', 'match-en', 'guide-en']));
+    expect(new Set(avec.pages.map((p) => p.type))).toEqual(new Set(['match', 'semaine', 'villes', 'ville', 'bar', 'ce-soir', 'agenda', 'affiche', 'affiche-bar', 'match-en', 'guide-en', 'club', 'competition']));
     for (const p of avec.pages) {
       expect(p.contenu.split('<script src="/mesure.js"').length - 1, p.chemin).toBe(1);
       expect(p.contenu, p.chemin).toContain(`${baliseDeLaMesure(ACTIVE)}\n<script type="application/ld+json">`);

@@ -1,0 +1,119 @@
+{
+  "_lisezMoi": "Les pages « Où regarder les matchs de … dans un bar » : une par club (matchs/club/<club>/) et une par compétition (matchs/competition/<compétition>/). Les clubs et les compétitions qui ont leur page sont ceux de cette liste, et seulement eux : la clé d’un club est celle de clubs.json, le nom d’une compétition celui qu’affiche le site (après competitions.json). Pour chacun : « de » (« du PSG », « de l’OM »), « ville » (la clé d’une page de ville de villes.json, ou rien) et, pour une compétition, son adresse et une phrase vraie pour toujours. Garde les mots entre accolades ({club}, {jour}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation, rien qui dépende du moment : le générateur dit lui-même ce qui change (les matchs, les bars, l’heure). Une page sans match à venir reste en ligne, en noindex, et le dit.",
+  "clubs": {
+    "psg": {
+      "de": "du PSG",
+      "ville": "paris"
+    },
+    "om": {
+      "de": "de l’OM",
+      "ville": "marseille"
+    },
+    "ol": {
+      "de": "de l’OL",
+      "ville": "lyon"
+    },
+    "lille": {
+      "de": "de Lille",
+      "ville": "lille"
+    },
+    "lens": {
+      "de": "de Lens"
+    },
+    "monaco": {
+      "de": "de Monaco"
+    },
+    "nice": {
+      "de": "de Nice"
+    },
+    "rennes": {
+      "de": "de Rennes"
+    }
+  },
+  "competitions": {
+    "Ligue 1": {
+      "cle": "ligue-1",
+      "nom": "la Ligue 1",
+      "phrase": "La Ligue 1 est le championnat de France. Chacun de ses clubs a aussi son agenda sur Baromatch, à ajouter au calendrier de ton téléphone."
+    },
+    "Ligue des champions": {
+      "cle": "ligue-des-champions",
+      "nom": "la Ligue des champions",
+      "phrase": "La Ligue des champions est la première des trois coupes d’Europe des clubs."
+    },
+    "Ligue Europa": {
+      "cle": "ligue-europa",
+      "nom": "la Ligue Europa",
+      "phrase": "La Ligue Europa est la deuxième des trois coupes d’Europe des clubs."
+    },
+    "Ligue Conférence": {
+      "cle": "ligue-conference",
+      "nom": "la Ligue Conférence",
+      "phrase": "La Ligue Conférence est la troisième des trois coupes d’Europe des clubs."
+    },
+    "Premier League": {
+      "cle": "premier-league",
+      "nom": "la Premier League",
+      "phrase": "La Premier League est le championnat d’Angleterre. L’Angleterre a une heure de moins que Paris, toute l’année : les heures écrites ici sont celles de Paris."
+    },
+    "LaLiga": {
+      "cle": "liga",
+      "nom": "la Liga",
+      "phrase": "LaLiga est le championnat d’Espagne. Les heures écrites ici sont celles de Paris."
+    },
+    "Serie A": {
+      "cle": "serie-a",
+      "nom": "la Serie A",
+      "phrase": "La Serie A est le championnat d’Italie. Les heures écrites ici sont celles de Paris."
+    },
+    "Bundesliga": {
+      "cle": "bundesliga",
+      "nom": "la Bundesliga",
+      "phrase": "La Bundesliga est le championnat d’Allemagne. Les heures écrites ici sont celles de Paris."
+    }
+  },
+  "fil": "Par club et par compétition",
+  "titre": "Où regarder les matchs {de} dans un bar",
+  "titreCompetition": "Où regarder {nom} dans un bar",
+  "surtitreClub": "Club",
+  "surtitreCompetition": "Compétition",
+  "chapeauClub": "{n} au programme de Baromatch, jusqu’au {jour}, à l’heure de Paris : la compétition, le coup d’envoi{bars}.",
+  "chapeauCompetition": "{n} au programme de Baromatch, jusqu’au {jour}, à l’heure de Paris : les clubs, le coup d’envoi{bars}.",
+  "chapeauSansMatch": "Pas de match au programme de Baromatch pour l’instant. Les prochains arrivent ici dès qu’ils sont annoncés.",
+  "titreMatchs": "Les prochains matchs {de}",
+  "titreMatchsCompetition": "Les prochains matchs de {nom}",
+  "sansMatch": "Pas de match au programme pour l’instant.",
+  "coupsDEnvoi": "Les coups d’envoi de ces matchs, à l’heure de Paris : {heures}.",
+  "titreBars": "Les bars qui diffusent ses matchs",
+  "sansBar": "Aucun bar ne diffuse encore un de ces matchs sur Baromatch.",
+  "prochaineSoiree": "Son prochain match {de} :",
+  "barsEnCompte": "{bars} sur Baromatch.",
+  "titreClubs": "Les clubs français de {nom}",
+  "titreTrouver": "Trouver un bar qui diffuse le match",
+  "ville": "Les bars de {ville} sur Baromatch, et ce qu’il faut savoir avant d’y aller :",
+  "chaine": "Baromatch ne dit pas sur quelle chaîne passe un match : il montre les bars qui le diffusent. Sur Baromatch, ce sont les bars eux-mêmes qui annoncent les matchs qu’ils diffusent ; ailleurs, appelle le bar avant de partir.",
+  "guide": "Comment trouver un bar qui diffuse le match",
+  "agenda": "Les matchs {de} dans ton agenda",
+  "agendaTexte": "Abonne-toi à l’agenda {de} : ses matchs arrivent dans le calendrier de ton téléphone, à l’heure de Paris, et suivent chaque changement d’horaire.",
+  "description": "{n} {de} au programme, à l’heure de Paris, et {bars} qui en {diffuse} sur Baromatch. Le prochain : {prochain}.",
+  "descriptionCourte": "Les prochains matchs {de}, à l’heure de Paris, et où les voir dans un bar. Le prochain : {prochain}.",
+  "descriptionSansMatch": "Les matchs {de} à l’heure de Paris, et où les voir dans un bar, dès qu’ils sont au programme de Baromatch.",
+  "descriptionCompetition": "{n} de {nom} au programme, à l’heure de Paris, avec les clubs, le coup d’envoi et {bars} qui en {diffuse} sur Baromatch.",
+  "descriptionCompetitionSansMatch": "Les matchs de {nom} à l’heure de Paris, et où les voir dans un bar, dès qu’ils sont au programme de Baromatch.",
+  "liens": {
+    "titre": "Par club et par compétition",
+    "clubs": "Par club",
+    "competitions": "Par compétition",
+    "aucun": "Pas de match au programme"
+  },
+  "lienDuClub": "Les matchs {de} et où les voir",
+  "lienDeLaCompetition": "Les matchs de {nom} et où les voir",
+  "chapeauBars": " et les bars qui diffusent chacun sur Baromatch",
+  "descriptionSansBar": "{n} {de} au programme, à l’heure de Paris, avec la compétition et le coup d’envoi. Le prochain : {prochain}.",
+  "descriptionCompetitionSansBar": "{n} de {nom} au programme, à l’heure de Paris, avec les clubs, le jour et le coup d’envoi de chacun.",
+  "prochain": "Le prochain : {match}, {quand}, en {competition}, {lieu}.",
+  "domicile": "à domicile",
+  "exterieur": "à l’extérieur",
+  "prochainCompetition": "Le prochain : {match}, {quand}.",
+  "clubDeLaCompetition": "{n} en {nom}"
+}

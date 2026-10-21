@@ -375,7 +375,7 @@ test('rien ne change, rien n’est réécrit : les mêmes octets ; un match qui 
   expect(existsSync(path.join(a, 'matchs/psg-ol-2026-10-25/match.ics'))).toBe(false);
 });
 
-test('sans vrai bar, aucun texte d’agenda ne parle de bars, et la page agenda/ reste en noindex, hors du plan du site', async () => {
+test('sans vrai bar, aucun texte d’agenda ne parle de bars ; la page agenda/ est indexable tant qu’un club a un match à venir, sinon noindex, hors du plan du site', async () => {
   const sortie = dossierVide();
   await construire({ source: `scenario:${SCENARIO}`, sortie, maintenant: Date.parse('2026-10-23T08:00:00Z'), racine, contenu: chargerLeContenu(racine), rendu: null });
   for (const fichier of agendasDe(sortie)) {
@@ -383,10 +383,18 @@ test('sans vrai bar, aucun texte d’agenda ne parle de bars, et la page agenda/
     const textes = [lu.calendrier['X-WR-CALDESC'] ?? '', ...lu.evenements.flatMap((ev) => [ev.SUMMARY, ev.DESCRIPTION])].join('\n');
     expect(textes, fichier).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffuse/iu);
   }
+  // Un outil fait des vrais matchs, qui ne nomme aucun bar (comme l’affiche de la semaine) : indexable sans bar, tant
+  // qu’un club de Ligue 1 a un match à venir.
   const page = octets(sortie, 'agenda/index.html').toString('utf8');
-  expect(page).toContain('<meta name="robots" content="noindex">');
-  expect(etatDe(sortie).pages['/agenda/']).toMatchObject({ type: 'agenda', indexable: false });
-  expect(readFileSync(path.join(sortie, 'sitemap.xml'), 'utf8')).not.toContain('/agenda/');
+  expect(page).not.toContain('noindex');
+  expect(etatDe(sortie).pages['/agenda/']).toMatchObject({ type: 'agenda', indexable: true });
+  expect(readFileSync(path.join(sortie, 'sitemap.xml'), 'utf8')).toContain('<loc>https://baromatch.fr/agenda/</loc>');
+  // Sans bar ni match à venir (le scénario, deux mois plus tard) : noindex, hors du plan du site.
+  const vide = dossierVide();
+  await construire({ source: `scenario:${SCENARIO}`, sortie: vide, maintenant: Date.parse('2026-12-23T08:00:00Z'), racine, contenu: chargerLeContenu(racine), rendu: null });
+  expect(octets(vide, 'agenda/index.html').toString('utf8')).toContain('<meta name="robots" content="noindex">');
+  expect(etatDe(vide).pages['/agenda/']).toMatchObject({ type: 'agenda', indexable: false });
+  expect(readFileSync(path.join(vide, 'sitemap.xml'), 'utf8')).not.toContain('/agenda/');
   // Avec de vrais bars (le scénario), la page est indexable et entre au plan du site, même quand aucun match de ces
   // agendas n’a plus de bar (le samedi 31, après la dernière soirée annoncée, Le Havre – PSG).
   const avec = dossierVide();

@@ -15,7 +15,9 @@
 // Les fichiers sont les mêmes octet pour octet tant que rien ne change : chaque évènement garde dans l’état l’empreinte
 // de son contenu, son numéro de version (SEQUENCE, qui monte à chaque vrai changement) et l’instant de ce changement
 // (DTSTAMP). La page agenda/ est indexable dès qu’un vrai bar publié est sur le site (qu’un de ces matchs ait un bar
-// ou pas : elle n’entre ni ne sort de l’index d’une semaine à l’autre) ; sans aucun vrai bar, noindex.
+// ou pas : elle n’entre ni ne sort de l’index d’une semaine à l’autre) ; sans aucun vrai bar, tant qu’un club de
+// Ligue 1 a un match à venir dans ses agendas : c’est un outil fait des vrais matchs, qui ne nomme aucun bar, comme
+// l’affiche de la semaine. Sans bar ni match à venir, noindex.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
@@ -36,7 +38,7 @@ export const DUREE_DANS_L_AGENDA_MS = 2 * HEURE_MS;
 export const GARDE_ANNULE_MS = 7 * JOUR_MS;
 // L’agenda d’un club qui sort des listes reste 30 jours, vide, puis disparaît.
 export const GARDE_CLUB_MS = 30 * JOUR_MS;
-// La page agenda/ est indexable dès ce nombre de vrais bars publiés sur le site.
+// La page agenda/ est indexable dès ce nombre de vrais bars publiés sur le site (ou, sans bar, avec un match à venir).
 export const BARS_POUR_L_AGENDA = 1;
 const PRODID = '-//Baromatch//Ton club dans ton agenda//FR';
 const DOMAINE = 'baromatch.fr';
@@ -148,7 +150,7 @@ export const fabriquerLaPageAgenda = ({ donnees, contenu, cadre, avecPresse = fa
   const etapes = [{ nom: textes.fil.accueil, chemin: '/' }, { nom: t.fil, chemin }];
   const p = {
     // Elle ne nomme aucun bar (barsNommes vide, gardé dans l’état comme pour toute page).
-    type: 'agenda', cle: 'agenda', date: null, chemin, indexable: donnees.bars.length >= BARS_POUR_L_AGENDA, titre: t.titre, description: t.description, barsNommes: [],
+    type: 'agenda', cle: 'agenda', date: null, chemin, indexable: donnees.bars.length >= BARS_POUR_L_AGENDA || resume.horizon !== null, titre: t.titre, description: t.description, barsNommes: [],
     jsonld: [pageWeb({ chemin, titre: t.titre, description: t.description }), filDAriane(etapes)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">

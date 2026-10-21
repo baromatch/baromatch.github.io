@@ -17,6 +17,7 @@ export const PAGES = [
   { chemin: '/presse.html', nom: 'presse' },
   { chemin: '/a-propos.html', nom: 'a-propos' },
   { chemin: '/comment-on-choisit-les-bars.html', nom: 'comment-on-choisit-les-bars' },
+  { chemin: '/trouver-un-bar-qui-diffuse-le-match.html', nom: 'guide-trouver-un-bar' },
   { chemin: '/404.html', nom: '404', indexable: false },
   { chemin: '/t/abcdefghjkmn', nom: 'tablee', lighthouse: false, indexable: false },
 ];

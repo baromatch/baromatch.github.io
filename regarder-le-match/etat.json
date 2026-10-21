@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "Bf2UrTYlLUSRYP3cPdGdfw",
-   "change": "2026-10-20",
+   "empreinte": "VooG1kFe9GSpgYJxSV-Bng",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
@@ -155,8 +155,8 @@
   "/agenda/psg.ics": {
    "type": "calendrier",
    "cle": "psg",
-   "empreinte": "SyPyzPdP4N5gALxh9xjPUg",
-   "change": "2026-10-20",
+   "empreinte": "6cBwMeh1F4ENU1daIpcWMw",
+   "change": "2026-10-21",
    "indexable": false,
    "memoire": {
     "court": "PSG",
@@ -210,31 +210,31 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "PdWxvLEc8O3_43tBbwr4Ag",
-   "change": "2026-10-20",
+   "empreinte": "U1AMK4s5gHTAbYa6PD8MsA",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "uRD01dDmaoVg8eKTbL57qA",
-   "change": "2026-10-20",
+   "empreinte": "oG8VYzxjMYa-06k_rbiPHg",
+   "change": "2026-10-21",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "j8CM7zWUMhuiUHzS-N8QYQ",
-   "change": "2026-10-20",
+   "empreinte": "9ITG8h4qkzVrp33b6nVL1w",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
   "/en/champions-league/": {
    "type": "guide-en",
    "cle": "champions-league",
-   "empreinte": "Rr-zMyS2D6gN2diboGduFA",
-   "change": "2026-10-20",
+   "empreinte": "OjBuQpn0xwsfgIHwHdOj5w",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
@@ -377,8 +377,8 @@
    "type": "match-en",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "YZVCuYhbIWPw8Rh98Ay9Xw",
-   "change": "2026-10-20",
+   "empreinte": "PsQURkcTGGkrsMLUnrPNxg",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
@@ -395,8 +395,8 @@
    "type": "match-en",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "gcDN54GVGS5qvilXC-iX9g",
-   "change": "2026-10-20",
+   "empreinte": "J-NtH3lpc-bhqMBu_reqMA",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
@@ -429,16 +429,16 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "k8lQYpSzoJ9d-MSvlWG-kg",
-   "change": "2026-10-20",
+   "empreinte": "n24NY6tLBUsoM-DSsdU2mg",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "QLTikrIVDsI0KjbHvHHstg",
-   "change": "2026-10-20",
+   "empreinte": "i8Ek9x75eHpd8HObba2wsQ",
+   "change": "2026-10-21",
    "indexable": true,
    "bars": []
   },
@@ -796,8 +796,8 @@
    "type": "match",
    "cle": "betis-barca-2026-10-17",
    "date": "2026-10-17T16:30:00.000Z",
-   "empreinte": "8CvAyqP1lCQe5KxLd8W1fw",
-   "change": "2026-10-20",
+   "empreinte": "jsWMiUYJwQCyQ2DGbWUN7g",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2350,8 +2350,8 @@
    "type": "match",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "Tc6eBPBpXz-Hyu_J_KZUoA",
-   "change": "2026-10-20",
+   "empreinte": "YkMprxIbpS-twRrSh5Sy9A",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2374,13 +2374,6 @@
      "nom": "FC Barcelona"
     }
    }
-  },
-  "/matchs/psg-barca-2026-10-20/partage.png": {
-   "type": "partage",
-   "cle": "psg-barca-2026-10-20",
-   "empreinte": "P4c9ZYSZQXRIT7vNXKGNAw",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/psg-ol-2026-10-25/": {
    "type": "match",
@@ -2540,8 +2533,8 @@
    "type": "match",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "e8Cnv3k0et6sKkEzlDsxlA",
-   "change": "2026-10-20",
+   "empreinte": "hskkneIXx2N0VlTwS9B8YA",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3038,29 +3031,6 @@
     "nom": "Olympique Lyonnais"
    },
    "empreinte": "-jtxEt-ibpGYxgv2vPq6zA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmuy4o3bt001lzz9w12rhfcw6@baromatch.fr": {
-   "ids": [
-    "cmuy4o3bt001lzz9w12rhfcw6",
-    "cmv6e5jfu000pryqjcr3s6v8f"
-   ],
-   "slug": "psg-barca-2026-10-20",
-   "debut": "2026-10-20T19:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des champions",
-   "domicile": {
-    "cle": "psg",
-    "court": "PSG",
-    "nom": "Paris Saint-Germain"
-   },
-   "exterieur": {
-    "cle": "barca",
-    "court": "Barça",
-    "nom": "FC Barcelona"
-   },
-   "empreinte": "uqEGVi7V-zrwH-YG3kJ18g",
    "sequence": 0,
    "modifie": "2026-10-20T10:48:07Z"
   },

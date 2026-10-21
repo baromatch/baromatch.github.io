@@ -54,13 +54,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmv6e5k3x002nryqjla3z0k0p@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
+DTSTAMP:20261021T214013Z
+SEQUENCE:1
 DTSTART:20261104T200000Z
 DTEND:20261104T220000Z
 SUMMARY:Lens – Como 1907
 DESCRIPTION:Ligue des champions · RC Lens – Como 1907\nCoup d’envoi me
- rcredi 4 novembre à 21:00\, heure de Paris.
+ rcredi 4 novembre à 21:00\, heure de Paris.\nLa page du match : https://
+ baromatch.fr/matchs/lens-como-1907-2026-11-04/
+URL:https://baromatch.fr/matchs/lens-como-1907-2026-11-04/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

@@ -11,20 +11,6 @@ X-WR-CALDESC:Lille : les matchs au programme de Baromatch (Ligue 1 et Ligu
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5jgj000rryqjd3m8s710@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
-DTSTART:20261021T164500Z
-DTEND:20261021T184500Z
-SUMMARY:Lille – Galatasaray
-DESCRIPTION:Ligue des champions · LOSC Lille – Galatasaray A.Ş.\nCoup d
- ’envoi mercredi 21 octobre à 18:45\, heure de Paris.\nLa page du match
-  : https://baromatch.fr/matchs/lille-galatasaray-2026-10-21/
-URL:https://baromatch.fr/matchs/lille-galatasaray-2026-10-21/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmuy4o36d0019zz9w74csusip@baromatch.fr
 DTSTAMP:20261020T104807Z
 SEQUENCE:0

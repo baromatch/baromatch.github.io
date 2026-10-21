@@ -125,6 +125,8 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
       expect(og['og:site_name'][0]).toBe('Baromatch');
       expect(og['twitter:card'][0]).toBe('summary_large_image');
       expect(og['twitter:site'][0]).toBe('@baromatchapp');
+      // L’image de la carte X : la même que celle d’Open Graph, dite aussi pour X (qui sinon la devine).
+      expect(og['twitter:image']).toEqual(og['og:image']);
       const image = og['og:image'][0];
       expect(image.startsWith(`${ORIGINE}/`)).toBe(true);
       const fichierImage = fichierDe(new URL(image).pathname);

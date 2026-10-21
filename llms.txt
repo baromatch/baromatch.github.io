@@ -7,7 +7,7 @@ Ton match. Ton bar. Ce soir. Les bars qui diffusent ton match, une place qui t�
 Les faits, pour ne pas se tromper :
 
 - Baromatch est une appli mobile française pour les fans de football. Elle montre les bars qui diffusent un match, garde une place au bar, puis garde la soirée en souvenir : un « sous-bock » dans un album.
-- En octobre 2026, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, pas encore dans les magasins d’applications (ni Google Play, ni App Store) et pas encore sur iPhone : on ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site et sur chaque page de ville.
+- En octobre 2026, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, ni en téléchargement public sur Google Play, et il n’y a pas encore de version iPhone : on ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site et sur chaque page de ville.
 - Où : à Paris, pour commencer. Pas encore de date pour d’autres villes.
 - Pour qui : les fans de foot de 18 ans et plus, et les bars qui diffusent les matchs.
 - Qui : Baromatch est édité par Skander Kamoun, son fondateur, à titre personnel pour le moment ; la société qui exploitera l’appli est en cours de création.
@@ -32,22 +32,22 @@ Les faits, pour ne pas se tromper :
 - [Où regarder le match ce soir](https://baromatch.fr/ce-soir/): les matchs du jour, à l’heure de Paris, et les bars qui diffusent chacun.
 - [Les matchs de la semaine](https://baromatch.fr/matchs/): les matchs des sept prochains jours, et les bars qui les diffusent.
 - [Comment trouver un bar qui diffuse le match](https://baromatch.fr/trouver-un-bar-qui-diffuse-le-match.html): le guide pas à pas : savoir quand se joue le match, trouver les bars qui l’annoncent, vérifier avant de partir.
-- [Où regarder les matchs du PSG dans un bar](https://baromatch.fr/matchs/club/psg/): les prochains matchs du PSG, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder les matchs de l’OM dans un bar](https://baromatch.fr/matchs/club/om/): les prochains matchs de l’OM, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder les matchs de l’OL dans un bar](https://baromatch.fr/matchs/club/ol/): les prochains matchs de l’OL, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder les matchs de Lille dans un bar](https://baromatch.fr/matchs/club/lille/): les prochains matchs de Lille, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder les matchs de Lens dans un bar](https://baromatch.fr/matchs/club/lens/): les prochains matchs de Lens, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder les matchs de Monaco dans un bar](https://baromatch.fr/matchs/club/monaco/): les prochains matchs de Monaco, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder les matchs de Nice dans un bar](https://baromatch.fr/matchs/club/nice/): les prochains matchs de Nice, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder les matchs de Rennes dans un bar](https://baromatch.fr/matchs/club/rennes/): les prochains matchs de Rennes, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Ligue 1 dans un bar](https://baromatch.fr/matchs/competition/ligue-1/): les prochains matchs de Ligue 1, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Ligue des champions dans un bar](https://baromatch.fr/matchs/competition/ligue-des-champions/): les prochains matchs de Ligue des champions, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Ligue Europa dans un bar](https://baromatch.fr/matchs/competition/ligue-europa/): les prochains matchs de Ligue Europa, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Ligue Conférence dans un bar](https://baromatch.fr/matchs/competition/ligue-conference/): les prochains matchs de Ligue Conférence, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Premier League dans un bar](https://baromatch.fr/matchs/competition/premier-league/): les prochains matchs de Premier League, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Liga dans un bar](https://baromatch.fr/matchs/competition/liga/): les prochains matchs de LaLiga, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Serie A dans un bar](https://baromatch.fr/matchs/competition/serie-a/): les prochains matchs de Serie A, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
-- [Où regarder la Bundesliga dans un bar](https://baromatch.fr/matchs/competition/bundesliga/): les prochains matchs de Bundesliga, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs du PSG dans un bar](https://baromatch.fr/matchs/club/psg/): les prochains matchs du PSG, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs de l’OM dans un bar](https://baromatch.fr/matchs/club/om/): les prochains matchs de l’OM, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs de l’OL dans un bar](https://baromatch.fr/matchs/club/ol/): les prochains matchs de l’OL, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs de Lille dans un bar](https://baromatch.fr/matchs/club/lille/): les prochains matchs de Lille, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs de Lens dans un bar](https://baromatch.fr/matchs/club/lens/): les prochains matchs de Lens, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs de Monaco dans un bar](https://baromatch.fr/matchs/club/monaco/): les prochains matchs de Monaco, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs de Nice dans un bar](https://baromatch.fr/matchs/club/nice/): les prochains matchs de Nice, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder les matchs de Rennes dans un bar](https://baromatch.fr/matchs/club/rennes/): les prochains matchs de Rennes, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder la Ligue 1 dans un bar](https://baromatch.fr/matchs/competition/ligue-1/): les prochains matchs de Ligue 1, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder la Ligue des champions dans un bar](https://baromatch.fr/matchs/competition/ligue-des-champions/): les prochains matchs de Ligue des champions, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder la Ligue Europa dans un bar](https://baromatch.fr/matchs/competition/ligue-europa/): les prochains matchs de Ligue Europa, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder la Ligue Conférence dans un bar](https://baromatch.fr/matchs/competition/ligue-conference/): les prochains matchs de Ligue Conférence, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder la Premier League dans un bar](https://baromatch.fr/matchs/competition/premier-league/): les prochains matchs de Premier League, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder LaLiga dans un bar](https://baromatch.fr/matchs/competition/liga/): les prochains matchs de LaLiga, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder la Serie A dans un bar](https://baromatch.fr/matchs/competition/serie-a/): les prochains matchs de Serie A, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
+- [Où regarder la Bundesliga dans un bar](https://baromatch.fr/matchs/competition/bundesliga/): les prochains matchs de Bundesliga, à l’heure de Paris, et, dès qu’un bar les annonce, les bars qui les diffusent sur Baromatch.
 - [Où regarder le match](https://baromatch.fr/regarder-le-match/): les villes, et les bars qui diffusent les matchs dans chacune.
 - [Ton club dans ton agenda](https://baromatch.fr/agenda/): les matchs d’un club de Ligue 1 dans l’agenda du téléphone, à l’heure de Paris : un abonnement par club, qui suit chaque changement d’horaire.
 - [Where to watch football in Paris](https://baromatch.fr/en/): les pages en anglais, pour qui vient voir un match à Paris : les bars de Paris sur Baromatch, la Premier League et la Ligue des champions.

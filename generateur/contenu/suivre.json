@@ -1,5 +1,5 @@
 {
-  "_lisezMoi": "Les pages « Où regarder les matchs de … dans un bar » : une par club (matchs/club/<club>/) et une par compétition (matchs/competition/<compétition>/). Les clubs et les compétitions qui ont leur page sont ceux de cette liste, et seulement eux : la clé d’un club est celle de clubs.json, le nom d’une compétition celui qu’affiche le site (après competitions.json). Pour chacun : « de » (« du PSG », « de l’OM »), « ville » (la clé d’une page de ville de villes.json, ou rien) et, pour une compétition, son adresse et une phrase vraie pour toujours. Garde les mots entre accolades ({club}, {jour}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation, rien qui dépende du moment : le générateur dit lui-même ce qui change (les matchs, les bars, l’heure). Une page sans match à venir reste en ligne, en noindex, et le dit.",
+  "_lisezMoi": "Les pages « Où regarder les matchs de … dans un bar » : une par club (matchs/club/<club>/) et une par compétition (matchs/competition/<compétition>/). Les clubs et les compétitions qui ont leur page sont ceux de cette liste, et seulement eux : la clé d’un club est celle de clubs.json, le nom d’une compétition celui qu’affiche le site (après competitions.json). Pour chacun : « de » (« du PSG », « de l’OM »), « ville » (la clé d’une page de ville de villes.json, ou rien) et, pour une compétition, son adresse et une phrase vraie pour toujours. Garde les mots entre accolades ({club}, {jour}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation, rien qui dépende du moment : le générateur dit lui-même ce qui change (les matchs, les bars, l’heure). Une page avec moins de 2 matchs à venir reste en ligne, en noindex, et le dit. Retirer un club ou une compétition de cette liste efface sa page au passage suivant : retire aussi son lien du guide (trouver-un-bar-qui-diffuse-le-match.html) et de llms.txt.",
   "clubs": {
     "psg": {
       "de": "du PSG",
@@ -58,7 +58,7 @@
     },
     "LaLiga": {
       "cle": "liga",
-      "nom": "la Liga",
+      "nom": "LaLiga",
       "phrase": "LaLiga est le championnat d’Espagne. Les heures écrites ici sont celles de Paris."
     },
     "Serie A": {
@@ -88,7 +88,7 @@
   "sansBar": "Aucun bar ne diffuse encore un de ces matchs sur Baromatch.",
   "prochaineSoiree": "Son prochain match {de} :",
   "barsEnCompte": "{bars} sur Baromatch.",
-  "titreClubs": "Les clubs français de {nom}",
+  "titreClubs": "Les clubs qui ont leur page sur Baromatch",
   "titreTrouver": "Trouver un bar qui diffuse le match",
   "ville": "Les bars de {ville} sur Baromatch, et ce qu’il faut savoir avant d’y aller :",
   "chaine": "Baromatch ne dit pas sur quelle chaîne passe un match : il montre les bars qui le diffusent. Sur Baromatch, ce sont les bars eux-mêmes qui annoncent les matchs qu’ils diffusent ; ailleurs, appelle le bar avant de partir.",
@@ -111,9 +111,12 @@
   "chapeauBars": " et les bars qui diffusent chacun sur Baromatch",
   "descriptionSansBar": "{n} {de} au programme, à l’heure de Paris, avec la compétition et le coup d’envoi. Le prochain : {prochain}.",
   "descriptionCompetitionSansBar": "{n} de {nom} au programme, à l’heure de Paris, avec les clubs, le jour et le coup d’envoi de chacun.",
-  "prochain": "Le prochain : {match}, {quand}, en {competition}, {lieu}.",
+  "prochain": "Le prochain : {match}, {quand}, {competition}, {lieu}.",
   "domicile": "à domicile",
   "exterieur": "à l’extérieur",
   "prochainCompetition": "Le prochain : {match}, {quand}.",
-  "clubDeLaCompetition": "{n} en {nom}"
+  "clubDeLaCompetition": "{n} en {nom}",
+  "titreSansBar": "Matchs {de} : quand et où les regarder",
+  "titreCompetitionSansBar": "{competition} : quand et où regarder les matchs",
+  "villeSansBar": "Ce qu’il faut savoir pour regarder le match à {ville} :"
 }

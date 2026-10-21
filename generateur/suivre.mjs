@@ -5,10 +5,12 @@
 // Paris, vers leur page quand ils en ont une), les vrais bars publiés qui en diffusent un (le nom vers sa page, sa
 // prochaine soirée), et ce que le site sait faire pour ce club (son agenda, la page de sa ville, le guide). Aucune
 // chaîne : les données n’en donnent pas, la page le dit. Aucune offre de bar, aucun score.
-// L’index : une page avec au moins un match à venir au programme (ni reporté ni annulé) est indexable, même sans vrai
-// bar, comme l’affiche de la semaine : elle répond à une vraie question (quand joue ce club, à quelle heure, et où le
-// voir) avec des données vraies, et elle le dit quand aucun bar ne diffuse encore ses matchs. Sans match à venir, la
-// page reste à son adresse (aucun lien ne meurt), en noindex, et le dit.
+// L’index : une page avec au moins 2 matchs à venir au programme (ni reportés ni annulés, MATCHS_POUR_L_INDEX) est
+// indexable, même sans vrai bar, comme l’affiche de la semaine : elle répond à une vraie question (quand joue ce club,
+// à quelle heure, et où le voir) avec des données vraies, et elle le dit quand aucun bar ne diffuse encore ses matchs.
+// Son titre ne promet un bar que si elle en montre un (« Où regarder les matchs du PSG dans un bar ») ; sans bar,
+// « Matchs du PSG : quand et où les regarder ». En dessous de 2 matchs, la page reste à son adresse (aucun lien ne
+// meurt), en noindex, et le dit.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { cheminDuCalendrier, clubsDeLigue1, lienVersLAgenda, webcalDe } from './agenda.mjs';
@@ -24,6 +26,8 @@ export const cheminDuClub = (cle) => `/matchs/club/${cle}/`;
 export const cheminDeLaCompetition = (cle) => `/matchs/competition/${cle}/`;
 // Le guide écrit à la main : comment trouver un bar qui diffuse le match.
 export const CHEMIN_DU_GUIDE = '/trouver-un-bar-qui-diffuse-le-match.html';
+// En dessous, une page mince : noindex.
+export const MATCHS_POUR_L_INDEX = 2;
 
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const clubsSuivis = (t) => Object.entries(t.clubs).filter(([cle]) => !cle.startsWith('_'));
@@ -67,6 +71,8 @@ export const fabriquerLesPagesSuivies = ({ donnees, contenu, cadre, avecPresse =
   const semaine = { nom: textes.fil.matchs, chemin: '/matchs/' };
   const ligue1 = new Set(clubsDeLigue1(donnees.matchs).map((c) => c.cle));
   const sortie = [];
+  // Les villes où Baromatch a de vrais bars publiés.
+  const barsDeLaVille = new Set(donnees.bars.map((b) => b.ville.cle));
 
   const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
   const quandCourt = (m) => (m.heureConfirmee ? `${jourEnLettres(m.debut)} à ${heureDeParis(m.debut)}` : `${jourEnLettres(m.debut)}, heure à confirmer`);
@@ -117,6 +123,7 @@ ${matchs.map(ligne).join('\n')}
   };
   // Le nombre de matchs à venir et le dernier jour qu’ils atteignent : « 4 matchs au programme de Baromatch, jusqu’au
   // dimanche 8 novembre ».
+  // matchs : ceux qui se jouent (ni reportés ni annulés), comme la description.
   const chapeau = (modele, matchs, soirees) => (matchs.length
     ? remplir(modele, { n: capitale(accorder(matchs.length, 'match', 'matchs')), jour: jourEnLettres(matchs.at(-1).debut), bars: soirees.length ? t.chapeauBars : '' })
     : t.chapeauSansMatch);
@@ -126,7 +133,7 @@ ${matchs.map(ligne).join('\n')}
   const description = (...candidats) => candidats.find((d) => d.length >= 70 && d.length <= 160) ?? candidats.at(-1);
   const nBars = (soirees) => accorder(soirees.length, 'bar');
   const sectionTrouver = (ville) => {
-    const guide = ville && villes[ville] ? `  <p>${e(remplir(t.ville, { ville: villes[ville].nom }))} <a href="${cheminDeLaVille({ cle: ville })}">${e(remplir(textes.ville.titre, { ville: villes[ville].nom }))}</a></p>\n` : '';
+    const guide = ville && villes[ville] ? `  <p>${e(remplir(barsDeLaVille.has(ville) ? t.ville : t.villeSansBar, { ville: villes[ville].nom }))} <a href="${cheminDeLaVille({ cle: ville })}">${e(remplir(textes.ville.titre, { ville: villes[ville].nom }))}</a></p>\n` : '';
     return `<section class="regarder-section" aria-labelledby="titre-trouver">
   <h2 id="titre-trouver">${e(t.titreTrouver)}</h2>
 ${guide}  <p>${e(t.chaine)}</p>
@@ -143,9 +150,9 @@ ${guide}  <p>${e(t.chaine)}</p>
     const nomComplet = donnees.matchs.flatMap((m) => [m.domicile, m.exterieur]).find((c) => c.cle === cle)?.nom || court;
     const matchs = aVenir.filter((m) => m.domicile.cle === cle || m.exterieur.cle === cle);
     const joues = matchs.filter((m) => !m.statut);
-    const indexable = joues.length > 0;
+    const indexable = joues.length >= MATCHS_POUR_L_INDEX;
     const soirees = barsDe(matchs);
-    const h1 = remplir(t.titre, { de: club.de });
+    const h1 = remplir(soirees.length ? t.titre : t.titreSansBar, { de: club.de });
     const titrePage = titreDe(h1);
     const prochain = joues[0];
     const desc = prochain
@@ -176,7 +183,7 @@ ${guide}  <p>${e(t.chaine)}</p>
 <header class="regarder-tete">
   <p class="regarder-surtitre">${e(t.surtitreClub)}</p>
   <h1 class="regarder-titre">${e(h1)}</h1>
-  <p class="regarder-chapeau">${e(chapeau(t.chapeauClub, matchs, soirees))}</p>
+  <p class="regarder-chapeau">${e(chapeau(t.chapeauClub, joues, soirees))}</p>
 ${prochain ? `  <p class="regarder-quand">${e(remplir(t.prochain, { match: `${prochain.domicile.nom} – ${prochain.exterieur.nom}`, quand: quandCourt(prochain), competition: prochain.competition, lieu: prochain.domicile.cle === cle ? t.domicile : t.exterieur }))}</p>\n` : ''}</header>
 ${sectionMatchs(remplir(t.titreMatchs, { de: club.de }), matchs, competitions)}
 ${sectionBars(soirees, club.de)}
@@ -190,9 +197,9 @@ ${agenda}${sectionTrouver(club.ville)}
     const chemin = cheminDeLaCompetition(competition.cle);
     const matchs = aVenir.filter((m) => m.competition === nom);
     const joues = matchs.filter((m) => !m.statut);
-    const indexable = joues.length > 0;
+    const indexable = joues.length >= MATCHS_POUR_L_INDEX;
     const soirees = barsDe(matchs);
-    const h1 = remplir(t.titreCompetition, { nom: competition.nom });
+    const h1 = remplir(soirees.length ? t.titreCompetition : t.titreCompetitionSansBar, { nom: competition.nom, competition: nom });
     const titrePage = titreDe(h1);
     const desc = joues.length
       ? remplir(soirees.length ? t.descriptionCompetition : t.descriptionCompetitionSansBar, { n: capitale(accorder(joues.length, 'match', 'matchs')), nom: competition.nom, bars: nBars(soirees), diffuse: soirees.length > 1 ? 'diffusent' : 'diffuse' })
@@ -218,7 +225,7 @@ ${suivis.map(([cle]) => `    ${ligneDeListe(e(clubs[cle]?.court ?? cle), cheminD
 <header class="regarder-tete">
   <p class="regarder-surtitre">${e(t.surtitreCompetition)}</p>
   <h1 class="regarder-titre">${e(h1)}</h1>
-  <p class="regarder-chapeau">${e(chapeau(t.chapeauCompetition, matchs, soirees))}</p>
+  <p class="regarder-chapeau">${e(chapeau(t.chapeauCompetition, joues, soirees))}</p>
   <p class="regarder-chapeau">${e(competition.phrase)}</p>
 ${joues[0] ? `  <p class="regarder-quand">${e(remplir(t.prochainCompetition, { match: `${joues[0].domicile.nom} – ${joues[0].exterieur.nom}`, quand: quandCourt(joues[0]) }))}</p>\n` : ''}</header>
 ${sectionMatchs(remplir(t.titreMatchsCompetition, { nom: competition.nom }), matchs)}

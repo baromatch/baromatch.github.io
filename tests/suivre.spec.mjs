@@ -1,7 +1,8 @@
 // Les pages « Où regarder les matchs de … dans un bar » (generateur/suivre.mjs) : une par club et par compétition de
 // contenu/suivre.json, faites des vraies données. Sur le scénario inventé (de vrais bars) et sur la copie enregistrée
 // des listes publiques (aucun bar publié : la réalité d’aujourd’hui) :
-// - indexable avec un match à venir, noindex sans, et la page le dit ;
+// - indexable avec au moins 2 matchs à venir, noindex en dessous, et la page le dit ;
+// - un titre qui ne promet un bar que si la page en montre un ;
 // - seulement les vrais bars publiés, jamais une offre, jamais une chaîne ;
 // - des titres, des descriptions et des h1 tous différents, et pas de pages presque identiques ;
 // - la semaine, chaque page de match et le guide mènent à elles ; elles mènent aux matchs et à agenda/.
@@ -53,7 +54,7 @@ test('un club avec des matchs à venir et de vrais bars : indexable, ses matchs 
   expect(psg.contenu).toContain('<h1 class="regarder-titre">Où regarder les matchs du PSG dans un bar</h1>');
   expect(psg.description).toBe('4 matchs du PSG au programme, à l’heure de Paris, et 3 bars qui en diffusent sur Baromatch. Le prochain : PSG – Barça, samedi 24 octobre à 21:00.');
   expect(psg.contenu).toContain('<a class="regarder-matchs__match" href="/matchs/psg-ol-2026-10-25/">PSG – OL</a>');
-  expect(psg.contenu).toContain(fine('Le prochain : Paris Saint-Germain – FC Barcelona, samedi 24 octobre à 21:00, en Ligue des champions, à domicile.'));
+  expect(psg.contenu).toContain(fine('Le prochain : Paris Saint-Germain – FC Barcelona, samedi 24 octobre à 21:00, Ligue des champions, à domicile.'));
   // Les vrais bars publiés seulement, et jamais leur offre (loi Evin) : leur nom, leur adresse, leur prochain match.
   expect(psg.contenu).toContain('<a href="/bar/le-zinc-des-amis-paris-11/">Le Zinc des Amis</a>');
   expect(psg.barsNommes.sort()).toEqual(['b-comptoir', 'b-gones', 'b-zinc']);
@@ -76,12 +77,18 @@ test('sans match à venir : la page reste, en noindex, et le dit', () => {
   expect(corps(monaco)).toContain('Aucun bar ne diffuse encore un de ces matchs sur Baromatch.');
   const europa = pageDe(scenario, '/matchs/competition/ligue-europa/');
   expect(europa.indexable).toBe(false);
+  // Un seul match à venir (Lille – Lens) : une page mince, en noindex.
+  const lille = pageDe(scenario, '/matchs/club/lille/');
+  expect(lille.indexable).toBe(false);
+  expect(robotsDe(lille)).toBe('noindex');
+  expect(lille.titre).toBe('Matchs de Lille : quand et où les regarder — Baromatch');
 });
 
-test('aujourd’hui, sans aucun bar publié : indexable avec un match à venir, sans rien promettre', () => {
+test('aujourd’hui, sans aucun bar publié : indexable avec des matchs à venir, sans rien promettre, titre compris', () => {
   for (const chemin of CHEMINS) {
     const p = pageDe(capture, chemin);
     expect(p.indexable, chemin).toBe(true);
+    expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus/iu);
     expect(corps(p), chemin).toContain('Aucun bar ne diffuse encore un de ces matchs sur Baromatch.');
     // La description ne compte aucun bar, le chapeau ne promet pas de bars.
     expect(p.description, chemin).not.toMatch(/\d+ bars? qui/);
@@ -112,9 +119,8 @@ test('des titres, des descriptions et des h1 tous différents, aux bonnes longue
       expect(p.description.length, p.chemin).toBeGreaterThanOrEqual(70);
       expect(p.description.length, p.chemin).toBeLessThanOrEqual(160);
     }
-    // Deux pages indexables de la liste ne partagent pas plus de 70 % de leurs suites de cinq mots (le corps, sans l’en-tête ni le
-    // pied du site) : le gabarit ne prend pas le pas sur les données. Le plus proche : deux clubs dont le seul match à
-    // venir est le même (Lille – Lens, dans le scénario), autour de 68 %.
+    // Deux pages indexables de la liste ne partagent pas plus de 60 % de leurs suites de cinq mots (le corps, sans
+    // l’en-tête ni le pied du site) : le gabarit ne prend pas le pas sur les données.
     const suites = (p) => {
       const mots = corps(p).toLowerCase().split(/\s+/);
       return new Set(mots.slice(0, -4).map((_, i) => mots.slice(i, i + 5).join(' ')));
@@ -126,7 +132,7 @@ test('des titres, des descriptions et des h1 tous différents, aux bonnes longue
         const [a, A] = toutes[i];
         const [b, B] = toutes[j];
         const communes = [...A].filter((s) => B.has(s)).length;
-        expect(communes / (A.size + B.size - communes), `${a} et ${b}`).toBeLessThan(0.7);
+        expect(communes / (A.size + B.size - communes), `${a} et ${b}`).toBeLessThan(0.6);
       }
     }
   }

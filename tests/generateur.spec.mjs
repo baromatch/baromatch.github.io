@@ -779,7 +779,7 @@ test.describe('les pages', () => {
     // et les pages des clubs et des compétitions qui ont un match à venir (suivre.mjs).
     expect(capture.pages.filter((p) => p.indexable).map((p) => p.chemin).sort()).toEqual([...PAGES_SUIVIES, '/agenda/'].sort());
     // Aucun titre de match ni de ville ne promet de bars, en français comme en anglais, même coupé (des noms longs).
-    const sansBar = capture.pages.filter((p) => ['match', 'match-en', 'ville'].includes(p.type));
+    const sansBar = capture.pages.filter((p) => ['match', 'match-en', 'ville', 'club', 'competition'].includes(p.type));
     expect(sansBar.length).toBeGreaterThan(40);
     for (const p of sansBar) {
       expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, p.chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus/iu);

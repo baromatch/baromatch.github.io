@@ -11,15 +11,16 @@ ton domaine ou ta voix. Chaque étape dit combien de temps elle prend et si elle
 
 1. **Google Search Console** : relier le domaine et envoyer le plan du site (20 minutes, gratuit).
 2. **Bing Webmaster Tools** : l’importer depuis Google (5 minutes, gratuit).
-3. **Les premiers bars qui acceptent par écrit** : chaque bar publié rend indexables les pages de ses matchs, de sa
-   ville, « Ce soir » et la semaine. C’est ce qui fera le plus pour être trouvé.
+3. **Les premiers bars qui acceptent par écrit** : dès le premier bar publié, « Ce soir », la semaine et la page de sa
+   ville (Paris, Lyon, Marseille ou Lille) entrent dans Google ; une page de match y entre dès que 2 bars le
+   diffusent. C’est ce qui fera le plus pour être trouvé.
 
 ---
 
 ## 1. Google Search Console (20 minutes, gratuit)
 
 Le site a déjà une balise de vérification Google dans l’accueil. Si tu as déjà accès à Search Console pour
-baromatch.fr, passe directement à l’étape 1.5.
+baromatch.fr, passe directement à l’étape 6.
 
 1. Va sur https://search.google.com/search-console et connecte-toi avec ton compte Google.
 2. Clique sur « Ajouter une propriété », choisis **« Domaine »** (la case de gauche), et écris `baromatch.fr`
@@ -71,7 +72,7 @@ pas. Reprends les phrases de la page Presse : elles sont justes et déjà relues
 - **Annuaires de startups françaises** : la communauté French Tech de ta ville (renseigne-toi sur ses conditions),
   Station F (seulement si tu y es). Une ligne vraie, le lien du site. Les pages « entreprise » payantes (comme celles
   des sites d’emploi) ne servent à rien pour l’instant 💶.
-- **Product Hunt** : plutôt le jour de l’ouverture au public, pas avant (une seule chance de lancement).
+- **Product Hunt** : plutôt le jour de l’ouverture au public, pas avant : c’est là qu’un lancement attire le plus de monde.
 
 **Le jour où l’appli est dans Google Play :**
 
@@ -121,7 +122,12 @@ Dans **Bing Webmaster Tools** : les mêmes chiffres, en plus petit.
 Note-les dans un tableau, une ligne par mois : impressions, clics, pages indexées. Trois mois suffisent pour voir si
 ça marche.
 
-## 7. Le jour où l’appli ouvre au public
+## 7. Le 1er novembre, et le jour où l’appli ouvre au public
+
+**Le 1er novembre** : l’accueil, À propos et llms.txt disent « En octobre 2026, l’appli est en
+test ». Demande à Claude de mettre le mois à jour (ou de l’écrire autrement), sinon la phrase vieillit.
+
+**Le jour de l’ouverture** :
 
 Dis-le à Claude : il faut changer marque.json (« ouverte » et le lien Google Play), et les phrases « en test » de
 l’accueil, d’À propos, de la page Presse et de llms.txt, toutes ensemble, le même jour. Pas avant : le site ne dit

@@ -68,7 +68,7 @@ test('à propos : ce qu’est Baromatch avec les mots de marque.json, où il en 
   const texte = normaliser(await page.locator('main').textContent());
   expect(normaliser(await page.locator('.document__chapeau').textContent())).toBe(normaliser(MARQUE.description));
   const titres = (await page.locator('main h2').allTextContents()).map(normaliser);
-  expect(titres).toEqual(['Pourquoi Baromatch existe', 'Ce que fait l’appli', 'Où en est Baromatch', 'Paris d’abord', 'Les règles qu’on s’impose', 'Qui publie Baromatch', 'Nous écrire']);
+  expect(titres).toEqual(['En bref', 'Pourquoi Baromatch existe', 'Ce que fait l’appli', 'Où en est Baromatch', 'Paris d’abord', 'Les règles qu’on s’impose', 'Qui publie Baromatch', 'Nous écrire']);
   if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle n’est pas encore ouverte au public, ni sur iPhone');
   // L’éditeur, comme les mentions légales le nomment ; rien d’autre sur le fondateur.
   await page.goto('/mentions-legales.html');

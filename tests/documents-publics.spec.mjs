@@ -119,6 +119,14 @@ const NOMS = [
 ];
 
 // ---------- Les exceptions ----------
+// Les seuls documents du dossier des documents : ceux du site lui-même (son référencement), écrits pour Skander, hors
+// de l’index (robots.txt). Seul leur chemin est permis ; leur texte est lu comme celui de tout autre fichier, avec une
+// exception : l’audit cite les pages de la documentation de Google, dont l’adresse a la forme d’un chemin de
+// documents (chacune comptée). Leurs noms sont écrits en morceaux, pour que ce fichier ne les contienne pas.
+const AUDIT_SEO = ['d', 'ocs/SEO-AUDIT-2026-10.m', 'd'].join('');
+const A_FAIRE_SEO = ['d', 'ocs/SEO-A-FAIRE-PAR-SKANDER.m', 'd'].join('');
+const DOCUMENTS_DU_SITE = [AUDIT_SEO, A_FAIRE_SEO];
+
 // Le texte que le visiteur lit exprès, et ses copies mot pour mot dans les tests. [fichier, motif, nombre] : le motif y
 // est permis exactement ce nombre de fois. Une occurrence de plus est une fuite ; une de moins, une exception à retirer.
 const EXCEPTIONS = [
@@ -148,6 +156,8 @@ const EXCEPTIONS = [
   // Le drapeau de Chromium qui le fait passer à côté de l’intermédiaire réseau de la machine de test, pour joindre le
   // serveur local à la place de baromatch.fr (Lighthouse avec la mesure d’audience) : rien sur le serveur de l’appli.
   ['tests/outils/lighthouse-mesure.mjs', 'reseau', 1],
+  // L’audit SEO : les adresses des pages de Google Search Central qu’il cite (developers.google.com/search/…).
+  [AUDIT_SEO, 'chemin', 20],
 ];
 
 // ---------- La recherche ----------
@@ -212,7 +222,8 @@ test('chaque exception vise un fichier publié, et un motif ou une empreinte de 
 });
 
 test('aucun chemin de fichier publié n’a la forme d’un renvoi au dépôt privé', () => {
-  expect(FICHIERS.flatMap((fichier) => fuites(fichier, fichier, { motifs: FORMES, exceptions: [] })
+  expect(FICHIERS.filter((fichier) => fichier.split('/')[0] === AUDIT_SEO.split('/')[0] && !DOCUMENTS_DU_SITE.includes(fichier))).toEqual([]);
+  expect(FICHIERS.filter((fichier) => !DOCUMENTS_DU_SITE.includes(fichier)).flatMap((fichier) => fuites(fichier, fichier, { motifs: FORMES, exceptions: [] })
     .map((fuite) => `${fichier} : ${fuite}`))).toEqual([]);
 });
 

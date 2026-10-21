@@ -16,6 +16,7 @@ import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
 import { appel, carteDuBar, commentCaMarche, fil, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
+import { lienDeLaCompetition, lienDuClub, sectionDesPagesSuivies } from './suivre.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
 export const SEMAINE_JOURS = 7;
@@ -137,6 +138,10 @@ export const fabriquerLesPages = ({
       && [m.domicile.cle, m.exterieur.cle].some((cle) => cle === match.domicile.cle || cle === match.exterieur.cle))
     .sort((a, b) => a.debut - b.debut);
 
+  // Les pages des clubs suivis et de la compétition d’un match (suivre.mjs) : « Les matchs du PSG et où les voir ».
+  const suivis = (match) => [lienDuClub(match.domicile.cle), lienDuClub(match.exterieur.cle), lienDeLaCompetition(match.competition)]
+    .filter(Boolean).map((lien) => `\n  <p class="regarder-suite">${lien}</p>`).join('');
+
   // ---------- Les pages des matchs ----------
   for (const match of [...avecPage, ...disparus]) {
     const chemin = cheminDuMatch(match);
@@ -228,7 +233,7 @@ ${places}  ${appel(marque, textes)}
   <h2 id="titre-prochains">${e(remplir(textes.match.prochains, { clubs }))}</h2>
 ${prochains.length ? `  <ul class="regarder-matchs">
 ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), suite: statutDuMatch(m, textes) })}`).join('\n')}
-  </ul>` : `  <p>${e(textes.match.aucunProchain)}</p>`}
+  </ul>` : `  <p>${e(textes.match.aucunProchain)}</p>`}${suivis(match)}
 </section>`;
     ajouter({
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
@@ -301,7 +306,8 @@ ${ensuite.length ? `<section class="regarder-section" aria-labelledby="titre-ens
   <ul class="regarder-matchs">
 ${ensuite.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: etatDuMatch(m) })}`).join('\n')}
   </ul>
-</section>\n` : ''}${afficheDeLaSemaine ? `${afficheDeLaSemaine()}\n` : ''}<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
+</section>\n` : ''}${sectionDesPagesSuivies({ clubs: contenu.clubs, aVenir: donnees.matchs.filter(enCoursOuAVenir) })}
+${afficheDeLaSemaine ? `${afficheDeLaSemaine()}\n` : ''}<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
 ${appel(marque, textes)}
 ${commentCaMarche(textes, marque)}`,
     });

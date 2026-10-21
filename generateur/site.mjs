@@ -14,6 +14,7 @@ import { lireLeCadre } from './gabarits.mjs';
 import { controlerLaPage } from './controle.mjs';
 import { lireLaMesure } from './mesure.mjs';
 import { fabriquerLesPages } from './pages.mjs';
+import { fabriquerLesPagesSuivies } from './suivre.mjs';
 import { lireLaSource } from './sources.mjs';
 import { chargerLeVocabulaire, validerLaPage } from './validateur.mjs';
 
@@ -36,6 +37,9 @@ export const construireEnMemoire = async ({
   });
   // « Ce soir » (/ce-soir/) : les places de ses bars viennent de la liste brute des soirées.
   pages.push(fabriquerCeSoir({ donnees, contenu, cadre, avecPresse, pages, nuits: listes.matchNights, images }));
+  // « Où regarder les matchs de … dans un bar » (/matchs/club/…/ et /matchs/competition/…/) : un club ou une compétition
+  // de la liste (suivre.mjs), ses matchs à venir et les vrais bars qui les diffusent.
+  pages.push(...fabriquerLesPagesSuivies({ donnees, contenu, cadre, avecPresse, pages }));
   // « Ton club dans ton agenda » (/agenda/) : la page ; ses fichiers d’agenda s’écrivent à côté (construire.mjs).
   pages.push(fabriquerLaPageAgenda({ donnees, contenu, cadre, avecPresse }));
   // Les affiches à imprimer (affiche.mjs), seulement avec l’encodeur des QR codes (qr.mjs) : sinon, aucune.

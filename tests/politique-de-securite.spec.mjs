@@ -27,6 +27,7 @@ const PAGES = [
   { chemin: '/presse.html', connect: [], formulaire: [] },
   { chemin: '/a-propos.html', connect: [], formulaire: [] },
   { chemin: '/comment-on-choisit-les-bars.html', connect: [], formulaire: [] },
+  { chemin: '/trouver-un-bar-qui-diffuse-le-match.html', connect: [], formulaire: [] },
   { chemin: '/404.html', connect: [API], formulaire: [] },
 ];
 

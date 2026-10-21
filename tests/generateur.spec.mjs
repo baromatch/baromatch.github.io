@@ -34,6 +34,11 @@ const VENDREDI = Date.parse('2026-10-23T08:00:00Z');
 const ENREGISTREMENT = Date.parse('2026-10-15T19:44:29Z');
 // Le contenu du dépôt, et les bars du scénario dans la liste des bars publiés (vide dans le dépôt aujourd’hui).
 const contenu = contenuDuScenario();
+// Les pages des clubs et des compétitions suivis (suivre.mjs), toutes avec un match à venir dans la copie enregistrée.
+const PAGES_SUIVIES = [
+  ...['psg', 'om', 'ol', 'lille', 'lens', 'monaco', 'nice', 'rennes'].map((cle) => `/matchs/club/${cle}/`),
+  ...['ligue-1', 'ligue-des-champions', 'ligue-europa', 'ligue-conference', 'premier-league', 'liga', 'serie-a', 'bundesliga'].map((cle) => `/matchs/competition/${cle}/`),
+];
 
 const donneesDu = async (source, maintenant) => preparer(await lireLaSource(source), { maintenant, ...contenu });
 
@@ -768,18 +773,20 @@ test.describe('les pages', () => {
     }
   });
 
-  test('la copie enregistrée de ce soir : zéro vrai bar, donc chaque page en noindex', async () => {
+  test('la copie enregistrée de ce soir : zéro vrai bar, donc chaque page en noindex, sauf les outils faits des vrais matchs', async () => {
     const capture = await construireEnMemoire({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT, racine, contenu });
-    expect(capture.pages.filter((p) => p.indexable).map((p) => p.chemin)).toEqual([]);
+    // Sans aucun bar, seuls restent dans l’index ce qui ne nomme aucun bar et répond avec les vrais matchs : agenda/,
+    // et les pages des clubs et des compétitions qui ont un match à venir (suivre.mjs).
+    expect(capture.pages.filter((p) => p.indexable).map((p) => p.chemin).sort()).toEqual([...PAGES_SUIVIES, '/agenda/'].sort());
     // Aucun titre de match ni de ville ne promet de bars, en français comme en anglais, même coupé (des noms longs).
-    const sansBar = capture.pages.filter((p) => ['match', 'match-en', 'ville'].includes(p.type));
+    const sansBar = capture.pages.filter((p) => ['match', 'match-en', 'ville', 'club', 'competition'].includes(p.type));
     expect(sansBar.length).toBeGreaterThan(40);
     for (const p of sansBar) {
       expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, p.chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus/iu);
       expect(p.titre.length, p.chemin).toBeLessThanOrEqual(60);
     }
     expect(capture.pages.filter((p) => p.type === 'bar')).toEqual([]);
-    expect(capture.pages.every((p) => robotsDe(p) === 'noindex')).toBe(true);
+    expect(capture.pages.filter((p) => !p.indexable).every((p) => robotsDe(p) === 'noindex')).toBe(true);
     for (const p of capture.pages) expect(p.contenu, p.chemin).not.toMatch(/démo|Rivoli/i);
   });
 });
@@ -1340,11 +1347,11 @@ test.describe('d’un passage à l’autre', () => {
   test('la prudence : un passage qui ferait disparaître plus de la moitié des pages n’écrit rien', async () => {
     // Les données manquantes ne vident pas le site : un match ou un bar absent garde sa page 30 jours (plus haut).
     // Mais un passage qui supprimerait d’un coup plus de la moitié des pages publiées (ici, après une longue pause,
-    // quarante pages de matchs de septembre arrivées au bout de leurs 30 jours) s’arrête et le dit.
+    // soixante pages de matchs de septembre arrivées au bout de leurs 30 jours) s’arrête et le dit.
     const sortie = dossierVide();
     await passer(sortie, '2026-10-23T08:00:00Z');
     const etat = etatDe(sortie);
-    for (let i = 1; i <= 40; i += 1) {
+    for (let i = 1; i <= 60; i += 1) {
       const slug = `vieux-match-${i}-2026-09-01`;
       etat.pages[`/matchs/${slug}/`] = { type: 'match', cle: slug, date: '2026-09-01T18:00:00.000Z', empreinte: 'x', change: '2026-09-01', indexable: false,
         memoire: { slug, ids: [slug], debut: '2026-09-01T18:00:00.000Z', heureConfirmee: true, competition: 'Ligue 1', domicile: { cle: 'a', court: 'A', nom: 'A' }, exterieur: { cle: 'b', court: 'B', nom: 'B' } } };
@@ -1352,9 +1359,10 @@ test.describe('d’un passage à l’autre', () => {
     writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
     // Les pages du scénario : 21 en français (8 matchs, la semaine, 5 villes et leur index, 5 bars, « Ce soir »),
-    // la page agenda/, 6 affiches à imprimer (celle de la semaine, une par vrai bar publié) et 6 pages en anglais
-    // (3 guides, 3 matchs) : 34, et les 40 vieux matchs, 74 (30 vieux matchs n’en feraient plus la moitié).
-    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 40 des 74 pages publiées : rien n’est écrit/);
+    // la page agenda/, 6 affiches à imprimer (celle de la semaine, une par vrai bar publié), 6 pages en anglais
+    // (3 guides, 3 matchs) et 16 pages de clubs et de compétitions : 50, et les 60 vieux matchs, 110 (50 vieux matchs
+    // n’en feraient pas plus de la moitié).
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 60 des 110 pages publiées : rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
     // Voulu : relancé en le disant, le passage les supprime.
     await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });
@@ -1427,17 +1435,19 @@ test.describe('d’un passage à l’autre', () => {
     expect(page).toContain('<summary>Ton badge, pour ton site</summary>');
   });
 
-  test('la copie enregistrée de ce soir, écrite : tout en noindex sauf l’affiche de la semaine, le plan du site inchangé à part elle', async () => {
+  test('la copie enregistrée de ce soir, écrite : tout en noindex sauf les outils faits des vrais matchs, le plan du site inchangé à part eux', async () => {
     const sortie = dossierVide();
     const resultat = await construire({ source: `capture:${CAPTURE}`, sortie, maintenant: ENREGISTREMENT, racine, contenu });
-    // L’affiche de la semaine est un outil fait des vrais matchs, qui ne nomme aucun bar : indexable même sans vrai bar
-    // (tests/affiche.spec.mjs). Rien d’autre.
-    expect(resultat.changees).toEqual(['https://baromatch.fr/matchs/affiche/']);
-    expect(Object.entries(etatDe(sortie).pages).filter(([, p]) => p.indexable).map(([chemin]) => chemin)).toEqual(['/matchs/affiche/']);
-    // La mise à jour automatique écrit déjà l’affiche dans le sitemap.xml enregistré : on la retire des deux côtés.
-    const sansLAffiche = (xml) => xml.replace(/\r\n/g, '\n').split('\n').filter((l) => !l.includes('<loc>https://baromatch.fr/matchs/affiche/</loc>')).join('\n');
-    expect(sansLAffiche(plan(sortie))).toBe(sansLAffiche(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')));
-    expect(plan(sortie)).toContain('<loc>https://baromatch.fr/matchs/affiche/</loc>');
+    // L’affiche de la semaine, agenda/ et les pages des clubs et des compétitions qui ont un match à venir sont des outils
+    // faits des vrais matchs, qui ne nomment aucun bar : indexables même sans vrai bar (tests/affiche.spec.mjs,
+    // tests/agenda.spec.mjs, tests/suivre.spec.mjs). Rien d’autre.
+    const outils = ['/agenda/', '/matchs/affiche/', ...PAGES_SUIVIES].sort();
+    expect([...resultat.changees].sort()).toEqual(outils.map((c) => `https://baromatch.fr${c}`).sort());
+    expect(Object.entries(etatDe(sortie).pages).filter(([, p]) => p.indexable).map(([chemin]) => chemin).sort()).toEqual(outils);
+    // La mise à jour automatique écrit déjà ces pages dans le sitemap.xml enregistré : on les retire des deux côtés.
+    const sansLesOutils = (xml) => xml.replace(/\r\n/g, '\n').split('\n').filter((l) => !outils.some((c) => l.includes(`<loc>https://baromatch.fr${c}</loc>`))).join('\n');
+    expect(sansLesOutils(plan(sortie))).toBe(sansLesOutils(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')));
+    for (const chemin of outils) expect(plan(sortie)).toContain(`<loc>https://baromatch.fr${chemin}</loc>`);
     expect(existsSync(path.join(sortie, 'bar'))).toBe(false);
   });
 });

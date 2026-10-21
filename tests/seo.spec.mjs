@@ -24,7 +24,7 @@ const TITRES_CHOISIS = {
   '/': 'Baromatch — Trouve un bar qui diffuse ton match, à Paris',
   '/boutique.html': 'La boutique Baromatch — pièces pour les soirs de match',
 };
-const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html'];
+const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html', '/trouver-un-bar-qui-diffuse-le-match.html'];
 const TYPES_ATTENDUS = {
   '/': ['Organization', 'WebSite', 'MobileApplication', 'FAQPage'],
   '/boutique.html': ['FAQPage'],
@@ -35,6 +35,7 @@ const TYPES_ATTENDUS = {
   '/presse.html': ['AboutPage', 'BreadcrumbList'],
   '/a-propos.html': ['AboutPage', 'BreadcrumbList'],
   '/comment-on-choisit-les-bars.html': ['WebPage', 'BreadcrumbList'],
+  '/trouver-un-bar-qui-diffuse-le-match.html': ['Article', 'BreadcrumbList'],
 };
 // Ce que le site ne peut pas promettre : ni produit en vente, ni note, ni recherche interne.
 const TYPES_INTERDITS = ['Product', 'Offer', 'AggregateOffer', 'AggregateRating', 'Review', 'SearchAction'];
@@ -124,6 +125,8 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
       expect(og['og:site_name'][0]).toBe('Baromatch');
       expect(og['twitter:card'][0]).toBe('summary_large_image');
       expect(og['twitter:site'][0]).toBe('@baromatchapp');
+      // L’image de la carte X : la même que celle d’Open Graph, dite aussi pour X (qui sinon la devine).
+      expect(og['twitter:image']).toEqual(og['og:image']);
       const image = og['og:image'][0];
       expect(image.startsWith(`${ORIGINE}/`)).toBe(true);
       const fichierImage = fichierDe(new URL(image).pathname);
@@ -379,7 +382,7 @@ test('robots.txt : les outils de vérification hors de l’index, le site et ses
   expect(lignes).toContain('User-agent: *');
   expect(lignes).toContain('Allow: /');
   expect(lignes).toContain(`Sitemap: ${ORIGINE}/sitemap.xml`);
-  for (const chemin of ['/tests/', '/package.json', '/package-lock.json', '/playwright.config.mjs', '/generateur/', '/regarder-le-match/etat.json']) {
+  for (const chemin of ['/tests/', '/package.json', '/package-lock.json', '/playwright.config.mjs', '/generateur/', '/docs/', '/regarder-le-match/etat.json']) {
     expect(lignes).toContain(`Disallow: ${chemin}`);
   }
 

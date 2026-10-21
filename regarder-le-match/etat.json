@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "U1AMK4s5gHTAbYa6PD8MsA",
+   "empreinte": "zs90KHyAkf-hrlgo-loU3w",
    "change": "2026-10-21",
    "indexable": false,
    "bars": []
@@ -332,8 +332,8 @@
    "type": "match-en",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "Fsg4zvXpFEaKOjNEe-4xog",
-   "change": "2026-10-20",
+   "empreinte": "VDz2bRz_ZGqGLc_Eheq_Jg",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": []
   },
@@ -429,7 +429,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "n24NY6tLBUsoM-DSsdU2mg",
+   "empreinte": "t8bTbSUW5jV-2hr5JVedlg",
    "change": "2026-10-21",
    "indexable": false,
    "bars": []
@@ -1622,8 +1622,8 @@
    "type": "match",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "pKHXDDAOF0t0PS3wkkJxSw",
-   "change": "2026-10-20",
+   "empreinte": "OHSebVxeVmWPK_-Czme3CA",
+   "change": "2026-10-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1645,13 +1645,6 @@
      "nom": "Galatasaray A.Ş."
     }
    }
-  },
-  "/matchs/lille-galatasaray-2026-10-21/match.ics": {
-   "type": "evenement",
-   "cle": "lille-galatasaray-2026-10-21",
-   "empreinte": "OnyXZ7wkCiz9F1yT1dNEeQ",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/lille-galatasaray-2026-10-21/partage.png": {
    "type": "partage",

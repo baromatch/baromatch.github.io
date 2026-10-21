@@ -5,6 +5,7 @@ Disallow: /package.json
 Disallow: /package-lock.json
 Disallow: /playwright.config.mjs
 Disallow: /generateur/
+Disallow: /docs/
 Disallow: /regarder-le-match/etat.json
 
 Sitemap: https://baromatch.fr/sitemap.xml

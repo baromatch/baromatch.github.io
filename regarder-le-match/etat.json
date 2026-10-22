@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "MO6as6N1-pdx0ZI2u6xtJQ",
+   "empreinte": "6nSVuXqjwcd-7plLYVj-2w",
    "change": "2026-10-22",
    "indexable": false,
    "bars": []
@@ -314,8 +314,8 @@
    "type": "match-en",
    "cle": "juventus-rennes-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "RRdbKeC4r0AYsgOdpiV-Yg",
-   "change": "2026-10-20",
+   "empreinte": "LDrBuqAvBvVKg1RtQGPFnQ",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": []
   },
@@ -413,8 +413,8 @@
    "type": "match-en",
    "cle": "sturm-graz-om-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "vWtBvY9Y6yqS5XS827PRmA",
-   "change": "2026-10-20",
+   "empreinte": "fwz6O1AYGFN2Vrn7F1PZCw",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": []
   },
@@ -438,7 +438,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "542Bd9PcLFMSbiNjuTpH2Q",
+   "empreinte": "Yd11sRv2DQlNIopVRhswxQ",
    "change": "2026-10-22",
    "indexable": false,
    "bars": []
@@ -1451,8 +1451,8 @@
    "type": "match",
    "cle": "juventus-rennes-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "srG-4GlvwhIlXZsBa8bEyQ",
-   "change": "2026-10-21",
+   "empreinte": "Hn5bvktvgphbb4pJM34BKw",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1474,13 +1474,6 @@
      "nom": "Stade Rennais FC"
     }
    }
-  },
-  "/matchs/juventus-rennes-2026-10-22/match.ics": {
-   "type": "evenement",
-   "cle": "juventus-rennes-2026-10-22",
-   "empreinte": "WHxHVdFQ9D6tUGDzUOPkrw",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/juventus-rennes-2026-10-22/partage.png": {
    "type": "partage",
@@ -2712,8 +2705,8 @@
    "type": "match",
    "cle": "sturm-graz-om-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "0WKI9hxw3JSy5_7T_625nQ",
-   "change": "2026-10-21",
+   "empreinte": "2qnEqgUcg-8ZWfFRm18hZA",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2735,13 +2728,6 @@
      "nom": "Olympique de Marseille"
     }
    }
-  },
-  "/matchs/sturm-graz-om-2026-10-22/match.ics": {
-   "type": "evenement",
-   "cle": "sturm-graz-om-2026-10-22",
-   "empreinte": "fcxJtLeoxecJzioPuHdYJg",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/sturm-graz-om-2026-10-22/partage.png": {
    "type": "partage",

@@ -28,6 +28,8 @@ const PAGES = [
   { chemin: '/a-propos.html', connect: [], formulaire: [] },
   { chemin: '/comment-on-choisit-les-bars.html', connect: [], formulaire: [] },
   { chemin: '/trouver-un-bar-qui-diffuse-le-match.html', connect: [], formulaire: [] },
+  // L’inscription au test Android part vers Formspree sans JavaScript (la page n’a aucun script).
+  { chemin: '/testeurs-android.html', connect: [], formulaire: [FORMSPREE] },
   { chemin: '/404.html', connect: [API], formulaire: [] },
 ];
 

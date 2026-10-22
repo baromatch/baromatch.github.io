@@ -68,3 +68,10 @@ test('la page Confidentialité : aucune espace ordinaire dans ses guillemets, co
   const page = readFileSync(path.join(racine, 'confidentialite.html'), 'utf8');
   expect(page.match(/.{0,40}(?:« | »).{0,10}/g) ?? []).toEqual([]);
 });
+
+test('la page « Deviens testeur Android » : une espace insécable dans les guillemets, avant « : ; ? ! », dans le texte qu’on lit', () => {
+  const page = readFileSync(path.join(racine, 'testeurs-android.html'), 'utf8');
+  // Le contenu de la page, sans le pied de page commun (le même sur toutes les pages, gabarits.mjs).
+  const corps = page.slice(page.indexOf('<main'), page.indexOf('</main>'));
+  expect(lisible(corps).match(new RegExp(`.{0,30}(?:${FAUTE.source}).{0,10}`, 'g')) ?? []).toEqual([]);
+});

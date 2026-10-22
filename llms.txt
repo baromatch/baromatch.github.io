@@ -7,7 +7,7 @@ Ton match. Ton bar. Ce soir. Les bars qui diffusent ton match, une place qui t�
 Les faits, pour ne pas se tromper :
 
 - Baromatch est une appli mobile française pour les fans de football. Elle montre les bars qui diffusent un match, garde une place au bar, puis garde la soirée en souvenir : un « sous-bock » dans un album.
-- En octobre 2026, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, ni en téléchargement public sur Google Play, et il n’y a pas encore de version iPhone : on ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site et sur chaque page de ville.
+- Pour l’instant, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, ni en téléchargement public sur Google Play, et il n’y a pas encore de version iPhone : seuls ses testeurs peuvent s’en servir, le public ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site et sur chaque page de ville.
 - Où : à Paris, pour commencer. Pas encore de date pour d’autres villes.
 - Pour qui : les fans de foot de 18 ans et plus, et les bars qui diffusent les matchs.
 - Qui : Baromatch est édité par Skander Kamoun, son fondateur, à titre personnel pour le moment ; la société qui exploitera l’appli est en cours de création.
@@ -24,6 +24,7 @@ Les faits, pour ne pas se tromper :
 
 - [Accueil](https://baromatch.fr/): ce qu’est Baromatch, le film de présentation, et la liste d’attente pour être prévenu à l’ouverture.
 - [Presse](https://baromatch.fr/presse.html): Baromatch en bref, ce qu’il n’est pas, les logos, des images de l’appli et le contact presse.
+- [Deviens testeur Android](https://baromatch.fr/testeurs-android.html): le test fermé de l’appli sur Google Play : qui peut s’inscrire (18 ans ou plus, un téléphone Android, un compte Google), ce que font les testeurs (au moins 14 jours d’affilée, puis leurs retours), et le formulaire. Rien n’est payé.
 - [À propos](https://baromatch.fr/a-propos.html): pourquoi Baromatch existe, où il en est, les règles qu’il s’impose et qui le publie.
 - [Comment on choisit les bars](https://baromatch.fr/comment-on-choisit-les-bars.html): d’où viennent les matchs, qui met à jour les places, quand un bar apparaît sur le site, et ce que Baromatch refuse (faux bars, faux avis, chiffres inventés, promotion de l’alcool, écussons, scores).
 

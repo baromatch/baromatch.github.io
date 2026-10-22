@@ -631,6 +631,27 @@ a:hover { color: var(--goutte); }
 .document ul { padding-left: 1.2em; }
 .document li { margin: 6px 0; }
 
+/* L’inscription au test Android (testeurs-android.html) : un formulaire ordinaire vers Formspree, sans JavaScript ; le
+   navigateur vérifie les champs (required, type="email"). Les champs et la case reprennent ceux de la boutique. */
+.inscription { max-width: 30rem; margin: 20px 0 0; }
+.inscription__etiquette { display: block; margin: 18px 0 6px; color: var(--texte); font-size: 0.9375rem; font-weight: 600; }
+.inscription__champ {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--champ-bord);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--texte);
+  font: inherit;
+}
+.inscription__champ::placeholder { color: var(--texte-discret); }
+.document .inscription__aide { margin: 6px 0 0; font-size: 0.875rem; }
+.inscription__accord { display: flex; align-items: flex-start; gap: 10px; min-height: 44px; margin: 18px 0 0; padding: 10px 0; color: var(--texte-doux); font-size: 0.9375rem; cursor: pointer; }
+.inscription__accord input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ambre); }
+.document .inscription__note { margin: 12px 0 0; font-size: 0.875rem; }
+.inscription__bouton { width: 100%; margin-top: 16px; }
+
 .perdu { text-align: center; padding-top: 48px; padding-bottom: 120px; }
 .perdu .verre { width: 140px; height: 140px; }
 .perdu h1 { font-size: clamp(2.5rem, 9vw, 4rem); }
@@ -856,8 +877,9 @@ a:hover { color: var(--goutte); }
   border-top: 1px solid var(--trait);
 }
 @media (min-width: 720px) { .vitrine-accueil { padding-top: 120px; padding-bottom: 128px; } }
-.vitrine-accueil__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); }
+.vitrine-accueil__texte, .testeurs-accueil__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); }
 .vitrine-accueil__bouton,
+.inscription__bouton,
 .boutique-produit__ajouter,
 .boutique-barre__bouton,
 .panier__envoyer,
@@ -879,6 +901,7 @@ a:hover { color: var(--goutte); }
 }
 .vitrine-accueil__bouton { margin-top: 30px; }
 .vitrine-accueil__bouton:hover,
+.inscription__bouton:hover,
 .boutique-produit__ajouter:hover,
 .boutique-barre__bouton:hover,
 .panier__envoyer:hover,

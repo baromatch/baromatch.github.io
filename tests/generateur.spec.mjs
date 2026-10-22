@@ -1307,7 +1307,8 @@ test.describe('d’un passage à l’autre', () => {
     await passer(sortie, '2026-10-23T08:00:00Z');
     const xml = plan(sortie);
     const lignes = (texte) => texte.split('\n').filter((l) => l.includes('<url>'));
-    const fixes = lignes(fixe).filter((l) => !l.includes('/matchs/'));
+    // Les pages fixes : toutes les lignes qui ne sont pas des pages générées (etat.mjs, GENEREE), agenda/ compris.
+    const fixes = lignes(fixe).filter((l) => !/<loc>https:\/\/baromatch\.fr\/(?:matchs|regarder-le-match|bar|ce-soir|agenda|en)\//.test(l));
     expect(lignes(xml).slice(0, fixes.length)).toEqual(fixes);
     expect(xml).not.toContain('vieux-match');
     const etat = etatDe(sortie);

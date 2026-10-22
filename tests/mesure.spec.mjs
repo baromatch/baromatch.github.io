@@ -75,7 +75,7 @@ test.describe('les pages écrites à la main', () => {
 
   test('la liste : chaque page .html servie, hors des pages générées et des outils', () => {
     expect(PAGES).toEqual(expect.arrayContaining([
-      'index.html', '404.html', 'confidentialite.html', 'pour-les-bars.html', 'cgu.html', 'presse.html', 'a-propos.html', 'comment-on-choisit-les-bars.html',
+      'index.html', '404.html', 'confidentialite.html', 'pour-les-bars.html', 'cgu.html', 'presse.html', 'a-propos.html', 'comment-on-choisit-les-bars.html', 'testeurs-android.html',
     ]));
     expect(PAGES.filter((p) => /^(?:matchs|regarder-le-match|bar|ce-soir|en|agenda|tests|generateur|node_modules)\//.test(p))).toEqual([]);
   });

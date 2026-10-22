@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k58002rryqjqgy3wyyo@baromatch.fr
+DTSTAMP:20261022T213301Z
+SEQUENCE:1
+DTSTART:20261105T174500Z
+DTEND:20261105T194500Z
+SUMMARY:Rennes – Olympiacos
+DESCRIPTION:Ligue Europa · Stade Rennais FC – Olympiacos FC\nCoup d’en
+ voi jeudi 5 novembre à 18:45\, heure de Paris.\nLa page du match : https
+ ://baromatch.fr/matchs/rennes-olympiacos-2026-11-05/
+URL:https://baromatch.fr/matchs/rennes-olympiacos-2026-11-05/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

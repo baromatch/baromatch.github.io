@@ -54,13 +54,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmv6e5k4j002pryqj5q3fdms7@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
+DTSTAMP:20261022T213301Z
+SEQUENCE:1
 DTSTART:20261105T174500Z
 DTEND:20261105T194500Z
 SUMMARY:Real Sociedad – OL
 DESCRIPTION:Ligue Europa · Real Sociedad de Fútbol – Olympique Lyonnais
- \nCoup d’envoi jeudi 5 novembre à 18:45\, heure de Paris.
+ \nCoup d’envoi jeudi 5 novembre à 18:45\, heure de Paris.\nLa page du m
+ atch : https://baromatch.fr/matchs/real-sociedad-ol-2026-11-05/
+URL:https://baromatch.fr/matchs/real-sociedad-ol-2026-11-05/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

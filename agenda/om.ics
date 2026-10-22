@@ -11,20 +11,6 @@ X-WR-CALDESC:OM : les matchs au programme de Baromatch (Ligue 1 et Ligue E
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5jih000xryqjvv55d6np@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
-DTSTART:20261022T164500Z
-DTEND:20261022T184500Z
-SUMMARY:Sturm Graz – OM
-DESCRIPTION:Ligue Europa · SK Sturm Graz – Olympique de Marseille\nCoup 
- d’envoi jeudi 22 octobre à 18:45\, heure de Paris.\nLa page du match :
-  https://baromatch.fr/matchs/sturm-graz-om-2026-10-22/
-URL:https://baromatch.fr/matchs/sturm-graz-om-2026-10-22/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmuy4o383001dzz9w3dcpq9yt@baromatch.fr
 DTSTAMP:20261020T104807Z
 SEQUENCE:0
@@ -54,13 +40,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmv6e5k6h002vryqjzqg0vgjr@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
+DTSTAMP:20261022T213301Z
+SEQUENCE:1
 DTSTART:20261105T200000Z
 DTEND:20261105T220000Z
 SUMMARY:Leverkusen – OM
 DESCRIPTION:Ligue Europa · Bayer 04 Leverkusen – Olympique de Marseille\
- nCoup d’envoi jeudi 5 novembre à 21:00\, heure de Paris.
+ nCoup d’envoi jeudi 5 novembre à 21:00\, heure de Paris.\nLa page du ma
+ tch : https://baromatch.fr/matchs/leverkusen-om-2026-11-05/
+URL:https://baromatch.fr/matchs/leverkusen-om-2026-11-05/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

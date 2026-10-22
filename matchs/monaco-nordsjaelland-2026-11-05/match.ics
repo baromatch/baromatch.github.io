@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k5v002tryqjcmpz58cc@baromatch.fr
+DTSTAMP:20261022T213301Z
+SEQUENCE:1
+DTSTART:20261105T200000Z
+DTEND:20261105T220000Z
+SUMMARY:Monaco – Nordsjælland
+DESCRIPTION:Ligue Conférence · AS Monaco – FC Nordsjælland\nCoup d’e
+ nvoi jeudi 5 novembre à 21:00\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/monaco-nordsjaelland-2026-11-05/
+URL:https://baromatch.fr/matchs/monaco-nordsjaelland-2026-11-05/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

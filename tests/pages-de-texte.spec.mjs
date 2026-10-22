@@ -50,6 +50,7 @@ test('confidentialité : « En bref » en tête, avec la durée de conservation,
   expect(liens).toEqual([
     ['#combien-de-temps', 'Combien de temps on garde tes données'],
     ['#liste-attente', 'ton adresse de la liste d’attente'],
+    ['#testeurs-android', 'ton inscription au test Android'],
     ['/supprimer-mon-compte.html', 'Supprimer ton compte'],
     ['mailto:contact@baromatch.fr', 'contact@baromatch.fr'],
   ]);

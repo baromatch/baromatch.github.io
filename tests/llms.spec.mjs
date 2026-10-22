@@ -37,7 +37,7 @@ test('les liens : les pages du site (chacune avec son fichier), le contact et le
   const adresses = liens.map((l) => l.adresse);
   for (const chemin of [
     '/', '/pour-les-bars.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html', '/ce-soir/', '/matchs/', '/regarder-le-match/',
-    '/agenda/', '/en/', '/matchs/affiche/', '/cgu.html', '/confidentialite.html',
+    '/agenda/', '/en/', '/matchs/affiche/', '/cgu.html', '/confidentialite.html', '/testeurs-android.html',
   ]) {
     expect(adresses, chemin).toContain(`${ORIGINE}${chemin}`);
   }

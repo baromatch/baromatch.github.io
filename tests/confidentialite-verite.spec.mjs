@@ -31,7 +31,15 @@ test('la page Confidentialité : contact@ partout, aucune case à remplir', asyn
 
 test('la page Confidentialité ne décrit comme destinataire ni Sentry, ni Mapbox, ni Firebase, ni Anthropic', async ({ page }) => {
   const texte = await texteDe(page, '/confidentialite.html');
-  expect(texte).not.toMatch(/Sentry|Mapbox|Firebase|Google|Anthropic/);
+  expect(texte).not.toMatch(/Sentry|Mapbox|Firebase|Anthropic/);
+  // Google ne reçoit qu’une chose : l’adresse Gmail des testeurs Android (sa section, et sa ligne dans les prestataires).
+  const horsDuTest = await page.locator('main').evaluate((main) => {
+    const copie = main.cloneNode(true);
+    copie.querySelector('#testeurs-android + ul').remove();
+    for (const li of copie.querySelectorAll('#prestataires + ul > li')) if (li.textContent.startsWith('Google ')) li.remove();
+    return copie.textContent;
+  });
+  expect(horsDuTest).not.toMatch(/Google/);
   // Les rapports d’erreurs : rien ne part aujourd’hui, et la page le décrira d’abord.
   await expect(page.locator('#plantages + p')).toHaveText(/aucun service de suivi des erreurs ne reçoit de rapport de l’appli ni de notre serveur/);
   // Les notifications : seuls les rappels programmés par le téléphone.

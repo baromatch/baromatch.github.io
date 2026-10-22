@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "XdD-Mi9s_VmB9GZrUkDmcg",
-   "change": "2026-10-21",
+   "empreinte": "CpnxPwA2KETboSWg2faktw",
+   "change": "2026-10-22",
    "indexable": true,
    "bars": []
   },
@@ -67,8 +67,8 @@
   "/agenda/lens.ics": {
    "type": "calendrier",
    "cle": "lens",
-   "empreinte": "9O5JLrMve3oC0qC2HC7fdA",
-   "change": "2026-10-21",
+   "empreinte": "8bmgUJjdmSzcPn1Urd8XQQ",
+   "change": "2026-10-22",
    "indexable": false,
    "memoire": {
     "court": "Lens",
@@ -210,31 +210,31 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "dTwKAiGJWZ49KYyg0IWMCw",
-   "change": "2026-10-21",
+   "empreinte": "MO6as6N1-pdx0ZI2u6xtJQ",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "oG8VYzxjMYa-06k_rbiPHg",
-   "change": "2026-10-21",
+   "empreinte": "_xgRGpc0GxjfTDvUia5GgQ",
+   "change": "2026-10-22",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "YlXwIPeOs6hCF2YU4LbSSA",
-   "change": "2026-10-21",
+   "empreinte": "Ro1WY73zG0TmJkoZi5Cqig",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": []
   },
   "/en/champions-league/": {
    "type": "guide-en",
    "cle": "champions-league",
-   "empreinte": "BTYXUgo6UlfOEteha-zqlw",
-   "change": "2026-10-21",
+   "empreinte": "TPfejNfWH-yWTSUGrBZiOQ",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": []
   },
@@ -269,8 +269,8 @@
    "type": "match-en",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "VzOzG44mGBP6GVJK9guMvQ",
-   "change": "2026-10-21",
+   "empreinte": "M4pyoiAs3NKvpmMXgWhFuA",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": []
   },
@@ -438,16 +438,16 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "lJzSUSJBmwAADYdQlVgY-g",
-   "change": "2026-10-21",
+   "empreinte": "542Bd9PcLFMSbiNjuTpH2Q",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "Iqa15QFECFrjysx1yEUFMA",
-   "change": "2026-10-21",
+   "empreinte": "cwdokIvlZQC9ZdK5U8MjWw",
+   "change": "2026-10-22",
    "indexable": true,
    "bars": []
   },
@@ -917,8 +917,8 @@
    "type": "match",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "yKWMUXCHbgBKPwQW9MB7fA",
-   "change": "2026-10-21",
+   "empreinte": "hNtRPddI3We6VJtlmoBctA",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -940,13 +940,6 @@
      "nom": "RC Lens"
     }
    }
-  },
-  "/matchs/bruges-lens-2026-10-21/partage.png": {
-   "type": "partage",
-   "cle": "bruges-lens-2026-10-21",
-   "empreinte": "TYEtIo5cl7mFVSCI218RaA",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/chelsea-man-united-2026-10-31/": {
    "type": "match",
@@ -1035,8 +1028,8 @@
   "/matchs/club/lens/": {
    "type": "club",
    "cle": "lens",
-   "empreinte": "iqrY4setYuMxJ9U125NITw",
-   "change": "2026-10-21",
+   "empreinte": "4zFiMEpVNEZ4p7FA8JP_LA",
+   "change": "2026-10-22",
    "indexable": true,
    "bars": []
   },
@@ -1131,8 +1124,8 @@
   "/matchs/competition/ligue-des-champions/": {
    "type": "competition",
    "cle": "ligue-des-champions",
-   "empreinte": "nH03tF3nN-RqTP4g2kp7Rg",
-   "change": "2026-10-21",
+   "empreinte": "F5pZpSj23ZwUHrbOXn_4Dg",
+   "change": "2026-10-22",
    "indexable": true,
    "bars": []
   },
@@ -2845,8 +2838,8 @@
    "type": "match",
    "cle": "troyes-lens-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "3sotUID0rvsKRWpkrNFTFg",
-   "change": "2026-10-20",
+   "empreinte": "u2_Z1gP4zhvzSRBoDKuuKQ",
+   "change": "2026-10-22",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3189,28 +3182,6 @@
     "nom": "Olympique Lyonnais"
    },
    "empreinte": "-jtxEt-ibpGYxgv2vPq6zA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jh6000tryqjnandqqmv@baromatch.fr": {
-   "ids": [
-    "cmv6e5jh6000tryqjnandqqmv"
-   ],
-   "slug": "bruges-lens-2026-10-21",
-   "debut": "2026-10-21T19:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des champions",
-   "domicile": {
-    "cle": "bruges",
-    "court": "Bruges",
-    "nom": "Club Brugge KV"
-   },
-   "exterieur": {
-    "cle": "lens",
-    "court": "Lens",
-    "nom": "RC Lens"
-   },
-   "empreinte": "x47zttIYyKJzaN5WW8V54A",
    "sequence": 0,
    "modifie": "2026-10-20T10:48:07Z"
   },

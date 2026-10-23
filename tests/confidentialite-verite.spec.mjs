@@ -29,9 +29,11 @@ test('la page Confidentialité : contact@ partout, aucune case à remplir', asyn
   expect(texte).not.toMatch(/\[|\]|à compléter|à préciser|TODO|⚠/i);
 });
 
-test('la page Confidentialité ne décrit comme destinataire ni Sentry, ni Mapbox, ni Firebase, ni Anthropic', async ({ page }) => {
+test('la page Confidentialité ne décrit comme destinataire ni Mapbox, ni Firebase, ni Anthropic', async ({ page }) => {
   const texte = await texteDe(page, '/confidentialite.html');
-  expect(texte).not.toMatch(/Sentry|Mapbox|Firebase|Anthropic/);
+  // Le pseudo est vérifié par le serveur seul, avec une liste de mots ; les photos, seules envoyées à Anthropic, sont
+  // fermées : la page ne le nomme pas tant qu’elle ne les décrit pas.
+  expect(texte).not.toMatch(/Mapbox|Firebase|Anthropic/);
   // Google ne reçoit qu’une chose : l’adresse Gmail des testeurs Android (sa section, et sa ligne dans les prestataires).
   const horsDuTest = await page.locator('main').evaluate((main) => {
     const copie = main.cloneNode(true);
@@ -40,8 +42,18 @@ test('la page Confidentialité ne décrit comme destinataire ni Sentry, ni Mapbo
     return copie.textContent;
   });
   expect(horsDuTest).not.toMatch(/Google/);
-  // Les rapports d’erreurs : rien ne part aujourd’hui, et la page le décrira d’abord.
-  await expect(page.locator('#plantages + p')).toHaveText(/aucun service de suivi des erreurs ne reçoit de rapport de l’appli ni de notre serveur/);
+  // Les rapports d’erreurs : Sentry, une fois allumé, en Europe, 30 jours, sans rien qui désigne quelqu’un.
+  const plantages = normaliser(await page.locator('#plantages ~ ul').first().innerText());
+  await expect(page.locator('#plantages + p')).toContainText('Tant qu’on ne l’a pas allumé, aucun rapport ne part chez lui.');
+  expect(plantages).toContain('dans la région Europe de Sentry (Francfort, en Allemagne). Sentry garde les rapports 30 jours avec son offre gratuite (90 jours avec une offre payante), puis les efface.');
+  expect(plantages).toContain('le code enlève ton adresse mail, ton pseudo, un prénom, l’identifiant de ton compte');
+  expect(plantages).toContain('Avant de l’allumer, on règle notre compte Sentry pour qu’il ne la garde pas.');
+  // Ce que le kit de Sentry de l’appli peut envoyer de lui-même : la page le dit.
+  expect(plantages).toContain('un signal sans compte qui compte les ouvertures sans plantage');
+  expect(plantages).toContain('Un rapport n’est rattaché à aucun compte');
+  await expect(page.locator('#prestataires + ul > li', { hasText: /^Sentry/ })).toContainText('une fois qu’on l’a allumé');
+  // Les mails d’alerte, par Resend : des chiffres, jamais un fan.
+  await expect(page.locator('#prestataires + ul > li', { hasText: /^Resend/ })).toContainText('ils ne disent que la sorte d’alerte et des chiffres, jamais un fan, un pseudo, une adresse mail, un code ni le nom d’un bar');
   // Les notifications : seuls les rappels programmés par le téléphone.
   await expect(page.locator('#notifications + ul')).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
   // Les photos : fermées, et la page sera mise à jour avant.
@@ -66,6 +78,118 @@ test('la page Confidentialité : les durées que l’effacement automatique appl
   expect(texte).not.toMatch(/effacée? automatiquement|Les journaux techniques : 30 jours|rien n’est gardé|anonymisé/);
   // La recherche d’adresse : les adresses trouvées sont gardées 5 minutes.
   expect(texte).toContain('Notre serveur garde les adresses trouvées 5 minutes');
+});
+
+// Les sauvegardes : faites par nous, chiffrées, effacées une fois leurs 28 jours passés, à la sauvegarde suivante
+// (5 semaines au plus avec une sauvegarde par semaine), jamais chez Railway ; un compte supprimé y reste autant. Et chaque durée de conservation de l’appli a sa ligne dans « Combien de temps ».
+test('la page Confidentialité : les sauvegardes chiffrées, 5 semaines au plus, et une ligne par durée', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const sauvegardes = normaliser(await page.locator('#sauvegardes + ul').innerText());
+  expect(sauvegardes).toContain('Qui les fait : nous, pas Railway.');
+  expect(sauvegardes).toContain('chaque copie est chiffrée avec une phrase de passe que seul le responsable de Baromatch connaît');
+  expect(sauvegardes).toContain('Jamais chez Railway.');
+  expect(sauvegardes).toContain('une sauvegarde est effacée une fois ses 28 jours passés, au moment de la sauvegarde suivante');
+  expect(sauvegardes).toContain('une copie vit donc 5 semaines au plus');
+  expect(sauvegardes).toContain('par exemple OneDrive, de Microsoft, une société américaine');
+  expect(sauvegardes).not.toContain('effacée au bout de 28 jours');
+  expect(sauvegardes).toContain('il reste dans les sauvegardes faites avant, jusqu’à ce qu’elles soient effacées : 5 semaines au plus.');
+  await expect(page.locator('#suppression + p + ul')).toContainText('ton compte reste dans les sauvegardes faites avant ta suppression, jusqu’à ce qu’elles soient effacées : 5 semaines au plus');
+  await expect(page.locator('#prestataires + ul > li', { hasText: /^Railway/ })).toContainText('Railway ne fait pas de sauvegarde de notre base : c’est nous qui les faisons');
+  const texte = await texteDe(page, '/confidentialite.html');
+  expect(texte).not.toMatch(/sauvegarde de notre base, chez Railway|copies de sauvegarde de notre base, chez Railway/);
+  await page.goto('/confidentialite.html');
+  const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
+  for (const ligne of [
+    'L’heure à laquelle tu dis arriver avec « Je suis en retard », et l’heure jusqu’à laquelle ta place est alors gardée : aujourd’hui, avec ta place. Prévu : effacées un jour après le coup d’envoi.',
+    'L’attente après des mauvais mots de passe, pour l’équipe des bars : 24 heures après le dernier mauvais mot de passe.',
+    'La case « mot de passe à changer » d’un compte de bar : jusqu’à ce que la personne choisisse son propre mot de passe.',
+    'Les sauvegardes chiffrées de notre base : effacées une fois leurs 28 jours passés, à la sauvegarde suivante (5 semaines au plus).',
+    'Les rapports d’erreurs chez Sentry, une fois allumé : 30 jours avec son offre gratuite, 90 avec une offre payante.',
+    'Nos mails d’alerte, sans donnée personnelle : dans notre boîte mail tant qu’on les garde, et chez Resend selon ses conditions.',
+    'Les compteurs du service (des nombres par tranche de 5 minutes, sans personne) : 2 heures.',
+    'La demande d’un bar envoyée par le formulaire du site : 12 mois, puis on l’efface nous-mêmes (voir « Les demandes des bars »).',
+  ]) expect(durees).toContain(ligne);
+});
+
+// Ce qui a changé pour les fans en octobre 2026 : « Je suis en retard », les places en direct (des chiffres), « Je veux
+// le voir » pour tout Paris, la confirmation des 18 ans redemandée après une déconnexion, et ce que la déconnexion et la
+// suppression effacent du téléphone. Ce qui vient avec l’appli le dit (« Avec la mise à jour d’octobre 2026 de l’appli »).
+test('la page Confidentialité : le retard annoncé, les places en direct, tout Paris, la déconnexion', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const retard = normaliser(await page.locator('#retard + ul').innerText());
+  expect(retard).toContain('tu peux prévenir le bar que tu arrives dans 10, 20 ou 30 minutes, une fois par place');
+  expect(retard).toContain('Ni ta position, ni un message.');
+  expect(retard).toContain('toi, et le bar de cette soirée, pendant la soirée');
+  expect(retard).toContain('aujourd’hui, avec ta place. Prévu : effacées un jour après le coup d’envoi. Si tu supprimes ton compte, elles sont effacées tout de suite.');
+  expect(retard).toContain('La trace de sécurité (que tu as prévenu, et de combien de minutes) suit la durée des traces de sécurité');
+  await expect(page.locator('#qui-voit-quoi + ul')).toContainText('se mettent à jour en direct sur les téléphones : ce sont des chiffres seulement, jamais qui a pris ou rendu une place');
+  const notifications = normaliser(await page.locator('#notifications + ul').innerText());
+  expect(notifications).toContain('« Je veux le voir », dit sans choisir de quartier, compte pour tout Paris : il entre dans les chiffres des bars de Paris, des nombres sans ton pseudo');
+  expect(notifications).toContain('quand un bar ouvre une soirée pour ce match en réponse à ces envies');
+  expect(notifications).toContain('ils quittent l’écran verrouillé dès que tu te déconnectes, que tu supprimes ton compte ou que tu coupes « Mes soirées »');
+  await expect(page.locator('#collecte + ul')).toContainText('elle est effacée du téléphone quand tu te déconnectes : la personne qui se connecte ensuite sur ce téléphone confirme pour elle-même');
+  await expect(page.locator('#collecte + ul')).toContainText('notre serveur le vérifie seul, avec cette liste, sans l’envoyer à aucun autre service');
+  const deconnexion = normaliser(await page.locator('#deconnexion + p + ul').innerText());
+  expect(deconnexion).toContain('ta confirmation d’avoir 18 ans : la personne qui se connecte ensuite confirme pour elle-même');
+  expect(deconnexion).toContain('les rappels de tes places sur l’écran verrouillé');
+  expect(deconnexion).toContain('le fichier de tes données et les images de story ou de badge');
+  await expect(page.locator('#deconnexion + p')).toContainText('Avec la mise à jour d’octobre 2026 de l’appli');
+  // Le jeton n’est retiré que par « Me déconnecter » : pas quand le serveur ferme la session.
+  await expect(page.locator('#deconnexion + p + ul + p')).toContainText('Si c’est notre serveur qui a fermé la session, le jeton reste enregistré avec ton compte.');
+  const suppression = normaliser(await page.locator('#suppression + p + ul').innerText());
+  expect(suppression).toContain('elle retire aussi de l’écran verrouillé les rappels de tes places, et efface le fichier de tes données et les images de story ou de badge');
+  expect(suppression).toContain('l’heure à laquelle tu avais dit arriver avec « Je suis en retard »');
+});
+
+// L’équipe des bars : l’attente après des mauvais mots de passe (par réseau, ce qui est gardé, 24 heures), le
+// changement de mot de passe qui ferme les autres sessions, le premier mot de passe à changer, le code de porte, et la
+// copie hors ligne de la console qui ne garde plus les réservations. Plus la phrase d’avant (« tu ne peux pas encore le
+// changer toi-même »), devenue fausse.
+test('la page Confidentialité : l’équipe des bars, ses mots de passe et le code de porte', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const equipe = normaliser(await page.locator('#equipe-des-bars + p + ul').innerText());
+  expect(equipe).toContain('le prochain essai pour cette adresse, depuis le même réseau, doit attendre');
+  expect(equipe).toContain('C’est compté par réseau, pas pour tout le compte');
+  expect(equipe).toContain('une empreinte de l’adresse mail tapée (pas l’adresse elle-même), le réseau d’où l’essai est parti (son adresse IP), le nombre de mauvais mots de passe d’affilée, l’heure du dernier et la fin de l’attente');
+  expect(equipe).toContain('Chaque réseau est oublié 24 heures après son dernier mauvais mot de passe');
+  expect(equipe).toContain('Aujourd’hui, pour une connexion par la console, ce réseau est celui de notre serveur de console');
+  expect(equipe).toContain('Changer ton mot de passe ferme tout de suite tes autres sessions');
+  expect(equipe).toContain('si c’est le patron qui a choisi ton mot de passe en t’ajoutant, tu en choisis un à toi à ta première connexion');
+  expect(equipe).toContain('un QR à usage unique, valable 10 minutes');
+  expect(equipe).toContain('On ne garde pas ce code lui-même, seulement une empreinte');
+  expect(equipe).toContain('jamais les réservations, l’équipe ni les arrivées. Cette copie est vidée quand la session se termine sur ce navigateur.');
+  expect(equipe).not.toMatch(/tu ne peux pas encore le changer|cette copie reste après la déconnexion/);
+});
+
+// Ce que voit le bar, et l’indice anti-triche : les pseudos pendant la soirée seulement, plus l’identifiant du compte,
+// un indice tiré des seules arrivées dans ce bar ; l’indice complet reste dans notre journal. Le code d’arrivée ne
+// retrouve à la porte que les fans que ce bar connaît ce jour-là. Plus aucune des phrases d’avant, devenues fausses.
+test('la page Confidentialité : ce que voit le bar, l’indice anti-triche et la portée du code d’arrivée', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const bar = normaliser(await page.locator('#qui-voit-quoi + ul > li', { hasText: /^Le bar où tu réserves/ }).innerText());
+  expect(bar).toContain('voit dans ses listes, le soir du match (de 3 heures avant le coup d’envoi à 3 heures après), ton pseudo');
+  expect(bar).toContain('Pour ses autres soirées, avant comme après, il ne voit que des chiffres. Il ne reçoit pas l’identifiant de ton compte.');
+  expect(bar).toContain('cet indice ne tient compte que des arrivées dans ce bar, jamais de tes arrivées dans d’autres bars');
+  expect(bar).toContain('combien de fans sont revenus chez lui (au moins deux arrivées sur la période qu’il choisit)');
+  await expect(page.locator('#qui-voit-quoi + ul > li', { hasText: /^Notre journal de sécurité/ })).toContainText('tient compte aussi de ta dernière arrivée dans un autre bar. Il sert à repérer la triche, et aucun bar ne le reçoit.');
+  await expect(page.locator('#pass + ul')).toContainText('il ne retrouve que les fans que ce bar connaît ce jour-là');
+  const texte = await texteDe(page, '/confidentialite.html');
+  expect(texte).not.toMatch(/jusqu’à 3 jours avant, dans sa console|Il reçoit aussi un identifiant technique de ton compte|Aujourd’hui, cet indice tient compte de ta dernière arrivée|l’équipe de n’importe quel bar Baromatch peut s’en servir|dans un bar Baromatch dans les 7 jours/);
+});
+
+// La modération des pseudos : ce qui est gardé d’un signalement, ce que voit la plateforme (des nombres, jamais qui),
+// aucun bar, et le renommage décidé par une personne, jamais par les signalements seuls.
+test('la page Confidentialité : les pseudos signalés, ce que voit la plateforme, et le renommage', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const signalements = normaliser(await page.locator('#signalements + ul').innerText());
+  expect(signalements).toContain('qui signale (ton compte), le compte signalé, la raison choisie et la date');
+  expect(signalements).toContain('La personne signalée n’en voit rien, et aucun bar ne voit les signalements de pseudos.');
+  expect(signalements).toContain('le pseudo d’aujourd’hui, le nombre de personnes qui l’ont signalé, les raisons, et les dates du premier et du dernier signalement. Jamais qui a signalé, jamais une adresse mail.');
+  expect(signalements).toContain('un signalement n’agit jamais tout seul');
+  expect(signalements).toContain('qui reçoit alors un pseudo tiré au hasard');
+  expect(signalements).toContain('L’ancien pseudo n’est pas gardé.');
+  expect(signalements).toContain('n’est pas enregistré avant 30 jours après le sien');
+  await expect(page.locator('#pourquoi + p + ul')).toContainText('Refuser un pseudo insultant, traiter les signalements et bannir un compte qui triche');
 });
 
 test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, et ce qui reste pseudonymisé', async ({ page }) => {

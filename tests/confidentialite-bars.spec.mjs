@@ -31,7 +31,7 @@ test('la section des bars dit la durée, le brouillon de l’onglet, à qui écr
   await expect(renvoi).toHaveCount(1);
   await expect(page.locator('#prestataires')).toHaveText('Nos prestataires');
   // La liste des prestataires dit que Resend envoie aussi le mail qui nous prévient d’une demande de bar.
-  await expect(page.locator('#prestataires + ul')).toContainText('Resend envoie le mail avec ton code de connexion, et le mail qui nous prévient d’une demande de bar. États-Unis.');
+  await expect(page.locator('#prestataires + ul')).toContainText('Resend envoie le mail avec ton code de connexion, et le mail qui nous prévient d’une demande de bar.');
 });
 
 // La section « Les demandes des bars » de la page Confidentialité dit le texte validé par le propriétaire, qui décrit

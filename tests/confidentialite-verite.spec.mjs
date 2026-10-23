@@ -29,9 +29,11 @@ test('la page Confidentialité : contact@ partout, aucune case à remplir', asyn
   expect(texte).not.toMatch(/\[|\]|à compléter|à préciser|TODO|⚠/i);
 });
 
-test('la page Confidentialité ne décrit comme destinataire ni Sentry, ni Mapbox, ni Firebase, ni Anthropic', async ({ page }) => {
+test('la page Confidentialité ne décrit comme destinataire ni Mapbox, ni Firebase, ni Anthropic', async ({ page }) => {
   const texte = await texteDe(page, '/confidentialite.html');
-  expect(texte).not.toMatch(/Sentry|Mapbox|Firebase|Anthropic/);
+  // Le pseudo est vérifié par le serveur seul, avec une liste de mots ; les photos, seules envoyées à Anthropic, sont
+  // fermées : la page ne le nomme pas tant qu’elle ne les décrit pas.
+  expect(texte).not.toMatch(/Mapbox|Firebase|Anthropic/);
   // Google ne reçoit qu’une chose : l’adresse Gmail des testeurs Android (sa section, et sa ligne dans les prestataires).
   const horsDuTest = await page.locator('main').evaluate((main) => {
     const copie = main.cloneNode(true);
@@ -40,8 +42,16 @@ test('la page Confidentialité ne décrit comme destinataire ni Sentry, ni Mapbo
     return copie.textContent;
   });
   expect(horsDuTest).not.toMatch(/Google/);
-  // Les rapports d’erreurs : rien ne part aujourd’hui, et la page le décrira d’abord.
-  await expect(page.locator('#plantages + p')).toHaveText(/aucun service de suivi des erreurs ne reçoit de rapport de l’appli ni de notre serveur/);
+  // Les rapports d’erreurs : Sentry, une fois allumé, en Europe, 30 jours, sans rien qui désigne quelqu’un.
+  const plantages = normaliser(await page.locator('#plantages ~ ul').first().innerText());
+  await expect(page.locator('#plantages + p')).toContainText('Tant qu’on ne l’a pas allumé, aucun rapport ne part chez lui.');
+  expect(plantages).toContain('dans la région Europe de Sentry (Francfort, en Allemagne). Sentry garde les rapports 30 jours, puis les efface.');
+  expect(plantages).toContain('le code enlève ton adresse mail, ton pseudo, un prénom, l’identifiant de ton compte');
+  expect(plantages).toContain('Notre compte Sentry est réglé pour ne pas la garder.');
+  expect(plantages).toContain('Un rapport n’est rattaché à aucun compte');
+  await expect(page.locator('#prestataires + ul > li', { hasText: /^Sentry/ })).toContainText('une fois qu’on l’a allumé');
+  // Les mails d’alerte, par Resend : des chiffres, jamais un fan.
+  await expect(page.locator('#prestataires + ul > li', { hasText: /^Resend/ })).toContainText('ils ne disent que la sorte d’alerte et des chiffres, jamais un fan, un pseudo, une adresse mail, un code ni le nom d’un bar');
   // Les notifications : seuls les rappels programmés par le téléphone.
   await expect(page.locator('#notifications + ul')).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
   // Les photos : fermées, et la page sera mise à jour avant.

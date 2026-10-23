@@ -44,7 +44,7 @@
 
 <main id="contenu" class="document page">
   <h1>Confidentialité</h1>
-  <p class="document__date">Mise à jour le 22 octobre 2026</p>
+  <p class="document__date">Mise à jour le 23 octobre 2026</p>
 
   <p>Cette page explique ce que <a href="#application">l’application Baromatch</a> et le <a href="#site">site baromatch.fr</a> font de tes données, et ce que deviennent <a href="#bars">les demandes des bars</a>. Le fonctionnement de l’appli est expliqué à part, dans <a href="/cgu.html">les règles de l’appli</a>.</p>
 
@@ -153,12 +153,21 @@
   <p>À chaque ouverture, l’appli demande au serveur de mises à jour d’Expo s’il existe une nouvelle version de son code, et la télécharge si besoin. Elle envoie le système du téléphone, la version de l’appli et de la mise à jour en cours, et un identifiant tiré au hasard par Expo à l’installation, sans lien avec ton compte. Comme tout serveur, Expo voit l’adresse IP de la connexion. Si l’appli a planté à l’ouverture précédente, le début du message d’erreur part aussi. Aucun compte, aucun mail, aucune position. Baromatch ne garde rien de ces demandes.</p>
 
   <h3 id="plantages">Les rapports d’erreurs</h3>
-  <p>Aujourd’hui, aucun service de suivi des erreurs ne reçoit de rapport de l’appli ni de notre serveur. Seul le début d’un message d’erreur part chez Expo, si l’appli a planté à l’ouverture précédente (<a href="#mises-a-jour">voir «&nbsp;Les mises à jour de l’appli&nbsp;»</a>). Si on met en place un service de suivi des erreurs, cette page le décrira d’abord.</p>
+  <p>Sentry (Functional Software, Inc.) est notre carnet des erreurs techniques&nbsp;: celles de notre serveur, de la console des bars et de l’appli. Tant qu’on ne l’a pas allumé, aucun rapport ne part chez lui. Une fois allumé, voici ce qu’il reçoit.</p>
+  <ul>
+    <li><strong>Ce qui part&nbsp;:</strong> le message de l’erreur, nettoyé&nbsp;; l’endroit du code où elle est arrivée&nbsp;; la page ou l’adresse du serveur demandée, sans ce qui suit le «&nbsp;?&nbsp;»&nbsp;; la version de l’appli ou du serveur&nbsp;; le système du téléphone ou le navigateur&nbsp;; l’heure. Pour une petite part des demandes faites à notre serveur, aussi leur durée et leur résultat.</li>
+    <li><strong>Ce qui ne part jamais&nbsp;:</strong> avant l’envoi, le code enlève ton adresse mail, ton pseudo, un prénom, l’identifiant de ton compte, les jetons de connexion, les cookies, l’adresse IP, le contenu de ce que tu envoies, les codes de connexion, ton code d’arrivée et ton numéro de pass, le QR d’un bar, et le code d’une tablée ou de la porte. Un rapport n’est rattaché à aucun compte&nbsp;: il n’y a rien à exporter ni à effacer pour toi chez Sentry.</li>
+    <li><strong>L’adresse IP&nbsp;:</strong> comme tout serveur, Sentry voit l’adresse IP de la connexion qui lui envoie un rapport. Notre compte Sentry est réglé pour ne pas la garder.</li>
+    <li><strong>Où, et combien de temps&nbsp;:</strong> dans la région Europe de Sentry (Francfort, en Allemagne). Sentry garde les rapports 30&nbsp;jours, puis les efface.</li>
+    <li><strong>Pourquoi&nbsp;:</strong> savoir vite quand le service casse, et le réparer. Notre intérêt légitime.</li>
+  </ul>
+  <p>Chez Expo aussi, le début d’un message d’erreur part, si l’appli a planté à l’ouverture précédente (<a href="#mises-a-jour">voir «&nbsp;Les mises à jour de l’appli&nbsp;»</a>).</p>
 
   <h3 id="prestataires">Nos prestataires</h3>
   <ul>
     <li><strong>Railway</strong> héberge notre serveur, notre base de données et la mémoire temporaire du serveur, en Europe (Pays-Bas). Ses journaux gardent l’adresse IP des connexions et l’adresse des pages demandées, qui peut contenir l’identifiant de ton compte. Railway est une société américaine.</li>
-    <li><strong>Resend</strong> envoie le mail avec ton code de connexion, et le mail qui nous prévient d’une demande de bar. États-Unis.</li>
+    <li><strong>Resend</strong> envoie le mail avec ton code de connexion, et le mail qui nous prévient d’une demande de bar. Une fois qu’on les a allumés, il envoie aussi les mails d’alerte qu’on s’écrit à nous-mêmes quand le service va mal (des erreurs en série, des codes de connexion qui ne partent pas, un serveur ralenti)&nbsp;: ils ne disent que la sorte d’alerte et des chiffres, jamais un fan, un pseudo, une adresse mail, un code ni le nom d’un bar. États-Unis.</li>
+    <li><strong>Sentry</strong> (Functional Software, Inc.) reçoit les rapports d’erreurs, sans donnée qui te désigne, une fois qu’on l’a allumé (<a href="#plantages">voir «&nbsp;Les rapports d’erreurs&nbsp;»</a>). Ils sont gardés en Europe (Francfort)&nbsp;; Sentry est une société américaine.</li>
     <li><strong>CARTO</strong> fournit le fond de carte (<a href="#position">voir «&nbsp;Ta position et la carte&nbsp;»</a>). États-Unis.</li>
     <li><strong>Expo</strong> fournit les mises à jour de l’appli (<a href="#mises-a-jour">voir plus haut</a>). États-Unis.</li>
     <li><strong>La Géoplateforme de l’IGN</strong>, le service d’adresses de l’État, trouve les adresses que tu cherches. France&nbsp;: pas de transfert.</li>

@@ -11,20 +11,6 @@ X-WR-CALDESC:Monaco : les matchs au programme de Baromatch (Ligue 1 et Lig
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5jj6000zryqjk9dgjf13@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
-DTSTART:20261022T190000Z
-DTEND:20261022T210000Z
-SUMMARY:Monaco – Fribourg
-DESCRIPTION:Ligue Conférence · AS Monaco – SC Freiburg\nCoup d’envoi 
- jeudi 22 octobre à 21:00\, heure de Paris.\nLa page du match : https://b
- aromatch.fr/matchs/monaco-fribourg-2026-10-22/
-URL:https://baromatch.fr/matchs/monaco-fribourg-2026-10-22/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmuy4o36d0019zz9w74csusip@baromatch.fr
 DTSTAMP:20261020T104807Z
 SEQUENCE:0

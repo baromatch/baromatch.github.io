@@ -165,7 +165,7 @@
 
   <h3 id="prestataires">Nos prestataires</h3>
   <ul>
-    <li><strong>Railway</strong> héberge notre serveur, notre base de données et la mémoire temporaire du serveur, en Europe (Pays-Bas). Ses journaux gardent l’adresse IP des connexions et l’adresse des pages demandées, qui peut contenir l’identifiant de ton compte. Railway est une société américaine.</li>
+    <li><strong>Railway</strong> héberge notre serveur, notre base de données et la mémoire temporaire du serveur, en Europe (Pays-Bas). Ses journaux gardent l’adresse IP des connexions et l’adresse des pages demandées, qui peut contenir l’identifiant de ton compte. Railway ne fait pas de sauvegarde de notre base&nbsp;: c’est nous qui les faisons (<a href="#sauvegardes">voir «&nbsp;Les sauvegardes&nbsp;»</a>). Railway est une société américaine.</li>
     <li><strong>Resend</strong> envoie le mail avec ton code de connexion, et le mail qui nous prévient d’une demande de bar. Une fois qu’on les a allumés, il envoie aussi les mails d’alerte qu’on s’écrit à nous-mêmes quand le service va mal (des erreurs en série, des codes de connexion qui ne partent pas, un serveur ralenti)&nbsp;: ils ne disent que la sorte d’alerte et des chiffres, jamais un fan, un pseudo, une adresse mail, un code ni le nom d’un bar. États-Unis.</li>
     <li><strong>Sentry</strong> (Functional Software, Inc.) reçoit les rapports d’erreurs, sans donnée qui te désigne, une fois qu’on l’a allumé (<a href="#plantages">voir «&nbsp;Les rapports d’erreurs&nbsp;»</a>). Ils sont gardés en Europe (Francfort)&nbsp;; Sentry est une société américaine.</li>
     <li><strong>CARTO</strong> fournit le fond de carte (<a href="#position">voir «&nbsp;Ta position et la carte&nbsp;»</a>). États-Unis.</li>
@@ -177,6 +177,17 @@
     <li><strong>L’hébergeur de notre boîte mail</strong> reçoit les mails que tu nous écris.</li>
   </ul>
   <p>Avec ces sociétés américaines, tes données peuvent être transférées hors de l’Union européenne, notamment aux États-Unis. Pour toute question sur ces transferts, écris-nous à <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>.</p>
+
+  <h3 id="sauvegardes">Les sauvegardes</h3>
+  <ul>
+    <li><strong>Qui les fait&nbsp;:</strong> nous, pas Railway. Une sauvegarde est une copie complète de notre base&nbsp;: elle contient donc tes données, comme la base elle-même.</li>
+    <li><strong>Protégées&nbsp;:</strong> chaque copie est chiffrée avec une phrase de passe que seul le responsable de Baromatch connaît. Sans elle, le fichier ne se lit pas. La copie n’est jamais écrite en clair sur un disque.</li>
+    <li><strong>Où&nbsp;:</strong> sur l’ordinateur du responsable de Baromatch, et une deuxième copie ailleurs, toujours chiffrée. Jamais chez Railway.</li>
+    <li><strong>Combien de temps&nbsp;:</strong> chaque sauvegarde est effacée au bout de 28&nbsp;jours, sa deuxième copie aussi.</li>
+    <li><strong>Qui la lit&nbsp;:</strong> personne, sauf pour remettre la base en place après une panne, ou pour vérifier, sur l’ordinateur du responsable, qu’une sauvegarde est complète.</li>
+    <li><strong>Pourquoi&nbsp;:</strong> ne pas perdre ton compte, tes places et ton album si notre base se perd. Notre intérêt légitime.</li>
+    <li><strong>Si tu supprimes ton compte&nbsp;:</strong> il reste dans les sauvegardes faites avant, jusqu’à ce qu’elles soient effacées&nbsp;: 28&nbsp;jours au plus. Une sauvegarde ne se modifie pas. Si on doit un jour en remettre une en place, on refait d’abord les suppressions de compte faites depuis son jour. Si l’ancienne base ne se lit plus du tout, celles faites dans l’appli pendant ces jours-là ne peuvent pas être retrouvées&nbsp;: écris-nous, et on supprime ton compte de nouveau.</li>
+  </ul>
 
   <h3 id="combien-de-temps">Combien de temps</h3>
   <p>Certaines durées seront appliquées par un effacement automatique, qui n’est pas encore en route. Pour celles-là, la page dit ce qui se passe aujourd’hui, puis la durée prévue.</p>
@@ -193,8 +204,15 @@
     <li>Les empreintes des vues d’offres&nbsp;: aujourd’hui, sans durée fixée. Prévu&nbsp;: effacées un jour après le coup d’envoi&nbsp;; le bar garde seulement le total.</li>
     <li>Ce que tu tapes dans la recherche d’adresse&nbsp;: les adresses trouvées sont gardées 5&nbsp;minutes.</li>
     <li>Des copies techniques de réponses récentes, pour éviter les doublons&nbsp;: 24&nbsp;heures au plus.</li>
+    <li>L’heure à laquelle tu dis arriver avec «&nbsp;Je suis en retard&nbsp;», et l’heure jusqu’à laquelle ta place est alors gardée&nbsp;: aujourd’hui, avec ta place. Prévu&nbsp;: effacées un jour après le coup d’envoi.</li>
+    <li>La demande d’un bar envoyée par le formulaire du site&nbsp;: 12&nbsp;mois (<a href="#bars">voir «&nbsp;Les demandes des bars&nbsp;»</a>).</li>
+    <li>L’attente après des mauvais mots de passe, pour l’équipe des bars&nbsp;: 24&nbsp;heures après le dernier mauvais mot de passe.</li>
+    <li>La case «&nbsp;mot de passe à changer&nbsp;» d’un compte de bar&nbsp;: jusqu’à ce que la personne choisisse son propre mot de passe.</li>
+    <li>Les sauvegardes chiffrées de notre base&nbsp;: effacées au bout de 28&nbsp;jours.</li>
+    <li>Les rapports d’erreurs chez Sentry, une fois allumé&nbsp;: 30&nbsp;jours.</li>
+    <li>Nos mails d’alerte, sans donnée personnelle&nbsp;: dans notre boîte mail tant qu’on les garde, et chez Resend selon ses conditions.</li>
+    <li>Les compteurs du service (des nombres par tranche de 5&nbsp;minutes, sans personne)&nbsp;: 2&nbsp;heures.</li>
     <li>Les journaux de notre serveur, chez Railway&nbsp;: selon la durée de garde de Railway.</li>
-    <li>Les copies de sauvegarde de notre base, chez Railway&nbsp;: une donnée effacée de la base peut rester dans une copie de sauvegarde jusqu’à ce que cette copie expire.</li>
     <li>Les demandes de mise à jour chez Expo&nbsp;: selon les conditions d’Expo (<a href="https://expo.dev/privacy" rel="noopener">expo.dev/privacy</a>).</li>
     <li>Le prénom de l’équipe de la porte&nbsp;: <a href="#equipe-des-bars">voir «&nbsp;Pour l’équipe des bars&nbsp;»</a>.</li>
   </ul>
@@ -204,7 +222,7 @@
   <ul>
     <li><strong>Tout de suite&nbsp;:</strong> ton adresse mail, ton pseudo, ton club, ta langue, ta confirmation d’âge, tes choix de notifications et ton code d’arrivée sont effacés. Tes sessions, tes jetons de notifications, les matchs que tu voulais voir, ta liste d’attente, tes notifications et ta photo, si tu en avais une, sont supprimés. Tes places à venir sont annulées et rendues aux autres fans. L’adresse IP et l’appareil sont effacés de tes traces de sécurité.</li>
     <li><strong>Gardé sans ton nom, mais pas anonyme&nbsp;:</strong> tes anciennes places et arrivées restent comptées dans les totaux des bars. Elles restent rattachées au même identifiant technique de compte, vidé de ton adresse mail et de ton pseudo. On en retire ton heure d’arrivée prévue, ton camp et l’empreinte de ton appareil. Ces données sont pseudonymisées&nbsp;: quelqu’un qui a gardé cet identifiant (par exemple un bar où tu as réservé, qui l’a reçu) pourrait encore les relier à toi. Ton numéro de pass reste. Les traces de sécurité restent, sans adresse IP ni appareil, avec une empreinte de ton adresse mail. Pour l’instant, ces lignes sont gardées sans durée fixée.</li>
-    <li><strong>Dans nos sauvegardes&nbsp;:</strong> une copie peut rester jusqu’à ce que la sauvegarde expire, puis disparaît.</li>
+    <li><strong>Dans nos sauvegardes&nbsp;:</strong> ton compte reste dans les sauvegardes faites avant ta suppression, jusqu’à ce qu’elles soient effacées&nbsp;: 28&nbsp;jours au plus (<a href="#sauvegardes">voir «&nbsp;Les sauvegardes&nbsp;»</a>).</li>
     <li><strong>Sur ton téléphone&nbsp;:</strong> l’appli efface ce qu’elle gardait (ton compte, tes places, ton album, tes choix) et repart de zéro. Si tu as téléchargé tes données, le fichier reste là où tu l’as enregistré, et une copie peut rester dans la mémoire de l’appli tant que tu ne la désinstalles pas. Un rappel déjà programmé pour une place peut encore s’afficher.</li>
     <li><strong>Chez nos prestataires&nbsp;:</strong> leurs copies techniques (les journaux d’envoi chez Resend, les journaux de Railway) s’effacent selon leurs propres durées.</li>
     <li>Pendant 24&nbsp;heures au plus, des copies techniques de réponses récentes peuvent rester dans la mémoire temporaire du serveur.</li>

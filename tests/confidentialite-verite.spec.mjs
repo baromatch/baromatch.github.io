@@ -151,6 +151,22 @@ test('la page Confidentialité : l’équipe des bars, ses mots de passe et le c
   expect(equipe).not.toMatch(/tu ne peux pas encore le changer|cette copie reste après la déconnexion/);
 });
 
+// Ce que voit le bar, et l’indice anti-triche : les pseudos pendant la soirée seulement, plus l’identifiant du compte,
+// un indice tiré des seules arrivées dans ce bar ; l’indice complet reste dans notre journal. Le code d’arrivée ne
+// retrouve à la porte que les fans que ce bar connaît ce jour-là. Plus aucune des phrases d’avant, devenues fausses.
+test('la page Confidentialité : ce que voit le bar, l’indice anti-triche et la portée du code d’arrivée', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const bar = normaliser(await page.locator('#qui-voit-quoi + ul > li', { hasText: /^Le bar où tu réserves/ }).innerText());
+  expect(bar).toContain('voit dans ses listes, le soir du match (de 3 heures avant le coup d’envoi à 3 heures après), ton pseudo');
+  expect(bar).toContain('Pour ses autres soirées, avant comme après, il ne voit que des chiffres. Il ne reçoit pas l’identifiant de ton compte.');
+  expect(bar).toContain('cet indice ne tient compte que des arrivées dans ce bar, jamais de tes arrivées dans d’autres bars');
+  expect(bar).toContain('combien de fans sont revenus chez lui (au moins deux arrivées sur la période qu’il choisit)');
+  await expect(page.locator('#qui-voit-quoi + ul > li', { hasText: /^Notre journal de sécurité/ })).toContainText('tient compte aussi de ta dernière arrivée dans un autre bar. Il sert à repérer la triche, et aucun bar ne le reçoit.');
+  await expect(page.locator('#pass + ul')).toContainText('il ne retrouve que les fans que ce bar connaît ce jour-là');
+  const texte = await texteDe(page, '/confidentialite.html');
+  expect(texte).not.toMatch(/jusqu’à 3 jours avant, dans sa console|Il reçoit aussi un identifiant technique de ton compte|Aujourd’hui, cet indice tient compte de ta dernière arrivée|l’équipe de n’importe quel bar Baromatch peut s’en servir|dans un bar Baromatch dans les 7 jours/);
+});
+
 test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, et ce qui reste pseudonymisé', async ({ page }) => {
   const texte = await texteDe(page, '/supprimer-mon-compte.html');
   const mails = await page.locator('main a[href^="mailto:"]').evaluateAll((a) => a.map((l) => l.getAttribute('href').split('?')[0]));

@@ -167,6 +167,20 @@ test('la page Confidentialité : ce que voit le bar, l’indice anti-triche et l
   expect(texte).not.toMatch(/jusqu’à 3 jours avant, dans sa console|Il reçoit aussi un identifiant technique de ton compte|Aujourd’hui, cet indice tient compte de ta dernière arrivée|l’équipe de n’importe quel bar Baromatch peut s’en servir|dans un bar Baromatch dans les 7 jours/);
 });
 
+// La modération des pseudos : ce qui est gardé d’un signalement, ce que voit la plateforme (des nombres, jamais qui),
+// aucun bar, et le renommage décidé par une personne, jamais par les signalements seuls.
+test('la page Confidentialité : les pseudos signalés, ce que voit la plateforme, et le renommage', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const signalements = normaliser(await page.locator('#signalements + ul').innerText());
+  expect(signalements).toContain('qui signale (ton compte), le compte signalé, la raison choisie et la date');
+  expect(signalements).toContain('La personne signalée n’en voit rien, et aucun bar ne voit les signalements de pseudos.');
+  expect(signalements).toContain('le pseudo d’aujourd’hui, le nombre de personnes qui l’ont signalé, les raisons, et les dates du premier et du dernier signalement. Jamais qui a signalé, jamais une adresse mail.');
+  expect(signalements).toContain('un signalement n’agit jamais tout seul');
+  expect(signalements).toContain('qui reçoit alors un pseudo tiré au hasard');
+  expect(signalements).toContain('L’ancien pseudo n’est pas gardé.');
+  await expect(page.locator('#pourquoi + p + ul')).toContainText('Refuser un pseudo insultant, traiter les signalements et bannir un compte qui triche');
+});
+
 test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, et ce qui reste pseudonymisé', async ({ page }) => {
   const texte = await texteDe(page, '/supprimer-mon-compte.html');
   const mails = await page.locator('main a[href^="mailto:"]').evaluateAll((a) => a.map((l) => l.getAttribute('href').split('?')[0]));

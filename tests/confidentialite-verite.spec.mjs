@@ -132,6 +132,25 @@ test('la page Confidentialité : le retard annoncé, les places en direct, tout 
   expect(suppression).toContain('l’heure à laquelle tu avais dit arriver avec « Je suis en retard »');
 });
 
+// L’équipe des bars : l’attente après des mauvais mots de passe (par réseau, ce qui est gardé, 24 heures), le
+// changement de mot de passe qui ferme les autres sessions, le premier mot de passe à changer, le code de porte, et la
+// copie hors ligne de la console qui ne garde plus les réservations. Plus la phrase d’avant (« tu ne peux pas encore le
+// changer toi-même »), devenue fausse.
+test('la page Confidentialité : l’équipe des bars, ses mots de passe et le code de porte', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const equipe = normaliser(await page.locator('#equipe-des-bars + p + ul').innerText());
+  expect(equipe).toContain('le prochain essai pour cette adresse, depuis le même réseau, doit attendre');
+  expect(equipe).toContain('C’est compté par réseau, pas pour tout le compte');
+  expect(equipe).toContain('une empreinte de l’adresse mail tapée (pas l’adresse elle-même), le réseau d’où l’essai est parti (son adresse IP), le nombre de mauvais mots de passe d’affilée, l’heure du dernier et la fin de l’attente');
+  expect(equipe).toContain('Chaque réseau est oublié 24 heures après son dernier mauvais mot de passe');
+  expect(equipe).toContain('Changer ton mot de passe ferme tout de suite tes autres sessions');
+  expect(equipe).toContain('si c’est le patron qui a choisi ton mot de passe en t’ajoutant, tu en choisis un à toi à ta première connexion');
+  expect(equipe).toContain('un QR à usage unique, valable 10 minutes');
+  expect(equipe).toContain('On ne garde pas ce code lui-même, seulement une empreinte');
+  expect(equipe).toContain('jamais les réservations, l’équipe ni les arrivées. Cette copie est vidée quand la session se termine sur ce navigateur.');
+  expect(equipe).not.toMatch(/tu ne peux pas encore le changer|cette copie reste après la déconnexion/);
+});
+
 test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, et ce qui reste pseudonymisé', async ({ page }) => {
   const texte = await texteDe(page, '/supprimer-mon-compte.html');
   const mails = await page.locator('main a[href^="mailto:"]').evaluateAll((a) => a.map((l) => l.getAttribute('href').split('?')[0]));

@@ -177,8 +177,8 @@
   "/agenda/strasbourg.ics": {
    "type": "calendrier",
    "cle": "strasbourg",
-   "empreinte": "ddvSeFHItDGwlD2RZeOLJA",
-   "change": "2026-10-20",
+   "empreinte": "MljQGsLuWZYFdGL9gpRg0g",
+   "change": "2026-10-23",
    "indexable": false,
    "memoire": {
     "court": "Strasbourg",
@@ -188,8 +188,8 @@
   "/agenda/toulouse.ics": {
    "type": "calendrier",
    "cle": "toulouse",
-   "empreinte": "3GeW7cWLPTbhhHt6_Zu1fQ",
-   "change": "2026-10-20",
+   "empreinte": "E5nJZuzSHMa5XszCdbcnyA",
+   "change": "2026-10-23",
    "indexable": false,
    "memoire": {
     "court": "Toulouse",
@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "lo8U_4ChB2TTIVJsTUHfWg",
+   "empreinte": "BBo_Oju8d1HPKWAKbIVuMA",
    "change": "2026-10-23",
    "indexable": false,
    "bars": []
@@ -474,7 +474,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "he47Nn8kYIYU-q3EDzuQ6Q",
+   "empreinte": "ZavEpWZVN1qaWlYURBs2Eg",
    "change": "2026-10-23",
    "indexable": false,
    "bars": []
@@ -911,8 +911,8 @@
    "type": "match",
    "cle": "brest-nice-2026-10-23",
    "date": "2026-10-23T18:45:00.000Z",
-   "empreinte": "5nZJDWY_LFbL3u1zsFpvMQ",
-   "change": "2026-10-21",
+   "empreinte": "bT374_v_uL_kYLMQ8L1CTw",
+   "change": "2026-10-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -934,13 +934,6 @@
      "nom": "OGC Nice"
     }
    }
-  },
-  "/matchs/brest-nice-2026-10-23/match.ics": {
-   "type": "evenement",
-   "cle": "brest-nice-2026-10-23",
-   "empreinte": "h0XNvbdaXEWl3oWN842YCw",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/brest-nice-2026-10-23/partage.png": {
    "type": "partage",
@@ -1144,8 +1137,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "9Qjd_8RKcy-3Fb8ooN5lcg",
-   "change": "2026-10-21",
+   "empreinte": "RXXiTlkr17V0i3pOBS31Gg",
+   "change": "2026-10-23",
    "indexable": true,
    "bars": []
   },
@@ -2467,8 +2460,8 @@
    "type": "match",
    "cle": "om-toulouse-2026-11-01",
    "date": "2026-11-01T19:45:00.000Z",
-   "empreinte": "mEfOegERJw-7yguF6zdbZQ",
-   "change": "2026-10-22",
+   "empreinte": "nCcYqx4Ui4EY62gsYkxIMQ",
+   "change": "2026-10-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2762,8 +2755,8 @@
    "type": "match",
    "cle": "rennes-strasbourg-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "724tnQ4qDHOJoupUZqLv3g",
-   "change": "2026-10-22",
+   "empreinte": "mVptbtznOp-UzUEQxIwWFA",
+   "change": "2026-10-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2804,8 +2797,8 @@
    "type": "match",
    "cle": "strasbourg-auxerre-2026-11-01",
    "date": "2026-11-01T14:00:00.000Z",
-   "empreinte": "gk3kNwNGXX_zlwiocbw7kQ",
-   "change": "2026-10-21",
+   "empreinte": "7KU-FmKy1d_w6OoB2-7mGA",
+   "change": "2026-10-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2898,12 +2891,54 @@
     }
    }
   },
+  "/matchs/toulouse-strasbourg-2026-11-06/": {
+   "type": "match",
+   "cle": "toulouse-strasbourg-2026-11-06",
+   "date": "2026-11-06T19:45:00.000Z",
+   "empreinte": "RhBDZrbWwbsGC3UYqE1_Fw",
+   "change": "2026-10-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "toulouse-strasbourg-2026-11-06",
+    "ids": [
+     "cmv6e5k74002xryqjgmm23efs"
+    ],
+    "debut": "2026-11-06T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "toulouse",
+     "court": "Toulouse",
+     "nom": "Toulouse FC"
+    },
+    "exterieur": {
+     "cle": "strasbourg",
+     "court": "Strasbourg",
+     "nom": "RC Strasbourg Alsace"
+    }
+   }
+  },
+  "/matchs/toulouse-strasbourg-2026-11-06/match.ics": {
+   "type": "evenement",
+   "cle": "toulouse-strasbourg-2026-11-06",
+   "empreinte": "86afbK4nU47U-0bcwG2_Uw",
+   "change": "2026-10-23",
+   "indexable": false
+  },
+  "/matchs/toulouse-strasbourg-2026-11-06/partage.png": {
+   "type": "partage",
+   "cle": "toulouse-strasbourg-2026-11-06",
+   "empreinte": "Kcz9eJ06SOz4Pb-kt8EZbQ",
+   "change": "2026-10-23",
+   "indexable": false
+  },
   "/matchs/toulouse-troyes-2026-10-24/": {
    "type": "match",
    "cle": "toulouse-troyes-2026-10-24",
    "date": "2026-10-24T15:15:00.000Z",
-   "empreinte": "FBuIHW2WxKE7c1TQynP5zw",
-   "change": "2026-10-21",
+   "empreinte": "C7eEpQUjhmnIz4wzE83skA",
+   "change": "2026-10-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4077,9 +4112,9 @@
     "court": "Strasbourg",
     "nom": "RC Strasbourg Alsace"
    },
-   "empreinte": "mcLKAeuXK8_l-e0s0rVApg",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
+   "empreinte": "0CJMUGjyaXOCl7-Dh6JcnA",
+   "sequence": 1,
+   "modifie": "2026-10-23T21:22:18Z"
   },
   "cmv6e5k7s002zryqjmqat0nt8@baromatch.fr": {
    "ids": [

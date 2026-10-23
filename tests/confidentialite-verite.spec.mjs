@@ -106,6 +106,32 @@ test('la page Confidentialité : les sauvegardes chiffrées, 28 jours, et une li
   ]) expect(durees).toContain(ligne);
 });
 
+// Ce qui a changé pour les fans en octobre 2026 : « Je suis en retard », les places en direct (des chiffres), « Je veux
+// le voir » pour tout Paris, la confirmation des 18 ans redemandée après une déconnexion, et ce que la déconnexion et la
+// suppression effacent du téléphone. Ce qui vient avec l’appli le dit (« Avec la mise à jour d’octobre 2026 de l’appli »).
+test('la page Confidentialité : le retard annoncé, les places en direct, tout Paris, la déconnexion', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const retard = normaliser(await page.locator('#retard + ul').innerText());
+  expect(retard).toContain('tu peux prévenir le bar que tu arrives dans 10, 20 ou 30 minutes, une fois par place');
+  expect(retard).toContain('Ni ta position, ni un message.');
+  expect(retard).toContain('toi, et le bar de cette soirée, pendant la soirée');
+  expect(retard).toContain('aujourd’hui, avec ta place. Prévu : effacées un jour après le coup d’envoi. Si tu supprimes ton compte, elles sont effacées tout de suite.');
+  await expect(page.locator('#qui-voit-quoi + ul')).toContainText('se mettent à jour en direct sur les téléphones : ce sont des chiffres seulement, jamais qui a pris ou rendu une place');
+  const notifications = normaliser(await page.locator('#notifications + ul').innerText());
+  expect(notifications).toContain('« Je veux le voir », dit sans choisir de quartier, compte pour tout Paris : il entre dans les chiffres de chaque bar de Paris, des nombres sans ton pseudo');
+  expect(notifications).toContain('ils quittent l’écran verrouillé dès que tu te déconnectes, que tu supprimes ton compte ou que tu coupes « Mes soirées »');
+  await expect(page.locator('#collecte + ul')).toContainText('elle est effacée du téléphone quand tu te déconnectes : la personne qui se connecte ensuite sur ce téléphone confirme pour elle-même');
+  await expect(page.locator('#collecte + ul')).toContainText('notre serveur le vérifie seul, avec une liste de mots, sans l’envoyer à aucun autre service');
+  const deconnexion = normaliser(await page.locator('#deconnexion + p + ul').innerText());
+  expect(deconnexion).toContain('ta confirmation d’avoir 18 ans : la personne qui se connecte ensuite confirme pour elle-même');
+  expect(deconnexion).toContain('les rappels de tes places sur l’écran verrouillé');
+  expect(deconnexion).toContain('le fichier de tes données et les images de story ou de badge');
+  await expect(page.locator('#deconnexion + p')).toContainText('Avec la mise à jour d’octobre 2026 de l’appli');
+  const suppression = normaliser(await page.locator('#suppression + p + ul').innerText());
+  expect(suppression).toContain('elle retire aussi de l’écran verrouillé les rappels de tes places, et efface le fichier de tes données et les images de story ou de badge');
+  expect(suppression).toContain('l’heure à laquelle tu avais dit arriver avec « Je suis en retard »');
+});
+
 test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, et ce qui reste pseudonymisé', async ({ page }) => {
   const texte = await texteDe(page, '/supprimer-mon-compte.html');
   const mails = await page.locator('main a[href^="mailto:"]').evaluateAll((a) => a.map((l) => l.getAttribute('href').split('?')[0]));

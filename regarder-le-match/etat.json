@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "rLnpCipBIvjn2mst3bcsIQ",
-   "change": "2026-10-24",
+   "empreinte": "sZIoPUY2KvGv1F6RwvTdbw",
+   "change": "2026-10-25",
    "indexable": true,
    "bars": []
   },
@@ -67,8 +67,8 @@
   "/agenda/lens.ics": {
    "type": "calendrier",
    "cle": "lens",
-   "empreinte": "8bmgUJjdmSzcPn1Urd8XQQ",
-   "change": "2026-10-22",
+   "empreinte": "rA76uPXS4Mu6TV930yFi8A",
+   "change": "2026-10-25",
    "indexable": false,
    "memoire": {
     "court": "Lens",
@@ -144,8 +144,8 @@
   "/agenda/paris-fc.ics": {
    "type": "calendrier",
    "cle": "paris-fc",
-   "empreinte": "oSzyYoJseB7AT7r8J7z1PQ",
-   "change": "2026-10-24",
+   "empreinte": "5_p1EMviHPBqN4zG-Q4o9A",
+   "change": "2026-10-25",
    "indexable": false,
    "memoire": {
     "court": "Paris FC",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "a6C07kLnmZUIMCh23UFvrg",
-   "change": "2026-10-24",
+   "empreinte": "mCMkyWgd1xNVdh7Ht3_sGA",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "89Lxze8k0m67hLXr0hqLHA",
-   "change": "2026-10-24",
+   "empreinte": "XvHjW9LiOnFWR65FTdynLA",
+   "change": "2026-10-25",
    "indexable": false
   },
   "/en/": {
@@ -269,8 +269,8 @@
    "type": "match-en",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "M4pyoiAs3NKvpmMXgWhFuA",
-   "change": "2026-10-22",
+   "empreinte": "ueutmplBMprEzKY5Bbu1TQ",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": []
   },
@@ -483,16 +483,16 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "NlAOelYbroa2KTZY7AA6iA",
-   "change": "2026-10-24",
+   "empreinte": "Z5evjHxJ3V6JK9unRhyRvQ",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "qvfsbR1NeOkYzsLHGylt5A",
-   "change": "2026-10-24",
+   "empreinte": "U8nGtrO3MOUNqfR3aOnYVA",
+   "change": "2026-10-25",
    "indexable": true,
    "bars": []
   },
@@ -962,8 +962,8 @@
    "type": "match",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "hNtRPddI3We6VJtlmoBctA",
-   "change": "2026-10-22",
+   "empreinte": "4hZhQdc_0KufckrTmyd5ng",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1059,8 +1059,8 @@
   "/matchs/club/lens/": {
    "type": "club",
    "cle": "lens",
-   "empreinte": "4zFiMEpVNEZ4p7FA8JP_LA",
-   "change": "2026-10-22",
+   "empreinte": "j4Q3CJk12bOLzNcApDudkQ",
+   "change": "2026-10-25",
    "indexable": true,
    "bars": []
   },
@@ -1139,8 +1139,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "N0ITEpDY01oTO9tC0YpBsQ",
-   "change": "2026-10-24",
+   "empreinte": "zl_crR-QLG56Rp_hgXbqIQ",
+   "change": "2026-10-25",
    "indexable": true,
    "bars": []
   },
@@ -1622,8 +1622,8 @@
    "type": "match",
    "cle": "lens-paris-fc-2026-10-24",
    "date": "2026-10-24T18:45:00.000Z",
-   "empreinte": "3EgRpr9F2gazDWbsIUn57g",
-   "change": "2026-10-24",
+   "empreinte": "KWf5BWVz_aELIbnTC6y7bA",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1645,13 +1645,6 @@
      "nom": "Paris FC"
     }
    }
-  },
-  "/matchs/lens-paris-fc-2026-10-24/partage.png": {
-   "type": "partage",
-   "cle": "lens-paris-fc-2026-10-24",
-   "empreinte": "9wuGTm55Q0XKLLn8T_RjCA",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/levante-atletico-2026-10-31/": {
    "type": "match",
@@ -2511,8 +2504,8 @@
    "type": "match",
    "cle": "paris-fc-rennes-2026-10-18",
    "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "UC_5GBsc0QdpJ9fi-gI_iA",
-   "change": "2026-10-22",
+   "empreinte": "Yf-1DKkEiJZEztzOfpGkaw",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3016,8 +3009,8 @@
    "type": "match",
    "cle": "troyes-lens-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "5CJ3zQ6r5rwnpRILATed4Q",
-   "change": "2026-10-24",
+   "empreinte": "D0SgcImMfPcKQxw_SRU56w",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3165,28 +3158,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmuy4o35b0017zz9w95w0gkfv@baromatch.fr": {
-   "ids": [
-    "cmuy4o35b0017zz9w95w0gkfv"
-   ],
-   "slug": "lens-paris-fc-2026-10-24",
-   "debut": "2026-10-24T18:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "lens",
-    "court": "Lens",
-    "nom": "RC Lens"
-   },
-   "exterieur": {
-    "cle": "paris-fc",
-    "court": "Paris FC",
-    "nom": "Paris FC"
-   },
-   "empreinte": "mlqymWES3TnAr5y7tgTsYA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmuy4o36d0019zz9w74csusip@baromatch.fr": {
    "ids": [
     "cmuy4o36d0019zz9w74csusip"

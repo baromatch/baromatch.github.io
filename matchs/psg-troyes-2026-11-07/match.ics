@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k8g0031ryqjcvt3ifw9@baromatch.fr
+DTSTAMP:20261024T204522Z
+SEQUENCE:1
+DTSTART:20261107T194500Z
+DTEND:20261107T214500Z
+SUMMARY:PSG – Troyes
+DESCRIPTION:Ligue 1 · Paris Saint-Germain – ESTAC Troyes\nCoup d’envoi
+  samedi 7 novembre à 20:45\, heure de Paris.\nLa page du match : https:/
+ /baromatch.fr/matchs/psg-troyes-2026-11-07/
+URL:https://baromatch.fr/matchs/psg-troyes-2026-11-07/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

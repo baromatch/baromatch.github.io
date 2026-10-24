@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "zn4qZDzRUrnN5P6MKEok_A",
-   "change": "2026-10-23",
+   "empreinte": "ckKB3HzDL3doMHbzF6hhww",
+   "change": "2026-10-24",
    "indexable": true,
    "bars": []
   },
@@ -34,8 +34,8 @@
   "/agenda/brest.ics": {
    "type": "calendrier",
    "cle": "brest",
-   "empreinte": "gB6Wfv6_Rq0PeUmAM2Sj3g",
-   "change": "2026-10-20",
+   "empreinte": "wHL6r6k1rj1je0f-0TZgaw",
+   "change": "2026-10-24",
    "indexable": false,
    "memoire": {
     "court": "Brest",
@@ -111,8 +111,8 @@
   "/agenda/nice.ics": {
    "type": "calendrier",
    "cle": "nice",
-   "empreinte": "9wiQLKO_aGlcpQT69yRwLg",
-   "change": "2026-10-20",
+   "empreinte": "qhpXnIjWBoFFsH9D_xdnRA",
+   "change": "2026-10-24",
    "indexable": false,
    "memoire": {
     "court": "Nice",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "BBo_Oju8d1HPKWAKbIVuMA",
-   "change": "2026-10-23",
+   "empreinte": "7s4VUs5vVyy2dKead3mQPg",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "KIB6Kd-t3pKDDz80KJK2LA",
-   "change": "2026-10-23",
+   "empreinte": "89Lxze8k0m67hLXr0hqLHA",
+   "change": "2026-10-24",
    "indexable": false
   },
   "/en/": {
@@ -474,16 +474,16 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "ZavEpWZVN1qaWlYURBs2Eg",
-   "change": "2026-10-23",
+   "empreinte": "3E--d7zEOJy6r26rBEmYyQ",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "uKpK-dhEyfF4RHy_8D3qKA",
-   "change": "2026-10-23",
+   "empreinte": "C7Lz1P-x3WsThHc1yOdf-w",
+   "change": "2026-10-24",
    "indexable": true,
    "bars": []
   },
@@ -911,8 +911,8 @@
    "type": "match",
    "cle": "brest-nice-2026-10-23",
    "date": "2026-10-23T18:45:00.000Z",
-   "empreinte": "bT374_v_uL_kYLMQ8L1CTw",
-   "change": "2026-10-23",
+   "empreinte": "rhiazZDypfF1PY67QUTcKw",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -934,13 +934,6 @@
      "nom": "OGC Nice"
     }
    }
-  },
-  "/matchs/brest-nice-2026-10-23/partage.png": {
-   "type": "partage",
-   "cle": "brest-nice-2026-10-23",
-   "empreinte": "1Z8ZYsFDZQtonUXbv3mtVw",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/bruges-lens-2026-10-21/": {
    "type": "match",
@@ -1081,8 +1074,8 @@
   "/matchs/club/nice/": {
    "type": "club",
    "cle": "nice",
-   "empreinte": "Rfhd6AKEqafssIqHH56BPQ",
-   "change": "2026-10-21",
+   "empreinte": "0-XzP4p3xdqar8vGjeQI0A",
+   "change": "2026-10-24",
    "indexable": true,
    "bars": []
   },
@@ -1137,8 +1130,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "RXXiTlkr17V0i3pOBS31Gg",
-   "change": "2026-10-23",
+   "empreinte": "LTiWgihJqiKPFh1NaoyHWw",
+   "change": "2026-10-24",
    "indexable": true,
    "bars": []
   },
@@ -1802,8 +1795,8 @@
    "type": "match",
    "cle": "lille-brest-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "CeiRR6-IwAQJ_FDVCCAe_A",
-   "change": "2026-10-21",
+   "empreinte": "Cv8V8gxt_DiuIa7WezL_-A",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2390,8 +2383,8 @@
    "type": "match",
    "cle": "ol-nice-2026-10-18",
    "date": "2026-10-18T18:45:00.000Z",
-   "empreinte": "kP32FoKufCM8VT27YVYokA",
-   "change": "2026-10-23",
+   "empreinte": "Aq7kiVDWw2A7capZEftZYA",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3170,28 +3163,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmuy4o33f0013zz9wrv3oiom0@baromatch.fr": {
-   "ids": [
-    "cmuy4o33f0013zz9wrv3oiom0"
-   ],
-   "slug": "brest-nice-2026-10-23",
-   "debut": "2026-10-23T18:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "brest",
-    "court": "Brest",
-    "nom": "Stade Brestois 29"
-   },
-   "exterieur": {
-    "cle": "nice",
-    "court": "Nice",
-    "nom": "OGC Nice"
-   },
-   "empreinte": "GrzdDc4tPMdjldQNdLFZFA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmuy4o34h0015zz9wqdz2927p@baromatch.fr": {
    "ids": [
     "cmuy4o34h0015zz9wqdz2927p"

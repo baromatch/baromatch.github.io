@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "7s4VUs5vVyy2dKead3mQPg",
+   "empreinte": "Osno03tmZhUyzplijszXdA",
    "change": "2026-10-24",
    "indexable": false,
    "bars": []
@@ -225,8 +225,8 @@
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "gnxF9OL9Wy-mlDxCOv2t4A",
-   "change": "2026-10-23",
+   "empreinte": "avvi1H1BBl6zEcDN3QIHOA",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": []
   },
@@ -242,8 +242,8 @@
    "type": "match-en",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "Wvtd7EOv8J56EFbTK-Ez9Q",
-   "change": "2026-10-20",
+   "empreinte": "64OvsC7tPX_PrN0lPSakIA",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": []
   },
@@ -251,8 +251,8 @@
    "type": "match-en",
    "cle": "aston-villa-man-city-2026-10-24",
    "date": "2026-10-24T11:30:00.000Z",
-   "empreinte": "o6pzfMkes9AVWpa1d67j6w",
-   "change": "2026-10-20",
+   "empreinte": "hJQf0SSyOQtyM837dhC8ng",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": []
   },
@@ -386,8 +386,8 @@
    "type": "match-en",
    "cle": "newcastle-aston-villa-2026-10-17",
    "date": "2026-10-17T16:30:00.000Z",
-   "empreinte": "MYs01D_P15295wlezEspqw",
-   "change": "2026-10-20",
+   "empreinte": "SBQ80G9Ee69RIsQ_X031JQ",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": []
   },
@@ -466,15 +466,15 @@
   "/en/premier-league/": {
    "type": "guide-en",
    "cle": "premier-league",
-   "empreinte": "tTZQEjXjSiVHr45C7Tjk0A",
-   "change": "2026-10-20",
+   "empreinte": "F0IIzngUqhOXmbceKDgGAw",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": []
   },
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "3E--d7zEOJy6r26rBEmYyQ",
+   "empreinte": "XfOZwfGTvGigQL56TspneQ",
    "change": "2026-10-24",
    "indexable": false,
    "bars": []
@@ -482,7 +482,7 @@
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "C7Lz1P-x3WsThHc1yOdf-w",
+   "empreinte": "HD4bmSG3C1WOZdNAHsDrLw",
    "change": "2026-10-24",
    "indexable": true,
    "bars": []
@@ -561,8 +561,8 @@
    "type": "match",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "aw45J7gKxEEeswnN9HYAPQ",
-   "change": "2026-10-21",
+   "empreinte": "2dSZwUrTPGLY9hPKUyWSTw",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -585,13 +585,6 @@
     }
    }
   },
-  "/matchs/arsenal-everton-2026-10-24/match.ics": {
-   "type": "evenement",
-   "cle": "arsenal-everton-2026-10-24",
-   "empreinte": "Tw4cg2h2BfZCHlgLDgex9Q",
-   "change": "2026-10-20",
-   "indexable": false
-  },
   "/matchs/arsenal-everton-2026-10-24/partage.png": {
    "type": "partage",
    "cle": "arsenal-everton-2026-10-24",
@@ -603,8 +596,8 @@
    "type": "match",
    "cle": "aston-villa-man-city-2026-10-24",
    "date": "2026-10-24T11:30:00.000Z",
-   "empreinte": "EEq96-1I3s08vwwvscJpXQ",
-   "change": "2026-10-21",
+   "empreinte": "mFBcNiIw4bwPMHYDotdUyw",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -626,20 +619,6 @@
      "nom": "Manchester City"
     }
    }
-  },
-  "/matchs/aston-villa-man-city-2026-10-24/match.ics": {
-   "type": "evenement",
-   "cle": "aston-villa-man-city-2026-10-24",
-   "empreinte": "tQdSOQE-C4to9avyZpcDbA",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/aston-villa-man-city-2026-10-24/partage.png": {
-   "type": "partage",
-   "cle": "aston-villa-man-city-2026-10-24",
-   "empreinte": "CQBlQU2jSnpAX-FuYhRLQg",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/auxerre-le-mans-2026-10-25/": {
    "type": "match",
@@ -1162,8 +1141,8 @@
   "/matchs/competition/premier-league/": {
    "type": "competition",
    "cle": "premier-league",
-   "empreinte": "3VnC0kbrVuV1XHamDQ1f9g",
-   "change": "2026-10-21",
+   "empreinte": "dKasY10twDtJPXOIco5kjQ",
+   "change": "2026-10-24",
    "indexable": true,
    "bars": []
   },
@@ -2229,8 +2208,8 @@
    "type": "match",
    "cle": "newcastle-aston-villa-2026-10-17",
    "date": "2026-10-17T16:30:00.000Z",
-   "empreinte": "WTk5ZJl12RIJcduDo1LmUQ",
-   "change": "2026-10-20",
+   "empreinte": "iO2oVuP4-cZC-EveuPkV7g",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2930,8 +2909,8 @@
    "type": "match",
    "cle": "toulouse-troyes-2026-10-24",
    "date": "2026-10-24T15:15:00.000Z",
-   "empreinte": "C7eEpQUjhmnIz4wzE83skA",
-   "change": "2026-10-23",
+   "empreinte": "gA6HxLLZJ9VoJKGtPJkv0Q",
+   "change": "2026-10-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2953,13 +2932,6 @@
      "nom": "ESTAC Troyes"
     }
    }
-  },
-  "/matchs/toulouse-troyes-2026-10-24/match.ics": {
-   "type": "evenement",
-   "cle": "toulouse-troyes-2026-10-24",
-   "empreinte": "Nz67oNRp-glTo_bS2UsKkQ",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/toulouse-troyes-2026-10-24/partage.png": {
    "type": "partage",
@@ -3336,50 +3308,6 @@
     "nom": "Olympique Lyonnais"
    },
    "empreinte": "-jtxEt-ibpGYxgv2vPq6zA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jkn0013ryqj4pur0exz@baromatch.fr": {
-   "ids": [
-    "cmv6e5jkn0013ryqj4pur0exz"
-   ],
-   "slug": "aston-villa-man-city-2026-10-24",
-   "debut": "2026-10-24T11:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "aston-villa",
-    "court": "Aston Villa",
-    "nom": "Aston Villa"
-   },
-   "exterieur": {
-    "cle": "man-city",
-    "court": "Man City",
-    "nom": "Manchester City"
-   },
-   "empreinte": "hn4egxjh9S_Qg045F9mHsw",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jlc0015ryqjmrogsn28@baromatch.fr": {
-   "ids": [
-    "cmv6e5jlc0015ryqjmrogsn28"
-   ],
-   "slug": "arsenal-everton-2026-10-24",
-   "debut": "2026-10-24T14:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "arsenal",
-    "court": "Arsenal",
-    "nom": "Arsenal FC"
-   },
-   "exterieur": {
-    "cle": "everton",
-    "court": "Everton",
-    "nom": "Everton FC"
-   },
-   "empreinte": "Gm94jn1in6SXrKLxG5-rtw",
    "sequence": 0,
    "modifie": "2026-10-20T10:48:07Z"
   },

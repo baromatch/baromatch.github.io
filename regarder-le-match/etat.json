@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "Jo_sLE6f5qzx1wilVrCFrg",
-   "change": "2026-10-25",
+   "empreinte": "xfN4TaRtlbffKbfAoQywFg",
+   "change": "2026-10-26",
    "indexable": true,
    "bars": []
   },
@@ -122,8 +122,8 @@
   "/agenda/ol.ics": {
    "type": "calendrier",
    "cle": "ol",
-   "empreinte": "s7SDOL8RMElZHGSnzi6s9w",
-   "change": "2026-10-25",
+   "empreinte": "-L8ok9ob_J8OOLM2Z1ytsw",
+   "change": "2026-10-26",
    "indexable": false,
    "memoire": {
     "court": "OL",
@@ -155,8 +155,8 @@
   "/agenda/psg.ics": {
    "type": "calendrier",
    "cle": "psg",
-   "empreinte": "Tb4ER4anbiw0SaWzo_KciQ",
-   "change": "2026-10-24",
+   "empreinte": "PdORSskEuwO3kPWbFRe_YQ",
+   "change": "2026-10-26",
    "indexable": false,
    "memoire": {
     "court": "PSG",
@@ -210,23 +210,23 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "izYeEiEWQyQ0Z8m4ouH4qw",
-   "change": "2026-10-25",
+   "empreinte": "d6h786AeDHEa-ae-HilM6g",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "XvHjW9LiOnFWR65FTdynLA",
-   "change": "2026-10-25",
+   "empreinte": "opLOXxo8hsA4xDNZ1_eREg",
+   "change": "2026-10-26",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "ECJlxV466FM9RwwPT31TVA",
-   "change": "2026-10-25",
+   "empreinte": "Ic2xFrh8NZeSYZJvJ5Pivg",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": []
   },
@@ -305,8 +305,8 @@
    "type": "match-en",
    "cle": "hoffenheim-ol-2026-10-22",
    "date": "2026-10-22T19:00:00.000Z",
-   "empreinte": "GbVi4zvd_4s0KA-T0agFgw",
-   "change": "2026-10-23",
+   "empreinte": "PPP51lDg7HGPfAqMQFJ5Qw",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": []
   },
@@ -413,8 +413,8 @@
    "type": "match-en",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "PsQURkcTGGkrsMLUnrPNxg",
-   "change": "2026-10-21",
+   "empreinte": "19djAhgY4W6emb0choodGg",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": []
   },
@@ -422,8 +422,8 @@
    "type": "match-en",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "QnviEHcD8nuHOY5EDIIIQw",
-   "change": "2026-10-25",
+   "empreinte": "SsVm2Y05Rpp9d27kmmWm3w",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": []
   },
@@ -458,8 +458,8 @@
    "type": "match-en",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "kQpM0SnGU95s_JXozb3ugw",
-   "change": "2026-10-25",
+   "empreinte": "5pMF5lFGdNlyDwRNaRdnNQ",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": []
   },
@@ -492,16 +492,16 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "YTUOBoA3CUYndMiB_k7ZYA",
-   "change": "2026-10-25",
+   "empreinte": "STvEyxBVGaZ2fQiOv0KmVQ",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "wuNrf3NMel6VLWIV0idFxA",
-   "change": "2026-10-25",
+   "empreinte": "7akylex4Xn9Rv65dGnl8bw",
+   "change": "2026-10-26",
    "indexable": true,
    "bars": []
   },
@@ -775,8 +775,8 @@
    "type": "match",
    "cle": "barca-real-madrid-2026-10-25",
    "date": "2026-10-25T20:00:00.000Z",
-   "empreinte": "3MOIKjIR2C4M2UftiyLBaw",
-   "change": "2026-10-25",
+   "empreinte": "epiYwPk_b64UcTBoHxgH2g",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -798,13 +798,6 @@
      "nom": "Real Madrid C.F."
     }
    }
-  },
-  "/matchs/barca-real-madrid-2026-10-25/partage.png": {
-   "type": "partage",
-   "cle": "barca-real-madrid-2026-10-25",
-   "empreinte": "PYEY8GpvQCkWBO6WiChXMw",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/bayern-dortmund-2026-10-31/": {
    "type": "match",
@@ -880,8 +873,8 @@
    "type": "match",
    "cle": "betis-barca-2026-10-17",
    "date": "2026-10-17T16:30:00.000Z",
-   "empreinte": "jsWMiUYJwQCyQ2DGbWUN7g",
-   "change": "2026-10-21",
+   "empreinte": "cTXKP053cpV9uaeR8T97Lg",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1149,8 +1142,8 @@
   "/matchs/club/ol/": {
    "type": "club",
    "cle": "ol",
-   "empreinte": "4ekOEca3IyYB8uDeeoX87A",
-   "change": "2026-10-25",
+   "empreinte": "1573FA-XacGGoKdsywi8vg",
+   "change": "2026-10-26",
    "indexable": true,
    "bars": []
   },
@@ -1165,8 +1158,8 @@
   "/matchs/club/psg/": {
    "type": "club",
    "cle": "psg",
-   "empreinte": "YeaV4i4bfuRXMK-d4lSXjA",
-   "change": "2026-10-24",
+   "empreinte": "aarvRBTLPCj5KcRp5Smz6A",
+   "change": "2026-10-26",
    "indexable": true,
    "bars": []
   },
@@ -1189,16 +1182,16 @@
   "/matchs/competition/liga/": {
    "type": "competition",
    "cle": "liga",
-   "empreinte": "BFWaii_xT1u7Dmf9CdS0EQ",
-   "change": "2026-10-21",
+   "empreinte": "MnT1TYprk5pCeZuJudMAAA",
+   "change": "2026-10-26",
    "indexable": true,
    "bars": []
   },
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "8c9SXCjO2RvNexlRx3Mtog",
-   "change": "2026-10-25",
+   "empreinte": "Aa2NZT8kX6r7AYFSI6uMfQ",
+   "change": "2026-10-26",
    "indexable": true,
    "bars": []
   },
@@ -1414,8 +1407,8 @@
    "type": "match",
    "cle": "hoffenheim-ol-2026-10-22",
    "date": "2026-10-22T19:00:00.000Z",
-   "empreinte": "QJEq3Xmr4xmVgeGrRrR6PA",
-   "change": "2026-10-23",
+   "empreinte": "edw2stRPAOyw2Y_sRGxgcQ",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2632,8 +2625,8 @@
    "type": "match",
    "cle": "ol-nice-2026-10-18",
    "date": "2026-10-18T18:45:00.000Z",
-   "empreinte": "Aq7kiVDWw2A7capZEftZYA",
-   "change": "2026-10-24",
+   "empreinte": "OBPDO_bglpnqdiNoWGnLMw",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2800,8 +2793,8 @@
    "type": "match",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "YkMprxIbpS-twRrSh5Sy9A",
-   "change": "2026-10-21",
+   "empreinte": "yUjR69tdpv91VMg5k0jvxQ",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2829,8 +2822,8 @@
    "type": "match",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "uAbi6BDDoc1gqH9ObbrYUQ",
-   "change": "2026-10-25",
+   "empreinte": "5ZJxGvljHREVUiAKYd905A",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2852,13 +2845,6 @@
      "nom": "Olympique Lyonnais"
     }
    }
-  },
-  "/matchs/psg-ol-2026-10-25/partage.png": {
-   "type": "partage",
-   "cle": "psg-ol-2026-10-25",
-   "empreinte": "iegb99CchFSdHTPZfqCUBQ",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/psg-troyes-2026-11-07/": {
    "type": "match",
@@ -2906,8 +2892,8 @@
    "type": "match",
    "cle": "real-madrid-seville-2026-10-18",
    "date": "2026-10-18T19:00:00.000Z",
-   "empreinte": "rHQDO-159KaooKwggnYxjQ",
-   "change": "2026-10-20",
+   "empreinte": "90ItNHrP0KEb03l1nWNPvg",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3130,8 +3116,8 @@
    "type": "match",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "pNnDnQZQx4dC6c5VvBsLew",
-   "change": "2026-10-25",
+   "empreinte": "FcO_ZmvmclQgfiitLA0FOA",
+   "change": "2026-10-26",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3447,28 +3433,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmuy4o3an001jzz9wga6hjce3@baromatch.fr": {
-   "ids": [
-    "cmuy4o3an001jzz9wga6hjce3"
-   ],
-   "slug": "psg-ol-2026-10-25",
-   "debut": "2026-10-25T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "psg",
-    "court": "PSG",
-    "nom": "Paris Saint-Germain"
-   },
-   "exterieur": {
-    "cle": "ol",
-    "court": "OL",
-    "nom": "Olympique Lyonnais"
-   },
-   "empreinte": "-jtxEt-ibpGYxgv2vPq6zA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmv6e5jpb001hryqjm51ofxyp@baromatch.fr": {
    "ids": [
     "cmv6e5jpb001hryqjm51ofxyp"

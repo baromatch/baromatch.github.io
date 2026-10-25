@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5k950033ryqjd11lw3c4@baromatch.fr
+DTSTAMP:20261025T161250Z
+SEQUENCE:0
+DTSTART:20261108T113000Z
+DTEND:20261108T133000Z
+SUMMARY:Naples – Lazio
+DESCRIPTION:Serie A · SSC Napoli – SS Lazio\nCoup d’envoi dimanche 8 n
+ ovembre à 12:30\, heure de Paris.\nLa page du match : https://baromatch.
+ fr/matchs/naples-lazio-2026-11-08/
+URL:https://baromatch.fr/matchs/naples-lazio-2026-11-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

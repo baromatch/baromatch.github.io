@@ -78,8 +78,8 @@
   "/agenda/lille.ics": {
    "type": "calendrier",
    "cle": "lille",
-   "empreinte": "gM8gCnm0WMOrbT2ElLp8lQ",
-   "change": "2026-10-21",
+   "empreinte": "Qv6i5Xt2KotcUGD1mg6xfQ",
+   "change": "2026-10-25",
    "indexable": false,
    "memoire": {
     "court": "Lille",
@@ -166,8 +166,8 @@
   "/agenda/rennes.ics": {
    "type": "calendrier",
    "cle": "rennes",
-   "empreinte": "Yb-_yuWOc0MpnJ1OKMGMSQ",
-   "change": "2026-10-22",
+   "empreinte": "abd8Us1Kwqs8cM2JldBGtQ",
+   "change": "2026-10-25",
    "indexable": false,
    "memoire": {
     "court": "Rennes",
@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "mCMkyWgd1xNVdh7Ht3_sGA",
+   "empreinte": "El9CnR_oBdz0IG_oVEtfew",
    "change": "2026-10-25",
    "indexable": false,
    "bars": []
@@ -483,7 +483,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "Z5evjHxJ3V6JK9unRhyRvQ",
+   "empreinte": "NgfwmCUwyENmj3T8Liv79A",
    "change": "2026-10-25",
    "indexable": false,
    "bars": []
@@ -491,7 +491,7 @@
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "U8nGtrO3MOUNqfR3aOnYVA",
+   "empreinte": "oLvPJri10rDn9NN-BXtKpA",
    "change": "2026-10-25",
    "indexable": true,
    "bars": []
@@ -892,8 +892,8 @@
    "type": "match",
    "cle": "bodo-glimt-lille-2026-11-03",
    "date": "2026-11-03T20:00:00.000Z",
-   "empreinte": "3xD6dsrNwr7Y1RbhgxCkHw",
-   "change": "2026-10-21",
+   "empreinte": "Bnk5rwBlKQFm3vp_gOQNsQ",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1067,8 +1067,8 @@
   "/matchs/club/lille/": {
    "type": "club",
    "cle": "lille",
-   "empreinte": "_9DPCn4PeNExXroWn-7AwA",
-   "change": "2026-10-21",
+   "empreinte": "UQjfAhgANHbWJAiJM8ogKg",
+   "change": "2026-10-25",
    "indexable": true,
    "bars": []
   },
@@ -1115,8 +1115,8 @@
   "/matchs/club/rennes/": {
    "type": "club",
    "cle": "rennes",
-   "empreinte": "lXk66JYtzh5bFRjziLHRDQ",
-   "change": "2026-10-22",
+   "empreinte": "CCQUpniZIOES7sRuHPUWxQ",
+   "change": "2026-10-25",
    "indexable": true,
    "bars": []
   },
@@ -1139,7 +1139,7 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "zl_crR-QLG56Rp_hgXbqIQ",
+   "empreinte": "efcuBEcvSptzF6pJ-KYahQ",
    "change": "2026-10-25",
    "indexable": true,
    "bars": []
@@ -1179,8 +1179,8 @@
   "/matchs/competition/serie-a/": {
    "type": "competition",
    "cle": "serie-a",
-   "empreinte": "u7_PjPUEDmbUQ1YELZ5fWw",
-   "change": "2026-10-24",
+   "empreinte": "IDqLNXUWC2pyx-F0qGORaA",
+   "change": "2026-10-25",
    "indexable": true,
    "bars": []
   },
@@ -1342,8 +1342,8 @@
    "type": "match",
    "cle": "inter-fiorentina-2026-10-25",
    "date": "2026-10-25T11:30:00.000Z",
-   "empreinte": "b3fjQ0q0vv8edh2n5G7-vA",
-   "change": "2026-10-21",
+   "empreinte": "QHuy-EPLYh1lsNvOdlTh1A",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1365,20 +1365,6 @@
      "nom": "ACF Fiorentina"
     }
    }
-  },
-  "/matchs/inter-fiorentina-2026-10-25/match.ics": {
-   "type": "evenement",
-   "cle": "inter-fiorentina-2026-10-25",
-   "empreinte": "-_fxL0G81LQ7p_1yKACKjg",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/inter-fiorentina-2026-10-25/partage.png": {
-   "type": "partage",
-   "cle": "inter-fiorentina-2026-10-25",
-   "empreinte": "RQJCxt-RZ6f3XCRDo-99jQ",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/juventus-lazio-2026-10-18/": {
    "type": "match",
@@ -1412,8 +1398,8 @@
    "type": "match",
    "cle": "juventus-naples-2026-11-01",
    "date": "2026-11-01T19:45:00.000Z",
-   "empreinte": "tnwnLzxl2sf-NFdbdx592g",
-   "change": "2026-10-21",
+   "empreinte": "0NdS2V9Hm9X84LPuLYtaIQ",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1832,8 +1818,8 @@
    "type": "match",
    "cle": "lille-lens-2026-10-30",
    "date": "2026-10-30T20:05:00.000Z",
-   "empreinte": "spvgp2GrK62coKwCVqY3lA",
-   "change": "2026-10-21",
+   "empreinte": "GNsglFCCh6ahDT-jM3tYpw",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2084,8 +2070,8 @@
    "type": "match",
    "cle": "monaco-lille-2026-10-25",
    "date": "2026-10-25T14:00:00.000Z",
-   "empreinte": "-aBumaDrYPFq2EekWBvzuQ",
-   "change": "2026-10-22",
+   "empreinte": "H4qBSAxbpCZuP2NsybI2og",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2107,13 +2093,6 @@
      "nom": "LOSC Lille"
     }
    }
-  },
-  "/matchs/monaco-lille-2026-10-25/match.ics": {
-   "type": "evenement",
-   "cle": "monaco-lille-2026-10-25",
-   "empreinte": "hhvdX7u3DdxdbJHRuiczOQ",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/monaco-lille-2026-10-25/partage.png": {
    "type": "partage",
@@ -2162,6 +2141,48 @@
    "cle": "monaco-nordsjaelland-2026-11-05",
    "empreinte": "bgULoNQfNiC-WtPeTO4raQ",
    "change": "2026-10-22",
+   "indexable": false
+  },
+  "/matchs/naples-lazio-2026-11-08/": {
+   "type": "match",
+   "cle": "naples-lazio-2026-11-08",
+   "date": "2026-11-08T11:30:00.000Z",
+   "empreinte": "UU-136V-S5Caxxu9PfJfPA",
+   "change": "2026-10-25",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "naples-lazio-2026-11-08",
+    "ids": [
+     "cmv6e5k950033ryqjd11lw3c4"
+    ],
+    "debut": "2026-11-08T11:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "naples",
+     "court": "Naples",
+     "nom": "SSC Napoli"
+    },
+    "exterieur": {
+     "cle": "lazio",
+     "court": "Lazio",
+     "nom": "SS Lazio"
+    }
+   }
+  },
+  "/matchs/naples-lazio-2026-11-08/match.ics": {
+   "type": "evenement",
+   "cle": "naples-lazio-2026-11-08",
+   "empreinte": "NX5GLKy1DvQNWiUPmTOQoQ",
+   "change": "2026-10-25",
+   "indexable": false
+  },
+  "/matchs/naples-lazio-2026-11-08/partage.png": {
+   "type": "partage",
+   "cle": "naples-lazio-2026-11-08",
+   "empreinte": "w93AsrW9nFRy6ludc_xrzg",
+   "change": "2026-10-25",
    "indexable": false
   },
   "/matchs/naples-rome-2026-10-24/": {
@@ -2266,8 +2287,8 @@
    "type": "match",
    "cle": "nice-rennes-2026-10-31",
    "date": "2026-10-31T16:15:00.000Z",
-   "empreinte": "KsMOB922DacCbH-fgbGiSA",
-   "change": "2026-10-22",
+   "empreinte": "FgCNkYiG-L5AWackudUxtA",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2711,12 +2732,54 @@
    "change": "2026-10-22",
    "indexable": false
   },
+  "/matchs/rennes-lille-2026-11-08/": {
+   "type": "match",
+   "cle": "rennes-lille-2026-11-08",
+   "date": "2026-11-08T14:00:00.000Z",
+   "empreinte": "tJMsp05Oq1irnzJzIfKtYg",
+   "change": "2026-10-25",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "rennes-lille-2026-11-08",
+    "ids": [
+     "cmv6e5k9v0035ryqj8c3c7zo4"
+    ],
+    "debut": "2026-11-08T14:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "rennes",
+     "court": "Rennes",
+     "nom": "Stade Rennais FC"
+    },
+    "exterieur": {
+     "cle": "lille",
+     "court": "Lille",
+     "nom": "LOSC Lille"
+    }
+   }
+  },
+  "/matchs/rennes-lille-2026-11-08/match.ics": {
+   "type": "evenement",
+   "cle": "rennes-lille-2026-11-08",
+   "empreinte": "BTHMRDfTG4DtOWH58MehJg",
+   "change": "2026-10-25",
+   "indexable": false
+  },
+  "/matchs/rennes-lille-2026-11-08/partage.png": {
+   "type": "partage",
+   "cle": "rennes-lille-2026-11-08",
+   "empreinte": "-pc9upZda7fV6LKBKbIaNg",
+   "change": "2026-10-25",
+   "indexable": false
+  },
   "/matchs/rennes-olympiacos-2026-11-05/": {
    "type": "match",
    "cle": "rennes-olympiacos-2026-11-05",
    "date": "2026-11-05T17:45:00.000Z",
-   "empreinte": "9f0fo8M4UX2aKA-McQAw6g",
-   "change": "2026-10-22",
+   "empreinte": "zJNanoL5G0J2sg4_bW7Kfw",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2757,8 +2820,8 @@
    "type": "match",
    "cle": "rennes-strasbourg-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "mVptbtznOp-UzUEQxIwWFA",
-   "change": "2026-10-23",
+   "empreinte": "IPRVH68WpHBOqzpkYzfJ1w",
+   "change": "2026-10-25",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3287,28 +3350,6 @@
     "nom": "Olympique Lyonnais"
    },
    "empreinte": "-jtxEt-ibpGYxgv2vPq6zA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jny001dryqjip19u5u8@baromatch.fr": {
-   "ids": [
-    "cmv6e5jny001dryqjip19u5u8"
-   ],
-   "slug": "inter-fiorentina-2026-10-25",
-   "debut": "2026-10-25T11:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Serie A",
-   "domicile": {
-    "cle": "inter",
-    "court": "Inter",
-    "nom": "FC Internazionale Milano"
-   },
-   "exterieur": {
-    "cle": "fiorentina",
-    "court": "Fiorentina",
-    "nom": "ACF Fiorentina"
-   },
-   "empreinte": "hCc3s4GzZUOBocyeYz2oug",
    "sequence": 0,
    "modifie": "2026-10-20T10:48:07Z"
   },
@@ -3972,6 +4013,28 @@
    "sequence": 1,
    "modifie": "2026-10-24T20:45:22Z"
   },
+  "cmv6e5k950033ryqjd11lw3c4@baromatch.fr": {
+   "ids": [
+    "cmv6e5k950033ryqjd11lw3c4"
+   ],
+   "slug": "naples-lazio-2026-11-08",
+   "debut": "2026-11-08T11:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "naples",
+    "court": "Naples",
+    "nom": "SSC Napoli"
+   },
+   "exterieur": {
+    "cle": "lazio",
+    "court": "Lazio",
+    "nom": "SS Lazio"
+   },
+   "empreinte": "L_1iXymJs0GcOtN1zN6-XQ",
+   "sequence": 0,
+   "modifie": "2026-10-25T16:12:50Z"
+  },
   "cmv6e5k9v0035ryqj8c3c7zo4@baromatch.fr": {
    "ids": [
     "cmv6e5k9v0035ryqj8c3c7zo4"
@@ -3990,9 +4053,9 @@
     "court": "Lille",
     "nom": "LOSC Lille"
    },
-   "empreinte": "F2VSyQCDk-dpsv43A_D8dQ",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
+   "empreinte": "4HY9v1zvmNGJd4B2Pzahbw",
+   "sequence": 1,
+   "modifie": "2026-10-25T16:12:50Z"
   },
   "cmv6e5kaj0037ryqjgkn2obzb@baromatch.fr": {
    "ids": [

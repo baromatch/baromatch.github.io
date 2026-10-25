@@ -54,13 +54,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmv6e5k9v0035ryqj8c3c7zo4@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
+DTSTAMP:20261025T161250Z
+SEQUENCE:1
 DTSTART:20261108T140000Z
 DTEND:20261108T160000Z
 SUMMARY:Rennes – Lille
 DESCRIPTION:Ligue 1 · Stade Rennais FC – LOSC Lille\nCoup d’envoi dima
- nche 8 novembre à 15:00\, heure de Paris.
+ nche 8 novembre à 15:00\, heure de Paris.\nLa page du match : https://ba
+ romatch.fr/matchs/rennes-lille-2026-11-08/
+URL:https://baromatch.fr/matchs/rennes-lille-2026-11-08/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

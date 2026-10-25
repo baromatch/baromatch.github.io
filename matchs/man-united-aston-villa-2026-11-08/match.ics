@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5kdo003fryqjg80iihcb@baromatch.fr
+DTSTAMP:20261025T204813Z
+SEQUENCE:0
+DTSTART:20261108T163000Z
+DTEND:20261108T183000Z
+SUMMARY:Man United – Aston Villa
+DESCRIPTION:Premier League · Manchester United – Aston Villa\nCoup d’e
+ nvoi dimanche 8 novembre à 17:30\, heure de Paris.\nLa page du match : h
+ ttps://baromatch.fr/matchs/man-united-aston-villa-2026-11-08/
+URL:https://baromatch.fr/matchs/man-united-aston-villa-2026-11-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

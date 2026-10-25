@@ -11,20 +11,6 @@ X-WR-CALDESC:Le Havre : les matchs au programme de Baromatch (Ligue 1)\,
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmuy4o383001dzz9w3dcpq9yt@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
-DTSTART:20261025T161500Z
-DTEND:20261025T181500Z
-SUMMARY:OM – Le Havre
-DESCRIPTION:Ligue 1 · Olympique de Marseille – Le Havre AC\nCoup d’env
- oi dimanche 25 octobre à 17:15\, heure de Paris.\nLa page du match : htt
- ps://baromatch.fr/matchs/om-le-havre-2026-10-25/
-URL:https://baromatch.fr/matchs/om-le-havre-2026-10-25/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmv6e5jq2001jryqjwmoopuma@baromatch.fr
 DTSTAMP:20261020T104807Z
 SEQUENCE:0
@@ -40,13 +26,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmv6e5kbh0039ryqjke2x7gu0@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
+DTSTAMP:20261025T204813Z
+SEQUENCE:1
 DTSTART:20261108T161500Z
 DTEND:20261108T181500Z
 SUMMARY:Le Havre – Lorient
 DESCRIPTION:Ligue 1 · Le Havre AC – FC Lorient\nCoup d’envoi dimanche 
- 8 novembre à 17:15\, heure de Paris.
+ 8 novembre à 17:15\, heure de Paris.\nLa page du match : https://baromat
+ ch.fr/matchs/le-havre-lorient-2026-11-08/
+URL:https://baromatch.fr/matchs/le-havre-lorient-2026-11-08/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

@@ -11,20 +11,6 @@ X-WR-CALDESC:Rennes : les matchs au programme de Baromatch (Ligue 1 et Lig
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmuy4o373001bzz9w6lup6lid@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
-DTSTART:20261025T161500Z
-DTEND:20261025T181500Z
-SUMMARY:Rennes – Strasbourg
-DESCRIPTION:Ligue 1 · Stade Rennais FC – RC Strasbourg Alsace\nCoup d’
- envoi dimanche 25 octobre à 17:15\, heure de Paris.\nLa page du match : 
- https://baromatch.fr/matchs/rennes-strasbourg-2026-10-25/
-URL:https://baromatch.fr/matchs/rennes-strasbourg-2026-10-25/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmv6e5jtm001tryqjjh7k07oq@baromatch.fr
 DTSTAMP:20261020T104807Z
 SEQUENCE:0

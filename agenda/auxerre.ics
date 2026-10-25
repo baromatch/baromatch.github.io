@@ -11,20 +11,6 @@ X-WR-CALDESC:Auxerre : les matchs au programme de Baromatch (Ligue 1)\, à
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmuy4o38u001fzz9wv9c9xi8d@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
-DTSTART:20261025T161500Z
-DTEND:20261025T181500Z
-SUMMARY:Auxerre – Le Mans
-DESCRIPTION:Ligue 1 · AJ Auxerre – Le Mans FC\nCoup d’envoi dimanche 2
- 5 octobre à 17:15\, heure de Paris.\nLa page du match : https://baromatc
- h.fr/matchs/auxerre-le-mans-2026-10-25/
-URL:https://baromatch.fr/matchs/auxerre-le-mans-2026-10-25/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmv6e5jye0027ryqjnwjxlrnx@baromatch.fr
 DTSTAMP:20261020T104807Z
 SEQUENCE:0

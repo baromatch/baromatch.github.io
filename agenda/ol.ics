@@ -54,13 +54,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmv6e5kcu003dryqjtxnfldn0@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
+DTSTAMP:20261025T204813Z
+SEQUENCE:1
 DTSTART:20261108T161500Z
 DTEND:20261108T181500Z
 SUMMARY:Brest – OL
 DESCRIPTION:Ligue 1 · Stade Brestois 29 – Olympique Lyonnais\nCoup d’e
- nvoi dimanche 8 novembre à 17:15\, heure de Paris.
+ nvoi dimanche 8 novembre à 17:15\, heure de Paris.\nLa page du match : h
+ ttps://baromatch.fr/matchs/brest-ol-2026-11-08/
+URL:https://baromatch.fr/matchs/brest-ol-2026-11-08/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmv6e5kbh0039ryqjke2x7gu0@baromatch.fr
+DTSTAMP:20261025T204813Z
+SEQUENCE:1
+DTSTART:20261108T161500Z
+DTEND:20261108T181500Z
+SUMMARY:Le Havre – Lorient
+DESCRIPTION:Ligue 1 · Le Havre AC – FC Lorient\nCoup d’envoi dimanche 
+ 8 novembre à 17:15\, heure de Paris.\nLa page du match : https://baromat
+ ch.fr/matchs/le-havre-lorient-2026-11-08/
+URL:https://baromatch.fr/matchs/le-havre-lorient-2026-11-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -6,7 +6,8 @@ import { test, expect } from '@playwright/test';
 import { couperLAPI } from './outils/invitation.mjs';
 import { PAGES } from './outils/pages.mjs';
 
-const LARGEURS = [320, 340, 359, 360, 400, 1280];
+// 401 px : la largeur la plus serrée avec la capsule « Pour les bars » ; 412 px, un téléphone Android courant.
+const LARGEURS = [320, 340, 359, 360, 400, 401, 412, 1280];
 const TEXTES_AGRANDIS = [125, 150, 200];
 const CIBLE = 44;
 const LOGO_MINIMUM = 120;
@@ -70,7 +71,7 @@ for (const page of PAGES) {
   }
 
   for (const pourcent of TEXTES_AGRANDIS) {
-    for (const largeur of [320, 360]) {
+    for (const largeur of [320, 360, 412]) {
       test(`${page.nom} à ${largeur} px, texte à ${pourcent} % : l’en-tête passe à la ligne au lieu de déborder`, async ({ page: onglet }) => {
         await couperLAPI(onglet);
         await onglet.setViewportSize({ width: largeur, height: 700 });

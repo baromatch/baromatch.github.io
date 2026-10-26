@@ -30,9 +30,14 @@ const IMAGE_OG_ALT = 'La Console de Baromatch : pour un match, les places sur Ba
 const SOURCE = readFileSync('pour-les-bars.html', 'utf8');
 const PREMIER_ECRAN = SOURCE.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
 const EMPREINTE = `'sha256-${createHash('sha256').update(PREMIER_ECRAN).digest('base64')}'`;
-// La politique de la page : elle-même, des images en data: (les sources vides des images cachées) et le serveur
-// Baromatch pour la seule demande d’un bar. connect-src garde 'self' : Lighthouse lit /robots.txt depuis la page. Quand
-// marque.json active la mesure d’audience, la page charge aussi /mesure.js, et connect-src admet son compte.
+// La politique de la page (la balise de la tête renvoie ici), règle par règle :
+// - script-src 'self' : aucun script en ligne (d’où pour-les-bars-amorce.js) ;
+// - style-src : l’empreinte du style de la tête (EMPREINTE, au-dessus : un style retouché, et ce test donne la nouvelle) ;
+// - img-src data: : les sources vides des captures cachées à une largeur ;
+// - connect-src : 'self' (Lighthouse y lit /robots.txt) et l’API, seul hôte à qui la page écrit (ADRESSE de
+//   pour-les-bars.js), pour la seule demande d’un bar ;
+// - form-action 'none' : seul le script envoie le formulaire ; base-uri et object-src : rien.
+// Quand marque.json active la mesure d’audience, la page charge aussi /mesure.js, et connect-src admet son compte.
 const MESURE = mesureDuSite();
 const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
   + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);

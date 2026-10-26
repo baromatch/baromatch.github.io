@@ -30,6 +30,7 @@ const PAGES = [
   { chemin: '/agenda/', nom: 'agenda' },
   { chemin: '/matchs/affiche/', nom: 'affiche de la semaine' },
   { chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', nom: 'affiche d’un bar' },
+  { chemin: '/matchs/affiche/pour-le-patron/', nom: 'feuille du patron' },
   { chemin: '/en/', nom: 'Paris en anglais', partage: true },
   { chemin: '/en/premier-league/', nom: 'Premier League en anglais', partage: true },
   { chemin: '/en/champions-league/', nom: 'Ligue des champions en anglais', partage: true },
@@ -62,6 +63,39 @@ test.afterAll(async () => {
   await serveur?.arreter();
   if (dossier) rmSync(dossier, { recursive: true, force: true });
 });
+
+// Le texte agrandi à 200 % (la méthode de texte-agrandi.spec.mjs), sur une page sans bar en français et en anglais : la
+// carte « Tu tiens un bar ? » et son bouton restent dans l’écran, le bouton passe à la ligne et se touche du doigt.
+for (const chemin of ['/matchs/lille-lens-2026-10-26/', '/en/premier-league/']) {
+  for (const largeur of [320, 360]) {
+    test(`${chemin} à ${largeur} px, texte à 200 % : la carte des bars et son bouton restent dans l’écran`, async ({ page: onglet }) => {
+      await onglet.setViewportSize({ width: largeur, height: 800 });
+      await onglet.goto(`${serveur.adresse}${chemin}`);
+      await onglet.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+      const r = await onglet.evaluate(() => {
+        const carte = document.querySelector('.regarder-bars-pro');
+        const bouton = carte.querySelector('.regarder-bars-pro__bouton');
+        const [c, b] = [carte.getBoundingClientRect(), bouton.getBoundingClientRect()];
+        const ecran = document.documentElement.clientWidth;
+        return {
+          dansLaCarte: b.left >= c.left - 0.5 && b.right <= c.right + 0.5,
+          dansLEcran: c.right <= ecran + 0.5 && b.right <= ecran + 0.5,
+          defile: document.documentElement.scrollWidth > ecran,
+          hauteur: b.height,
+        };
+      });
+      expect({ ...r, hauteur: r.hauteur >= 44 }).toEqual({ dansLaCarte: true, dansLEcran: true, defile: false, hauteur: true });
+    });
+  }
+  // En contraste forcé (Windows), l’ombre qui dessine la capsule disparaît : un vrai bord (transparent, repeint par le
+  // système) garde au bouton sa forme.
+  test(`${chemin} en contraste forcé : « Proposer mon bar » garde un bord`, async ({ page: onglet }) => {
+    await onglet.emulateMedia({ forcedColors: 'active' });
+    await onglet.goto(`${serveur.adresse}${chemin}`);
+    const bord = await onglet.locator('.regarder-bars-pro__bouton').evaluate((b) => [getComputedStyle(b).borderTopStyle, getComputedStyle(b).borderTopWidth]);
+    expect(bord).toEqual(['solid', '1px']);
+  });
+}
 
 for (const page of PAGES) {
   test.describe(page.nom, () => {

@@ -10,6 +10,7 @@ import { fabriquerLesPagesAnglaises, lierLesLangues } from './anglais.mjs';
 import { fabriquerCeSoir } from './ce-soir.mjs';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
+import { fabriquerLaFeuilleDuPatron } from './feuille-du-patron.mjs';
 import { lireLeCadre } from './gabarits.mjs';
 import { controlerLaPage } from './controle.mjs';
 import { lireLaMesure } from './mesure.mjs';
@@ -43,9 +44,13 @@ export const construireEnMemoire = async ({
   // « Ton club dans ton agenda » (/agenda/) : la page ; ses fichiers d’agenda s’écrivent à côté (construire.mjs).
   pages.push(fabriquerLaPageAgenda({ donnees, contenu, cadre, avecPresse }));
   // Les affiches à imprimer (affiche.mjs), seulement avec l’encodeur des QR codes (qr.mjs) : sinon, aucune.
-  pages.push(...fabriquerLesAffiches({ donnees, contenu, cadre, avecPresse, qr }));
+  pages.push(...fabriquerLesAffiches({ donnees, contenu, cadre, avecPresse, qr, images }));
   // Les pages en anglais (/en/) : des mêmes données, et des pages de matchs ci-dessus (anglais.mjs).
   pages.push(...fabriquerLesPagesAnglaises({ donnees, contenu, cadre, avecPresse, pages, images, anciens }));
+  // La feuille à laisser au patron d’un bar (feuille-du-patron.mjs), avec l’encodeur des QR codes comme les affiches.
+  const feuilleDuPatron = fabriquerLaFeuilleDuPatron({ donnees, contenu, cadre, avecPresse, qr });
+  pages.push(...feuilleDuPatron.pages);
+  avertissements.push(...feuilleDuPatron.avertissements);
 
   const vocabulaire = chargerLeVocabulaire();
   const offres = donnees.soirees.map((s) => s.offre?.titre).filter(Boolean);

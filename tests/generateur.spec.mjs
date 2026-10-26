@@ -572,7 +572,7 @@ test.describe('les pages', () => {
     }
   });
 
-  test('un match sans vrai bar : noindex, et le lien « Tu tiens un bar ? » vers Pour les bars', () => {
+  test('un match sans vrai bar : noindex, et la carte « Tu tiens un bar ? » vers le formulaire de Pour les bars', () => {
     const p = pageDe('/matchs/lille-lens-2026-10-26/');
     expect(p.indexable).toBe(false);
     // Son titre, son h1, son aperçu et le texte envoyé sur WhatsApp ne promettent aucun bar : « où le regarder ».
@@ -583,7 +583,13 @@ test.describe('les pages', () => {
     expect(`${p.titre} ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`).not.toMatch(/bars? qui|diffus/);
     expect(robotsDe(p)).toBe('noindex');
     expect(p.contenu).toContain('Pas encore de bar pour ce match sur Baromatch.');
-    expect(p.contenu).toContain(insecables('<a href="/pour-les-bars.html">Tu tiens un bar ?</a>'));
+    // La carte des bars dit ce qui est vrai avant l’ouverture (Baromatch cherche ses premiers bars), jamais que des
+    // fans trouvent le bar ou qu’il s’annonce tout seul, et son bouton mène droit au formulaire.
+    expect(p.contenu).toContain(insecables(`<div class="regarder-bars-pro">
+    <p><strong>Tu tiens un bar ?</strong> Baromatch cherche ses premiers bars à Paris.</p>
+    <a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">Proposer mon bar</a>
+  </div>`));
+    expect(p.contenu).not.toMatch(/te trouvent|Annonce tes matchs/);
     expect(p.contenu).not.toMatch(/démo|Lucette/i);
     expect(deType(p, 'Event')).toEqual([]);
   });
@@ -1360,10 +1366,10 @@ test.describe('d’un passage à l’autre', () => {
     writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
     // Les pages du scénario : 21 en français (8 matchs, la semaine, 5 villes et leur index, 5 bars, « Ce soir »),
-    // la page agenda/, 6 affiches à imprimer (celle de la semaine, une par vrai bar publié), 6 pages en anglais
-    // (3 guides, 3 matchs) et 16 pages de clubs et de compétitions : 50, et les 60 vieux matchs, 110 (50 vieux matchs
-    // n’en feraient pas plus de la moitié).
-    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 60 des 110 pages publiées : rien n’est écrit/);
+    // la page agenda/, 7 affiches à imprimer (celle de la semaine, une par vrai bar publié, la feuille du patron), 6 pages
+    // en anglais (3 guides, 3 matchs) et 16 pages de clubs et de compétitions : 51, et les 60 vieux matchs, 111 (51 vieux
+    // matchs n’en feraient pas plus de la moitié).
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 60 des 111 pages publiées : rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
     // Voulu : relancé en le disant, le passage les supprime.
     await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });

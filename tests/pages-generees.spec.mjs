@@ -63,6 +63,31 @@ test.afterAll(async () => {
   if (dossier) rmSync(dossier, { recursive: true, force: true });
 });
 
+// Le texte agrandi à 200 % (la méthode de texte-agrandi.spec.mjs), sur une page sans bar en français et en anglais : la
+// carte « Tu tiens un bar ? » et son bouton restent dans l’écran, le bouton passe à la ligne et se touche du doigt.
+for (const chemin of ['/matchs/lille-lens-2026-10-26/', '/en/premier-league/']) {
+  for (const largeur of [320, 360]) {
+    test(`${chemin} à ${largeur} px, texte à 200 % : la carte des bars et son bouton restent dans l’écran`, async ({ page: onglet }) => {
+      await onglet.setViewportSize({ width: largeur, height: 800 });
+      await onglet.goto(`${serveur.adresse}${chemin}`);
+      await onglet.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+      const r = await onglet.evaluate(() => {
+        const carte = document.querySelector('.regarder-bars-pro');
+        const bouton = carte.querySelector('.regarder-bars-pro__bouton');
+        const [c, b] = [carte.getBoundingClientRect(), bouton.getBoundingClientRect()];
+        const ecran = document.documentElement.clientWidth;
+        return {
+          dansLaCarte: b.left >= c.left - 0.5 && b.right <= c.right + 0.5,
+          dansLEcran: c.right <= ecran + 0.5 && b.right <= ecran + 0.5,
+          defile: document.documentElement.scrollWidth > ecran,
+          hauteur: b.height,
+        };
+      });
+      expect({ ...r, hauteur: r.hauteur >= 44 }).toEqual({ dansLaCarte: true, dansLEcran: true, defile: false, hauteur: true });
+    });
+  }
+}
+
 for (const page of PAGES) {
   test.describe(page.nom, () => {
     for (const largeur of [360, 1280]) {

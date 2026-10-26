@@ -500,7 +500,7 @@
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "EK3t45Knx7ZZ05lcwRq5IQ",
+   "empreinte": "xfkmOFzg048Gr-GIrUHCtQ",
    "change": "2026-10-26",
    "indexable": true,
    "bars": []
@@ -511,6 +511,14 @@
    "empreinte": "yGbOzAr30jJaGHjCkcNZBw",
    "change": "2026-10-26",
    "indexable": false
+  },
+  "/matchs/affiche/pour-le-patron/": {
+   "type": "affiche-patron",
+   "cle": "pour-le-patron",
+   "empreinte": "iGg7SrQsR7ygFJ4RmQFc3w",
+   "change": "2026-10-26",
+   "indexable": false,
+   "bars": []
   },
   "/matchs/angers-lorient-2026-10-25/": {
    "type": "match",

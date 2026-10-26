@@ -121,7 +121,7 @@ for (const site of SITES) {
     test('les pages en anglais, agenda/ et les affiches sont parmi les pages vérifiées', () => {
       const sortes = new Set(generees.map((p) => p.type));
       const avecDesBars = generees.some((p) => p.type === 'bar' && !p.memoire?.disparu);
-      for (const sorte of ['agenda', 'affiche', 'guide-en', 'match-en', ...(avecDesBars ? ['affiche-bar'] : [])]) expect(sortes.has(sorte), sorte).toBe(true);
+      for (const sorte of ['agenda', 'affiche', 'affiche-patron', 'guide-en', 'match-en', ...(avecDesBars ? ['affiche-bar'] : [])]) expect(sortes.has(sorte), sorte).toBe(true);
       expect(generees.filter((p) => pourLesAnciensLiens(p) && p.indexable).map((p) => p.chemin)).toEqual([]);
     });
 

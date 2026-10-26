@@ -1,5 +1,5 @@
 // Les affiches à imprimer : un seul moteur (la feuille, ses lignes de matchs, son pied et son QR code, affiche.css),
-// deux entrées.
+// trois entrées.
 // - L’affiche de la semaine (/matchs/affiche/), ouverte à tous les bars, même ceux qui ne sont pas sur Baromatch : les
 //   matchs des sept jours de /matchs/ (mêmes jours, heure de Paris), sans les matchs reportés ou annulés. Le patron
 //   coche ceux qu’il diffuse et imprime : seules les lignes cochées s’impriment, ou toutes si rien n’est coché. Tout
@@ -9,8 +9,12 @@
 // - L’affiche d’un bar publié (/bar/<bar>/affiche/) : « on diffuse le match », sa prochaine soirée annoncée, ses autres
 //   soirées des sept jours, et un QR code vers sa page. Jamais pour un bar qui n’est pas publié : sa page disparaît
 //   avec lui (aucune affiche n’est écrite, l’état l’efface). Aucune offre : rien sur l’alcool.
-// À l’impression : papier blanc, encre noire, une seule touche d’ambre (le verre de la marque) ; A4 ou A3 au choix, sans
-// fixer la taille du papier (@page size bloquerait le choix dans la fenêtre d’impression).
+// - La feuille à laisser au patron d’un bar (/matchs/affiche/pour-le-patron/), fabriquée par feuille-du-patron.mjs :
+//   quatre lignes de la page des bars, où on en est, et un QR code vers son formulaire ; noindex. Ici, seulement son
+//   adresse, ses textes, quand elle est écrite, et le lien de l’affiche de la semaine qui y mène.
+// À l’impression : papier blanc, encre noire, une seule touche d’ambre (le verre de la marque) ; A4 ou A3 au choix (la
+// feuille du patron : A4 ou A5), sans fixer la taille du papier (@page size bloquerait le choix dans la fenêtre
+// d’impression).
 // Les QR codes sont dessinés au passage du générateur (qr.mjs) : sans l’encodeur, aucune affiche n’est écrite.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -33,6 +37,14 @@ export const TEXTES_DES_AFFICHES = JSON.parse(readFileSync(path.join(DOSSIER_GEN
 // L’adresse du QR code de l’affiche ouverte : l’accueil, telle quelle (aucun paramètre de suivi).
 export const ADRESSE_DU_QR = adresseDe('/');
 export const FEUILLE_DE_STYLE = '/affiche.css';
+// La feuille du patron : son adresse et ses textes (feuille-du-patron.json). Sa ligne « Où on en est » suit l’état de
+// l’appli (marque.json) : sans la phrase de cet état, ni la feuille, ni le lien qui y mène ; sans l’encodeur des QR
+// codes non plus, comme les affiches.
+export const CHEMIN_DE_LA_FEUILLE_DU_PATRON = `${CHEMIN_DE_L_AFFICHE}pour-le-patron/`;
+export const TEXTES_DE_LA_FEUILLE_DU_PATRON = JSON.parse(readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 'feuille-du-patron.json'), 'utf8'));
+export const ouEnEstDuPatron = (marque) => TEXTES_DE_LA_FEUILLE_DU_PATRON.feuille.ouEnEst[marque.appli?.ouverte ? 'ouverte' : 'fermee'];
+export const feuilleDuPatronEcrite = ({ qr, marque }) => Boolean(qr && ouEnEstDuPatron(marque));
+const lienVersLaFeuilleDuPatron = (ecrite) => (ecrite ? `\n  <p class="regarder-suite"><a href="${CHEMIN_DE_LA_FEUILLE_DU_PATRON}">${e(TEXTES_DE_LA_FEUILLE_DU_PATRON.lien)}</a></p>` : '');
 
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
@@ -63,7 +75,7 @@ const lesDates = (jours) => {
 // ---------- Le moteur : la feuille ----------
 
 // Le verre de la marque, pour le papier : le bord en noir, le liquide en ambre (la seule couleur de l’affiche).
-const VERRE = '<svg class="affiche-verre" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><clipPath id="affiche-bol"><circle cx="100" cy="100" r="67"/></clipPath><g clip-path="url(#affiche-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="#FFB13D"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="#0A0B10" stroke-width="16" stroke-linecap="round"/></svg>';
+export const VERRE = '<svg class="affiche-verre" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><clipPath id="affiche-bol"><circle cx="100" cy="100" r="67"/></clipPath><g clip-path="url(#affiche-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="#FFB13D"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="#0A0B10" stroke-width="16" stroke-linecap="round"/></svg>';
 
 // L’heure d’une ligne : « 20:45 » ; une heure provisoire n’est pas écrite (« Heure à confirmer »).
 const heureDeLaLigne = (m) => `<time class="affiche-heure${m.heureConfirmee ? '' : ' affiche-heure--a-confirmer'}" datetime="${debutDe(m)}">${e(m.heureConfirmee ? heureDeParis(m.debut) : TEXTES_DES_AFFICHES.feuille.heureAConfirmer)}</time>`;
@@ -140,8 +152,9 @@ export const fabriquerLAfficheOuverte = ({ donnees, contenu, cadre, avecPresse =
   const etapes = [{ nom: contenu.textes.fil.accueil, chemin: '/' }, { nom: contenu.textes.fil.matchs, chemin: '/matchs/' }, { nom: t.fil, chemin }];
   const titrePage = t.titrePage;
   const desc = t.description;
-  // La phrase pour les bars inscrits : seulement quand il en existe au moins un vrai, publié.
-  const inscrits = donnees.bars.length > 0 ? `\n  <p>${e(t.barInscrit)}</p>` : '';
+  // La phrase pour les bars inscrits : seulement quand il en existe au moins un vrai, publié. Puis le lien vers la
+  // feuille à laisser au patron, quand elle est écrite.
+  const inscrits = `${donnees.bars.length > 0 ? `\n  <p>${e(t.barInscrit)}</p>` : ''}${lienVersLaFeuilleDuPatron(feuilleDuPatronEcrite({ qr, marque: contenu.marque }))}`;
   const corps = `${fil(etapes)}
 <header class="regarder-tete">
   <h1 class="regarder-titre">${e(t.titre)}</h1>

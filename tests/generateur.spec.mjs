@@ -1360,10 +1360,10 @@ test.describe('d’un passage à l’autre', () => {
     writeFileSync(path.join(sortie, 'regarder-le-match/etat.json'), JSON.stringify(etat));
     const etatAvant = lire(sortie, 'regarder-le-match/etat.json');
     // Les pages du scénario : 21 en français (8 matchs, la semaine, 5 villes et leur index, 5 bars, « Ce soir »),
-    // la page agenda/, 6 affiches à imprimer (celle de la semaine, une par vrai bar publié), 6 pages en anglais
-    // (3 guides, 3 matchs) et 16 pages de clubs et de compétitions : 50, et les 60 vieux matchs, 110 (50 vieux matchs
-    // n’en feraient pas plus de la moitié).
-    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 60 des 110 pages publiées : rien n’est écrit/);
+    // la page agenda/, 7 affiches à imprimer (celle de la semaine, une par vrai bar publié, la feuille du patron), 6 pages
+    // en anglais (3 guides, 3 matchs) et 16 pages de clubs et de compétitions : 51, et les 60 vieux matchs, 111 (51 vieux
+    // matchs n’en feraient pas plus de la moitié).
+    await expect(passer(sortie, '2026-10-23T09:00:00Z')).rejects.toThrow(/supprimerait 60 des 111 pages publiées : rien n’est écrit/);
     expect(lire(sortie, 'regarder-le-match/etat.json')).toBe(etatAvant);
     // Voulu : relancé en le disant, le passage les supprime.
     await passer(sortie, '2026-10-23T09:00:00Z', { accepterLesSuppressions: true });

@@ -406,7 +406,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
    {"@type": "Question", "name": "Je m’engage pour combien de temps\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Sans engagement\u00a0: tu arrêtes quand tu veux. Pendant le lancement, c’est gratuit, et aucun paiement tant que tu n’as pas accepté un tarif."}},
    {"@type": "Question", "name": "Mes clients doivent télécharger une appli\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour garder une place, oui\u00a0: l’appli Baromatch, gratuite, en test sur Android pour l’instant. Pour entrer, non\u00a0: ceux qui n’ont pas l’appli ou pas de réservation entrent comme d’habitude, et ton équipe les compte avec «\u00a0Sans réservation\u00a0», sans compte ni nom. Tu choisis combien de places tu ouvres sur Baromatch\u00a0: le reste de la salle reste pour tes habitués et ceux qui passent."}},
    {"@type": "Question", "name": "De quoi j’ai besoin\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour la porte, l’appli Baromatch sur un téléphone Android\u00a0: pour l’instant, elle n’existe que sur Android. Sans Android, la page Scan de la Console valide un pass depuis un navigateur. Pour la Console, un navigateur suffit, sur ordinateur ou sur téléphone\u00a0: rien à installer. On t’explique comment installer l’appli quand on te répond."}},
-   {"@type": "Question", "name": "Comment je démarre, et en combien de temps\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Le délai est à préciser. Dans l’ordre\u00a0: tu envoies ta demande, une personne te répond par e-mail ou par téléphone, puis, si on avance ensemble, Baromatch crée ton bar et ton compte patron (il n’y a pas d’inscription en ligne). Tu te connectes alors à la Console, tu règles ta salle et tu choisis tes matchs."}},
+   {"@type": "Question", "name": "Comment je démarre, et en combien de temps\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "On te répond sous 48\u00a0h. Dans l’ordre\u00a0: tu envoies ta demande, une personne te répond par e-mail ou par téléphone, puis, si on avance ensemble, Baromatch crée ton bar et ton compte patron (il n’y a pas d’inscription en ligne). Tu te connectes alors à la Console, tu règles ta salle et tu choisis tes matchs."}},
    {"@type": "Question", "name": "Je peux mettre une offre sur une boisson\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "L’offre du soir est la tienne\u00a0: c’est toi qui la décides et qui la sers. Tu écris un titre et un prix (0\u00a0€ si c’est gratuit)\u00a0: les fans la voient sur la page de ton bar. Sous une offre qui parle d’alcool, l’appli affiche «\u00a0L’abus d’alcool est dangereux pour la santé, à consommer avec modération.\u00a0»"}},
    {"@type": "Question", "name": "Quels matchs je peux mettre sur Baromatch\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Ceux du calendrier Baromatch, sur les 14 prochains jours\u00a0: tu choisis ceux que tu ouvres aux réservations. Tu n’ajoutes pas de match toi-même."}},
    {"@type": "Question", "name": "Qui tient la porte\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Ton équipe, chacun avec son compte. Dans Équipe, tu ajoutes une personne avec un prénom, une adresse e-mail et un mot de passe que tu lui donnes. Elle ouvre le Mode bar dans l’appli et ne voit que la soirée en cours. Si tu la retires, son Mode bar se ferme tout de suite, sur tous ses téléphones."}},
@@ -718,7 +718,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
       </details>
       <details>
         <summary>Comment je démarre, et en combien de temps&nbsp;?<svg aria-hidden="true" focusable="false"><use href="#pb-plus"/></svg></summary>
-        <p>Le délai est à préciser. Dans l’ordre&nbsp;: tu envoies ta demande, une personne te répond par e-mail ou par téléphone, puis, si on avance ensemble, Baromatch crée ton bar et ton compte patron (il n’y a pas d’inscription en ligne). Tu te connectes alors à la Console, tu règles ta salle et tu choisis tes matchs.</p>
+        <p>On te répond sous 48&nbsp;h. Dans l’ordre&nbsp;: tu envoies ta demande, une personne te répond par e-mail ou par téléphone, puis, si on avance ensemble, Baromatch crée ton bar et ton compte patron (il n’y a pas d’inscription en ligne). Tu te connectes alors à la Console, tu règles ta salle et tu choisis tes matchs.</p>
       </details>
       <details>
         <summary>Je peux mettre une offre sur une boisson&nbsp;?<svg aria-hidden="true" focusable="false"><use href="#pb-plus"/></svg></summary>
@@ -758,7 +758,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
   <section class="contact bloc page" id="proposer" aria-labelledby="titre-contact">
     <div class="contact__intro">
       <h2 class="titre-section" id="titre-contact">Propose ton bar</h2>
-      <p class="chapo">Pas de compte à créer&nbsp;: une personne lit chaque demande.</p>
+      <p class="chapo">Pas de compte à créer&nbsp;: une personne lit chaque demande et te répond sous 48&nbsp;h.</p>
       <ol class="contact__suite">
         <li>Tu envoies ta demande.</li>
         <li>On te répond par e-mail ou par téléphone.</li>
@@ -824,8 +824,9 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
       <div class="merci" id="demande-envoyee" tabindex="-1" hidden>
         <svg class="merci__verre" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><g clip-path="url(#pb-bol)"><g transform="translate(0 -54.6)"><use href="#pb-vague"/></g></g><use href="#pb-contour"/></svg>
         <h3 class="merci__titre">C’est envoyé.</h3>
-        <p>On te répond à <strong id="demande-envoyee-email"></strong>, ou par téléphone si tu as laissé ton numéro. Pas d’e-mail automatique&nbsp;: c’est une personne qui te répond.</p>
+        <p>On te répond sous 48&nbsp;h à <strong id="demande-envoyee-email"></strong>, ou par téléphone si tu as laissé ton numéro. Pas d’e-mail automatique&nbsp;: c’est une personne qui te répond.</p>
         <p>Une erreur dans l’adresse&nbsp;? <button class="lien-bouton" id="demande-nouvelle" type="button">Envoie une nouvelle demande</button></p>
+        <p>En attendant, <a href="/matchs/affiche/">imprime l’affiche gratuite des matchs de la semaine</a> pour ton comptoir. Dis aussi à tes habitués de <a href="/#attente">laisser leur e-mail pour être prévenus du lancement</a>.</p>
       </div>
       <div class="sans-js" id="demande-secours">
         <p class="sans-js__titre">Écris-nous à contact@baromatch.fr</p>

@@ -572,7 +572,7 @@ test.describe('les pages', () => {
     }
   });
 
-  test('un match sans vrai bar : noindex, et le lien « Tu tiens un bar ? » vers Pour les bars', () => {
+  test('un match sans vrai bar : noindex, et la carte « Tu tiens un bar ? » vers le formulaire de Pour les bars', () => {
     const p = pageDe('/matchs/lille-lens-2026-10-26/');
     expect(p.indexable).toBe(false);
     // Son titre, son h1, son aperçu et le texte envoyé sur WhatsApp ne promettent aucun bar : « où le regarder ».
@@ -583,7 +583,13 @@ test.describe('les pages', () => {
     expect(`${p.titre} ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`).not.toMatch(/bars? qui|diffus/);
     expect(robotsDe(p)).toBe('noindex');
     expect(p.contenu).toContain('Pas encore de bar pour ce match sur Baromatch.');
-    expect(p.contenu).toContain(insecables('<a href="/pour-les-bars.html">Tu tiens un bar ?</a>'));
+    // La carte des bars dit ce qui est vrai avant l’ouverture (Baromatch cherche ses premiers bars), jamais que des
+    // fans trouvent le bar ou qu’il s’annonce tout seul, et son bouton mène droit au formulaire.
+    expect(p.contenu).toContain(insecables(`<div class="regarder-bars-pro">
+    <p><strong>Tu tiens un bar ?</strong> Baromatch cherche ses premiers bars à Paris.</p>
+    <a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">Proposer mon bar</a>
+  </div>`));
+    expect(p.contenu).not.toMatch(/te trouvent|Annonce tes matchs/);
     expect(p.contenu).not.toMatch(/démo|Lucette/i);
     expect(deType(p, 'Event')).toEqual([]);
   });

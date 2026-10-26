@@ -6,6 +6,7 @@ import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
+import { MARQUE } from './outils/marque.mjs';
 import { PIED } from './outils/pied.mjs';
 import { ralentirLaPremiereImage } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
@@ -308,9 +309,12 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto(PAGE);
     const ouverture = page.locator('.ouverture-bars');
-    // La ligne d’état, juste sous la phrase d’ouverture (la phrase des autres pages pour la plateforme).
+    // La ligne d’état, juste sous la phrase d’ouverture : tant que l’appli n’est pas ouverte (marque.json), elle dit
+    // que les fans ne réservent pas encore, avant la plateforme. Le jour où l’appli ouvre, ce test échoue tant que la
+    // ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__etat');
-    await expect(etat).toHaveText('Où on en est : Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.');
+    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
+    await expect(etat).toHaveText('Où on en est : Baromatch n’est pas encore ouvert au public, les fans ne réservent pas encore. En test sur Android, à Paris ; pas d’appli iPhone pour l’instant.');
     // Sous le bouton, une phrase sur le prix ; dans les pastilles, le tarif du bar à côté du gratuit des clients.
     const bouton = ouverture.locator('.actions .capsule[href="#proposer"]');
     const prix = ouverture.locator('.actions + .ouverture-bars__prix');
@@ -412,6 +416,27 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await expect(bouton).toHaveText('Proposer mon bar');
     const fin = await page.locator('.atouts__grille').boundingBox();
     expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
+  });
+
+  test('« Proposer mon bar » revient à la fin de « Ton soir de match, heure par heure »', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(PAGE);
+    const bouton = page.locator('.horaire > .actions .capsule[href="#proposer"]');
+    await expect(bouton).toHaveText('Proposer mon bar');
+    const fin = await page.locator('.horaire__historique').boundingBox();
+    expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
+  });
+
+  test('avant le formulaire, ce qui est vrai sur ce site : l’accord écrit du bar, et aucun bar qui paie pour passer devant', async ({ page }) => {
+    await page.goto(PAGE);
+    const accord = page.locator('#proposer .contact__intro .contact__suite + .chapo');
+    await expect(accord).toHaveText('Sur ce site, ton bar n’apparaît qu’avec ton accord écrit, et aucun bar ne paie pour passer devant un autre. Comment on choisit les bars.');
+    await expect(accord.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
+    // Les deux faits sont ceux de la page qui explique le choix des bars, avec la même limite, « sur ce site » : la page
+    // des bars ne promet rien de plus, et rien sur l’ordre des bars dans l’appli.
+    const choix = readFileSync('comment-on-choisit-les-bars.html', 'utf8');
+    expect(choix).toContain('Il n’apparaît sur ce site qu’avec son accord écrit.');
+    expect(choix).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Aucun bar ne paie pour passer devant un autre.');
   });
 
   test('les deux lignes pour les fans passent sous le formulaire, en fin de page', async ({ page }) => {

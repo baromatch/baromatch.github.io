@@ -180,7 +180,7 @@ test('l’affiche de la semaine : indexable même sans vrai bar publié, contrô
   expect(p.indexable).toBe(true);
   expect(robotsDe(p)).toBe('max-image-preview:large');
   expect(p.barsNommes).toEqual([]);
-  expect(p.contenu).toContain('<title>Affiche des matchs de la semaine pour ton bar</title>');
+  expect(p.contenu).toContain('<title>Affiche des matchs de foot de la semaine pour ton bar</title>');
   expect(p.contenu).toContain('<meta name="description" content="Les matchs des sept prochains jours, à l’heure de Paris\u00A0: coche ceux que tu diffuses et imprime ton affiche en A4 ou en A3. Gratuit, sans compte.">');
   expect(p.contenu.match(/<h1[\s>]/g)).toHaveLength(1);
   expect(p.contenu).toContain('<h1 class="regarder-titre">L’affiche des matchs de la semaine</h1>');
@@ -285,6 +285,8 @@ test('« Ton bar est sur Baromatch ? » seulement quand un vrai bar est publié 
     expect(texte).not.toMatch(MOTS_INTERDITS);
     expect(texte).not.toMatch(/alcool|bière|pinte|verre offert|happy|partenaire/i);
     expect(texte).toContain('Ton bar est à Paris ? Propose-le sur Baromatch');
+    // Le lien mène droit au formulaire de la page des bars.
+    expect(html).toContain('<a href="/pour-les-bars.html#proposer">');
     expect(html.split('<main')[1]).not.toMatch(/<img\b/);
   }
 });

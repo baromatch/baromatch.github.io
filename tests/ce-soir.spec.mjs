@@ -123,7 +123,9 @@ test('un jour sans vrai bar : noindex, les matchs du jour et les suivants vers l
   expect(matchs).toMatch(/^id="titre-matchs">Les matchs d’aujourd’hui<\/h2>/);
   expect(matchs).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
   expect(matchs).toContain('<a class="regarder-matchs__match" href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a> <span class="regarder-matchs__infos"><time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1 · <span class="regarder-compte">Pas encore de bar</span></span>');
-  expect(matchs).toContain('<a href="/pour-les-bars.html">Tu tiens un bar');
+  // « Tu tiens un bar ? » : une carte, et un bouton droit vers le formulaire de la page des bars.
+  expect(matchs).toContain('<div class="regarder-bars-pro">');
+  expect(matchs).toContain('<a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">Proposer mon bar</a>');
   expect(sectionDe(p, 'titre-prochains')).toContain('<a class="regarder-matchs__match" href="/matchs/psg-barca-2026-10-24/">PSG – Barça</a>');
   // Les villes, chacune vers sa page ; la liste d’attente tant que l’appli n’est pas ouverte.
   const villes = sectionDe(p, 'titre-villes');

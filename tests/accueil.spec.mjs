@@ -88,6 +88,27 @@ for (const ecran of [
   });
 }
 
+// Plus bas dans la page, « préviens-moi » revient deux fois : après le film et après les questions. La même capsule
+// ambre que sur les pages des matchs, vers le formulaire du haut. « Voir la boutique » passe en verre : près de ces
+// rappels, l’ambre reste à l’appel des fans (« Deviens testeur Android » garde le sien).
+test('« préviens-moi » revient après le film et après les questions ; la boutique en verre', async ({ page }) => {
+  await page.goto('/');
+  const rappels = page.locator('main .rappel-attente a.capsule');
+  await expect(rappels).toHaveCount(2);
+  await expect(rappels).toHaveText(['L’appli ouvre bientôt : préviens-moi', 'L’appli ouvre bientôt : préviens-moi']);
+  for (const lien of await rappels.all()) await expect(lien).toHaveAttribute('href', '#attente');
+  expect(await page.$$eval('main .rappel-attente', (p) => p.map((e) => e.closest('section').className.split(' ')[0])))
+    .toEqual(['film', 'questions-fans']);
+  const boutique = page.locator('main a[href="/boutique.html"]');
+  await expect(boutique).toHaveCount(1);
+  expect(await boutique.evaluate((a) => getComputedStyle(a).backgroundColor)).not.toBe('rgb(255, 177, 61)');
+  expect(await page.locator('main a[href="/testeurs-android.html"]').evaluate((a) => getComputedStyle(a).backgroundColor)).toBe('rgb(255, 177, 61)');
+  // Un rappel mène au formulaire, et le champ est là.
+  await rappels.last().click();
+  await expect(page).toHaveURL(/#attente$/);
+  await expect(page.locator('#attente-mail')).toBeInViewport();
+});
+
 test('le lien /#attente arrive sur le formulaire avec son étiquette et la phrase qui dit pourquoi', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 360, height: 640 });

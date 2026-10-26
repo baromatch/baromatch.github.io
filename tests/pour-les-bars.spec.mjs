@@ -430,12 +430,13 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   test('avant le formulaire, ce qui est vrai sur ce site : l’accord écrit du bar, et aucun bar qui paie pour passer devant', async ({ page }) => {
     await page.goto(PAGE);
     const accord = page.locator('#proposer .contact__intro .contact__suite + .chapo');
-    await expect(accord).toHaveText('Ton bar n’apparaît sur ce site qu’avec ton accord écrit, et aucun bar ne paie pour passer devant un autre. Comment on choisit les bars.');
+    await expect(accord).toHaveText('Sur ce site, ton bar n’apparaît qu’avec ton accord écrit, et aucun bar ne paie pour passer devant un autre. Comment on choisit les bars.');
     await expect(accord.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
-    // Les deux faits sont ceux de la page qui explique le choix des bars : la page des bars ne promet rien de plus.
+    // Les deux faits sont ceux de la page qui explique le choix des bars, avec la même limite, « sur ce site » : la page
+    // des bars ne promet rien de plus, et rien sur l’ordre des bars dans l’appli.
     const choix = readFileSync('comment-on-choisit-les-bars.html', 'utf8');
     expect(choix).toContain('Il n’apparaît sur ce site qu’avec son accord écrit.');
-    expect(choix).toContain('Aucun bar ne paie pour passer devant un autre.');
+    expect(choix).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Aucun bar ne paie pour passer devant un autre.');
   });
 
   test('les deux lignes pour les fans passent sous le formulaire, en fin de page', async ({ page }) => {

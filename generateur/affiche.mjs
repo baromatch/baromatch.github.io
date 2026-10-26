@@ -175,7 +175,7 @@ ${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant)
 <section class="regarder-section" aria-labelledby="titre-apres">
   <h2 id="titre-apres">${e(t.titreApres)}</h2>
   <p>${e(t.droits)}</p>
-  <p class="regarder-suite"><a href="/pour-les-bars.html">${e(t.proposer)}</a></p>${inscrits}
+  <p class="regarder-suite"><a href="/pour-les-bars.html#proposer">${e(t.proposer)}</a></p>${inscrits}
 </section>`;
   // Indexable même sans aucun vrai bar publié : c’est un outil, fait des vrais matchs de la semaine (leurs vraies
   // heures), qui ne dit d’aucun bar qu’il est sur Baromatch. Exception à la règle « pas de vrai bar, pas d’index »,

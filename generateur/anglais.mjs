@@ -163,7 +163,10 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
     ${bars.map((bar) => carteDuBar(bar, options)).join('\n    ')}
   </ul>
   <p class="regarder-note">${e(t.bars.enFrancais)}</p>`;
-  const tuTiensUnBar = `<p class="regarder-bars-pro"><a href="/pour-les-bars.html" hreflang="fr">${e(t.bars.tuTiensUnBar)}</a> ${e(t.bars.tuTiensUnBarSuite)}</p>`;
+  const tuTiensUnBar = `<div class="regarder-bars-pro">
+    <p><strong>${e(t.bars.tuTiensUnBar)}</strong> ${e(t.bars.tuTiensUnBarSuite)}</p>
+    <a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer" hreflang="fr">${e(t.bars.proposerMonBar)}</a>
+  </div>`;
   // Les matchs, sous le titre de leur jour à Paris : la ligne ne donne que l’heure.
   const parJour = (matchs) => [...new Set(matchs.map((m) => jourDeParis(m.debut)))].map((jour) => `  <h3 class="regarder-jour">${e(jourEntierALAnglaise(Date.parse(`${jour}T12:00:00Z`)))}</h3>
   <ul class="regarder-matchs">

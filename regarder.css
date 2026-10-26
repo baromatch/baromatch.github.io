@@ -100,7 +100,44 @@
 .regarder-ville + .regarder-quartier { margin-top: 0; }
 
 .regarder-vide { margin: 0 0 8px; font-weight: 650; }
-.regarder-bars-pro { margin: 0; color: var(--texte-doux); }
+/* « Tu tiens un bar ? » sur une page sans bar : une carte de verre, un bouton de verre vers le formulaire des bars.
+   L’ambre reste à l’appel des fans, juste dessous. */
+.regarder-bars-pro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin: 12px 0 0;
+  padding: 16px 20px;
+  border: 1px solid var(--verre-bord);
+  border-radius: 20px;
+  background: var(--verre);
+  box-shadow: var(--verre-reflet);
+}
+.regarder-bars-pro p { flex: 1 1 15rem; margin: 0; color: var(--texte-doux); }
+.regarder-bars-pro strong { color: var(--texte); }
+/* Le bouton passe à la ligne avec le texte agrandi, comme la capsule de l’appel des fans : il ne sort jamais de l’écran.
+   Contraste forcé (Windows) : l’ombre disparaît, le bord transparent devient visible, le bouton garde sa forme. */
+.regarder-bars-pro__bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--verre-fort);
+  box-shadow: inset 0 0 0 1px var(--verre-bord-fort);
+  color: var(--texte);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  text-decoration: none;
+}
+.regarder-bars-pro__bouton:hover { background: rgba(255, 255, 255, 0.15); color: var(--texte); }
 
 /* Le bloc du soir, en haut de la semaine : une carte de verre. */
 .regarder-ce-soir {

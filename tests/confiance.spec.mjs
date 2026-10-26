@@ -101,7 +101,7 @@ test('comment on choisit les bars : un h1, et chaque intertitre pose la question
 });
 
 // L’ordre dit ici est celui que le générateur applique (tests/generateur.spec.mjs, « l’ordre annoncé ») ; aucun
-// classement payant n’existe, et la page ne parle pas du tarif des bars (encore à préciser sur « Pour les bars »).
+// classement payant n’existe, et la page ne parle pas du tarif des bars (leurs conditions sont sur « Pour les bars »).
 test('comment on choisit les bars : l’ordre d’affichage (ville, arrondissement, nom), et aucun bar ne paie sa place', async ({ page }) => {
   await page.goto(CONFIANCE);
   const ordre = normaliser(await page.locator('h2#ordre + p').textContent());

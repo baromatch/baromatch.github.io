@@ -3,13 +3,15 @@
 // lui-même (ce qui part, chaque réponse du serveur) est vérifié par pour-les-bars-formulaire.spec.mjs. Le serveur
 // est simulé (page.route) : aucun test n’écrit à l’API de production.
 import { test, expect } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { MARQUE } from './outils/marque.mjs';
 import { PIED } from './outils/pied.mjs';
 import { ralentirLaPremiereImage } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
+import { estPermis } from '../generateur/etat.mjs';
 import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
 
 const PAGE = '/pour-les-bars.html';
@@ -31,6 +33,14 @@ const EMPREINTE = `'sha256-${createHash('sha256').update(PREMIER_ECRAN).digest('
 const MESURE = mesureDuSite();
 const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
   + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);
+
+// Les conditions des premiers bars, mot pour mot comme le fondateur les a écrites (26 octobre 2026) : sous le bouton,
+// en tête de « Combien ça coûte ? », et reprises sans rien y ajouter dans « Je m’engage pour combien de temps ? ».
+const CONDITIONS = 'Gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.';
+const COMBIEN = 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux. Pour tes clients, Baromatch est gratuit : ce qu’ils prennent au bar, ils le paient au bar.';
+const ENGAGEMENT = 'Sans engagement : tu arrêtes quand tu veux. Pendant le lancement, c’est gratuit, et aucun paiement tant que tu n’as pas accepté un tarif.';
+// « Le tarif est à préciser », « tarif à préciser » : ce que la page disait avant ces conditions.
+const TARIF_A_PRECISER = /tarif\s+(?:est\s+)?à\s+préciser/i;
 
 // La loi Evin : la mention sanitaire, citée une fois, sous l’explication de l’offre du soir ; aucun mot d’alcool ailleurs.
 const MENTION = 'L’abus d’alcool est dangereux pour la santé, à consommer avec modération.';
@@ -193,7 +203,7 @@ test.describe('ce que la page dit', () => {
       question: details.querySelector('summary').textContent,
       reponse: [...details.children].filter((e) => e.tagName !== 'SUMMARY').map((e) => e.textContent).join(' '),
     })));
-    expect(visibles).toHaveLength(12);
+    expect(visibles).toHaveLength(13);
     const espaces = (texte) => texte.replace(/[ \t\r\n]+/g, ' ').trim();
     expect(faq.mainEntity.map((q) => [q['@type'], q.acceptedAnswer['@type'], espaces(q.name), espaces(q.acceptedAnswer.text)]))
       .toEqual(visibles.map((v) => ['Question', 'Answer', espaces(v.question), espaces(v.reponse)]));
@@ -315,16 +325,15 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__etat');
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
     await expect(etat).toHaveText('Où on en est : Baromatch n’est pas encore ouvert au public, les fans ne réservent pas encore. En test sur Android, à Paris ; pas d’appli iPhone pour l’instant.');
-    // Sous le bouton, une phrase sur le prix ; dans les pastilles, le tarif du bar à côté du gratuit des clients.
+    // Sous le bouton, les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du
+    // gratuit des clients.
     const bouton = ouverture.locator('.actions .capsule[href="#proposer"]');
     const prix = ouverture.locator('.actions + .ouverture-bars__prix');
-    // Le tarif du bar d’abord, « à préciser » (il n’est pas fixé) : « ne coûte rien » ne se lit pas comme le prix du
-    // service.
-    await expect(prix).toHaveText('Pour ton bar, le tarif est à préciser. Envoyer ta demande ne coûte rien : pose ta question dans ton message.');
+    await expect(prix).toHaveText(CONDITIONS);
     await expect(ouverture.locator('.boutique-promesses li')).toHaveText([
       'On cherche les premiers bars, à Paris',
       'Tu choisis combien de places tu ouvres',
-      'Gratuit pour tes clients · pour ton bar, tarif à préciser',
+      'Gratuit pour tes clients · pour ton bar, pendant le lancement, sans engagement',
     ]);
     // Tout ça sans défiler : le bouton et la phrase du prix sont dans le premier écran.
     await expect(bouton).toBeInViewport({ ratio: 1 });
@@ -362,11 +371,12 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(normaliser(await page.locator('main').textContent())).not.toMatch(/iPhone[^.]*(bientôt|prochainement|arrive|bientot)/i);
   });
 
-  test('les questions : le prix d’abord, ouvert ; une réponse franche en tête ; les clients, le délai et l’offre sur une boisson répondus', async ({ page }) => {
+  test('les questions : le prix d’abord, ouvert, puis l’engagement ; une réponse franche en tête ; les clients, le délai et l’offre sur une boisson répondus', async ({ page }) => {
     await page.goto(PAGE);
     const lues = await questions(page);
-    expect(lues.slice(0, 5).map((q) => q.question)).toEqual([
+    expect(lues.slice(0, 6).map((q) => q.question)).toEqual([
       'Combien ça coûte ?',
+      'Je m’engage pour combien de temps ?',
       'Mes clients doivent télécharger une appli ?',
       'De quoi j’ai besoin ?',
       'Comment je démarre, et en combien de temps ?',
@@ -375,7 +385,8 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(lues.filter((q) => q.ouverte).map((q) => q.question)).toEqual(['Combien ça coûte ?']);
     await expect(page.locator('.questions details').first().locator('p')).toBeVisible();
     const reponse = (debut) => lues.find((q) => q.question.startsWith(debut)).reponse;
-    expect(reponse('Combien')).toBe('Pour ton bar, le tarif est à préciser : pose la question dans ta demande, on te répond. Pour tes clients, Baromatch est gratuit : ce qu’ils prennent au bar, ils le paient au bar.');
+    expect(reponse('Combien')).toBe(COMBIEN);
+    expect(reponse('Je m’engage')).toBe(ENGAGEMENT);
     expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite, en test sur Android pour l’instant\. Pour entrer, non : /);
     expect(reponse('Comment je démarre')).toMatch(/^Le délai est à préciser\. Dans l’ordre : tu envoies ta demande/);
     expect(reponse('Comment je démarre')).not.toMatch(/\d+\s*(jours?|semaines?|heures?|h\b)/);
@@ -389,6 +400,47 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(balisee.replace(/\s+/g, ' ')).toBe(boisson);
     // L’ancienne réponse « On ne peut pas encore te donner de délai. », franche mais vide, est remplacée par l’ordre des choses.
     expect(lues.map((q) => q.reponse).join(' ')).not.toContain('On ne peut pas encore te donner de délai');
+  });
+
+  // Les conditions des premiers bars : sous le bouton, dans les pastilles, dans les deux questions et dans la FAQ
+  // balisée, les mêmes mots. « Tarif à préciser » ne se lit plus nulle part : ni sur la page, ni dans ce que lisent un
+  // lecteur d’écran, un aperçu de partage ou un moteur de recherche.
+  test('les conditions des premiers bars, mot pour mot : sous le bouton, dans « Combien ça coûte ? », dans « Je m’engage pour combien de temps ? » et dans la FAQ balisée ; « tarif à préciser » nulle part', async ({ page }) => {
+    await page.goto(PAGE);
+    await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS);
+    expect(normaliser(await page.locator('main').textContent())).toContain(CONDITIONS);
+    // La nouvelle question, juste après le prix, fermée comme les autres (seul le prix est ouvert).
+    const engagement = page.locator('.questions details', { has: page.locator('summary', { hasText: 'Je m’engage pour combien de temps' }) });
+    await expect(engagement).toHaveCount(1);
+    expect(await engagement.evaluate((d) => d.open)).toBe(false);
+    await expect(engagement.locator('summary')).toHaveText('Je m’engage pour combien de temps ?');
+    await expect(engagement.locator('p')).toHaveText(ENGAGEMENT);
+    // La FAQ balisée dit les mêmes mots.
+    const balisees = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
+      .flatMap((s) => JSON.parse(s.textContent)['@graph'] ?? []).flatMap((n) => n.mainEntity ?? [])
+      .map((q) => [q.name, q.acceptedAnswer.text]));
+    const balisee = (question) => normaliser(balisees.find(([nom]) => normaliser(nom) === question)?.[1] ?? '');
+    expect(balisee('Combien ça coûte ?')).toBe(COMBIEN);
+    expect(balisee('Je m’engage pour combien de temps ?')).toBe(ENGAGEMENT);
+    // Ce que tout le monde lit de la page : le texte, les attributs, la tête, les données structurées.
+    const lu = await page.evaluate(() => [
+      document.title,
+      document.body.textContent,
+      ...[...document.querySelectorAll('[alt], [aria-label], [title], meta[content]')]
+        .map((e) => [e.getAttribute('alt'), e.getAttribute('aria-label'), e.getAttribute('title'), e.getAttribute('content')].filter(Boolean).join(' ')),
+      ...[...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.stringify(JSON.parse(s.textContent))),
+    ].join(' '));
+    expect(normaliser(lu)).not.toMatch(TARIF_A_PRECISER);
+  });
+
+  // Ailleurs que sur cette page : les pages écrites à la main, leurs scripts, llms.txt. Les pages que le générateur
+  // écrit (sa liste blanche) sont relues à leur source, dans tests/feuille-du-patron.spec.mjs.
+  test('aucun fichier publié écrit à la main ne dit encore « tarif à préciser »', () => {
+    const fichiers = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], { encoding: 'utf8' })
+      .split('\0')
+      .filter((f) => /\.(?:html|js|txt|xml|json)$/.test(f) && !/^(?:docs|tests|generateur)\//.test(f) && !estPermis(f) && existsSync(f));
+    expect(fichiers).toEqual(expect.arrayContaining(['pour-les-bars.html', 'pour-les-bars.js', 'index.html', 'presse.html', 'llms.txt']));
+    expect(fichiers.filter((f) => TARIF_A_PRECISER.test(readFileSync(f, 'utf8').replace(/&nbsp;/g, ' ')))).toEqual([]);
   });
 
   test('les mots de la Console sont dits en clair au premier emploi : la Console, le pass, le Mode bar ; les places sont « libérées », la position « pas envoyée »', async ({ page }) => {
@@ -942,7 +994,7 @@ test.describe('sans JavaScript', () => {
     await expect(page.locator('.atout')).toHaveCount(5);
     await expect(page.locator('.marche__etape')).toHaveCount(3);
     await expect(page.locator('.horaire__moment')).toHaveCount(5);
-    await expect(page.locator('.questions details')).toHaveCount(12);
+    await expect(page.locator('.questions details')).toHaveCount(13);
     await expect(page.locator('.formulaire__ailleurs a[href="mailto:contact@baromatch.fr"]')).toBeVisible();
   });
 });

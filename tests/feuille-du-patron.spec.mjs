@@ -45,7 +45,7 @@ const TITRE = 'Remplis ton bar les soirs de match.';
 const LIGNES = [
   'Sur l’appli Baromatch, les fans de foot trouvent un bar qui diffuse leur match et y gardent leur place.',
   'Tu choisis tes matchs et combien de places tu ouvres.',
-  'Gratuit pour tes clients. Pour ton bar, le tarif est à préciser. Envoyer ta demande ne coûte rien.',
+  'Gratuit pour tes clients. Pour ton bar, gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.',
   'Sur baromatch.fr, ton bar n’apparaît qu’avec ton accord écrit.',
 ];
 const OU_EN_EST = 'Baromatch cherche ses premiers bars à Paris. L’appli est en test sur Android ; les fans ne réservent pas encore.';
@@ -193,12 +193,24 @@ test('le texte de la feuille : le titre, les quatre lignes, où on en est et le 
     [TITRE, 'pour-les-bars.html', ['Remplis ton bar les soirs de match.']],
     [LIGNES[0], 'pour-les-bars.html', ['Sur l’appli Baromatch, les fans qui cherchent où voir le match trouvent ton bar et gardent leur place.', 'le fan choisit son match et voit les bars qui le diffusent']],
     [LIGNES[1], 'pour-les-bars.html', ['tu choisis tes matchs', 'Tu choisis combien de places tu ouvres']],
-    [LIGNES[2], 'pour-les-bars.html', ['Gratuit pour tes clients', 'Pour ton bar, le tarif est à préciser. Envoyer ta demande ne coûte rien']],
+    [LIGNES[2], 'pour-les-bars.html', ['Gratuit pour tes clients', 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.']],
     [LIGNES[3], 'comment-on-choisit-les-bars.html', ['Il n’apparaît sur ce site qu’avec son accord écrit.']],
     [LIGNES[3], 'pour-les-bars.html', ['Sur ce site, ton bar n’apparaît qu’avec ton accord écrit']],
     [OU_EN_EST, 'pour-les-bars.html', ['Baromatch cherche ses premiers bars à Paris.', 'en test sur Android', 'les fans ne réservent pas encore']],
   ];
   for (const [phrase, page, dejaDit] of SOURCES) for (const morceau of dejaDit) expect(publie[page], `${phrase} ← ${page}`).toContain(morceau.toLowerCase());
+});
+
+test('les conditions des premiers bars sur la feuille ; aucune page générée ne dit plus « tarif à préciser »', async () => {
+  // Les mots du fondateur (26 octobre 2026), tels que la page des bars les publie, et rien de plus.
+  const conditions = 'Pour ton bar, gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.';
+  expect(TEXTES_DE_LA_FEUILLE_DU_PATRON.feuille.lignes.filter((ligne) => ligne.includes(conditions))).toHaveLength(1);
+  for (const avec of [contenu, sansBarPublie]) {
+    const site = await enMemoire({ avec });
+    expect(laFeuille(pageDe(site, FEUILLE).contenu)).toContain(conditions);
+    const disent = site.pages.filter((p) => /tarif\s+(?:est\s+)?à\s+préciser/i.test(p.contenu.replace(/&nbsp;/g, ' '))).map((p) => p.chemin);
+    expect(disent).toEqual([]);
+  }
 });
 
 test('« Où on en est » suit marque.json : l’appli ouverte, la feuille n’est plus écrite tant que sa phrase n’est pas relue', async () => {

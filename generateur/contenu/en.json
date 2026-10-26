@@ -88,7 +88,8 @@
     "prochaine": "Next match night:",
     "sansSoiree": "No match night announced for now.",
     "tuTiensUnBar": "Run a bar in Paris?",
-    "tuTiensUnBarSuite": "List your match nights on Baromatch. The page for bars is in French.",
+    "tuTiensUnBarSuite": "Baromatch is looking for its first bars. The page for bars is in French.",
+    "proposerMonBar": "Suggest your bar",
     "compte": "{n} bar in Paris",
     "comptePluriel": "{n} bars in Paris",
     "pasDeBar": "No Paris bar listed yet"

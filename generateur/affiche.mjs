@@ -163,7 +163,7 @@ ${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant)
 <section class="regarder-section" aria-labelledby="titre-apres">
   <h2 id="titre-apres">${e(t.titreApres)}</h2>
   <p>${e(t.droits)}</p>
-  <p class="regarder-suite"><a href="/pour-les-bars.html">${e(t.proposer)}</a></p>${inscrits}
+  <p class="regarder-suite"><a href="/pour-les-bars.html#proposer">${e(t.proposer)}</a></p>${inscrits}
 </section>`;
   // Son image de partage, celle que voit un bar à qui on l’envoie : ce qu’elle est et ses dates de la semaine (refaite
   // quand elles changent, partage.png?v=…). Sans le rendu des images (images false), l’image générale du site.

@@ -500,10 +500,17 @@
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "xhizlXA6PyjB_wDPkeG-vw",
+   "empreinte": "EK3t45Knx7ZZ05lcwRq5IQ",
    "change": "2026-10-26",
    "indexable": true,
    "bars": []
+  },
+  "/matchs/affiche/partage.png": {
+   "type": "partage",
+   "cle": "affiche",
+   "empreinte": "yGbOzAr30jJaGHjCkcNZBw",
+   "change": "2026-10-26",
+   "indexable": false
   },
   "/matchs/angers-lorient-2026-10-25/": {
    "type": "match",

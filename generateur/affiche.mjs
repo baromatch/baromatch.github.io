@@ -20,6 +20,7 @@ import { fil, page } from './gabarits.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { adresseDe, cheminDeLaVille, cheminDuBar, debutDe, filDAriane, pageWeb } from './jsonld.mjs';
 import { description as decrire, SEMAINE_JOURS, titre as intituler } from './pages.mjs';
+import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 import { svgDuQr } from './qr.mjs';
 import { capitale, echapper as e } from './texte.mjs';
 
@@ -131,7 +132,7 @@ const avecLaFeuille = (pageDeBase, { cadre, marque, avecPresse }) => ({
 
 // ---------- L’affiche de la semaine, pour tous les bars ----------
 
-export const fabriquerLAfficheOuverte = ({ donnees, contenu, cadre, avecPresse = false, qr }) => {
+export const fabriquerLAfficheOuverte = ({ donnees, contenu, cadre, avecPresse = false, qr, images = false }) => {
   const { maintenant } = donnees;
   const t = TEXTES_DES_AFFICHES.ouverte;
   const f = TEXTES_DES_AFFICHES.feuille;
@@ -164,15 +165,24 @@ ${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant)
   <p>${e(t.droits)}</p>
   <p class="regarder-suite"><a href="/pour-les-bars.html">${e(t.proposer)}</a></p>${inscrits}
 </section>`;
+  // Son image de partage, celle que voit un bar à qui on l’envoie : ce qu’elle est et ses dates de la semaine (refaite
+  // quand elles changent, partage.png?v=…). Sans le rendu des images (images false), l’image générale du site.
+  const partage = { sorte: 'affiche', dates: lesDates(joursDeLaSemaine(maintenant)) };
+  const lignes = lignesDeLaCarte(partage, undefined, contenu.textes);
+  const carte = carteDessinable(lignes) ? lignes : null;
+  const image = images && carte ? imageDeLaCarte(chemin, carte, { verre: cadre.verre, signature: images.signature }) : null;
   // Indexable même sans aucun vrai bar publié : c’est un outil, fait des vrais matchs de la semaine (leurs vraies
   // heures), qui ne dit d’aucun bar qu’il est sur Baromatch. Exception à la règle « pas de vrai bar, pas d’index »,
   // voulue (tests/affiche.spec.mjs la vérifie). Mais avec moins de 3 matchs à montrer, la page est mince :
   // lisible, en noindex et hors du plan du site.
-  return avecLaFeuille({
-    type: 'affiche', cle: 'affiche', date: null, chemin, indexable: matchs.length >= MATCHS_POUR_L_INDEX, titre: titrePage, description: desc, barsNommes: [],
-    jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes)],
-    corps,
-  }, { cadre, marque: contenu.marque, avecPresse });
+  return {
+    ...avecLaFeuille({
+      type: 'affiche', cle: 'affiche', date: null, chemin, indexable: matchs.length >= MATCHS_POUR_L_INDEX, titre: titrePage, description: desc, barsNommes: [],
+      jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes)],
+      corps, image,
+    }, { cadre, marque: contenu.marque, avecPresse }),
+    carte, ...(image ? { imageDePartage: image } : {}),
+  };
 };
 
 // ---------- L’affiche d’un bar publié ----------
@@ -243,10 +253,10 @@ export const lienVersLAfficheDeLaSemaine = () => `<p class="regarder-suite"><a h
 
 // Toutes les affiches d’un passage : l’affiche ouverte et celle de chaque vrai bar publié. Sans encodeur de QR code
 // (qr null), aucune.
-export const fabriquerLesAffiches = ({ donnees, contenu, cadre, avecPresse = false, qr }) => {
+export const fabriquerLesAffiches = ({ donnees, contenu, cadre, avecPresse = false, qr, images = false }) => {
   if (!qr) return [];
   return [
-    fabriquerLAfficheOuverte({ donnees, contenu, cadre, avecPresse, qr }),
+    fabriquerLAfficheOuverte({ donnees, contenu, cadre, avecPresse, qr, images }),
     ...donnees.bars.map((bar) => fabriquerLAfficheDuBar({ bar, donnees, contenu, cadre, avecPresse, qr })),
   ];
 };

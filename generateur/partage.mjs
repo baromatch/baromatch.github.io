@@ -1,4 +1,4 @@
-// Le partage d’une page de match, de ville, de bar ou de « Ce soir » : son image d’aperçu (1200 × 630, celle que
+// Le partage d’une page de match, de ville, de bar, de « Ce soir » ou de l’affiche de la semaine : son image d’aperçu (1200 × 630, celle que
 // montrent WhatsApp, iMessage, X ou un moteur à côté du lien) et le bloc « Partager » de la page.
 // L’image est d’abord un SVG, fait ici sans rien installer : la nuit #0A0B10, la lumière ambre du bar derrière une carte
 // de verre, le verre de la marque, et le texte en Bricolage Grotesque (deux réglages fixes de la police du site, dans
@@ -170,6 +170,12 @@ const lignesBrutes = (partage, textes, textesDuSite) => {
     const surtitre = nombre ? t.surtitre : matchs.length ? t.surtitreSansBar : '';
     const titre = capitale(jourEnLettres(jour));
     return { surtitre, titre, ligne, ambre, alt: phrase(surtitre ? `${surtitre}, ${jourEnLettres(jour)}` : titre, ligne, ambre) };
+  }
+  if (partage.sorte === 'affiche') {
+    // L’affiche de la semaine, celle qu’on envoie à un bar : ce qu’elle est, ses vraies dates, gratuite. Jamais
+    // « sur Baromatch » ni une place promise : elle va aussi dans des bars qui n’y sont pas.
+    const t = textes.affiche;
+    return { surtitre: t.surtitre, titre: t.titre, ligne: partage.dates, ambre: t.ambre, alt: phrase(`${t.titre}, ${partage.dates.toLocaleLowerCase('fr-FR')}`, t.ambre) };
   }
   if (partage.sorte === 'ville') {
     const { ville } = partage;

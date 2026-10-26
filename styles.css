@@ -490,8 +490,11 @@ a:hover { color: var(--goutte); }
 
 /* Sous les étapes, le lien vers les matchs de ce soir : seul sur sa ligne, 44 px à toucher. */
 .soiree__suite { margin: 48px 0 0; }
-/* « Préviens-moi » plus bas dans l’accueil (après le film, après les questions) : la capsule des pages des matchs. */
+/* « Préviens-moi » plus bas dans l’accueil (après le film, après les questions) : la capsule des pages des matchs, qui
+   se coupe au téléphone au milieu de la phrase, jamais dans « préviens-moi » (comme dans regarder.css). */
 .rappel-attente { margin: 32px 0 0; }
+.rappel-attente .capsule { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; text-wrap: balance; }
+.film .rappel-attente { margin-bottom: 40px; }
 .soiree__suite a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 
 /* ---------- Bars partenaires ---------- */

@@ -109,6 +109,41 @@ test('« préviens-moi » revient après le film et après les questions ; la bo
   await expect(page.locator('#attente-mail')).toBeInViewport();
 });
 
+for (const largeur of [320, 360]) {
+  test(`à ${largeur} px, chaque rappel « préviens-moi » se coupe entre deux mots, jamais dans « préviens-moi », et se touche du doigt`, async ({ page }) => {
+    await page.setViewportSize({ width: largeur, height: 800 });
+    await page.goto('/');
+    for (const rappel of await page.locator('main .rappel-attente a.capsule').all()) {
+      const r = await rappel.evaluate((a) => {
+        // Les lignes du texte, telles que le navigateur les a coupées.
+        const plage = document.createRange();
+        const texte = a.firstChild;
+        const lignes = [];
+        for (let i = 0; i < texte.length; i += 1) {
+          plage.setStart(texte, i);
+          plage.setEnd(texte, i + 1);
+          const haut = Math.round(plage.getBoundingClientRect().top);
+          if (!lignes.length || lignes.at(-1).haut !== haut) lignes.push({ haut, texte: '' });
+          lignes.at(-1).texte += texte.data[i];
+        }
+        const boite = a.getBoundingClientRect();
+        const section = a.closest('section').getBoundingClientRect();
+        return {
+          lignes: lignes.map((l) => l.texte.trim()),
+          hauteur: boite.height,
+          dedans: boite.left >= section.left && boite.right <= section.right,
+          defile: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        };
+      });
+      expect(r.lignes.join(' | ')).not.toMatch(/préviens-$|préviens- \|/);
+      expect(r.lignes.some((l) => l.endsWith('préviens-moi') || l === 'préviens-moi')).toBe(true);
+      expect(r.hauteur).toBeGreaterThanOrEqual(44);
+      expect(r.dedans).toBe(true);
+      expect(r.defile).toBe(false);
+    }
+  });
+}
+
 test('le lien /#attente arrive sur le formulaire avec son étiquette et la phrase qui dit pourquoi', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 360, height: 640 });

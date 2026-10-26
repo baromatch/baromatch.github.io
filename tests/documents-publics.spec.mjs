@@ -119,13 +119,15 @@ const NOMS = [
 ];
 
 // ---------- Les exceptions ----------
-// Les seuls documents du dossier des documents : ceux du site lui-même (son référencement), écrits pour Skander, hors
+// Les seuls documents du dossier des documents : ceux du site lui-même (son référencement, et le fichier qui ouvre
+// l’appli Android depuis un lien du site, /.well-known/assetlinks.json), écrits pour Skander, hors
 // de l’index (robots.txt). Seul leur chemin est permis ; leur texte est lu comme celui de tout autre fichier, avec une
 // exception : l’audit cite les pages de la documentation de Google, dont l’adresse a la forme d’un chemin de
 // documents (chacune comptée). Leurs noms sont écrits en morceaux, pour que ce fichier ne les contienne pas.
 const AUDIT_SEO = ['d', 'ocs/SEO-AUDIT-2026-10.m', 'd'].join('');
 const A_FAIRE_SEO = ['d', 'ocs/SEO-A-FAIRE-PAR-SKANDER.m', 'd'].join('');
-const DOCUMENTS_DU_SITE = [AUDIT_SEO, A_FAIRE_SEO];
+const LIENS_ANDROID = ['d', 'ocs/ANDROID-OUVRIR-L-APPLI.m', 'd'].join('');
+const DOCUMENTS_DU_SITE = [AUDIT_SEO, A_FAIRE_SEO, LIENS_ANDROID];
 
 // Le texte que le visiteur lit exprès, et ses copies mot pour mot dans les tests. [fichier, motif, nombre] : le motif y
 // est permis exactement ce nombre de fois. Une occurrence de plus est une fuite ; une de moins, une exception à retirer.

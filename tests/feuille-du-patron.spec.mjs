@@ -277,10 +277,16 @@ test.describe('dans le navigateur', () => {
   const visibles = (onglet, selecteur) => onglet.locator(selecteur).evaluateAll((elements) => elements.filter((el) => el.getClientRects().length > 0).length);
   const pagesDuPdf = (pdf) => (pdf.toString('latin1').match(/\/Type\s*\/Page\b/g) ?? []).length;
   const MM = 96 / 25.4;
-  // Les feuilles imprimées : leur haut et leur hauteur (mm), et ce qui dépasse de chacune (px).
-  const feuilles = (onglet) => onglet.locator('.affiche--patron').evaluateAll((liste) => liste.filter((f) => f.getClientRects().length).map((f) => ({
-    haut: f.getBoundingClientRect().top, hauteur: f.getBoundingClientRect().height, deborde: f.scrollHeight - f.clientHeight,
-  })));
+  // Les feuilles imprimées : leur haut et leur hauteur (mm), et ce qui dépasse de chacune (px) : le bas de son élément
+  // le plus bas sous le bas de la feuille. Ni la ligne de coupe (dessinée 7 mm sous la première feuille), ni l’intérieur
+  // des dessins (la vague du verre, rognée par son cercle) n’en sont.
+  const feuilles = (onglet) => onglet.locator('.affiche--patron').evaluateAll((liste) => liste.filter((f) => f.getClientRects().length).map((f) => {
+    const cadre = f.getBoundingClientRect();
+    return {
+      haut: cadre.top, hauteur: cadre.height,
+      deborde: Math.max(...[...f.querySelectorAll('*:not(svg *)')].filter((e) => e.getClientRects().length).map((e) => e.getBoundingClientRect().bottom)) - cadre.bottom,
+    };
+  }));
 
   test('à l’impression, en A4 : la feuille et sa copie sur une seule page, la coupe au milieu ; papier blanc, encre noire, rien d’autre du site', async ({ page: onglet }) => {
     const ailleurs = surveiller(onglet);
@@ -296,12 +302,14 @@ test.describe('dans le navigateur', () => {
     // entre les deux. Chacune reste d’un seul tenant si la page est plus courte (break-inside).
     for (const f of [haut, bas]) {
       expect(f.hauteur / MM).toBeCloseTo(127, 0);
-      expect(f.deborde).toBeLessThanOrEqual(0);
+      expect(f.deborde).toBeLessThanOrEqual(0.5);
     }
     expect(await onglet.locator('.affiche--patron').evaluateAll((liste) => liste.map((f) => getComputedStyle(f).breakInside))).toEqual(['avoid', 'avoid']);
     expect((bas.haut - haut.haut - haut.hauteur) / MM).toBeCloseTo(14, 0);
     expect((bas.haut + bas.hauteur - haut.haut) / MM).toBeLessThanOrEqual(268.5);
-    expect(await onglet.locator('.affiche--copie').evaluate((copie) => getComputedStyle(copie, '::before').borderTopStyle)).toBe('dashed');
+    // La ligne de coupe tient à la première feuille, 7 mm sous elle : au milieu de l’écart de 14 mm.
+    expect(await onglet.locator('.affiche--patron').evaluateAll((liste) => liste.map((f) => [getComputedStyle(f, '::after').borderTopStyle, getComputedStyle(f, '::after').bottom])))
+      .toEqual([['dashed', `${(-7 * 96 / 25.4).toFixed(4).replace(/0+$/, '')}px`], ['none', 'auto']]);
     // Ni l’en-tête, ni le pied du site, ni le fil, ni la tête de la page, ni le mode d’emploi et le choix du papier.
     for (const selecteur of ['header.entete', 'footer.pied', '.regarder-fil', '.regarder-tete', '.affiche-mode', '.affiche-format', '#titre-feuille']) {
       expect(await visibles(onglet, selecteur), selecteur).toBe(0);
@@ -322,13 +330,20 @@ test.describe('dans le navigateur', () => {
   });
 
   test('à l’impression, en A4 sur une page plus courte (Letter) : la copie passe entière sur la page suivante', async ({ page: onglet }) => {
-    // Le choix A4 resté coché, mais du papier Letter dans la fenêtre d’impression (255 mm imprimables) : les deux
+    // Le choix A4 resté coché, mais du papier Letter dans la fenêtre d’impression (192 × 255 mm imprimables) : les deux
     // feuilles ne tiennent plus sur une page ; la copie, d’un seul tenant, va sur la deuxième.
-    await onglet.setViewportSize({ width: Math.round(186 * MM), height: 1000 });
+    await onglet.setViewportSize({ width: Math.round(191.9 * MM), height: 1000 });
     await onglet.goto(`${serveur.adresse}${FEUILLE}`);
     await onglet.evaluate(() => document.fonts.ready);
     await expect(onglet.locator('#patron-a4')).toBeChecked();
     expect(pagesDuPdf(await onglet.pdf({ format: 'Letter' }))).toBe(2);
+    // Deux pages, coupée ou non : on regarde donc les feuilles dans une colonne de la hauteur d’une page Letter (le même
+    // découpage que l’impression). Chaque feuille y tient d’un seul morceau.
+    await onglet.emulateMedia({ media: 'print' });
+    expect(await onglet.evaluate(() => {
+      Object.assign(document.querySelector('.affiche-zone').style, { height: '255.4mm', columnCount: '1', columnGap: '0', columnFill: 'auto' });
+      return [...document.querySelectorAll('.affiche--patron')].map((f) => f.getClientRects().length);
+    })).toEqual([1, 1]);
   });
 
   test('à l’impression, en A5 : la feuille seule, sur une seule page, sans rien qui dépasse', async ({ page: onglet }) => {
@@ -340,10 +355,12 @@ test.describe('dans le navigateur', () => {
     await onglet.emulateMedia({ media: 'print' });
     const imprimees = await feuilles(onglet);
     expect(imprimees).toHaveLength(1);
-    expect(imprimees[0].deborde).toBeLessThanOrEqual(0);
+    expect(imprimees[0].deborde).toBeLessThanOrEqual(0.5);
     expect(imprimees[0].hauteur / MM).toBeLessThanOrEqual(186);
     expect(await visibles(onglet, '.affiche-qr__code')).toBe(1);
     expect(pagesDuPdf(await onglet.pdf({ format: 'A5' }))).toBe(1);
+    // En A5, une feuille seule : pas de ligne de coupe.
+    expect(await onglet.locator('.affiche--patron').first().evaluate((f) => getComputedStyle(f, '::after').borderTopStyle)).toBe('none');
   });
 
   test('à l’écran : une seule feuille, sa copie cachée ; aucune violation d’axe à 360 et 1280 px, rien ne défile de côté', async ({ page: onglet }) => {

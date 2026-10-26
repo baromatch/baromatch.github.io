@@ -232,8 +232,11 @@ label.affiche-ligne__texte { cursor: pointer; }
    seule feuille, sur la moitié haute. */
 @media print {
   .affiche--patron { min-height: 0; height: 127mm; break-inside: avoid; }
-  .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; position: relative; margin-top: 14mm; }
-  .affiche--copie::before { content: ""; position: absolute; top: -7mm; right: 0; left: 0; border-top: 0.3mm dashed #000000; }
+  .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; margin-top: 14mm; }
+  /* La ligne de coupe, 7 mm sous la première feuille : entre les deux feuilles, ou sous la première quand la copie
+     passe sur la page suivante (jamais seule au bas d’une page). */
+  .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie) { position: relative; }
+  .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie)::after { content: ""; position: absolute; right: 0; bottom: -7mm; left: 0; border-top: 0.3mm dashed #000000; }
   .regarder:has(#patron-a5:checked) .affiche--patron { height: auto; min-height: 184mm; }
 
   .affiche--patron .affiche-tete { padding-bottom: 2.5mm; border-bottom-width: 0.8mm; }

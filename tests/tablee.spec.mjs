@@ -1,5 +1,7 @@
 // La page d’un lien de tablée (/t/‹code›, servie par 404.html et tablee.js), vue sur un téléphone sans l’appli : ce
-// qu’est une tablée, la carte de l’invitation, « tu peux venir sans l’appli » juste dessous, puis où en est l’appli.
+// qu’est une tablée, la carte de l’invitation, « tu peux venir sans l’appli » juste dessous, puis comment avoir l’appli
+// (« Ouvrir dans l’appli » sur Android seulement, pour qui l’a déjà). Aucune donnée personnelle : ni le pseudo de l’hôte,
+// ni ceux de la tablée, même quand le serveur les envoie.
 // Plus de « Ouvre ce lien sur ton téléphone avec Baromatch » (on y est déjà, et sans l’appli). Un lien mort ne montre
 // que le titre, la phrase d’état et « Me prévenir au lancement » ; une panne (serveur muet 8 s, coupure, réponse
 // incomplète) y ajoute la définition d’une tablée et « Réessayer ». L’heure se lit « Ce soir, coup d’envoi à 21 h ».
@@ -7,12 +9,16 @@
 import { test, expect } from '@playwright/test';
 import { arreterLHorloge as arreterLHorlogeA } from './outils/horloge.mjs';
 import { API_TABLEE, enTetesCors, INVITATION } from './outils/invitation.mjs';
+import { violationsAxe } from './outils/axe.mjs';
 
 const LIEN = '/t/abcdefghjkmn';
 // Mardi 13 octobre 2026, 17:30 à Paris : le soir d’un match à 21:00.
 const MAINTENANT = new Date('2026-10-13T17:30:00+02:00');
 const PANNE = 'L’invitation ne s’affiche pas pour l’instant. Réessaie dans un moment, ou demande le bar et l’heure à la personne qui t’invite.';
 const DEFINITION = 'Une tablée, c’est un groupe de potes qui regarde le match ensemble, à la même table.';
+const VENIR = 'Tu peux venir quand même : arrive avec la personne qui t’invite. À l’entrée, son pass compte aussi pour toi.';
+const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
+const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 
 const invitation = (plus = {}) => ({ ...INVITATION, ...plus });
 const match = (plus = {}) => ({ ...INVITATION.match, ...plus });
@@ -57,9 +63,9 @@ const verifierLaPanne = async (page) => {
 
 test('invitation ouverte : la carte, puis « tu peux venir sans l’appli », puis l’appli ; plus de « Ouvre ce lien »', async ({ page }) => {
   await ouvrir(page, { statut: 200, corps: invitation() });
-  await expect(page.locator('#tablee-titre')).toHaveText('Nico_B t’a gardé une place.');
-  await expect(page).toHaveTitle('Une tablée t’attend — Baromatch');
-  await expect(page.locator('#tablee-etat')).toHaveText('Il reste 3 places à sa table.');
+  await expect(page.locator('#tablee-titre')).toHaveText('Une place t’attend.');
+  await expect(page).toHaveTitle('Une place t’attend — Baromatch');
+  await expect(page.locator('#tablee-etat')).toHaveText('Il reste 3 places à la table.');
   await expect(page.locator('#tablee-definition')).toHaveText(DEFINITION);
   await expect(page.locator('#tablee-carte')).toBeVisible();
   await expect(page.locator('#tablee-match')).toHaveText('Paris – Marseille');
@@ -71,32 +77,113 @@ test('invitation ouverte : la carte, puis « tu peux venir sans l’appli », pu
   const venir = page.locator('#tablee-venir');
   await expect(venir).toBeVisible();
   await expect(venir.locator('h2')).toHaveText('Tu n’as pas l’appli ?');
-  await expect(venir.locator('p')).toHaveText('Tu peux venir quand même : arrive avec Nico_B. À l’entrée, son pass compte aussi pour toi.');
+  await expect(venir.locator('p')).toHaveText(VENIR);
   // Juste sous la carte, avant ce qui parle de l’appli.
   expect(await page.evaluate(() => document.getElementById('tablee-carte').nextElementSibling.id)).toBe('tablee-venir');
 
+  // Comment avoir l’appli : le test fermé sur Android, sinon la liste d’attente. « Ouvrir dans l’appli » est pour Android.
   const appli = page.locator('#tablee-appli');
   await expect(appli).toContainText('Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.');
-  await expect(appli.locator('a')).toHaveText('Me prévenir au lancement');
-  await expect(appli.locator('a')).toHaveAttribute('href', '/#attente');
+  await expect(appli).toContainText('Tu as un téléphone Android ? Deviens testeur pour installer l’appli avant tout le monde. Sinon, laisse ton adresse : on te prévient au lancement.');
+  await expect(appli.getByRole('link', { name: 'Deviens testeur' })).toHaveAttribute('href', '/testeurs-android.html');
+  await expect(appli.getByRole('link', { name: 'Me prévenir au lancement' })).toHaveAttribute('href', '/#attente');
+  await expect(page.locator('#tablee-ouvrir')).toBeHidden();
   await expect(page.locator('#tablee-reessayer')).toBeHidden();
   expect((await visibles(page)).join(' ')).not.toMatch(/Ouvre ce lien|avec Baromatch\./);
 });
 
-test('une place, sans pseudo d’hôte : « la personne qui t’invite »', async ({ page }) => {
-  await ouvrir(page, { statut: 200, corps: invitation({ host: null, open: 1 }) });
+// Aucune donnée personnelle : le serveur envoie le pseudo de l’hôte et ceux de la tablée, la page n’en montre aucun,
+// ni dans la page, ni dans l’onglet.
+for (const cas of [
+  { nom: 'une place', corps: invitation({ open: 1, members: [{ pseudo: 'Nico_B', host: true }, { pseudo: 'Lea_93', host: false }] }), titre: 'Une place t’attend.', etat: 'Il reste 1 place à la table.' },
+  { nom: 'la table pleine', corps: invitation({ open: 0, full: true, members: [{ pseudo: 'Nico_B', host: true }, { pseudo: 'Lea_93', host: false }] }), titre: 'La table est pleine.', etat: 'Le bar a peut-être encore de la place : demande à la personne qui t’invite.' },
+]) {
+  test(`${cas.nom} : aucun pseudo, ni de l’hôte ni de la tablée`, async ({ page }) => {
+    await ouvrir(page, { statut: 200, corps: cas.corps });
+    await expect(page.locator('#tablee-titre')).toHaveText(cas.titre);
+    await expect(page.locator('#tablee-etat')).toHaveText(cas.etat);
+    expect(await page.locator('body').innerText()).not.toMatch(/Nico_B|Lea_93/);
+    expect(await page.title()).not.toMatch(/Nico_B|Lea_93/);
+  });
+}
+
+test('sans pseudo d’hôte dans la réponse : la même invitation', async ({ page }) => {
+  await ouvrir(page, { statut: 200, corps: invitation({ host: null }) });
   await expect(page.locator('#tablee-titre')).toHaveText('Une place t’attend.');
-  await expect(page.locator('#tablee-etat')).toHaveText('Il reste 1 place à la table.');
-  await expect(page.locator('#tablee-venir p')).toHaveText('Tu peux venir quand même : arrive avec la personne qui t’invite. À l’entrée, son pass compte aussi pour toi.');
+  await expect(page.locator('#tablee-venir p')).toHaveText(VENIR);
 });
 
-test('table pleine : demander à l’hôte, sans la note sur son pass ni « regarde dans l’appli »', async ({ page }) => {
+test('table pleine : demander à la personne qui t’invite, sans la note sur son pass ni « regarde dans l’appli »', async ({ page }) => {
   await ouvrir(page, { statut: 200, corps: invitation({ open: 0, full: true }) });
   await expect(page.locator('#tablee-titre')).toHaveText('La table est pleine.');
-  await expect(page.locator('#tablee-etat')).toHaveText('Le bar a peut-être encore de la place : demande à Nico_B.');
+  await expect(page.locator('#tablee-etat')).toHaveText('Le bar a peut-être encore de la place : demande à la personne qui t’invite.');
   await expect(page.locator('#tablee-carte')).toBeVisible();
   await expect(page.locator('#tablee-venir')).toBeHidden();
   expect((await visibles(page)).join(' ')).not.toMatch(/pass compte|regarde dans l’appli/);
+});
+
+// « Ouvrir dans l’appli », sur Android seulement (l’appli n’existe pas ailleurs) : pour qui a l’appli et voit quand même
+// cette page. Un « intent » de Chrome ouvre baromatch://t/‹code› dans fr.baromatch.app ; sans l’appli, le navigateur va
+// à la page des testeurs Android. Seulement quand l’invitation est là (ouverte ou pleine).
+const INTENT = 'intent://t/abcdefghjkmn#Intent;scheme=baromatch;package=fr.baromatch.app;S.browser_fallback_url=';
+
+test.describe('sur Android', () => {
+  test.use({ userAgent: ANDROID });
+
+  for (const cas of [
+    { nom: 'invitation ouverte', corps: invitation() },
+    { nom: 'table pleine', corps: invitation({ open: 0, full: true }) },
+  ]) {
+    test(`${cas.nom} : « Ouvrir dans l’appli », avant ce qui dit comment l’avoir`, async ({ page }) => {
+      await ouvrir(page, { statut: 200, corps: cas.corps });
+      const lien = page.locator('#tablee-ouvrir-lien');
+      await expect(page.locator('#tablee-ouvrir p')).toHaveText('Tu l’as déjà sur ce téléphone ?');
+      await expect(lien).toBeVisible();
+      await expect(lien).toHaveText('Ouvrir dans l’appli');
+      await expect(lien).toHaveAttribute('href', `${INTENT}${encodeURIComponent('https://baromatch.fr/testeurs-android.html')};end`);
+      const ordre = await page.locator('#tablee-appli-detail').evaluate((d) => [...d.children].map((e) => e.id || e.tagName.toLowerCase()));
+      expect(ordre).toEqual(['h2', 'tablee-ouvrir', 'p', 'p']);
+    });
+  }
+
+  for (const cas of [
+    { nom: 'lien inconnu (404)', reponses: [{ statut: 404 }], titre: 'Ce lien ne mène à aucune tablée.' },
+    { nom: 'invitation terminée (410)', reponses: [{ statut: 410 }], titre: 'Cette invitation est terminée.' },
+    { nom: 'panne (500)', reponses: [{ statut: 500 }], titre: 'Une tablée t’attend.' },
+  ]) {
+    test(`${cas.nom} : pas de « Ouvrir dans l’appli »`, async ({ page }) => {
+      await ouvrir(page, ...cas.reponses);
+      await expect(page.locator('#tablee-titre')).toHaveText(cas.titre);
+      await expect(page.locator('#tablee-ouvrir')).toBeHidden();
+    });
+  }
+
+  for (const largeur of [360, 1280]) {
+    test(`à ${largeur} px, l’invitation avec « Ouvrir dans l’appli » : aucune violation axe`, async ({ page }) => {
+      await ouvrir(page, { statut: 200, corps: invitation() });
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await expect(page.locator('#tablee-ouvrir-lien')).toBeVisible();
+      expect(await violationsAxe(page)).toEqual([]);
+    });
+  }
+
+  test('en attente de l’invitation : pas encore de « Ouvrir dans l’appli »', async ({ page }) => {
+    await ouvrir(page, 'silence');
+    await expect(page.locator('#tablee-etat')).toHaveText('On regarde l’invitation…');
+    await expect(page.locator('#tablee-ouvrir')).toBeHidden();
+  });
+});
+
+test.describe('sur iPhone', () => {
+  test.use({ userAgent: IPHONE });
+
+  test('l’invitation, sans « Ouvrir dans l’appli » (pas d’appli iPhone)', async ({ page }) => {
+    await ouvrir(page, { statut: 200, corps: invitation() });
+    await expect(page.locator('#tablee-carte')).toBeVisible();
+    await expect(page.locator('#tablee-ouvrir')).toBeHidden();
+    await expect(page.getByRole('link', { name: 'Me prévenir au lancement' })).toBeVisible();
+  });
 });
 
 // Le nom du match, tel que le serveur le donne : son titre ; sans titre, les deux équipes (homeTeam, awayTeam), sinon
@@ -108,7 +195,7 @@ for (const cas of [
   test(`le nom du match ${cas.nom} : « ${cas.attendu} »`, async ({ page }) => {
     await ouvrir(page, { statut: 200, corps: invitation({ match: cas.match }) });
     await expect(page.locator('#tablee-match')).toHaveText(cas.attendu);
-    await expect(page.locator('#tablee-titre')).toHaveText('Nico_B t’a gardé une place.');
+    await expect(page.locator('#tablee-titre')).toHaveText('Une place t’attend.');
   });
 }
 
@@ -120,17 +207,16 @@ for (const cas of [
     await ouvrir(page, { statut: cas.statut });
     await expect(page.locator('#tablee-titre')).toHaveText(cas.titre);
     await expect(page.locator('#tablee-etat')).toHaveText(cas.etat);
-    await expect(page.locator('#tablee-appli a')).toBeVisible();
+    await expect(page.locator('#tablee-appli .tablee__bouton')).toBeVisible();
     expect(await visibles(page)).toEqual(['La tablée', cas.titre, cas.etat, 'Me prévenir au lancement']);
   });
 }
 
 // WCAG 2.4.2 : le titre de l’onglet suit l’état et dit la même chose que le titre de la page (sans son point), pour qui
-// passe d’un onglet à l’autre : lien mort, invitation terminée, table pleine, panne, attente. Sauf l’invitation ouverte :
-// l’onglet garde « Une tablée t’attend — Baromatch » (ce que la page est), sans le pseudo de l’hôte, qui n’a rien à
-// faire dans l’onglet ni dans l’historique du navigateur.
-const TITRE_INVITATION = 'Une tablée t’attend — Baromatch';
+// passe d’un onglet à l’autre : lien mort, invitation terminée, invitation ouverte, table pleine, panne, attente.
+const TITRE_EN_PANNE = 'Une tablée t’attend — Baromatch';
 for (const cas of [
+  { nom: 'invitation ouverte', reponses: [{ statut: 200, corps: invitation() }], titre: 'Une place t’attend.' },
   { nom: 'lien inconnu (404)', reponses: [{ statut: 404 }], titre: 'Ce lien ne mène à aucune tablée.' },
   { nom: 'code mal formé', chemin: '/t/ABCDEF', reponses: ['coupure'], titre: 'Ce lien ne mène à aucune tablée.' },
   { nom: 'invitation terminée (410)', reponses: [{ statut: 410 }], titre: 'Cette invitation est terminée.' },
@@ -148,22 +234,10 @@ for (const cas of [
   });
 }
 
-for (const cas of [
-  { nom: 'avec le pseudo de l’hôte', corps: invitation(), titre: 'Nico_B t’a gardé une place.' },
-  { nom: 'sans pseudo d’hôte', corps: invitation({ host: null, open: 1 }), titre: 'Une place t’attend.' },
-]) {
-  test(`invitation ouverte ${cas.nom} : l’onglet garde « Une tablée t’attend », sans le pseudo`, async ({ page }) => {
-    await ouvrir(page, { statut: 200, corps: cas.corps });
-    await expect(page.locator('#tablee-titre')).toHaveText(cas.titre);
-    await expect(page).toHaveTitle(TITRE_INVITATION);
-    expect(await page.title()).not.toContain('Nico_B');
-  });
-}
-
 test('« Réessayer » après une panne : le titre de l’onglet suit l’état qui arrive', async ({ page }) => {
   await ouvrir(page, { statut: 500 }, { statut: 410 });
   await verifierLaPanne(page);
-  await expect(page).toHaveTitle(TITRE_INVITATION);
+  await expect(page).toHaveTitle(TITRE_EN_PANNE);
   await page.locator('#tablee-reessayer').click();
   await expect(page.locator('#tablee-titre')).toHaveText('Cette invitation est terminée.');
   await expect(page).toHaveTitle('Cette invitation est terminée — Baromatch');
@@ -182,7 +256,7 @@ test('une panne : la définition, « Réessayer » qui ramène au titre, et l’
   const demandes = await ouvrir(page, { statut: 500 }, { statut: 200, corps: invitation() });
   await verifierLaPanne(page);
   await page.locator('#tablee-reessayer').click();
-  await expect(page.locator('#tablee-titre')).toHaveText('Nico_B t’a gardé une place.');
+  await expect(page.locator('#tablee-titre')).toHaveText('Une place t’attend.');
   await expect(page.locator('#tablee-titre')).toBeFocused();
   await expect(page.locator('#tablee-carte')).toBeVisible();
   await expect(page.locator('#tablee-reessayer')).toBeHidden();
@@ -271,7 +345,7 @@ for (const ecran of [{ largeur: 360, hauteur: 740 }, { largeur: 1280, hauteur: 8
 // (sa ligne n’est gardée que tant que tablee.js n’a pas tourné).
 test('une invitation ouverte sans nombre de places : pas de ligne vide sous le titre', async ({ page }) => {
   await ouvrir(page, { statut: 200, corps: invitation({ open: null }) });
-  await expect(page.locator('#tablee-titre')).toHaveText('Nico_B t’a gardé une place.');
+  await expect(page.locator('#tablee-titre')).toHaveText('Une place t’attend.');
   await expect(page.locator('#tablee-carte')).toBeVisible();
   await expect(page.locator('#tablee-etat')).toBeHidden();
 });
@@ -281,8 +355,8 @@ test('si tablee.js ne se charge pas, la page ne reste pas sur « On regarde l’
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto(LIEN);
   await expect(page.locator('#tablee-titre')).toHaveText('Une tablée t’attend.');
-  await expect(page.locator('#tablee-appli a')).toBeVisible();
-  await expect(page.locator('#tablee-appli a')).toHaveText('Me prévenir au lancement');
+  await expect(page.locator('#tablee-appli .tablee__bouton')).toBeVisible();
+  await expect(page.locator('#tablee-appli .tablee__bouton')).toHaveText('Me prévenir au lancement');
   expect((await visibles(page)).join(' ')).not.toContain('On regarde l’invitation');
 });
 

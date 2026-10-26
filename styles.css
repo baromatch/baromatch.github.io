@@ -1271,7 +1271,8 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .tablee .tablee__definition { margin: 12px auto 0; max-width: 28rem; color: var(--texte-discret); font-size: 0.9375rem; }
 .tablee .tablee__definition[hidden] { display: none; }
 
-.tablee__reessayer {
+.tablee__reessayer,
+.tablee__ouvrir-lien {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1286,7 +1287,8 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
   font-weight: 700;
   cursor: pointer;
 }
-.tablee__reessayer:hover { background: var(--verre-fort); }
+.tablee__reessayer:hover,
+.tablee__ouvrir-lien:hover { background: var(--verre-fort); color: var(--texte); }
 .tablee__reessayer[hidden] { display: none; }
 
 /* « Tu n’as pas l’appli ? » juste sous la carte : la réponse que cherche un fan venu de WhatsApp. */
@@ -1305,6 +1307,12 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .tablee__appli { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--trait); text-align: left; }
 .tablee__appli h2 { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.25; }
 .tablee .tablee__appli p { margin: 0; max-width: none; color: var(--texte-doux); }
+.tablee .tablee__appli p + p { margin-top: 8px; }
+/* « Ouvrir dans l’appli » (Android seulement) : pour qui l’a déjà, avant ce qui dit comment l’avoir ; un bouton de
+   verre, pas d’ambre : l’ambre reste à « Me prévenir au lancement ». */
+.tablee__ouvrir { margin: 0 0 20px; }
+.tablee__ouvrir[hidden] { display: none; }
+.tablee__ouvrir .tablee__ouvrir-lien { margin-top: 10px; text-decoration: none; }
 .tablee__bouton { margin-top: 20px; }
 /* Un lien mort ou une panne : seulement le bouton, sous la phrase d’état. */
 .tablee__appli:has(> [hidden]) { margin-top: 12px; padding-top: 0; border-top: 0; text-align: center; }

@@ -4,8 +4,11 @@
    https://baromatch.fr, même chemin : la page est alors marquée « data-renvoi » et ce script ne demande rien).
    Ce script lit alors le code, demande l’invitation publique à l’API Baromatch (GET /api/tablee/‹code›, que le serveur
    ne permet que depuis l’origine exacte https://baromatch.fr) et l’affiche.
-   Sur Android avec l’appli, le lien s’ouvre dans l’appli et cette page n’apparaît pas : qui la voit n’a pas l’appli.
-   Elle lui dit donc ce qu’est une tablée, l’invitation, qu’il peut venir sans l’appli, puis où en est l’appli.
+   Sur Android avec l’appli, le lien s’ouvre d’habitude dans l’appli (/.well-known/assetlinks.json) et cette page
+   n’apparaît pas : qui la voit n’a, presque toujours, pas l’appli. Elle lui dit donc ce qu’est une tablée, l’invitation,
+   qu’il peut venir sans l’appli, puis comment l’installer. Sur Android, « Ouvrir dans l’appli » sert à qui l’a quand
+   même : un lien ouvert dans le navigateur d’une autre appli, ou une appli installée avant assetlinks.json.
+   Aucune donnée personnelle : ni le pseudo de l’hôte, ni ceux de la tablée, même si le serveur les envoie.
 
    Les états : en attente, ouverte, pleine, fermée (lien inconnu ou invitation terminée) et panne (serveur injoignable,
    muet au-delà de DELAI_MS, ou réponse incomplète : « Réessayer »). */
@@ -24,6 +27,12 @@
   // Dès cette heure (de Paris), un match du jour se dit « Ce soir » plutôt que « Aujourd’hui ».
   var HEURE_DU_SOIR = 18;
   var CARTE = "https://www.google.com/maps/search/?api=1&query=";
+  // L’appli n’existe que sur Android : ailleurs, « Ouvrir dans l’appli » ne mènerait nulle part. Le lien est un
+  // « intent » de Chrome : il ouvre baromatch://t/‹code› dans l’appli (son propre schéma, qui ouvre l’invitation même
+  // sans assetlinks.json) ; sans l’appli, le navigateur va à SANS_L_APPLI au lieu de ne rien faire.
+  var ANDROID = /Android/i.test(navigator.userAgent || "");
+  var PAQUET = "fr.baromatch.app";
+  var SANS_L_APPLI = "https://baromatch.fr/testeurs-android.html";
 
   var titre = document.getElementById("tablee-titre");
   var etat = document.getElementById("tablee-etat");
@@ -31,9 +40,10 @@
   var reessayer = document.getElementById("tablee-reessayer");
   var carte = document.getElementById("tablee-carte");
   var venir = document.getElementById("tablee-venir");
-  var venirTexte = document.getElementById("tablee-venir-texte");
   var appli = document.getElementById("tablee-appli");
   var appliDetail = document.getElementById("tablee-appli-detail");
+  var ouvrir = document.getElementById("tablee-ouvrir");
+  var ouvrirLien = document.getElementById("tablee-ouvrir-lien");
 
   // Ce que chaque état montre. Un lien mort : le titre, la phrase d’état et « Me prévenir au lancement ». Une panne :
   // les mêmes, plus la définition d’une tablée et « Réessayer ». Ni l’un ni l’autre ne dit rien sur l’appli ni sur la
@@ -42,13 +52,12 @@
   // partant, et revient sous la carte comme un bloc neuf, sans rien déplacer de ce qu’on voyait. L’état est aussi posé
   // sur la page (data-tablee) : styles.css ne garde la ligne de la phrase d’état que tant que ce script n’a pas tourné.
   // Le titre de l’onglet dit la même chose que celui de la page, sans son point (WCAG 2.4.2) : « Ce lien ne mène à aucune
-  // tablée — Baromatch », « La table est pleine — Baromatch »… Sauf l’invitation ouverte : « Une tablée t’attend —
-  // Baromatch », sans le pseudo de l’hôte, qui n’a rien à faire dans l’onglet ni dans l’historique du navigateur.
+  // tablée — Baromatch », « Une place t’attend — Baromatch »…
   function aller(nom, texteTitre, texteEtat) {
     var vivante = nom === "ouverte" || nom === "pleine";
     document.documentElement.setAttribute("data-tablee", nom);
     titre.textContent = texteTitre;
-    document.title = (nom === "ouverte" ? "Une tablée t’attend" : texteTitre.replace(/\.$/, "")) + " — Baromatch";
+    document.title = texteTitre.replace(/\.$/, "") + " — Baromatch";
     etat.textContent = texteEtat || "";
     definition.hidden = nom === "fermee";
     reessayer.hidden = !(nom === "panne" && typeof fetch === "function" && API);
@@ -56,6 +65,7 @@
     venir.hidden = nom !== "ouverte";
     appli.hidden = nom === "attente";
     appliDetail.hidden = !vivante;
+    ouvrir.hidden = !(vivante && ANDROID);
   }
 
   function attendre() {
@@ -187,16 +197,17 @@
     if (!nomBar || !match || !coup) return indisponible();
 
     remplirLaCarte(invitation, nomBar, match, coup);
-    var hote = invitation.host && texte(invitation.host.pseudo);
-    var qui = hote || "la personne qui t’invite";
     var libres = typeof invitation.open === "number" ? invitation.open : null;
     if (invitation.full || libres === 0) {
-      return aller("pleine", "La table est pleine.", "Le bar a peut-être encore de la place : demande à " + qui + ".");
+      return aller("pleine", "La table est pleine.", "Le bar a peut-être encore de la place : demande à la personne qui t’invite.");
     }
-    var table = hote ? "sa table" : "la table";
-    venirTexte.textContent = "Tu peux venir quand même : arrive avec " + qui + ". À l’entrée, son pass compte aussi pour toi.";
-    aller("ouverte", hote ? hote + " t’a gardé une place." : "Une place t’attend.",
-      libres === 1 ? "Il reste 1 place à " + table + "." : libres ? "Il reste " + libres + " places à " + table + "." : "");
+    aller("ouverte", "Une place t’attend.",
+      libres === 1 ? "Il reste 1 place à la table." : libres ? "Il reste " + libres + " places à la table." : "");
+  }
+
+  function lienVersLAppli(code) {
+    return "intent://t/" + code + "#Intent;scheme=baromatch;package=" + PAQUET +
+      ";S.browser_fallback_url=" + encodeURIComponent(SANS_L_APPLI) + ";end";
   }
 
   // GET /api/tablee/‹code› répond lui-même « Cache-Control: no-store » : pas besoin de le redemander ici (un mode de
@@ -240,6 +251,7 @@
 
   var code = lireCode();
   if (!code) return inconnu();
+  ouvrirLien.href = lienVersLAppli(code);
   // Sans ce script, la page montre le titre, la définition et l’appli : elle ne dit pas qu’elle cherche l’invitation.
   attendre();
 

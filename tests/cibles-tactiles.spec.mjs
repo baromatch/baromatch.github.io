@@ -9,7 +9,7 @@ import { couperLAPI, simulerLInvitation } from './outils/invitation.mjs';
 
 const MINIMUM = 24;
 const VISE = 44;
-const LIENS_SEULS = ['.pied__liens a', '.bars__actions a', '.panier__retirer', '.tablee__plan', '.attente__corriger', '.panier__corriger'];
+const LIENS_SEULS = ['.pied__liens a', '.bars__actions a', '.panier__retirer', '.tablee__plan', '.tablee__ouvrir-lien', '.attente__corriger', '.panier__corriger'];
 
 // Chaque cible visible, sa taille, et si c’est un lien pris dans une phrase (son parent dit plus que lui).
 const lireLesCibles = (onglet) => onglet.evaluate((seuls) => [...document.querySelectorAll('a[href], button, summary')]
@@ -57,6 +57,19 @@ test('boutique : dans la sélection ouverte, « Retirer » et les boutons de qua
   await onglet.locator('#barre-ouvrir').click();
   await expect(onglet.locator('.panier__retirer')).toBeVisible();
   verifier(await lireLesCibles(onglet));
+});
+
+// Sur Android, la tablée ouverte a aussi « Ouvrir dans l’appli ».
+test.describe('sur Android', () => {
+  test.use({ userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36' });
+
+  test('tablée ouverte à 360 px : « Ouvrir dans l’appli » et chaque cible se touchent du doigt', async ({ page: onglet }) => {
+    await simulerLInvitation(onglet);
+    await onglet.setViewportSize({ width: 360, height: 800 });
+    await onglet.goto('/t/abcdefghjkmn');
+    await expect(onglet.locator('#tablee-ouvrir-lien')).toBeVisible();
+    verifier(await lireLesCibles(onglet));
+  });
 });
 
 for (const largeur of [360, 1280]) {

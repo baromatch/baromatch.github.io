@@ -292,6 +292,27 @@ a:hover { color: var(--goutte); }
   }
   .attente__champ:focus-visible { outline: none; }
   .attente__bouton { height: 52px; border-radius: 999px; }
+  /* Le champ n’a plus de bord : c’est la pilule qui dit où l’on tape, par le même contour que tout le site. Un
+     contour, pas seulement la couleur du bord : en contraste élevé (Windows), le système le repeint, il reste visible. */
+  .attente__ligne:has(.attente__champ:focus-visible) { outline: 2px solid var(--ambre); outline-offset: 2px; }
+}
+
+/* Une adresse refusée (aria-invalid, posé par main.js) se voit aussi sur le champ, pas seulement dans le message : un
+   bord de 2 px à la couleur de l’erreur, sans rien déplacer (le retrait perd le pixel que le bord gagne). Au téléphone
+   sur le champ ; à partir de 560 px sur la pilule. */
+@media (max-width: 559.98px) {
+  .attente__champ[aria-invalid="true"] { border: 2px solid var(--erreur); padding: 0 17px; }
+}
+@media (min-width: 560px) {
+  .attente__ligne:has(.attente__champ[aria-invalid="true"]) { padding: 5px; border: 2px solid var(--erreur); }
+}
+/* En couleurs forcées (contraste élevé de Windows), la couleur de l’erreur s’efface : le bord passe à 3 px, en tirets,
+   pour se distinguer du bord ordinaire par sa forme (même taille : le retrait perd encore ce que le bord gagne). */
+@media (forced-colors: active) and (max-width: 559.98px) {
+  .attente__champ[aria-invalid="true"] { border: 3px dashed CanvasText; padding: 0 16px; }
+}
+@media (forced-colors: active) and (min-width: 560px) {
+  .attente__ligne:has(.attente__champ[aria-invalid="true"]) { padding: 4px; border: 3px dashed CanvasText; }
 }
 
 .attente__plateformes {
@@ -812,6 +833,21 @@ a:hover { color: var(--goutte); }
   .entete__nav { column-gap: 4px; }
   .entete__lien { font-size: 0.875rem; }
 }
+/* Dès qu’il y a la place (401 px), « Pour les bars » devient une capsule de verre : un patron la voit sans chercher, et
+   l’ambre reste aux appels de la page. En dessous, le lien souligné, comme « Boutique ». */
+@media (min-width: 401px) {
+  .entete__lien--bars {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--verre-bord-fort);
+    border-radius: 999px;
+    background: var(--verre-fort);
+    box-shadow: var(--verre-reflet);
+  }
+  .entete__lien--bars:hover { background: rgba(255, 255, 255, 0.15); }
+}
 
 /* ---------- Baromatch en bref, sur l'accueil ---------- */
 
@@ -1250,7 +1286,8 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .tablee .tablee__definition { margin: 12px auto 0; max-width: 28rem; color: var(--texte-discret); font-size: 0.9375rem; }
 .tablee .tablee__definition[hidden] { display: none; }
 
-.tablee__reessayer {
+.tablee__reessayer,
+.tablee__ouvrir-lien {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1265,7 +1302,8 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
   font-weight: 700;
   cursor: pointer;
 }
-.tablee__reessayer:hover { background: var(--verre-fort); }
+.tablee__reessayer:hover,
+.tablee__ouvrir-lien:hover { background: var(--verre-fort); color: var(--texte); }
 .tablee__reessayer[hidden] { display: none; }
 
 /* « Tu n’as pas l’appli ? » juste sous la carte : la réponse que cherche un fan venu de WhatsApp. */
@@ -1284,6 +1322,12 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .tablee__appli { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--trait); text-align: left; }
 .tablee__appli h2 { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.25; }
 .tablee .tablee__appli p { margin: 0; max-width: none; color: var(--texte-doux); }
+.tablee .tablee__appli p + p { margin-top: 8px; }
+/* « Ouvrir dans l’appli » (Android seulement) : pour qui l’a déjà, avant ce qui dit comment l’avoir ; un bouton de
+   verre, pas d’ambre : l’ambre reste à « Me prévenir au lancement ». */
+.tablee__ouvrir { margin: 0 0 20px; }
+.tablee__ouvrir[hidden] { display: none; }
+.tablee__ouvrir .tablee__ouvrir-lien { margin-top: 10px; text-decoration: none; }
 .tablee__bouton { margin-top: 20px; }
 /* Un lien mort ou une panne : seulement le bouton, sous la phrase d’état. */
 .tablee__appli:has(> [hidden]) { margin-top: 12px; padding-top: 0; border-top: 0; text-align: center; }

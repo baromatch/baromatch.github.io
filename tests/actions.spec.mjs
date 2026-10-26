@@ -12,6 +12,11 @@ import path from 'node:path';
 import { cheminDeChromium, CHROMIUM_INSTALLE, racine } from './outils/environnement.mjs';
 
 const lireLAction = (nom) => readFileSync(path.join(racine, '.github', 'workflows', nom), 'utf8').replace(/\r\n/g, '\n');
+// Les actions qu’une Action utilise, dans l’ordre ; le texte d’une de ses étapes (jusqu’à la suivante) ; le dossier et la
+// clé d’une étape de cache.
+const actionsDe = (texte) => [...texte.matchAll(/uses: ([^\s]+)/g)].map((m) => m[1]);
+const etapeDe = (texte, nom) => texte.split(`\n      - name: ${nom}\n`)[1].split(/\n\n|\n {6}(?:- |# )/)[0];
+const cacheDe = (etape) => ({ dossier: etape.match(/\n {10}path: ~\/(\S+)/)?.[1], cle: etape.match(/\n {10}key: (\S+)/)?.[1] });
 
 // Le script d’une étape (son « run: | »), sans son retrait.
 const scriptDeLEtape = (action, nom) => {
@@ -214,7 +219,7 @@ test.describe('« Vérifications » : les tests du site sur GitHub', () => {
       'npm ci --ignore-scripts --no-audit --no-fund',
       'npm ci --ignore-scripts --no-audit --no-fund',
       'npx playwright install --with-deps chromium',
-      'sudo apt-get install -y --no-install-recommends ffmpeg',
+      'mkdir -p ~/paquets-ffmpeg/partial && sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/paquets-ffmpeg" ffmpeg',
       'npx playwright test',
     ]);
     // Aucun test sauté faute d’outil : chaque « test.skip » des vérifications attend un outil que l’Action installe.
@@ -224,11 +229,21 @@ test.describe('« Vérifications » : les tests du site sur GitHub', () => {
     expect(travaux).toMatch(/\n {8}working-directory: generateur\/images\n {8}run: npm ci --ignore-scripts --no-audit --no-fund\n/);
   });
 
-  test('les mêmes actions, à la même étiquette, que « Pages des matchs »', () => {
-    const actions = (texte) => [...texte.matchAll(/uses: ([^\s]+)/g)].map((m) => m[1]);
-    // Étiquettes vérifiées le 20 octobre 2026 : actions/checkout v7 (v7.0.1) et actions/setup-node v7 (v7.1.0).
-    expect(actions(action)).toEqual(['actions/checkout@v7', 'actions/setup-node@v7']);
-    expect(actions(lireLAction('pages-des-matchs.yml'))).toEqual(actions(action));
+  test('les mêmes actions, à la même étiquette, que « Pages des matchs », et la reprise du cache de ffmpeg', () => {
+    // Étiquettes vérifiées le 20 octobre 2026 : actions/checkout v7 (v7.0.1) et actions/setup-node v7 (v7.1.0) ; le
+    // 27 octobre 2026 : actions/cache v6 (v6.1.0).
+    expect(actionsDe(action)).toEqual(['actions/checkout@v7', 'actions/setup-node@v7', 'actions/cache/restore@v6']);
+    expect(actionsDe(lireLAction('pages-des-matchs.yml'))).toEqual(['actions/checkout@v7', 'actions/setup-node@v7']);
+  });
+
+  test('ffmpeg : ses paquets repris du cache que « Cache de ffmpeg » remplit, avant l’installation qui les lit', () => {
+    // Reprendre seulement (cache/restore) : une branche n’écrit pas de cache que les autres ne pourraient pas lire.
+    const reprise = etapeDe(action, 'Reprendre les paquets de ffmpeg');
+    expect(reprise).toContain('uses: actions/cache/restore@v6\n');
+    expect(cacheDe(reprise)).toEqual(cacheDe(etapeDe(lireLAction('cache-ffmpeg.yml'), 'Garder les paquets de ffmpeg')));
+    expect(action.indexOf('- name: Reprendre les paquets de ffmpeg')).toBeLessThan(action.indexOf('- name: Installer ffmpeg'));
+    // apt lit les paquets dans le dossier du cache, et ne télécharge que ceux qui y manquent.
+    expect(etapeDe(action, 'Installer ffmpeg')).toContain(`-o Dir::Cache::Archives="$HOME/${cacheDe(reprise).dossier}" ffmpeg`);
   });
 
   test('Chromium : CHROME_PATH, sinon celui déjà installé sur la machine, sinon celui de Playwright', () => {
@@ -238,5 +253,40 @@ test.describe('« Vérifications » : les tests du site sur GitHub', () => {
     expect(cheminDeChromium({ env: {}, existe: () => false, dePlaywright })).toBe('/cache/ms-playwright/chromium/chrome');
     // Par défaut, celui que Playwright attend : un vrai chemin, celui que « npx playwright install chromium » remplit.
     expect(cheminDeChromium({ env: {}, existe: () => false })).toMatch(/chrom/i);
+  });
+});
+
+test.describe('« Cache de ffmpeg » : les paquets de ffmpeg gardés dans le cache de GitHub', () => {
+  const action = lireLAction('cache-ffmpeg.yml');
+  const sansCommentaires = action.split('\n').filter((l) => !l.trim().startsWith('#')).join('\n');
+
+  test('quand elle tourne : un envoi sur main (le cache de main, seul lisible par toutes les branches), chaque lundi, ou à la main', () => {
+    expect(sansCommentaires.split('\non:\n')[1].split('\n\n')[0]).toBe("  push:\n    branches: [main]\n  schedule:\n    - cron: '41 4 * * 1'\n  workflow_dispatch:");
+    expect(sansCommentaires).not.toMatch(/pull_request|workflow_run/);
+  });
+
+  test('ce qu’elle peut : lire le dépôt, rien d’autre ; aucun secret, aucun jeton ; une seule action, le cache officiel', () => {
+    expect(sansCommentaires).toMatch(/\npermissions:\n  contents: read\n\n/);
+    expect(sansCommentaires.match(/permissions:/g)).toHaveLength(1);
+    expect(sansCommentaires).not.toMatch(/secrets\.|github\.token|_TOKEN|JETON|\$\{\{/);
+    expect(actionsDe(action)).toEqual(['actions/cache@v6']);
+  });
+
+  test('ce qu’elle fait : seulement si le cache est vide, télécharger ffmpeg sans l’installer, et laisser des paquets lisibles', () => {
+    const travaux = sansCommentaires.split('\njobs:\n')[1];
+    expect([...travaux.matchAll(/^ {2}[a-z-]+:$/gm)].map((m) => m[0].trim())).toEqual(['remplir:']);
+    expect(travaux).toContain('    runs-on: ubuntu-latest\n    timeout-minutes: 45\n');
+    expect(etapeDe(action, 'Garder les paquets de ffmpeg')).toContain('id: cache\n');
+    expect(cacheDe(etapeDe(action, 'Garder les paquets de ffmpeg'))).toEqual({ dossier: 'paquets-ffmpeg', cle: 'paquets-ffmpeg-ubuntu-1' });
+    const telecharger = etapeDe(action, 'Télécharger les paquets de ffmpeg');
+    expect(telecharger).toContain("if: steps.cache.outputs.cache-hit != 'true'\n");
+    expect(scriptDeLEtape(action, 'Télécharger les paquets de ffmpeg')).toBe([
+      'mkdir -p ~/paquets-ffmpeg/partial',
+      'sudo apt-get update',
+      'sudo apt-get install -y --no-install-recommends --download-only -o Dir::Cache::Archives="$HOME/paquets-ffmpeg" ffmpeg',
+      'sudo rm -rf ~/paquets-ffmpeg/partial ~/paquets-ffmpeg/lock',
+      'sudo chown -R "$USER" ~/paquets-ffmpeg',
+      '',
+    ].join('\n'));
   });
 });

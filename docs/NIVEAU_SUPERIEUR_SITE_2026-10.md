@@ -40,7 +40,8 @@ pages mesurées font 100 en vitesse. Chaque changement visible donnera ses chiff
 
 ## Avant tout : tes réponses et quatre vérifications (sans code)
 
-**Tes six réponses.** Chacune débloque une ligne du classement.
+**Tes six réponses.** La réponse 1 fixe la voix du site pour les bars ; les réponses 2 à 6 débloquent chacune une
+ligne du classement.
 
 1. **Tutoyer ou vouvoyer les bars ?** La consigne de la mission dit « vouvoiement pour les bars ». Le site, ses
    textes générés, les affiches et la Console des bars tutoient aujourd’hui. Ma recommandation : garder le « tu »,
@@ -63,7 +64,7 @@ pages mesurées font 100 en vitesse. Chaque changement visible donnera ses chiff
    demande leur indexation (bouton « Demander une indexation »).
 2. **Formspree** : quelle formule, combien d’inscriptions par mois ? Un seul formulaire reçoit la liste d’attente,
    le test Android et la boutique. S’il est plein, l’inscription des testeurs s’arrête aussi. À vérifier avant de
-   pousser plus de fans vers la liste d’attente (lignes 3, 4 et 11).
+   pousser plus de fans vers la liste d’attente (lignes 3, 4, 11 et 15).
 3. **Les demandes des bars** : la page Confidentialité explique qu’une demande peut, rarement, ne pas t’arriver par
    mail. Avant d’annoncer un délai de réponse, il te faut un moyen de voir ces demandes-là. C’est à faire côté appli,
    pas sur le site.
@@ -81,15 +82,15 @@ sinon elle attend le maestro, ou ta réponse.
 |---|---|---|---|---|---|---|---|
 | 1 | Page des bars : dire où on en est, et les faits qu’un patron cherche | 2 | 0 | 0 | 3 | S | je fusionne |
 | 2 | Pages des matchs, clubs, compétitions et villes : « Tu tiens un bar ? » devient une carte vraie, qui mène au formulaire | 2 | 0 | 0 | 1 | S | je fusionne |
-| 3 | Accueil : les bars juste après « Comment ça va marcher », la boutique à la fin, « préviens-moi » plus bas | 1 | 2 | 0 | 0 | S | je fusionne |
-| 4 | Fin du guide, d’« À propos » et de « Comment on choisit les bars » : deux cartes, une pour les fans, une pour les bars | 1 | 1 | 0 | 1 | S | je fusionne |
+| 3 | Accueil : les bars juste après « Comment ça va marcher », avec une phrase vraie, la boutique à la fin, « préviens-moi » plus bas | 1 | 2 | 0 | 1 | S | je fusionne, après la vérification 2 |
+| 4 | Fin du guide, d’« À propos » et de « Comment on choisit les bars » : deux cartes, une pour les fans, une pour les bars | 1 | 1 | 0 | 1 | S | je fusionne, après la vérification 2 |
 | 5 | L’affiche de la semaine : sa propre image de partage, « foot » dans son titre, un lien vers le formulaire | 2 | 0 | 1 | 1 | M | je fusionne |
 | 6 | La feuille « Pour le patron » : une page A5 à imprimer et à laisser au comptoir, avec un QR code vers la page des bars | 2 | 0 | 0 | 1 | M | je fusionne |
-| 7 | Page des bars : qui répond, en combien de temps, et quoi faire en attendant | 2 | 1 | 0 | 2 | S | après tes réponses 2 et la vérification 3 |
+| 7 | Page des bars : qui répond, en combien de temps, et quoi faire en attendant | 2 | 1 | 0 | 2 | S | après ta réponse 2 et la vérification 3 |
 | 8 | Page des bars : le titre, l’image de partage et les conditions pour les premiers bars | 3 | 0 | 1 | 2 | M | après tes réponses 3 et 4 |
 | 9 | Le badge retiré de la page des bars jusqu’au premier bar publié | 1 | 0 | 0 | 2 | S | après ta réponse 5 |
 | 10 | Tes mots de fondateur sur « À propos » et « Presse » | 1 | 0 | 0 | 3 | S | après ta réponse 6 |
-| 11 | Après l’inscription d’un fan : partager Baromatch, et envoyer la page des bars à son bar | 1 | 2 | 0 | 0 | M | après ton accord sur deux phrases |
+| 11 | Après l’inscription d’un fan : partager Baromatch, et envoyer la page des bars à son bar | 1 | 2 | 0 | 0 | M | après ton accord sur deux phrases et la vérification 2 |
 | 12 | Accueil et agenda : des liens vers les pages des clubs | 0 | 1 | 2 | 0 | S | je fusionne |
 | 13 | Le champ d’adresse de la liste d’attente : un contour et une erreur bien visibles, aussi en mode contraste élevé | 0 | 1 | 0 | 1 | S | je fusionne |
 | 14 | « Pour les bars » plus visible dans l’en-tête, en capsule de verre | 1 | 0 | 0 | 1 | S | je fusionne |
@@ -110,12 +111,14 @@ sinon elle attend le maestro, ou ta réponse.
 
 ### 2. Pages des matchs, clubs, compétitions et villes : une carte vraie pour les bars
 
-- **Ce qu’on voit** : sur les 74 pages qui disent « Pas encore de bar », le paragraphe « Tu tiens un bar ? » devient
+- **Ce qu’on voit** : sur les pages des matchs, clubs, compétitions et villes qui ont le paragraphe « Tu tiens un
+  bar ? » (74 le 26 octobre : 58 en français, 16 en anglais), ce paragraphe devient
   une petite carte de verre avec « Proposer mon bar », qui mène droit au formulaire. Parmi elles, les 8 pages de
   clubs et les 7 pages de compétitions sont dans le plan du site : ouvertes à Google.
 - **Pourquoi** : la phrase actuelle dit « les fans qui cherchent où le voir te trouvent » : c’est faux tant que
   l’appli n’est pas ouverte. Elle devient la phrase déjà publiée sur la page des bars : « Baromatch cherche ses
-  premiers bars à Paris. » La même chose en anglais. Le lien de l’affiche de la semaine mène aussi au formulaire.
+  premiers bars à Paris. » La phrase anglaise change aussi. La même promesse fausse disparaît du guide « Trouver un
+  bar qui diffuse le match ». Le lien de l’affiche de la semaine mène aussi au formulaire.
 - **Risque** : deux appels sur le même écran ; la carte reste en verre, l’ambre reste aux fans. Toutes les pages
   générées changent au passage suivant du générateur.
 - **Preuve** : tests du générateur, captures d’une page de club et d’une page de match.
@@ -126,8 +129,9 @@ sinon elle attend le maestro, ou ta réponse.
   d’être tout en bas, après la boutique. Deux rappels « L’appli ouvre bientôt : préviens-moi » plus bas dans la page.
   Le bouton des bars mène droit au formulaire.
 - **Pourquoi** : sur ordinateur, le formulaire n’est pas dans le premier écran ; plus bas, le seul lien vers la liste
-  d’attente est caché dans une réponse de la FAQ.
-- **Risque** : faible. Les mots ne changent pas. À faire après la vérification Formspree.
+  d’attente est caché dans une réponse de la FAQ. La bande des bars dit aujourd’hui que Baromatch montre les soirées
+  du bar aux fans : elle prend la phrase vraie de la page des bars, « Baromatch cherche ses premiers bars à Paris. ».
+- **Risque** : faible. À mettre en ligne après la vérification Formspree.
 - **Preuve** : tests de l’accueil, captures 360 et 1280 px, Lighthouse.
 
 ### 4. Deux cartes d’action en fin de page
@@ -136,13 +140,14 @@ sinon elle attend le maestro, ou ta réponse.
   choisit les bars » : une carte pour les fans (« préviens-moi ») et une pour les bars (« Proposer mon bar »).
   Des liens seulement, aucun formulaire.
 - **Pourquoi** : ces pages sont indexées et finissent sur un paragraphe. Les mots existent déjà sur le site.
-- **Risque** : faire publicité sur une page de conseils ; les cartes restent courtes, après le contenu.
+- **Risque** : faire de la publicité sur une page de conseils ; les cartes restent courtes, après le contenu. À mettre
+  en ligne après la vérification Formspree.
 
 ### 5. L’affiche de la semaine, prête à partager
 
 - **Ce qu’on voit** : quand tu envoies l’affiche à un bar par WhatsApp, l’aperçu dit « L’affiche des matchs de la
   semaine, du … au …, gratuite, à imprimer » au lieu du slogan des fans. Son titre dit « matchs de foot ». Son lien
-  « Propose ton bar » mène au formulaire.
+  « Ton bar est à Paris ? Propose-le sur Baromatch » mène au formulaire.
 - **Pourquoi** : c’est la page que tu laisses à un bar que tu démarches, et la seule page indexée faite pour eux
   après la page des bars.
 - **Risque** : les dates doivent rester vraies ; l’image est refaite à chaque passage du générateur.
@@ -162,7 +167,7 @@ sinon elle attend le maestro, ou ta réponse.
 - **8, titre, image de partage et conditions** : le titre et l’image changent ensemble ; « tarif à préciser » laisse
   la place à tes conditions vraies, et une question « Je m’engage pour combien de temps ? ».
 - **9, le badge** : s’il part, la page gagne de la place, et l’affiche gratuite reste à un geste avant le formulaire.
-- **10, tes mots** : sur « À propos » et « Presse », là où mène la ligne 7.
+- **10, tes mots** : sur « À propos » et « Presse », là où un patron vérifie qui est derrière Baromatch.
 - **11, après l’inscription d’un fan** : « Partager Baromatch », et « Ton bar préféré n’est pas sur Baromatch ?
   Envoie-lui la page Pour les bars ». Aucun suivi, aucun paramètre dans les liens partagés.
 

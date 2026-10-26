@@ -422,6 +422,11 @@ test.describe('d’un passage à l’autre', () => {
     expect(meta(html, 'twitter:image')).toEqual([IMAGE_DU_SITE]);
     // Le bloc « Partager » reste : il ne dépend pas de l’image.
     expect(html).toContain('class="partage"');
+    // L’affiche de la semaine aussi : l’image générale du site, et plus de partage.png à côté d’elle.
+    const affiche = readFileSync(path.join(sortie, 'matchs/affiche/index.html'), 'utf8');
+    expect(meta(affiche, 'og:image')).toEqual([IMAGE_DU_SITE]);
+    expect(meta(affiche, 'twitter:image')).toEqual([IMAGE_DU_SITE]);
+    expect(existsSync(path.join(sortie, 'matchs/affiche/partage.png'))).toBe(false);
 
     const vide = dossierVide();
     await expect(passer(vide, '2026-10-21T08:00:00Z', { rendu: null, images: 'exiger' })).rejects.toThrow(/Images de partage exigées, rien n’est écrit/);

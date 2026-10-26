@@ -2,7 +2,8 @@
 // le match » : après le contenu, une carte pour les fans (la liste d’attente de l’accueil) et une pour les bars (le
 // formulaire de la page des bars). Le guide a déjà sa section « Tu tiens un bar qui diffuse les matchs ? » juste
 // au-dessus : il garde seulement la carte des fans, et « Proposer mon bar » arrive sous le paragraphe de cette section,
-// plutôt qu’une carte qui le répète. Des liens seulement : aucun formulaire, aucun script. Leurs mots sont ceux déjà
+// plutôt qu’une carte qui le répète. Des liens seulement : aucun formulaire, aucun script (sauf /mesure.js, quand
+// marque.json active la mesure d’audience). Leurs mots sont ceux déjà
 // publiés sur les pages des matchs (generateur/contenu/textes.json : l’appel des fans, la carte « Tu tiens un bar ? »),
 // mot pour mot. Chaque bouton se touche sur 44 px ; à 320 et 360 px, il passe à la ligne sans sortir de sa carte (ou de
 // la page), texte à 200 % compris, et « préviens-moi » ne se coupe pas au texte normal ; en contraste forcé (Windows), il
@@ -12,6 +13,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { appliquerAUnePage, lireLaMesure, mesureDuSite } from '../generateur/mesure.mjs';
 
 const TEXTES = JSON.parse(readFileSync(path.join(racine, 'generateur', 'contenu', 'textes.json'), 'utf8'));
 const normaliser = (texte) => texte.replace(/[\s  ]+/g, ' ').trim();
@@ -25,6 +27,13 @@ const PAGES = [
 ];
 // Les boutons : ceux des cartes, et celui des bars sur le guide.
 const BOUTONS = 'main .fin-de-page a, main a.fin-de-page__bouton';
+// La page telle qu’elle est (avec la mesure de marque.json, arrêtée tant que son code est vide), et la même réécrite avec
+// une mesure d’essai (comme tests/politique-de-securite.spec.mjs).
+const ESSAI = lireLaMesure({ mesure: { outil: 'goatcounter', code: 'essai' } });
+const CAS = [
+  { nom: 'telle quelle', mesure: mesureDuSite(), lire: (html) => html },
+  { nom: 'avec un code de mesure', mesure: ESSAI, lire: (html) => appliquerAUnePage(html, ESSAI) },
+];
 
 // Les cartes, telles qu’elles se lisent : leur texte et leur lien.
 const lireLesCartes = (onglet) => onglet.$$eval('main > .fin-de-page > .fin-de-page__carte', (cartes) => cartes.map((carte) => ({
@@ -67,10 +76,21 @@ for (const { chemin, cartes: attendues, sousLesBars } of PAGES) {
     const bloc = source.slice(source.indexOf('<div class="fin-de-page">'), source.indexOf('</main>'));
     expect(bloc).toContain('ouvre bientôt&nbsp;: préviens-moi');
     if (attendues.includes(BARS)) expect(bloc).toContain('Tu tiens un bar&nbsp;?');
-    // Des liens seulement : ni formulaire, ni champ, ni script sur la page (les données structurées ne s’exécutent pas).
-    await expect(page.locator('form, input, button, textarea, select')).toHaveCount(0);
-    await expect(page.locator('script:not([type="application/ld+json"])')).toHaveCount(0);
   });
+
+  // Des liens seulement : ni formulaire, ni champ, ni script (les données structurées ne s’exécutent pas), sauf
+  // /mesure.js quand la mesure d’audience est active. La page telle qu’elle est, et la même réécrite avec une mesure
+  // d’essai, comme l’Action le fait quand marque.json en a une.
+  for (const { nom, mesure, lire } of CAS) {
+    test(`${chemin} ${nom} : des liens seulement, aucun formulaire, aucun script hors de la mesure d’audience`, async ({ page }) => {
+      const html = lire(readFileSync(path.join(racine, chemin), 'utf8'));
+      await page.route(`**${chemin}`, (route) => route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: html }));
+      await page.goto(chemin);
+      await expect(page.locator('form, input, button, textarea, select')).toHaveCount(0);
+      const scripts = await page.locator('script:not([type="application/ld+json"])').evaluateAll((liste) => liste.map((s) => s.getAttribute('src')));
+      expect(scripts).toEqual(mesure.active ? ['/mesure.js'] : []);
+    });
+  }
 
   for (const largeur of [320, 360, 1280]) {
     test(`${chemin} à ${largeur} px : chaque bouton se touche sur 44 px, dans sa carte, et « préviens-moi » ne se coupe pas`, async ({ page }) => {

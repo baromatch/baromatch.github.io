@@ -285,19 +285,21 @@ test.describe('« Cache de ffmpeg » : les paquets de ffmpeg gardés dans le cac
     expect(sansCommentaires.match(/permissions:/g)).toHaveLength(1);
     expect(sansCommentaires).not.toMatch(/secrets\.|github\.token|_TOKEN|JETON/);
     // La seule expression : le numéro du passage, pour une clé neuve à chaque passage.
+    expect(sansCommentaires.split('${{').length - 1).toBe(1);
     expect([...sansCommentaires.matchAll(/\$\{\{([^}]*)\}\}/g)].map((m) => m[1].trim())).toEqual(['github.run_id']);
     expect(actionsDe(action)).toEqual(['actions/cache@v6']);
   });
 
-  test('ce qu’elle fait : refaire le cache à partir du plus récent, télécharger ffmpeg sans l’installer, retirer ce qui ne sert plus, et laisser des paquets lisibles', () => {
+  test('ce qu’elle fait : refaire le cache à partir du plus récent, télécharger ffmpeg sans l’installer, retirer ce qu’on ne peut plus télécharger, et laisser des paquets lisibles', () => {
     const travaux = sansCommentaires.split('\njobs:\n')[1];
     expect([...travaux.matchAll(/^ {2}[a-z-]+:$/gm)].map((m) => m[0].trim())).toEqual(['remplir:']);
     expect(travaux).toContain('    runs-on: ubuntu-24.04\n    timeout-minutes: 45\n');
     expect(cacheDe(etapeDe(action, 'Garder les paquets de ffmpeg'))).toEqual({
       dossier: 'paquets-ffmpeg', cle: 'paquets-ffmpeg-ubuntu-24.04-${{ github.run_id }}', prefixe: 'paquets-ffmpeg-ubuntu-24.04-',
     });
-    // À chaque passage, sans condition : le cache repris ne garde ainsi jamais de vieux paquets.
-    expect(etapeDe(action, 'Télécharger les paquets de ffmpeg')).not.toMatch(/\n {8}if:/);
+    // À chaque passage, sans condition : le cache repris ne garde que des paquets encore téléchargeables.
+    expect(etapeDe(action, 'Télécharger les paquets de ffmpeg')).not.toMatch(/^ {8}if:/m);
+    expect(etapeDe(action, 'Télécharger les paquets de ffmpeg')).toMatch(/^ {8}run: \|\n/);
     expect(scriptDeLEtape(action, 'Télécharger les paquets de ffmpeg')).toBe([
       'mkdir -p ~/paquets-ffmpeg/partial',
       'sudo apt-get update',

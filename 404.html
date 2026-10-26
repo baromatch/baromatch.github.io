@@ -78,9 +78,11 @@
     <a class="bouton-nuit perdu__accueil" href="/">Revenir à l’accueil</a>
   </div>
   <!-- La page d’une tablée, dans l’ordre où un fan sans l’appli en a besoin : ce qu’est une tablée, l’invitation,
-       « tu peux venir sans l’appli », puis où en est l’appli. tablee.js montre ou cache chaque bloc selon l’état
-       (en attente, ouverte, pleine, lien mort, panne) ; s’il ne se charge pas, l’appli et « Me prévenir au lancement »
-       restent là. -->
+       « tu peux venir sans l’appli », puis comment avoir l’appli. Aucun pseudo, ni de l’hôte ni de la tablée.
+       tablee.js montre ou cache chaque bloc selon l’état (en attente, ouverte, pleine, lien mort, panne), et
+       « Ouvrir dans l’appli » sur Android seulement ; s’il ne se charge pas, l’appli et « Me prévenir au lancement »
+       restent là. Le jour où l’appli est sur Google Play (marque.json, « appli »), le bloc de l’appli le dit aussi,
+       et SANS_L_APPLI de tablee.js mène à sa fiche. -->
   <div class="tablee" id="tablee">
     <p class="tablee__sur">La tablée</p>
     <h1 class="titre-section tablee__titre" id="tablee-titre" tabindex="-1">Une tablée t’attend.</h1>
@@ -94,12 +96,17 @@
     </dl>
     <section class="tablee__venir" id="tablee-venir" aria-labelledby="tablee-venir-titre" hidden>
       <h2 id="tablee-venir-titre">Tu n’as pas l’appli&nbsp;?</h2>
-      <p id="tablee-venir-texte">Tu peux venir quand même&nbsp;: arrive avec la personne qui t’invite. À l’entrée, son pass compte aussi pour toi.</p>
+      <p>Tu peux venir quand même&nbsp;: arrive avec la personne qui t’invite. À l’entrée, son pass compte aussi pour toi.</p>
     </section>
     <div class="tablee__appli" id="tablee-appli">
       <div id="tablee-appli-detail">
         <h2>L’appli Baromatch</h2>
-        <p>Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant. Laisse ton adresse&nbsp;: on te prévient pour les premiers tests et le lancement.</p>
+        <div class="tablee__ouvrir" id="tablee-ouvrir" hidden>
+          <p>Tu l’as déjà sur ce téléphone&nbsp;?</p>
+          <a class="tablee__ouvrir-lien" id="tablee-ouvrir-lien" href="/testeurs-android.html">Ouvrir dans l’appli</a>
+        </div>
+        <p>Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.</p>
+        <p>Tu as un téléphone Android&nbsp;? <a href="/testeurs-android.html">Deviens testeur</a> pour installer l’appli avant tout le monde. Sinon, laisse ton adresse&nbsp;: on te prévient au lancement.</p>
       </div>
       <a class="tablee__bouton" href="/#attente">Me prévenir au lancement</a>
     </div>

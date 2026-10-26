@@ -199,8 +199,12 @@ ${etapes.map((etape) => `    <li><strong>${e(etape.titre)}</strong> ${e(etape.te
 </section>`;
 };
 
-// « Tu tiens un bar ? » : vers la page des bars.
-export const tuTiensUnBar = (textes) => `<p class="regarder-bars-pro"><a href="/pour-les-bars.html">${e(textes.match.tuTiensUnBar)}</a> ${e(textes.match.tuTiensUnBarSuite)}</p>`;
+// « Tu tiens un bar ? » : une carte de verre, et un bouton de verre droit vers le formulaire de la page des bars
+// (l’ambre reste à l’appel des fans). Une phrase vraie avant l’ouverture : Baromatch cherche ses premiers bars.
+export const tuTiensUnBar = (textes) => `<div class="regarder-bars-pro">
+    <p><strong>${e(textes.match.tuTiensUnBar)}</strong> ${e(textes.match.tuTiensUnBarSuite)}</p>
+    <a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">${e(textes.match.proposerMonBar)}</a>
+  </div>`;
 
 // La carte d’un bar : son nom (vers sa page), son quartier et son adresse, ce qu’il dit de lui ; sur la page d’un
 // match, l’offre de la soirée ; sur « Ce soir », ses places (une phrase déjà écrite, ou rien).

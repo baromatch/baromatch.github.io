@@ -16,6 +16,17 @@ const MENTION_SANTE = 'L’abus d’alcool est dangereux pour la santé, à cons
 
 test.use({ javaScriptEnabled: false });
 
+// Tant que l’appli n’est pas ouverte, aucun fan ne trouve un bar sur Baromatch : le guide, et la carte « Tu tiens un
+// bar ? » des pages générées, disent ce qui est vrai, que Baromatch cherche ses premiers bars.
+test('avant l’ouverture, ni le guide ni les pages générées ne disent aux bars que des fans les trouvent', async ({ page }) => {
+  expect(JSON.parse(lire('marque.json')).appli.ouverte, 'l’appli est ouverte : relire ce que le guide et la carte des bars promettent').toBe(false);
+  await page.goto('/trouver-un-bar-qui-diffuse-le-match.html');
+  const bars = normaliser(await page.locator('#bars + p').textContent());
+  expect(bars).toContain('Baromatch cherche ses premiers bars à Paris.');
+  expect(bars).not.toMatch(/te trouvent|Annonce tes matchs/);
+  expect(TEXTES.match.tuTiensUnBarSuite).toBe('Baromatch cherche ses premiers bars à Paris.');
+});
+
 test('le film de l’accueil dit que ses bars, ses places et ses chiffres sont inventés', async ({ page }) => {
   await page.goto('/');
   const note = normaliser(await page.locator('#film-note').innerText());

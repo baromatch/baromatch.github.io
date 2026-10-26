@@ -833,6 +833,21 @@ a:hover { color: var(--goutte); }
   .entete__nav { column-gap: 4px; }
   .entete__lien { font-size: 0.875rem; }
 }
+/* Dès qu’il y a la place (401 px), « Pour les bars » devient une capsule de verre : un patron la voit sans chercher, et
+   l’ambre reste aux appels de la page. En dessous, le lien souligné, comme « Boutique ». */
+@media (min-width: 401px) {
+  .entete__lien--bars {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--verre-bord-fort);
+    border-radius: 999px;
+    background: var(--verre-fort);
+    box-shadow: var(--verre-reflet);
+  }
+  .entete__lien--bars:hover { background: rgba(255, 255, 255, 0.15); }
+}
 
 /* ---------- Baromatch en bref, sur l'accueil ---------- */
 

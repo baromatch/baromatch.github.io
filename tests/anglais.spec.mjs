@@ -256,6 +256,10 @@ test.describe('d’autres jours', () => {
     // Sans vrai bar : la page le dit, avec l’heure ; aucun nombre de bars.
     const pl = pageDe(site, '/en/matches/everton-chelsea-2026-10-17/');
     expect(pl.contenu).toContain('No Paris bar has listed this match on Baromatch yet.');
+    // The bars card: what is true before the app opens, and a button straight to the (French) form.
+    expect(pl.contenu).toContain('<p><strong>Run a bar in Paris?</strong> Baromatch is looking for its first bars. The page for bars is in French.</p>');
+    expect(pl.contenu).toContain('<a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer" hreflang="fr">Suggest your bar</a>');
+    expect(pl.contenu).not.toContain('List your match nights');
     expect(pl.contenu).toContain('Sat 17 Oct, 1:30 pm (Paris time)');
     expect(pl.contenu).toContain('That’s 12:30 pm in the UK.');
     for (const p of en) expect(texteVisible(p.contenu), p.chemin).not.toMatch(/\d+ (?:Paris bars?|bars? in Paris)/);

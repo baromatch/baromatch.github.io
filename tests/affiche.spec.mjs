@@ -285,6 +285,8 @@ test('« Ton bar est sur Baromatch ? » seulement quand un vrai bar est publié 
     expect(texte).not.toMatch(MOTS_INTERDITS);
     expect(texte).not.toMatch(/alcool|bière|pinte|verre offert|happy|partenaire/i);
     expect(texte).toContain('Ton bar est à Paris ? Propose-le sur Baromatch');
+    // Le lien mène droit au formulaire de la page des bars.
+    expect(html).toContain('<a href="/pour-les-bars.html#proposer">');
     expect(html.split('<main')[1]).not.toMatch(/<img\b/);
   }
 });

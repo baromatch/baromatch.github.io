@@ -651,11 +651,6 @@ a:hover { color: var(--goutte); }
 .document strong { color: var(--texte); font-weight: 600; }
 .document ul { padding-left: 1.2em; }
 .document li { margin: 6px 0; }
-/* Le mot du fondateur (À propos, Presse) : ses mots, cités tels quels dans une carte de verre, signés de son prénom. */
-.citation { margin: 20px 0 0; padding: 20px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
-.citation blockquote { margin: 0; }
-.document .citation blockquote p { margin: 0; color: var(--texte); font-size: 1.1875rem; }
-.citation figcaption { margin: 12px 0 0; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; }
 
 /* L’inscription au test Android (testeurs-android.html) : un formulaire ordinaire vers Formspree, sans JavaScript ; le
    navigateur vérifie les champs (required, type="email"). Les champs et la case reprennent ceux de la boutique. */
@@ -1348,7 +1343,12 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .document .presse__logos, .document .presse__captures { display: grid; gap: 20px; margin: 24px 0 0; padding: 0; list-style: none; }
 .document .presse__logos > li, .document .presse__captures > li { margin: 0; }
 @media (min-width: 720px) { .document .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.presse__logo { padding: 16px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
+.presse__logo, .citation { padding: 16px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
+/* Le mot du fondateur (À propos, Presse) : ses mots tels quels, signés, dans le même verre. */
+.citation { margin: 20px 0 0; }
+.citation blockquote { margin: 0; }
+.document .citation p { margin: 0; color: var(--texte); }
+.citation figcaption { margin-top: 12px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; }
 .presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: 20px; border-radius: 12px; background: var(--nuit); }
 .presse__apercu--clair { background: #F7F7F9; }
 .presse__apercu img { width: 100%; height: auto; }

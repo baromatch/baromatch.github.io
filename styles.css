@@ -687,7 +687,7 @@ a:hover { color: var(--goutte); }
 .perdu__liens { margin: 0 auto 36px; max-width: 34rem; }
 .perdu .perdu__sous-titre { margin: 0 0 12px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.01em; }
 .perdu__capsules { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; margin: 0 0 24px; padding: 0; list-style: none; }
-.perdu__capsule {
+.perdu__capsule, .fin-de-page__bouton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -704,7 +704,7 @@ a:hover { color: var(--goutte); }
   text-align: center;
   text-decoration: none;
 }
-.perdu__capsule:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
+.perdu__capsule:hover, .fin-de-page__bouton:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
 
 /* ---------- L'ouverture animée : la goutte tombe dans le verre ---------- */
 
@@ -1343,12 +1343,18 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .document .presse__logos, .document .presse__captures { display: grid; gap: 20px; margin: 24px 0 0; padding: 0; list-style: none; }
 .document .presse__logos > li, .document .presse__captures > li { margin: 0; }
 @media (min-width: 720px) { .document .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.presse__logo, .citation { padding: 16px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
+.presse__logo, .citation, .fin-de-page__carte { padding: 16px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
 /* Le mot du fondateur (À propos, Presse) : ses mots tels quels, signés, dans le même verre. */
 .citation { margin: 20px 0 0; }
 .citation blockquote { margin: 0; }
 .document .citation p { margin: 0; color: var(--texte); }
 .citation figcaption { margin-top: 12px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; }
+/* La fin du guide, d’À propos et de Comment on choisit les bars : une carte pour les fans, une pour les bars. */
+.fin-de-page { display: grid; gap: 12px; margin-top: 48px; }
+.fin-de-page__carte { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.document .fin-de-page__carte p { flex: 1 1 15rem; margin: 0; }
+.fin-de-page a { max-width: 100%; min-height: 44px; padding: 10px 20px; font-size: inherit; line-height: 1.25; text-align: center; text-wrap: balance; }
+.fin-de-page .capsule { border: 1px solid transparent; }
 .presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: 20px; border-radius: 12px; background: var(--nuit); }
 .presse__apercu--clair { background: #F7F7F9; }
 .presse__apercu img { width: 100%; height: auto; }

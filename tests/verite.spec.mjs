@@ -39,6 +39,20 @@ test('avant l’ouverture, la page presse ne dit pas que des fans trouvent les b
   await expect(bars.locator('a')).toHaveAttribute('href', '/pour-les-bars.html');
 });
 
+// Les deux cartes de fin de page (le guide, À propos, Comment on choisit les bars) : « bientôt » pour les fans, « ses
+// premiers bars » pour les bars. Vrai tant que l’appli n’est pas ouverte ; le jour où elle ouvre, ce test le rappelle.
+test('avant l’ouverture, les cartes de fin de page disent « bientôt » aux fans et « ses premiers bars » aux bars', async ({ page }) => {
+  expect(JSON.parse(lire('marque.json')).appli.ouverte, 'l’appli est ouverte : relire les cartes de fin de page').toBe(false);
+  for (const chemin of ['/trouver-un-bar-qui-diffuse-le-match.html', '/a-propos.html', CONFIANCE]) {
+    await page.goto(chemin);
+    const [fans, bars] = (await page.locator('.fin-de-page__carte').allTextContents()).map(normaliser);
+    expect(fans, chemin).toContain('Baromatch est en test sur Android, à Paris.');
+    expect(fans, chemin).toContain('L’appli ouvre bientôt : préviens-moi');
+    expect(bars, chemin).toContain('Baromatch cherche ses premiers bars à Paris.');
+    expect(`${fans} ${bars}`, chemin).not.toMatch(/te trouvent|réserve ta place|garde ta place/i);
+  }
+});
+
 test('le film de l’accueil dit que ses bars, ses places et ses chiffres sont inventés', async ({ page }) => {
   await page.goto('/');
   const note = normaliser(await page.locator('#film-note').innerText());

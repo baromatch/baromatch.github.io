@@ -59,6 +59,19 @@ test('boutique : dans la sélection ouverte, « Retirer » et les boutons de qua
   verifier(await lireLesCibles(onglet));
 });
 
+// Sur Android, la tablée ouverte a aussi « Ouvrir dans l’appli ».
+test.describe('sur Android', () => {
+  test.use({ userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36' });
+
+  test('tablée ouverte à 360 px : « Ouvrir dans l’appli » et chaque cible se touchent du doigt', async ({ page: onglet }) => {
+    await simulerLInvitation(onglet);
+    await onglet.setViewportSize({ width: 360, height: 800 });
+    await onglet.goto('/t/abcdefghjkmn');
+    await expect(onglet.locator('#tablee-ouvrir-lien')).toBeVisible();
+    verifier(await lireLesCibles(onglet));
+  });
+});
+
 for (const largeur of [360, 1280]) {
   test(`tablée ouverte à ${largeur} px : « Voir sur la carte » et chaque cible se touchent du doigt`, async ({ page: onglet }) => {
     await simulerLInvitation(onglet);

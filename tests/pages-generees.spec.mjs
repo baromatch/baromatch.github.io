@@ -30,6 +30,7 @@ const PAGES = [
   { chemin: '/agenda/', nom: 'agenda' },
   { chemin: '/matchs/affiche/', nom: 'affiche de la semaine' },
   { chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', nom: 'affiche d’un bar' },
+  { chemin: '/matchs/affiche/pour-le-patron/', nom: 'feuille du patron' },
   { chemin: '/en/', nom: 'Paris en anglais', partage: true },
   { chemin: '/en/premier-league/', nom: 'Premier League en anglais', partage: true },
   { chemin: '/en/champions-league/', nom: 'Ligue des champions en anglais', partage: true },

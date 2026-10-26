@@ -1,0 +1,43 @@
+{
+  "_lisezMoi": "Les textes de la feuille à laisser au patron d’un bar (/matchs/affiche/pour-le-patron/) : la page, la feuille à imprimer, et le lien de l’affiche de la semaine qui y mène. Garde les clés et les mots entre accolades ({jour}, {contact}) : le générateur y met les vraies valeurs. Tutoiement, présent, phrases courtes, aucun point d’exclamation. Rien sur l’alcool. La feuille ne dit que ce que la page des bars (pour-les-bars.html) et « Comment on choisit les bars » disent déjà : n’y ajoute aucune promesse. La ligne « Où on en est » suit l’état de l’appli (marque.json, « appli.ouverte ») : « fermee » tant qu’elle n’est pas ouverte. Le jour où elle ouvre, écris la phrase de « ouverte » : vide, la feuille n’est plus écrite (ni le lien qui y mène), et le journal le dit.",
+  "fil": "La feuille du patron",
+  "titrePage": "Feuille à laisser au patron d’un bar",
+  "description": "Une feuille à imprimer pour le patron d’un bar qui te dit « plus tard » : ce que Baromatch fait pour son bar, où on en est, et un QR code.",
+  "titre": "La feuille à laisser au patron",
+  "chapeau": "Un patron te dit « plus tard » ? Laisse-lui cette feuille : ce que Baromatch fait pour son bar, où on en est, et un QR code pour proposer son bar.",
+  "modeTitre": "Comment faire",
+  "etapes": [
+    "Choisis ton papier ici, puis le même dans la fenêtre d’impression : A4, avec deux feuilles à couper au milieu, ou A5.",
+    "Imprime avec le menu de ton navigateur : Imprimer (Ctrl + P, ou Cmd + P sur Mac). Sur téléphone : Partager, puis Imprimer.",
+    "Au stylo, écris ton prénom après « Laissée par », puis laisse la feuille au patron."
+  ],
+  "marges": "Garde les marges par défaut dans la fenêtre d’impression : les deux feuilles tiennent sur une page A4.",
+  "format": {
+    "legende": "Le papier",
+    "a4": "A4, deux feuilles à couper",
+    "a5": "A5, une feuille"
+  },
+  "titreFeuille": "La feuille",
+  "lien": "Un patron veut en savoir plus ? La feuille à lui laisser",
+  "feuille": {
+    "surtitre": "Baromatch · pour les bars",
+    "titre": "Remplis ton bar les soirs de match.",
+    "lignes": [
+      "Sur l’appli Baromatch, les fans de foot trouvent un bar qui diffuse leur match et y gardent leur place.",
+      "Tu choisis tes matchs et combien de places tu ouvres.",
+      "Gratuit pour tes clients. Pour ton bar, le tarif est à préciser. Envoyer ta demande ne coûte rien.",
+      "Sur baromatch.fr, ton bar n’apparaît qu’avec ton accord écrit."
+    ],
+    "ouEnEst": {
+      "titre": "Où on en est :",
+      "fermee": "Baromatch cherche ses premiers bars à Paris. L’appli est en test sur Android ; les fans ne réservent pas encore.",
+      "ouverte": ""
+    },
+    "appel": "Propose ton bar : scanne le code.",
+    "contact": "Ou écris à {contact}",
+    "stylo": "Laissée par :",
+    "prepare": "Feuille préparée sur baromatch.fr, le {jour}.",
+    "qr": "QR code vers la page des bars de baromatch.fr, au formulaire pour proposer un bar",
+    "adresse": "baromatch.fr/pour-les-bars.html"
+  }
+}

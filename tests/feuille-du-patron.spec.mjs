@@ -195,7 +195,8 @@ test('le texte de la feuille : le titre, les quatre lignes, où on en est et le 
     [LIGNES[1], 'pour-les-bars.html', ['tu choisis tes matchs', 'Tu choisis combien de places tu ouvres']],
     [LIGNES[2], 'pour-les-bars.html', ['Gratuit pour tes clients', 'Pour ton bar, le tarif est à préciser. Envoyer ta demande ne coûte rien']],
     [LIGNES[3], 'comment-on-choisit-les-bars.html', ['Il n’apparaît sur ce site qu’avec son accord écrit.']],
-    [OU_EN_EST, 'pour-les-bars.html', ['Baromatch cherche ses premiers bars à Paris.', 'en test sur Android', 'prévenu du lancement']],
+    [LIGNES[3], 'pour-les-bars.html', ['Sur ce site, ton bar n’apparaît qu’avec ton accord écrit']],
+    [OU_EN_EST, 'pour-les-bars.html', ['Baromatch cherche ses premiers bars à Paris.', 'en test sur Android', 'les fans ne réservent pas encore']],
   ];
   for (const [phrase, page, dejaDit] of SOURCES) for (const morceau of dejaDit) expect(publie[page], `${phrase} ← ${page}`).toContain(morceau.toLowerCase());
 });
@@ -291,13 +292,15 @@ test.describe('dans le navigateur', () => {
     await expect(onglet.locator('#patron-a4')).toBeChecked();
     const [haut, bas] = await feuilles(onglet);
     expect(bas, 'la copie s’imprime en A4').toBeTruthy();
-    // Chacune sur une moitié de la zone imprimable (273 mm), sans rien qui dépasse ; la coupe, en pointillés, entre les deux.
+    // 127 mm chacune, 5 mm de jeu dans la zone imprimable (273 mm), sans rien qui dépasse ; la coupe, en pointillés,
+    // entre les deux. Chacune reste d’un seul tenant si la page est plus courte (break-inside).
     for (const f of [haut, bas]) {
-      expect(f.hauteur / MM).toBeCloseTo(129, 0);
+      expect(f.hauteur / MM).toBeCloseTo(127, 0);
       expect(f.deborde).toBeLessThanOrEqual(0);
     }
+    expect(await onglet.locator('.affiche--patron').evaluateAll((liste) => liste.map((f) => getComputedStyle(f).breakInside))).toEqual(['avoid', 'avoid']);
     expect((bas.haut - haut.haut - haut.hauteur) / MM).toBeCloseTo(14, 0);
-    expect((bas.haut + bas.hauteur - haut.haut) / MM).toBeLessThanOrEqual(273);
+    expect((bas.haut + bas.hauteur - haut.haut) / MM).toBeLessThanOrEqual(268.5);
     expect(await onglet.locator('.affiche--copie').evaluate((copie) => getComputedStyle(copie, '::before').borderTopStyle)).toBe('dashed');
     // Ni l’en-tête, ni le pied du site, ni le fil, ni la tête de la page, ni le mode d’emploi et le choix du papier.
     for (const selecteur of ['header.entete', 'footer.pied', '.regarder-fil', '.regarder-tete', '.affiche-mode', '.affiche-format', '#titre-feuille']) {
@@ -316,6 +319,16 @@ test.describe('dans le navigateur', () => {
     expect(cote / MM).toBeCloseTo(36, 0);
     expect(pagesDuPdf(await onglet.pdf({ format: 'A4' }))).toBe(1);
     expect(ailleurs).toEqual([]);
+  });
+
+  test('à l’impression, en A4 sur une page plus courte (Letter) : la copie passe entière sur la page suivante', async ({ page: onglet }) => {
+    // Le choix A4 resté coché, mais du papier Letter dans la fenêtre d’impression (255 mm imprimables) : les deux
+    // feuilles ne tiennent plus sur une page ; la copie, d’un seul tenant, va sur la deuxième.
+    await onglet.setViewportSize({ width: Math.round(186 * MM), height: 1000 });
+    await onglet.goto(`${serveur.adresse}${FEUILLE}`);
+    await onglet.evaluate(() => document.fonts.ready);
+    await expect(onglet.locator('#patron-a4')).toBeChecked();
+    expect(pagesDuPdf(await onglet.pdf({ format: 'Letter' }))).toBe(2);
   });
 
   test('à l’impression, en A5 : la feuille seule, sur une seule page, sans rien qui dépasse', async ({ page: onglet }) => {

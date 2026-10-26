@@ -225,11 +225,13 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-laissee__trait { flex: 1; min-width: 6rem; height: 1.5em; border-bottom: 1px solid var(--encre-douce); }
 .affiche--patron .affiche-qr__code { width: 144px; height: 144px; }
 
-/* À l’impression : A4 (le choix par défaut), la feuille et sa copie, chacune sur une moitié de la zone imprimable
-   (273 mm entre les marges de 12 mm), la ligne de coupe au milieu de la page ; A5, la feuille seule, la page entière.
-   Un navigateur sans :has() imprime une seule feuille, sur la moitié haute. */
+/* À l’impression : A4 (le choix par défaut), la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la ligne de
+   coupe au milieu : 268 mm sur les 273 de la zone imprimable (marges de 12 mm), 5 mm de jeu. Une page plus courte
+   (papier Letter, d’autres marges, une impression depuis un téléphone) : la copie passe entière sur la page suivante,
+   jamais coupée en deux (break-inside). A5, la feuille seule, la page entière. Un navigateur sans :has() imprime une
+   seule feuille, sur la moitié haute. */
 @media print {
-  .affiche--patron { min-height: 0; height: 129mm; }
+  .affiche--patron { min-height: 0; height: 127mm; break-inside: avoid; }
   .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; position: relative; margin-top: 14mm; }
   .affiche--copie::before { content: ""; position: absolute; top: -7mm; right: 0; left: 0; border-top: 0.3mm dashed #000000; }
   .regarder:has(#patron-a5:checked) .affiche--patron { height: auto; min-height: 184mm; }

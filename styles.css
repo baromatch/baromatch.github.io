@@ -292,6 +292,27 @@ a:hover { color: var(--goutte); }
   }
   .attente__champ:focus-visible { outline: none; }
   .attente__bouton { height: 52px; border-radius: 999px; }
+  /* Le champ n’a plus de bord : c’est la pilule qui dit où l’on tape, par le même contour que tout le site. Un
+     contour, pas seulement la couleur du bord : en contraste élevé (Windows), le système le repeint, il reste visible. */
+  .attente__ligne:has(.attente__champ:focus-visible) { outline: 2px solid var(--ambre); outline-offset: 2px; }
+}
+
+/* Une adresse refusée (aria-invalid, posé par main.js) se voit aussi sur le champ, pas seulement dans le message : un
+   bord de 2 px à la couleur de l’erreur, sans rien déplacer (le retrait perd le pixel que le bord gagne). Au téléphone
+   sur le champ ; à partir de 560 px sur la pilule. */
+@media (max-width: 559.98px) {
+  .attente__champ[aria-invalid="true"] { border: 2px solid var(--erreur); padding: 0 17px; }
+}
+@media (min-width: 560px) {
+  .attente__ligne:has(.attente__champ[aria-invalid="true"]) { padding: 5px; border: 2px solid var(--erreur); }
+}
+/* En couleurs forcées (contraste élevé de Windows), la couleur de l’erreur s’efface : le bord passe à 3 px, en tirets,
+   pour se distinguer du bord ordinaire par sa forme (même taille : le retrait perd encore ce que le bord gagne). */
+@media (forced-colors: active) and (max-width: 559.98px) {
+  .attente__champ[aria-invalid="true"] { border: 3px dashed CanvasText; padding: 0 16px; }
+}
+@media (forced-colors: active) and (min-width: 560px) {
+  .attente__ligne:has(.attente__champ[aria-invalid="true"]) { padding: 4px; border: 3px dashed CanvasText; }
 }
 
 .attente__plateformes {

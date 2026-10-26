@@ -86,6 +86,14 @@ for (const chemin of ['/matchs/lille-lens-2026-10-26/', '/en/premier-league/']) 
       expect({ ...r, hauteur: r.hauteur >= 44 }).toEqual({ dansLaCarte: true, dansLEcran: true, defile: false, hauteur: true });
     });
   }
+  // En contraste forcé (Windows), l’ombre qui dessine la capsule disparaît : un vrai bord (transparent, repeint par le
+  // système) garde au bouton sa forme.
+  test(`${chemin} en contraste forcé : « Proposer mon bar » garde un bord`, async ({ page: onglet }) => {
+    await onglet.emulateMedia({ forcedColors: 'active' });
+    await onglet.goto(`${serveur.adresse}${chemin}`);
+    const bord = await onglet.locator('.regarder-bars-pro__bouton').evaluate((b) => [getComputedStyle(b).borderTopStyle, getComputedStyle(b).borderTopWidth]);
+    expect(bord).toEqual(['solid', '1px']);
+  });
 }
 
 for (const page of PAGES) {

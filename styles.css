@@ -651,6 +651,11 @@ a:hover { color: var(--goutte); }
 .document strong { color: var(--texte); font-weight: 600; }
 .document ul { padding-left: 1.2em; }
 .document li { margin: 6px 0; }
+/* Le mot du fondateur (À propos, Presse) : ses mots, cités tels quels dans une carte de verre, signés de son prénom. */
+.citation { margin: 20px 0 0; padding: 20px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
+.citation blockquote { margin: 0; }
+.document .citation blockquote p { margin: 0; color: var(--texte); font-size: 1.1875rem; }
+.citation figcaption { margin: 12px 0 0; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; }
 
 /* L’inscription au test Android (testeurs-android.html) : un formulaire ordinaire vers Formspree, sans JavaScript ; le
    navigateur vérifie les champs (required, type="email"). Les champs et la case reprennent ceux de la boutique. */

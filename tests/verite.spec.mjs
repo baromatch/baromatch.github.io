@@ -27,6 +27,18 @@ test('avant l’ouverture, ni le guide ni les pages générées ne disent aux ba
   expect(TEXTES.match.tuTiensUnBarSuite).toBe('Baromatch cherche ses premiers bars à Paris.');
 });
 
+// De même sur la page presse, que les journalistes citent : « Pour les bars » dit ce qui est vrai avant l’ouverture,
+// avec les mots de la page des bars, et y mène toujours.
+test('avant l’ouverture, la page presse ne dit pas que des fans trouvent les bars', async ({ page }) => {
+  expect(JSON.parse(lire('marque.json')).appli.ouverte, 'l’appli est ouverte : relire ce que la page presse dit des bars').toBe(false);
+  await page.goto('/presse.html');
+  const bars = page.locator('.presse__faits > div').filter({ has: page.locator('dt', { hasText: 'Pour les bars' }) }).locator('dd');
+  const texte = normaliser(await bars.textContent());
+  expect(texte).toMatch(/^Baromatch cherche ses premiers bars à Paris\. Chaque bar choisit ses matchs et combien de places il ouvre\. /);
+  expect(texte).not.toMatch(/trouvent|annoncent|gardées avant l’arrivée/);
+  await expect(bars.locator('a')).toHaveAttribute('href', '/pour-les-bars.html');
+});
+
 test('le film de l’accueil dit que ses bars, ses places et ses chiffres sont inventés', async ({ page }) => {
   await page.goto('/');
   const note = normaliser(await page.locator('#film-note').innerText());

@@ -20,7 +20,10 @@ const CANONIQUE = `${ORIGINE}${PAGE}`;
 const API = 'https://api-production-8ce4.up.railway.app';
 const ADRESSE = `${API}/api/public/bar-contact`;
 
-const TITRE = 'Remplis ton bar les soirs de match — Baromatch pour les bars';
+// Le titre choisi par le fondateur (26 octobre 2026) : celui de l’onglet, de la carte de partage et de la FAQ balisée.
+const TITRE = 'Les soirs de match, ton bar sur Baromatch — Pour les bars';
+// L’image de partage porte ce titre ; un nouveau nom de fichier, pour que les aperçus déjà vus se refassent.
+const IMAGE_OG = '/img/og-bars-2026-10.jpg';
 const DESCRIPTION = 'Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.';
 const IMAGE_OG_ALT = 'La Console de Baromatch : pour un match, les places sur Baromatch, l’ouverture des réservations et l’heure jusqu’à laquelle une place est gardée. Exemple.';
 // Le style du premier écran, en ligne dans la tête : la politique ne l’autorise que par son empreinte.
@@ -34,9 +37,11 @@ const MESURE = mesureDuSite();
 const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
   + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);
 
-// Les conditions des premiers bars, mot pour mot comme le fondateur les a écrites (26 octobre 2026) : sous le bouton,
-// en tête de « Combien ça coûte ? », et reprises sans rien y ajouter dans « Je m’engage pour combien de temps ? ».
+// Les conditions des premiers bars, mot pour mot comme le fondateur les a écrites (26 octobre 2026) : en entier en tête
+// de « Combien ça coûte ? », reprises sans rien y ajouter dans « Je m’engage pour combien de temps ? », et leur première
+// phrase sous le bouton (le titre tient sur trois lignes au téléphone : la phrase du prix reste dans le premier écran).
 const CONDITIONS = 'Gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.';
+const CONDITIONS_COURTES = 'Gratuit pendant le lancement, sans engagement.';
 const COMBIEN = 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux. Pour tes clients, Baromatch est gratuit : ce qu’ils prennent au bar, ils le paient au bar.';
 const ENGAGEMENT = 'Sans engagement : tu arrêtes quand tu veux. Pendant le lancement, c’est gratuit, et aucun paiement tant que tu n’as pas accepté un tarif.';
 // « Le tarif est à préciser », « tarif à préciser » : ce que la page disait avant ces conditions.
@@ -131,7 +136,7 @@ test.describe('ce que la page dit', () => {
       ogTitre: [TITRE],
       ogDescription: [DESCRIPTION],
       ogUrl: [CANONIQUE],
-      ogImage: [`${ORIGINE}/img/og-bars.jpg`],
+      ogImage: [`${ORIGINE}${IMAGE_OG}`],
       ogImageAlt: [IMAGE_OG_ALT],
       twitter: ['summary_large_image', '@baromatchapp'],
       feuilles: ['/styles.css', '/pour-les-bars.css'],
@@ -148,6 +153,12 @@ test.describe('ce que la page dit', () => {
     expect(titres).toHaveLength(1);
     expect(titres[0]).toMatch(/\bbar\b/i);
     expect(titres[0]).toMatch(/\bmatch\b/i);
+    // Deux lignes, comme sur l’image de partage.
+    expect(await page.locator('h1 > span').allTextContents()).toEqual(['Les soirs de match,', 'ton bar sur Baromatch.']);
+    // L’ancien titre ne se lit plus nulle part : ni l’onglet, ni la carte de partage, ni la FAQ balisée. Sa nouvelle
+    // image est dans le dépôt.
+    expect(await page.content()).not.toContain('Remplis ton bar');
+    expect(existsSync(IMAGE_OG.slice(1)), IMAGE_OG).toBe(true);
   });
 
   test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, badge, questions, formulaire', async ({ page }) => {
@@ -157,7 +168,7 @@ test.describe('ce que la page dit', () => {
       titre: s.querySelector('h1, h2').textContent.replace(/\s+/g, ' ').trim(),
     })));
     const ATTENDUES = [
-      'Remplis ton bar les soirs de match.',
+      'Les soirs de match, ton bar sur Baromatch.',
       'Ce que Baromatch fait pour ton bar',
       'Comment ça marche',
       'Ton soir de match, heure par heure',
@@ -329,7 +340,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     // gratuit des clients.
     const bouton = ouverture.locator('.actions .capsule[href="#proposer"]');
     const prix = ouverture.locator('.actions + .ouverture-bars__prix');
-    await expect(prix).toHaveText(CONDITIONS);
+    await expect(prix).toHaveText(CONDITIONS_COURTES);
     await expect(ouverture.locator('.boutique-promesses li')).toHaveText([
       'On cherche les premiers bars, à Paris',
       'Tu choisis combien de places tu ouvres',
@@ -407,8 +418,11 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   // lecteur d’écran, un aperçu de partage ou un moteur de recherche.
   test('les conditions des premiers bars, mot pour mot : sous le bouton, dans « Combien ça coûte ? », dans « Je m’engage pour combien de temps ? » et dans la FAQ balisée ; « tarif à préciser » nulle part', async ({ page }) => {
     await page.goto(PAGE);
-    await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS);
-    expect(normaliser(await page.locator('main').textContent())).toContain(CONDITIONS);
+    expect(CONDITIONS.startsWith(CONDITIONS_COURTES)).toBe(true);
+    await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
+    // En entier dans « Combien ça coûte ? », ouverte d’emblée, après « Pour ton bar : ».
+    expect(COMBIEN.toLowerCase()).toContain(`pour ton bar : ${CONDITIONS.toLowerCase()} pour tes clients`);
+    expect(normaliser(await page.locator('main').textContent()).toLowerCase()).toContain(CONDITIONS.toLowerCase());
     // La nouvelle question, juste après le prix, fermée comme les autres (seul le prix est ouvert).
     const engagement = page.locator('.questions details', { has: page.locator('summary', { hasText: 'Je m’engage pour combien de temps' }) });
     await expect(engagement).toHaveCount(1);

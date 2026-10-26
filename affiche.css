@@ -241,7 +241,8 @@ label.affiche-ligne__texte { cursor: pointer; }
 
   .affiche--patron .affiche-tete { padding-bottom: 2.5mm; border-bottom-width: 0.8mm; }
   .affiche-patron__surtitre { margin-bottom: 1.5mm; font-size: 10pt; }
-  .affiche--patron .affiche-titre { font-size: 34pt; }
+  /* Le titre de la feuille tient sur une ligne en A4 : sur deux, la feuille déborderait de ses 127 mm. */
+  .affiche--patron .affiche-titre { font-size: 32pt; }
   .affiche-patron__lignes li { padding: 1.4mm 0; border-bottom-width: 0.2mm; font-size: 12.5pt; line-height: 1.25; }
   .affiche-patron__etat { margin-top: 2.5mm; font-size: 10pt; line-height: 1.35; }
   .affiche--patron .affiche-pied { gap: 6mm; margin-top: auto; padding-top: 3mm; border-top-width: 0.8mm; }

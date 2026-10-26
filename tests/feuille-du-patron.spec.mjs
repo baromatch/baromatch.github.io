@@ -41,7 +41,7 @@ const vocabulaire = chargerLeVocabulaire();
 const SOURCE = `scenario:${SCENARIO}`;
 
 // Le texte de la feuille, tel qu’il a été relu (les espaces insécables de la typographie française comprises).
-const TITRE = 'Remplis ton bar les soirs de match.';
+const TITRE = 'Les soirs de match, ton bar sur Baromatch.';
 const LIGNES = [
   'Sur l’appli Baromatch, les fans de foot trouvent un bar qui diffuse leur match et y gardent leur place.',
   'Tu choisis tes matchs et combien de places tu ouvres.',
@@ -190,7 +190,7 @@ test('le texte de la feuille : le titre, les quatre lignes, où on en est et le 
     'comment-on-choisit-les-bars.html': texteDuDepot('comment-on-choisit-les-bars.html').toLowerCase(),
   };
   const SOURCES = [
-    [TITRE, 'pour-les-bars.html', ['Remplis ton bar les soirs de match.']],
+    [TITRE, 'pour-les-bars.html', ['Les soirs de match, ton bar sur Baromatch.']],
     [LIGNES[0], 'pour-les-bars.html', ['Sur l’appli Baromatch, les fans qui cherchent où voir le match trouvent ton bar et gardent leur place.', 'le fan choisit son match et voit les bars qui le diffusent']],
     [LIGNES[1], 'pour-les-bars.html', ['tu choisis tes matchs', 'Tu choisis combien de places tu ouvres']],
     [LIGNES[2], 'pour-les-bars.html', ['Gratuit pour tes clients', 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.']],

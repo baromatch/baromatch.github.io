@@ -1349,11 +1349,12 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .citation blockquote { margin: 0; }
 .document .citation p { margin: 0; color: var(--texte); }
 .citation figcaption { margin-top: 12px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; }
-/* La fin du guide, d’À propos et de Comment on choisit les bars : une carte pour les fans, une pour les bars. */
+/* La fin d’À propos et de Comment on choisit les bars : une carte pour les fans, une pour les bars. Le guide garde
+   celle des fans ; son « Proposer mon bar » est sous « Tu tiens un bar qui diffuse les matchs ? ». */
 .fin-de-page { display: grid; gap: 12px; margin-top: 48px; }
 .fin-de-page__carte { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .document .fin-de-page__carte p { flex: 1 1 15rem; margin: 0; }
-.fin-de-page a { max-width: 100%; min-height: 44px; padding: 10px 20px; font-size: inherit; line-height: 1.25; text-align: center; text-wrap: balance; }
+.fin-de-page a, .fin-de-page__bouton { max-width: 100%; min-height: 44px; padding: 10px 20px; font-size: inherit; line-height: 1.25; text-align: center; text-wrap: balance; }
 .fin-de-page .capsule { border: 1px solid transparent; }
 .presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: 20px; border-radius: 12px; background: var(--nuit); }
 .presse__apercu--clair { background: #F7F7F9; }

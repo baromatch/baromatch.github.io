@@ -306,6 +306,14 @@ a:hover { color: var(--goutte); }
 @media (min-width: 560px) {
   .attente__ligne:has(.attente__champ[aria-invalid="true"]) { padding: 5px; border: 2px solid var(--erreur); }
 }
+/* En couleurs forcées (contraste élevé de Windows), la couleur de l’erreur s’efface : le bord passe à 3 px, en tirets,
+   pour se distinguer du bord ordinaire par sa forme (même taille : le retrait perd encore ce que le bord gagne). */
+@media (forced-colors: active) and (max-width: 559.98px) {
+  .attente__champ[aria-invalid="true"] { border: 3px dashed CanvasText; padding: 0 16px; }
+}
+@media (forced-colors: active) and (min-width: 560px) {
+  .attente__ligne:has(.attente__champ[aria-invalid="true"]) { padding: 4px; border: 3px dashed CanvasText; }
+}
 
 .attente__plateformes {
   margin: 12px 4px 0;

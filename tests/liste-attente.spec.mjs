@@ -56,6 +56,25 @@ test('en contraste élevé (Windows), à 1280 px : la pilule garde son contour a
   expect(await page.locator('#attente .attente__ligne').evaluate((e) => getComputedStyle(e).outlineStyle)).toBe('solid');
 });
 
+// En couleurs forcées, la couleur de l’erreur disparaît : le bord d’erreur se distingue par sa forme (3 px, en tirets),
+// toujours sans déplacer le champ.
+for (const largeur of [360, 1280]) {
+  test(`en contraste élevé (Windows), à ${largeur} px : une adresse refusée se voit à la forme du bord`, async ({ page }) => {
+    await simulerFormspree(page);
+    await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: largeur, height: 800 });
+    await page.goto('/');
+    const cadre = largeur >= 560 ? page.locator('#attente .attente__ligne') : champ(page);
+    expect(await cadre.evaluate((e) => getComputedStyle(e).borderTopStyle)).toBe('solid');
+    const place = () => champ(page).evaluate((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top + window.scrollY, r.width, r.height]; });
+    const avant = await place();
+    await sInscrire(page, 'paul@gmail');
+    await expect(champ(page)).toHaveAttribute('aria-invalid', 'true');
+    expect(await cadre.evaluate((e) => [getComputedStyle(e).borderTopStyle, getComputedStyle(e).borderTopWidth])).toEqual(['dashed', '3px']);
+    expect(await place()).toEqual(avant);
+  });
+}
+
 test('« paul@gmail » est refusé sans envoi, avec ce qui manque', async ({ page }) => {
   const envois = await simulerFormspree(page);
   await page.goto('/');

@@ -1,6 +1,7 @@
-/* Baromatch — les affiches à imprimer : l’affiche des matchs de la semaine (/matchs/affiche/) et l’affiche de chaque
-   bar publié (/bar/<bar>/affiche/), écrites par le générateur (generateur/affiche.mjs). Elles reprennent styles.css et
-   regarder.css ; ici, la feuille et son impression.
+/* Baromatch — les affiches à imprimer : l’affiche des matchs de la semaine (/matchs/affiche/), l’affiche de chaque
+   bar publié (/bar/<bar>/affiche/) et la feuille à laisser au patron (/matchs/affiche/pour-le-patron/), écrites par le
+   générateur (generateur/affiche.mjs, generateur/feuille-du-patron.mjs). Elles reprennent styles.css et regarder.css ;
+   ici, la feuille et son impression.
    À l’écran : la nuit du site, et l’affiche en aperçu sur une feuille blanche.
    À l’impression : seulement la feuille, papier blanc, encre noire, une seule touche d’ambre (le verre de la marque).
    Une affiche pleine nuit viderait la cartouche d’un bar. Seules les lignes cochées s’impriment ; si rien n’est coché,
@@ -203,4 +204,59 @@ label.affiche-ligne__texte { cursor: pointer; }
   .affiche-appel__suite { margin: calc(1mm * var(--echelle)) 0 calc(5mm * var(--echelle)); font-size: calc(13pt * var(--echelle)); }
   .affiche--bar .affiche-pied { margin-top: auto; padding-top: calc(6mm * var(--echelle)); border-top-width: calc(1.2mm * var(--echelle)); }
   .affiche--bar .affiche-qr__code { width: calc(55mm * var(--echelle)); height: calc(55mm * var(--echelle)); }
+}
+
+/* ---------- La feuille à laisser au patron (/matchs/affiche/pour-le-patron/) ----------
+   Le même papier : un surtitre, le titre, quatre lignes, « Où on en est », puis le pied (l’appel, le contact, « Laissée
+   par » et sa ligne au stylo, la date et le verre ; le QR code à droite). La copie (la seconde feuille de l’A4) ne se
+   montre jamais à l’écran. */
+
+.affiche--copie { display: none; }
+.affiche-patron__surtitre { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
+.affiche--patron .affiche-titre { font-size: clamp(2.25rem, 9vw, 3.5rem); }
+.affiche-patron__lignes { margin: 0; padding: 0; list-style: none; }
+.affiche-patron__lignes li { padding: 12px 0; border-bottom: 1px solid var(--trait-papier); font-size: 1.125rem; font-weight: 650; line-height: 1.35; }
+.affiche-patron__etat { margin: 14px 0 0; color: var(--encre-douce); font-size: 0.9375rem; line-height: 1.45; }
+.affiche-patron__etat strong { color: var(--encre); font-weight: 750; }
+.affiche--patron .affiche-pied { margin-top: 20px; padding-top: 16px; border-top: 3px solid var(--encre); }
+.affiche--patron .affiche-appel { font-size: 1.25rem; }
+/* « Laissée par : » et sa ligne vide, à remplir au stylo : imprimée, et un dessin pour un lecteur d’écran. */
+.affiche-laissee { display: flex; align-items: flex-end; gap: 8px; max-width: 22rem; margin: 0 0 16px; font-weight: 650; }
+.affiche-laissee__trait { flex: 1; min-width: 6rem; height: 1.5em; border-bottom: 1px solid var(--encre-douce); }
+.affiche--patron .affiche-qr__code { width: 144px; height: 144px; }
+
+/* À l’impression : A4 (le choix par défaut), la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la ligne de
+   coupe au milieu : 268 mm sur les 273 de la zone imprimable (marges de 12 mm), 5 mm de jeu. Une page plus courte
+   (papier Letter, d’autres marges, une impression depuis un téléphone) : la copie passe entière sur la page suivante,
+   jamais coupée en deux (break-inside). A5, la feuille seule, la page entière. Un navigateur sans :has() imprime une
+   seule feuille, sur la moitié haute. */
+@media print {
+  .affiche--patron { min-height: 0; height: 127mm; break-inside: avoid; }
+  .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; margin-top: 14mm; }
+  /* La ligne de coupe, 7 mm sous la première feuille : entre les deux feuilles, ou sous la première quand la copie
+     passe sur la page suivante (jamais seule au bas d’une page). */
+  .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie) { position: relative; }
+  .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie)::after { content: ""; position: absolute; right: 0; bottom: -7mm; left: 0; border-top: 0.3mm dashed #000000; }
+  .regarder:has(#patron-a5:checked) .affiche--patron { height: auto; min-height: 184mm; }
+
+  .affiche--patron .affiche-tete { padding-bottom: 2.5mm; border-bottom-width: 0.8mm; }
+  .affiche-patron__surtitre { margin-bottom: 1.5mm; font-size: 10pt; }
+  .affiche--patron .affiche-titre { font-size: 34pt; }
+  .affiche-patron__lignes li { padding: 1.4mm 0; border-bottom-width: 0.2mm; font-size: 12.5pt; line-height: 1.25; }
+  .affiche-patron__etat { margin-top: 2.5mm; font-size: 10pt; line-height: 1.35; }
+  .affiche--patron .affiche-pied { gap: 6mm; margin-top: auto; padding-top: 3mm; border-top-width: 0.8mm; }
+  .affiche--patron .affiche-appel { font-size: 16pt; }
+  .affiche--patron .affiche-appel__suite { margin: 0.5mm 0 3mm; font-size: 11pt; }
+  .affiche-laissee { gap: 2mm; max-width: 90mm; margin-bottom: 3mm; font-size: 11pt; }
+  .affiche-laissee__trait { height: 7mm; border-bottom-color: #000000; }
+  .affiche--patron .affiche-prepare { font-size: 8.5pt; }
+  .affiche--patron .affiche-verre { width: 6.5mm; height: 6.5mm; }
+  /* 36 mm marge comprise : le code lui-même (33 modules sur 41) fait près de 3 cm. */
+  .affiche--patron .affiche-qr__code { width: 36mm; height: 36mm; }
+  .affiche--patron .affiche-qr__adresse { margin-top: 1mm; font-size: 9pt; }
+  /* L’A5 : plus étroite que la moitié d’une A4, plus haute ; un code plus grand. */
+  .regarder:has(#patron-a5:checked) .affiche--patron .affiche-titre { font-size: 36pt; }
+  .regarder:has(#patron-a5:checked) .affiche-patron__lignes li { padding: 2mm 0; font-size: 13.5pt; }
+  .regarder:has(#patron-a5:checked) .affiche-patron__etat { margin-top: 3mm; font-size: 10.5pt; }
+  .regarder:has(#patron-a5:checked) .affiche--patron .affiche-qr__code { width: 42mm; height: 42mm; }
 }

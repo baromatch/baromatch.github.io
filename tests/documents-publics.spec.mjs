@@ -56,8 +56,12 @@ const FORMES = [
   { cle: 'mission', motif: /\bmissio[n][\s_-]*\d/i },
   // Le dépôt où vit l’appli, cité comme tel.
   { cle: 'depot', motif: /d[ée]p[ôo]t\s+de\s+l[’']appl[i]/i },
-  // L’état de sa mise en production : son service de construction mobile, ce qui est en production ou pas encore.
-  { cle: 'production', motif: /\bE[A]S\b|\b[Dd][ée]plo(?:ie|ient|yée?s?|iement)\b|\b[Dd]eplo(?:y|ys|yed|yment)\b/ },
+  // L’état de sa mise en production : son service de construction mobile (par son sigle, son adresse, ou ce qu’il garde :
+  // la clé de signature et ses réglages de construction), ce qui est en production ou pas encore.
+  {
+    cle: 'production',
+    motif: /\bE[A]S\b|\b[Ee]xp[o]\.dev\b|\b[Kk]e[y]store\b|\b[Pp]rofils? de buil[d]\b|\b[Dd][ée]plo(?:ie|ient|yée?s?|iement)\b|\b[Dd]eplo(?:y|ys|yed|yment)\b/,
+  },
 ];
 
 // ---------- (b) Ce que le serveur fait pour se protéger ----------
@@ -119,15 +123,17 @@ const NOMS = [
 ];
 
 // ---------- Les exceptions ----------
-// Les seuls documents du dossier des documents : ceux du site lui-même (son référencement, et le plan qui classe ses
-// prochains changements), écrits pour Skander, hors
-// de l’index (robots.txt). Seul leur chemin est permis ; leur texte est lu comme celui de tout autre fichier, avec une
-// exception : l’audit cite les pages de la documentation de Google, dont l’adresse a la forme d’un chemin de
-// documents (chacune comptée). Leurs noms sont écrits en morceaux, pour que ce fichier ne les contienne pas.
+// Les seuls documents du dossier des documents : ceux du site lui-même (son référencement, le plan qui classe ses
+// prochains changements, et le fichier qui ouvre l’appli Android depuis un lien du site, /.well-known/assetlinks.json),
+// écrits pour Skander, hors de l’index (robots.txt). Seul leur chemin est permis ; leur texte est lu comme celui de
+// tout autre fichier, avec une exception : l’audit cite les pages de la documentation de Google, dont l’adresse a la
+// forme d’un chemin de documents (chacune comptée). Leurs noms sont écrits en morceaux, pour que ce fichier ne les
+// contienne pas.
 const AUDIT_SEO = ['d', 'ocs/SEO-AUDIT-2026-10.m', 'd'].join('');
 const A_FAIRE_SEO = ['d', 'ocs/SEO-A-FAIRE-PAR-SKANDER.m', 'd'].join('');
 const PLAN_DU_SITE = ['d', 'ocs/NIVEAU_SUPERIEUR_SITE_2026-10.m', 'd'].join('');
-const DOCUMENTS_DU_SITE = [AUDIT_SEO, A_FAIRE_SEO, PLAN_DU_SITE];
+const LIENS_ANDROID = ['d', 'ocs/ANDROID-OUVRIR-L-APPLI.m', 'd'].join('');
+const DOCUMENTS_DU_SITE = [AUDIT_SEO, A_FAIRE_SEO, PLAN_DU_SITE, LIENS_ANDROID];
 
 // Le texte que le visiteur lit exprès, et ses copies mot pour mot dans les tests. [fichier, motif, nombre] : le motif y
 // est permis exactement ce nombre de fois. Une occurrence de plus est une fuite ; une de moins, une exception à retirer.
@@ -158,6 +164,9 @@ const EXCEPTIONS = [
   // Le drapeau de Chromium qui le fait passer à côté de l’intermédiaire réseau de la machine de test, pour joindre le
   // serveur local à la place de baromatch.fr (Lighthouse avec la mesure d’audience) : rien sur le serveur de l’appli.
   ['tests/outils/lighthouse-mesure.mjs', 'reseau', 1],
+  // La page de confidentialité renvoie aux conditions d’Expo, le prestataire des mises à jour de l’appli, par leur
+  // adresse publique (le lien et son texte).
+  ['confidentialite.html', 'production', 2],
   // L’audit SEO : les adresses des pages de Google Search Central qu’il cite (developers.google.com/search/…).
   [AUDIT_SEO, 'chemin', 20],
 ];

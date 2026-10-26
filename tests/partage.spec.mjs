@@ -59,10 +59,12 @@ test.describe('les images de partage', () => {
   });
   const lire = (relatif) => readFileSync(path.join(sortie, relatif), 'utf8');
 
-  test('une image PNG de 1200 × 630, de moins de 150 Ko, à côté de chaque page de match, de ville, de bar et de « Ce soir »', () => {
+  test('une image PNG de 1200 × 630, de moins de 150 Ko, à côté de chaque page de match, de ville, de bar, de « Ce soir » et de l’affiche de la semaine', () => {
     const images = resultat.fichiers.filter((f) => f.type === 'partage');
     const types = images.map((f) => resultat.fichiers.find((p) => `${p.chemin}partage.png` === f.chemin).type);
-    expect(new Set(types)).toEqual(new Set(['match', 'ville', 'bar', 'ce-soir']));
+    expect(new Set(types)).toEqual(new Set(['match', 'ville', 'bar', 'ce-soir', 'affiche']));
+    // L’affiche d’un bar n’en a pas : elle reste une feuille à imprimer, avec l’image générale du site.
+    expect(images.filter((f) => /^\/bar\/[a-z0-9-]+\/affiche\//.test(f.chemin))).toEqual([]);
     for (const image of images) {
       expect(image.chemin).toMatch(/^\/(?:(?:matchs|regarder-le-match|bar)\/[a-z0-9-]+|ce-soir)\/partage\.png$/);
       expect(lirePng(path.join(sortie, image.chemin))).toEqual({ png: true, largeur: 1200, hauteur: 630, poids: expect.any(Number) });
@@ -78,7 +80,8 @@ test.describe('les images de partage', () => {
   });
 
   test('og:image et twitter:image : l’adresse absolue de son image et sa version, ses dimensions, ce qu’elle montre', () => {
-    const pages = resultat.fichiers.filter((f) => ['match', 'ville', 'bar', 'ce-soir'].includes(f.type) && f.carte);
+    const pages = resultat.fichiers.filter((f) => ['match', 'ville', 'bar', 'ce-soir', 'affiche'].includes(f.type) && f.carte);
+    expect(pages.map((p) => p.chemin)).toContain('/matchs/affiche/');
     expect(pages.length).toBeGreaterThan(10);
     for (const p of pages) {
       const html = p.contenu;
@@ -107,6 +110,13 @@ test.describe('les images de partage', () => {
     // Une ville sans vrai bar : son nom, sans « Où regarder le match ».
     expect(carteDe('/regarder-le-match/marseille/')).toEqual({ surtitre: 'Les soirs de match', titre: 'Marseille', ligne: '', ambre: '', alt: 'Les soirs de match à Marseille.' });
     expect(carteDe('/bar/au-bon-coin-lyon-2/')).toMatchObject({ titre: 'Au Bon Coin', ligne: 'On diffuse le match', ambre: '' });
+    // L’affiche de la semaine, telle qu’un bar la reçoit : ce qu’elle est, les dates de sa semaine, gratuite. Ni
+    // « sur Baromatch », ni place promise, ni le mot « bar » (la règle de toute image d’une page sans vrai bar, plus bas).
+    const affiche = carteDe('/matchs/affiche/');
+    expect(affiche).toMatchObject({ surtitre: 'Pour ton comptoir', titre: 'L’affiche des matchs de la semaine', ambre: 'Gratuite, à imprimer' });
+    expect(affiche.ligne.replace(/\u00A0/g, ' ')).toMatch(/^Du (lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) .+ au (lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) .+$/);
+    expect(affiche.alt.replace(/\u00A0/g, ' ')).toBe(`L’affiche des matchs de la semaine, ${affiche.ligne.replace(/\u00A0/g, ' ').toLocaleLowerCase('fr-FR')}. Gratuite, à imprimer.`);
+    expect(Object.values(affiche).join(' ')).not.toMatch(/sur Baromatch|place|\d+\s?bars?\b/i);
     // Sur chaque page de match, le nombre de l’image est celui des cartes de bars de la page.
     for (const p of resultat.fichiers.filter((f) => f.type === 'match' && f.carte)) {
       const cartes = (p.contenu.match(/<li class="regarder-carte">/g) ?? []).length;
@@ -121,7 +131,9 @@ test.describe('les images de partage', () => {
       expect(dessine, p.chemin).not.toMatch(/\b0 bars?\b|\d\s*[-–]\s*\d|!/);
       // Une page qui ne montre aucun vrai bar : son image n’en promet pas non plus.
       if (!/<li class="regarder-carte">/.test(p.contenu)) expect(`${dessine} · ${p.carte.alt}`, p.chemin).not.toMatch(/regarder|(?<!\p{L})bars?(?!\p{L})|guide/iu);
-      expect(dessine).toContain(p.carte.titre.replace(/&/g, '&amp;'));
+      // Le titre, dessiné en entier, sur une ligne ou sur deux (l’affiche de la semaine : « L’affiche des matchs · de la
+      // semaine »).
+      expect(dessine.replace(/ · /g, ' '), p.chemin).toContain(p.carte.titre.replace(/&/g, '&amp;'));
       expect(svg).not.toMatch(/<image|href=|https?:\/\/(?!www\.w3\.org)/);
     }
   });
@@ -293,7 +305,7 @@ test.describe('d’un passage à l’autre', () => {
     expect(new Set(vues.map((v) => v.chemin))).toContain('/ce-soir/');
     // Les textes des images eux-mêmes (generateur/contenu/partage.json, hors du bloc « Partager ») : aucun non plus.
     const { bouton, _lisezMoi, ...dessines } = JSON.parse(readFileSync(path.join(racine, 'generateur/contenu/partage.json'), 'utf8'));
-    expect(Object.keys(dessines).sort()).toEqual(['bar', 'ceSoir', 'match', 'ville']);
+    expect(Object.keys(dessines).sort()).toEqual(['affiche', 'bar', 'ceSoir', 'match', 'ville']);
     for (const [sorte, cles] of Object.entries(dessines)) for (const [cle, texte] of Object.entries(cles)) expect(texte, `${sorte}.${cle}`).not.toMatch(RELATIFS);
     // Une image de chaque sorte, rendue deux fois par deux rendus chargés à part : octet pour octet, la même.
     const sortes = [...new Map(vues.map((v) => [v.chemin.split('/')[1], v])).values()];
@@ -410,6 +422,11 @@ test.describe('d’un passage à l’autre', () => {
     expect(meta(html, 'twitter:image')).toEqual([IMAGE_DU_SITE]);
     // Le bloc « Partager » reste : il ne dépend pas de l’image.
     expect(html).toContain('class="partage"');
+    // L’affiche de la semaine aussi : l’image générale du site, et plus de partage.png à côté d’elle.
+    const affiche = readFileSync(path.join(sortie, 'matchs/affiche/index.html'), 'utf8');
+    expect(meta(affiche, 'og:image')).toEqual([IMAGE_DU_SITE]);
+    expect(meta(affiche, 'twitter:image')).toEqual([IMAGE_DU_SITE]);
+    expect(existsSync(path.join(sortie, 'matchs/affiche/partage.png'))).toBe(false);
 
     const vide = dossierVide();
     await expect(passer(vide, '2026-10-21T08:00:00Z', { rendu: null, images: 'exiger' })).rejects.toThrow(/Images de partage exigées, rien n’est écrit/);

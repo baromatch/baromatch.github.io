@@ -43,7 +43,7 @@ export const construireEnMemoire = async ({
   // « Ton club dans ton agenda » (/agenda/) : la page ; ses fichiers d’agenda s’écrivent à côté (construire.mjs).
   pages.push(fabriquerLaPageAgenda({ donnees, contenu, cadre, avecPresse }));
   // Les affiches à imprimer (affiche.mjs), seulement avec l’encodeur des QR codes (qr.mjs) : sinon, aucune.
-  pages.push(...fabriquerLesAffiches({ donnees, contenu, cadre, avecPresse, qr }));
+  pages.push(...fabriquerLesAffiches({ donnees, contenu, cadre, avecPresse, qr, images }));
   // Les pages en anglais (/en/) : des mêmes données, et des pages de matchs ci-dessus (anglais.mjs).
   pages.push(...fabriquerLesPagesAnglaises({ donnees, contenu, cadre, avecPresse, pages, images, anciens }));
 

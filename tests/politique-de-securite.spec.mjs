@@ -88,13 +88,15 @@ test.describe('rien ne viole la politique en parcourant les pages', () => {
   test('l’accueil : la liste d’attente (refus, inscription, correction) et le film', async ({ page }) => {
     const violations = await ecouter(page);
     await simulerFormspree(page);
+    // Le film se charge dès qu’il est visible au tiers (main.js) : parfois déjà pendant la liste d’attente, au-dessus.
+    // Sa requête est donc attendue dès l’ouverture de la page, pas seulement après le défilement.
+    const film = page.waitForRequest(/baromatch-film-[^/]+\.mp4$/);
     await page.goto('/');
     await page.locator('#attente-mail').fill('paul@gmail');
     await page.locator('#attente button[type="submit"]').click();
     await page.locator('#attente-mail').fill('paul@gmail.com');
     await page.locator('#attente button[type="submit"]').click();
     await page.locator('#attente-corriger').click();
-    const film = page.waitForRequest(/baromatch-film-[^/]+\.mp4$/);
     await page.locator('#film').scrollIntoViewIfNeeded();
     await film;
     await page.locator('#film-son').click();

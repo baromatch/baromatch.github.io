@@ -4,10 +4,12 @@ Mis à jour le 26 octobre 2026.
 
 ## En bref
 
-- Le fichier `https://baromatch.fr/.well-known/assetlinks.json` est **déjà en ligne** (depuis le 12 octobre 2026),
-  avec une empreinte. Google le lit sans erreur (vérifié le 26 octobre 2026).
-- **Il te reste deux vérifications** : que cette empreinte est bien celle d’expo.dev, puis, après le premier envoi sur
-  Google Play, celle de la Play Console. Si l’une est différente, tu me la donnes et je l’ajoute.
+- Le fichier `https://baromatch.fr/.well-known/assetlinks.json` est **en ligne** depuis le 12 octobre 2026.
+  Google le lit sans erreur (vérifié le 26 octobre 2026).
+- Son empreinte a été **vérifiée le 26 octobre 2026** : c’est bien celle de la clé qui signe l’appli aujourd’hui.
+  **Rien à changer.**
+- Si un jour une autre clé signe l’appli (par exemple celle de Google Play), il faudra **ajouter** son empreinte à
+  côté de l’actuelle, sans retirer celle-ci.
 - Une empreinte **n’est pas un secret** : tu peux la copier dans une conversation sans risque.
 
 ## À quoi sert ce fichier
@@ -24,39 +26,22 @@ Une empreinte, c’est 32 paires de chiffres et de lettres séparées par « : �
 
 ## Ce qui est en ligne aujourd’hui
 
-| Empreinte | D’où elle vient | Pour qui |
+| Empreinte | Vérifiée | Pour qui |
 |---|---|---|
-| `7C:26:27:DF:FB:2B:E5:7F:AC:CC:0D:74:96:DF:2C:BE:DA:FA:CD:75:8C:BD:7F:26:0C:19:6B:83:FC:37:8C:F2` | posée le 12 octobre 2026 ; **à confirmer** : ce doit être celle d’expo.dev | l’appli des testeurs (l’APK) |
+| `7C:26:27:DF:FB:2B:E5:7F:AC:CC:0D:74:96:DF:2C:BE:DA:FA:CD:75:8C:BD:7F:26:0C:19:6B:83:FC:37:8C:F2` | le 26 octobre 2026 | la clé qui signe l’appli aujourd’hui |
 
-## Ce que tu dois faire
+## Ajouter une empreinte
 
-### 1. Vérifier l’empreinte d’expo.dev (5 minutes, maintenant)
+Les étapes pour lire l’empreinte d’une clé ne sont pas écrites ici : ce dépôt est public. Elles t’ont été données
+dans la conversation du 26 octobre 2026 ; une mission Claude peut te les redonner.
 
-1. Va sur https://expo.dev et connecte-toi.
-2. Ouvre le projet Baromatch, puis **Credentials** (dans le menu de gauche).
-3. Choisis **Android**, puis `fr.baromatch.app`, puis la clé (**Keystore**) du profil de build.
-4. Note la ligne **SHA-256 Fingerprint**.
-5. Compare-la avec celle du tableau ci-dessus :
-   - **identique** : rien à faire ;
-   - **différente** : envoie-la-moi (la ligne entière).
+Quand tu as une nouvelle empreinte, écris dans une conversation Claude sur ce dépôt
+(`baromatch/baromatch.github.io`), par exemple :
+« Ajoute cette empreinte à assetlinks.json : AB:CD:…:EF ».
 
-### 2. Après le premier envoi sur Google Play (5 minutes)
-
-1. Play Console → Baromatch → **Tester et publier** → **Configuration** → **Intégrité de l’appli** →
-   **Signature d’applications**.
-2. Note le SHA-256 du **« Certificat de la clé de signature d’application »**.
-   Attention : la même page montre aussi le certificat de la **clé d’importation** ; ce n’est pas celui-là.
-3. Compare-le avec celui d’expo.dev :
-   - **identique** (au premier envoi, tu as donné à Google la clé d’expo.dev, le choix conseillé) : rien à faire ;
-   - **différent** (Google a créé sa propre clé) : envoie-le-moi. Je l’ajoute **à côté** de celui d’expo.dev, sans
-     retirer ce dernier : les testeurs qui gardent l’APK en ont encore besoin.
-
-### Comment me donner une empreinte
-
-Dans une conversation Claude sur ce dépôt (`baromatch/baromatch.github.io`), écris par exemple :
-« Ajoute cette empreinte à assetlinks.json : AB:CD:…:EF (Play Console, clé de signature d’application) ».
-
-Le site refuse tout ce qui n’est pas une vraie empreinte (un test le vérifie) : jamais de texte « à remplir » en ligne.
+Elle s’ajoute **à côté** de l’actuelle, jamais à sa place : les téléphones qui ont l’appli signée par l’ancienne clé
+en ont encore besoin. Le site refuse tout ce qui n’est pas une vraie empreinte (un test le vérifie) : jamais de texte
+« à remplir » en ligne.
 
 ## Vérifier que ça marche
 
@@ -69,11 +54,10 @@ Le site refuse tout ce qui n’est pas une vraie empreinte (un test le vérifie)
 - **Avec un ordinateur et un câble** (facultatif) : `adb shell pm get-app-links fr.baromatch.app` doit dire
   `baromatch.fr: verified`.
 
-## Rien à faire pour
+## Rien à faire pour l’iPhone
 
-- **L’iPhone** : il n’y a pas d’appli iPhone. Le jour où il y en a une, il faudra un autre fichier
-  (`apple-app-site-association`) : ce sera une autre mission.
-- **www.baromatch.fr** : l’appli ne connaît que `baromatch.fr`, et le site renvoie toujours vers `https://baromatch.fr`.
+Il n’y a pas d’appli iPhone. Le jour où il y en a une, il faudra un autre fichier (`apple-app-site-association`) :
+ce sera une autre mission.
 
 ## Pour mémoire : la page d’un lien de tablée
 

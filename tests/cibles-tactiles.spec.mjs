@@ -9,7 +9,7 @@ import { couperLAPI, simulerLInvitation } from './outils/invitation.mjs';
 
 const MINIMUM = 24;
 const VISE = 44;
-const LIENS_SEULS = ['.pied__liens a', '.bars__actions a', '.panier__retirer', '.tablee__plan', '.attente__corriger', '.panier__corriger'];
+const LIENS_SEULS = ['.pied__liens a', '.bars__actions a', '.panier__retirer', '.tablee__plan', '.tablee__ouvrir-lien', '.attente__corriger', '.panier__corriger'];
 
 // Chaque cible visible, sa taille, et si c’est un lien pris dans une phrase (son parent dit plus que lui).
 const lireLesCibles = (onglet) => onglet.evaluate((seuls) => [...document.querySelectorAll('a[href], button, summary')]

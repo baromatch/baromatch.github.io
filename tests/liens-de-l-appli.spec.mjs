@@ -1,7 +1,7 @@
 // /.well-known/assetlinks.json : il dit à Android que les liens https://baromatch.fr/t/… s’ouvrent dans l’appli
 // fr.baromatch.app, signée par l’une des clés dont il donne l’empreinte SHA-256. Une empreinte fausse ou un texte « à
 // remplir » ne casse rien d’autre, mais Android ouvre alors le lien dans le navigateur : ce test refuse tout ce qui
-// n’est pas une vraie empreinte, et la doc écrite pour Skander (DOC) dit d’où chacune vient (expo.dev, Play Console).
+// n’est pas une vraie empreinte, et la doc écrite pour Skander (DOC) nomme chacune, avec la date où elle a été vérifiée.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -10,7 +10,7 @@ import { racine } from './outils/environnement.mjs';
 const FICHIER = path.join(racine, '.well-known', 'assetlinks.json');
 // Son nom est écrit en morceaux, comme dans tests/documents-publics.spec.mjs.
 const DOC = path.join(racine, ['d', 'ocs/ANDROID-OUVRIR-L-APPLI.m', 'd'].join(''));
-// 32 octets en hexadécimal majuscule, séparés par « : », comme expo.dev et la Play Console les affichent.
+// 32 octets en hexadécimal majuscule, séparés par « : », comme les outils d’Android les affichent.
 const EMPREINTE = /^[0-9A-F]{2}(?::[0-9A-F]{2}){31}$/;
 
 const lire = () => JSON.parse(readFileSync(FICHIER, 'utf8'));

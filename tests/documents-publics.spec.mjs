@@ -56,8 +56,12 @@ const FORMES = [
   { cle: 'mission', motif: /\bmissio[n][\s_-]*\d/i },
   // Le dépôt où vit l’appli, cité comme tel.
   { cle: 'depot', motif: /d[ée]p[ôo]t\s+de\s+l[’']appl[i]/i },
-  // L’état de sa mise en production : son service de construction mobile, ce qui est en production ou pas encore.
-  { cle: 'production', motif: /\bE[A]S\b|\b[Dd][ée]plo(?:ie|ient|yée?s?|iement)\b|\b[Dd]eplo(?:y|ys|yed|yment)\b/ },
+  // L’état de sa mise en production : son service de construction mobile (par son sigle, son adresse, ou ce qu’il garde :
+  // la clé de signature et ses réglages de construction), ce qui est en production ou pas encore.
+  {
+    cle: 'production',
+    motif: /\bE[A]S\b|\b[Ee]xp[o]\.dev\b|\b[Kk]e[y]store\b|\b[Pp]rofils? de buil[d]\b|\b[Dd][ée]plo(?:ie|ient|yée?s?|iement)\b|\b[Dd]eplo(?:y|ys|yed|yment)\b/,
+  },
 ];
 
 // ---------- (b) Ce que le serveur fait pour se protéger ----------
@@ -158,6 +162,9 @@ const EXCEPTIONS = [
   // Le drapeau de Chromium qui le fait passer à côté de l’intermédiaire réseau de la machine de test, pour joindre le
   // serveur local à la place de baromatch.fr (Lighthouse avec la mesure d’audience) : rien sur le serveur de l’appli.
   ['tests/outils/lighthouse-mesure.mjs', 'reseau', 1],
+  // La page de confidentialité renvoie aux conditions d’Expo, le prestataire des mises à jour de l’appli, par leur
+  // adresse publique (le lien et son texte).
+  ['confidentialite.html', 'production', 2],
   // L’audit SEO : les adresses des pages de Google Search Central qu’il cite (developers.google.com/search/…).
   [AUDIT_SEO, 'chemin', 20],
 ];

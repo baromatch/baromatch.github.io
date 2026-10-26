@@ -22,16 +22,17 @@ test.describe('la bande « bars » de l’accueil', () => {
     expect(texte).not.toMatch(/aux fans qui cherchent|qui a réservé/);
   });
 
-  test('la capsule de nuit mène à la page Pour les bars ; l’e-mail reste un lien second', async ({ page }) => {
+  test('la capsule de nuit mène droit au formulaire de la page Pour les bars ; l’e-mail reste un lien second', async ({ page }) => {
     await page.goto('/');
     const bande = page.locator('section#bars');
     const capsule = bande.locator('a.bouton-nuit');
     await expect(capsule).toHaveCount(1);
-    await expect(capsule).toHaveAttribute('href', '/pour-les-bars.html');
+    // Comme chaque « Proposer mon bar » du site : droit au formulaire (#proposer), pas en haut de la page.
+    await expect(capsule).toHaveAttribute('href', '/pour-les-bars.html#proposer');
     await expect(capsule).toHaveText('Proposer mon bar');
     const liens = await bande.locator('a').evaluateAll((a) => a.map((l) => [l.getAttribute('href'), l.className]));
     expect(liens).toEqual([
-      ['/pour-les-bars.html', 'bouton-nuit'],
+      ['/pour-les-bars.html#proposer', 'bouton-nuit'],
       ['mailto:contact@baromatch.fr', ''],
     ]);
   });

@@ -391,10 +391,15 @@ test('la semaine (/matchs/) mène à l’affiche de ses matchs, par un lien seul
   expect(pageDe(await enMemoire({ avec: sansBarPublie }), '/matchs/').contenu).toContain(`<a href="${OUVERTE}">`);
 });
 
-test('« Partager mon badge » de la page des bars mène à l’affiche de la semaine', () => {
+// Sans « Partager mon badge » (retiré tant qu’aucun bar n’est publié : tests/badge.spec.mjs), la phrase de l’affiche
+// clôt « Ce que tu vois des fans », juste avant les questions et le formulaire.
+test('la page des bars mène à l’affiche de la semaine, une fois, juste avant les questions et le formulaire', () => {
   const html = readFileSync(path.join(racine, 'pour-les-bars.html'), 'utf8');
-  const bloc = html.slice(html.indexOf('id="badge"'), html.indexOf('</section>', html.indexOf('id="badge"')));
-  expect(bloc).toContain('<a href="/matchs/affiche/">');
+  const phrase = '<p class="chapo"><a href="/matchs/affiche/">Une affiche des matchs de la semaine, gratuite, pour ton comptoir</a>. Même sans être sur Baromatch&nbsp;: tu coches les matchs que tu diffuses, tu imprimes.</p>';
+  expect(html.split('href="/matchs/affiche/"')).toHaveLength(2);
+  expect(html).toContain(`${phrase}\n  </section>\n\n  <section class="questions bloc page"`);
+  expect(html.indexOf(phrase)).toBeGreaterThan(html.indexOf('id="titre-regard"'));
+  expect(html.indexOf(phrase)).toBeLessThan(html.indexOf('id="proposer"'));
 });
 
 // ---------- Dans le navigateur ----------

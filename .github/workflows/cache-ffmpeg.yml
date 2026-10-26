@@ -1,0 +1,49 @@
+# Le cache de ffmpeg : les paquets d’Ubuntu de ffmpeg, téléchargés depuis main et gardés dans le cache de GitHub
+# (actions/cache), pour que « Vérifications » les reprenne sans passer par le miroir d’Ubuntu, parfois si lent qu’il
+# menait l’installation jusqu’aux 30 minutes. Un cache écrit depuis main est lisible par toutes les branches et toutes
+# les demandes de fusion ; un cache écrit depuis une branche ne l’est que par elle : d’où ce passage sur main.
+# Chaque lundi, le cache est refait à partir du précédent : seuls les paquets mis à jour depuis viennent du miroir, et
+# ceux qu’on ne peut plus télécharger sont retirés. GitHub efface un cache que personne ne lit pendant 7 jours.
+# Les deux Actions tournent sur la même version d’Ubuntu, écrite dans la clé : des paquets d’une autre version ne
+# serviraient à rien. Pour en changer, changer « runs-on » et la clé ensemble, ici et dans « Vérifications ».
+# Rien n’est installé ni publié : les paquets sont seulement téléchargés. Aucun secret, aucun droit d’écrire.
+name: Cache de ffmpeg
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cache-ffmpeg.yml
+      - .github/workflows/verifications.yml
+  schedule:
+    - cron: '41 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  remplir:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      # Une clé neuve à chaque passage (le numéro du passage), refaite à partir du cache le plus récent de cette
+      # version d’Ubuntu : « Vérifications » reprend toujours le plus récent.
+      - name: Garder les paquets de ffmpeg
+        uses: actions/cache@v6
+        with:
+          path: ~/paquets-ffmpeg
+          key: paquets-ffmpeg-ubuntu-24.04-${{ github.run_id }}
+          restore-keys: paquets-ffmpeg-ubuntu-24.04-
+
+      # Télécharger ce qui manque, sans rien installer, retirer les paquets qu’on ne peut plus télécharger (apt-get
+      # autoclean), puis rendre le dossier lisible à l’enregistrement du cache (apt écrit en root). Le dossier « partial »
+      # et le verrou d’apt ne sont pas gardés.
+      - name: Télécharger les paquets de ffmpeg
+        run: |
+          mkdir -p ~/paquets-ffmpeg/partial
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends --download-only -o Dir::Cache::Archives="$HOME/paquets-ffmpeg" ffmpeg
+          sudo apt-get autoclean -o Dir::Cache::Archives="$HOME/paquets-ffmpeg"
+          sudo rm -rf ~/paquets-ffmpeg/partial ~/paquets-ffmpeg/lock
+          sudo chown -R "$USER" ~/paquets-ffmpeg

@@ -1,12 +1,13 @@
 // La page presse : ce qu’est Baromatch dit avec les mots de marque.json, ce qu’il n’est pas (ni paris sportifs, ni
-// diffuseur, ni vente d’alcool), les logos à télécharger, les captures, le film et le contact. L’histoire du fondateur
-// n’y est pas tant qu’elle n’est pas écrite : aucun emplacement vide en ligne. Ses données structurées la relient à
-// l’Organization de l’accueil.
+// diffuseur, ni vente d’alcool), le mot du fondateur (ses mots, mot pour mot, rien d’écrit à sa place), les logos à
+// télécharger, les captures, le film et le contact. Aucun emplacement vide en ligne. Ses données structurées la relient
+// à l’Organization de l’accueil.
 // Le reste (référencement, liens, accessibilité, politique de sécurité, pied de page) vient de tests/outils/pages.mjs.
 import { test, expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { MOT_DU_FONDATEUR, motPourMot, SIGNATURE_DU_FONDATEUR } from './outils/fondateur.mjs';
 
 const PAGE = '/presse.html';
 const ORIGINE = 'https://baromatch.fr';
@@ -36,7 +37,22 @@ test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d
   expect(paris).not.toMatch(/pronostic/i);
 });
 
-test('l’histoire du fondateur, pas encore écrite : aucun emplacement vide, ni lu, ni dans la source, et la page reste indexable', async ({ page, request }) => {
+// Ses mots à lui, écrits le 26 octobre 2026 : publiés tels quels, avec la typographie du site (l’apostrophe ’, une
+// espace insécable avant « : » et « ? »), signés, et juste après « Baromatch en bref », là où un journaliste les cite.
+test('le mot du fondateur : ses mots, mot pour mot, signés, juste après « Baromatch en bref »', async ({ page }) => {
+  await page.goto(PAGE);
+  const titres = (await page.locator('main h2').allTextContents()).map(normaliser);
+  expect(titres.slice(0, 3)).toEqual(['Baromatch en bref', 'Le mot du fondateur', 'Ce que Baromatch n’est pas']);
+  const mot = page.locator('#mot-du-fondateur + figure');
+  const cite = await mot.locator('blockquote').textContent();
+  expect(motPourMot(cite)).toBe(MOT_DU_FONDATEUR);
+  expect(cite).not.toMatch(/'| [:;?!]/);
+  expect(cite).toContain('simple\u00a0: où');
+  expect(cite).toContain('de la place\u00a0? Je');
+  expect(normaliser(await mot.locator('figcaption').textContent())).toBe(SIGNATURE_DU_FONDATEUR);
+});
+
+test('aucun emplacement vide, ni lu, ni dans la source, et la page reste indexable', async ({ page, request }) => {
   // Ni dans la page servie (texte, commentaires, classes), ni dans aucune page HTML du dépôt.
   const source = await (await request.get(PAGE)).text();
   const aEcrire = /[àa] [ée]crire|[àa] compl[ée]ter|presse__a-ecrire|son fondateur arrive/i;

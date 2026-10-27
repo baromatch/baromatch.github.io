@@ -30,6 +30,8 @@ const KO = 1024;
 // pour les bars 11, 234, 56, 72, 59 ; « Ce soir », match, ville et pages en anglais 6, 144 à 146, 2, 61, 0 ; bar 7,
 // 144, 2, 61, 2 ; agenda/ 5, 143, 0, 61, 0 ; les affiches 6, 147, 0, 72 (affiche.css, 11 Ko), 0.
 // La police (121 Ko) fait l’essentiel de chaque page.
+// 26 octobre 2026 : le CSS des deux affiches passe de 86 à 87 Ko. styles.css gagne le mot du fondateur (À propos,
+// Presse) ; avec « Pour les bars » dans l’en-tête et l’accueil revu, elles arrivent à 86,8 Ko, compté 87.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 180, js: 16, css: 58, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 155, js: 0, css: 58, images: 0 } },
@@ -44,8 +46,8 @@ const PAGES = [
   { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
   { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
   { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 86, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 86, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 87, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 87, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };

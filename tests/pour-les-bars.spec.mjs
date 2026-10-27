@@ -951,7 +951,11 @@ test.describe('le premier écran d’abord', () => {
   });
 
   test('pour-les-bars.js toujours pas là au bout de 12 s : la place est rendue au chemin e-mail ; arrivé ensuite, il affiche le formulaire et efface le secours', async ({ page }) => {
-    await page.clock.install();
+    // L’horloge installée avance aussi d’elle-même, au rythme réel : sur une machine chargée, une seconde passée entre
+    // le chargement et la première avance suffisait à montrer le secours avant la 12e seconde. Elle reste donc
+    // arrêtée, et seuls les runFor la font avancer ; elle repart avant que le script n’arrive.
+    await page.clock.install({ time: new Date('2026-10-27T20:00:00+01:00') });
+    await page.clock.pauseAt(new Date('2026-10-27T20:00:01+01:00'));
     const lacher = await retenir(page, '**/pour-les-bars.js');
     const demande = page.waitForRequest('**/pour-les-bars.js');
     await page.goto(`${PAGE}#proposer`, { waitUntil: 'domcontentloaded' });
@@ -961,6 +965,7 @@ test.describe('le premier écran d’abord', () => {
     await page.clock.runFor(1_000);
     await expect(page.locator('#demande-secours')).toBeVisible();
     await expect(page.locator('#demande')).toBeHidden();
+    await page.clock.resume();
     lacher();
     await pret(page);
     await expect(page.locator('#demande-secours')).toBeHidden();

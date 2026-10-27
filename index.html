@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Politique de sécurité (GitHub Pages ne permet pas d’en-tête) : seulement les fichiers du site ; Formspree pour la
-     liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même) ; l’empreinte du style du
-     noscript. Une retouche d’un script ou d’un style en ligne change son empreinte :
+     liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même) ; les empreintes du style du
+     noscript et de celui du partage. Une retouche d’un script ou d’un style en ligne change son empreinte :
      tests/politique-de-securite.spec.mjs donne la nouvelle. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-sdE1IA7xkRAGohjqCy/Z+CUnLnFuMm9NC71+35yRanQ='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-sdE1IA7xkRAGohjqCy/Z+CUnLnFuMm9NC71+35yRanQ=' 'sha256-diCZSNhXtS/Z/x5KQ7GJ4wKsezJ+PJ/UwI+OayKxlN0='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
 <meta name="google-site-verification" content="nBxxD8vbrngLKD1Te1fRcbC8tGC2-gwezW9NG9urIaw" />
 <!-- Bing Webmaster Tools : remplace la ligne suivante par la balise de vérification que Bing donne (elle commence par <meta name="msvalidate.01"). -->
 <!-- BING_SITE_VERIFICATION -->
@@ -24,6 +24,10 @@
 <!-- Sans JavaScript, main.js ne choisit ni l’affiche ni la version du film : le lecteur de secours (dans #film-cadre) prend
      la place du film et le bouton du son, qui ne marcherait pas, disparaît. -->
 <noscript><style>#film, .film__son { display: none; }</style></noscript>
+<!-- Après l’inscription, le partage (main.js) : un peu d’air sous « Corriger l’adresse », la question des bars écrite comme
+     l’étiquette du champ, et deux capsules de verre qui, sur deux lignes ou plus (petit écran, texte agrandi), gardent de
+     l’air autour du texte, comme les rappels « préviens-moi ». -->
+<style>.attente__partage { margin-top: 8px; } .attente__question { margin: 16px 0 10px 4px; font-size: 0.9375rem; font-weight: 600; } .attente__partage .capsule { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; text-wrap: balance; }</style>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
@@ -105,6 +109,14 @@
         <input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
         <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
         <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
+        <!-- Après l’inscription seulement (main.js) : partager Baromatch, et la page des bars à envoyer à son bar. Les textes
+             du partage sont écrits ici, et seulement ici ; chaque adresse partagée est nue, sans aucun paramètre. -->
+        <div class="attente__partage" id="attente-partage" hidden data-copie="Lien copié." data-echec="Copie impossible&nbsp;: appuie longtemps sur le lien pour le copier.">
+          <button class="capsule vitrine-accueil__bouton--verre" type="button" data-titre="Baromatch — Trouve un bar qui diffuse ton match, à Paris" data-texte="Ton match. Ton bar. Ce soir." data-adresse="https://baromatch.fr/">Partager Baromatch</button>
+          <p class="attente__question" id="attente-partage-question">Ton bar préféré n’est pas sur Baromatch&nbsp;?</p>
+          <button class="capsule vitrine-accueil__bouton--verre" id="attente-partage-bars" type="button" aria-labelledby="attente-partage-question attente-partage-bars" data-titre="Les soirs de match, ton bar sur Baromatch — Pour les bars" data-texte="Les soirs de match, ton bar sur Baromatch." data-adresse="https://baromatch.fr/pour-les-bars.html">Envoie-lui la page Pour les bars</button>
+          <p class="attente__retour attente__retour--ok" id="attente-partage-statut" role="status" aria-live="polite"></p>
+        </div>
         <p class="attente__plateformes">Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.</p>
         <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
       </form>

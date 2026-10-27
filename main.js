@@ -12,7 +12,9 @@
    (réseau, pas de réponse en 10 s, tout autre refus). Chaque échec laisse une issue : écrire à contact@baromatch.fr.
    (Le même texte et la même règle sont dans boutique.js : ses tests et ceux-ci vérifient les deux pages.)
 
-   La ville (Paris, Lyon, Marseille, Lille ou Autre) part avec l’adresse ; le message d’inscription la reprend. */
+   La ville (Paris, Lyon, Marseille, Lille ou Autre) part avec l’adresse ; le message d’inscription la reprend.
+
+   Inscrite, et seulement alors : « Partager Baromatch » et la page des bars à envoyer à son bar (#attente-partage). */
 
 (function () {
   var form = document.getElementById("attente");
@@ -22,6 +24,9 @@
   var bouton = form.querySelector('button[type="submit"]');
   var retour = document.getElementById("attente-retour");
   var corriger = document.getElementById("attente-corriger");
+  var partage = document.getElementById("attente-partage");
+  var statutDuPartage = document.getElementById("attente-partage-statut");
+  if (!statutDuPartage) partage = null;
   var texteBouton = bouton.textContent;
   var CONTACT = "contact@baromatch.fr";
   // Au-delà, un envoi sans réponse est une panne : le bouton revient au lieu de rester sur « Envoi… ».
@@ -58,6 +63,45 @@
     else bouton.setAttribute("aria-disabled", "true");
     bouton.textContent = etat === "envoi" ? TEXTES.envoi : etat === "inscrite" ? TEXTES.note : texteBouton;
     if (corriger) corriger.hidden = etat !== "inscrite";
+    if (partage) {
+      partage.hidden = etat !== "inscrite";
+      statutDuPartage.textContent = "";
+    }
+  }
+
+  // Après l’inscription seulement, comme « Corriger l’adresse » : « Partager Baromatch » et la page des bars (le bloc
+  // #attente-partage de index.html, qui porte leurs textes et leurs adresses). Le bouton « Partager » du téléphone
+  // (navigator.share) quand il existe ; sinon, ou s’il est refusé, l’adresse est copiée et la zone de statut le dit ; si
+  // la copie est refusée, l’adresse s’affiche en lien, sélectionnée, à copier à la main. L’adresse est celle du bouton,
+  // nue (sans paramètre) ; rien ne part sur le réseau, rien n’est compté ni gardé.
+  function copierLAdresse(adresse) {
+    function aLaMain() {
+      var lien = document.createElement("a");
+      lien.href = adresse;
+      lien.textContent = adresse.replace("https://", "");
+      statutDuPartage.textContent = partage.dataset.echec + " ";
+      statutDuPartage.appendChild(lien);
+      window.getSelection().selectAllChildren(lien);
+    }
+    var pressePapiers = navigator.clipboard;
+    if (!pressePapiers || typeof pressePapiers.writeText !== "function") return aLaMain();
+    pressePapiers.writeText(adresse).then(function () {
+      statutDuPartage.textContent = partage.dataset.copie;
+    }, aLaMain);
+  }
+
+  if (partage) {
+    partage.addEventListener("click", function (event) {
+      var action = event.target.closest("button[data-adresse]");
+      if (!action) return;
+      var d = action.dataset;
+      statutDuPartage.textContent = "";
+      if (typeof navigator.share !== "function") return copierLAdresse(d.adresse);
+      // Fermé sans partager (AbortError) : rien à dire. Refusé par le navigateur : la copie prend le relais.
+      navigator.share({ title: d.titre, text: d.texte, url: d.adresse }).catch(function (erreur) {
+        if (!erreur || erreur.name !== "AbortError") copierLAdresse(d.adresse);
+      });
+    });
   }
 
   function afficher(message, type) {

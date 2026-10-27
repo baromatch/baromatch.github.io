@@ -187,7 +187,8 @@ test.describe('accueil : la FAQ des fans', () => {
     const reponse = (debut) => visibles.find(([question]) => question.startsWith(debut))[1];
     if (!MARQUE.appli.ouverte) {
       expect(reponse('Je peux déjà')).toMatch(/^Pas encore\. Baromatch est en test sur Android, à Paris/);
-      await expect(page.locator('.questions-fans a[href="#attente"]')).toHaveText('Laisse ton adresse');
+      // Le lien dans la réponse (le rappel « préviens-moi », sous les questions, est vérifié par accueil.spec.mjs).
+      await expect(page.locator('.questions-fans details a[href="#attente"]')).toHaveText('Laisse ton adresse');
     }
     expect(reponse('C’est gratuit')).toMatch(/^Oui\..*Ce que tu prends au bar, tu le paies au bar\.$/);
     expect(reponse('Il faut un compte')).toContain('code de 6 chiffres, valable 10 minutes');

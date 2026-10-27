@@ -30,9 +30,14 @@ const IMAGE_OG_ALT = 'La Console de Baromatch : pour un match, les places sur Ba
 const SOURCE = readFileSync('pour-les-bars.html', 'utf8');
 const PREMIER_ECRAN = SOURCE.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
 const EMPREINTE = `'sha256-${createHash('sha256').update(PREMIER_ECRAN).digest('base64')}'`;
-// La politique de la page : elle-même, des images en data: (les sources vides des images cachées) et le serveur
-// Baromatch pour la seule demande d’un bar. connect-src garde 'self' : Lighthouse lit /robots.txt depuis la page. Quand
-// marque.json active la mesure d’audience, la page charge aussi /mesure.js, et connect-src admet son compte.
+// La politique de la page (la balise de la tête renvoie ici), règle par règle :
+// - script-src 'self' : aucun script en ligne (d’où pour-les-bars-amorce.js) ;
+// - style-src : l’empreinte du style de la tête (EMPREINTE, au-dessus : un style retouché, et ce test donne la nouvelle) ;
+// - img-src data: : les sources vides des captures cachées à une largeur ;
+// - connect-src : 'self' (Lighthouse y lit /robots.txt) et l’API, seul hôte à qui la page écrit (ADRESSE de
+//   pour-les-bars.js), pour la seule demande d’un bar ;
+// - form-action 'none' : seul le script envoie le formulaire ; base-uri et object-src : rien.
+// Quand marque.json active la mesure d’audience, la page charge aussi /mesure.js, et connect-src admet son compte.
 const MESURE = mesureDuSite();
 const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
   + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);
@@ -433,8 +438,10 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(reponse('Combien')).toBe(COMBIEN);
     expect(reponse('Je m’engage')).toBe(ENGAGEMENT);
     expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite, en test sur Android pour l’instant\. Pour entrer, non : /);
-    expect(reponse('Comment je démarre')).toMatch(/^Le délai est à préciser\. Dans l’ordre : tu envoies ta demande/);
-    expect(reponse('Comment je démarre')).not.toMatch(/\d+\s*(jours?|semaines?|heures?|h\b)/);
+    // Le délai de réponse d’abord (sous 48 h), puis l’ordre des choses, sans autre durée promise : ni mise en place, ni
+    // ouverture.
+    expect(reponse('Comment je démarre')).toMatch(/^On te répond sous 48 h\. Dans l’ordre : tu envoies ta demande/);
+    expect(reponse('Comment je démarre').replace('sous 48 h', '')).not.toMatch(/\d+\s*(jours?|semaines?|heures?|h\b)/);
     // Tant que la question n’est pas tranchée avec un avocat (loi Evin), la réponse ne dit pas « Oui » : elle dit ce
     // qu’est l’offre du soir, et la mention sanitaire sous une offre qui parle d’alcool. Pareil dans la FAQ balisée.
     const boisson = 'L’offre du soir est la tienne : c’est toi qui la décides et qui la sers. Tu écris un titre et un prix (0 € si c’est gratuit) : les fans la voient sur la page de ton bar. Sous une offre qui parle d’alcool, l’appli affiche « L’abus d’alcool est dangereux pour la santé, à consommer avec modération. »';
@@ -545,6 +552,68 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(ordre.at(-1)).toBe('egares');
     expect(ordre.indexOf('contact')).toBe(ordre.length - 2);
     await expect(page.locator('.egares')).toContainText('Montre cette page au patron.');
+  });
+});
+
+// Le délai choisi par le fondateur (26 octobre 2026) : une personne répond à chaque demande sous 48 h. Il est dit avant
+// le formulaire, redit dans « C’est envoyé. » et dans « Comment je démarre, et en combien de temps ? », toujours avec les
+// mêmes mots. Rien d’autre n’est promis : ni le temps de mise en place, ni une date d’ouverture.
+test.describe('le délai de réponse : sous 48 h', () => {
+  const DELAI = 'sous 48 h';
+
+  test('avant le formulaire : une personne lit chaque demande et répond sous 48 h', async ({ page }) => {
+    await page.goto(PAGE);
+    await expect(page.locator('#proposer .contact__intro > .chapo').first())
+      .toHaveText('Pas de compte à créer : une personne lit chaque demande et te répond sous 48 h.');
+  });
+
+  test('« Comment je démarre, et en combien de temps ? » : la réponse sous 48 h d’abord, la même dans la FAQ balisée ; plus rien « à préciser » sur la page', async ({ page }) => {
+    await page.goto(PAGE);
+    const demarrer = page.locator('.questions details', { has: page.locator('summary', { hasText: 'Comment je démarre' }) });
+    await expect(demarrer.locator('p')).toHaveText('On te répond sous 48 h. Dans l’ordre : tu envoies ta demande, une personne te répond par e-mail ou par téléphone, '
+      + 'puis, si on avance ensemble, Baromatch crée ton bar et ton compte patron (il n’y a pas d’inscription en ligne). Tu te connectes alors à la '
+      + 'Console, tu règles ta salle et tu choisis tes matchs.');
+    const lu = await page.evaluate(() => ({
+      balisee: [...document.querySelectorAll('script[type="application/ld+json"]')].flatMap((s) => JSON.parse(s.textContent)['@graph'] ?? [])
+        .flatMap((n) => n.mainEntity ?? []).find((q) => q.name.startsWith('Comment je démarre')).acceptedAnswer.text,
+      tout: [document.title, document.body.textContent, ...[...document.querySelectorAll('script[type="application/ld+json"]')]
+        .map((s) => JSON.stringify(JSON.parse(s.textContent)))].join(' '),
+    }));
+    expect(normaliser(lu.balisee)).toBe(normaliser(await demarrer.locator('p').textContent()));
+    expect(normaliser(lu.tout)).not.toMatch(/à préciser/i);
+  });
+
+  test('« C’est envoyé. » : la réponse sous 48 h à l’adresse tapée, et deux choses à faire en attendant, deux liens : l’affiche gratuite, la liste d’attente pour les habitués', async ({ page }) => {
+    await simulerServeur(page);
+    await page.clock.install();
+    await page.goto(PAGE);
+    await pret(page);
+    await envoyerUneDemande(page);
+    const merci = page.locator('#demande-envoyee');
+    await expect(merci).toBeVisible();
+    await expect(merci.locator('p')).toHaveText([
+      `On te répond sous 48 h à ${SAISIE['#demande-email']}, ou par téléphone si tu as laissé ton numéro. Pas d’e-mail automatique : c’est une personne qui te répond.`,
+      'Une erreur dans l’adresse ? Envoie une nouvelle demande',
+      'En attendant, imprime l’affiche gratuite des matchs de la semaine pour ton comptoir. Dis aussi à tes habitués de laisser leur e-mail pour être prévenus du lancement.',
+    ]);
+    // Des liens seuls, vers deux pages du site qui existent : l’affiche de la semaine, la liste d’attente de l’accueil.
+    expect(await merci.locator('a').evaluateAll((liens) => liens.map((a) => [a.getAttribute('href'), a.textContent]))).toEqual([
+      ['/matchs/affiche/', 'imprime l’affiche gratuite des matchs de la semaine'],
+      ['/#attente', 'laisser leur e-mail pour être prévenus du lancement'],
+    ]);
+    expect(existsSync('matchs/affiche/index.html')).toBe(true);
+    expect(readFileSync('index.html', 'utf8')).toContain('id="attente"');
+    // axe lit « C’est envoyé. » et ses liens dans tests/pour-les-bars-formulaire.spec.mjs, à 360 et 1280 px.
+  });
+
+  test('un seul délai, dit trois fois avec les mêmes mots ; la FAQ balisée le dit aussi', async ({ page }) => {
+    await page.goto(PAGE);
+    const texte = normaliser(await page.locator('main').textContent());
+    expect(fois(texte, DELAI)).toBe(3);
+    expect(texte).not.toMatch(/48\s*heures|deux jours|2 jours|24 h/i);
+    const balisee = normaliser(await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
+      .map((s) => JSON.stringify(JSON.parse(s.textContent))).join(' ')));
+    expect(fois(balisee, DELAI)).toBe(1);
   });
 });
 

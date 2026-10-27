@@ -1,7 +1,7 @@
 // Les pages de confiance : « À propos » (pourquoi Baromatch existe, où il en est, qui le publie) et « Comment on choisit
 // les bars » (d’où viennent les matchs, qui tient les places, quand un bar apparaît sur le site, ce qu’on refuse).
 // Écrites pour être citées telles quelles : un h1, des intertitres qui posent la question, des phrases datées. Rien n’y
-// est inventé : ni l’histoire du fondateur (tant qu’il ne l’a pas écrite, la page n’en a pas, pas même un emplacement),
+// est inventé : ni le mot du fondateur (ses mots à lui, mot pour mot, rien d’écrit à sa place, pas même un emplacement),
 // ni un bar publié (aucune phrase datée sur les bars publiés : une page de match sans vrai bar le dit, avec les mots du
 // générateur).
 // Le reste (référencement, liens, accessibilité, contraste, cibles, texte agrandi, politique de sécurité, pied de page)
@@ -10,6 +10,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { MOT_DU_FONDATEUR, motPourMot, SIGNATURE_DU_FONDATEUR } from './outils/fondateur.mjs';
 import { PIED } from './outils/pied.mjs';
 import { contenuDuScenario, MAINTENANT_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
@@ -68,13 +69,27 @@ test('à propos : ce qu’est Baromatch avec les mots de marque.json, où il en 
   const texte = normaliser(await page.locator('main').textContent());
   expect(normaliser(await page.locator('.document__chapeau').textContent())).toBe(normaliser(MARQUE.description));
   const titres = (await page.locator('main h2').allTextContents()).map(normaliser);
-  expect(titres).toEqual(['En bref', 'Pourquoi Baromatch existe', 'Ce que fait l’appli', 'Où en est Baromatch', 'Paris d’abord', 'Les règles qu’on s’impose', 'Qui publie Baromatch', 'Nous écrire']);
+  expect(titres).toEqual(['En bref', 'Pourquoi Baromatch existe', 'Le mot du fondateur', 'Ce que fait l’appli', 'Où en est Baromatch', 'Paris d’abord', 'Les règles qu’on s’impose', 'Qui publie Baromatch', 'Nous écrire']);
   if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle n’est pas encore ouverte au public, ni sur iPhone');
-  // L’éditeur, comme les mentions légales le nomment ; rien d’autre sur le fondateur.
+  // L’éditeur, comme les mentions légales le nomment ; ailleurs, le fondateur ne signe que de son prénom (son mot).
   await page.goto('/mentions-legales.html');
   const editeur = normaliser(await page.locator('h2:has-text("Directeur de la publication") + p').textContent());
   expect(texte).toContain(`Baromatch est édité par ${editeur}, son fondateur, à titre personnel pour le moment.`);
   expect(texte.match(new RegExp(editeur, 'g'))).toHaveLength(1);
+});
+
+// Ses mots à lui, écrits le 26 octobre 2026 : publiés tels quels, avec la typographie du site (l’apostrophe ’, une
+// espace insécable avant « : » et « ? »), signés, juste après « Pourquoi Baromatch existe ».
+test('à propos : le mot du fondateur, mot pour mot, signé, juste après « Pourquoi Baromatch existe »', async ({ page }) => {
+  await page.goto(A_PROPOS);
+  await expect(page.locator('#pourquoi ~ h2').first()).toHaveAttribute('id', 'mot-du-fondateur');
+  const mot = page.locator('#mot-du-fondateur + figure');
+  const cite = await mot.locator('blockquote').textContent();
+  expect(motPourMot(cite)).toBe(MOT_DU_FONDATEUR);
+  expect(cite).not.toMatch(/'| [:;?!]/);
+  expect(cite).toContain('simple\u00a0: où');
+  expect(cite).toContain('de la place\u00a0? Je');
+  expect(normaliser(await mot.locator('figcaption').textContent())).toBe(SIGNATURE_DU_FONDATEUR);
 });
 
 test('à propos : les règles renvoient au détail, aux CGU et à la confidentialité', async ({ page }) => {

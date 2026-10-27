@@ -311,7 +311,8 @@ test.describe('dans le navigateur', () => {
     const [haut, bas] = await feuilles(onglet);
     expect(bas, 'la copie s’imprime en A4').toBeTruthy();
     // 127 mm chacune, 5 mm de jeu dans la zone imprimable (273 mm), sans rien qui dépasse ; la coupe, en pointillés,
-    // entre les deux. Chacune reste d’un seul tenant si la page est plus courte (break-inside).
+    // entre les deux. Chacune reste d’un seul tenant si la page est plus courte (break-inside). Le titre de la feuille
+    // y tient sur une ligne (32 pt, affiche.css) : sur deux, la feuille déborderait de ses 127 mm.
     for (const f of [haut, bas]) {
       expect(f.hauteur / MM).toBeCloseTo(127, 0);
       expect(f.deborde).toBeLessThanOrEqual(0.5);

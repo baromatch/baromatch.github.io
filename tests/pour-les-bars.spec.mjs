@@ -368,6 +368,40 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(fan.height).toBeGreaterThanOrEqual(44);
   });
 
+  // Le titre se coupe comme sur l’image de partage (IMAGE_OG) : deux lignes sur ordinateur, en colonne unique (1024 px)
+  // comme dans la colonne de gauche (dès 1100 px). Là, sa taille suit la colonne, min(5rem, 6.6vw) : la seconde ligne
+  // garde au moins 10 px de marge, barre de défilement comprise. Au téléphone, rien ne change : 13,4vw, trois lignes.
+  const DEUX_LIGNES = ['Les soirs de match,', 'ton bar sur Baromatch.'];
+  for (const [largeur, lignes, taille] of [
+    [360, ['Les soirs de match,', 'ton bar', 'sur Baromatch.'], '48.24px'],
+    [1024, DEUX_LIGNES], [1100, DEUX_LIGNES], [1280, DEUX_LIGNES], [1440, DEUX_LIGNES], [1920, DEUX_LIGNES],
+  ]) {
+    test(`à ${largeur} px, le titre tient sur ${lignes.length} lignes : « ${lignes.join(' / ')} »`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.goto(PAGE);
+      await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
+      // Chaque mot rejoint la ligne du mot d’avant s’il a le même haut, sinon il en commence une.
+      const titre = await page.locator('h1').evaluate((h1) => {
+        const rangees = [];
+        for (const span of h1.querySelectorAll('span')) {
+          let haut = null;
+          for (const mot of span.firstChild.data.matchAll(/\S+/g)) {
+            const morceau = document.createRange();
+            morceau.setStart(span.firstChild, mot.index);
+            morceau.setEnd(span.firstChild, mot.index + mot[0].length);
+            const y = Math.round(morceau.getBoundingClientRect().top);
+            if (y === haut) rangees[rangees.length - 1] += ` ${mot[0]}`;
+            else rangees.push(mot[0]);
+            haut = y;
+          }
+        }
+        return { rangees, taille: getComputedStyle(h1).fontSize };
+      });
+      expect(titre.rangees).toEqual(lignes);
+      if (taille) expect(titre.taille).toBe(taille);
+    });
+  }
+
   test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte, à l’étape 3 et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console', async ({ page }) => {
     await page.goto(PAGE);
     const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });

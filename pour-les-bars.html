@@ -7,7 +7,7 @@
      tête (tests/pour-les-bars.spec.mjs donne la nouvelle) ; img-src data: : sources vides des captures cachées à une
      largeur ; connect-src : 'self' (Lighthouse y lit /robots.txt) et l’API, seul hôte à qui la page écrit (ADRESSE de
      pour-les-bars.js) ; form-action 'none' : seul le script envoie le formulaire ; base-uri et object-src : rien. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-0DZf8rtPu9lo86iRJEu1BQELwTJyEVXZ8tDxPewPkzc='; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-tdq1ASMsLeYTZKicsuPnMtvqGf/fwWV3RWXFSHGACPY='; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -166,6 +166,7 @@ main figure { position: relative; }
   letter-spacing: -0.03em;
 }
 .ouverture-bars__titre span { display: block; }
+@media (min-width: 1100px) { .ouverture-bars__titre { font-size: min(5rem, 6.6vw); } }
 .ouverture-bars__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); font-size: 1.125rem; }
 @media (min-width: 720px) { .ouverture-bars__texte { font-size: 1.25rem; } }
 .ouverture-bars__haut { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; margin: 0 0 18px; }

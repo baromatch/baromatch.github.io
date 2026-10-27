@@ -116,7 +116,7 @@ test('comment on choisit les bars : un h1, et chaque intertitre pose la question
 });
 
 // L’ordre dit ici est celui que le générateur applique (tests/generateur.spec.mjs, « l’ordre annoncé ») ; aucun
-// classement payant n’existe, et la page ne parle pas du tarif des bars (encore à préciser sur « Pour les bars »).
+// classement payant n’existe, et la page ne parle pas du tarif des bars (leurs conditions sont sur « Pour les bars »).
 test('comment on choisit les bars : l’ordre d’affichage (ville, arrondissement, nom), et aucun bar ne paie sa place', async ({ page }) => {
   await page.goto(CONFIANCE);
   const ordre = normaliser(await page.locator('h2#ordre + p').textContent());
@@ -202,7 +202,8 @@ test.describe('accueil : la FAQ des fans', () => {
     const reponse = (debut) => visibles.find(([question]) => question.startsWith(debut))[1];
     if (!MARQUE.appli.ouverte) {
       expect(reponse('Je peux déjà')).toMatch(/^Pas encore\. Baromatch est en test sur Android, à Paris/);
-      await expect(page.locator('.questions-fans a[href="#attente"]')).toHaveText('Laisse ton adresse');
+      // Le lien dans la réponse (le rappel « préviens-moi », sous les questions, est vérifié par accueil.spec.mjs).
+      await expect(page.locator('.questions-fans details a[href="#attente"]')).toHaveText('Laisse ton adresse');
     }
     expect(reponse('C’est gratuit')).toMatch(/^Oui\..*Ce que tu prends au bar, tu le paies au bar\.$/);
     expect(reponse('Il faut un compte')).toContain('code de 6 chiffres, valable 10 minutes');

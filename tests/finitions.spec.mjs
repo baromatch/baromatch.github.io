@@ -91,13 +91,14 @@ test('la date en tête de ligne prend une capitale : la tête d’un match, les 
 });
 
 // Les cibles qui restaient sous 44 px : « 1 bar à Lyon » (le décompte des bars), le nom d’une ville au-dessus de ses
-// bars, les clubs de « Suis ton club dans ton agenda ».
+// bars, les clubs de « Suis ton club dans ton agenda ». Et, sur agenda/, le lien de chaque carte vers la page du club.
 test('« 1 bar à Lyon », la ville au-dessus des bars et les clubs de l’agenda se touchent sur 44 × 44 px', async ({ page: onglet }) => {
   await onglet.setViewportSize({ width: 360, height: 800 });
   for (const [chemin, selecteurs] of [
     [MATCH, ['.regarder-compte a', '.regarder-ville a', '.regarder-agenda__clubs a']],
     ['/matchs/', ['.regarder-compte a']],
     ['/ce-soir/', ['.regarder-compte a']],
+    ['/agenda/', ['.regarder-carte__suite a']],
   ]) {
     await onglet.goto(`${serveur.adresse}${chemin}`);
     for (const selecteur of selecteurs) {

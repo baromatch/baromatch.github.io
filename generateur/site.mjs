@@ -15,7 +15,7 @@ import { lireLeCadre } from './gabarits.mjs';
 import { controlerLaPage } from './controle.mjs';
 import { lireLaMesure } from './mesure.mjs';
 import { fabriquerLesPages } from './pages.mjs';
-import { fabriquerLesPagesSuivies } from './suivre.mjs';
+import { fabriquerLesPagesSuivies, lienDuClub } from './suivre.mjs';
 import { lireLaSource } from './sources.mjs';
 import { chargerLeVocabulaire, validerLaPage } from './validateur.mjs';
 
@@ -41,8 +41,12 @@ export const construireEnMemoire = async ({
   // « Où regarder les matchs de … dans un bar » (/matchs/club/…/ et /matchs/competition/…/) : un club ou une compétition
   // de la liste (suivre.mjs), ses matchs à venir et les vrais bars qui les diffusent.
   pages.push(...fabriquerLesPagesSuivies({ donnees, contenu, cadre, avecPresse, pages }));
-  // « Ton club dans ton agenda » (/agenda/) : la page ; ses fichiers d’agenda s’écrivent à côté (construire.mjs).
-  pages.push(fabriquerLaPageAgenda({ donnees, contenu, cadre, avecPresse }));
+  // « Ton club dans ton agenda » (/agenda/) : la page, où chaque club qui a sa page (juste au-dessus) y mène ; ses
+  // fichiers d’agenda s’écrivent à côté (construire.mjs).
+  const clubsAvecPage = new Set(pages.filter((p) => p.type === 'club').map((p) => p.cle));
+  pages.push(fabriquerLaPageAgenda({
+    donnees, contenu, cadre, avecPresse, lienDuClub: (cle) => (clubsAvecPage.has(cle) ? lienDuClub(cle, contenu.suivre) : null),
+  }));
   // Les affiches à imprimer (affiche.mjs), seulement avec l’encodeur des QR codes (qr.mjs) : sinon, aucune.
   pages.push(...fabriquerLesAffiches({ donnees, contenu, cadre, avecPresse, qr, images }));
   // Les pages en anglais (/en/) : des mêmes données, et des pages de matchs ci-dessus (anglais.mjs).

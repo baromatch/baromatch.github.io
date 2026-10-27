@@ -122,7 +122,9 @@ const ligneDesCompetitions = (competitions) => (competitions.length > 1 && compe
   ? TEXTES.page.coupesDEurope
   : enumerer(competitions));
 
-export const fabriquerLaPageAgenda = ({ donnees, contenu, cadre, avecPresse = false }) => {
+// lienDuClub : le lien vers la page d’un club (« Les matchs du PSG et où les voir »), s’il en a une, sinon null (site.mjs
+// le donne, d’après les pages des clubs du même passage) ; sa carte y mène, en dernier, sous son abonnement.
+export const fabriquerLaPageAgenda = ({ donnees, contenu, cadre, avecPresse = false, lienDuClub = () => null }) => {
   const { marque, textes } = contenu;
   const t = TEXTES.page;
   const resume = resumerLesAgendas(donnees);
@@ -133,11 +135,12 @@ export const fabriquerLaPageAgenda = ({ donnees, contenu, cadre, avecPresse = fa
     const n = resume.parClub.get(club.cle).length;
     const aVenir = n ? remplir(n > 1 ? t.aVenirPluriel : t.aVenir, { n }) : t.aucunAVenir;
     const adresse = adresseDe(cheminDuCalendrier(club.cle));
+    const saPage = lienDuClub(club.cle);
     return `    <li class="regarder-carte" id="${ancreDuClub(club.cle)}">
       <h3 class="regarder-carte__nom">${e(club.court)}</h3>
       <p class="regarder-carte__lieu">${club.nom && club.nom !== club.court ? `${e(club.nom)} · ` : ''}${e(aVenir)}</p>
       <p class="regarder-agenda"><a class="regarder-agenda__bouton" href="${webcalDe(club.cle)}">${e(t.sAbonner)}<span class="visuellement-cache"> : ${e(club.court)}</span></a></p>
-      <p class="regarder-agenda__adresse"><a href="${adresse}">${e(adresse)}</a></p>
+      <p class="regarder-agenda__adresse"><a href="${adresse}">${e(adresse)}</a></p>${saPage ? `\n      <p class="regarder-carte__suite">${saPage}</p>` : ''}
     </li>`;
   };
   const dedans = [

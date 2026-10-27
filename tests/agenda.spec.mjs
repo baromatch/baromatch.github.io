@@ -12,11 +12,12 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 import { erreursDuCalendrier, lireLeCalendrier } from './outils/icalendar.mjs';
-import { contenuDuScenario, SCENARIO } from './outils/site-genere.mjs';
+import { CAPTURE, contenuDuScenario, MAINTENANT_DE_LA_CAPTURE, SCENARIO } from './outils/site-genere.mjs';
 import { blocDuMatch } from '../generateur/agenda.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { construire } from '../generateur/construire.mjs';
 import { ecrireUnFichier, estPermis } from '../generateur/etat.mjs';
+import { TEXTES_SUIVRE, cheminDuClub } from '../generateur/suivre.mjs';
 import { insecables } from '../generateur/texte.mjs';
 import { echapperTexte, instantUtc, lendemain, plier } from '../generateur/ical.mjs';
 
@@ -444,6 +445,38 @@ test('la page agenda/ : trois lignes d’explication, les clubs, chaque téléph
   expect(pageCoupe).toContain('<p class="regarder-chapeau">Ligue 1, Coupe de France et Ligue des champions, pour l’instant jusqu’au vendredi 20 novembre.</p>');
   expect(pageCoupe).toContain('<p>Pas de match amical pour l’instant.</p>');
   expect(lireEtValider(octets(avecCoupe, 'agenda/psg.ics')).calendrier['X-WR-CALDESC']).toContain('(Ligue 1, Coupe de France et Ligue des champions)');
+});
+
+// Un fan qui suit un club passe de son agenda à sa page (generateur/suivre.mjs : une par club de contenu/suivre.json) :
+// ses matchs à venir et où les voir. La carte d’un club qui a sa page y mène, en dernier, avec les mots de la page d’un
+// match ; un club sans page n’a pas ce lien (aucun lien ne meurt). Sur le scénario inventé et sur la copie enregistrée
+// des listes publiques (tous les clubs de la liste y jouent en Ligue 1) : chaque lien mène à une page que le même
+// passage écrit.
+test('la page agenda/ : la carte de chaque club qui a sa page y mène, celle des autres non', async () => {
+  const clubsAvecPage = Object.keys(TEXTES_SUIVRE.clubs).filter((cle) => !cle.startsWith('_'));
+  for (const [nom, maintenant, options, attendus] of [
+    ['le scénario', '2026-10-23T08:00:00Z', {}, ['lens', 'lille', 'nice', 'ol', 'om', 'psg']],
+    ['la capture', new Date(MAINTENANT_DE_LA_CAPTURE).toISOString(), { source: `capture:${CAPTURE}`, contenu: chargerLeContenu(racine) }, [...clubsAvecPage].sort()],
+  ]) {
+    const sortie = dossierVide();
+    await passer(sortie, maintenant, options);
+    const page = octets(sortie, 'agenda/index.html').toString('utf8');
+    const cartes = [...page.matchAll(/<li class="regarder-carte" id="club-([a-z0-9-]+)">([\s\S]*?)<\/li>/g)].map((m) => ({ cle: m[1], carte: m[2] }));
+    expect(cartes.length, nom).toBeGreaterThan(attendus.length);
+    const lies = cartes.filter((c) => c.carte.includes('/matchs/club/')).map((c) => c.cle).sort();
+    expect(lies, nom).toEqual(attendus);
+    for (const { cle, carte } of cartes) {
+      if (!clubsAvecPage.includes(cle)) continue;
+      const lien = `<a href="${cheminDuClub(cle)}">${TEXTES_SUIVRE.lienDuClub.replace('{de}', TEXTES_SUIVRE.clubs[cle].de)}</a>`;
+      expect(carte.trimEnd().endsWith(`<p class="regarder-carte__suite">${lien}</p>`), `${nom} : ${cle}`).toBe(true);
+      expect(existsSync(path.join(sortie, 'matchs', 'club', cle, 'index.html')), `${nom} : ${cle}`).toBe(true);
+    }
+  }
+  const sortie = dossierVide();
+  await passer(sortie, '2026-10-23T08:00:00Z');
+  expect(octets(sortie, 'agenda/index.html').toString('utf8')).toContain(`<p class="regarder-agenda__adresse"><a href="https://baromatch.fr/agenda/psg.ics">https://baromatch.fr/agenda/psg.ics</a></p>
+      <p class="regarder-carte__suite"><a href="/matchs/club/psg/">Les matchs du PSG et où les voir</a></p>
+    </li>`);
 });
 
 test('la page d’un match : « Ajouter à mon agenda » s’il est à venir, l’agenda de ses clubs ; la page d’une ville mène à l’agenda', async () => {

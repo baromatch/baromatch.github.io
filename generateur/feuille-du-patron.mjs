@@ -1,12 +1,12 @@
 // La feuille à laisser au patron d’un bar (/matchs/affiche/pour-le-patron/) : la troisième entrée du moteur des
 // affiches (affiche.mjs, affiche.css), pour le jour où un patron dit « plus tard » à qui vient lui parler de Baromatch
 // (le fondateur, ou un fan). Une feuille à imprimer et à laisser au comptoir.
-// - La feuille : « Remplis ton bar les soirs de match. », quatre lignes que la page des bars (pour-les-bars.html) et
-//   « Comment on choisit les bars » disent déjà (feuille-du-patron.json : aucune promesse de plus), la ligne « Où on en
-//   est » de l’état de l’appli (marque.json), puis le pied : l’appel, l’adresse de contact, « Laissée par : » et sa
-//   ligne vide à remplir au stylo (un dessin, qu’un lecteur d’écran ne lit pas : rien n’est tapé, rien n’est envoyé), la
-//   date et le verre de la marque ; à droite, un QR code vers le formulaire de la page des bars, sans paramètre de
-//   suivi, son adresse écrite en clair dessous.
+// - La feuille : « Les soirs de match, ton bar sur Baromatch. », quatre lignes que la page des bars
+//   (pour-les-bars.html) et « Comment on choisit les bars » disent déjà (feuille-du-patron.json : aucune promesse de
+//   plus), la ligne « Où on en est » de l’état de l’appli (marque.json), puis le pied : l’appel, l’adresse de contact,
+//   « Laissée par : » et sa ligne vide à remplir au stylo (un dessin, qu’un lecteur d’écran ne lit pas : rien n’est
+//   tapé, rien n’est envoyé), la date et le verre de la marque ; à droite, un QR code vers le formulaire de la page des
+//   bars, sans paramètre de suivi, son adresse écrite en clair dessous.
 // - Le papier, sans fixer sa taille (@page size bloquerait le choix dans la fenêtre d’impression) : A4, deux feuilles
 //   l’une au-dessus de l’autre, à couper au milieu (la seconde est une copie, que ni l’écran ni un lecteur d’écran ne
 //   montrent), ou A5, une feuille.

@@ -511,6 +511,11 @@ a:hover { color: var(--goutte); }
 
 /* Sous les étapes, le lien vers les matchs de ce soir : seul sur sa ligne, 44 px à toucher. */
 .soiree__suite { margin: 48px 0 0; }
+/* « Préviens-moi » plus bas dans l’accueil (après le film, après les questions) : la capsule des pages des matchs, qui
+   se coupe au téléphone au milieu de la phrase, jamais dans « préviens-moi » (comme dans regarder.css). */
+.rappel-attente { margin: 32px 0 0; }
+.rappel-attente .capsule { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; text-wrap: balance; }
+.film .rappel-attente { margin-bottom: 40px; }
 .soiree__suite a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 
 /* ---------- Bars partenaires ---------- */
@@ -833,6 +838,21 @@ a:hover { color: var(--goutte); }
   .entete__nav { column-gap: 4px; }
   .entete__lien { font-size: 0.875rem; }
 }
+/* Dès qu’il y a la place (401 px), « Pour les bars » devient une capsule de verre : un patron la voit sans chercher, et
+   l’ambre reste aux appels de la page. En dessous, le lien souligné, comme « Boutique ». */
+@media (min-width: 401px) {
+  .entete__lien--bars {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--verre-bord-fort);
+    border-radius: 999px;
+    background: var(--verre-fort);
+    box-shadow: var(--verre-reflet);
+  }
+  .entete__lien--bars:hover { background: rgba(255, 255, 255, 0.15); }
+}
 
 /* ---------- Baromatch en bref, sur l'accueil ---------- */
 
@@ -928,6 +948,9 @@ a:hover { color: var(--goutte); }
 .panier__envoyer:hover,
 .tablee__bouton:hover,
 .capsule:hover { background: #FFC163; color: var(--nuit); }
+/* Sur l’accueil, « Voir la boutique » en verre : l’ambre reste à l’appel des fans, « préviens-moi », juste au-dessus. */
+.vitrine-accueil__bouton--verre { background: var(--verre-fort); color: var(--texte); box-shadow: inset 0 0 0 1px var(--verre-bord-fort); }
+.vitrine-accueil__bouton--verre:hover { background: rgba(255, 255, 255, 0.15); color: var(--texte); }
 .panier__envoyer[disabled] { opacity: 0.55; cursor: not-allowed; }
 /* La sélection pendant l’envoi : le bouton garde le focus (aria-disabled, boutique.js) et paraît en attente. */
 .panier .panier__envoyer[aria-disabled="true"],

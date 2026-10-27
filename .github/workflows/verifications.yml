@@ -22,7 +22,8 @@ concurrency:
 
 jobs:
   verifier:
-    runs-on: ubuntu-latest
+    # Ubuntu 24.04, pas « ubuntu-latest » qui change de version : la clé du cache de ffmpeg nomme cette version.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -43,10 +44,20 @@ jobs:
       - name: Installer Chromium
         run: npx playwright install --with-deps chromium
 
-      # Un test lit la dernière image du film avec ffmpeg (tests/seo.spec.mjs) : sans lui, ce test serait sauté. La liste
-      # des paquets vient d’être mise à jour par l’étape d’avant.
+      # Un test lit la dernière image du film avec ffmpeg (tests/seo.spec.mjs) : sans lui, ce test serait sauté. Ses
+      # paquets viennent du cache de GitHub, le plus récent que « Cache de ffmpeg » a rempli depuis main (même dossier,
+      # même version d’Ubuntu, celle de « runs-on ») : le miroir d’Ubuntu, parfois si lent qu’il menait l’installation
+      # jusqu’aux 30 minutes, n’est appelé que pour un paquet qui manque (cache vide, ou paquet mis à jour depuis). La
+      # liste des paquets vient d’être mise à jour par l’étape « Installer Chromium ».
+      - name: Reprendre les paquets de ffmpeg
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/paquets-ffmpeg
+          key: paquets-ffmpeg-ubuntu-24.04
+          restore-keys: paquets-ffmpeg-ubuntu-24.04-
+
       - name: Installer ffmpeg
-        run: sudo apt-get install -y --no-install-recommends ffmpeg
+        run: mkdir -p ~/paquets-ffmpeg/partial && sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/paquets-ffmpeg" ffmpeg
 
       - name: Lancer les vérifications
         run: npx playwright test

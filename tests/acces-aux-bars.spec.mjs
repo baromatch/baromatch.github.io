@@ -2,6 +2,7 @@
 // capsule de nuit vers la page et l’e-mail en lien second) et le lien des règles de l’appli, au texte qui dit où l’on
 // va (un lien interne descriptif aide aussi le référencement de la page).
 import { test, expect } from '@playwright/test';
+import { MARQUE } from './outils/marque.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 
@@ -14,22 +15,32 @@ test.describe('la bande « bars » de l’accueil', () => {
     await expect(bande.locator('h2#titre-bars')).toHaveText('Ton bar diffuse les matchs ?');
     const texte = normaliser(await bande.innerText());
     expect(texte).not.toMatch(/\b(vous|vos|votre|nous)\b/i);
-    expect(texte).toContain('Baromatch montre tes soirées de match aux fans qui cherchent où voir le match, et tu sais à l’avance qui a réservé.');
-    expect(texte).toContain('On cherche nos premiers bars à Paris.');
+    // La phrase vraie de la page des bars, tant que l’appli n’est pas ouverte : aucun fan ne voit encore les soirées
+    // d’un bar sur Baromatch.
+    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : relire la phrase de la bande des bars').toBe(false);
+    expect(texte).toContain('Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres.');
+    expect(texte).not.toMatch(/aux fans qui cherchent|qui a réservé/);
   });
 
-  test('la capsule de nuit mène à la page Pour les bars ; l’e-mail reste un lien second', async ({ page }) => {
+  test('la capsule de nuit mène droit au formulaire de la page Pour les bars ; l’e-mail reste un lien second', async ({ page }) => {
     await page.goto('/');
     const bande = page.locator('section#bars');
     const capsule = bande.locator('a.bouton-nuit');
     await expect(capsule).toHaveCount(1);
-    await expect(capsule).toHaveAttribute('href', '/pour-les-bars.html');
+    // Comme chaque « Proposer mon bar » du site : droit au formulaire (#proposer), pas en haut de la page.
+    await expect(capsule).toHaveAttribute('href', '/pour-les-bars.html#proposer');
     await expect(capsule).toHaveText('Proposer mon bar');
     const liens = await bande.locator('a').evaluateAll((a) => a.map((l) => [l.getAttribute('href'), l.className]));
     expect(liens).toEqual([
-      ['/pour-les-bars.html', 'bouton-nuit'],
+      ['/pour-les-bars.html#proposer', 'bouton-nuit'],
       ['mailto:contact@baromatch.fr', ''],
     ]);
+  });
+
+  test('elle arrive juste après « Comment ça va marcher », avant « Baromatch en bref » ; la boutique ferme la page', async ({ page }) => {
+    await page.goto('/');
+    const ordre = await page.$$eval('main > section', (sections) => sections.map((s) => s.id || s.className.split(' ')[0]));
+    expect(ordre).toEqual(['ouverture', 'film', 'soiree', 'bars', 'en-bref', 'testeurs-accueil', 'questions', 'vitrine-accueil']);
   });
 
   test('aucune phrase de la bande ne promet ce que Baromatch ne tient pas', async ({ page }) => {

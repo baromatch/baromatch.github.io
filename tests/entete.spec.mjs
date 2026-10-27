@@ -6,7 +6,8 @@ import { test, expect } from '@playwright/test';
 import { couperLAPI } from './outils/invitation.mjs';
 import { PAGES } from './outils/pages.mjs';
 
-const LARGEURS = [320, 340, 359, 360, 400, 1280];
+// 401 px : la largeur la plus serrée avec la capsule « Pour les bars » ; 412 px, un téléphone Android courant.
+const LARGEURS = [320, 340, 359, 360, 400, 401, 412, 1280];
 const TEXTES_AGRANDIS = [125, 150, 200];
 const CIBLE = 44;
 const LOGO_MINIMUM = 120;
@@ -70,7 +71,7 @@ for (const page of PAGES) {
   }
 
   for (const pourcent of TEXTES_AGRANDIS) {
-    for (const largeur of [320, 360]) {
+    for (const largeur of [320, 360, 412]) {
       test(`${page.nom} à ${largeur} px, texte à ${pourcent} % : l’en-tête passe à la ligne au lieu de déborder`, async ({ page: onglet }) => {
         await couperLAPI(onglet);
         await onglet.setViewportSize({ width: largeur, height: 700 });
@@ -84,3 +85,35 @@ for (const page of PAGES) {
     }
   }
 }
+
+// « Pour les bars », l’entrée des patrons : une capsule de verre dès 401 px (bord tout autour, rayon de capsule, fond
+// de verre, jamais l’ambre des appels) ; en dessous, le lien souligné comme « Boutique ». Sur la page des bars, son texte
+// reste ambre (aria-current).
+for (const largeur of [360, 400, 401, 1280]) {
+  test(`à ${largeur} px, « Pour les bars » ${largeur >= 401 ? 'est une capsule de verre' : 'reste un lien souligné'}`, async ({ page: onglet }) => {
+    await onglet.setViewportSize({ width: largeur, height: 700 });
+    await onglet.goto('/');
+    const style = await onglet.locator('.entete__lien--bars').evaluate((a) => {
+      const s = getComputedStyle(a);
+      return { rayon: s.borderTopLeftRadius, bordHaut: s.borderTopWidth, fond: s.backgroundColor, hauteur: a.getBoundingClientRect().height };
+    });
+    if (largeur >= 401) {
+      expect(style.rayon).toBe('999px');
+      expect(style.bordHaut).toBe('1px');
+      expect(style.fond).not.toBe('rgba(0, 0, 0, 0)');
+      expect(style.fond).not.toBe('rgb(255, 177, 61)');
+    } else {
+      expect(style.bordHaut).toBe('0px');
+      expect(style.fond).toBe('rgba(0, 0, 0, 0)');
+    }
+    expect(style.hauteur).toBeGreaterThanOrEqual(44);
+  });
+}
+
+test('sur la page des bars, la capsule garde son texte ambre (la page où l’on est)', async ({ page: onglet }) => {
+  await onglet.setViewportSize({ width: 1280, height: 700 });
+  await onglet.goto('/pour-les-bars.html');
+  const lien = onglet.locator('.entete__lien--bars');
+  await expect(lien).toHaveAttribute('aria-current', 'page');
+  expect(await lien.evaluate((a) => getComputedStyle(a).color)).toBe('rgb(255, 177, 61)');
+});

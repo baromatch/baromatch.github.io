@@ -7,8 +7,8 @@
      tête (tests/pour-les-bars.spec.mjs donne la nouvelle) ; img-src data: : sources vides des captures cachées à une
      largeur ; connect-src : 'self' (Lighthouse y lit /robots.txt) et l’API, seul hôte à qui la page écrit (ADRESSE de
      pour-les-bars.js) ; form-action 'none' : seul le script envoie le formulaire ; base-uri et object-src : rien. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-0DZf8rtPu9lo86iRJEu1BQELwTJyEVXZ8tDxPewPkzc='; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
-<title>Remplis ton bar les soirs de match — Baromatch pour les bars</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-tdq1ASMsLeYTZKicsuPnMtvqGf/fwWV3RWXFSHGACPY='; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
 <link rel="canonical" href="https://baromatch.fr/pour-les-bars.html">
@@ -166,6 +166,7 @@ main figure { position: relative; }
   letter-spacing: -0.03em;
 }
 .ouverture-bars__titre span { display: block; }
+@media (min-width: 1100px) { .ouverture-bars__titre { font-size: min(5rem, 6.6vw); } }
 .ouverture-bars__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); font-size: 1.125rem; }
 @media (min-width: 720px) { .ouverture-bars__texte { font-size: 1.25rem; } }
 .ouverture-bars__haut { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; margin: 0 0 18px; }
@@ -388,24 +389,25 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
-<meta property="og:title" content="Remplis ton bar les soirs de match — Baromatch pour les bars">
+<meta property="og:title" content="Les soirs de match, ton bar sur Baromatch — Pour les bars">
 <meta property="og:description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta property="og:url" content="https://baromatch.fr/pour-les-bars.html">
-<meta property="og:image" content="https://baromatch.fr/img/og-bars.jpg">
+<meta property="og:image" content="https://baromatch.fr/img/og-bars-2026-10.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="La Console de Baromatch : pour un match, les places sur Baromatch, l’ouverture des réservations et l’heure jusqu’à laquelle une place est gardée. Exemple.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@baromatchapp">
-<meta name="twitter:image" content="https://baromatch.fr/img/og-bars.jpg">
+<meta name="twitter:image" content="https://baromatch.fr/img/og-bars-2026-10.jpg">
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@graph": [
  {"@type": "BreadcrumbList", "@id": "https://baromatch.fr/pour-les-bars.html#fil", "itemListElement": [
   {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://baromatch.fr/"},
   {"@type": "ListItem", "position": 2, "name": "Pour les bars", "item": "https://baromatch.fr/pour-les-bars.html"}]},
- {"@type": "FAQPage", "@id": "https://baromatch.fr/pour-les-bars.html#page", "url": "https://baromatch.fr/pour-les-bars.html", "name": "Remplis ton bar les soirs de match — Baromatch pour les bars", "inLanguage": "fr-FR",
+ {"@type": "FAQPage", "@id": "https://baromatch.fr/pour-les-bars.html#page", "url": "https://baromatch.fr/pour-les-bars.html", "name": "Les soirs de match, ton bar sur Baromatch — Pour les bars", "inLanguage": "fr-FR",
   "isPartOf": {"@id": "https://baromatch.fr/#site"}, "breadcrumb": {"@id": "https://baromatch.fr/pour-les-bars.html#fil"}, "mainEntity": [
-   {"@type": "Question", "name": "Combien ça coûte\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour ton bar, le tarif est à préciser\u00a0: pose la question dans ta demande, on te répond. Pour tes clients, Baromatch est gratuit\u00a0: ce qu’ils prennent au bar, ils le paient au bar."}},
+   {"@type": "Question", "name": "Combien ça coûte\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour ton bar\u00a0: gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux. Pour tes clients, Baromatch est gratuit\u00a0: ce qu’ils prennent au bar, ils le paient au bar."}},
+   {"@type": "Question", "name": "Je m’engage pour combien de temps\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Sans engagement\u00a0: tu arrêtes quand tu veux. Pendant le lancement, c’est gratuit, et aucun paiement tant que tu n’as pas accepté un tarif."}},
    {"@type": "Question", "name": "Mes clients doivent télécharger une appli\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour garder une place, oui\u00a0: l’appli Baromatch, gratuite, en test sur Android pour l’instant. Pour entrer, non\u00a0: ceux qui n’ont pas l’appli ou pas de réservation entrent comme d’habitude, et ton équipe les compte avec «\u00a0Sans réservation\u00a0», sans compte ni nom. Tu choisis combien de places tu ouvres sur Baromatch\u00a0: le reste de la salle reste pour tes habitués et ceux qui passent."}},
    {"@type": "Question", "name": "De quoi j’ai besoin\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour la porte, l’appli Baromatch sur un téléphone Android\u00a0: pour l’instant, elle n’existe que sur Android. Sans Android, la page Scan de la Console valide un pass depuis un navigateur. Pour la Console, un navigateur suffit, sur ordinateur ou sur téléphone\u00a0: rien à installer. On t’explique comment installer l’appli quand on te répond."}},
    {"@type": "Question", "name": "Comment je démarre, et en combien de temps\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Le délai est à préciser. Dans l’ordre\u00a0: tu envoies ta demande, une personne te répond par e-mail ou par téléphone, puis, si on avance ensemble, Baromatch crée ton bar et ton compte patron (il n’y a pas d’inscription en ligne). Tu te connectes alors à la Console, tu règles ta salle et tu choisis tes matchs."}},
@@ -437,18 +439,18 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
         <p class="etiquette"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><g clip-path="url(#pb-bol)"><use href="#pb-vague"/></g><use href="#pb-contour"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg>Pour les bars</p>
         <a class="lien-fan" href="/#attente">Tu es fan&nbsp;? Par ici<span class="visuellement-cache"> pour être prévenu du lancement</span></a>
       </div>
-      <h1 class="ouverture-bars__titre" id="titre"><span>Remplis ton bar</span> <span>les soirs de match.</span></h1>
+      <h1 class="ouverture-bars__titre" id="titre"><span>Les soirs de match,</span> <span>ton bar sur Baromatch.</span></h1>
       <p class="ouverture-bars__texte">Sur l’appli Baromatch, les fans qui cherchent où voir le match trouvent ton bar et gardent leur place. Avant le coup d’envoi, tu sais qui a réservé, et pour combien de personnes.</p>
       <p class="ouverture-bars__etat"><strong>Où on en est&nbsp;:</strong> Baromatch n’est pas encore ouvert au public, les fans ne réservent pas encore. En test sur Android, à Paris&nbsp;; pas d’appli iPhone pour l’instant.</p>
       <div class="actions">
         <a class="capsule" href="#proposer">Proposer mon bar</a>
         <a class="lien-fleche" href="#comment">Voir comment ça marche<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
       </div>
-      <p class="ouverture-bars__prix">Pour ton bar, le tarif est à préciser. Envoyer ta demande ne coûte rien&nbsp;: pose ta question dans ton message.</p>
+      <p class="ouverture-bars__prix">Gratuit pendant le lancement, sans engagement.</p>
       <ul class="boutique-promesses">
         <li><strong>On cherche</strong> les premiers bars, à Paris</li>
         <li><strong>Tu choisis</strong> combien de places tu ouvres</li>
-        <li><strong>Gratuit</strong> pour tes clients · <strong>pour ton bar</strong>, tarif à préciser</li>
+        <li><strong>Gratuit</strong> pour tes clients · <strong>pour ton bar</strong>, pendant le lancement, sans engagement</li>
       </ul>
     </div>
 
@@ -682,7 +684,11 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
     <div class="questions__liste">
       <details open>
         <summary>Combien ça coûte&nbsp;?<svg aria-hidden="true" focusable="false"><use href="#pb-plus"/></svg></summary>
-        <p>Pour ton bar, le tarif est à préciser&nbsp;: pose la question dans ta demande, on te répond. Pour tes clients, Baromatch est gratuit&nbsp;: ce qu’ils prennent au bar, ils le paient au bar.</p>
+        <p>Pour ton bar&nbsp;: gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux. Pour tes clients, Baromatch est gratuit&nbsp;: ce qu’ils prennent au bar, ils le paient au bar.</p>
+      </details>
+      <details>
+        <summary>Je m’engage pour combien de temps&nbsp;?<svg aria-hidden="true" focusable="false"><use href="#pb-plus"/></svg></summary>
+        <p>Sans engagement&nbsp;: tu arrêtes quand tu veux. Pendant le lancement, c’est gratuit, et aucun paiement tant que tu n’as pas accepté un tarif.</p>
       </details>
       <details>
         <summary>Mes clients doivent télécharger une appli&nbsp;?<svg aria-hidden="true" focusable="false"><use href="#pb-plus"/></svg></summary>

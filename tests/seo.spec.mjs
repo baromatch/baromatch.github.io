@@ -421,7 +421,7 @@ test('robots.txt : les outils de vérification hors de l’index, le site et ses
     ...INDEXABLES.map((p) => p.chemin), '/t/abcdefghjkmn', '/.well-known/assetlinks.json', '/styles.css', '/main.js',
     '/tablee.js', '/boutique.js', '/fonts/bricolage-grotesque.woff2', '/img/og-image.jpg', '/favicon.svg', '/favicon.ico',
     '/apple-touch-icon.png', '/sitemap.xml', '/pour-les-bars.css', '/pour-les-bars.js', '/pour-les-bars-amorce.js',
-    '/img/og-bars.jpg', ...fichiersSous('img/bars'), '/llms.txt', ...fichiersSous('presse'), ...fichiersSous('badge'),
+    '/img/og-bars-2026-10.jpg', ...fichiersSous('img/bars'), '/llms.txt', ...fichiersSous('presse'), ...fichiersSous('badge'),
   ];
   expect(ouverts.filter((chemin) => !permis(chemin))).toEqual([]);
 });

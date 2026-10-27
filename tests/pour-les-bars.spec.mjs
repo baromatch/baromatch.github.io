@@ -3,13 +3,15 @@
 // lui-même (ce qui part, chaque réponse du serveur) est vérifié par pour-les-bars-formulaire.spec.mjs. Le serveur
 // est simulé (page.route) : aucun test n’écrit à l’API de production.
 import { test, expect } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { MARQUE } from './outils/marque.mjs';
 import { PIED } from './outils/pied.mjs';
 import { ralentirLaPremiereImage } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
+import { estPermis } from '../generateur/etat.mjs';
 import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
 
 const PAGE = '/pour-les-bars.html';
@@ -18,7 +20,10 @@ const CANONIQUE = `${ORIGINE}${PAGE}`;
 const API = 'https://api-production-8ce4.up.railway.app';
 const ADRESSE = `${API}/api/public/bar-contact`;
 
-const TITRE = 'Remplis ton bar les soirs de match — Baromatch pour les bars';
+// Le titre choisi par le fondateur (26 octobre 2026) : celui de l’onglet, de la carte de partage et de la FAQ balisée.
+const TITRE = 'Les soirs de match, ton bar sur Baromatch — Pour les bars';
+// L’image de partage porte ce titre ; un nouveau nom de fichier, pour que les aperçus déjà vus se refassent.
+const IMAGE_OG = '/img/og-bars-2026-10.jpg';
 const DESCRIPTION = 'Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.';
 const IMAGE_OG_ALT = 'La Console de Baromatch : pour un match, les places sur Baromatch, l’ouverture des réservations et l’heure jusqu’à laquelle une place est gardée. Exemple.';
 // Le style du premier écran, en ligne dans la tête : la politique ne l’autorise que par son empreinte.
@@ -31,6 +36,16 @@ const EMPREINTE = `'sha256-${createHash('sha256').update(PREMIER_ECRAN).digest('
 const MESURE = mesureDuSite();
 const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
   + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);
+
+// Les conditions des premiers bars, mot pour mot comme le fondateur les a écrites (26 octobre 2026) : en entier en tête
+// de « Combien ça coûte ? », reprises sans rien y ajouter dans « Je m’engage pour combien de temps ? », et leur première
+// phrase sous le bouton (le titre tient sur trois lignes au téléphone : la phrase du prix reste dans le premier écran).
+const CONDITIONS = 'Gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.';
+const CONDITIONS_COURTES = 'Gratuit pendant le lancement, sans engagement.';
+const COMBIEN = 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux. Pour tes clients, Baromatch est gratuit : ce qu’ils prennent au bar, ils le paient au bar.';
+const ENGAGEMENT = 'Sans engagement : tu arrêtes quand tu veux. Pendant le lancement, c’est gratuit, et aucun paiement tant que tu n’as pas accepté un tarif.';
+// « Le tarif est à préciser », « tarif à préciser » : ce que la page disait avant ces conditions.
+const TARIF_A_PRECISER = /tarif\s+(?:est\s+)?à\s+préciser/i;
 
 // La loi Evin : la mention sanitaire, citée une fois, sous l’explication de l’offre du soir ; aucun mot d’alcool ailleurs.
 const MENTION = 'L’abus d’alcool est dangereux pour la santé, à consommer avec modération.';
@@ -121,7 +136,7 @@ test.describe('ce que la page dit', () => {
       ogTitre: [TITRE],
       ogDescription: [DESCRIPTION],
       ogUrl: [CANONIQUE],
-      ogImage: [`${ORIGINE}/img/og-bars.jpg`],
+      ogImage: [`${ORIGINE}${IMAGE_OG}`],
       ogImageAlt: [IMAGE_OG_ALT],
       twitter: ['summary_large_image', '@baromatchapp'],
       feuilles: ['/styles.css', '/pour-les-bars.css'],
@@ -138,6 +153,12 @@ test.describe('ce que la page dit', () => {
     expect(titres).toHaveLength(1);
     expect(titres[0]).toMatch(/\bbar\b/i);
     expect(titres[0]).toMatch(/\bmatch\b/i);
+    // Deux lignes, comme sur l’image de partage.
+    expect(await page.locator('h1 > span').allTextContents()).toEqual(['Les soirs de match,', 'ton bar sur Baromatch.']);
+    // L’ancien titre ne se lit plus nulle part : ni l’onglet, ni la carte de partage, ni la FAQ balisée. Sa nouvelle
+    // image est dans le dépôt.
+    expect(await page.content()).not.toContain('Remplis ton bar');
+    expect(existsSync(IMAGE_OG.slice(1)), IMAGE_OG).toBe(true);
   });
 
   test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, questions, formulaire', async ({ page }) => {
@@ -147,7 +168,7 @@ test.describe('ce que la page dit', () => {
       titre: s.querySelector('h1, h2').textContent.replace(/\s+/g, ' ').trim(),
     })));
     const ATTENDUES = [
-      'Remplis ton bar les soirs de match.',
+      'Les soirs de match, ton bar sur Baromatch.',
       'Ce que Baromatch fait pour ton bar',
       'Comment ça marche',
       'Ton soir de match, heure par heure',
@@ -191,7 +212,7 @@ test.describe('ce que la page dit', () => {
       question: details.querySelector('summary').textContent,
       reponse: [...details.children].filter((e) => e.tagName !== 'SUMMARY').map((e) => e.textContent).join(' '),
     })));
-    expect(visibles).toHaveLength(12);
+    expect(visibles).toHaveLength(13);
     const espaces = (texte) => texte.replace(/[ \t\r\n]+/g, ' ').trim();
     expect(faq.mainEntity.map((q) => [q['@type'], q.acceptedAnswer['@type'], espaces(q.name), espaces(q.acceptedAnswer.text)]))
       .toEqual(visibles.map((v) => ['Question', 'Answer', espaces(v.question), espaces(v.reponse)]));
@@ -313,16 +334,15 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__etat');
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
     await expect(etat).toHaveText('Où on en est : Baromatch n’est pas encore ouvert au public, les fans ne réservent pas encore. En test sur Android, à Paris ; pas d’appli iPhone pour l’instant.');
-    // Sous le bouton, une phrase sur le prix ; dans les pastilles, le tarif du bar à côté du gratuit des clients.
+    // Sous le bouton, les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du
+    // gratuit des clients.
     const bouton = ouverture.locator('.actions .capsule[href="#proposer"]');
     const prix = ouverture.locator('.actions + .ouverture-bars__prix');
-    // Le tarif du bar d’abord, « à préciser » (il n’est pas fixé) : « ne coûte rien » ne se lit pas comme le prix du
-    // service.
-    await expect(prix).toHaveText('Pour ton bar, le tarif est à préciser. Envoyer ta demande ne coûte rien : pose ta question dans ton message.');
+    await expect(prix).toHaveText(CONDITIONS_COURTES);
     await expect(ouverture.locator('.boutique-promesses li')).toHaveText([
       'On cherche les premiers bars, à Paris',
       'Tu choisis combien de places tu ouvres',
-      'Gratuit pour tes clients · pour ton bar, tarif à préciser',
+      'Gratuit pour tes clients · pour ton bar, pendant le lancement, sans engagement',
     ]);
     // Tout ça sans défiler : le bouton et la phrase du prix sont dans le premier écran.
     await expect(bouton).toBeInViewport({ ratio: 1 });
@@ -346,6 +366,40 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(fan.height).toBeGreaterThanOrEqual(44);
   });
 
+  // Le titre se coupe comme sur l’image de partage (IMAGE_OG) : deux lignes sur ordinateur, en colonne unique (1024 px)
+  // comme dans la colonne de gauche (dès 1100 px). Là, sa taille suit la colonne, min(5rem, 6.6vw) : la seconde ligne
+  // garde au moins 10 px de marge, barre de défilement comprise. Au téléphone, rien ne change : 13,4vw, trois lignes.
+  const DEUX_LIGNES = ['Les soirs de match,', 'ton bar sur Baromatch.'];
+  for (const [largeur, lignes, taille] of [
+    [360, ['Les soirs de match,', 'ton bar', 'sur Baromatch.'], '48.24px'],
+    [1024, DEUX_LIGNES], [1100, DEUX_LIGNES], [1280, DEUX_LIGNES], [1440, DEUX_LIGNES], [1920, DEUX_LIGNES],
+  ]) {
+    test(`à ${largeur} px, le titre tient sur ${lignes.length} lignes : « ${lignes.join(' / ')} »`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.goto(PAGE);
+      await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
+      // Chaque mot rejoint la ligne du mot d’avant s’il a le même haut, sinon il en commence une.
+      const titre = await page.locator('h1').evaluate((h1) => {
+        const rangees = [];
+        for (const span of h1.querySelectorAll('span')) {
+          let haut = null;
+          for (const mot of span.firstChild.data.matchAll(/\S+/g)) {
+            const morceau = document.createRange();
+            morceau.setStart(span.firstChild, mot.index);
+            morceau.setEnd(span.firstChild, mot.index + mot[0].length);
+            const y = Math.round(morceau.getBoundingClientRect().top);
+            if (y === haut) rangees[rangees.length - 1] += ` ${mot[0]}`;
+            else rangees.push(mot[0]);
+            haut = y;
+          }
+        }
+        return { rangees, taille: getComputedStyle(h1).fontSize };
+      });
+      expect(titre.rangees).toEqual(lignes);
+      if (taille) expect(titre.taille).toBe(taille);
+    });
+  }
+
   test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte, à l’étape 3 et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console', async ({ page }) => {
     await page.goto(PAGE);
     const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });
@@ -360,11 +414,12 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(normaliser(await page.locator('main').textContent())).not.toMatch(/iPhone[^.]*(bientôt|prochainement|arrive|bientot)/i);
   });
 
-  test('les questions : le prix d’abord, ouvert ; une réponse franche en tête ; les clients, le délai et l’offre sur une boisson répondus', async ({ page }) => {
+  test('les questions : le prix d’abord, ouvert, puis l’engagement ; une réponse franche en tête ; les clients, le délai et l’offre sur une boisson répondus', async ({ page }) => {
     await page.goto(PAGE);
     const lues = await questions(page);
-    expect(lues.slice(0, 5).map((q) => q.question)).toEqual([
+    expect(lues.slice(0, 6).map((q) => q.question)).toEqual([
       'Combien ça coûte ?',
+      'Je m’engage pour combien de temps ?',
       'Mes clients doivent télécharger une appli ?',
       'De quoi j’ai besoin ?',
       'Comment je démarre, et en combien de temps ?',
@@ -373,7 +428,8 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(lues.filter((q) => q.ouverte).map((q) => q.question)).toEqual(['Combien ça coûte ?']);
     await expect(page.locator('.questions details').first().locator('p')).toBeVisible();
     const reponse = (debut) => lues.find((q) => q.question.startsWith(debut)).reponse;
-    expect(reponse('Combien')).toBe('Pour ton bar, le tarif est à préciser : pose la question dans ta demande, on te répond. Pour tes clients, Baromatch est gratuit : ce qu’ils prennent au bar, ils le paient au bar.');
+    expect(reponse('Combien')).toBe(COMBIEN);
+    expect(reponse('Je m’engage')).toBe(ENGAGEMENT);
     expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite, en test sur Android pour l’instant\. Pour entrer, non : /);
     expect(reponse('Comment je démarre')).toMatch(/^Le délai est à préciser\. Dans l’ordre : tu envoies ta demande/);
     expect(reponse('Comment je démarre')).not.toMatch(/\d+\s*(jours?|semaines?|heures?|h\b)/);
@@ -387,6 +443,50 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(balisee.replace(/\s+/g, ' ')).toBe(boisson);
     // L’ancienne réponse « On ne peut pas encore te donner de délai. », franche mais vide, est remplacée par l’ordre des choses.
     expect(lues.map((q) => q.reponse).join(' ')).not.toContain('On ne peut pas encore te donner de délai');
+  });
+
+  // Les conditions des premiers bars : sous le bouton, dans les pastilles, dans les deux questions et dans la FAQ
+  // balisée, les mêmes mots. « Tarif à préciser » ne se lit plus nulle part : ni sur la page, ni dans ce que lisent un
+  // lecteur d’écran, un aperçu de partage ou un moteur de recherche.
+  test('les conditions des premiers bars, mot pour mot : sous le bouton, dans « Combien ça coûte ? », dans « Je m’engage pour combien de temps ? » et dans la FAQ balisée ; « tarif à préciser » nulle part', async ({ page }) => {
+    await page.goto(PAGE);
+    expect(CONDITIONS.startsWith(CONDITIONS_COURTES)).toBe(true);
+    await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
+    // En entier dans « Combien ça coûte ? », ouverte d’emblée, après « Pour ton bar : ».
+    expect(COMBIEN.toLowerCase()).toContain(`pour ton bar : ${CONDITIONS.toLowerCase()} pour tes clients`);
+    expect(normaliser(await page.locator('main').textContent()).toLowerCase()).toContain(CONDITIONS.toLowerCase());
+    // La nouvelle question, juste après le prix, fermée comme les autres (seul le prix est ouvert).
+    const engagement = page.locator('.questions details', { has: page.locator('summary', { hasText: 'Je m’engage pour combien de temps' }) });
+    await expect(engagement).toHaveCount(1);
+    expect(await engagement.evaluate((d) => d.open)).toBe(false);
+    await expect(engagement.locator('summary')).toHaveText('Je m’engage pour combien de temps ?');
+    await expect(engagement.locator('p')).toHaveText(ENGAGEMENT);
+    // La FAQ balisée dit les mêmes mots.
+    const balisees = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
+      .flatMap((s) => JSON.parse(s.textContent)['@graph'] ?? []).flatMap((n) => n.mainEntity ?? [])
+      .map((q) => [q.name, q.acceptedAnswer.text]));
+    const balisee = (question) => normaliser(balisees.find(([nom]) => normaliser(nom) === question)?.[1] ?? '');
+    expect(balisee('Combien ça coûte ?')).toBe(COMBIEN);
+    expect(balisee('Je m’engage pour combien de temps ?')).toBe(ENGAGEMENT);
+    // Ce que tout le monde lit de la page : le texte, les attributs, la tête, les données structurées.
+    const lu = await page.evaluate(() => [
+      document.title,
+      document.body.textContent,
+      ...[...document.querySelectorAll('[alt], [aria-label], [title], meta[content]')]
+        .map((e) => [e.getAttribute('alt'), e.getAttribute('aria-label'), e.getAttribute('title'), e.getAttribute('content')].filter(Boolean).join(' ')),
+      ...[...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.stringify(JSON.parse(s.textContent))),
+    ].join(' '));
+    expect(normaliser(lu)).not.toMatch(TARIF_A_PRECISER);
+  });
+
+  // Ailleurs que sur cette page : les pages écrites à la main, leurs scripts, llms.txt. Les pages que le générateur
+  // écrit (sa liste blanche) sont relues à leur source, dans tests/feuille-du-patron.spec.mjs.
+  test('aucun fichier publié écrit à la main ne dit encore « tarif à préciser »', () => {
+    const fichiers = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], { encoding: 'utf8' })
+      .split('\0')
+      .filter((f) => /\.(?:html|js|txt|xml|json)$/.test(f) && !/^(?:docs|tests|generateur)\//.test(f) && !estPermis(f) && existsSync(f));
+    expect(fichiers).toEqual(expect.arrayContaining(['pour-les-bars.html', 'pour-les-bars.js', 'index.html', 'presse.html', 'llms.txt']));
+    expect(fichiers.filter((f) => TARIF_A_PRECISER.test(readFileSync(f, 'utf8').replace(/&nbsp;/g, ' ')))).toEqual([]);
   });
 
   test('les mots de la Console sont dits en clair au premier emploi : la Console, le pass, le Mode bar ; les places sont « libérées », la position « pas envoyée »', async ({ page }) => {
@@ -940,7 +1040,7 @@ test.describe('sans JavaScript', () => {
     await expect(page.locator('.atout')).toHaveCount(5);
     await expect(page.locator('.marche__etape')).toHaveCount(3);
     await expect(page.locator('.horaire__moment')).toHaveCount(5);
-    await expect(page.locator('.questions details')).toHaveCount(12);
+    await expect(page.locator('.questions details')).toHaveCount(13);
     await expect(page.locator('.formulaire__ailleurs a[href="mailto:contact@baromatch.fr"]')).toBeVisible();
   });
 });

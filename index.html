@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Politique de sécurité (GitHub Pages ne permet pas d’en-tête) : seulement les fichiers du site ; Formspree pour la
-     liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même) ; l’empreinte du style du
-     noscript. Une retouche d’un script ou d’un style en ligne change son empreinte :
+     liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même) ; l’empreinte de chaque style en
+     ligne (« Ton club », le noscript). Une retouche d’un script ou d’un style en ligne change son empreinte :
      tests/politique-de-securite.spec.mjs donne la nouvelle. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-sdE1IA7xkRAGohjqCy/Z+CUnLnFuMm9NC71+35yRanQ='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-DTp3XwWvLvOZCCI6zEYeM30B2Ctp2C1yMN5qOv95oFQ=' 'sha256-sdE1IA7xkRAGohjqCy/Z+CUnLnFuMm9NC71+35yRanQ='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
 <meta name="google-site-verification" content="nBxxD8vbrngLKD1Te1fRcbC8tGC2-gwezW9NG9urIaw" />
 <!-- Bing Webmaster Tools : remplace la ligne suivante par la balise de vérification que Bing donne (elle commence par <meta name="msvalidate.01"). -->
 <!-- BING_SITE_VERIFICATION -->
@@ -21,6 +21,15 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+<!-- « Ton club », sous les étapes : les capsules de verre de la page introuvable (.perdu__capsule, styles.css), de 44 px
+     au moins, sans ambre (l’ambre reste à « préviens-moi » et aux bars), alignées sur le texte. Son empreinte est dans
+     la politique de sécurité, en tête de page. -->
+<style>
+.clubs-accueil { margin: 56px 0 0; }
+.clubs-accueil__titre { margin: 0; font-size: 1.3125rem; font-weight: 700; line-height: 1.2; }
+.clubs-accueil__texte { margin: 8px 0 0; max-width: 40rem; color: var(--texte-doux); font-size: 1rem; }
+.clubs-accueil .perdu__capsules { justify-content: flex-start; margin: 20px 0 0; }
+</style>
 <!-- Sans JavaScript, main.js ne choisit ni l’affiche ni la version du film : le lecteur de secours (dans #film-cadre) prend
      la place du film et le bouton du son, qui ne marcherait pas, disparaît. -->
 <noscript><style>#film, .film__son { display: none; }</style></noscript>
@@ -177,6 +186,23 @@
       </li>
     </ol>
     <p class="soiree__suite"><a href="/ce-soir/">Où regarder le match ce soir</a></p>
+    <!-- « Ton club » : la page de chaque club que le générateur écrit (une par club de generateur/contenu/suivre.json),
+         dans l’ordre de cette liste et par son nom court (generateur/contenu/clubs.json). Un club ajouté à la liste, ou
+         retiré, s’ajoute ou se retire ici aussi : tests/accueil.spec.mjs le vérifie. -->
+    <div class="clubs-accueil" id="clubs-accueil">
+      <h3 class="clubs-accueil__titre" id="titre-clubs-accueil">Ton club</h3>
+      <p class="clubs-accueil__texte">Ses prochains matchs, à l’heure de Paris&nbsp;: le jour, le coup d’envoi, la compétition.</p>
+      <ul class="perdu__capsules" aria-labelledby="titre-clubs-accueil">
+        <li><a class="perdu__capsule" href="/matchs/club/psg/">PSG</a></li>
+        <li><a class="perdu__capsule" href="/matchs/club/om/">OM</a></li>
+        <li><a class="perdu__capsule" href="/matchs/club/ol/">OL</a></li>
+        <li><a class="perdu__capsule" href="/matchs/club/lille/">Lille</a></li>
+        <li><a class="perdu__capsule" href="/matchs/club/lens/">Lens</a></li>
+        <li><a class="perdu__capsule" href="/matchs/club/monaco/">Monaco</a></li>
+        <li><a class="perdu__capsule" href="/matchs/club/nice/">Nice</a></li>
+        <li><a class="perdu__capsule" href="/matchs/club/rennes/">Rennes</a></li>
+      </ul>
+    </div>
   </section>
 
   <section class="bars" id="bars" aria-labelledby="titre-bars">

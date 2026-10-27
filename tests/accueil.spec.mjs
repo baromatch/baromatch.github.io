@@ -1,8 +1,16 @@
 // L’accueil vu par un fan qui arrive un soir de match : dès le premier écran, il lit que Baromatch n’est pas encore
 // ouvert, que l’appli est gratuite pour les fans et où elle en est (Android en test, pas d’iPhone), et il voit le champ
 // et le bouton de la liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… pas encore ouverte »).
-// La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque.
+// La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque. Sous les étapes, « Ton club » mène
+// à la page de chaque club.
 import { test, expect } from '@playwright/test';
+import { existsSync } from 'node:fs';
+import { racine } from './outils/environnement.mjs';
+import { fichierDe } from './outils/pages.mjs';
+import { CAPTURE, MAINTENANT_DE_LA_CAPTURE } from './outils/site-genere.mjs';
+import { chargerLeContenu } from '../generateur/contenu.mjs';
+import { construireEnMemoire } from '../generateur/site.mjs';
+import { TEXTES_SUIVRE, cheminDuClub } from '../generateur/suivre.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
@@ -374,3 +382,74 @@ test('les cinq étapes disent que ça va marcher ainsi, que la place est gratuit
     { titre: 'Garde la soirée', texte: 'Chaque soirée validée devient un sous-bock, le souvenir du match, du bar et de la date, dans ton album.' },
   ]);
 });
+
+// « Ton club » : la page de chaque club (generateur/suivre.mjs en écrit une par club de generateur/contenu/suivre.json),
+// dans l’ordre de cette liste et par son nom court (generateur/contenu/clubs.json), comme le guide et la semaine les
+// donnent. Ni plus ni moins : un club ajouté à la liste, ou retiré, change l’accueil aussi. Et chaque page existe, dans
+// le dépôt (le site servi) comme dans ce que le générateur écrit (la copie enregistrée des listes publiques) : si une
+// page de club n’est plus écrite, le test échoue.
+test('« Ton club » : la page de chaque club de la liste, dans son ordre, et chacune existe', async ({ page }) => {
+  const { clubs } = chargerLeContenu(racine);
+  const attendus = Object.keys(TEXTES_SUIVRE.clubs).filter((cle) => !cle.startsWith('_'))
+    .map((cle) => ({ href: cheminDuClub(cle), texte: clubs[cle].court }));
+  expect(attendus.length).toBeGreaterThan(0);
+  await page.goto('/');
+  const bloc = page.locator('#clubs-accueil');
+  await expect(bloc.locator('h3')).toHaveText('Ton club');
+  await expect(bloc.locator('p')).toHaveText('Ses prochains matchs, à l’heure de Paris : le jour, le coup d’envoi, la compétition.');
+  const liens = await bloc.locator('a').evaluateAll((a) => a.map((l) => ({ href: l.getAttribute('href'), texte: l.textContent.trim() })));
+  expect(liens).toEqual(attendus);
+  for (const { href } of attendus) expect(existsSync(fichierDe(href)), href).toBe(true);
+  const site = await construireEnMemoire({ source: `capture:${CAPTURE}`, maintenant: MAINTENANT_DE_LA_CAPTURE, racine, contenu: chargerLeContenu(racine) });
+  expect(site.pages.filter((p) => p.type === 'club').map((p) => p.chemin).sort()).toEqual(attendus.map((a) => a.href).sort());
+});
+
+// Il se lit sous les étapes et « Où regarder le match ce soir », dans « Comment ça va marcher », avant la bande des
+// bars : bien après la liste d’attente. Des capsules de verre, sans ambre (l’ambre reste à « préviens-moi » et aux
+// bars), de 44 × 44 px au moins ; au clavier, chaque club prend le focus à son tour, et le focus se voit.
+for (const largeur of [360, 1280]) {
+  test(`à ${largeur} px, « Ton club » suit les étapes, avant les bars, en capsules de verre de 44 px, au clavier`, async ({ page }) => {
+    await page.setViewportSize({ width: largeur, height: 800 });
+    await page.goto('/');
+    const ordre = await page.evaluate(() => {
+      const bloc = document.getElementById('clubs-accueil');
+      const avant = (a, b) => Boolean(a && b && a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      return {
+        section: bloc?.closest('section')?.classList[0] ?? null,
+        apresLeFormulaire: avant(document.getElementById('attente'), bloc),
+        apresCeSoir: avant(document.querySelector('.soiree__suite'), bloc),
+        avantLesBars: avant(bloc, document.getElementById('bars')),
+      };
+    });
+    expect(ordre).toEqual({ section: 'soiree', apresLeFormulaire: true, apresCeSoir: true, avantLesBars: true });
+    const capsules = await page.locator('#clubs-accueil a').all();
+    expect(capsules.length).toBeGreaterThan(0);
+    // Alignées sur le titre, pas centrées comme sur la page introuvable : le style de l’accueil s’applique (son empreinte
+    // est dans la politique de sécurité).
+    const bords = await page.evaluate(() => [document.getElementById('titre-clubs-accueil'), document.querySelector('#clubs-accueil a')]
+      .map((e) => e.getBoundingClientRect().left));
+    expect(Math.abs(bords[0] - bords[1])).toBeLessThan(1);
+    const ambre = /^rgba?\(255, 177, 61/;
+    for (const capsule of capsules) {
+      const lu = await capsule.evaluate((a) => {
+        const s = getComputedStyle(a);
+        const r = a.getBoundingClientRect();
+        return { fond: s.backgroundColor, couleur: s.color, bord: s.borderTopColor, rayon: parseFloat(s.borderTopLeftRadius), largeur: r.width, hauteur: r.height };
+      });
+      const nom = await capsule.textContent();
+      for (const cle of ['fond', 'couleur', 'bord']) expect(lu[cle], `${nom} : ${cle}`).not.toMatch(ambre);
+      expect(lu.fond, nom).not.toBe('rgba(0, 0, 0, 0)');
+      expect(lu.rayon, nom).toBeGreaterThanOrEqual(22);
+      expect(lu.hauteur, nom).toBeGreaterThanOrEqual(44);
+      expect(lu.largeur, nom).toBeGreaterThanOrEqual(44);
+    }
+    await page.locator('.soiree__suite a').focus();
+    for (const capsule of capsules) {
+      await page.keyboard.press('Tab');
+      await expect(capsule).toBeFocused();
+      const contour = await capsule.evaluate((a) => ({ style: getComputedStyle(a).outlineStyle, epaisseur: parseFloat(getComputedStyle(a).outlineWidth) }));
+      expect(contour.style).not.toBe('none');
+      expect(contour.epaisseur).toBeGreaterThanOrEqual(2);
+    }
+  });
+}

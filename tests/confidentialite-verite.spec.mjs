@@ -86,7 +86,10 @@ test('la page Confidentialité : les durées que l’effacement automatique appl
 // serveur n’arrivent pas sur le téléphone.
 test('la page Confidentialité : tout texte de la recherche part vers l’IGN, et les messages de Baromatch sur un match', async ({ page }) => {
   await page.goto('/confidentialite.html');
-  const recherche = normaliser(await page.locator('#position + ul > li', { hasText: 'La recherche de la carte' }).innerText());
+  const ligneRecherche = page.locator('#position + ul > li', { hasText: 'La recherche de la carte' });
+  await expect(ligneRecherche).toHaveCount(1);
+  await expect(page.locator('#messages-match')).toHaveCount(1);
+  const recherche = normaliser(await ligneRecherche.innerText());
   expect(recherche).toContain('tout ce que tu tapes dans la recherche, dès 3 caractères, part de notre serveur vers la Géoplateforme de l’IGN');
   expect(recherche).toContain('Pas seulement une adresse : un nom de bar, de club ou de quartier part aussi.');
   expect(recherche).toContain('L’IGN ne reçoit que ce texte : ni ton compte, ni ton adresse IP.');
@@ -96,13 +99,18 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   const messages = normaliser(await page.locator('#messages-match').innerText());
   expect(messages).toContain('quand les notifications de notre serveur arriveront sur ton téléphone, Baromatch pourra t’envoyer de temps en temps un message sur un match : un match qui approche, ou la mi-temps.');
   expect(messages).toContain('Seulement si tu as gardé « Offres des bars » allumé dans Réglages (il l’est au départ)');
-  expect(messages).toContain('seulement si une de tes arrivées a été validée dans un bar ces 7 derniers jours');
-  expect(messages).toContain('Au plus une notification que tu n’as pas demandée par match, ce message compris, et aucune pour un match où tu as déjà ta place.');
+  expect(messages).toContain('Et seulement si une de tes arrivées a été validée dans un bar ces 7 derniers jours');
+  expect(messages).toContain('Par match, au plus une de ces notifications : ton club qui joue, une soirée qui ouvre, ou ce message. Aucune pour un match où tu as déjà ta place.');
   expect(messages).toContain('aucune offre de bar ne part en notification');
   expect(messages).toContain('coupe « Offres des bars » dans Réglages, ou les notifications de Baromatch dans les réglages de ton téléphone');
   // Aujourd’hui, rien ne part encore du serveur : la page le dit toujours, juste avant.
   await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
-  await expect(page.locator('#pourquoi + p + ul')).toContainText('T’envoyer de temps en temps un message sur un match');
+  // Sa base est écrite, et le résumé « en clair » des intérêts légitimes, auquel renvoie le droit de s’opposer, la compte.
+  const base = page.locator('#pourquoi + p + ul > li', { hasText: 'T’envoyer de temps en temps un message sur un match' });
+  await expect(base).toHaveCount(1);
+  await expect(base).toContainText('notre intérêt légitime, quand les notifications de notre serveur arriveront sur ton téléphone');
+  await expect(base).toContainText('ou qu’il arrive à la mi-temps');
+  await expect(page.locator('#pourquoi ~ p', { hasText: 'Nos intérêts légitimes, en clair' })).toContainText('te prévenir qu’un match approche ou arrive à la mi-temps');
   await expect(page.locator('#pourquoi + p + ul a[href="#messages-match"]')).toHaveCount(1);
 });
 

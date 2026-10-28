@@ -39,10 +39,10 @@ test.describe('la bande « bars » de l’accueil', () => {
     ]);
   });
 
-  test('elle arrive juste après « Un soir de match, minute par minute », avant « Baromatch en bref » ; la boutique ferme la page', async ({ page }) => {
+  test('elle arrive juste après « Un soir de match, minute par minute », avant « Baromatch en bref » ; les questions ferment la page (la boutique n’est plus que dans le menu)', async ({ page }) => {
     await page.goto('/');
     const ordre = await page.$$eval('main > section', (sections) => sections.map((s) => s.id || s.className.split(' ')[0]));
-    expect(ordre).toEqual(['ouverture', 'soiree', 'bars', 'en-bref', 'testeurs-accueil', 'questions', 'vitrine-accueil']);
+    expect(ordre).toEqual(['ouverture', 'soiree', 'bars', 'en-bref', 'testeurs-accueil', 'questions']);
   });
 
   test('aucune phrase de la bande ne promet ce que Baromatch ne tient pas', async ({ page }) => {

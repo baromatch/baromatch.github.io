@@ -990,7 +990,7 @@ a:hover { color: var(--goutte); }
   .questions-fans summary, .questions-fans summary::after { transition: none; }
 }
 
-/* ---------- La boutique sur l'accueil ---------- */
+/* ---------- Le bloc des testeurs, sur l'accueil (et le bouton en verre des blocs secondaires) ---------- */
 
 .vitrine-accueil {
   padding-top: 88px;
@@ -1028,7 +1028,7 @@ a:hover { color: var(--goutte); }
 .panier__envoyer:hover,
 .tablee__bouton:hover,
 .capsule:hover { background: #FFC163; color: var(--nuit); }
-/* Sur l’accueil, « Voir la boutique » en verre : l’ambre reste à l’appel des fans, « préviens-moi », juste au-dessus. */
+/* Sur l’accueil, « Deviens testeur Android » en verre : l’ambre reste à l’appel des fans, la liste d’attente. */
 .vitrine-accueil__bouton--verre { background: var(--verre-fort); color: var(--texte); box-shadow: inset 0 0 0 1px var(--verre-bord-fort); }
 .vitrine-accueil__bouton--verre:hover { background: rgba(255, 255, 255, 0.15); color: var(--texte); }
 .panier__envoyer[disabled] { opacity: 0.55; cursor: not-allowed; }

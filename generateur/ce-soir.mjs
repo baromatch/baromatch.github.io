@@ -242,7 +242,7 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
 ${sectionDuSoir}
 ${sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : ''}${sectionSoirsAuBar}${sectionProchains}
 ${sectionVilles}
-${appel(marque, textes)}
+${appel(marque, textes, { sansBar: sansAucunBar })}
 ${commentCaMarche(textes, marque)}`,
   };
   return { ...p, carte, ...(image ? { imageDePartage: image } : {}), contenu: page({ cadre, marque, avecPresse, ...p, image }) };

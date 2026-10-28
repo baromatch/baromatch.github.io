@@ -163,9 +163,11 @@ export const fabriquerLesPages = ({
     const memoire = { slug: match.slug, ids: match.ids, debut: new Date(match.debut).toISOString(), heureConfirmee: match.heureConfirmee, competition: match.competition, domicile: match.domicile, exterieur: match.exterieur };
     // « Ajouter à mon agenda » : un match à venir, ni reporté ni annulé ; son fichier s’écrit à côté de la page.
     const evenement = vivant && aSonFichier(match, maintenant);
-    // Le titre dit « où regarder le match » seulement si la page montre au moins un vrai bar publié (ce que les fans
-    // cherchent) ; sans bar, passé ou plus au programme, le match seul, et son jour dans le titre de la page.
-    const promesse = !passe && vivant && soirees.length ? ' : où regarder le match' : '';
+    // Le titre dit « où regarder le match » seulement si la page montre au moins un vrai bar publié pour un match qui se
+    // joue (ce que les fans cherchent) ; sans bar, reporté ou annulé, passé ou plus au programme, le match seul, et son
+    // jour dans le titre de la page. Comme les pages des clubs et des compétitions (suivre.mjs, barsDe).
+    const ouRegarder = !passe && vivant && !match.statut && soirees.length > 0;
+    const promesse = ouRegarder ? ' : où regarder le match' : '';
     const enTete = `<header class="regarder-tete">
   <p class="regarder-surtitre">${e(match.competition)}</p>
   <h1 class="regarder-titre">${e(nom)}${promesse}</h1>
@@ -207,7 +209,7 @@ ${enTete}
     // Le titre (et donc og:title et le texte envoyé sur WhatsApp) : « où regarder le match » seulement avec de vrais
     // bars (« PSG – OL, 25 octobre : où regarder le match ») ; sans, le match et son jour (« PSG – Barça, mardi 20
     // octobre »). Rien à changer à la main : le passage qui publie un bar pour ce match lui rend son « où ».
-    const titrePage = soirees.length
+    const titrePage = ouRegarder
       ? titre(`${nom}, ${dateCourte(match.debut)} : où regarder le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : où regarder le match`,
         `${nom} : où regarder le match — Baromatch`, `${nom} : où regarder le match`)
       : titre(`${nom}, ${jourEnLettres(match.debut)} — Baromatch`, `${nom}, ${dateCourte(match.debut)} — Baromatch`, `${nom}, ${jourEnLettres(match.debut)}`, nom);
@@ -328,7 +330,7 @@ ${ensuite.map((m) => `    ${ligneDeMatch(m, { avecPage: true, suite: etatDuMatch
   </ul>
 </section>\n` : ''}${sectionDesPagesSuivies({ clubs: contenu.clubs, aVenir: donnees.matchs.filter(enCoursOuAVenir) })}
 ${afficheDeLaSemaine ? `${afficheDeLaSemaine()}\n` : ''}<p class="regarder-retour"><a href="/regarder-le-match/">${e(textes.semaine.toutesLesVilles)}</a></p>
-${appel(marque, textes)}
+${appel(marque, textes, { sansBar: sansAucunBar })}
 ${commentCaMarche(textes, marque)}`,
     });
   }

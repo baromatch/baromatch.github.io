@@ -174,8 +174,8 @@ export const atouts = (bar, textes) => {
 };
 
 // L’appel à l’action : tant que l’appli n’est pas ouverte, la liste d’attente de l’accueil. note : la phrase dessous
-// (sans elle, l’appel seul, quand la page la dit déjà plus bas). sansBar : sous « Pas encore de bar », l’appli ouverte
-// ne promet aucune place (« Télécharge l’appli », sans la phrase des places).
+// (sans elle, l’appel seul, quand la page la dit déjà plus bas). sansBar : sous « Pas encore de bar », ou sur une page
+// qui le dit, l’appli ouverte ne promet aucune place (« Télécharge l’appli », sans la phrase des places).
 export const appel = (marque, textes, { note = true, sansBar = false } = {}) => {
   if (marque.appli.ouverte) {
     const magasins = [['Android', marque.appli.android], ['iPhone', marque.appli.iphone]].filter(([, lien]) => lien);

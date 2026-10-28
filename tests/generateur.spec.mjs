@@ -784,10 +784,14 @@ test.describe('les pages', () => {
     expect(brestNice.description).toBe('Brest – Nice (Ligue 1), vendredi 23 octobre à 20:45 : match annulé. Les prochains matchs des deux clubs, à l’heure de Paris.');
     // L’appli ouverte, sans bar : sous « Pas encore de bar », la boutique d’applis sans promettre de place.
     const ouverteSansBar = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: VENDREDI, racine, contenu: { ...chargerLeContenu(racine), marque: { ...contenu.marque, appli: { ouverte: true, android: 'https://magasin.exemple/baromatch-android', iphone: '' } } } });
-    for (const p of ouverteSansBar.pages.filter((x) => ['semaine', 'match', 'club'].includes(x.type) && x.contenu.includes('titre-premiers'))) {
+    for (const p of ouverteSansBar.pages.filter((x) => ['semaine', 'ce-soir', 'match', 'club'].includes(x.type) && x.contenu.includes('titre-premiers'))) {
       const bloc = blocDe(p);
       expect(bloc, p.chemin).toContain(`<a class="capsule" href="https://magasin.exemple/baromatch-android">${insecables(contenu.textes.appel.ouverte.texteSansBar)} · Android</a>`);
       expect(bloc, p.chemin).not.toMatch(/place|Réserve/);
+    }
+    // … et la semaine et « Ce soir », qui ont un second appel en bas de page, ne promettent de place nulle part.
+    for (const chemin of ['/matchs/', '/ce-soir/']) {
+      expect(texteVisible(ouverteSansBar.pages.find((p) => p.chemin === chemin).contenu), chemin).not.toMatch(/Réserve ta place|Ta place ne coûte rien/);
     }
 
     // Dès le premier bar publié, plus aucune page n’a le bloc ; la semaine et « Ce soir » reprennent leurs titres, et le
@@ -822,13 +826,26 @@ test.describe('les pages', () => {
     expect(pageDe('/matchs/psg-ol-2026-10-25/').contenu).toContain('<a href="/matchs/club/psg/">Les matchs du PSG et où les voir</a>');
     expect(pageDe('/matchs/lille-lens-2026-10-26/').contenu).toContain('<a href="/matchs/club/lille/">Les matchs de Lille</a>');
     expect(pageDe('/matchs/lille-lens-2026-10-26/').contenu).toContain('<a href="/matchs/competition/ligue-1/">Les matchs de la Ligue 1 et où les voir</a>');
-    // Chaque page de match à venir, de club et de compétition, du scénario comme de l’état réel (aucun bar publié) :
-    // « où » dans le titre et dans le h1 si, et seulement si, la page nomme au moins un vrai bar.
+    // Un match reporté ou annulé ne se regarde pas, même si un bar l’avait annoncé : ni sur sa page, ni sur celle de sa
+    // compétition, ni dans les liens vers elle. PSG – Barça annulé : la Ligue des champions n’a plus de match avec un bar.
+    const brut = await lireLaSource(`scenario:${SCENARIO}`);
+    for (const m of brut.matches.filter((x) => x.id.startsWith('m-psg-barca'))) m.status = 'CANCELLED';
+    const annule = await construireEnMemoire({ brut, maintenant: VENDREDI, racine, contenu });
+    const deLAnnule = (chemin) => annule.pages.find((p) => p.chemin === chemin);
+    expect(deLAnnule('/matchs/psg-barca-2026-10-24/').barsNommes.length).toBeGreaterThan(0);
+    expect(deLAnnule('/matchs/psg-barca-2026-10-24/').titre).toBe('PSG – Barça, samedi 24 octobre — Baromatch');
+    expect(deLAnnule('/matchs/competition/ligue-des-champions/').titre).toBe('Ligue des champions : quand regarder les matchs — Baromatch');
+    expect(deLAnnule('/matchs/club/psg/').titre).toBe('Où regarder les matchs du PSG dans un bar — Baromatch');
+    expect(deLAnnule('/matchs/club/psg/').contenu).toContain('<a href="/matchs/competition/ligue-des-champions/">Les matchs de la Ligue des champions</a>');
+    expect(deLAnnule('/matchs/club/psg/').contenu).toContain('<a href="/matchs/competition/ligue-1/">Les matchs de la Ligue 1 et où les voir</a>');
+    // Chaque page de match à venir, de club et de compétition, du scénario (avec et sans match annulé) comme de l’état
+    // réel (aucun bar publié) : « où » dans le titre et dans le h1 si, et seulement si, la page nomme au moins un vrai
+    // bar pour un match qui se joue (une page de match reporté ou annulé est hors du plan du site : horsPlan).
     const reel = await construireEnMemoire({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT, racine, contenu: chargerLeContenu(racine) });
     const OU = /(?<!\p{L})où(?!\p{L})/iu;
     const compte = { avec: 0, sans: 0 };
-    for (const p of [...site.pages, ...reel.pages].filter((x) => ['club', 'competition'].includes(x.type) || (x.type === 'match' && x.partage))) {
-      const montre = p.barsNommes.length > 0;
+    for (const p of [...site.pages, ...annule.pages, ...reel.pages].filter((x) => ['club', 'competition'].includes(x.type) || (x.type === 'match' && x.partage))) {
+      const montre = p.barsNommes.length > 0 && !p.horsPlan;
       compte[montre ? 'avec' : 'sans'] += 1;
       expect(OU.test(p.titre), `${p.chemin} : ${p.titre}`).toBe(montre);
       expect(OU.test(h1De(p)), `${p.chemin} : ${h1De(p)}`).toBe(montre);

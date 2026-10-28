@@ -196,37 +196,27 @@
   });
 })();
 
-/* Le film : la version portrait sur téléphone, paysage ailleurs ; lecture muette en boucle, le son au choix.
-   La page ne nomme aucune affiche et ne précharge pas le film (preload="none") : on choisit ici l’affiche
-   de l’écran, la seule téléchargée, et le film ne se charge qu’en arrivant à l’écran.
-   Il part seul : « Pause », juste avant le son, l’arrête (WCAG 2.2.2), et la pause tient, le film ne repart pas en
-   revenant à l’écran. Chaque bouton dit ce qu’il fera (« Pause » / « Lire », « Mettre le son » / « Couper le son »),
-   sans état « enfoncé » qui contredirait son nom (4.1.2). En mouvement réduit, ou si le navigateur refuse la lecture
-   automatique, le lecteur classique remplace les deux boutons. */
+/* Le film, sans le son : il part seul, muet, en boucle, quand il arrive à l’écran (preload="none" : rien ne se charge
+   avant), et s’arrête quand il en sort. Le bouton du cadre l’arrête (WCAG 2.2.2) et la pause tient : le film ne repart
+   pas en revenant à l’écran. Le bouton dit ce qu’il fera (« Mettre le film en pause » / « Lire le film »), sans état
+   « enfoncé » qui contredirait son nom (4.1.2). En mouvement réduit, en économie de données, ou si le navigateur refuse
+   la lecture automatique, le lecteur classique remplace le bouton. */
 (function () {
   var video = document.getElementById("film");
-  var cadre = document.getElementById("film-cadre");
-  var commandes = document.getElementById("film-commandes");
   var lecture = document.getElementById("film-lecture");
-  var bouton = document.getElementById("film-son");
-  if (!video || !cadre || !commandes || !lecture || !bouton) return;
+  if (!video || !lecture) return;
 
-  var portrait = window.matchMedia("(max-width: 719px) and (orientation: portrait)").matches;
-  video.poster = video.getAttribute(portrait ? "data-affiche-portrait" : "data-affiche-paysage");
-  if (portrait) {
-    cadre.classList.add("film__cadre--portrait");
-    video.src = video.getAttribute("data-portrait");
-  }
-
+  var icone = lecture.querySelector("path");
   var calme = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  // Vrai quand la personne a mis le film en pause : il ne repart alors que par « Lire » (ou « Mettre le son »).
+  var econome = navigator.connection && navigator.connection.saveData;
+  // Vrai quand la personne a mis le film en pause : il ne repart alors que par son bouton.
   var arreteParToi = false;
 
-  // Le focus d’un bouton qui s’efface passe au lecteur classique qui le remplace, pas à la page.
+  // Le focus du bouton qui s’efface passe au lecteur classique qui le remplace, pas à la page.
   function lecteurClassique() {
-    var avaitLeFocus = commandes.contains(document.activeElement);
+    var avaitLeFocus = document.activeElement === lecture;
     video.controls = true;
-    commandes.hidden = true;
+    lecture.hidden = true;
     if (avaitLeFocus) video.focus();
   }
 
@@ -242,24 +232,25 @@
   }
 
   function direLaLecture() {
-    lecture.textContent = video.paused ? "Lire" : "Pause";
+    lecture.setAttribute("aria-label", video.paused ? "Lire le film" : "Mettre le film en pause");
+    icone.setAttribute("d", video.paused ? "M7 4.5v15l12-7.5z" : "M7 5h3.5v14H7zM13.5 5H17v14h-3.5z");
   }
 
-  if (calme) {
+  if (calme || econome) {
     lecteurClassique();
-  } else {
-    lecture.hidden = false;
-    direLaLecture();
-    video.addEventListener("play", direLaLecture);
-    video.addEventListener("pause", direLaLecture);
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (entrees) {
-        entrees.forEach(function (entree) {
-          if (!entree.isIntersecting) video.pause();
-          else if (!arreteParToi) lire();
-        });
-      }, { threshold: 0.35 }).observe(video);
-    }
+    return;
+  }
+  lecture.hidden = false;
+  direLaLecture();
+  video.addEventListener("play", direLaLecture);
+  video.addEventListener("pause", direLaLecture);
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (entree) {
+        if (!entree.isIntersecting) video.pause();
+        else if (!arreteParToi) lire();
+      });
+    }, { threshold: 0.35 }).observe(video);
   }
 
   lecture.addEventListener("click", function () {
@@ -267,16 +258,91 @@
     if (arreteParToi) video.pause();
     else lire();
   });
+})();
 
-  bouton.addEventListener("click", function () {
-    var avecSon = video.muted;
-    video.muted = !avecSon;
-    if (avecSon) {
-      arreteParToi = false;
-      video.currentTime = 0;
-      lire();
+/* Un soir de match, minute par minute. Ses écrans ne se chargent qu’en approchant (.est-proche, 600 px avant) : le
+   premier affichage de l’accueil n’en paie aucun. Sur ordinateur, ils sont empilés à côté des moments, et celui du
+   moment qui passe au milieu de la fenêtre se montre (.est-actif). */
+(function () {
+  var soiree = document.querySelector(".soiree");
+  var moments = document.querySelectorAll(".moment");
+  if (!soiree || !moments.length) return;
+  if (!("IntersectionObserver" in window)) {
+    soiree.classList.add("est-proche");
+    return;
+  }
+  var approche = new IntersectionObserver(function (entrees) {
+    if (entrees[0].isIntersecting) {
+      soiree.classList.add("est-proche");
+      approche.disconnect();
     }
-    bouton.classList.toggle("film__son--avec-son", avecSon);
-    bouton.textContent = avecSon ? "Couper le son" : "Mettre le son";
+  }, { rootMargin: "600px 0px" });
+  approche.observe(soiree);
+
+  var milieu = new IntersectionObserver(function (entrees) {
+    entrees.forEach(function (entree) {
+      if (!entree.isIntersecting) return;
+      for (var i = 0; i < moments.length; i++) moments[i].classList.toggle("est-actif", moments[i] === entree.target.parentNode);
+    });
+  }, { rootMargin: "-50% 0px -50% 0px" });
+  for (var i = 0; i < moments.length; i++) milieu.observe(moments[i].querySelector(".moment__corps"));
+})();
+
+/* « Maintiens pour essayer » : le geste de l’appli. Tenir le bouton (doigt, souris, ou Espace et Entrée au clavier)
+   remplit le verre en 1,4 s ; lâcher avant le vide. Plein, il dit « Place gardée. », puis revient au départ. Rien
+   n’est envoyé ni réservé : la note, lue par les lecteurs d’écran (role="status"), le dit. En mouvement réduit, un
+   appui suffit. */
+(function () {
+  var essai = document.getElementById("essai");
+  var bouton = document.getElementById("essai-bouton");
+  var mot = document.getElementById("essai-mot");
+  var note = document.getElementById("essai-note");
+  if (!essai || !bouton || !mot || !note) return;
+
+  var calme = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var DEPART = note.textContent;
+  var minuteur = 0;
+  var retour = 0;
+
+  function remplir() {
+    bouton.classList.remove("est-tenu");
+    bouton.classList.add("est-plein");
+    mot.textContent = "Place gardée.";
+    note.textContent = "C’était un essai\u00a0: rien n’est réservé.";
+    if (navigator.vibrate) navigator.vibrate(12);
+    retour = setTimeout(function () {
+      bouton.classList.remove("est-plein");
+      mot.textContent = "Maintiens pour essayer";
+      note.textContent = DEPART;
+    }, 3500);
+  }
+
+  function tenir(evenement) {
+    if (evenement.type === "keydown" && (evenement.repeat || (evenement.key !== " " && evenement.key !== "Enter"))) return;
+    if (evenement.type === "pointerdown" && evenement.button !== 0) return;
+    evenement.preventDefault();
+    if (bouton.classList.contains("est-plein") || bouton.classList.contains("est-tenu")) return;
+    clearTimeout(retour);
+    if (calme) {
+      remplir();
+      return;
+    }
+    bouton.classList.add("est-tenu");
+    minuteur = setTimeout(remplir, 1400);
+  }
+
+  function lacher() {
+    if (!bouton.classList.contains("est-tenu")) return;
+    clearTimeout(minuteur);
+    bouton.classList.remove("est-tenu");
+    note.textContent = "Lâché trop tôt\u00a0: le verre se vide. Garde le doigt appuyé jusqu’au bout.";
+  }
+
+  bouton.addEventListener("pointerdown", tenir);
+  bouton.addEventListener("keydown", tenir);
+  ["pointerup", "pointerleave", "pointercancel", "keyup", "blur"].forEach(function (type) {
+    bouton.addEventListener(type, lacher);
   });
+  bouton.addEventListener("contextmenu", function (evenement) { evenement.preventDefault(); });
+  essai.hidden = false;
 })();

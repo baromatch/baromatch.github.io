@@ -102,13 +102,9 @@
 
 /* ---------- Les écrans ---------- */
 
-/* L’étiquette « Écran de démonstration », posée sur le bord haut de chaque écran (la figure est son repère). */
-.exemple { position: absolute; top: -12px; left: 24px; z-index: 2; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; background: var(--nuit); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); color: var(--texte); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
+/* L’étiquette « Écran de démonstration » et le téléphone de verre (bord de 6 px, rayons concentriques 34 = 28 + 6)
+   sont dans styles.css : l’accueil les montre aussi. */
 
-/* Le téléphone est sans marque : bord de 6 px, rayons concentriques 34 = 28 + 6. */
-.telephone { position: relative; padding: 6px; border-radius: 34px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
-.telephone__ecran { overflow: hidden; border-radius: 28px; background: var(--nuit); outline: 1px solid rgba(255, 255, 255, 0.1); outline-offset: -1px; }
-.telephone__ecran img { width: 100%; height: auto; }
 /* Un morceau de la Console : un panneau de nuit, ses propres coins. */
 .capture { overflow: hidden; max-width: 360px; border-radius: 24px; background: var(--nuit); outline: 1px solid rgba(255, 255, 255, 0.12); outline-offset: -1px; box-shadow: var(--ombre-scene); }
 .capture img { width: 100%; height: auto; }

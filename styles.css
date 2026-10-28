@@ -998,7 +998,7 @@ a:hover { color: var(--goutte); }
   border-top: 1px solid var(--trait);
 }
 @media (min-width: 720px) { .vitrine-accueil { padding-top: 120px; padding-bottom: 128px; } }
-.vitrine-accueil__texte, .testeurs-accueil__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); }
+.testeurs-accueil__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); }
 .vitrine-accueil__bouton,
 .inscription__bouton,
 .boutique-produit__ajouter,

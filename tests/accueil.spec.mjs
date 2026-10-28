@@ -83,7 +83,8 @@ for (const ecran of [
 // Plus bas dans la page, « préviens-moi » revient deux fois : après la soirée et après les questions. La même capsule
 // ambre que sur les pages des matchs, vers le formulaire du haut. Un seul appel principal : tout ce qui est en ambre
 // dans la page (hors de la bande des bars, ambre elle-même) mène à la liste d’attente ; « Deviens testeur Android » est
-// en verre. La boutique n’est plus dans l’accueil, seulement dans le menu (décision du propriétaire, 28 octobre).
+// en verre. La boutique n’est plus présentée dans l’accueil : on la trouve dans le menu et le pied de page (décision du
+// propriétaire, 28 octobre).
 test('« préviens-moi » revient après la soirée et après les questions ; l’ambre ne mène qu’à la liste d’attente', async ({ page }) => {
   await page.goto('/');
   const rappels = page.locator('main .rappel-attente a.capsule');
@@ -95,7 +96,8 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   const testeurs = page.locator('main a[href="/testeurs-android.html"]');
   await expect(testeurs).toHaveCount(1);
   expect(await testeurs.evaluate((a) => getComputedStyle(a).backgroundColor)).not.toBe('rgb(255, 177, 61)');
-  await expect(page.locator('main a[href="/boutique.html"]')).toHaveCount(0);
+  await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
+  expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
   await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(1);
   const enAmbre = await page.$$eval('main a, main button', (elements) => elements
     .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')

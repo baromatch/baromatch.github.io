@@ -12,7 +12,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { violationsAxe } from './outils/axe.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
-import { construireLeSiteDExemple } from './outils/site-genere.mjs';
+import { racine } from './outils/environnement.mjs';
+import { CAPTURE, MAINTENANT_DE_LA_CAPTURE, construireLeSiteDExemple } from './outils/site-genere.mjs';
+import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { lireLeCadre } from '../generateur/gabarits.mjs';
 import { mesureDuSite } from '../generateur/mesure.mjs';
 import { pageDeRepli } from '../generateur/refus.mjs';
@@ -268,4 +270,47 @@ test('les pages en anglais au téléphone : le lien de langue, le fil, les match
   await onglet.goto(`${serveur.adresse}/en/`);
   expect(await onglet.evaluate(() => [document.documentElement.lang, document.querySelector('.entete').lang, document.querySelector('.pied').lang])).toEqual(['en', 'fr', 'fr']);
   await expect(onglet.locator('.regarder-langue a')).toHaveText('Version française');
+});
+
+// Aucun bar publié (le dépôt tel quel, sur la copie enregistrée des listes publiques) : « Pas encore de bar » en tête
+// des pages des matchs (gabarits.mjs, enAttenteDesBars), jugé dans le navigateur comme le reste : aucune violation
+// d’axe, aucun débordement, l’appel des fans et le lien des bars sur 44 px, et le texte à 200 % qui reste dans l’écran.
+test.describe('sans aucun bar publié', () => {
+  let dossierSansBar;
+  let serveurSansBar;
+  test.beforeAll(async () => {
+    dossierSansBar = mkdtempSync(path.join(tmpdir(), 'site-sans-bar-'));
+    await construireLeSiteDExemple(dossierSansBar, { source: `capture:${CAPTURE}`, maintenant: MAINTENANT_DE_LA_CAPTURE, contenu: chargerLeContenu(racine) });
+    serveurSansBar = await demarrerServeur(await portLibre(), -1, { dossier: dossierSansBar });
+  });
+  test.afterAll(async () => {
+    await serveurSansBar?.arreter();
+    if (dossierSansBar) rmSync(dossierSansBar, { recursive: true, force: true });
+  });
+
+  for (const chemin of ['/matchs/', '/ce-soir/', '/matchs/psg-barca-2026-10-20/', '/matchs/club/psg/', '/matchs/competition/ligue-1/']) {
+    test(`${chemin} : « Pas encore de bar », sans violation d’axe ni débordement, ses liens sur 44 px, et à 200 %`, async ({ page: onglet }) => {
+      const bloc = onglet.locator('.regarder-premiers');
+      const liens = bloc.locator('a.capsule, .regarder-premiers__bars a');
+      for (const largeur of [360, 1280]) {
+        await onglet.setViewportSize({ width: largeur, height: 800 });
+        await onglet.goto(`${serveurSansBar.adresse}${chemin}`);
+        await expect(bloc).toHaveCount(1);
+        await expect(bloc.locator('h2')).toHaveText(/^Pas encore de bar (?:sur Baromatch|pour ce match)$/);
+        expect(await violationsAxe(onglet), `${largeur} px`).toEqual([]);
+        expect(await onglet.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${largeur} px`).toBeLessThanOrEqual(0);
+        const hauteurs = await liens.evaluateAll((as) => as.map((a) => Math.round(a.getBoundingClientRect().height)));
+        expect(hauteurs, `${largeur} px`).toHaveLength(2);
+        expect(hauteurs.filter((h) => h < 44), `${largeur} px`).toEqual([]);
+      }
+      await onglet.setViewportSize({ width: 320, height: 800 });
+      await onglet.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+      const dehors = await onglet.evaluate(() => {
+        const ecran = document.documentElement.clientWidth;
+        return [...document.querySelectorAll('.regarder-premiers, .regarder-premiers *')].filter((n) => n.getBoundingClientRect().right > ecran + 0.5).map((n) => n.outerHTML.slice(0, 60));
+      });
+      expect(dehors).toEqual([]);
+      expect(await onglet.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    });
+  }
 });

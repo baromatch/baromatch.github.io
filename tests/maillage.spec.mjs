@@ -114,9 +114,10 @@ for (const site of SITES) {
     });
 
     // Une page qui ne reste que pour les anciens liens : un match passé (ou qui n’est plus au programme), en français
-    // comme en anglais, un bar parti, une page neutre. Elle dit noindex, et rien ne la cherche à la rejoindre.
+    // comme en anglais, un bar parti, une page neutre. Elle dit noindex, et rien ne la cherche à la rejoindre. Un match
+    // à venir a sa section des bars, ou, tant qu’aucun bar n’est publié, « Pas encore de bar » à sa place.
     const pourLesAnciensLiens = (p) => p.repli || (p.type === 'bar' && p.memoire?.disparu)
-      || (['match', 'match-en'].includes(p.type) && (Date.parse(p.memoire?.debut ?? p.date) + DUREE_MATCH_MS <= maintenant || !pages.get(p.chemin).includes('id="titre-bars"')));
+      || (['match', 'match-en'].includes(p.type) && (Date.parse(p.memoire?.debut ?? p.date) + DUREE_MATCH_MS <= maintenant || !/id="titre-(?:bars|premiers)"/.test(pages.get(p.chemin))));
 
     test('les pages en anglais, agenda/ et les affiches sont parmi les pages vérifiées', () => {
       const sortes = new Set(generees.map((p) => p.type));
@@ -183,8 +184,9 @@ for (const site of SITES) {
     });
 
     test('la semaine mène à chaque match à venir qui a sa page', () => {
+      // Un match à venir : sa section des bars, ou, tant qu’aucun bar n’est publié, « Pas encore de bar » à sa place.
       const aVenir = generees.filter((p) => p.type === 'match' && Date.parse(p.memoire.debut) + DUREE_MATCH_MS > maintenant
-        && pages.get(p.chemin).includes('id="titre-bars"'));
+        && /id="titre-(?:bars|premiers)"/.test(pages.get(p.chemin)));
       expect(aVenir.length).toBeGreaterThan(0);
       const semaine = liensDeLaPage('/matchs/');
       expect(aVenir.filter((p) => !semaine.has(p.chemin)).map((p) => p.chemin)).toEqual([]);

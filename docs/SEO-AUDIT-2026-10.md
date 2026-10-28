@@ -93,8 +93,8 @@ Les pages citées :
 
 | # | Constat | Effet | Ce qui est fait |
 |---|---|---|---|
-| T1 | Titres de 15 à 60 caractères et descriptions de 70 à 160, uniques, vérifiés par le contrôle du générateur et les tests. Un titre ne promet des bars que si la page en montre. | Conforme. | Les nouvelles pages suivent la même règle : « Où regarder les matchs du PSG dans un bar » seulement avec un vrai bar, sinon « Matchs du PSG : quand et où les regarder » (testé dans `tests/suivre.spec.mjs` et `tests/generateur.spec.mjs`). La relecture l’avait trouvée manquante : corrigé. |
-| T2 | Les liens sont de vrais `<a href>`, avec un texte qui dit où ils mènent. | Conforme. | Les pages de match et la semaine mènent maintenant aux pages des clubs et des compétitions (« Les matchs du PSG et où les voir »). |
+| T1 | Titres de 15 à 60 caractères et descriptions de 70 à 160, uniques, vérifiés par le contrôle du générateur et les tests. Un titre ne promet des bars que si la page en montre. | Conforme. | Les nouvelles pages suivent la même règle : « Où regarder les matchs du PSG dans un bar » seulement avec un vrai bar, sinon « Matchs du PSG : quand les regarder » (testé dans `tests/suivre.spec.mjs` et `tests/generateur.spec.mjs`). La relecture l’avait trouvée manquante : corrigé. Depuis le 28 octobre (décision du propriétaire), la page d’un match, d’un club ou d’une compétition dit « où regarder » dès qu’elle montre un vrai bar publié, et « quand » sinon (le match et son jour), sans rien changer à la main. |
+| T2 | Les liens sont de vrais `<a href>`, avec un texte qui dit où ils mènent. | Conforme. | Les pages de match et la semaine mènent maintenant aux pages des clubs et des compétitions (« Les matchs du PSG et où les voir » quand la page du PSG montre un vrai bar, sinon « Les matchs du PSG »). |
 | T3 | L’accueil disait ce qu’est Baromatch, mais pas en un seul endroit clair (où, quand, pour qui, qui, contact). | Les moteurs et les assistants doivent recoller des morceaux. | **Fait.** « Baromatch en bref » sur l’accueil et dans À propos, avec les mêmes phrases ; llms.txt les reprend. |
 
 ### Vitesse et téléphone

@@ -173,18 +173,20 @@ export const atouts = (bar, textes) => {
   return liste.length ? `<ul class="regarder-atouts">${liste.map((a) => `<li>${e(a)}</li>`).join('')}</ul>` : '';
 };
 
-// L’appel à l’action : tant que l’appli n’est pas ouverte, la liste d’attente de l’accueil.
-export const appel = (marque, textes) => {
+// L’appel à l’action : tant que l’appli n’est pas ouverte, la liste d’attente de l’accueil. note : la phrase dessous
+// (sans elle, l’appel seul, quand la page la dit déjà plus bas). sansBar : sous « Pas encore de bar », ou sur une page
+// qui le dit, l’appli ouverte ne promet aucune place (« Télécharge l’appli », sans la phrase des places).
+export const appel = (marque, textes, { note = true, sansBar = false } = {}) => {
   if (marque.appli.ouverte) {
     const magasins = [['Android', marque.appli.android], ['iPhone', marque.appli.iphone]].filter(([, lien]) => lien);
     return `<div class="regarder-appel">
-  ${magasins.map(([nom, lien]) => `<a class="capsule" href="${e(lien)}">${e(textes.appel.ouverte.texte)} · ${nom}</a>`).join('\n  ')}
-  <p>${e(textes.appel.ouverte.note)}</p>
+  ${magasins.map(([nom, lien]) => `<a class="capsule" href="${e(lien)}">${e(sansBar ? textes.appel.ouverte.texteSansBar : textes.appel.ouverte.texte)} · ${nom}</a>`).join('\n  ')}${note && !sansBar ? `
+  <p>${e(textes.appel.ouverte.note)}</p>` : ''}
 </div>`;
   }
   return `<div class="regarder-appel">
-  <a class="capsule" href="${e(textes.appel.fermee.adresse)}">${e(textes.appel.fermee.texte)}</a>
-  <p>${e(textes.appel.fermee.note)}</p>
+  <a class="capsule" href="${e(textes.appel.fermee.adresse)}">${e(textes.appel.fermee.texte)}</a>${note ? `
+  <p>${e(textes.appel.fermee.note)}</p>` : ''}
 </div>`;
 };
 
@@ -206,6 +208,23 @@ export const tuTiensUnBar = (textes) => `<div class="regarder-bars-pro">
     <a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">${e(textes.match.proposerMonBar)}</a>
   </div>`;
 
+// Tant qu’aucun bar n’est publié (donnees.bars vide) : en tête des pages des matchs, le fait (« Pas encore de bar sur
+// Baromatch »), ce que la page attend, l’appel des fans, puis une ligne pour les bars ; court, pour que les matchs
+// restent près du haut de l’écran. Sur la page d’un match (match), le titre et la phrase parlent de ce match ; un match
+// reporté ou annulé, qu’aucun bar n’annoncera, garde le fait seul. note : la phrase sous l’appel, sur les pages qui
+// n’ont pas d’autre appel (un match, un club, une compétition) ; sur la semaine et « Ce soir », l’appel seul, sa note
+// est en bas de page. Le jour du premier bar publié, les pages reprennent seules leurs bars : rien à changer à la main.
+export const enAttenteDesBars = (marque, textes, { match = null, note = Boolean(match) } = {}) => {
+  const t = textes.premiersBars;
+  const [titre, texte] = !match ? [t.titre, t.matchs] : match.statut ? [t.titre, t.seul] : [t.titreMatch, t.match];
+  return `<section class="regarder-section regarder-premiers" aria-labelledby="titre-premiers">
+  <h2 id="titre-premiers">${e(titre)}</h2>
+  <p>${e(texte)}</p>
+  ${appel(marque, textes, { note, sansBar: true })}
+  <p class="regarder-premiers__bars"><strong>${e(textes.match.tuTiensUnBar)}</strong> <a href="/pour-les-bars.html#proposer">${e(textes.match.proposerMonBar)}</a></p>
+</section>`;
+};
+
 // La carte d’un bar : son nom (vers sa page), son quartier et son adresse, ce qu’il dit de lui ; sur la page d’un
 // match, l’offre de la soirée ; sur « Ce soir », ses places (une phrase déjà écrite, ou rien).
 export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = '' } = {}) => [
@@ -224,7 +243,7 @@ export const statutDuMatch = (match, textes) => (match.statut ? ` · <strong>${e
 
 // Une ligne d’une liste de matchs (ou de villes) : sa tête, seule sur sa ligne (un lien de 44 px vers sa page, ou son
 // nom), et dessous ses détails, en tête de ligne (une capitale, aucun « · » devant). tete : du HTML déjà échappé.
-export const ligneDeListe = (tete, adresse, infos) => `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${tete}</a>` : `<span class="regarder-matchs__match">${tete}</span>`} <span class="regarder-matchs__infos">${infos}</span></li>`;
+export const ligneDeListe = (tete, adresse, infos) => `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${tete}</a>` : `<span class="regarder-matchs__match">${tete}</span>`}${infos ? ` <span class="regarder-matchs__infos">${infos}</span>` : ''}</li>`;
 
 // Une ligne de match : son nom court (vers sa page s’il en a une) ; dessous, le jour et l’heure (ou l’heure seule, sous
 // un titre qui donne déjà le jour), la compétition, et la suite (« · » puis les bars, ou le statut du match).

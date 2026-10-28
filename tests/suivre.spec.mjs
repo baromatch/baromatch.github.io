@@ -81,18 +81,28 @@ test('sans match à venir : la page reste, en noindex, et le dit', () => {
   const lille = pageDe(scenario, '/matchs/club/lille/');
   expect(lille.indexable).toBe(false);
   expect(robotsDe(lille)).toBe('noindex');
-  expect(lille.titre).toBe('Matchs de Lille : quand et où les regarder — Baromatch');
+  expect(lille.titre).toBe('Matchs de Lille : quand les regarder — Baromatch');
 });
 
 test('aujourd’hui, sans aucun bar publié : indexable avec des matchs à venir, sans rien promettre, titre compris', () => {
   for (const chemin of CHEMINS) {
     const p = pageDe(capture, chemin);
     expect(p.indexable, chemin).toBe(true);
-    expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus/iu);
-    expect(corps(p), chemin).toContain('Aucun bar ne diffuse encore un de ces matchs sur Baromatch.');
+    // Ni bar, ni « où » : « Matchs du PSG : quand les regarder », « Ligue 1 : quand regarder les matchs ».
+    expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus|(?<!\p{L})où(?!\p{L})/iu);
+    // La page le dit une fois, juste sous sa tête, avant ses matchs : « Pas encore de bar sur Baromatch », ce que la
+    // page attend, l’appel des fans et une ligne pour les bars. Aucune ligne de match ne le répète, et la section des
+    // bars n’est pas là.
+    // L’appel a sa phrase : la page n’en a pas d’autre.
+    expect(corps(p), chemin).toContain('Pas encore de bar sur Baromatch Baromatch cherche ses premiers bars à Paris. Dès qu’un bar annonce un match, il s’affiche ici. L’appli ouvre bientôt : préviens-moi Baromatch est en test sur Android, à Paris. Laisse ton adresse : on te prévient le jour où l’appli ouvre. Tu tiens un bar ? Proposer mon bar');
+    expect(p.contenu, chemin).toMatch(/<\/header>\n<section class="regarder-section regarder-premiers" aria-labelledby="titre-premiers">[\s\S]*?<\/section>\n<section class="regarder-section" aria-labelledby="titre-matchs">/);
+    expect(corps(p).match(/Pas encore de bar/g), chemin).toHaveLength(1);
+    expect(p.contenu, chemin).not.toContain('id="titre-bars"');
     // La description ne compte aucun bar, le chapeau ne promet pas de bars.
     expect(p.description, chemin).not.toMatch(/\d+ bars? qui/);
     expect(p.contenu.match(/<p class="regarder-chapeau">([^<]*)/)[1], chemin).not.toMatch(/bars/);
+    // Les liens vers les pages des compétitions ne disent pas « et où les voir » non plus.
+    expect(p.contenu, chemin).not.toContain('où les voir');
     expect(p.barsNommes, chemin).toEqual([]);
     expect(p.contenu, chemin).not.toContain('regarder-carte__nom');
   }
@@ -136,6 +146,16 @@ test('des titres, des descriptions et des h1 tous différents, aux bonnes longue
       }
     }
   }
+});
+
+test('aujourd’hui, sans aucun bar publié : les titres des clubs et des compétitions, et les liens des pages des matchs', () => {
+  expect(pageDe(capture, '/matchs/club/psg/').titre).toBe('Matchs du PSG : quand les regarder — Baromatch');
+  expect(pageDe(capture, '/matchs/club/om/').contenu).toContain(fine('<h1 class="regarder-titre">Matchs de l’OM : quand les regarder</h1>'));
+  expect(pageDe(capture, '/matchs/competition/ligue-1/').titre).toBe('Ligue 1 : quand regarder les matchs — Baromatch');
+  const match = pageDe(capture, '/matchs/psg-barca-2026-10-20/');
+  expect(match.contenu).toContain('<a href="/matchs/club/psg/">Les matchs du PSG</a>');
+  expect(match.contenu).toContain('<a href="/matchs/competition/ligue-des-champions/">Les matchs de la Ligue des champions</a>');
+  for (const p of capture.pages.filter((x) => x.type === 'match')) expect(p.contenu, p.chemin).not.toContain('où les voir');
 });
 
 test('le maillage : la semaine et chaque page de match y mènent, le guide aussi', () => {

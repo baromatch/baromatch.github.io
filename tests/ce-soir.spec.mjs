@@ -16,6 +16,7 @@ import { construireEnMemoire } from '../generateur/site.mjs';
 import { construire } from '../generateur/construire.mjs';
 import { estPermis } from '../generateur/etat.mjs';
 import { controlerLaPage, texteVisible } from '../generateur/controle.mjs';
+import { insecables } from '../generateur/gabarits.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage } from '../generateur/validateur.mjs';
 
 const SCENARIO = path.join(racine, 'tests', 'donnees', 'scenario.json');
@@ -119,21 +120,37 @@ test('un jour sans vrai bar : noindex, les matchs du jour et les suivants vers l
   expect(p.indexable).toBe(false);
   expect(robotsDe(p)).toBe('noindex');
   expect(p.contenu).not.toContain('id="titre-bars"');
+  // Aucun bar publié sur Baromatch : le titre ne promet aucun bar, et la page le dit une fois, juste sous les matchs de
+  // ce soir : l’appel des fans, puis une ligne pour les bars, vers le formulaire de leur page.
+  expect(titreDe(p)).toBe('Les matchs de ce soir, vendredi 23 octobre — Baromatch');
+  expect(p.contenu).toContain('<h1 class="regarder-titre">Les matchs de ce soir</h1>');
+  const premiers = sectionDe(p, 'titre-premiers');
+  expect(premiers).toMatch(/^id="titre-premiers">Pas encore de bar sur Baromatch<\/h2>\n {2}<p>Baromatch cherche ses premiers bars à Paris\. Dès qu’un bar annonce un match, il s’affiche ici\.<\/p>/);
+  // L’appel seul : sa note est en bas de la page, avec le second appel.
+  expect(premiers).not.toContain(sansBarPublie.textes.appel.fermee.note);
+  expect(premiers).toContain('<a class="capsule" href="/#attente">');
+  expect(premiers).toContain(insecables('<p class="regarder-premiers__bars"><strong>Tu tiens un bar ?</strong> <a href="/pour-les-bars.html#proposer">Proposer mon bar</a></p>'));
+  const corps = p.contenu.split('<main')[1];
+  expect(corps.indexOf('id="titre-premiers"')).toBeGreaterThan(corps.indexOf('id="titre-matchs"'));
+  expect(corps.indexOf('id="titre-premiers"')).toBeLessThan(corps.indexOf('id="titre-prochains"'));
+  // Les matchs du jour, « au programme » (le h1 dit déjà « les matchs de ce soir ») ; aucune ligne ne répète
+  // « Pas encore de bar », et la carte des bars n’est plus que la ligne du haut.
   const matchs = sectionDe(p, 'titre-matchs');
-  expect(matchs).toMatch(/^id="titre-matchs">Les matchs d’aujourd’hui<\/h2>/);
-  expect(matchs).toContain('Pas encore de bar sur Baromatch pour les matchs d’aujourd’hui.');
-  expect(matchs).toContain('<a class="regarder-matchs__match" href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a> <span class="regarder-matchs__infos"><time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1 · <span class="regarder-compte">Pas encore de bar</span></span>');
-  // « Tu tiens un bar ? » : une carte, et un bouton droit vers le formulaire de la page des bars.
-  expect(matchs).toContain('<div class="regarder-bars-pro">');
-  expect(matchs).toContain('<a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">Proposer mon bar</a>');
+  expect(matchs).toMatch(/^id="titre-matchs">Au programme<\/h2>\n {2}<ul class="regarder-matchs">/);
+  expect(matchs).toContain('<a class="regarder-matchs__match" href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a> <span class="regarder-matchs__infos"><time datetime="2026-10-23T20:45:00+02:00">20:45</time> · Ligue 1</span>');
+  expect(texteVisible(p.contenu).match(/Pas encore de bar/g)).toHaveLength(1);
+  expect(p.contenu).not.toContain('<div class="regarder-bars-pro">');
   expect(sectionDe(p, 'titre-prochains')).toContain('<a class="regarder-matchs__match" href="/matchs/psg-barca-2026-10-24/">PSG – Barça</a>');
   // Les villes, chacune vers sa page ; la liste d’attente tant que l’appli n’est pas ouverte.
   const villes = sectionDe(p, 'titre-villes');
   for (const ville of ['paris', 'lyon', 'marseille', 'lille']) expect(villes).toContain(`<a class="regarder-matchs__match" href="/regarder-le-match/${ville}/">`);
+  // Sans un seul bar, la section des villes ne parle pas de leurs bars.
+  expect(villes).toContain(`<p>${sansBarPublie.textes.premiersBars.villesSuite}</p>`);
+  expect(villes).not.toMatch(/bars|regarder-compte/);
   expect(p.contenu).toContain('<a class="capsule" href="/#attente">');
   expect(p.description).toBe('Vendredi 23 octobre : 1 match aujourd’hui, à l’heure de Paris. Pas encore de bar pour le voir sur Baromatch : les prochains matchs et les villes.');
   // Le chapeau ne promet pas les bars de chaque match : aucun ne les diffuse.
-  expect(p.contenu).toContain(`<p class="regarder-chapeau">${sansBarPublie.textes.ceSoir.chapeauSansBar}</p>`);
+  expect(p.contenu).toContain(`<p class="regarder-chapeau">${sansBarPublie.textes.premiersBars.ceSoirChapeau}</p>`);
   expect(texteVisible(p.contenu.split('</header>')[0])).not.toMatch(/les bars qui l(?:e|es) diffusen?t/);
   // Ni bar, ni place, ni réservation : rien que la page ne puisse tenir.
   expect(p.contenu).not.toMatch(/Cave des Gones|Zinc|Comptoir|BarOrPub|regarder-carte__nom/);
@@ -148,6 +165,9 @@ test('un soir sans bar, avec des vrais bars publiés : indexable, elle le dit, e
   sansErreur(p);
   expect(p.indexable).toBe(true);
   expect(robotsDe(p)).toBe('max-image-preview:large');
+  // Des vrais bars publiés : ni « Pas encore de bar sur Baromatch » en tête, ni le titre sans promesse.
+  expect(p.contenu).not.toContain('titre-premiers');
+  expect(titreDe(p)).toBe('Où regarder le match ce soir, vendredi 23 octobre');
   // Ce soir : le match du jour, et « pas encore de bar », en clair ; aucune carte de bar.
   expect(p.contenu).not.toContain('id="titre-bars"');
   expect(p.contenu).not.toContain('regarder-carte__nom');
@@ -189,7 +209,7 @@ test('la copie des listes publiques, un samedi soir : le bar de démo n’est ja
   expect(p.indexable).toBe(false);
   expect(p.contenu).not.toMatch(/démo|Exemple/i);
   const matchs = sectionDe(p, 'titre-matchs');
-  expect(matchs).toMatch(/^id="titre-matchs">Les matchs de ce soir<\/h2>/);
+  expect(matchs).toMatch(/^id="titre-matchs">Au programme<\/h2>/);
   expect(matchs).toContain('Strasbourg – PSG</a> <span class="regarder-matchs__infos">Commencé à <time datetime="2026-10-17T17:15:00+02:00">17:15</time>');
   expect(matchs).toContain('Lille – Brest</a> <span class="regarder-matchs__infos"><time datetime="2026-10-17T20:45:00+02:00">20:45</time>');
   expect(matchs).not.toContain('Everton');
@@ -210,7 +230,7 @@ test('un match fini n’est plus listé ; il l’est encore tant qu’il peut se
   expect(fini.indexable).toBe(true);
   expect(fini.contenu).not.toContain('Brest – Nice</a>');
   expect(fini.contenu).not.toContain('regarder-carte__nom');
-  expect(sectionDe(fini, 'titre-rien')).toMatch(/^id="titre-rien">Fini pour ce soir<\/h2>\n {2}<p>Les matchs de ce soir sont terminés. Les prochains sont juste en dessous.<\/p>/);
+  expect(sectionDe(fini, 'titre-rien')).toMatch(/^id="titre-rien">Fini pour ce soir<\/h2>\n {2}<p>Les matchs de ce soir sont terminés. Les prochains sont plus bas.<\/p>/);
   expect(sectionDe(fini, 'titre-soirs')).toContain('<h3 class="regarder-jour">Samedi 24 octobre</h3>');
   expect(sectionDe(fini, 'titre-prochains')).toContain('PSG – Barça');
   // OM – Lens, la veille, n’y est jamais.
@@ -280,7 +300,7 @@ test('un jour sans aucun match : une page utile (les prochains matchs, les ville
   const p = await ceSoir({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT });
   sansErreur(p);
   expect(p.indexable).toBe(false);
-  expect(titreDe(p)).toBe('Où regarder le match ce soir, jeudi 15 octobre — Baromatch');
+  expect(titreDe(p)).toBe('Les matchs de ce soir, jeudi 15 octobre — Baromatch');
   expect(sectionDe(p, 'titre-rien')).toMatch(/^id="titre-rien">Pas de match ce soir<\/h2>/);
   const prochains = sectionDe(p, 'titre-prochains');
   expect(prochains).toContain('<h3 class="regarder-jour">Vendredi 16 octobre</h3>\n  <ul class="regarder-matchs">\n    <li><a class="regarder-matchs__match" href="/matchs/le-mans-toulouse-2026-10-16/">Le Mans – Toulouse</a> <span class="regarder-matchs__infos"><time datetime="2026-10-16T20:45:00+02:00">20:45</time>');
@@ -289,7 +309,11 @@ test('un jour sans aucun match : une page utile (les prochains matchs, les ville
   expect(p.contenu).toContain('<a class="capsule" href="/#attente">');
   // Aucun vrai bar : ni la description ni le chapeau ne parlent des bars qui diffusent les prochains matchs.
   expect(p.description).toBe('Jeudi 15 octobre : pas de match annoncé ce soir. Les prochains, à l’heure de Paris, et les villes, sur Baromatch.');
-  expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.ceSoir.chapeauSansBar}</p>`);
+  expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.premiersBars.ceSoirChapeau}</p>`);
+  // « Pas de match ce soir » d’abord, puis « Pas encore de bar sur Baromatch », et l’appel des fans.
+  expect(sectionDe(p, 'titre-premiers')).toContain('<a class="capsule" href="/#attente">');
+  const corps = p.contenu.split('<main')[1];
+  expect(corps.indexOf('id="titre-rien"')).toBeLessThan(corps.indexOf('id="titre-premiers"'));
   // Rien n’annonce ce soir : l’ItemList suit les prochains matchs, vers leurs pages.
   const [liste] = deType(p, 'ItemList');
   expect(liste.name).toBe('Les prochains matchs');

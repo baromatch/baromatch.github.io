@@ -236,6 +236,12 @@
 /* Sur deux lignes au téléphone, l’appel se coupe au milieu de la phrase, jamais dans « préviens-moi ». */
 .regarder-appel .capsule { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; text-wrap: balance; }
 .regarder-appel p { margin: 0; max-width: 40ch; color: var(--texte-doux); font-size: 0.9375rem; }
+/* « Pas encore de bar » (enAttenteDesBars, generateur/gabarits.mjs) : l’appel des fans, puis une ligne pour les bars, au plus
+   près de la phrase. Le lien des bars a sa cible de 44 px. */
+.regarder-premiers .regarder-appel { margin-top: 16px; }
+.regarder-premiers__bars { margin: 12px 0 0; color: var(--texte-doux); }
+.regarder-premiers__bars strong { color: var(--texte); }
+.regarder-premiers__bars a { display: inline-block; padding: 10px 0; }
 /* La liste d’attente d’une ville (generateur/attente.mjs) : le formulaire de l’accueil, aligné sur son titre. */
 .regarder-attente .attente { margin: 0; }
 /* Sous la liste d’attente d’une page en anglais : l’essentiel de la confidentialité, en petit. */

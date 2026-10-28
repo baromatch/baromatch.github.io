@@ -80,6 +80,32 @@ test('la page Confidentialité : les durées que l’effacement automatique appl
   expect(texte).toContain('Notre serveur garde les adresses trouvées 5 minutes');
 });
 
+// La recherche de la carte (le besoin n° 40 de l’appli, 27 octobre 2026) : tout ce que le fan tape, dès 3 caractères,
+// part vers l’IGN, même un nom de bar ou de club ; la réponse reste 5 minutes, sans le compte. Et les messages de Baromatch
+// sur un match (le besoin n° 41) : à qui, combien, et comment les couper ; aucun ne part tant que les notifications du
+// serveur n’arrivent pas sur le téléphone.
+test('la page Confidentialité : tout texte de la recherche part vers l’IGN, et les messages de Baromatch sur un match', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const recherche = normaliser(await page.locator('#position + ul > li', { hasText: 'La recherche de la carte' }).innerText());
+  expect(recherche).toContain('tout ce que tu tapes dans la recherche, dès 3 caractères, part de notre serveur vers la Géoplateforme de l’IGN');
+  expect(recherche).toContain('Pas seulement une adresse : un nom de bar, de club ou de quartier part aussi.');
+  expect(recherche).toContain('L’IGN ne reçoit que ce texte : ni ton compte, ni ton adresse IP.');
+  expect(recherche).toContain('Notre serveur garde les adresses trouvées 5 minutes, sans ton compte');
+  const texte = await texteDe(page, '/confidentialite.html');
+  expect(texte).not.toContain('recherche d’adresse');
+  const messages = normaliser(await page.locator('#messages-match').innerText());
+  expect(messages).toContain('quand les notifications de notre serveur arriveront sur ton téléphone, Baromatch pourra t’envoyer de temps en temps un message sur un match : un match qui approche, ou la mi-temps.');
+  expect(messages).toContain('Seulement si tu as gardé « Offres des bars » allumé dans Réglages (il l’est au départ)');
+  expect(messages).toContain('seulement si une de tes arrivées a été validée dans un bar ces 7 derniers jours');
+  expect(messages).toContain('Au plus une notification que tu n’as pas demandée par match, ce message compris, et aucune pour un match où tu as déjà ta place.');
+  expect(messages).toContain('aucune offre de bar ne part en notification');
+  expect(messages).toContain('coupe « Offres des bars » dans Réglages, ou les notifications de Baromatch dans les réglages de ton téléphone');
+  // Aujourd’hui, rien ne part encore du serveur : la page le dit toujours, juste avant.
+  await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
+  await expect(page.locator('#pourquoi + p + ul')).toContainText('T’envoyer de temps en temps un message sur un match');
+  await expect(page.locator('#pourquoi + p + ul a[href="#messages-match"]')).toHaveCount(1);
+});
+
 // Les sauvegardes : faites par nous, chiffrées, effacées une fois leurs 28 jours passés, à la sauvegarde suivante
 // (5 semaines au plus avec une sauvegarde par semaine), jamais chez Railway ; un compte supprimé y reste autant. Et chaque durée de conservation de l’appli a sa ligne dans « Combien de temps ».
 test('la page Confidentialité : les sauvegardes chiffrées, 5 semaines au plus, et une ligne par durée', async ({ page }) => {

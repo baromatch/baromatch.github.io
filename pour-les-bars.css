@@ -159,10 +159,11 @@
 @media (min-width: 1100px) { .conditions__liste { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .conditions__liste li { padding: 18px 20px; border-radius: 20px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); color: var(--texte-doux); }
 .conditions__liste strong { display: block; margin-bottom: 4px; color: var(--texte); font-size: 1.125rem; font-weight: 800; line-height: 1.25; }
-/* Les liens qui mènent ailleurs (comment on choisit les bars, l’affiche de la semaine) : neutres, soulignés. L’ambre
-   reste aux actions de la page. */
-.conditions__liste a, .marche .chapo a { color: var(--texte-doux); text-decoration: underline; text-decoration-color: rgba(247, 247, 249, 0.4); text-underline-offset: 0.2em; }
-.conditions__liste a:hover, .marche .chapo a:hover { color: var(--texte); text-decoration-color: currentColor; }
+/* Les liens dans le texte (comment on choisit les bars, le formulaire depuis les conditions, l’affiche de la semaine,
+   l’e-mail et la Confidentialité des questions) : neutres, soulignés. L’ambre reste aux boutons de la page, et aux
+   liens du bas, qui sont l’action du fan et du partenaire. */
+.conditions__liste a, .marche .chapo a, .questions a { color: var(--texte-doux); text-decoration: underline; text-decoration-color: rgba(247, 247, 249, 0.4); text-underline-offset: 0.2em; }
+.conditions__liste a:hover, .marche .chapo a:hover, .questions a:hover { color: var(--texte); text-decoration-color: currentColor; }
 
 /* ---------- Ce que tu vois des fans ---------- */
 

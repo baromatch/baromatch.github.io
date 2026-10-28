@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-zT6EBywhCMDaSWB7JeXv7HnyojqddrVt5y+u9pPfd64='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-VGvM9jjzpw5CTP/mXPRjSl90WataBinCxz3t74UdBLQ='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -119,6 +119,7 @@ main figure { position: relative; }
 .egares { display: grid; gap: 12px; padding-top: 22px; padding-bottom: 22px; border-top: 1px solid var(--trait); }
 @media (min-width: 960px) { .egares { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; } }
 .egares__ligne { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px; margin: 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.45; }
+.insecable { white-space: nowrap; }
 .egares__ligne svg { width: 20px; height: 20px; margin-top: 1px; color: var(--texte-discret); }
 
 @media (min-width: 960px) { .contact { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; } }
@@ -259,7 +260,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
         <li><i data-e=s></i>sans réservation</li>
         <li><i data-e=l></i>le reste de ta salle</li>
       </ul>
-      <figcaption class="legende">Un exemple, avec les chiffres d’une soirée de démonstration&nbsp;: 80 places dans la salle, 35 sur Baromatch, un coup d’envoi à 21:00.</figcaption>
+      <figcaption class="legende">Un exemple, avec les chiffres d’une soirée de démonstration&nbsp;: 80 places dans la salle, 35 sur Baromatch au départ, un coup d’envoi à 21:00.</figcaption>
     </figure>
   </section>
 
@@ -271,13 +272,13 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
       <li><strong>Gratuit pour tes clients.</strong> Ce qu’ils prennent au bar, ils le paient au bar. Sans l’appli, ils entrent comme d’habitude.</li>
       <li><strong>Rien sans ton accord.</strong> Sur ce site, ton bar n’apparaît qu’avec ton accord écrit.</li>
       <li><strong>Aucun bar ne paie pour passer devant un autre.</strong> Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. <a href="/comment-on-choisit-les-bars.html">Comment on choisit les bars</a></li>
-      <li><strong>Une réponse sous 48&nbsp;h.</strong> Une personne lit chaque demande.</li>
+      <li><strong>Une réponse sous 48&nbsp;h.</strong> Une personne lit chaque demande. <a href="#proposer">Propose ton bar</a></li>
     </ul>
   </section>
 
   <section class="atouts bloc page" id="ce-que-ca-change" aria-labelledby="titre-atouts">
     <h2 class="titre-section" id="titre-atouts">Ce que Baromatch fait pour ton bar</h2>
-    <p class="chapo">Sur l’appli, le fan choisit son match et voit les bars qui le diffusent. Toi, tu règles tout dans la Console (ton espace Baromatch, dans un navigateur), sur ordinateur ou sur téléphone, et ton équipe scanne à la porte avec l’appli. Ces écrans viennent de l’appli et de la Console&nbsp;; le bar, les clubs et les pseudos sont inventés.</p>
+    <p class="chapo">Sur l’appli, le fan choisit son match et voit les bars qui le diffusent. Toi, tu règles tout dans la Console (ton espace Baromatch, dans un navigateur), sur ordinateur ou sur téléphone, et ton équipe scanne à la porte avec l’appli.</p>
     <div class="atouts__grille">
       <article class="atout moment">
         <div class="moment__texte">
@@ -508,7 +509,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
             <label class="panier__etiquette" for="demande-ville">Ville</label>
             <input class="panier__champ" id="demande-ville" name="city" type="text" autocomplete="address-level2" required minlength="2" maxlength="60" aria-describedby="demande-ville-indice">
             <p class="champ__erreur" id="demande-ville-erreur" hidden></p>
-            <p class="champ__indice" id="demande-ville-indice">Baromatch commence à Paris. Ailleurs, écris-nous quand même.</p>
+            <p class="champ__indice" id="demande-ville-indice">Baromatch commence à Paris. Ailleurs, <span class="insecable">écris-nous</span> quand même.</p>
           </div>
           <div class="champ champ--large">
             <label class="panier__etiquette" for="demande-nom">Ton nom</label>
@@ -565,9 +566,9 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
   </section>
 
   <aside class="egares page" aria-label="Pour les fans, les partenaires et la presse">
-    <p class="egares__ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Tu cherches un bar pour regarder le match&nbsp;? Baromatch est en test à Paris. <a href="/#attente">Laisse ton e-mail pour être prévenu</a>.</span></p>
+    <p class="egares__ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Tu cherches un bar pour regarder le match&nbsp;? Baromatch est en test à Paris. <a href="/#attente">Laisse ton <span class="insecable">e-mail</span> pour être prévenu</a>.</span></p>
     <p class="egares__ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10v10h16V10"/><path d="M3 10l2-6h14l2 6"/><path d="M10 20v-5h4v5"/></svg><span>Ton bar préféré n’est pas sur Baromatch&nbsp;? Montre cette page au patron.</span></p>
-    <p class="egares__ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg><span>Partenaire, club, ville ou journaliste&nbsp;? <a href="mailto:contact@baromatch.fr?subject=Partenariat%20Baromatch">Écris-nous</a>, ou va sur la <a href="/presse.html">page Presse</a>.</span></p>
+    <p class="egares__ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg><span>Partenaire, club, ville ou journaliste&nbsp;? <a class="insecable" href="mailto:contact@baromatch.fr?subject=Partenariat%20ou%20presse%20%E2%80%93%20Baromatch">Écris-nous</a>, ou va sur la <a href="/presse.html">page Presse</a>.</span></p>
   </aside>
 </main>
 <footer class="pied page">

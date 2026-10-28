@@ -537,8 +537,12 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   test('« Proposer mon bar » trois fois : en haut, après ce que ça change, dans la bande ambre ; en haut, rien d’autre n’est ambre plein', async ({ page }) => {
     await page.goto(PAGE);
     await pret(page);
-    expect(await page.$$eval('main a[href="#proposer"]', (liens) => liens.map((a) => [a.closest('section').className.split(' ')[0], a.textContent.trim()])))
-      .toEqual([['ouverture-bars', 'Proposer mon bar'], ['atouts', 'Proposer mon bar'], ['bars', 'Proposer mon bar']]);
+    expect(await page.$$eval('main a[href="#proposer"]', (liens) => liens.map((a) => [a.closest('section').className.split(' ')[0], a.className, a.textContent.trim()])))
+      .toEqual([['ouverture-bars', 'capsule', 'Proposer mon bar'], ['conditions', '', 'Propose ton bar'], ['atouts', 'capsule', 'Proposer mon bar'], ['bars', 'bouton-nuit', 'Proposer mon bar']]);
+    // Après les conditions, un simple lien vers le formulaire, sans fond ni ambre : la question du prix réglée, on peut
+    // écrire sans remonter ni descendre six écrans.
+    expect(await page.locator('.conditions a[href="#proposer"]').evaluate((a) => [getComputedStyle(a).color, getComputedStyle(a).backgroundColor]))
+      .toEqual(['rgba(247, 247, 249, 0.74)', 'rgba(0, 0, 0, 0)']);
     const fonds = await page.$$eval('.ouverture-bars button, .ouverture-bars a', (cibles) => cibles.map((c) => getComputedStyle(c).backgroundColor));
     expect(fonds.filter((f) => f === 'rgb(255, 177, 61)')).toHaveLength(1);
   });
@@ -574,7 +578,10 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await expect(lignes.nth(0).locator('a')).toHaveAttribute('href', '/#attente');
     // L’e-mail des partenaires arrive avec son objet, déjà écrit ; la page Presse existe.
     expect(await lignes.nth(2).locator('a').evaluateAll((a) => a.map((l) => l.getAttribute('href'))))
-      .toEqual(['mailto:contact@baromatch.fr?subject=Partenariat%20Baromatch', '/presse.html']);
+      .toEqual(['mailto:contact@baromatch.fr?subject=Partenariat%20ou%20presse%20%E2%80%93%20Baromatch', '/presse.html']);
+    // « Écris-nous » et « e-mail » ne se coupent pas à leur trait d’union.
+    await expect(page.locator('.egares .insecable')).toHaveCount(2);
+    expect(await page.locator('.egares .insecable').evaluateAll((e) => e.map((x) => getComputedStyle(x).whiteSpace))).toEqual(['nowrap', 'nowrap']);
     expect(existsSync('presse.html')).toBe(true);
   });
 });
@@ -635,7 +642,7 @@ test.describe('le délai de réponse : sous 48 h', () => {
     await page.goto(PAGE);
     const texte = normaliser(await page.locator('main').textContent());
     expect(fois(texte, DELAI)).toBe(4);
-    await expect(page.locator('.conditions__liste li', { hasText: 'Une réponse sous 48' })).toHaveText('Une réponse sous 48 h. Une personne lit chaque demande.');
+    await expect(page.locator('.conditions__liste li', { hasText: 'Une réponse sous 48' })).toHaveText('Une réponse sous 48 h. Une personne lit chaque demande. Propose ton bar');
     expect(texte).not.toMatch(/48\s*heures|deux jours|2 jours|24 h/i);
     const balisee = normaliser(await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
       .map((s) => JSON.stringify(JSON.parse(s.textContent))).join(' ')));

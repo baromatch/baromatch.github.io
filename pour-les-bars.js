@@ -1056,8 +1056,10 @@
   var PAUSE = "M7 5h3.5v14H7zM13.5 5H17v14h-3.5z";
   var LECTURE = "M7 4.5v15l12-7.5z";
   var quota = 35;
-  // 17:00 d’abord, si la page l’a montré (son style, @media (scripting: enabled)) ; sinon 21:00, jusqu’à la lecture.
-  var a17h = !calme && Boolean(window.matchMedia && window.matchMedia("(scripting: enabled)").matches);
+  // 17:00 d’abord, si la page l’a montré (son style, @media (scripting: enabled)) et ne l’a pas déjà remplacé par
+  // 21:00 (l’amorce le fait quand ce script tarde plus de 12 s) ; sinon 21:00, jusqu’à la lecture.
+  var a17h = !calme && !figure.hasAttribute("data-vivant")
+    && Boolean(window.matchMedia && window.matchMedia("(scripting: enabled)").matches);
   var minute = a17h ? 0 : ENVOI;
   var seule = !calme;          // la soirée se joue d’elle-même, tant qu’on ne touche à rien
   var depuisLeDebut = !a17h;   // le premier « Rejouer » (ou la première lecture) repart de 17:00
@@ -1082,9 +1084,9 @@
 
   var dans = function (selecteur) { return figure.querySelector(selecteur + " .v21"); };
   var chiffres = figure.querySelectorAll(".kpi b .v21");
-  // Les mots qui suivent un chiffre, au pluriel puis au singulier (0 et 1), comme dans la Console ; null : invariable.
-  var MOTS = [null, [" arrivés avec Baromatch", " arrivé avec Baromatch"], [" encore attendus", " encore attendu"], null,
-    [" places encore en ligne", " place encore en ligne"]];
+  // Le mot qui s’accorde avec un chiffre (data-mot), au pluriel puis au singulier (0 et 1), comme dans la Console ;
+  // null : invariable. À 17:00, avant ce script, la page a déjà ses mots au singulier (les .v17).
+  var MOTS = [null, ["arrivés", "arrivé"], ["attendus", "attendu"], null, ["places", "place"]];
   var tuiles = figure.querySelectorAll(".kpi");
   var surQuota = figure.querySelectorAll(".kpi small")[1];
   var lieux = {
@@ -1116,8 +1118,8 @@
     var valeurs = [arrives + sans, arrives, pris - liberes - arrives, sans, quota - pris];
     for (var k = 0; k < chiffres.length; k += 1) {
       chiffres[k].textContent = String(valeurs[k]);
-      var mots = MOTS[k] && tuiles[k].lastChild;
-      if (mots) mots.nodeValue = MOTS[k][valeurs[k] <= 1 ? 1 : 0];
+      var mot = MOTS[k] && tuiles[k].querySelector("[data-mot]");
+      if (mot) mot.textContent = MOTS[k][valeurs[k] <= 1 ? 1 : 0];
     }
     if (surQuota) surQuota.textContent = "/" + quota;
     var recit = "";

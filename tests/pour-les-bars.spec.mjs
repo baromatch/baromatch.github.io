@@ -1187,28 +1187,35 @@ test.describe('pas de défilement de côté', () => {
 // « Ta salle, ce soir » avec le texte agrandi (WCAG 1.4.4) : les mots des chiffres ne se coupent jamais au milieu, et
 // la salle ne saute pas pendant que la soirée se joue (le récit garde la hauteur du plus long, 19:00).
 test.describe('ta salle, ce soir, au téléphone et avec le texte agrandi', () => {
-  for (const [largeur, texte] of [[320, 100], [360, 100], [320, 200], [414, 200]]) {
-    test(`à ${largeur} px, texte à ${texte} % : aucun mot des chiffres ne se coupe ; le récit garde sa hauteur de 17:00 à 21:30`, async ({ page }) => {
+  for (const [largeur, texte] of [[320, 100], [360, 100], [375, 100], [414, 100], [1280, 100], [320, 200], [414, 200]]) {
+    test(`à ${largeur} px, texte à ${texte} % : aucun mot des chiffres ne se coupe ; la salle garde sa hauteur de 17:00 à 21:30`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto(PAGE);
       await pret(page);
       await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, texte);
+      // Chaque mot affiché des tuiles, hors chiffres : une seule ligne chacun.
       const coupes = await page.$$eval('.kpi', (liste) => liste.flatMap((kpi) => {
-        const noeud = kpi.lastChild;
-        return [...noeud.nodeValue.matchAll(/\S+/g)].filter((mot) => {
+        const textes = [];
+        const parcours = document.createTreeWalker(kpi, NodeFilter.SHOW_TEXT);
+        while (parcours.nextNode()) {
+          const noeud = parcours.currentNode;
+          if (!noeud.parentElement.closest('b') && noeud.parentElement.getClientRects().length) textes.push(noeud);
+        }
+        return textes.flatMap((noeud) => [...noeud.nodeValue.matchAll(/\S+/g)].filter((mot) => {
           const morceau = document.createRange();
           morceau.setStart(noeud, mot.index);
           morceau.setEnd(noeud, mot.index + mot[0].length);
           return morceau.getClientRects().length > 1;
-        }).map((mot) => mot[0]);
+        }).map((mot) => mot[0]));
       }));
       expect(coupes, 'mots coupés').toEqual([]);
       const curseur = page.getByRole('slider', { name: 'L’heure' });
+      // Le récit et les chiffres (un mot qui passe au singulier) ne changent pas la hauteur de la salle.
       const hauteurs = [];
       for (const minute of ['0', '60', '120', '240', '270']) {
         await curseur.fill(minute);
-        hauteurs.push(await page.locator('.salle-soir__recit').evaluate((r) => Math.round(r.getBoundingClientRect().height)));
+        hauteurs.push(await page.locator('.salle-soir').evaluate((f) => Math.round(f.getBoundingClientRect().height)));
       }
       expect(new Set(hauteurs).size, hauteurs.join(' ')).toBe(1);
     });
@@ -1268,7 +1275,7 @@ test.describe('le mouvement', () => {
     curseur: '270',
   };
   // Les mots des chiffres, comme dans la Console : au singulier à 0 et 1.
-  const mots = (page) => page.$$eval('.kpi', (liste) => liste.map((k) => k.lastChild.nodeValue.trim()));
+  const mots = (page) => page.$$eval('.kpi', (liste) => liste.map((k) => k.innerText.replace(k.querySelector('b').innerText, '').replace(/\s+/g, ' ').trim()));
   const deuxImages = (page) => page.evaluate(() => new Promise((r) => { requestAnimationFrame(() => requestAnimationFrame(r)); }));
 
   test('sans réduction, la salle part de 17:00 et se joue d’elle-même jusqu’à 21:30 quand elle est à l’écran, une seule fois', async ({ page }) => {
@@ -1356,8 +1363,10 @@ test.describe('le mouvement', () => {
     await page.waitForTimeout(600);
     expect((await salle(page)).heure).toBe(arretee);
     await expect(page.locator('#salle-jouer')).toHaveAttribute('aria-label', 'Reprendre la soirée');
-    // Elle revient : la soirée reprend où elle en était, jusqu’à 21:30.
+    // Elle revient : la soirée reprend où elle en était (jamais avant), jusqu’à 21:30.
     await page.locator('.salle').scrollIntoViewIfNeeded();
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).not.toBe(arretee);
+    expect((await salle(page)).heure > arretee).toBe(true);
     await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).toBe('21:30');
     // Les places sur Baromatch, de 10 à 60 : la salle garde ses 80 places.
     const plus = page.getByRole('button', { name: '5 places en ligne de plus' });

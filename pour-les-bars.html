@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-yvbonjCT2up718d45B16jMtFSVD1tcCf7vV4EgaEsRs='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-iBqMjt2PHk3Wo9qHSlas5edKzHWYD1IakqnVV+lDSPQ='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -89,10 +89,10 @@ main figure { position: relative; }
 .salle__sol { visibility: hidden; }
 
 .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin: 6px 0 0; }
-.kpi { grid-column: span 2; padding: 10px 10px 9px; border-radius: 16px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); color: var(--texte-doux); font-size: 0.75rem; line-height: 1.2; }
+.kpi { grid-column: span 2; min-height: calc(4.4em + 23px); padding: 10px 10px 9px; border-radius: 16px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); color: var(--texte-doux); font-size: 0.75rem; line-height: 1.2; }
 .kpi:nth-child(n+4) { grid-column: span 3; }
 @media (min-width: 720px) and (max-width: 1099px) { .kpis { grid-template-columns: repeat(5, minmax(0, 1fr)); } .kpi, .kpi:nth-child(n+4) { grid-column: auto; } }
-@container (max-width: 26em) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi, .kpi:nth-child(n+4) { grid-column: auto; } }
+@container (max-width: 19em) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi, .kpi:nth-child(n+4) { grid-column: auto; } }
 @container (max-width: 16em) { .kpis { grid-template-columns: minmax(0, 1fr); } }
 .kpi b { display: block; margin-bottom: 4px; color: var(--texte); font-size: 1.5rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .kpi small { color: var(--texte-discret); font-size: 0.8125rem; font-weight: 700; }
@@ -245,10 +245,10 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
       <div class="salle" aria-hidden="true"><div class="salle__sol"><span class="salle__mur"><span class="salle__ecran">21:00</span></span><span class="salle__comptoir"></span><span class="salle__porte"></span><span class="salle__tables"><b><i data-e=a></i><i data-e=s></i><i data-e=g></i><i data-e=a></i></b><b><i data-e=l></i><i data-e=e></i><i data-e=s></i><i data-e=s></i></b><b><i data-e=s></i><i data-e=a></i><i data-e=a></i><i data-e=l></i></b><b><i data-e=a></i><i data-e=g></i><i data-e=s></i><i data-e=l></i></b><b><i data-e=g></i><i data-e=a></i><i data-e=a></i><i data-e=l></i></b><b><i data-e=s></i><i data-e=s></i><i data-e=s></i><i data-e=a></i></b><b><i data-e=a></i><i data-e=l></i><i data-e=a></i><i data-e=a></i></b><b><i data-e=s></i><i data-e=l></i><i data-e=a></i><i data-e=e></i></b><b><i data-e=l></i><i data-e=s></i><i data-e=a></i><i data-e=s></i></b><b><i data-e=l></i><i data-e=g></i><i data-e=l></i><i data-e=a></i></b><b><i data-e=l></i><i data-e=l></i><i data-e=l></i><i data-e=a></i></b><b><i data-e=a></i><i data-e=l></i><i data-e=l></i><i data-e=l></i></b><b><i data-e=l></i><i data-e=l></i><i data-e=e></i><i data-e=a></i></b><b><i data-e=s></i><i data-e=a></i><i data-e=l></i><i data-e=l></i></b><b><i data-e=g></i><i data-e=l></i><i data-e=a></i><i data-e=s></i></b><b><i data-e=l></i><i data-e=s></i><i data-e=l></i><i data-e=s></i></b><b><i data-e=l></i><i data-e=e></i><i data-e=l></i><i data-e=l></i></b><b><i data-e=e></i><i data-e=l></i><i data-e=s></i><i data-e=a></i></b><b><i data-e=a></i><i data-e=a></i><i data-e=l></i><i data-e=a></i></b><b><i data-e=g></i><i data-e=s></i><i data-e=g></i><i data-e=s></i></b></span></div></div>
       <ul class="kpis">
         <li class="kpi"><b><span class="v21">41</span><span class="v17">0</span><small>/80</small></b> dans le bar</li>
-        <li class="kpi kpi--ok"><b><span class="v21">23</span><span class="v17">0</span></b> arrivés avec Baromatch</li>
-        <li class="kpi kpi--attendus"><b><span class="v21">7</span><span class="v17">0</span></b> encore attendus</li>
+        <li class="kpi kpi--ok"><b><span class="v21">23</span><span class="v17">0</span></b> <span class="v21" data-mot>arrivés</span><span class="v17">arrivé</span> avec Baromatch</li>
+        <li class="kpi kpi--attendus"><b><span class="v21">7</span><span class="v17">0</span></b> encore <span class="v21" data-mot>attendus</span><span class="v17">attendu</span></li>
         <li class="kpi"><b><span class="v21">18</span><span class="v17">0</span></b> sans réservation</li>
-        <li class="kpi"><b><span class="v21">5</span><span class="v17">35</span><small>/35</small></b> places encore en ligne</li>
+        <li class="kpi"><b><span class="v21">5</span><span class="v17">35</span><small>/35</small></b> <span class="v21" data-mot>places</span><span class="v17">places</span> encore en ligne</li>
       </ul>
       <div class="salle-soir__commandes">
         <div class="pas" id="salle-places"><button class="pas__bouton" type="button" data-pas="-5" disabled aria-label="5 places en ligne de moins">−</button><output class="pas__valeur" id="salle-quota" aria-live="polite"><span>35</span><span class="visuellement-cache"> places sur Baromatch</span></output><button class="pas__bouton pas__bouton--plus" type="button" data-pas="5" disabled aria-label="5 places en ligne de plus">+</button><span class="pas__nom" aria-hidden="true">places sur<br>Baromatch</span></div>

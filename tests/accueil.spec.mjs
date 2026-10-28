@@ -82,8 +82,9 @@ for (const ecran of [
 
 // Plus bas dans la page, « préviens-moi » revient deux fois : après la soirée et après les questions. La même capsule
 // ambre que sur les pages des matchs, vers le formulaire du haut. Un seul appel principal : tout ce qui est en ambre
-// dans la page (hors de la bande des bars, ambre elle-même) mène à la liste d’attente ; « Deviens testeur Android » et
-// « Voir la boutique » sont en verre.
+// dans la page (hors de la bande des bars, ambre elle-même) mène à la liste d’attente ; « Deviens testeur Android » est
+// en verre. La boutique n’est plus présentée dans l’accueil : on la trouve dans le menu et le pied de page (décision du
+// propriétaire, 28 octobre).
 test('« préviens-moi » revient après la soirée et après les questions ; l’ambre ne mène qu’à la liste d’attente', async ({ page }) => {
   await page.goto('/');
   const rappels = page.locator('main .rappel-attente a.capsule');
@@ -92,11 +93,12 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   for (const lien of await rappels.all()) await expect(lien).toHaveAttribute('href', '#attente');
   expect(await page.$$eval('main .rappel-attente', (p) => p.map((e) => e.closest('section').className.split(' ')[0])))
     .toEqual(['soiree', 'questions-fans']);
-  for (const lien of ['/boutique.html', '/testeurs-android.html']) {
-    const verre = page.locator(`main a[href="${lien}"]`);
-    await expect(verre).toHaveCount(1);
-    expect(await verre.evaluate((a) => getComputedStyle(a).backgroundColor), lien).not.toBe('rgb(255, 177, 61)');
-  }
+  const testeurs = page.locator('main a[href="/testeurs-android.html"]');
+  await expect(testeurs).toHaveCount(1);
+  expect(await testeurs.evaluate((a) => getComputedStyle(a).backgroundColor)).not.toBe('rgb(255, 177, 61)');
+  await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
+  expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
+  await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(1);
   const enAmbre = await page.$$eval('main a, main button', (elements) => elements
     .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')
     .map((e) => e.getAttribute('href') ?? e.closest('form')?.id));
@@ -429,6 +431,8 @@ const INSTANTS = [
 test('la soirée en huit moments, dans l’ordre, chacun avec son écran de démonstration', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#titre-soiree')).toHaveText('Un soir de match, minute par minute.');
+  // Ce que montrent ces moments est publié dans la version de test de l’appli (le propriétaire, 28 octobre).
+  await expect(page.locator('.soiree .surtitre')).toHaveText('Dans la version de test de l’appli');
   expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('Sur ces écrans, les bars, les clubs et les pseudos sont inventés.');
   const lus = await page.locator('.instant').evaluateAll((instants) => instants.map((m) => ({
     heure: m.querySelector('.instant__heure time').textContent,

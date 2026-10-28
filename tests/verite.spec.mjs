@@ -39,10 +39,10 @@ test('avant l’ouverture, la page presse ne dit pas que des fans trouvent les b
   await expect(bars.locator('a')).toHaveAttribute('href', '/pour-les-bars.html');
 });
 
-test('le film de l’accueil dit que ses bars, ses places et ses chiffres sont inventés', async ({ page }) => {
+test('le film de l’accueil dit que ses bars, ses clubs, ses pseudos et ses chiffres sont inventés', async ({ page }) => {
   await page.goto('/');
   const note = normaliser(await page.locator('#film-note').innerText());
-  expect(note).toContain('Ses bars, ses places et ses chiffres sont inventés.');
+  expect(note).toContain('Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.');
   // La page de confiance le promet pour chaque capture de l’appli.
   await page.goto(CONFIANCE);
   expect(normaliser(await page.locator('#accord + ul').textContent())).toContain('utilisent des bars et des pseudos inventés, et le disent');

@@ -366,6 +366,6 @@ test('les liens vers « Ce soir » : depuis l’accueil, la semaine et chaque pa
   const villes = site.pages.filter((x) => x.type === 'ville');
   expect(villes.length).toBeGreaterThan(3);
   for (const ville of villes) expect(ville.contenu, ville.chemin).toContain(lien);
-  // L’accueil : sous « Comment ça va marcher », un lien seul (le fichier existe : tests/liens.spec.mjs le suit).
+  // L’accueil : sous « Un soir de match, minute par minute », un lien seul (le fichier existe : tests/liens.spec.mjs le suit).
   expect(readFileSync(path.join(racine, 'index.html'), 'utf8')).toContain('<p class="soiree__suite"><a href="/ce-soir/">Où regarder le match ce soir</a></p>');
 });

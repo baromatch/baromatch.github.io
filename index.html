@@ -7,7 +7,7 @@
      liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même) ; l’empreinte du style du
      noscript. Une retouche d’un script ou d’un style en ligne change son empreinte :
      tests/politique-de-securite.spec.mjs donne la nouvelle. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-sdE1IA7xkRAGohjqCy/Z+CUnLnFuMm9NC71+35yRanQ='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-0DwpcQg4aC7mjUIi/hLvMveB6nun9m4SkQ1RsQWj8T8='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
 <meta name="google-site-verification" content="nBxxD8vbrngLKD1Te1fRcbC8tGC2-gwezW9NG9urIaw" />
 <!-- Bing Webmaster Tools : remplace la ligne suivante par la balise de vérification que Bing donne (elle commence par <meta name="msvalidate.01"). -->
 <!-- BING_SITE_VERIFICATION -->
@@ -21,9 +21,9 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
-<!-- Sans JavaScript, main.js ne choisit ni l’affiche ni la version du film : le lecteur de secours (dans #film-cadre) prend
-     la place du film et le bouton du son, qui ne marcherait pas, disparaît. -->
-<noscript><style>#film, .film__son { display: none; }</style></noscript>
+<!-- Sans JavaScript, le lecteur de secours (dans #film-cadre, avec ses commandes) prend la place du film, que main.js
+     lance et arrête ; les écrans de « Un soir de match » se montrent sans attendre main.js. -->
+<noscript><style>#film { display: none; } .soiree:not(.est-proche) .instant__ecran img { display: block; }</style></noscript>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
@@ -109,73 +109,128 @@
         <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
       </form>
     </div>
-  </section>
-
-  <section class="film page" aria-labelledby="titre-film">
-    <h2 class="titre-section" id="titre-film">Baromatch en 30 secondes</h2>
-    <div class="film__cadre" id="film-cadre">
-      <video class="film__video" id="film" playsinline muted loop preload="none"
-        data-paysage="/baromatch-film-16x9.mp4" data-portrait="/baromatch-film-9x16.mp4"
-        data-affiche-paysage="/baromatch-film-16x9.webp" data-affiche-portrait="/baromatch-film-9x16.webp"
-        aria-label="Le film de présentation de Baromatch" aria-describedby="film-note">
-        <source src="/baromatch-film-16x9.mp4" type="video/mp4">
-      </video>
-      <noscript><video class="film__video" controls playsinline preload="none" poster="/baromatch-film-16x9.webp" aria-label="Le film de présentation de Baromatch" aria-describedby="film-note"><source src="/baromatch-film-16x9.mp4" type="video/mp4"></video></noscript>
-      <div class="film__commandes" id="film-commandes">
-        <button class="film__bouton" id="film-lecture" type="button" hidden>Pause</button>
-        <button class="film__bouton film__son" id="film-son" type="button">Mettre le son</button>
+    <!-- Le film n’a pas de son : sa version en mots, « Ce que montre le film », dit ce qu’il montre à l’écran, lu sur
+         ses images, et rien d’autre (WCAG 1.2.1). Chaque lecteur cite la note qui le dit. -->
+    <figure class="film">
+      <div class="film__cadre" id="film-cadre">
+        <video class="film__video" id="film" width="540" height="960" playsinline muted loop preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video>
+        <noscript><video class="film__video" width="540" height="960" controls playsinline preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video></noscript>
+        <button class="film__bouton" id="film-lecture" type="button" hidden aria-label="Mettre le film en pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
       </div>
-    </div>
-    <!-- Le film a une bande-son : au niveau AA (WCAG 1.2.5), il se présente comme l’alternative en images du texte qui
-         suit, et chaque lecteur cite cette phrase. Le texte dit ce que le film montre à l’écran, mot pour mot, lu sur ses
-         images (1.2.3) : rien d’autre. -->
-    <p class="film__note" id="film-note">Ce film reprend en images le texte «&nbsp;Ce que montre le film&nbsp;», juste dessous. Ses bars, ses places et ses chiffres sont inventés.</p>
-    <details class="film__texte" id="film-texte">
-      <summary>Ce que montre le film</summary>
-      <ol>
-        <li>Une goutte tombe et remplit le verre de Baromatch. «&nbsp;Ce soir, y a match.&nbsp;» Paris – Marseille, 21:00.</li>
-        <li>«&nbsp;Tu le regardes où&nbsp;?&nbsp;» L’écran «&nbsp;Ce soir&nbsp;» de l’appli, lundi 5 octobre, Paris 11e&nbsp;: le match du soir, Paris – Marseille à 21:00, «&nbsp;14 bars le passent près de toi&nbsp;». Dessous, «&nbsp;Ça se remplit&nbsp;», en direct des bars&nbsp;: Le Onze, La Lucarne, Chez Momo et Chez Gégé, avec leur quartier, leur distance et leurs places.</li>
-        <li>«&nbsp;Les bars qui passent ton match. Juste à côté.&nbsp;» Une carte du quartier, un verre sur chaque bar, et «&nbsp;La Lucarne · 12 places&nbsp;».</li>
-        <li>L’écran «&nbsp;Ta place à La Lucarne&nbsp;», «&nbsp;Paris – Marseille · lundi 21:00 · gratuit&nbsp;». «&nbsp;Vous êtes combien&nbsp;?&nbsp;» 4. «&nbsp;Tu arrives vers&nbsp;» 20:30. «&nbsp;Maintiens.&nbsp;» «&nbsp;Ça se remplit.&nbsp;» Le bouton «&nbsp;Maintiens pour réserver&nbsp;» est tenu appuyé et se remplit&nbsp;: «&nbsp;Tiens appuyé, le verre se remplit.&nbsp;»</li>
-        <li>L’ambre remplit l’écran&nbsp;: «&nbsp;C’est à toi.&nbsp;»</li>
-        <li>«&nbsp;Ta place est gardée.&nbsp;» «&nbsp;La Lucarne · 21:00 · 4 personnes&nbsp;». Le pass n°&nbsp;0412&nbsp;: Paris – Marseille, 21:00, bar La Lucarne, arrivée vers 20:30, 4 personnes, un QR code et le code 482 913, «&nbsp;Montre-le en arrivant au bar.&nbsp;»</li>
-        <li>Le QR code du pass est scanné. «&nbsp;Tu y es.&nbsp;»</li>
-        <li>«&nbsp;La soirée, tu la gardes.&nbsp;» Le sous-bock du match, Paris – Marseille&nbsp;: «&nbsp;Sous-bock n°08 · La Lucarne · lundi 5 octobre&nbsp;».</li>
-        <li>Baromatch. «&nbsp;Ton match, ton bar.&nbsp;» «&nbsp;Bientôt sur Android et iPhone · baromatch.fr&nbsp;»</li>
-      </ol>
-    </details>
-    <p class="rappel-attente"><a class="capsule" href="#attente">L’appli ouvre bientôt&nbsp;: préviens-moi</a></p>
+      <figcaption class="film__legende">
+        <p class="film__note" id="film-note">Un film sans le son, raconté en mots juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
+        <details class="film__texte" id="film-texte">
+          <summary>Ce que montre le film</summary>
+          <ol>
+            <li>Un quartier, la nuit, vu d’en haut&nbsp;: des bars s’allument, chacun avec son verre. «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;» Il est 18:42.</li>
+            <li>«&nbsp;Écrans de démonstration&nbsp;». «&nbsp;La Lucarne Lunaire.&nbsp;» L’écran pour garder sa place&nbsp;: «&nbsp;Tu arrives vers&nbsp;» 20:00, 20:30 ou 21:00, et 20:30 est choisi. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» «&nbsp;Au comptoir, tu es @Zephyr&nbsp;». Le bouton «&nbsp;Maintiens pour réserver&nbsp;», et dessous&nbsp;: «&nbsp;Tiens appuyé, le verre se remplit. Lâche avant la fin, rien n’est réservé.&nbsp;» Plus bas, «&nbsp;Réserver sans maintenir&nbsp;».</li>
+            <li>«&nbsp;Maintiens.&nbsp;» Le bouton est tenu appuyé et se remplit d’ambre. «&nbsp;Le verre se remplit.&nbsp;»</li>
+            <li>L’ambre remplit l’écran&nbsp;: «&nbsp;Place gardée.&nbsp;»</li>
+            <li>L’écran «&nbsp;Ta soirée&nbsp;»&nbsp;: «&nbsp;Ce soir · coup d’envoi 21:00&nbsp;», «&nbsp;Place gardée&nbsp;». Alvène – Orvèle, 21:00, au bar La Lucarne Lunaire, pour 1 personne, ton camp&nbsp;: juste le match. Le QR code du pass, et «&nbsp;Ou donne ce code&nbsp;».</li>
+            <li>20:37. «&nbsp;Scanne le QR du bar&nbsp;», La Lucarne Lunaire · Alvène – Orvèle. Sur l’écran du bar&nbsp;: «&nbsp;Tu y es. Scanne-moi.&nbsp;» «&nbsp;Ouvre Baromatch, scanne ce code&nbsp;: ta place est validée et ton sous-bock se colle dans ton album.&nbsp;» Dessous, «&nbsp;ou entre son code&nbsp;».</li>
+            <li>«&nbsp;Tu y es&nbsp;»&nbsp;: «&nbsp;Arrivée validée à 20:37 à La Lucarne Lunaire. Coup d’envoi dans 23 minutes.&nbsp;» «&nbsp;arrivée · deux vibrations&nbsp;», puis «&nbsp;Sous-bock n°08 collé&nbsp;».</li>
+            <li>20:38. «&nbsp;Ta soirée se colle dans ton album.&nbsp;» Le sous-bock n°08, Alvène – Orvèle, à La Lucarne Lunaire, se pose parmi les autres&nbsp;: Alvène – Orvèle, Port-Ambrail – Brisecôte, Hautvergne – Mirebelle, Sablerive – Kerbrume, Lucival – Valbrume. L’album passe de 7 à 8 sous-bocks, et de 4 à 5 bars.</li>
+            <li>21:00. Le sous-bock rejoint le verre de Baromatch, qui se remplit. Puis Baromatch&nbsp;: «&nbsp;Ton match. Ton bar. Ce soir.&nbsp;» «&nbsp;baromatch.fr&nbsp;» «&nbsp;Bientôt sur Android, à Paris&nbsp;»</li>
+          </ol>
+        </details>
+      </figcaption>
+    </figure>
   </section>
 
   <section class="soiree page" aria-labelledby="titre-soiree">
-    <h2 class="titre-section" id="titre-soiree">Comment ça va marcher</h2>
-    <ol class="etapes">
-      <li class="etape">
-        <svg class="etape__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="j1-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="j1-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="j1-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#j1-bol)"><path d="M20 137.5 q22.5 -4 45 0 t45 0 t45 0 t45 0 V200 H20 Z" fill="url(#j1-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#j1-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/></svg>
-        <h3 class="etape__titre">Choisis ton match</h3>
-        <p class="etape__texte">Les matchs à venir, avec l’heure du coup d’envoi.</p>
-      </li>
-      <li class="etape">
-        <svg class="etape__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="j2-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="j2-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="j2-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#j2-bol)"><path d="M20 118.8 q22.5 -4 45 0 t45 0 t45 0 t45 0 V200 H20 Z" fill="url(#j2-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#j2-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/></svg>
-        <h3 class="etape__titre">Trouve ton bar</h3>
-        <p class="etape__texte">Les bars qui le diffusent près de chez toi, et les places qui leur restent.</p>
-      </li>
-      <li class="etape">
-        <svg class="etape__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="j3-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="j3-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="j3-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#j3-bol)"><path d="M20 100.0 q22.5 -4 45 0 t45 0 t45 0 t45 0 V200 H20 Z" fill="url(#j3-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#j3-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/></svg>
-        <h3 class="etape__titre">Garde ta place</h3>
-        <p class="etape__texte">Pour toi seul ou pour toute la bande, gratuitement, avant de partir.</p>
-      </li>
-      <li class="etape">
-        <svg class="etape__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="j4-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="j4-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="j4-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#j4-bol)"><path d="M20 81.2 q22.5 -4 45 0 t45 0 t45 0 t45 0 V200 H20 Z" fill="url(#j4-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#j4-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/></svg>
-        <h3 class="etape__titre">Arrive et montre ton pass</h3>
-        <p class="etape__texte">À l’entrée, l’équipe du bar scanne ton pass, ou tu scannes le QR du bar&nbsp;: le bar sait que tu es là.</p>
-      </li>
-      <li class="etape">
-        <svg class="etape__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="j5-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="j5-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="j5-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#j5-bol)"><path d="M20 62.5 q22.5 -4 45 0 t45 0 t45 0 t45 0 V200 H20 Z" fill="url(#j5-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#j5-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/></svg>
-        <h3 class="etape__titre">Garde la soirée</h3>
-        <p class="etape__texte">Chaque soirée validée devient un sous-bock, le souvenir du match, du bar et de la date, dans ton album.</p>
-      </li>
-    </ol>
+    <p class="surtitre">Ce que fait l’appli aujourd’hui</p>
+    <h2 class="titre-section" id="titre-soiree">Un soir de match, minute par minute.</h2>
+    <p class="soiree__chapo">Sur ces écrans, les bars, les clubs et les pseudos sont inventés.</p>
+    <!-- Sur ordinateur, les écrans restent à côté du texte, l’un sur l’autre : main.js montre celui du moment qui passe au
+         milieu de la fenêtre. Au téléphone, chaque écran suit son moment. -->
+    <div class="instants">
+      <div class="instant est-actif">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>18:42</time></p>
+          <h3 class="instant__titre">Le match de ce soir, en premier</h3>
+          <p class="instant__texte">Tu ouvres l’appli&nbsp;: le match de ce soir, et les bars qui le passent. «&nbsp;Près de toi&nbsp;» montre les plus proches qui ont encore de la place, avec le temps à pied. Ta position reste sur ton téléphone.</p>
+        </div>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ce-soir-300.webp" srcset="/img/appli/ce-soir-300.webp 300w, /img/appli/ce-soir-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="L’écran Ce soir de l’appli&nbsp;: Alvène – Orvèle à 21:00, en Coupe des Faubourgs, puis Près de toi&nbsp;: La Lucarne Lunaire à 6 min à pied, encore 7 places, et Le Onze Étoilé à 9 min, encore 12 places."></div></div>
+        </figure>
+      </div>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>18:50</time></p>
+          <h3 class="instant__titre">Bar complet&nbsp;? <span class="insecable">Mets-toi</span> sur la liste</h3>
+          <p class="instant__texte">Si une place se libère avant le coup d’envoi, le premier de la liste la voit dans l’appli. Elle n’est pas mise de côté&nbsp;: il faut la prendre vite.</p>
+        </div>
+        <figure class="instant__ecran instant__ecran--large"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/liste-attente-300.webp" srcset="/img/appli/liste-attente-300.webp 300w, /img/appli/liste-attente-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="La page d’un bar complet, Chez Zénon&nbsp;: une place s’est libérée pour Alvène – Orvèle, et le bouton «&nbsp;Prendre ma place&nbsp;»."></div></div>
+        </figure>
+      </div>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:05</time></p>
+          <h3 class="instant__titre">La carte cherche pour toi</h3>
+          <p class="instant__texte">Tape un club, un bar, un quartier ou une adresse. Filtre les bars&nbsp;: de la place, un grand écran, le son du match, une terrasse, un accès PMR.</p>
+        </div>
+        <figure class="instant__ecran instant__ecran--large"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/carte-recherche-300.webp" srcset="/img/appli/carte-recherche-300.webp 300w, /img/appli/carte-recherche-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="La recherche de l’appli, avec «&nbsp;11e&nbsp;»&nbsp;: des bars du 11e, comme La Lucarne Lunaire rue des Crampons, à 6 min à pied, encore 7 places, puis le quartier et des adresses."></div></div>
+        </figure>
+      </div>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:12</time></p>
+          <h3 class="instant__titre">Garde ta place d’un geste</h3>
+          <p class="instant__texte">Maintiens le bouton&nbsp;: le verre se remplit, la place est à toi. C’est gratuit. Lâche avant la fin&nbsp;: rien n’est réservé.</p>
+          <div class="essai" id="essai" hidden>
+            <button class="essai__bouton" id="essai-bouton" type="button"><span class="essai__verre" aria-hidden="true"><span class="essai__liquide"></span></span><span id="essai-mot">Maintiens pour essayer</span></button>
+            <p class="essai__note" id="essai-note" role="status">Ici, c’est un essai.</p>
+          </div>
+        </div>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/bar-300.webp" srcset="/img/appli/bar-300.webp 300w, /img/appli/bar-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="La page d’un bar dans l’appli&nbsp;: La Lucarne Lunaire, 14 rue des Crampons, à 6 min à pied. Coin des supporters d’Orvèle, grand écran, 5 écrans, son du match, debout, les deux camps. 4 places prises, et le bouton «&nbsp;Prendre ma place&nbsp;»."></div></div>
+        </figure>
+      </div>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:13</time></p>
+          <h3 class="instant__titre">Ton pass, même sans réseau</h3>
+          <p class="instant__texte">Ta place t’attend dans «&nbsp;Ta soirée&nbsp;»&nbsp;: un QR code et un code à 6 chiffres, qui s’affichent même sans réseau. «&nbsp;Y aller&nbsp;» ouvre le bar dans ton appli de cartes.</p>
+        </div>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ta-soiree-300.webp" srcset="/img/appli/ta-soiree-300.webp 300w, /img/appli/ta-soiree-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="Ta soirée dans l’appli&nbsp;: Alvène – Orvèle à 21:00, à La Lucarne Lunaire, pour 1 personne, le QR code du pass et son code, et le bouton «&nbsp;Y aller · 6 min à pied&nbsp;»."></div></div>
+        </figure>
+      </div>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:20</time></p>
+          <h3 class="instant__titre">Toute la bande à la même table</h3>
+          <p class="instant__texte">Garde des places pour ta bande, jusqu’à 8, toi compris, et envoie-leur le lien de ta tablée. Ceux qui la rejoignent dans l’appli ont chacun leur pass. Tu peux aussi partager ta soirée en story.</p>
+        </div>
+        <figure class="instant__ecran instant__ecran--large"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/tablee-300.webp" srcset="/img/appli/tablee-300.webp 300w, /img/appli/tablee-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="Ta tablée, sous ton pass&nbsp;: 2 places prises sur 4, toi et plume.r, et 2 libres. «&nbsp;Envoie le lien à ta bande avant 21:00.&nbsp;» Les boutons «&nbsp;Inviter des potes&nbsp;» et «&nbsp;Copier le lien&nbsp;»."></div></div>
+        </figure>
+      </div>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>20:25</time></p>
+          <h3 class="instant__titre">«&nbsp;Je suis en retard&nbsp;»</h3>
+          <p class="instant__texte">Le métro traîne&nbsp;? Préviens le bar&nbsp;: 10, 20 ou 30 minutes. Avant d’envoyer, tu vois jusqu’à quelle heure ta place t’attend.</p>
+        </div>
+        <figure class="instant__ecran instant__ecran--large"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/en-retard-300.webp" srcset="/img/appli/en-retard-300.webp 300w, /img/appli/en-retard-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="Ta soirée, «&nbsp;Tu arrives dans combien de temps&nbsp;?&nbsp;»&nbsp;: 10, 20 ou 30 min. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» Le bouton «&nbsp;Prévenir le bar&nbsp;»."></div></div>
+        </figure>
+      </div>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>20:37</time></p>
+          <h3 class="instant__titre">Tu y es</h3>
+          <p class="instant__texte">Au bar, scanne son QR code ou montre ton pass à l’équipe. Deux vibrations&nbsp;: c’est validé. Ta soirée devient un sous-bock aux noms des deux clubs, collé dans ton album.</p>
+        </div>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
+          <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/tu-y-es-300.webp" srcset="/img/appli/tu-y-es-300.webp 300w, /img/appli/tu-y-es-600.webp 600w" sizes="(min-width: 960px) 292px, 192px" width="300" height="649" loading="lazy" decoding="async" alt="Tu y es&nbsp;: arrivée validée à 20:37 à La Lucarne Lunaire, coup d’envoi dans 23 minutes. Sous-bock n°08 collé."></div></div>
+        </figure>
+      </div>
+    </div>
+    <p class="soiree__notifs">Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass. Pour le reste, au plus une notification par match.</p>
+    <p class="rappel-attente"><a class="capsule" href="#attente">L’appli ouvre bientôt&nbsp;: préviens-moi</a></p>
     <p class="soiree__suite"><a href="/ce-soir/">Où regarder le match ce soir</a></p>
   </section>
 
@@ -183,7 +238,7 @@
     <div class="bars__contenu page">
       <div>
         <h2 class="titre-section" id="titre-bars">Ton bar diffuse les matchs&nbsp;?</h2>
-        <p class="bars__texte">Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres.</p>
+        <p class="bars__texte">Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres. Gratuit pendant le lancement, sans engagement.</p>
         <div class="bars__actions">
           <a class="bouton-nuit" href="/pour-les-bars.html#proposer">Proposer mon bar</a>
           <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>
@@ -202,15 +257,16 @@
       <div><dt>Pour qui</dt><dd>Les fans de foot de 18&nbsp;ans et plus, et les bars qui diffusent les matchs.</dd></div>
       <div><dt>Qui</dt><dd>Baromatch est édité par Skander Kamoun, son fondateur.</dd></div>
       <div><dt>Contact</dt><dd><a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a></dd></div>
+      <div><dt>Presse</dt><dd><a href="/presse.html">Logos, film, images et contact</a></dd></div>
     </dl>
     <p class="en-bref__suite"><a href="/trouver-un-bar-qui-diffuse-le-match.html">Comment trouver un bar qui diffuse le match</a></p>
   </section>
 
   <section class="testeurs-accueil vitrine-accueil page" aria-labelledby="titre-testeurs">
-    <p class="boutique-sur">Testeurs Android</p>
+    <p class="surtitre">Testeurs Android</p>
     <h2 class="titre-section" id="titre-testeurs">Teste Baromatch avant son ouverture.</h2>
     <p class="testeurs-accueil__texte">Tu as 18&nbsp;ans ou plus, un téléphone Android et un compte Google&nbsp;? Inscris-toi au test fermé de l’appli sur Google Play&nbsp;: tu restes inscrit au moins 14&nbsp;jours d’affilée, tu t’en sers, et tu nous dis ce que tu en penses. Rien n’est payé.</p>
-    <a class="vitrine-accueil__bouton" href="/testeurs-android.html">Deviens testeur Android</a>
+    <a class="vitrine-accueil__bouton vitrine-accueil__bouton--verre" href="/testeurs-android.html">Deviens testeur Android</a>
   </section>
 
   <section class="questions-fans page" id="questions" aria-labelledby="titre-questions-fans">
@@ -251,7 +307,7 @@
   </section>
 
   <section class="vitrine-accueil page" aria-labelledby="titre-boutique">
-    <p class="boutique-sur">Nouveau</p>
+    <p class="surtitre">Nouveau</p>
     <h2 class="titre-section" id="titre-boutique">La boutique arrive.</h2>
     <p class="vitrine-accueil__texte">T-shirt, sweat, casquette, écharpe, tote bag et sous-bocks&nbsp;: des pièces Baromatch pour les soirs de match, sans aucun club dessus. Choisis les tiennes dès maintenant&nbsp;: on t’écrit à l’ouverture, sans rien payer.</p>
     <a class="vitrine-accueil__bouton vitrine-accueil__bouton--verre" href="/boutique.html">Voir la boutique</a>

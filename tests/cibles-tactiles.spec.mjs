@@ -1,6 +1,7 @@
 // Les cibles tactiles (WCAG 2.2, 2.5.8) : chaque lien, bouton et question dépliable se touche sur 24 × 24 px au
 // moins, sauf un lien pris dans une phrase (l’exception « en ligne »). Les liens qui ne sont pas dans une phrase (pied
-// de page, e-mail de la bande des bars, « Retirer » de la sélection) visent 44 px de haut, notre minimum.
+// de page, e-mail de la bande des bars, « Retirer » de la sélection) visent 44 px de haut, notre minimum, comme le
+// curseur de l’heure de « Ta salle, ce soir » sur « Pour les bars ».
 // Chaque page est mesurée finie : sur « Pour les bars », le formulaire et sa feuille arrivent après le premier écran.
 import { test, expect } from '@playwright/test';
 import { PAGES } from './outils/pages.mjs';
@@ -9,10 +10,10 @@ import { couperLAPI, simulerLInvitation } from './outils/invitation.mjs';
 
 const MINIMUM = 24;
 const VISE = 44;
-const LIENS_SEULS = ['.pied__liens a', '.bars__actions a', '.panier__retirer', '.tablee__plan', '.tablee__ouvrir-lien', '.attente__corriger', '.panier__corriger'];
+const LIENS_SEULS = ['.pied__liens a', '.bars__actions a', '.panier__retirer', '.tablee__plan', '.tablee__ouvrir-lien', '.attente__corriger', '.panier__corriger', 'input[type="range"]'];
 
 // Chaque cible visible, sa taille, et si c’est un lien pris dans une phrase (son parent dit plus que lui).
-const lireLesCibles = (onglet) => onglet.evaluate((seuls) => [...document.querySelectorAll('a[href], button, summary')]
+const lireLesCibles = (onglet) => onglet.evaluate((seuls) => [...document.querySelectorAll('a[href], button, summary, input[type="range"]')]
   .filter((e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden'
     && !e.closest('.lien-evitement, .attente__piege, .formulaire__piege'))
   .map((e) => {

@@ -9,7 +9,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { MARQUE } from './outils/marque.mjs';
 import { PIED } from './outils/pied.mjs';
-import { ralentirLaPremiereImage } from './outils/attente.mjs';
+import { ralentirLaPolice } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 import { estPermis } from '../generateur/etat.mjs';
 import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
@@ -33,13 +33,13 @@ const EMPREINTE = `'sha256-${createHash('sha256').update(PREMIER_ECRAN).digest('
 // La politique de la page (la balise de la tête renvoie ici), règle par règle :
 // - script-src 'self' : aucun script en ligne (d’où pour-les-bars-amorce.js) ;
 // - style-src : l’empreinte du style de la tête (EMPREINTE, au-dessus : un style retouché, et ce test donne la nouvelle) ;
-// - img-src data: : les sources vides des captures cachées à une largeur ;
+// - img-src 'self' : les écrans de démonstration, sur le site ; aucune image d’ailleurs, aucune source data: ;
 // - connect-src : 'self' (Lighthouse y lit /robots.txt) et l’API, seul hôte à qui la page écrit (ADRESSE de
 //   pour-les-bars.js), pour la seule demande d’un bar ;
 // - form-action 'none' : seul le script envoie le formulaire ; base-uri et object-src : rien.
 // Quand marque.json active la mesure d’audience, la page charge aussi /mesure.js, et connect-src admet son compte.
 const MESURE = mesureDuSite();
-const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self' data:; font-src 'self'; `
+const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; style-src 'self' ${EMPREINTE}; img-src 'self'; font-src 'self'; `
   + "connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'", MESURE);
 
 // Les conditions des premiers bars, mot pour mot comme le fondateur les a écrites (26 octobre 2026) : en entier en tête
@@ -166,7 +166,9 @@ test.describe('ce que la page dit', () => {
     expect(existsSync(IMAGE_OG.slice(1)), IMAGE_OG).toBe(true);
   });
 
-  test('les sections dans l’ordre : ouverture, atouts, comment ça marche, heure par heure, ce que tu vois, badge, questions, formulaire', async ({ page }) => {
+  // Après la relecture « trois visiteurs » (28 octobre 2026) : les conditions d’abord, puis ce que ça change, comment
+  // démarrer, ce que tu vois des fans, les questions et le formulaire. La soirée se raconte une fois, dans la salle.
+  test('les sections dans l’ordre : ouverture (ta salle, ce soir), les conditions, ce que ça change, pour démarrer, ce que tu vois, questions, formulaire', async ({ page }) => {
     await page.goto(PAGE);
     const sections = await page.$$eval('main > section', (liste) => liste.map((s) => ({
       id: s.id,
@@ -174,18 +176,19 @@ test.describe('ce que la page dit', () => {
     })));
     const ATTENDUES = [
       'Les soirs de match, ton bar sur Baromatch.',
+      'Les conditions',
       'Ce que Baromatch fait pour ton bar',
-      'Comment ça marche',
-      'Ton soir de match, heure par heure',
+      'Pour démarrer',
       'Ce que tu vois des fans. Et ce que tu ne vois jamais.',
-      'Partager mon badge',
       'Les questions des bars',
       'Propose ton bar',
     ];
     expect(sections.map((s) => s.titre).filter((t) => ATTENDUES.includes(t))).toEqual(ATTENDUES);
-    expect(sections.find((s) => s.titre === 'Comment ça marche').id).toBe('comment');
+    expect(sections.find((s) => s.titre === 'Pour démarrer').id).toBe('comment');
+    expect(sections.find((s) => s.titre === 'Ce que Baromatch fait pour ton bar').id).toBe('ce-que-ca-change');
+    // La soirée n’est plus racontée une deuxième fois heure par heure.
+    await expect(page.locator('.horaire')).toHaveCount(0);
     expect(sections.find((s) => s.titre === 'Propose ton bar').id).toBe('proposer');
-    expect(sections.find((s) => s.titre === 'Partager mon badge').id).toBe('badge');
     await expect(page.locator('main > section').first().locator('h1')).toHaveCount(1);
   });
 
@@ -340,7 +343,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     // ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__etat');
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
-    await expect(etat).toHaveText('Où on en est : Baromatch n’est pas encore ouvert au public, les fans ne réservent pas encore. En test sur Android, à Paris ; pas d’appli iPhone pour l’instant.');
+    await expect(etat).toHaveText('Où on en est : Baromatch est en test sur Android, à Paris (pas encore sur iPhone). Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
     // Sous le bouton, les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du
     // gratuit des clients.
     const bouton = ouverture.locator('.actions .capsule[href="#proposer"]');
@@ -358,7 +361,8 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const fan = ouverture.locator('a[href="/#attente"]');
     await expect(fan).toHaveCount(1);
     await expect(fan).toBeInViewport({ ratio: 1 });
-    await expect(fan).toHaveAccessibleName('Tu es fan ? Par ici pour être prévenu du lancement');
+    // Il dit ce qu’on trouve en le suivant : laisser son e-mail.
+    await expect(fan).toHaveAccessibleName('Fan ? Laisse ton e-mail pour être prévenu du lancement');
     expect((await fan.boundingBox()).y + 24).toBeLessThan((await page.locator('h1').boundingBox()).y + 1);
     // Et l’ancienne pastille « Premiers bars à Paris », qui se lisait comme « il y a déjà des bars », est partie.
     await expect(ouverture).not.toContainText('Premiers bars à Paris');
@@ -407,13 +411,14 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     });
   }
 
-  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte, à l’étape 3 et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console', async ({ page }) => {
+  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console', async ({ page }) => {
     await page.goto(PAGE);
     const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });
-    await expect(carte).toContainText('c’est l’appli Baromatch, sur Android seulement pour l’instant');
-    await expect(carte).toContainText('la Console (ton espace Baromatch, dans un navigateur) valide aussi un pass');
+    await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte. Il marche sur Android pour l’instant');
+    await expect(carte).toContainText('sans Android, la page Scan de la Console valide aussi un pass, depuis un navigateur.');
+    // L’étape 3 renvoie à la réponse pour l’installation, sans répéter le détail.
     const etape = page.locator('.marche__etape').nth(2);
-    await expect(etape).toContainText('Pour l’instant, l’appli de la porte n’existe que sur Android : sans téléphone Android, la page Scan de la Console valide aussi un pass, depuis un navigateur.');
+    await expect(etape).toContainText('On t’explique comment installer l’appli de la porte.');
     const besoin = (await questions(page)).find((q) => q.question === 'De quoi j’ai besoin ?');
     expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone Android : pour l’instant, elle n’existe que sur Android\./);
     expect(besoin.reponse).toContain('On t’explique comment installer l’appli quand on te répond.');
@@ -507,10 +512,9 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(apres('Console')).toContain('Console (ton espace Baromatch');
     expect(apres('pass ', 50)).toContain('pass du fan (un QR code sur son téléphone)');
     expect(texte.slice(texte.indexOf('Mode bar') - 12, texte.indexOf('Mode bar') + 40)).toContain('c’est le Mode bar, l’écran de la porte');
-    await expect(page.locator('.horaire__titre')).toContainText(['Les places gardées sont libérées']);
     // Une place sans arrivée validée est libérée : un fan dans la salle mais jamais scanné compte absent.
-    await expect(page.locator('.horaire__moment', { hasText: 'Les places gardées sont libérées' }).locator('.horaire__texte'))
-      .toHaveText('Si l’arrivée du fan n’est pas validée, sa place est libérée et comptée absente. Cette heure, c’est toi qui la choisis.');
+    await expect(page.locator('.moment__liste li', { hasText: 'À l’heure que tu choisis' }))
+      .toHaveText('À l’heure que tu choisis, une place dont l’arrivée n’est pas validée est libérée et comptée absente.');
     expect(texte).not.toMatch(/tombent/);
     // Mot pour mot : la position n’est pas envoyée avec l’arrivée (l’appli s’en sert sur le téléphone).
     await expect(page.locator('.regard__liste li', { hasText: 'Sa position' })).toHaveText('Sa position : elle n’est pas envoyée avec son arrivée.');
@@ -519,26 +523,40 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   test('« Proposer mon bar » revient à la fin de « Ce que Baromatch fait pour ton bar »', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto(PAGE);
+    // La mise en page sous le premier écran : avec sa feuille (pret), sinon elle change entre les deux mesures.
+    await pret(page);
     const bouton = page.locator('.atouts > .actions .capsule[href="#proposer"]');
     await expect(bouton).toHaveText('Proposer mon bar');
     const fin = await page.locator('.atouts__grille').boundingBox();
     expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
   });
 
-  test('« Proposer mon bar » revient à la fin de « Ton soir de match, heure par heure »', async ({ page }) => {
-    await page.setViewportSize({ width: 360, height: 800 });
+  // Un seul bouton principal, « Proposer mon bar », trois fois, pas plus (la relecture « trois visiteurs » : quatre, c’est
+  // de la pression) : en haut, après ce que ça change, dans la bande ambre. Puis le formulaire. Le « + » des places de la
+  // salle n’est pas ambre : en haut de la page, seul le bouton l’est.
+  test('« Proposer mon bar » trois fois : en haut, après ce que ça change, dans la bande ambre ; en haut, rien d’autre n’est ambre plein', async ({ page }) => {
     await page.goto(PAGE);
-    const bouton = page.locator('.horaire > .actions .capsule[href="#proposer"]');
-    await expect(bouton).toHaveText('Proposer mon bar');
-    const fin = await page.locator('.horaire__historique').boundingBox();
-    expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
+    await pret(page);
+    expect(await page.$$eval('main a[href="#proposer"]', (liens) => liens.map((a) => [a.closest('section').className.split(' ')[0], a.className, a.textContent.trim()])))
+      .toEqual([['ouverture-bars', 'capsule', 'Proposer mon bar'], ['conditions', '', 'Propose ton bar'], ['atouts', 'capsule', 'Proposer mon bar'], ['bars', 'bouton-nuit', 'Proposer mon bar']]);
+    // Après les conditions, un simple lien vers le formulaire, sans fond ni ambre : la question du prix réglée, on peut
+    // écrire sans remonter ni descendre six écrans.
+    expect(await page.locator('.conditions a[href="#proposer"]').evaluate((a) => [getComputedStyle(a).color, getComputedStyle(a).backgroundColor]))
+      .toEqual(['rgba(247, 247, 249, 0.74)', 'rgba(0, 0, 0, 0)']);
+    const fonds = await page.$$eval('.ouverture-bars button, .ouverture-bars a', (cibles) => cibles.map((c) => getComputedStyle(c).backgroundColor));
+    expect(fonds.filter((f) => f === 'rgb(255, 177, 61)')).toHaveLength(1);
   });
 
-  test('avant le formulaire, ce qui est vrai sur ce site : l’accord écrit du bar, et aucun bar qui paie pour passer devant', async ({ page }) => {
+  test('dans les conditions, ce qui est vrai sur ce site : l’accord écrit du bar, et aucun bar qui paie pour passer devant ; le formulaire commence juste sous son délai', async ({ page }) => {
     await page.goto(PAGE);
-    const accord = page.locator('#proposer .contact__intro .contact__suite + .chapo');
-    await expect(accord).toHaveText('Sur ce site, ton bar n’apparaît qu’avec ton accord écrit, et aucun bar ne paie pour passer devant un autre. Comment on choisit les bars.');
-    await expect(accord.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
+    await expect(page.locator('.conditions__liste li', { hasText: 'Rien sans ton accord' }))
+      .toHaveText('Rien sans ton accord. Sur ce site, ton bar n’apparaît qu’avec ton accord écrit.');
+    const ordre = page.locator('.conditions__liste li', { hasText: 'Aucun bar ne paie' });
+    await expect(ordre).toHaveText('Aucun bar ne paie pour passer devant un autre. Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Comment on choisit les bars');
+    await expect(ordre.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
+    // Au-dessus du formulaire, rien qui le répète ou qui en éloigne : son titre et son délai.
+    expect(await page.$$eval('#proposer .contact__intro > *', (e) => e.map((x) => x.tagName.toLowerCase()))).toEqual(['h2', 'p']);
+    await expect(page.locator('#proposer .contact__intro a')).toHaveCount(0);
     // Les deux faits sont ceux de la page qui explique le choix des bars, avec la même limite, « sur ce site » : la page
     // des bars ne promet rien de plus, et rien sur l’ordre des bars dans l’appli.
     const choix = readFileSync('comment-on-choisit-les-bars.html', 'utf8');
@@ -546,12 +564,25 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(choix).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Aucun bar ne paie pour passer devant un autre.');
   });
 
-  test('les deux lignes pour les fans passent sous le formulaire, en fin de page', async ({ page }) => {
+  test('sous le formulaire, en fin de page : une ligne pour le fan, une pour le patron qu’il connaît, une pour les partenaires et la presse', async ({ page }) => {
     await page.goto(PAGE);
     const ordre = await page.$$eval('main > *', (enfants) => enfants.map((e) => e.className.split(' ')[0]));
     expect(ordre.at(-1)).toBe('egares');
     expect(ordre.indexOf('contact')).toBe(ordre.length - 2);
-    await expect(page.locator('.egares')).toContainText('Montre cette page au patron.');
+    const lignes = page.locator('.egares__ligne');
+    await expect(lignes).toHaveText([
+      'Tu cherches un bar pour regarder le match ? Baromatch est en test à Paris. Laisse ton e-mail pour être prévenu.',
+      'Ton bar préféré n’est pas sur Baromatch ? Montre cette page au patron.',
+      'Partenaire, club, ville ou journaliste ? Écris-nous, ou va sur la page Presse.',
+    ]);
+    await expect(lignes.nth(0).locator('a')).toHaveAttribute('href', '/#attente');
+    // L’e-mail des partenaires arrive avec son objet, déjà écrit ; la page Presse existe.
+    expect(await lignes.nth(2).locator('a').evaluateAll((a) => a.map((l) => l.getAttribute('href'))))
+      .toEqual(['mailto:contact@baromatch.fr?subject=Partenariat%20ou%20presse%20%E2%80%93%20Baromatch', '/presse.html']);
+    // « Écris-nous » et « e-mail » ne se coupent pas à leur trait d’union.
+    await expect(page.locator('.egares .insecable')).toHaveCount(2);
+    expect(await page.locator('.egares .insecable').evaluateAll((e) => e.map((x) => getComputedStyle(x).whiteSpace))).toEqual(['nowrap', 'nowrap']);
+    expect(existsSync('presse.html')).toBe(true);
   });
 });
 
@@ -606,10 +637,12 @@ test.describe('le délai de réponse : sous 48 h', () => {
     // axe lit « C’est envoyé. » et ses liens dans tests/pour-les-bars-formulaire.spec.mjs, à 360 et 1280 px.
   });
 
-  test('un seul délai, dit trois fois avec les mêmes mots ; la FAQ balisée le dit aussi', async ({ page }) => {
+  // Dans les conditions, avant le formulaire, dans « Comment je démarre » et dans « C’est envoyé. ».
+  test('un seul délai, dit quatre fois avec les mêmes mots ; la FAQ balisée le dit aussi', async ({ page }) => {
     await page.goto(PAGE);
     const texte = normaliser(await page.locator('main').textContent());
-    expect(fois(texte, DELAI)).toBe(3);
+    expect(fois(texte, DELAI)).toBe(4);
+    await expect(page.locator('.conditions__liste li', { hasText: 'Une réponse sous 48' })).toHaveText('Une réponse sous 48 h. Une personne lit chaque demande. Propose ton bar');
     expect(texte).not.toMatch(/48\s*heures|deux jours|2 jours|24 h/i);
     const balisee = normaliser(await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
       .map((s) => JSON.stringify(JSON.parse(s.textContent))).join(' ')));
@@ -680,9 +713,10 @@ test.describe('les images', () => {
       expect([...new Set(demandees)].filter((chemin) => chemin.startsWith('/img/') && !montrees.has(chemin))).toEqual([]);
     });
 
-    // L’étiquette « Exemple » est posée sur la capture elle-même, dans son coin du haut : on la
-    // voit en même temps que les chiffres, pas 13 px sous l’image. La légende dit le reste.
-    test(`à ${largeur} px : chaque capture porte son étiquette « Exemple » dans son coin, a sa légende, et l’écran de la porte se dit maquette`, async ({ page }) => {
+    // L’étiquette « Écran de démonstration » est posée sur le bord haut du cadre de l’écran, dans son coin : on la
+    // voit avec l’écran, sans rien cacher de lui. La légende dit le reste (un bar, des clubs, des pseudos inventés).
+    // Ce sont les vrais écrans de l’appli et de la Console : aucune légende ne dit « maquette ».
+    test(`à ${largeur} px : chaque écran porte son étiquette « Écran de démonstration » dans son coin, a sa légende, et aucun ne se dit maquette`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto(PAGE);
       await pret(page);
@@ -701,16 +735,16 @@ test.describe('les images', () => {
           surLaCapture: Boolean(e && c) && e.right > c.left && e.left < c.right && e.bottom > c.top && e.top < c.bottom,
           dansLeCoin: Boolean(e && c) && e.top >= c.top - 16 && e.top <= c.top + 24 && e.left <= c.left + 40,
           legende: affiche(legende) ? legende.innerText : '',
-          porte: image.getAttribute('src').includes('porte-cest-bon'),
+          alt: image.getAttribute('alt'),
         };
       }));
       expect(figures.length).toBeGreaterThan(3);
       for (const figure of figures) {
-        expect(figure.exemple, `${figure.src} : étiquette « Exemple »`).toEqual(['Exemple']);
+        expect(figure.exemple, `${figure.src} : étiquette « Écran de démonstration »`).toEqual(['Écran de démonstration']);
         expect(figure.surLaCapture, `${figure.src} : l’étiquette est sur la capture`).toBe(true);
         expect(figure.dansLeCoin, `${figure.src} : l’étiquette est dans le coin du haut`).toBe(true);
         expect(figure.legende.length, `${figure.src} : légende`).toBeGreaterThan(20);
-        if (figure.porte) expect(figure.legende, `${figure.src} : la porte est une maquette`).toMatch(/maquette/);
+        expect(`${figure.legende} ${figure.alt}`, `${figure.src} : un vrai écran`).not.toMatch(/maquette/i);
       }
     });
   }
@@ -780,8 +814,11 @@ test.describe('ce que la page charge', () => {
 // a ses règles dans la page ; pour-les-bars.css et le script du formulaire attendent qu’il soit affiché
 // (pour-les-bars-amorce.js). Lighthouse mobile : 93–97 quand ils partaient avec le reste, 98–99 depuis.
 test.describe('le premier écran d’abord', () => {
-  // La part de chaque boîte qui est à l’écran (un conteneur peut grandir sous l’écran sans que rien ne bouge).
+  // La part de chaque boîte qui est à l’écran (un conteneur peut grandir sous l’écran sans que rien ne bouge). La scène
+  // de la salle (.salle, aria-hidden) compte par sa boîte, posée dès le premier affichage ; ce qu’elle contient est
+  // caché jusqu’à pour-les-bars.css, qui le dessine dedans sans rien pousser.
   const boitesALEcran = (page) => page.evaluate(() => [...document.querySelectorAll('body *')]
+    .filter((e) => !e.parentElement.closest('.salle'))
     .map((e) => [e, e.getBoundingClientRect()])
     .filter(([, b]) => b.width > 0 && b.height > 0 && b.top < window.innerHeight && b.bottom > 0)
     .map(([e, b]) => {
@@ -852,7 +889,7 @@ test.describe('le premier écran d’abord', () => {
   // sur 4G lente (environ 2,95 s avant comme après) : gardé parce qu’une feuille bloquée ne retient plus le formulaire.
   test('après le premier affichage, pour-les-bars.css et le script partent ensemble ; le formulaire s’affiche sans attendre la feuille, avec le bord de ses champs', async ({ page }) => {
     await suivreLeFormulaire(page);
-    const imageArrivee = await ralentirLaPremiereImage(page);
+    const policeArrivee = await ralentirLaPolice(page);
     const lacher = await retenir(page, '**/pour-les-bars.css');
     await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
     await formulaireAffiche(page);
@@ -866,7 +903,7 @@ test.describe('le premier écran d’abord', () => {
     expect(await page.evaluate(() => [...document.styleSheets].some((f) => f.href?.endsWith('/pour-les-bars.css')))).toBe(false);
     expect(await page.locator('#demande-bar').evaluate((c) => getComputedStyle(c).borderTopColor)).toBe('rgba(255, 255, 255, 0.34)');
     lacher();
-    await imageArrivee();
+    await policeArrivee();
   });
 
   test('arrivé sur une ancre (#proposer, depuis une affiche), la feuille et le script partent sans attendre le premier affichage, ensemble', async ({ page }) => {
@@ -934,7 +971,7 @@ test.describe('le premier écran d’abord', () => {
 
   test('l’amorce garde la place du formulaire par un attribut data-attente que le style de la page rend invisible, jamais par un style écrit', async ({ page }) => {
     // Le script retenu pendant que la page charge encore : on n’attend que le HTML lu, puis la demande du script.
-    const imageArrivee = await ralentirLaPremiereImage(page);
+    const policeArrivee = await ralentirLaPolice(page);
     const lacher = await retenir(page, '**/pour-les-bars.js');
     const demande = page.waitForRequest('**/pour-les-bars.js');
     await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
@@ -947,11 +984,15 @@ test.describe('le premier écran d’abord', () => {
     await formulaireAffiche(page);
     await expect(formulaire).not.toHaveAttribute('data-attente');
     await expect(formulaire).not.toHaveAttribute('style');
-    await imageArrivee();
+    await policeArrivee();
   });
 
   test('pour-les-bars.js toujours pas là au bout de 12 s : la place est rendue au chemin e-mail ; arrivé ensuite, il affiche le formulaire et efface le secours', async ({ page }) => {
-    await page.clock.install();
+    // L’horloge installée avance aussi d’elle-même, au rythme réel : sur une machine chargée, une seconde passée entre
+    // le chargement et la première avance suffisait à montrer le secours avant la 12e seconde. Elle reste donc
+    // arrêtée, et seuls les runFor la font avancer ; elle repart avant que le script n’arrive.
+    await page.clock.install({ time: new Date('2026-10-27T20:00:00+01:00') });
+    await page.clock.pauseAt(new Date('2026-10-27T20:00:01+01:00'));
     const lacher = await retenir(page, '**/pour-les-bars.js');
     const demande = page.waitForRequest('**/pour-les-bars.js');
     await page.goto(`${PAGE}#proposer`, { waitUntil: 'domcontentloaded' });
@@ -961,6 +1002,7 @@ test.describe('le premier écran d’abord', () => {
     await page.clock.runFor(1_000);
     await expect(page.locator('#demande-secours')).toBeVisible();
     await expect(page.locator('#demande')).toBeHidden();
+    await page.clock.resume();
     lacher();
     await pret(page);
     await expect(page.locator('#demande-secours')).toBeHidden();
@@ -1021,10 +1063,13 @@ test.describe('le premier écran d’abord', () => {
       await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
       const avant = await boitesALEcran(page);
       expect(avant.length).toBeGreaterThan(20);
+      const scene = () => page.locator('.salle__sol').evaluate((sol) => getComputedStyle(sol).visibility);
+      expect(await scene()).toBe('hidden');
       lacher();
       await pret(page);
       await page.evaluate(() => window.scrollTo(0, 0));
       expect(await boitesALEcran(page)).toEqual(avant);
+      expect(await scene()).toBe('visible');
     });
   }
 
@@ -1110,7 +1155,7 @@ test.describe('sans JavaScript', () => {
     // Ce qu’un robot doit lire est dans le HTML, sans script.
     await expect(page.locator('.atout')).toHaveCount(5);
     await expect(page.locator('.marche__etape')).toHaveCount(3);
-    await expect(page.locator('.horaire__moment')).toHaveCount(5);
+    await expect(page.locator('.conditions__liste li')).toHaveCount(6);
     await expect(page.locator('.questions details')).toHaveCount(13);
     await expect(page.locator('.formulaire__ailleurs a[href="mailto:contact@baromatch.fr"]')).toBeVisible();
   });
@@ -1167,6 +1212,44 @@ test.describe('pas de défilement de côté', () => {
   }
 });
 
+// « Ta salle, ce soir » avec le texte agrandi (WCAG 1.4.4) : les mots des chiffres ne se coupent jamais au milieu, et
+// la salle ne saute pas pendant que la soirée se joue (le récit garde la hauteur du plus long, 19:00).
+test.describe('ta salle, ce soir, au téléphone et avec le texte agrandi', () => {
+  for (const [largeur, texte] of [[320, 100], [360, 100], [375, 100], [414, 100], [1280, 100], [320, 200], [414, 200]]) {
+    test(`à ${largeur} px, texte à ${texte} % : aucun mot des chiffres ne se coupe ; la salle garde sa hauteur de 17:00 à 21:30`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto(PAGE);
+      await pret(page);
+      await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, texte);
+      // Chaque mot affiché des tuiles, hors chiffres : une seule ligne chacun.
+      const coupes = await page.$$eval('.kpi', (liste) => liste.flatMap((kpi) => {
+        const textes = [];
+        const parcours = document.createTreeWalker(kpi, NodeFilter.SHOW_TEXT);
+        while (parcours.nextNode()) {
+          const noeud = parcours.currentNode;
+          if (!noeud.parentElement.closest('b') && noeud.parentElement.getClientRects().length) textes.push(noeud);
+        }
+        return textes.flatMap((noeud) => [...noeud.nodeValue.matchAll(/\S+/g)].filter((mot) => {
+          const morceau = document.createRange();
+          morceau.setStart(noeud, mot.index);
+          morceau.setEnd(noeud, mot.index + mot[0].length);
+          return morceau.getClientRects().length > 1;
+        }).map((mot) => mot[0]));
+      }));
+      expect(coupes, 'mots coupés').toEqual([]);
+      const curseur = page.getByRole('slider', { name: 'L’heure' });
+      // Le récit et les chiffres (un mot qui passe au singulier) ne changent pas la hauteur de la salle.
+      const hauteurs = [];
+      for (const minute of ['0', '60', '120', '240', '270']) {
+        await curseur.fill(minute);
+        hauteurs.push(await page.locator('.salle-soir').evaluate((f) => Math.round(f.getBoundingClientRect().height)));
+      }
+      expect(new Set(hauteurs).size, hauteurs.join(' ')).toBe(1);
+    });
+  }
+});
+
 test.describe('le mouvement', () => {
   const enCours = (page) => page.evaluate(() => document.getAnimations()
     .filter((animation) => animation.playState === 'running')
@@ -1187,32 +1270,174 @@ test.describe('le mouvement', () => {
     expect(await enCours(page)).toEqual([]);
   });
 
-  // Les verres de « heure par heure » : vides tant qu’on ne les a pas vus, ils se remplissent à leur niveau la
-  // première fois que la liste arrive à l’écran (800 ms, 60 ms d’écart de l’un à l’autre), puis ne bougent plus.
-  const niveaux = (page) => page.$$eval('.horaire__niveau', (liste) => liste.map((g) => getComputedStyle(g).transform));
+  // Ta salle, ce soir : ce qu’elle montre (l’heure, le récit, les cinq chiffres, l’état des 80 sièges, le curseur).
+  const salle = (page) => page.evaluate(() => {
+    const figure = document.querySelector('.salle-soir');
+    const lire = (e) => e.innerText.replace(/\s+/g, ' ').trim();
+    const etats = {};
+    figure.querySelectorAll('.salle__tables i').forEach((i) => { etats[i.dataset.e] = (etats[i.dataset.e] ?? 0) + 1; });
+    return {
+      heure: lire(figure.querySelector('.salle-soir__heure')),
+      recit: lire(figure.querySelector('.salle-soir__recit')),
+      chiffres: [...figure.querySelectorAll('.kpi b')].map(lire),
+      etats,
+      curseur: figure.querySelector('#salle-curseur').value,
+    };
+  });
+  // À 21:00, les chiffres de la page Ce soir de la Console de démonstration.
+  const A_21_H = {
+    heure: '21:00',
+    recit: '21:00 · Coup d’envoi. Tu sais qui est là, et qui est encore attendu.',
+    chiffres: ['41/80', '23', '7', '18', '5/35'],
+    etats: { a: 23, g: 7, e: 5, s: 18, l: 27 },
+    curseur: '240',
+  };
+  // À 21:30 : 3 des 7 fans attendus sont arrivés, et les 4 autres places gardées sont libérées, comptées absentes,
+  // pas remises en ligne. Plus personne ne réserve depuis le coup d’envoi, mais comme la Console, la salle compte
+  // toujours les 5 places en ligne pas prises.
+  const A_21_H_30 = {
+    heure: '21:30',
+    recit: '21:30 · Les places gardées sont libérées : une arrivée pas validée compte absente.',
+    chiffres: ['44/80', '26', '0', '18', '5/35'],
+    etats: { a: 26, e: 5, s: 18, l: 31 },
+    curseur: '270',
+  };
+  // Les mots des chiffres, comme dans la Console : au singulier à 0 et 1.
+  const mots = (page) => page.$$eval('.kpi', (liste) => liste.map((k) => k.innerText.replace(k.querySelector('b').innerText, '').replace(/\s+/g, ' ').trim()));
+  const deuxImages = (page) => page.evaluate(() => new Promise((r) => { requestAnimationFrame(() => requestAnimationFrame(r)); }));
 
-  test('sans réduction, les verres de la soirée se remplissent la première fois qu’on les voit', async ({ page }) => {
+  test('sans réduction, la salle part de 17:00 et se joue d’elle-même jusqu’à 21:30 quand elle est à l’écran, une seule fois', async ({ page }) => {
+    // Chaque heure affichée, dans l’ordre, depuis que le script a la main.
+    await page.addInitScript(() => {
+      window.heures = [];
+      new MutationObserver(() => {
+        const heure = document.querySelector('.salle-soir[data-vivant] .salle-soir__heure .v21')?.textContent;
+        if (heure && heure !== window.heures.at(-1)) window.heures.push(heure);
+      }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['data-vivant'] });
+    });
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(PAGE);
     await pret(page);
-    const avant = await niveaux(page);
-    expect(avant).toHaveLength(5);
-    expect(avant.filter((t) => t === 'none')).toEqual([]);
-    await page.locator('.horaire__liste').scrollIntoViewIfNeeded();
-    await expect(page.locator('.horaire__liste')).toHaveClass(/\bhoraire__liste--versee\b/);
-    // La transition se lit dans le style calculé, qui ne dépend pas du moment où on le lit (une animation en cours,
-    // elle, peut déjà être finie).
-    const transitions = await page.$$eval('.horaire__niveau', (liste) => liste.map((g) => {
-      const style = getComputedStyle(g);
-      return [style.transitionProperty, style.transitionDuration, style.transitionDelay];
-    }));
-    expect(transitions).toEqual(['0s', '0.06s', '0.12s', '0.18s', '0.24s'].map((delai) => ['transform', '0.8s', delai]));
-    // Puis chaque verre finit à son niveau : on attend la fin des transitions, sans minuterie à deviner.
-    await page.$$eval('.horaire__niveau', (liste) => Promise.all(liste.flatMap((g) => g.getAnimations().map((a) => a.finished))));
-    expect(await niveaux(page)).toEqual(Array(5).fill('none'));
-    // Une seule fois : remonter et redescendre ne les vide pas.
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 15_000 }).toBe('21:30');
+    expect(await salle(page)).toEqual(A_21_H_30);
+    expect(await mots(page)).toEqual(['dans le bar', 'arrivés avec Baromatch', 'encore attendu', 'sans réservation', 'places encore en ligne']);
+    const heures = await page.evaluate(() => window.heures);
+    expect(heures[0]).toBe('17:00');
+    expect(heures.length, heures.join(' ')).toBeGreaterThan(10);
+    expect([...heures].sort()).toEqual(heures);
+    await expect(page.locator('#salle-jouer')).toHaveAttribute('aria-label', 'Rejouer la soirée');
+    // Une seule fois : la salle sort de l’écran, y revient, et reste à 21:30.
+    await page.locator('#proposer').scrollIntoViewIfNeeded();
+    await deuxImages(page);
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.locator('.horaire__liste').scrollIntoViewIfNeeded();
-    expect(await niveaux(page)).toEqual(Array(5).fill('none'));
+    await deuxImages(page);
+    await page.waitForTimeout(400);
+    expect((await salle(page)).heure).toBe('21:30');
+  });
+
+  test('la soirée qui se joue a son bouton pause ; les places sur Baromatch et l’heure se règlent, et alors elle ne se joue plus d’elle-même', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(PAGE);
+    await pret(page);
+    const jouer = page.locator('#salle-jouer');
+    await expect(jouer).toHaveAttribute('aria-label', 'Mettre la soirée en pause');
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).not.toBe('17:00');
+    await jouer.click();
+    await expect(jouer).toHaveAttribute('aria-label', 'Reprendre la soirée');
+    const arretee = (await salle(page)).heure;
+    await page.waitForTimeout(600);
+    expect((await salle(page)).heure).toBe(arretee);
+    // Les places sur Baromatch, de 5 en 5 : la salle et les chiffres suivent.
+    // Lu avec son nom : « 40 places sur Baromatch ».
+    const quota = page.locator('#salle-quota');
+    await page.getByRole('button', { name: '5 places en ligne de plus' }).click();
+    await expect(quota).toHaveText('40 places sur Baromatch');
+    expect((await salle(page)).chiffres[4]).toMatch(/\/40$/);
+    await page.getByRole('button', { name: '5 places en ligne de moins' }).click();
+    await expect(quota).toHaveText('35 places sur Baromatch');
+    // L’heure, au curseur : il se lit en heure, pas en minutes.
+    const curseur = page.getByRole('slider', { name: 'L’heure' });
+    await curseur.fill('120');
+    expect(await salle(page)).toMatchObject({ heure: '19:00', curseur: '120' });
+    await expect(curseur).toHaveAttribute('aria-valuetext', '19:00');
+    expect((await salle(page)).recit).toMatch(/^19:00 · La porte valide les arrivées d’un scan\./);
+    await curseur.fill('240');
+    expect(await salle(page)).toEqual(A_21_H);
+    // On y a touché : sortir de l’écran et revenir ne relance rien.
+    await page.locator('#proposer').scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(400);
+    expect((await salle(page)).heure).toBe('21:00');
+    await jouer.click();
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 15_000 }).toBe('21:30');
+    expect(await salle(page)).toEqual(A_21_H_30);
+  });
+
+  test('au téléphone, la soirée attend que la scène soit à l’écran, s’arrête quand elle en sort, reprend quand elle revient ; les places vont de 10 à 60', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(PAGE);
+    await pret(page);
+    await expect(page.locator('.salle-soir')).toHaveAttribute('data-vivant', '');
+    // La scène est sous le premier écran : rien ne se joue.
+    await page.waitForTimeout(600);
+    expect((await salle(page)).heure).toBe('17:00');
+    await page.locator('.salle').scrollIntoViewIfNeeded();
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).not.toBe('17:00');
+    // Elle sort de l’écran au milieu de la soirée : l’heure s’arrête.
+    await page.locator('#proposer').scrollIntoViewIfNeeded();
+    await deuxImages(page);
+    const arretee = (await salle(page)).heure;
+    expect(arretee).not.toBe('21:30');
+    await page.waitForTimeout(600);
+    expect((await salle(page)).heure).toBe(arretee);
+    await expect(page.locator('#salle-jouer')).toHaveAttribute('aria-label', 'Reprendre la soirée');
+    // Elle revient : la soirée reprend où elle en était (jamais avant), jusqu’à 21:30.
+    await page.locator('.salle').scrollIntoViewIfNeeded();
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).not.toBe(arretee);
+    expect((await salle(page)).heure > arretee).toBe(true);
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).toBe('21:30');
+    // Les places sur Baromatch, de 10 à 60 : la salle garde ses 80 places.
+    const plus = page.getByRole('button', { name: '5 places en ligne de plus' });
+    const moins = page.getByRole('button', { name: '5 places en ligne de moins' });
+    for (let i = 0; i < 8; i += 1) await plus.click();
+    await expect(page.locator('#salle-quota')).toHaveText('60 places sur Baromatch');
+    expect(Object.values((await salle(page)).etats).reduce((a, b) => a + b, 0)).toBe(80);
+    for (let i = 0; i < 14; i += 1) await moins.click();
+    await expect(page.locator('#salle-quota')).toHaveText('10 places sur Baromatch');
+    expect(Object.values((await salle(page)).etats).reduce((a, b) => a + b, 0)).toBe(80);
+    // 10 places : 1 encore en ligne, au singulier.
+    expect((await salle(page)).chiffres[4]).toBe('1/10');
+    expect((await mots(page))[4]).toBe('place encore en ligne');
+  });
+
+  test('en mouvement réduit, et sans JavaScript, la salle est à 21:00 d’emblée ; sans mouvement, « Rejouer » avance d’un moment à l’autre, d’un coup', async ({ browser, baseURL }) => {
+    for (const options of [{ reducedMotion: 'reduce' }, { javaScriptEnabled: false }]) {
+      const contexte = await browser.newContext({ baseURL, ...options });
+      const page = await contexte.newPage();
+      await page.goto(PAGE);
+      if (options.javaScriptEnabled === false) {
+        expect(await salle(page), JSON.stringify(options)).toEqual(A_21_H);
+        // Sans script, les boutons sont là, inactifs : rien ne les branche.
+        await expect(page.locator('.salle-soir__commandes button:not([disabled]), #salle-curseur:not([disabled])')).toHaveCount(0);
+        await contexte.close();
+        continue;
+      }
+      await pret(page);
+      expect(await salle(page), JSON.stringify(options)).toEqual(A_21_H);
+      await expect(page.locator('.salle-soir__commandes [disabled]')).toHaveCount(0);
+      // La scène et la lumière arrivent sans mouvement.
+      expect(await page.locator('.salle').evaluate((salle) => getComputedStyle(salle).animationName)).toBe('none');
+      expect(await page.locator('.lumiere').evaluate((l) => getComputedStyle(l, '::before').animationName)).toBe('none');
+      // Les places changées d’abord : « Rejouer » repart quand même de 17:00, et le dit.
+      await page.getByRole('button', { name: '5 places en ligne de plus' }).click();
+      await page.getByRole('button', { name: '5 places en ligne de moins' }).click();
+      await expect(page.locator('#salle-jouer')).toHaveAttribute('aria-label', 'Rejouer la soirée');
+      await page.locator('#salle-jouer').click();
+      expect((await salle(page)).heure).toBe('17:00');
+      await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).toBe('21:30');
+      expect(await salle(page)).toEqual(A_21_H_30);
+      await contexte.close();
+    }
   });
 
   test('les capsules de la page s’enfoncent sous le doigt (0,96), pas pendant l’envoi, et pas en mouvement réduit', async ({ page }) => {
@@ -1247,38 +1472,26 @@ test.describe('le mouvement', () => {
     }
   });
 
-  test('en mouvement réduit, et sans JavaScript, les verres de la soirée sont à leur niveau d’emblée', async ({ browser, baseURL }) => {
-    for (const options of [{ reducedMotion: 'reduce' }, { javaScriptEnabled: false }]) {
-      const contexte = await browser.newContext({ baseURL, ...options });
-      const page = await contexte.newPage();
-      await page.goto(PAGE);
-      expect(await niveaux(page), JSON.stringify(options)).toEqual(Array(5).fill('none'));
-      await contexte.close();
-    }
-  });
-
-  // WCAG 2.2.2 : la vague du verre de 21:00 s’arrête d’elle-même avant 5 s, sur l’image du verre immobile (une longueur
-  // d’onde entière, 140 px).
-  test('la vague du verre de 21:00 s’arrête d’elle-même avant 5 s, sur l’image du verre immobile', async ({ page }) => {
+  // WCAG 2.2.2 : rien ne bouge de lui-même plus de 5 s. Les animations de la page finissent avant 5 s ; la soirée qui
+  // se joue (8 s) a son bouton pause, à côté d’elle ; la lumière ne bouge qu’avec le défilement.
+  test('aucune animation de la page ne dure plus de 5 s d’elle-même', async ({ page }) => {
     await page.goto(PAGE);
-    const vagues = await page.evaluate(() => document.getAnimations().filter((a) => a.animationName === 'bm-vague').map((a) => {
-      const temps = a.effect.getComputedTiming();
-      const images = a.effect.getKeyframes();
-      return { fin: temps.endTime, iterations: temps.iterations, derniere: images[images.length - 1].transform };
-    }));
-    expect(vagues).toHaveLength(1);
-    expect(Number.isFinite(vagues[0].iterations), 'un nombre fixe de passages').toBe(true);
-    expect(vagues[0].fin).toBeLessThanOrEqual(5000);
-    expect(vagues[0].derniere).toBe('translateX(-140px)');
-    await page.evaluate(() => document.getAnimations().forEach((a) => { if (a.animationName === 'bm-vague') a.finish(); }));
-    expect(await page.locator('.horaire .bm-vague').evaluate((v) => getComputedStyle(v).transform)).toBe('none');
+    await pret(page);
+    const durees = await page.evaluate(() => document.getAnimations().map((a) => [a.animationName ?? a.transitionProperty, a.effect.getComputedTiming().endTime]));
+    expect(durees.filter(([, fin]) => !(fin <= 5000))).toEqual([]);
   });
 
-  test('sans réduction, le téléphone de la porte se pose, le verre de 21:00 ondule et un petit verre se remplit pendant l’envoi', async ({ page }) => {
+  test('sans réduction, la scène de la salle et la lumière arrivent en douceur, et un petit verre se remplit pendant l’envoi', async ({ page }) => {
     await simulerServeur(page, 'silence');
     await page.clock.install();
     await page.goto(PAGE);
-    expect(await enCours(page)).toEqual(expect.arrayContaining(['pb-poser', 'bm-vague']));
+    await pret(page);
+    expect(await page.locator('.salle').evaluate((salle) => getComputedStyle(salle).animationName)).toBe('pb-salle');
+    // Le relief reste : le sol garde sa 3D (une opacité en cours l’aplatirait) et son mur se dresse.
+    expect(await page.locator('.salle__sol').evaluate((sol) => [getComputedStyle(sol).transformStyle, getComputedStyle(sol).opacity, getComputedStyle(sol).animationName]))
+      .toEqual(['preserve-3d', '1', 'none']);
+    expect(await page.locator('.lumiere').evaluate((l) => [getComputedStyle(l, '::before').animationName, getComputedStyle(l, '::after').animationName]))
+      .toEqual(['pb-allumer', 'pb-allumer']);
     await envoyerUneDemande(page);
     await expect(page.locator('#demande-envoyer')).toHaveAttribute('aria-disabled', 'true');
     expect(await enCours(page)).toContain('pb-monter');

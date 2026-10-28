@@ -1,18 +1,14 @@
 /* Baromatch — liste d’attente
-   L’adresse d’envoi est l’attribut action du formulaire de index.html (Formspree). S’il est vide ou garde
-   TON-ID-FORMSPREE, le bouton ouvre un mail vers contact@baromatch.fr.
+   L’adresse d’envoi est l’attribut action du formulaire (Formspree) ; vide ou TON-ID-FORMSPREE : un mail à
+   contact@baromatch.fr.
 
-   Après l’inscription, l’adresse reste dans le champ et le message la rappelle : une faute se voit. « Corriger
-   l’adresse » (ou taper dans le champ) rouvre l’envoi ; la nouvelle inscription porte aussi l’adresse qu’elle
-   remplace (champ « remplace »), comme une autre ville choisie après l’inscription. Ce champ informe seulement le
-   propriétaire : rien n’est remplacé ni effacé sur sa seule foi (n’importe qui peut l’écrire en envoyant au
-   formulaire), une suppression passe par contact@baromatch.fr.
+   Après l’inscription, l’adresse reste dans le champ et le message la rappelle. « Corriger l’adresse » (ou taper dans
+   le champ) rouvre l’envoi ; la nouvelle inscription porte l’adresse qu’elle remplace (champ « remplace »), qui
+   informe seulement le propriétaire : rien n’est effacé sur sa foi, une suppression passe par contact@baromatch.fr.
 
-   L’issue d’un envoi se décide en un seul endroit (transmettre) : inscrite, adresse refusée par Formspree, ou panne
-   (réseau, pas de réponse en 10 s, tout autre refus). Chaque échec laisse une issue : écrire à contact@baromatch.fr.
-   (Le même texte et la même règle sont dans boutique.js : ses tests et ceux-ci vérifient les deux pages.)
-
-   La ville (Paris, Lyon, Marseille, Lille ou Autre) part avec l’adresse ; le message d’inscription la reprend. */
+   L’issue d’un envoi se décide dans transmettre : inscrite, adresse refusée, ou panne (réseau, 10 s sans réponse, tout
+   autre refus) ; chaque échec laisse écrire à contact@baromatch.fr (même règle dans boutique.js). La ville part avec
+   l’adresse, et le message la reprend. */
 
 (function () {
   var form = document.getElementById("attente");
@@ -196,42 +192,40 @@
   });
 })();
 
-/* Le film : la version portrait sur téléphone, paysage ailleurs ; lecture muette en boucle, le son au choix.
-   La page ne nomme aucune affiche et ne précharge pas le film (preload="none") : on choisit ici l’affiche
-   de l’écran, la seule téléchargée, et le film ne se charge qu’en arrivant à l’écran.
-   Il part seul : « Pause », juste avant le son, l’arrête (WCAG 2.2.2), et la pause tient, le film ne repart pas en
-   revenant à l’écran. Chaque bouton dit ce qu’il fera (« Pause » / « Lire », « Mettre le son » / « Couper le son »),
-   sans état « enfoncé » qui contredirait son nom (4.1.2). En mouvement réduit, ou si le navigateur refuse la lecture
-   automatique, le lecteur classique remplace les deux boutons. */
+/* Un lien vers la liste d’attente, plus bas dans l’accueil : en arrivant, le champ de l’adresse a le focus. */
+document.addEventListener("click", function (evenement) {
+  // Un clic qui ouvre un autre onglet (Ctrl, Cmd, Maj…) laisse le focus où il est.
+  if (evenement.defaultPrevented || evenement.button || evenement.ctrlKey || evenement.metaKey || evenement.shiftKey || evenement.altKey) return;
+  var lien = evenement.target.closest && evenement.target.closest('a[href="#attente"]');
+  var champ = document.getElementById("attente-mail");
+  if (lien && champ) setTimeout(function () { champ.focus(); }, 0);
+});
+
+/* Le film, sans le son : il part seul, en boucle, à l’écran (rien ne se charge avant), et s’arrête hors de l’écran.
+   Son bouton l’arrête (WCAG 2.2.2), et la pause tient. Le bouton dit ce qu’il fera, sans état « enfoncé » (4.1.2). En
+   mouvement réduit, en économie de données, ou si la lecture automatique est refusée : le lecteur classique. */
 (function () {
   var video = document.getElementById("film");
-  var cadre = document.getElementById("film-cadre");
-  var commandes = document.getElementById("film-commandes");
   var lecture = document.getElementById("film-lecture");
-  var bouton = document.getElementById("film-son");
-  if (!video || !cadre || !commandes || !lecture || !bouton) return;
+  if (!video || !lecture) return;
 
-  var portrait = window.matchMedia("(max-width: 719px) and (orientation: portrait)").matches;
-  video.poster = video.getAttribute(portrait ? "data-affiche-portrait" : "data-affiche-paysage");
-  if (portrait) {
-    cadre.classList.add("film__cadre--portrait");
-    video.src = video.getAttribute("data-portrait");
-  }
-
+  var icone = lecture.querySelector("path");
   var calme = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  // Vrai quand la personne a mis le film en pause : il ne repart alors que par « Lire » (ou « Mettre le son »).
+  var econome = navigator.connection && navigator.connection.saveData;
+  // Vrai quand la personne a mis le film en pause : il ne repart alors que par son bouton.
   var arreteParToi = false;
+  var observateur = null;
 
-  // Le focus d’un bouton qui s’efface passe au lecteur classique qui le remplace, pas à la page.
+  // Le focus du bouton passe au lecteur classique, qui est à la personne : le défilement ne le lance plus.
   function lecteurClassique() {
-    var avaitLeFocus = commandes.contains(document.activeElement);
+    var avaitLeFocus = document.activeElement === lecture;
+    if (observateur) observateur.disconnect();
     video.controls = true;
-    commandes.hidden = true;
+    lecture.hidden = true;
     if (avaitLeFocus) video.focus();
   }
 
-  // Une lecture refusée (lecture automatique bloquée, film illisible) passe au lecteur classique. Une lecture annulée
-  // par une pause avant d’avoir commencé (AbortError : le film se chargeait encore) n’est pas un refus.
+  // Une lecture refusée passe au lecteur classique ; une lecture annulée par une pause (AbortError) n’est pas un refus.
   function lire() {
     var essai = video.play();
     if (essai && essai.catch) {
@@ -242,24 +236,26 @@
   }
 
   function direLaLecture() {
-    lecture.textContent = video.paused ? "Lire" : "Pause";
+    lecture.setAttribute("aria-label", video.paused ? "Lire le film" : "Mettre le film en pause");
+    icone.setAttribute("d", video.paused ? "M7 4.5v15l12-7.5z" : "M7 5h3.5v14H7zM13.5 5H17v14h-3.5z");
   }
 
-  if (calme) {
+  if (calme || econome) {
     lecteurClassique();
-  } else {
-    lecture.hidden = false;
-    direLaLecture();
-    video.addEventListener("play", direLaLecture);
-    video.addEventListener("pause", direLaLecture);
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (entrees) {
-        entrees.forEach(function (entree) {
-          if (!entree.isIntersecting) video.pause();
-          else if (!arreteParToi) lire();
-        });
-      }, { threshold: 0.35 }).observe(video);
-    }
+    return;
+  }
+  lecture.hidden = false;
+  direLaLecture();
+  video.addEventListener("play", direLaLecture);
+  video.addEventListener("pause", direLaLecture);
+  if ("IntersectionObserver" in window) {
+    observateur = new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (entree) {
+        if (!entree.isIntersecting) video.pause();
+        else if (!arreteParToi) lire();
+      });
+    }, { threshold: 0.35 });
+    observateur.observe(video);
   }
 
   lecture.addEventListener("click", function () {
@@ -267,16 +263,118 @@
     if (arreteParToi) video.pause();
     else lire();
   });
+})();
 
-  bouton.addEventListener("click", function () {
-    var avecSon = video.muted;
-    video.muted = !avecSon;
-    if (avecSon) {
-      arreteParToi = false;
-      video.currentTime = 0;
-      lire();
+/* Un soir de match : ses écrans ne se chargent qu’à 600 px de la section (.est-proche). Sur ordinateur, ils sont
+   empilés à côté des moments (.instant), et celui du moment au milieu de la fenêtre se montre (.est-actif). */
+(function () {
+  var soiree = document.querySelector(".soiree");
+  var instants = document.querySelectorAll(".instant");
+  if (!soiree || !instants.length) return;
+  if (!("IntersectionObserver" in window)) {
+    soiree.classList.add("est-proche");
+    return;
+  }
+  var approche = new IntersectionObserver(function (entrees) {
+    if (entrees[0].isIntersecting) {
+      soiree.classList.add("est-proche");
+      approche.disconnect();
     }
-    bouton.classList.toggle("film__son--avec-son", avecSon);
-    bouton.textContent = avecSon ? "Couper le son" : "Mettre le son";
+  }, { rootMargin: "600px 0px" });
+  approche.observe(soiree);
+
+  // Parmi les moments dans la bande du milieu (30 % de la fenêtre), le plus proche du milieu ; bande vide : rien ne change.
+  var dansLaBande = [];
+  var milieu = new IntersectionObserver(function (entrees) {
+    entrees.forEach(function (entree) {
+      var rang = dansLaBande.indexOf(entree.target);
+      if (entree.isIntersecting && rang < 0) dansLaBande.push(entree.target);
+      if (!entree.isIntersecting && rang >= 0) dansLaBande.splice(rang, 1);
+    });
+    var centre = window.innerHeight / 2;
+    var proche = null;
+    var ecart = Infinity;
+    dansLaBande.forEach(function (corps) {
+      var boite = corps.getBoundingClientRect();
+      var ici = Math.abs(boite.top + boite.height / 2 - centre);
+      if (ici < ecart) { ecart = ici; proche = corps; }
+    });
+    if (!proche) return;
+    for (var i = 0; i < instants.length; i++) instants[i].classList.toggle("est-actif", instants[i] === proche.parentNode);
+  }, { rootMargin: "-35% 0px -35% 0px" });
+  for (var i = 0; i < instants.length; i++) milieu.observe(instants[i].querySelector(".instant__corps"));
+})();
+
+/* « Maintiens pour essayer » : le geste de l’appli. Tenir le bouton (doigt, souris, ou Espace et Entrée au clavier)
+   remplit le verre en 1,4 s ; lâcher avant le vide. Plein, il dit « Place gardée. », puis revient au départ. Rien
+   n’est envoyé ni réservé : la note, lue par les lecteurs d’écran (role="status"), le dit. En mouvement réduit, ou
+   avec un lecteur d’écran (un clic sans pointeur), un appui suffit. */
+(function () {
+  var essai = document.getElementById("essai");
+  var bouton = document.getElementById("essai-bouton");
+  var mot = document.getElementById("essai-mot");
+  var note = document.getElementById("essai-note");
+  if (!essai || !bouton || !mot || !note) return;
+
+  var calme = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var DEPART = note.textContent;
+  var minuteur = 0;
+  var retour = 0;
+
+  function remplir() {
+    bouton.classList.remove("est-tenu");
+    bouton.classList.add("est-plein");
+    mot.textContent = "Place gardée.";
+    note.textContent = "C’était un essai\u00a0: rien n’est réservé.";
+    retour = setTimeout(function () {
+      bouton.classList.remove("est-plein");
+      mot.textContent = "Maintiens pour essayer";
+      note.textContent = DEPART;
+    }, 3500);
+  }
+
+  function tenir(evenement) {
+    if (evenement.type === "keydown") {
+      if (evenement.key !== " " && evenement.key !== "Enter") return;
+      // Une touche tenue se répète : chaque répétition est annulée aussi, sinon elle activerait le bouton (un clic).
+      evenement.preventDefault();
+      if (evenement.repeat) return;
+    }
+    if (evenement.type === "pointerdown" && evenement.button !== 0) return;
+    evenement.preventDefault();
+    if (bouton.classList.contains("est-plein") || bouton.classList.contains("est-tenu")) return;
+    clearTimeout(retour);
+    if (calme) {
+      remplir();
+      return;
+    }
+    bouton.classList.add("est-tenu");
+    minuteur = setTimeout(remplir, 1400);
+  }
+
+  function lacher(evenement) {
+    if (evenement.type === "keyup" && (evenement.key === " " || evenement.key === "Enter")) evenement.preventDefault();
+    if (!bouton.classList.contains("est-tenu")) return;
+    clearTimeout(minuteur);
+    bouton.classList.remove("est-tenu");
+    note.textContent = "Lâché trop tôt\u00a0: le verre se vide. Tiens jusqu’au bout.";
+  }
+
+  bouton.addEventListener("pointerdown", tenir);
+  bouton.addEventListener("keydown", tenir);
+  ["pointerup", "pointerleave", "pointercancel", "keyup", "blur"].forEach(function (type) {
+    bouton.addEventListener(type, lacher);
   });
+  bouton.addEventListener("contextmenu", function (evenement) { evenement.preventDefault(); });
+  // Un lecteur d’écran active un bouton par un simple clic, sans pointeur ni touche tenue : ce clic remplit le verre, comme
+  // « Réserver sans maintenir » dans l’appli.
+  bouton.addEventListener("click", function (evenement) {
+    // (Une touche tenue n’en fait pas : ses appuis sont annulés dans tenir().)
+    if (evenement.detail === 0 && !bouton.classList.contains("est-plein")) {
+      clearTimeout(retour);
+      clearTimeout(minuteur);
+      remplir();
+    }
+  });
+  essai.hidden = false;
 })();

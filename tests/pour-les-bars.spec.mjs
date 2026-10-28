@@ -1314,7 +1314,7 @@ test.describe('le mouvement', () => {
       expect(await salle(page), JSON.stringify(options)).toEqual(A_21_H);
       await expect(page.locator('.salle-soir__commandes [disabled]')).toHaveCount(0);
       // La scène et la lumière arrivent sans mouvement.
-      expect(await page.locator('.salle__sol').evaluate((sol) => getComputedStyle(sol).animationName)).toBe('none');
+      expect(await page.locator('.salle').evaluate((salle) => getComputedStyle(salle).animationName)).toBe('none');
       expect(await page.locator('.lumiere').evaluate((l) => getComputedStyle(l, '::before').animationName)).toBe('none');
       await page.locator('#salle-jouer').click();
       expect((await salle(page)).heure).toBe('17:00');
@@ -1370,7 +1370,10 @@ test.describe('le mouvement', () => {
     await page.clock.install();
     await page.goto(PAGE);
     await pret(page);
-    expect(await page.locator('.salle__sol').evaluate((sol) => getComputedStyle(sol).animationName)).toBe('pb-salle');
+    expect(await page.locator('.salle').evaluate((salle) => getComputedStyle(salle).animationName)).toBe('pb-salle');
+    // Le relief reste : le sol garde sa 3D (une opacité en cours l’aplatirait) et son mur se dresse.
+    expect(await page.locator('.salle__sol').evaluate((sol) => [getComputedStyle(sol).transformStyle, getComputedStyle(sol).opacity, getComputedStyle(sol).animationName]))
+      .toEqual(['preserve-3d', '1', 'none']);
     expect(await page.locator('.lumiere').evaluate((l) => [getComputedStyle(l, '::before').animationName, getComputedStyle(l, '::after').animationName]))
       .toEqual(['pb-allumer', 'pb-allumer']);
     await envoyerUneDemande(page);

@@ -479,6 +479,9 @@ a:hover { color: var(--goutte); }
   letter-spacing: -0.02em;
 }
 
+/* Des mots qui ne se séparent pas en fin de ligne (« Mets-toi », une adresse e-mail dans une phrase). */
+.insecable { white-space: nowrap; }
+
 /* Le surtitre d’une section : il dit de quoi elle parle, en petites capitales, sans ambre (l’ambre est pour les actions). */
 .surtitre { margin: 0 0 14px; color: var(--texte-discret); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 
@@ -842,7 +845,7 @@ a:hover { color: var(--goutte); }
 }
 
 /* Le film, sans le son, dans son cadre de verre 9:16 : sous la liste d’attente au téléphone, à droite sur ordinateur,
-   un peu tourné vers le texte. Jamais étiré : sa largeur suit la hauteur de la fenêtre, entre 15 et 23 rem. */
+   un peu tourné vers le texte. Jamais étiré : sa largeur suit la hauteur de la fenêtre, entre 240 px et 23 rem. */
 .film { width: min(100%, 20rem); margin: 56px auto 0; perspective: 1600px; }
 .film__cadre {
   position: relative;
@@ -892,7 +895,7 @@ a:hover { color: var(--goutte); }
 .film__texte summary { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 600; list-style: none; cursor: pointer; }
 .film__texte summary::-webkit-details-marker { display: none; }
 /* Le « + » des questions de l’accueil : le texte se déplie. */
-.film__texte summary::after { content: "+"; font-size: 1.25rem; font-weight: 400; line-height: 1; transition: transform 200ms var(--sortie-douce); }
+.film__texte summary::after { content: "+" / ""; font-size: 1.25rem; font-weight: 400; line-height: 1; transition: transform 200ms var(--sortie-douce); }
 .film__texte[open] summary::after { transform: rotate(45deg); }
 @media (prefers-reduced-motion: reduce) { .film__texte summary::after { transition: none; } }
 .film__texte summary:hover { color: var(--ambre); }

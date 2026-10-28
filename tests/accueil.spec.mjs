@@ -106,6 +106,8 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await rappels.last().click();
   await expect(page).toHaveURL(/#attente$/);
   await expect(page.locator('#attente-mail')).toBeInViewport();
+  // Le champ a le focus : on écrit tout de suite, sans toucher encore.
+  await expect(page.locator('#attente-mail')).toBeFocused();
 });
 
 for (const largeur of [320, 360]) {
@@ -408,14 +410,14 @@ test('la vague du verre s’arrête d’elle-même avant 5 s, sur l’image du v
 // l’ordre de la soirée, chacun avec son vrai écran (bar, clubs et pseudos inventés), marqué « Écran de démonstration ».
 // Les phrases qui portent une règle de l’appli sont figées : une règle qui change les change avec elle.
 const INSTANTS = [
-  { heure: '18:42', titre: '« Ce soir », tout de suite', ecran: 'ce-soir', telephone: true, dit: ['Déjà regardé aujourd’hui ? Ils s’affichent tout de suite', 'les plus proches qui ont encore de la place', 'Ta position reste sur ton téléphone.'] },
-  { heure: '18:50', titre: 'Bar complet ? Mets-toi sur la liste', ecran: 'liste-attente', dit: ['avant le coup d’envoi, et tu es premier sur la liste', 'elle n’est pas gardée pour toi'] },
+  { heure: '18:42', titre: 'Le match de ce soir, en premier', ecran: 'ce-soir', telephone: true, dit: ['le match de ce soir, et les bars qui le passent', 'les plus proches qui ont encore de la place', 'Ta position reste sur ton téléphone.'] },
+  { heure: '18:50', titre: 'Bar complet ? Mets-toi sur la liste', ecran: 'liste-attente', dit: ['avant le coup d’envoi, le premier de la liste la voit dans l’appli', 'Elle n’est pas mise de côté'] },
   { heure: '19:05', titre: 'La carte cherche pour toi', ecran: 'carte-recherche', dit: ['un club, un bar, un quartier ou une adresse', 'de la place, un grand écran, le son du match, une terrasse, un accès PMR'] },
-  { heure: '19:12', titre: 'Garde ta place d’un geste', ecran: 'bar', telephone: true, dit: ['gratuitement', 'Lâche avant la fin : rien n’est réservé.'] },
+  { heure: '19:12', titre: 'Garde ta place d’un geste', ecran: 'bar', telephone: true, dit: ['C’est gratuit.', 'Lâche avant la fin : rien n’est réservé.'] },
   { heure: '19:13', titre: 'Ton pass, même sans réseau', ecran: 'ta-soiree', telephone: true, dit: ['un QR code et un code à 6 chiffres', 'même sans réseau', 'ouvre le bar dans ton appli de cartes'] },
-  { heure: '19:20', titre: 'Toute la bande à la même table', ecran: 'tablee', dit: ['jusqu’à 8 avec toi', 'Ceux qui la rejoignent dans l’appli ont chacun leur pass.', 'en story'] },
+  { heure: '19:20', titre: 'Toute la bande à la même table', ecran: 'tablee', dit: ['jusqu’à 8, toi compris', 'Ceux qui la rejoignent dans l’appli ont chacun leur pass.', 'en story'] },
   { heure: '20:25', titre: '« Je suis en retard »', ecran: 'en-retard', dit: ['10, 20 ou 30 minutes', 'jusqu’à quelle heure ta place t’attend'] },
-  { heure: '20:37', titre: 'Tu y es', ecran: 'tu-y-es', telephone: true, dit: ['scanne le QR du bar ou montre ton pass à l’équipe', 'un sous-bock aux noms des deux clubs'] },
+  { heure: '20:37', titre: 'Tu y es', ecran: 'tu-y-es', telephone: true, dit: ['scanne son QR code ou montre ton pass à l’équipe', 'un sous-bock aux noms des deux clubs'] },
 ];
 
 test('la soirée en huit moments, dans l’ordre, chacun avec son écran de démonstration', async ({ page }) => {
@@ -444,7 +446,7 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   // Les heures avancent, comme la soirée.
   expect(lus.map((m) => m.heure)).toEqual([...lus.map((m) => m.heure)].sort());
   // Rien d’autre ne promet les notifications : au plus une par match, et la ligne calme d’une heure avant.
-  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Au plus une notification par match. Et une heure avant le coup d’envoi, une ligne calme sur ton écran verrouillé : ta place t’attend.');
+  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton pass s’affiche sur ton écran verrouillé, sans son. Pour le reste, au plus une notification par match.');
   const soiree = normaliser(await page.locator('.soiree').innerText());
   expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone/i);
 });
@@ -517,7 +519,7 @@ test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » 
   const note = page.locator('#essai-note');
   await bouton.scrollIntoViewIfNeeded();
   await expect(bouton).toHaveText('Maintiens pour essayer');
-  await expect(note).toHaveText('Ici, c’est un essai : rien n’est réservé.');
+  await expect(note).toHaveText('Ici, c’est un essai.');
   await expect(note).toHaveAttribute('role', 'status');
   await bouton.focus();
   await page.keyboard.down(' ');
@@ -551,3 +553,39 @@ test('« Maintiens pour essayer » avec un lecteur d’écran : un clic sans poi
   await expect(page.locator('#essai-bouton')).toHaveText('Place gardée.');
   await expect(page.locator('#essai-note')).toHaveText('C’était un essai : rien n’est réservé.');
 });
+
+// Une touche tenue se répète (Espace ou Entrée) : chaque répétition reste une touche tenue, jamais un clic. Lâchée
+// avant 1,4 s, le verre se vide, comme au doigt.
+for (const touche of [' ', 'Enter']) {
+  test(`« Maintiens pour essayer » : ${touche === ' ' ? 'Espace' : 'Entrée'} tenue avec ses répétitions, lâchée trop tôt, ne remplit rien`, async ({ page }) => {
+    await page.goto('/');
+    const bouton = page.locator('#essai-bouton');
+    await bouton.scrollIntoViewIfNeeded();
+    await bouton.focus();
+    await page.keyboard.down(touche);
+    for (let i = 0; i < 8; i += 1) {
+      await page.waitForTimeout(100);
+      await page.keyboard.down(touche);
+    }
+    await page.keyboard.up(touche);
+    await expect(page.locator('#essai-note')).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
+    await page.waitForTimeout(1600);
+    await expect(bouton).not.toHaveClass(/est-plein/);
+    await expect(bouton).toHaveText('Maintiens pour essayer');
+  });
+}
+
+// « Bar complet ? Mets-toi sur la liste » ne se coupe jamais au trait d’union, du plus petit téléphone à l’ordinateur.
+for (const largeur of [320, 360, 375, 390, 1280]) {
+  test(`à ${largeur} px, « Mets-toi » reste sur une ligne`, async ({ page }) => {
+    await page.setViewportSize({ width: largeur, height: 800 });
+    await page.goto('/');
+    const lignes = await page.locator('.instant__titre .insecable').evaluate((e) => {
+      const plage = document.createRange();
+      plage.selectNodeContents(e);
+      return new Set([...plage.getClientRects()].map((r) => Math.round(r.top))).size;
+    });
+    expect(lignes).toBe(1);
+  });
+}
+

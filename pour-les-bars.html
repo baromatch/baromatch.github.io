@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-u8tmA3On9beGBNP2XZuxE78vXdDKJ53yYx/kur4LwuY='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-yvbonjCT2up718d45B16jMtFSVD1tcCf7vV4EgaEsRs='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -67,15 +67,16 @@ main figure { position: relative; }
 .ouverture-bars .boutique-promesses { margin-top: 24px; }
 
 /* Ta salle, ce soir : 80 places vues en 3D (les sièges sont dans le HTML, dans leur état de 21:00) */
-.salle-soir { margin: 44px 0 0; padding: 18px 16px 16px; border-radius: 28px; background: rgba(10, 11, 16, 0.55); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet), var(--ombre-scene); }
+.salle-soir { container-type: inline-size; margin: 44px 0 0; padding: 18px 16px 16px; border-radius: 28px; background: rgba(10, 11, 16, 0.55); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet), var(--ombre-scene); }
 @media (min-width: 720px) { .salle-soir { padding: 22px 24px 20px; } }
 @media (min-width: 1100px) { .salle-soir { margin: 0; } }
 .salle-soir__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; }
 .salle-soir__titre { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; font-size: 1.125rem; font-weight: 800; line-height: 1.2; }
 .salle-soir__exemple { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); color: var(--texte); font-size: 0.75rem; font-weight: 700; }
 .salle-soir__heure { margin: 0; font-size: 2rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.salle-soir__recit { min-height: 4.4em; margin: 10px 0 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.45; }
-@media (min-width: 560px) { .salle-soir__recit { min-height: 2.9em; } }
+.salle-soir__recit { display: grid; margin: 10px 0 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.45; }
+.salle-soir__recit > span { grid-area: 1 / 1; }
+.salle-soir__gabarit { visibility: hidden; }
 .v17 { display: none; }
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   .salle-soir:not([data-vivant]) .v21 { display: none; }
@@ -91,6 +92,8 @@ main figure { position: relative; }
 .kpi { grid-column: span 2; padding: 10px 10px 9px; border-radius: 16px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); color: var(--texte-doux); font-size: 0.75rem; line-height: 1.2; }
 .kpi:nth-child(n+4) { grid-column: span 3; }
 @media (min-width: 720px) and (max-width: 1099px) { .kpis { grid-template-columns: repeat(5, minmax(0, 1fr)); } .kpi, .kpi:nth-child(n+4) { grid-column: auto; } }
+@container (max-width: 26em) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi, .kpi:nth-child(n+4) { grid-column: auto; } }
+@container (max-width: 16em) { .kpis { grid-template-columns: minmax(0, 1fr); } }
 .kpi b { display: block; margin-bottom: 4px; color: var(--texte); font-size: 1.5rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .kpi small { color: var(--texte-discret); font-size: 0.8125rem; font-weight: 700; }
 .kpi--ok b { color: #7EE2B0; }
@@ -106,7 +109,7 @@ main figure { position: relative; }
 .lecture { display: inline-flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: 10px; }
 .lecture__bouton svg { width: 18px; height: 18px; }
 .lecture__heure { display: inline-flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: 10px; min-height: 44px; color: var(--texte-doux); font-size: 0.875rem; }
-.lecture__heure input { width: 140px; max-width: 100%; accent-color: var(--ambre); }
+.lecture__heure input { width: 140px; max-width: 100%; height: 44px; margin: 0; accent-color: var(--ambre); }
 .salle-soir__legende { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 12px 0 0; color: var(--texte-doux); font-size: 0.8125rem; }
 .salle-soir__legende li { display: inline-flex; align-items: center; gap: 6px; }
 .salle-soir__legende i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
@@ -238,7 +241,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
         <p class="salle-soir__titre" id="salle-titre">Ta salle, ce soir <span class="salle-soir__exemple">Exemple</span></p>
         <p class="salle-soir__heure"><span class="v21">21:00</span><span class="v17">17:00</span></p>
       </div>
-      <p class="salle-soir__recit"><span class="v21">21:00 · Coup d’envoi. Tu sais qui est là, et qui est encore attendu.</span><span class="v17">17:00 · Tu ouvres 35 places sur Baromatch. Les 45 autres restent à toi.</span></p>
+      <p class="salle-soir__recit"><span class="salle-soir__gabarit" aria-hidden="true">19:00 · La porte valide les arrivées d’un scan. Ceux qui entrent sans l’appli se comptent d’un toucher.</span><span class="v21">21:00 · Coup d’envoi. Tu sais qui est là, et qui est encore attendu.</span><span class="v17">17:00 · Tu ouvres 35 places sur Baromatch. Les 45 autres restent à toi.</span></p>
       <div class="salle" aria-hidden="true"><div class="salle__sol"><span class="salle__mur"><span class="salle__ecran">21:00</span></span><span class="salle__comptoir"></span><span class="salle__porte"></span><span class="salle__tables"><b><i data-e=a></i><i data-e=s></i><i data-e=g></i><i data-e=a></i></b><b><i data-e=l></i><i data-e=e></i><i data-e=s></i><i data-e=s></i></b><b><i data-e=s></i><i data-e=a></i><i data-e=a></i><i data-e=l></i></b><b><i data-e=a></i><i data-e=g></i><i data-e=s></i><i data-e=l></i></b><b><i data-e=g></i><i data-e=a></i><i data-e=a></i><i data-e=l></i></b><b><i data-e=s></i><i data-e=s></i><i data-e=s></i><i data-e=a></i></b><b><i data-e=a></i><i data-e=l></i><i data-e=a></i><i data-e=a></i></b><b><i data-e=s></i><i data-e=l></i><i data-e=a></i><i data-e=e></i></b><b><i data-e=l></i><i data-e=s></i><i data-e=a></i><i data-e=s></i></b><b><i data-e=l></i><i data-e=g></i><i data-e=l></i><i data-e=a></i></b><b><i data-e=l></i><i data-e=l></i><i data-e=l></i><i data-e=a></i></b><b><i data-e=a></i><i data-e=l></i><i data-e=l></i><i data-e=l></i></b><b><i data-e=l></i><i data-e=l></i><i data-e=e></i><i data-e=a></i></b><b><i data-e=s></i><i data-e=a></i><i data-e=l></i><i data-e=l></i></b><b><i data-e=g></i><i data-e=l></i><i data-e=a></i><i data-e=s></i></b><b><i data-e=l></i><i data-e=s></i><i data-e=l></i><i data-e=s></i></b><b><i data-e=l></i><i data-e=e></i><i data-e=l></i><i data-e=l></i></b><b><i data-e=e></i><i data-e=l></i><i data-e=s></i><i data-e=a></i></b><b><i data-e=a></i><i data-e=a></i><i data-e=l></i><i data-e=a></i></b><b><i data-e=g></i><i data-e=s></i><i data-e=g></i><i data-e=s></i></b></span></div></div>
       <ul class="kpis">
         <li class="kpi"><b><span class="v21">41</span><span class="v17">0</span><small>/80</small></b> dans le bar</li>
@@ -248,7 +251,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
         <li class="kpi"><b><span class="v21">5</span><span class="v17">35</span><small>/35</small></b> places encore en ligne</li>
       </ul>
       <div class="salle-soir__commandes">
-        <div class="pas" id="salle-places"><button class="pas__bouton" type="button" data-pas="-5" disabled aria-label="5 places en ligne de moins">−</button><output class="pas__valeur" id="salle-quota" aria-live="polite">35</output><button class="pas__bouton pas__bouton--plus" type="button" data-pas="5" disabled aria-label="5 places en ligne de plus">+</button><span class="pas__nom">places sur<br>Baromatch</span></div>
+        <div class="pas" id="salle-places"><button class="pas__bouton" type="button" data-pas="-5" disabled aria-label="5 places en ligne de moins">−</button><output class="pas__valeur" id="salle-quota" aria-live="polite"><span>35</span><span class="visuellement-cache"> places sur Baromatch</span></output><button class="pas__bouton pas__bouton--plus" type="button" data-pas="5" disabled aria-label="5 places en ligne de plus">+</button><span class="pas__nom" aria-hidden="true">places sur<br>Baromatch</span></div>
         <div class="lecture" id="salle-lecture"><button class="lecture__bouton" id="salle-jouer" type="button" disabled aria-label="Rejouer la soirée"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12-7.5z"/></svg></button><label class="lecture__heure"><span>L’heure</span><input id="salle-curseur" type="range" min="0" max="270" step="5" value="240" aria-valuetext="21:00" disabled></label></div>
       </div>
       <ul class="salle-soir__legende">
@@ -323,7 +326,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
           <p class="moment__numero">2</p>
           <h3 class="atout__titre">Moins d’absents, et pas de place bloquée</h3>
           <ul class="moment__liste">
-            <li><strong>«&nbsp;Je suis en retard&nbsp;»&nbsp;:</strong> le fan prévient qu’il arrive dans 10, 20 ou 30&nbsp;minutes. Tu le vois dans la Console, «&nbsp;En retard · vers 21:20&nbsp;», et sa place l’attend un peu plus&nbsp;: 15&nbsp;minutes au plus, et rien de plus si tu libères les places au coup d’envoi.</li>
+            <li><strong>«&nbsp;Je suis en retard&nbsp;»&nbsp;:</strong> le fan prévient qu’il arrive dans 10, 20 ou 30&nbsp;minutes, et tu le vois dans la Console («&nbsp;En retard · vers 21:20&nbsp;»). Si tu gardes les places 15&nbsp;minutes après le coup d’envoi, la sienne peut attendre jusqu’à 30&nbsp;minutes après, pas plus.</li>
             <li><strong>À l’heure que tu choisis,</strong> une place dont l’arrivée n’est pas validée est libérée et comptée absente.</li>
             <li><strong>Ton bar est plein&nbsp;?</strong> Les fans rejoignent la liste d’attente. Une place se libère avant le coup d’envoi&nbsp;: le premier de la liste le voit dans l’appli, et la prend s’il veut.</li>
             <li><strong>Un fan qui ne vient plus</strong> rend sa place d’un geste.</li>

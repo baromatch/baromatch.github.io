@@ -9,7 +9,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { MARQUE } from './outils/marque.mjs';
 import { PIED } from './outils/pied.mjs';
-import { ralentirLaPremiereImage } from './outils/attente.mjs';
+import { ralentirLaPolice } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 import { estPermis } from '../generateur/etat.mjs';
 import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
@@ -861,7 +861,7 @@ test.describe('le premier écran d’abord', () => {
   // sur 4G lente (environ 2,95 s avant comme après) : gardé parce qu’une feuille bloquée ne retient plus le formulaire.
   test('après le premier affichage, pour-les-bars.css et le script partent ensemble ; le formulaire s’affiche sans attendre la feuille, avec le bord de ses champs', async ({ page }) => {
     await suivreLeFormulaire(page);
-    const imageArrivee = await ralentirLaPremiereImage(page);
+    const policeArrivee = await ralentirLaPolice(page);
     const lacher = await retenir(page, '**/pour-les-bars.css');
     await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
     await formulaireAffiche(page);
@@ -875,7 +875,7 @@ test.describe('le premier écran d’abord', () => {
     expect(await page.evaluate(() => [...document.styleSheets].some((f) => f.href?.endsWith('/pour-les-bars.css')))).toBe(false);
     expect(await page.locator('#demande-bar').evaluate((c) => getComputedStyle(c).borderTopColor)).toBe('rgba(255, 255, 255, 0.34)');
     lacher();
-    await imageArrivee();
+    await policeArrivee();
   });
 
   test('arrivé sur une ancre (#proposer, depuis une affiche), la feuille et le script partent sans attendre le premier affichage, ensemble', async ({ page }) => {
@@ -943,7 +943,7 @@ test.describe('le premier écran d’abord', () => {
 
   test('l’amorce garde la place du formulaire par un attribut data-attente que le style de la page rend invisible, jamais par un style écrit', async ({ page }) => {
     // Le script retenu pendant que la page charge encore : on n’attend que le HTML lu, puis la demande du script.
-    const imageArrivee = await ralentirLaPremiereImage(page);
+    const policeArrivee = await ralentirLaPolice(page);
     const lacher = await retenir(page, '**/pour-les-bars.js');
     const demande = page.waitForRequest('**/pour-les-bars.js');
     await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
@@ -956,7 +956,7 @@ test.describe('le premier écran d’abord', () => {
     await formulaireAffiche(page);
     await expect(formulaire).not.toHaveAttribute('data-attente');
     await expect(formulaire).not.toHaveAttribute('style');
-    await imageArrivee();
+    await policeArrivee();
   });
 
   test('pour-les-bars.js toujours pas là au bout de 12 s : la place est rendue au chemin e-mail ; arrivé ensuite, il affiche le formulaire et efface le secours', async ({ page }) => {
@@ -1184,6 +1184,37 @@ test.describe('pas de défilement de côté', () => {
   }
 });
 
+// « Ta salle, ce soir » avec le texte agrandi (WCAG 1.4.4) : les mots des chiffres ne se coupent jamais au milieu, et
+// la salle ne saute pas pendant que la soirée se joue (le récit garde la hauteur du plus long, 19:00).
+test.describe('ta salle, ce soir, au téléphone et avec le texte agrandi', () => {
+  for (const [largeur, texte] of [[320, 100], [360, 100], [320, 200], [414, 200]]) {
+    test(`à ${largeur} px, texte à ${texte} % : aucun mot des chiffres ne se coupe ; le récit garde sa hauteur de 17:00 à 21:30`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto(PAGE);
+      await pret(page);
+      await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, texte);
+      const coupes = await page.$$eval('.kpi', (liste) => liste.flatMap((kpi) => {
+        const noeud = kpi.lastChild;
+        return [...noeud.nodeValue.matchAll(/\S+/g)].filter((mot) => {
+          const morceau = document.createRange();
+          morceau.setStart(noeud, mot.index);
+          morceau.setEnd(noeud, mot.index + mot[0].length);
+          return morceau.getClientRects().length > 1;
+        }).map((mot) => mot[0]);
+      }));
+      expect(coupes, 'mots coupés').toEqual([]);
+      const curseur = page.getByRole('slider', { name: 'L’heure' });
+      const hauteurs = [];
+      for (const minute of ['0', '60', '120', '240', '270']) {
+        await curseur.fill(minute);
+        hauteurs.push(await page.locator('.salle-soir__recit').evaluate((r) => Math.round(r.getBoundingClientRect().height)));
+      }
+      expect(new Set(hauteurs).size, hauteurs.join(' ')).toBe(1);
+    });
+  }
+});
+
 test.describe('le mouvement', () => {
   const enCours = (page) => page.evaluate(() => document.getAnimations()
     .filter((animation) => animation.playState === 'running')
@@ -1226,15 +1257,18 @@ test.describe('le mouvement', () => {
     etats: { a: 23, g: 7, e: 5, s: 18, l: 27 },
     curseur: '240',
   };
-  // À 21:30 : plus personne ne réserve depuis le coup d’envoi (les 5 places en ligne reviennent au bar), 3 des 7 fans
-  // attendus sont arrivés, et les 4 autres places gardées sont libérées, comptées absentes, pas remises en ligne.
+  // À 21:30 : 3 des 7 fans attendus sont arrivés, et les 4 autres places gardées sont libérées, comptées absentes,
+  // pas remises en ligne. Plus personne ne réserve depuis le coup d’envoi, mais comme la Console, la salle compte
+  // toujours les 5 places en ligne pas prises.
   const A_21_H_30 = {
     heure: '21:30',
     recit: '21:30 · Les places gardées sont libérées : une arrivée pas validée compte absente.',
-    chiffres: ['44/80', '26', '0', '18', '0/35'],
-    etats: { a: 26, s: 18, l: 36 },
+    chiffres: ['44/80', '26', '0', '18', '5/35'],
+    etats: { a: 26, e: 5, s: 18, l: 31 },
     curseur: '270',
   };
+  // Les mots des chiffres, comme dans la Console : au singulier à 0 et 1.
+  const mots = (page) => page.$$eval('.kpi', (liste) => liste.map((k) => k.lastChild.nodeValue.trim()));
   const deuxImages = (page) => page.evaluate(() => new Promise((r) => { requestAnimationFrame(() => requestAnimationFrame(r)); }));
 
   test('sans réduction, la salle part de 17:00 et se joue d’elle-même jusqu’à 21:30 quand elle est à l’écran, une seule fois', async ({ page }) => {
@@ -1251,6 +1285,7 @@ test.describe('le mouvement', () => {
     await pret(page);
     await expect.poll(async () => (await salle(page)).heure, { timeout: 15_000 }).toBe('21:30');
     expect(await salle(page)).toEqual(A_21_H_30);
+    expect(await mots(page)).toEqual(['dans le bar', 'arrivés avec Baromatch', 'encore attendu', 'sans réservation', 'places encore en ligne']);
     const heures = await page.evaluate(() => window.heures);
     expect(heures[0]).toBe('17:00');
     expect(heures.length, heures.join(' ')).toBeGreaterThan(10);
@@ -1278,11 +1313,13 @@ test.describe('le mouvement', () => {
     await page.waitForTimeout(600);
     expect((await salle(page)).heure).toBe(arretee);
     // Les places sur Baromatch, de 5 en 5 : la salle et les chiffres suivent.
+    // Lu avec son nom : « 40 places sur Baromatch ».
+    const quota = page.locator('#salle-quota');
     await page.getByRole('button', { name: '5 places en ligne de plus' }).click();
-    await expect(page.locator('#salle-quota')).toHaveText('40');
+    await expect(quota).toHaveText('40 places sur Baromatch');
     expect((await salle(page)).chiffres[4]).toMatch(/\/40$/);
     await page.getByRole('button', { name: '5 places en ligne de moins' }).click();
-    await expect(page.locator('#salle-quota')).toHaveText('35');
+    await expect(quota).toHaveText('35 places sur Baromatch');
     // L’heure, au curseur : il se lit en heure, pas en minutes.
     const curseur = page.getByRole('slider', { name: 'L’heure' });
     await curseur.fill('120');
@@ -1299,6 +1336,41 @@ test.describe('le mouvement', () => {
     await jouer.click();
     await expect.poll(async () => (await salle(page)).heure, { timeout: 15_000 }).toBe('21:30');
     expect(await salle(page)).toEqual(A_21_H_30);
+  });
+
+  test('au téléphone, la soirée attend que la scène soit à l’écran, s’arrête quand elle en sort, reprend quand elle revient ; les places vont de 10 à 60', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(PAGE);
+    await pret(page);
+    await expect(page.locator('.salle-soir')).toHaveAttribute('data-vivant', '');
+    // La scène est sous le premier écran : rien ne se joue.
+    await page.waitForTimeout(600);
+    expect((await salle(page)).heure).toBe('17:00');
+    await page.locator('.salle').scrollIntoViewIfNeeded();
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).not.toBe('17:00');
+    // Elle sort de l’écran au milieu de la soirée : l’heure s’arrête.
+    await page.locator('#proposer').scrollIntoViewIfNeeded();
+    await deuxImages(page);
+    const arretee = (await salle(page)).heure;
+    expect(arretee).not.toBe('21:30');
+    await page.waitForTimeout(600);
+    expect((await salle(page)).heure).toBe(arretee);
+    await expect(page.locator('#salle-jouer')).toHaveAttribute('aria-label', 'Reprendre la soirée');
+    // Elle revient : la soirée reprend où elle en était, jusqu’à 21:30.
+    await page.locator('.salle').scrollIntoViewIfNeeded();
+    await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).toBe('21:30');
+    // Les places sur Baromatch, de 10 à 60 : la salle garde ses 80 places.
+    const plus = page.getByRole('button', { name: '5 places en ligne de plus' });
+    const moins = page.getByRole('button', { name: '5 places en ligne de moins' });
+    for (let i = 0; i < 8; i += 1) await plus.click();
+    await expect(page.locator('#salle-quota')).toHaveText('60 places sur Baromatch');
+    expect(Object.values((await salle(page)).etats).reduce((a, b) => a + b, 0)).toBe(80);
+    for (let i = 0; i < 14; i += 1) await moins.click();
+    await expect(page.locator('#salle-quota')).toHaveText('10 places sur Baromatch');
+    expect(Object.values((await salle(page)).etats).reduce((a, b) => a + b, 0)).toBe(80);
+    // 10 places : 1 encore en ligne, au singulier.
+    expect((await salle(page)).chiffres[4]).toBe('1/10');
+    expect((await mots(page))[4]).toBe('place encore en ligne');
   });
 
   test('en mouvement réduit, et sans JavaScript, la salle est à 21:00 d’emblée ; sans mouvement, « Rejouer » avance d’un moment à l’autre, d’un coup', async ({ browser, baseURL }) => {
@@ -1319,6 +1391,10 @@ test.describe('le mouvement', () => {
       // La scène et la lumière arrivent sans mouvement.
       expect(await page.locator('.salle').evaluate((salle) => getComputedStyle(salle).animationName)).toBe('none');
       expect(await page.locator('.lumiere').evaluate((l) => getComputedStyle(l, '::before').animationName)).toBe('none');
+      // Les places changées d’abord : « Rejouer » repart quand même de 17:00, et le dit.
+      await page.getByRole('button', { name: '5 places en ligne de plus' }).click();
+      await page.getByRole('button', { name: '5 places en ligne de moins' }).click();
+      await expect(page.locator('#salle-jouer')).toHaveAttribute('aria-label', 'Rejouer la soirée');
       await page.locator('#salle-jouer').click();
       expect((await salle(page)).heure).toBe('17:00');
       await expect.poll(async () => (await salle(page)).heure, { timeout: 10_000 }).toBe('21:30');

@@ -1003,14 +1003,16 @@
 /* Ta salle, ce soir (l’ouverture de la page) : 80 places qui se remplissent de 17:00 au coup d’envoi, puis les places
    gardées libérées à 21:30. Les sièges sont dans le HTML, dans leur état de 21:00 ; avec ce script et sans « réduire
    les animations », la page montre d’abord 17:00 (son style, @media (scripting: enabled)), et ce script joue la soirée
-   en 8 s quand la salle est à l’écran : en pause quand elle en sort, reprise quand elle revient, une seule fois. Il
+   en 8 s quand la scène est à l’écran : en pause quand elle en sort, reprise quand elle revient, une seule fois. Il
    branche aussi les boutons, présents et inactifs dès le HTML : les places sur Baromatch (− et +), l’heure (le curseur)
    et lecture ou pause ; dès qu’on y touche, la soirée ne se joue plus d’elle-même. Avec « réduire les animations », la
-   salle reste à 21:00, et « Rejouer » avance d’un moment à l’autre, d’un coup, toutes les 1,6 s.
+   salle reste à 21:00, et « Rejouer » avance d’un moment à l’autre, d’un coup, toutes les 1,6 s. Un navigateur qui ne
+   connaît pas @media (scripting) a montré 21:00 : la salle y reste jusqu’à ce que la soirée se joue, depuis 17:00.
    Les chiffres sont ceux de la page Ce soir de la Console de démonstration : à 21:00, 80 places, 35 sur Baromatch,
    30 gardées, 23 arrivés, 7 encore attendus, 18 sans réservation, 5 encore en ligne. Après le coup d’envoi, plus
-   personne ne réserve : les places en ligne pas prises reviennent au bar ; trois retardataires arrivent avant 21:20 ;
-   à 21:30, une place gardée dont l’arrivée n’est pas validée est libérée et comptée absente, et ne repart pas en ligne.
+   personne ne réserve, mais la Console compte toujours les places en ligne pas prises : la page aussi. Trois
+   retardataires arrivent avant 21:20 ; à 21:30, une place gardée dont l’arrivée n’est pas validée est libérée et
+   comptée absente, et ne repart pas en ligne. Comme la Console, les mots des chiffres passent au singulier à 0 et 1.
    Et la lumière du match (.lumiere) : sa force (--h) monte à mesure qu’on descend dans la page. */
 (function () {
   "use strict";
@@ -1054,9 +1056,11 @@
   var PAUSE = "M7 5h3.5v14H7zM13.5 5H17v14h-3.5z";
   var LECTURE = "M7 4.5v15l12-7.5z";
   var quota = 35;
-  var minute = calme ? ENVOI : 0;
-  var seule = !calme;     // la soirée se joue d’elle-même, tant qu’on ne touche à rien
-  var depuisLeDebut = calme; // sans mouvement, le premier « Rejouer » repart de 17:00
+  // 17:00 d’abord, si la page l’a montré (son style, @media (scripting: enabled)) ; sinon 21:00, jusqu’à la lecture.
+  var a17h = !calme && Boolean(window.matchMedia && window.matchMedia("(scripting: enabled)").matches);
+  var minute = a17h ? 0 : ENVOI;
+  var seule = !calme;          // la soirée se joue d’elle-même, tant qu’on ne touche à rien
+  var depuisLeDebut = !a17h;   // le premier « Rejouer » (ou la première lecture) repart de 17:00
 
   var lisse = function (t, a, b) {
     var u = Math.min(1, Math.max(0, (t - a) / (b - a)));
@@ -1078,12 +1082,16 @@
 
   var dans = function (selecteur) { return figure.querySelector(selecteur + " .v21"); };
   var chiffres = figure.querySelectorAll(".kpi b .v21");
+  // Les mots qui suivent un chiffre, au pluriel puis au singulier (0 et 1), comme dans la Console ; null : invariable.
+  var MOTS = [null, [" arrivés avec Baromatch", " arrivé avec Baromatch"], [" encore attendus", " encore attendu"], null,
+    [" places encore en ligne", " place encore en ligne"]];
+  var tuiles = figure.querySelectorAll(".kpi");
   var surQuota = figure.querySelectorAll(".kpi small")[1];
   var lieux = {
     heure: dans(".salle-soir__heure"),
     recit: dans(".salle-soir__recit"),
     ecran: figure.querySelector(".salle__ecran"),
-    quota: figure.querySelector("#salle-quota"),
+    quota: figure.querySelector("#salle-quota span"),
     curseur: figure.querySelector("#salle-curseur"),
     jouer: figure.querySelector("#salle-jouer"),
   };
@@ -1101,19 +1109,23 @@
     var sans = Math.round(lisse(minute, 90, ENVOI) * Math.min(18, CAPACITE - quota));
     ordre.forEach(function (siege, i) {
       var e;
-      if (i < quota) e = i < arrives ? "a" : i < pris - liberes ? "g" : i < pris || !ouvert ? "l" : "e";
+      if (i < quota) e = i < arrives ? "a" : i < pris - liberes ? "g" : i < pris ? "l" : "e";
       else e = i - quota < sans ? "s" : "l";
       if (siege.getAttribute("data-e") !== e) siege.setAttribute("data-e", e);
     });
-    var valeurs = [arrives + sans, arrives, pris - liberes - arrives, sans, ouvert ? quota - pris : 0];
-    for (var k = 0; k < chiffres.length; k += 1) chiffres[k].textContent = String(valeurs[k]);
+    var valeurs = [arrives + sans, arrives, pris - liberes - arrives, sans, quota - pris];
+    for (var k = 0; k < chiffres.length; k += 1) {
+      chiffres[k].textContent = String(valeurs[k]);
+      var mots = MOTS[k] && tuiles[k].lastChild;
+      if (mots) mots.nodeValue = MOTS[k][valeurs[k] <= 1 ? 1 : 0];
+    }
     if (surQuota) surQuota.textContent = "/" + quota;
     var recit = "";
     RECITS.forEach(function (r) { if (minute >= r[0]) recit = r[1](quota); });
     lieux.recit.textContent = recit;
     lieux.heure.textContent = heure(minute);
     lieux.ecran.textContent = heure(Math.min(minute, ENVOI));
-    lieux.quota.textContent = String(quota);
+    if (lieux.quota.textContent !== String(quota)) lieux.quota.textContent = String(quota);
     lieux.curseur.value = String(minute);
     lieux.curseur.setAttribute("aria-valuetext", heure(minute));
   };
@@ -1161,20 +1173,19 @@
     lecture.image = window.requestAnimationFrame(image);
   };
 
-  var prendreLaMain = function () {
-    seule = false;
-    depuisLeDebut = false;
-  };
+  // Les places sur Baromatch changent la salle, pas l’heure ; le curseur choisit l’heure, et la lecture repart de là.
   figure.querySelectorAll("[data-pas]").forEach(function (b) {
     b.addEventListener("click", function () {
-      prendreLaMain();
+      seule = false;
       quota = Math.max(10, Math.min(60, quota + Number(b.getAttribute("data-pas"))));
       dessiner();
+      if (!lecture) bouton(false);
     });
   });
   lieux.curseur.addEventListener("input", function () {
     arreter();
-    prendreLaMain();
+    seule = false;
+    depuisLeDebut = false;
     minute = Number(lieux.curseur.value);
     dessiner();
     bouton(false);
@@ -1194,5 +1205,5 @@
     var visible = entrees.some(function (entree) { return entree.isIntersecting; });
     if (visible && !lecture && minute < FIN) jouer();
     else if (!visible && lecture) arreter();
-  }, { threshold: 0.35 }).observe(figure);
+  }, { threshold: 0.5 }).observe(figure.querySelector(".salle"));
 })();

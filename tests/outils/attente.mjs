@@ -11,19 +11,23 @@ export const attendreLaPageFinie = async (onglet) => {
   });
 };
 
-// « Pour les bars » lente, comme sur une machine chargée : sa première image retenue 1,5 s. Le premier affichage vient
-// alors avant « load », et l’amorce demande la feuille et le script pendant que la page charge encore ; une feuille ou
-// un script que le test retient retient alors « load » aussi. Un tel test n’attend que le HTML lu (goto avec
-// waitUntil: 'domcontentloaded'), jamais « load ». Rend de quoi attendre que l’image soit partie vers la page, ce que le
-// test fait avant de finir.
-export const ralentirLaPremiereImage = async (onglet) => {
+// « Pour les bars » lente, comme sur une machine chargée : sa police (demandée dès la tête, en préchargement)
+// retenue 1,5 s. Le premier affichage vient alors avant « load » (la police s’affiche en remplacement, font-display:
+// swap), et l’amorce demande la feuille et le script pendant que la page charge encore ; une feuille ou un script que le
+// test retient retient alors « load » aussi. Un tel test n’attend que le HTML lu (goto avec waitUntil:
+// 'domcontentloaded'), jamais « load ». Rend de quoi attendre que la police soit partie vers la page, ce que le test
+// fait avant de finir, et qui vérifie qu’elle a bien été retenue (sinon le test ne reproduirait plus la page lente).
+export const ralentirLaPolice = async (onglet) => {
   const envois = [];
-  await onglet.route('**/img/bars/console-programme-reglages-*.webp', (route) => {
+  await onglet.route('**/fonts/bricolage-grotesque.woff2', (route) => {
     const envoi = new Promise((resoudre) => { setTimeout(resoudre, 1_500); }).then(() => route.continue());
     envois.push(envoi);
     return envoi;
   });
-  return () => Promise.all(envois);
+  return async () => {
+    if (envois.length === 0) throw new Error('ralentirLaPolice : la police n’a pas été demandée, rien n’a été retenu');
+    await Promise.all(envois);
+  };
 };
 
 // Les images paresseuses (loading="lazy") ne se chargent qu’en approchant de l’écran : la page défile jusqu’en bas,

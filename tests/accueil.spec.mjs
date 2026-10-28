@@ -108,6 +108,12 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await expect(page.locator('#attente-mail')).toBeInViewport();
   // Le champ a le focus : on écrit tout de suite, sans toucher encore.
   await expect(page.locator('#attente-mail')).toBeFocused();
+  // Un Ctrl-clic ouvre le formulaire dans un autre onglet : ici, le focus reste où il était.
+  await page.evaluate(() => document.activeElement.blur());
+  const premier = rappels.first();
+  await premier.focus();
+  await premier.click({ modifiers: ['Control'] });
+  await expect(premier).toBeFocused();
 });
 
 for (const largeur of [320, 360]) {
@@ -446,7 +452,7 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   // Les heures avancent, comme la soirée.
   expect(lus.map((m) => m.heure)).toEqual([...lus.map((m) => m.heure)].sort());
   // Rien d’autre ne promet les notifications : au plus une par match, et la ligne calme d’une heure avant.
-  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton pass s’affiche sur ton écran verrouillé, sans son. Pour le reste, au plus une notification par match.');
+  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass. Pour le reste, au plus une notification par match.');
   const soiree = normaliser(await page.locator('.soiree').innerText());
   expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone/i);
 });

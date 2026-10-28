@@ -194,9 +194,11 @@
 
 /* Un lien vers la liste d’attente, plus bas dans l’accueil : en arrivant, le champ de l’adresse a le focus. */
 document.addEventListener("click", function (evenement) {
+  // Un clic qui ouvre un autre onglet (Ctrl, Cmd, Maj…) laisse le focus où il est.
+  if (evenement.defaultPrevented || evenement.button || evenement.ctrlKey || evenement.metaKey || evenement.shiftKey || evenement.altKey) return;
   var lien = evenement.target.closest && evenement.target.closest('a[href="#attente"]');
   var champ = document.getElementById("attente-mail");
-  if (lien && champ) setTimeout(function () { champ.focus({ preventScroll: true }); }, 0);
+  if (lien && champ) setTimeout(function () { champ.focus(); }, 0);
 });
 
 /* Le film, sans le son : il part seul, en boucle, à l’écran (rien ne se charge avant), et s’arrête hors de l’écran.

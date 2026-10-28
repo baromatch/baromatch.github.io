@@ -895,7 +895,7 @@ a:hover { color: var(--goutte); }
 .film__texte summary { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 600; list-style: none; cursor: pointer; }
 .film__texte summary::-webkit-details-marker { display: none; }
 /* Le « + » des questions de l’accueil : le texte se déplie. */
-.film__texte summary::after { content: "+" / ""; font-size: 1.25rem; font-weight: 400; line-height: 1; transition: transform 200ms var(--sortie-douce); }
+.film__texte summary::after { content: "+"; content: "+" / ""; font-size: 1.25rem; font-weight: 400; line-height: 1; transition: transform 200ms var(--sortie-douce); }
 .film__texte[open] summary::after { transform: rotate(45deg); }
 @media (prefers-reduced-motion: reduce) { .film__texte summary::after { transition: none; } }
 .film__texte summary:hover { color: var(--ambre); }

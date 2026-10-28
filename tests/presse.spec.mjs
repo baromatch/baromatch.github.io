@@ -92,6 +92,9 @@ test('les captures et le film : des images légères chargées tard, le film à 
   }
   await expect(page.locator('a.presse__film')).toHaveAttribute('href', '/baromatch-film.mp4');
   await expect(page.locator('a.presse__film img')).toHaveAttribute('src', '/baromatch-film.webp');
+  // La phrase du film, entière, et rien d’un attribut perdu dans le texte.
+  await expect(page.locator('#film + p')).toHaveText('Le film de présentation de Baromatch : 15 secondes, sans le son, en portrait. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.');
+  expect(await page.locator('#film ~ *').evaluateAll((e) => e.map((x) => x.textContent).join(' '))).not.toMatch(/">|<\/a>|alt=/);
 });
 
 test('le contact presse : l’adresse de marque.json', async ({ page }) => {

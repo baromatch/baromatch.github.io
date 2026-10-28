@@ -196,11 +196,9 @@
   });
 })();
 
-/* Le film, sans le son : il part seul, muet, en boucle, quand il arrive à l’écran (preload="none" : rien ne se charge
-   avant), et s’arrête quand il en sort. Le bouton du cadre l’arrête (WCAG 2.2.2) et la pause tient : le film ne repart
-   pas en revenant à l’écran. Le bouton dit ce qu’il fera (« Mettre le film en pause » / « Lire le film »), sans état
-   « enfoncé » qui contredirait son nom (4.1.2). En mouvement réduit, en économie de données, ou si le navigateur refuse
-   la lecture automatique, le lecteur classique remplace le bouton. */
+/* Le film, sans le son : il part seul, en boucle, à l’écran (rien ne se charge avant), et s’arrête hors de l’écran.
+   Son bouton l’arrête (WCAG 2.2.2), et la pause tient. Le bouton dit ce qu’il fera, sans état « enfoncé » (4.1.2). En
+   mouvement réduit, en économie de données, ou si la lecture automatique est refusée : le lecteur classique. */
 (function () {
   var video = document.getElementById("film");
   var lecture = document.getElementById("film-lecture");
@@ -211,17 +209,18 @@
   var econome = navigator.connection && navigator.connection.saveData;
   // Vrai quand la personne a mis le film en pause : il ne repart alors que par son bouton.
   var arreteParToi = false;
+  var observateur = null;
 
-  // Le focus du bouton qui s’efface passe au lecteur classique qui le remplace, pas à la page.
+  // Le focus du bouton passe au lecteur classique, qui est à la personne : le défilement ne le lance plus.
   function lecteurClassique() {
     var avaitLeFocus = document.activeElement === lecture;
+    if (observateur) observateur.disconnect();
     video.controls = true;
     lecture.hidden = true;
     if (avaitLeFocus) video.focus();
   }
 
-  // Une lecture refusée (lecture automatique bloquée, film illisible) passe au lecteur classique. Une lecture annulée
-  // par une pause avant d’avoir commencé (AbortError : le film se chargeait encore) n’est pas un refus.
+  // Une lecture refusée passe au lecteur classique ; une lecture annulée par une pause (AbortError) n’est pas un refus.
   function lire() {
     var essai = video.play();
     if (essai && essai.catch) {
@@ -245,12 +244,13 @@
   video.addEventListener("play", direLaLecture);
   video.addEventListener("pause", direLaLecture);
   if ("IntersectionObserver" in window) {
-    new IntersectionObserver(function (entrees) {
+    observateur = new IntersectionObserver(function (entrees) {
       entrees.forEach(function (entree) {
         if (!entree.isIntersecting) video.pause();
         else if (!arreteParToi) lire();
       });
-    }, { threshold: 0.35 }).observe(video);
+    }, { threshold: 0.35 });
+    observateur.observe(video);
   }
 
   lecture.addEventListener("click", function () {
@@ -260,9 +260,8 @@
   });
 })();
 
-/* Un soir de match, minute par minute. Ses écrans ne se chargent qu’en approchant (.est-proche, 600 px avant) : le
-   premier affichage de l’accueil n’en paie aucun. Sur ordinateur, ils sont empilés à côté des moments (.instant), et
-   celui du moment qui passe au milieu de la fenêtre se montre (.est-actif). */
+/* Un soir de match : ses écrans ne se chargent qu’à 600 px de la section (.est-proche). Sur ordinateur, ils sont
+   empilés à côté des moments (.instant), et celui du moment au milieu de la fenêtre se montre (.est-actif). */
 (function () {
   var soiree = document.querySelector(".soiree");
   var instants = document.querySelectorAll(".instant");
@@ -279,8 +278,7 @@
   }, { rootMargin: "600px 0px" });
   approche.observe(soiree);
 
-  // Les moments dans la bande du milieu de la fenêtre (30 % de sa hauteur) ; le plus proche du milieu est le moment en
-  // cours. Bande vide (au-dessus ou au-dessous de la liste) : le moment en cours ne change pas.
+  // Parmi les moments dans la bande du milieu (30 % de la fenêtre), le plus proche du milieu ; bande vide : rien ne change.
   var dansLaBande = [];
   var milieu = new IntersectionObserver(function (entrees) {
     entrees.forEach(function (entree) {
@@ -304,8 +302,8 @@
 
 /* « Maintiens pour essayer » : le geste de l’appli. Tenir le bouton (doigt, souris, ou Espace et Entrée au clavier)
    remplit le verre en 1,4 s ; lâcher avant le vide. Plein, il dit « Place gardée. », puis revient au départ. Rien
-   n’est envoyé ni réservé : la note, lue par les lecteurs d’écran (role="status"), le dit. En mouvement réduit, un
-   appui suffit. */
+   n’est envoyé ni réservé : la note, lue par les lecteurs d’écran (role="status"), le dit. En mouvement réduit, ou
+   avec un lecteur d’écran (un clic sans pointeur), un appui suffit. */
 (function () {
   var essai = document.getElementById("essai");
   var bouton = document.getElementById("essai-bouton");
@@ -317,13 +315,14 @@
   var DEPART = note.textContent;
   var minuteur = 0;
   var retour = 0;
+  // Vrai le temps d’une touche tenue : l’Espace lâché ne doit pas compter comme un clic de lecteur d’écran.
+  var clavier = false;
 
   function remplir() {
     bouton.classList.remove("est-tenu");
     bouton.classList.add("est-plein");
     mot.textContent = "Place gardée.";
     note.textContent = "C’était un essai\u00a0: rien n’est réservé.";
-    if (navigator.vibrate) navigator.vibrate(12);
     retour = setTimeout(function () {
       bouton.classList.remove("est-plein");
       mot.textContent = "Maintiens pour essayer";
@@ -335,6 +334,7 @@
     if (evenement.type === "keydown" && (evenement.repeat || (evenement.key !== " " && evenement.key !== "Enter"))) return;
     if (evenement.type === "pointerdown" && evenement.button !== 0) return;
     evenement.preventDefault();
+    if (evenement.type === "keydown") clavier = true;
     if (bouton.classList.contains("est-plein") || bouton.classList.contains("est-tenu")) return;
     clearTimeout(retour);
     if (calme) {
@@ -345,11 +345,12 @@
     minuteur = setTimeout(remplir, 1400);
   }
 
-  function lacher() {
+  function lacher(evenement) {
+    if (evenement.type === "keyup") setTimeout(function () { clavier = false; }, 0);
     if (!bouton.classList.contains("est-tenu")) return;
     clearTimeout(minuteur);
     bouton.classList.remove("est-tenu");
-    note.textContent = "Lâché trop tôt\u00a0: le verre se vide. Garde le doigt appuyé jusqu’au bout.";
+    note.textContent = "Lâché trop tôt\u00a0: le verre se vide. Tiens jusqu’au bout.";
   }
 
   bouton.addEventListener("pointerdown", tenir);
@@ -358,5 +359,13 @@
     bouton.addEventListener(type, lacher);
   });
   bouton.addEventListener("contextmenu", function (evenement) { evenement.preventDefault(); });
+  // Un lecteur d’écran active un bouton par un simple clic, sans pointeur ni touche tenue : ce clic remplit le verre, comme
+  // « Réserver sans maintenir » dans l’appli.
+  bouton.addEventListener("click", function (evenement) {
+    if (evenement.detail === 0 && !clavier && !bouton.classList.contains("est-plein")) {
+      clearTimeout(retour);
+      remplir();
+    }
+  });
   essai.hidden = false;
 })();

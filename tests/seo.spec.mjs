@@ -510,7 +510,7 @@ test.describe('le film de l’accueil', () => {
     }
   });
 
-  test('au téléphone, le film ne se charge qu’en arrivant à l’écran ; une seule affiche, en WebP', async ({ page: onglet }) => {
+  for (const [largeur, hauteur] of [[360, 800], [412, 823]]) test(`au téléphone (${largeur}×${hauteur}), le film ne se charge qu’en arrivant à l’écran ; une seule affiche, en WebP`, async ({ page: onglet }) => {
     const films = [];
     const affiches = [];
     onglet.on('request', (requete) => {
@@ -518,7 +518,7 @@ test.describe('le film de l’accueil', () => {
       if (chemin.endsWith('.mp4') && !films.includes(chemin)) films.push(chemin);
       if (/^\/baromatch-film[^/]*\.(jpe?g|png|webp)$/.test(chemin)) affiches.push(chemin);
     });
-    await onglet.setViewportSize({ width: 360, height: 800 });
+    await onglet.setViewportSize({ width: largeur, height: hauteur });
     await onglet.goto('/');
     await onglet.waitForLoadState('networkidle');
     expect(films).toEqual([]);

@@ -236,6 +236,33 @@ test('le film part seul quand il arrive à l’écran, et s’arrête quand il e
   await expect.poll(() => lireLeFilm(page)).toMatchObject({ enPause: true });
 });
 
+test('lecture automatique refusée : le lecteur classique, et une pause faite avec ses commandes tient en revenant au film', async ({ page }) => {
+  await simulerUnLecteur(page);
+  // Le navigateur refuse la première lecture (pas de lecture automatique) ; la personne lance ensuite le film elle-même.
+  await page.addInitScript(() => {
+    const jouer = HTMLMediaElement.prototype.play;
+    let refuse = false;
+    HTMLMediaElement.prototype.play = function () {
+      if (!refuse) { refuse = true; return Promise.reject(new DOMException('refusé', 'NotAllowedError')); }
+      return jouer.call(this);
+    };
+  });
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/');
+  await page.locator('#film').scrollIntoViewIfNeeded();
+  await expect.poll(() => lireLeFilm(page)).toMatchObject({ enPause: true, controles: true });
+  await expect(page.locator('#film-lecture')).toBeHidden();
+  await page.locator('#film').evaluate((v) => v.play());
+  await expect.poll(() => lireLeFilm(page)).toMatchObject({ enPause: false });
+  await page.locator('#film').evaluate((v) => v.pause());
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await deuxImages(page);
+  await page.locator('#film').scrollIntoViewIfNeeded();
+  await deuxImages(page);
+  await deuxImages(page);
+  expect(await lireLeFilm(page)).toMatchObject({ enPause: true, controles: true });
+});
+
 test('le film encore en chargement : le bouton l’arrête sans tomber ni perdre le focus', async ({ page }) => {
   // Le vrai lecteur : sa lecture attend des données, et pause() annule cette attente (AbortError). Ce n’est pas un refus
   // de lecture automatique : le bouton reste, sans lecteur classique.
@@ -314,7 +341,7 @@ test('le texte du film est juste sous lui, replié, avec chaque phrase du film d
 
 // La note du film dit qu’il est sans le son, que le texte dessous dit ce qu’il montre, et que tout y est inventé ;
 // chaque lecteur du film la cite (aria-describedby), avec ou sans JavaScript.
-const NOTE_DU_FILM = 'Le film, sans le son, montre ce que dit le texte « Ce que montre le film », juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.';
+const NOTE_DU_FILM = 'Un film sans le son, raconté en mots juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.';
 
 test('la note du film, citée par chaque lecteur, avec ou sans JavaScript', async ({ page, browser }) => {
   await page.goto('/');
@@ -381,20 +408,20 @@ test('la vague du verre s’arrête d’elle-même avant 5 s, sur l’image du v
 // l’ordre de la soirée, chacun avec son vrai écran (bar, clubs et pseudos inventés), marqué « Écran de démonstration ».
 // Les phrases qui portent une règle de l’appli sont figées : une règle qui change les change avec elle.
 const INSTANTS = [
-  { heure: '18:42', titre: '« Ce soir », tout de suite', ecran: 'ce-soir', dit: ['les bars les plus proches qui ont encore de la place', 'Ta position reste sur ton téléphone.'] },
-  { heure: '18:50', titre: 'Complet ? La liste d’attente', ecran: 'liste-attente', dit: ['avant le coup d’envoi', 'elle va au premier qui la prend'] },
-  { heure: '19:05', titre: 'La carte cherche pour toi', ecran: 'carte-recherche', dit: ['un club, un bar, un quartier ou une adresse', 'un grand écran, le son du match, une terrasse ou un accès PMR'] },
-  { heure: '19:12', titre: 'Garde ta place d’un geste', ecran: 'bar', dit: ['jusqu’à 8', 'c’est gratuit', 'Lâche avant la fin : rien n’est réservé.'] },
-  { heure: '19:13', titre: 'Ton pass, même sans réseau', ecran: 'ta-soiree', dit: ['un QR code et un code à 6 chiffres', 'même sans réseau'] },
-  { heure: '19:20', titre: 'Toute la bande à la même table', ecran: 'tablee', dit: ['jusqu’à 8', 'Chacun a son pass.', '« J’y vais »'] },
+  { heure: '18:42', titre: '« Ce soir », tout de suite', ecran: 'ce-soir', telephone: true, dit: ['Déjà regardé aujourd’hui ? Ils s’affichent tout de suite', 'les plus proches qui ont encore de la place', 'Ta position reste sur ton téléphone.'] },
+  { heure: '18:50', titre: 'Bar complet ? Mets-toi sur la liste', ecran: 'liste-attente', dit: ['avant le coup d’envoi, et tu es premier sur la liste', 'elle n’est pas gardée pour toi'] },
+  { heure: '19:05', titre: 'La carte cherche pour toi', ecran: 'carte-recherche', dit: ['un club, un bar, un quartier ou une adresse', 'de la place, un grand écran, le son du match, une terrasse, un accès PMR'] },
+  { heure: '19:12', titre: 'Garde ta place d’un geste', ecran: 'bar', telephone: true, dit: ['gratuitement', 'Lâche avant la fin : rien n’est réservé.'] },
+  { heure: '19:13', titre: 'Ton pass, même sans réseau', ecran: 'ta-soiree', telephone: true, dit: ['un QR code et un code à 6 chiffres', 'même sans réseau', 'ouvre le bar dans ton appli de cartes'] },
+  { heure: '19:20', titre: 'Toute la bande à la même table', ecran: 'tablee', dit: ['jusqu’à 8 avec toi', 'Ceux qui la rejoignent dans l’appli ont chacun leur pass.', 'en story'] },
   { heure: '20:25', titre: '« Je suis en retard »', ecran: 'en-retard', dit: ['10, 20 ou 30 minutes', 'jusqu’à quelle heure ta place t’attend'] },
-  { heure: '20:37', titre: 'Tu y es', ecran: 'tu-y-es', dit: ['scanne le QR du comptoir, ou montre ton pass à l’équipe', 'un sous-bock aux noms des deux clubs'] },
+  { heure: '20:37', titre: 'Tu y es', ecran: 'tu-y-es', telephone: true, dit: ['scanne le QR du bar ou montre ton pass à l’équipe', 'un sous-bock aux noms des deux clubs'] },
 ];
 
 test('la soirée en huit moments, dans l’ordre, chacun avec son écran de démonstration', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#titre-soiree')).toHaveText('Un soir de match, minute par minute.');
-  expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('L’appli est en test à Paris. Sur ses écrans, les bars, les clubs et les pseudos sont inventés.');
+  expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('Sur ces écrans, les bars, les clubs et les pseudos sont inventés.');
   const lus = await page.locator('.instant').evaluateAll((instants) => instants.map((m) => ({
     heure: m.querySelector('.instant__heure time').textContent,
     titre: m.querySelector('h3.instant__titre').textContent.replace(/\s+/g, ' ').trim(),
@@ -417,7 +444,7 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   // Les heures avancent, comme la soirée.
   expect(lus.map((m) => m.heure)).toEqual([...lus.map((m) => m.heure)].sort());
   // Rien d’autre ne promet les notifications : au plus une par match, et la ligne calme d’une heure avant.
-  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Et au plus une notification par match. Une heure avant le coup d’envoi, une ligne calme sur ton écran verrouillé te rappelle ta place.');
+  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Au plus une notification par match. Et une heure avant le coup d’envoi, une ligne calme sur ton écran verrouillé : ta place t’attend.');
   const soiree = normaliser(await page.locator('.soiree').innerText());
   expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone/i);
 });
@@ -443,18 +470,23 @@ test('les écrans de la soirée ne se chargent qu’en approchant, sans rien fai
   expect(apres.y).toBeCloseTo(avant.y, 0);
 });
 
-test('sans JavaScript, chaque écran de la soirée se voit, et l’essai du geste n’est pas proposé', async ({ browser }) => {
+// Au téléphone, quatre moments ont leur écran (les autres se lisent sans : la page reste courte) ; sur ordinateur, les
+// huit. Sans JavaScript, ces écrans se voient quand même ; l’essai du geste, qui en a besoin, n’est pas proposé.
+test('au téléphone, quatre écrans sur huit, avec ou sans JavaScript ; sans JavaScript, pas d’essai du geste', async ({ page, browser }) => {
+  const visibles = (onglet) => onglet.locator('.instant__ecran').evaluateAll((f) => f.map((e) => getComputedStyle(e).display !== 'none'));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  expect(await visibles(page)).toEqual(INSTANTS.map((m) => Boolean(m.telephone)));
   const contexte = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 360, height: 800 } });
   try {
-    const page = await contexte.newPage();
-    await page.goto('/');
-    const ecrans = page.locator('.instant__ecran img');
-    await expect(ecrans).toHaveCount(INSTANTS.length);
-    for (const ecran of await ecrans.all()) {
+    const onglet = await contexte.newPage();
+    await onglet.goto('/');
+    expect(await visibles(onglet)).toEqual(INSTANTS.map((m) => Boolean(m.telephone)));
+    for (const ecran of await onglet.locator('.instant__ecran:not(.instant__ecran--large) img').all()) {
       await ecran.scrollIntoViewIfNeeded();
       await expect(ecran).toBeVisible();
     }
-    await expect(page.locator('#essai')).toBeHidden();
+    await expect(onglet.locator('#essai')).toBeHidden();
   } finally {
     await contexte.close();
   }
@@ -491,7 +523,7 @@ test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » 
   await page.keyboard.down(' ');
   await page.waitForTimeout(300);
   await page.keyboard.up(' ');
-  await expect(note).toHaveText('Lâché trop tôt : le verre se vide. Garde le doigt appuyé jusqu’au bout.');
+  await expect(note).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
   // Lâché, il ne se remplit pas plus tard.
   await page.waitForTimeout(1600);
   await expect(bouton).not.toHaveClass(/est-plein/);
@@ -510,4 +542,12 @@ test('« Maintiens pour essayer » en mouvement réduit : un appui suffit', asyn
   await page.goto('/');
   await page.locator('#essai-bouton').click();
   await expect(page.locator('#essai-bouton')).toHaveText('Place gardée.');
+});
+
+// Un lecteur d’écran active le bouton par un simple clic, sans pointeur ni touche tenue : le verre se remplit d’un coup.
+test('« Maintiens pour essayer » avec un lecteur d’écran : un clic sans pointeur suffit', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#essai-bouton').evaluate((b) => b.click());
+  await expect(page.locator('#essai-bouton')).toHaveText('Place gardée.');
+  await expect(page.locator('#essai-note')).toHaveText('C’était un essai : rien n’est réservé.');
 });

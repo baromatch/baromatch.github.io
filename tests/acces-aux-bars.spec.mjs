@@ -19,6 +19,8 @@ test.describe('la bande « bars » de l’accueil', () => {
     // d’un bar sur Baromatch.
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : relire la phrase de la bande des bars').toBe(false);
     expect(texte).toContain('Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres.');
+    // Les conditions de la page des bars, dans ses mots : un patron sait tout de suite ce que ça coûte.
+    expect(texte).toContain('Gratuit pendant le lancement, sans engagement.');
     expect(texte).not.toMatch(/aux fans qui cherchent|qui a réservé/);
   });
 
@@ -46,9 +48,10 @@ test.describe('la bande « bars » de l’accueil', () => {
   test('aucune phrase de la bande ne promet ce que Baromatch ne tient pas', async ({ page }) => {
     await page.goto('/');
     const texte = normaliser(await page.locator('section#bars').innerText());
-    // Pas de chiffre, de prix, de partenaire cité ni de promesse de résultat : rien n’est encore mesuré.
+    // Pas de chiffre, de prix, de partenaire cité ni de promesse de résultat : rien n’est encore mesuré. Seule la
+    // condition du lancement, celle de la page des bars, dit « gratuit ».
     expect(texte).not.toMatch(/\d/);
-    expect(texte).not.toMatch(/€|gratuit|garanti|toujours|n°\s?1|plein/i);
+    expect(texte.replace('Gratuit pendant le lancement, sans engagement.', '')).not.toMatch(/€|gratuit|garanti|toujours|n°\s?1|plein/i);
     expect(texte).not.toContain('!');
   });
 

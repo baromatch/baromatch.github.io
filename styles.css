@@ -956,7 +956,7 @@ a:hover { color: var(--goutte); }
 .panier .panier__envoyer[aria-disabled="true"],
 .panier .panier__envoyer[aria-disabled="true"]:hover { background: var(--ambre); opacity: 0.55; cursor: progress; }
 
-/* ---------- La boutique ---------- */
+/* ---------- La boutique : ce que d’autres pages lui empruntent (le reste est dans boutique.css) ---------- */
 
 .boutique-sur {
   margin: 0 0 14px;
@@ -966,21 +966,6 @@ a:hover { color: var(--goutte); }
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-
-.boutique-ouverture { padding-top: 40px; padding-bottom: 56px; }
-@media (min-width: 720px) { .boutique-ouverture { padding-top: 72px; padding-bottom: 80px; } }
-
-.boutique-titre {
-  margin: 0;
-  font-weight: 800;
-  font-stretch: 82%;
-  font-variation-settings: "opsz" 96;
-  font-size: clamp(3.25rem, 13vw, 7rem);
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-}
-
-.boutique-texte { max-width: 38rem; margin: 22px 0 0; color: var(--texte-doux); font-size: 1.125rem; }
 
 .boutique-promesses { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; padding: 0; }
 .boutique-promesses li {
@@ -992,202 +977,6 @@ a:hover { color: var(--goutte); }
   font-size: 0.9375rem;
 }
 .boutique-promesses strong { color: var(--texte); font-weight: 700; }
-
-.boutique-intertitre {
-  margin: 0 0 24px;
-  font-weight: 800;
-  font-stretch: 88%;
-  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
-  line-height: 1;
-  letter-spacing: -0.015em;
-}
-
-.boutique-vitrine { padding-bottom: 72px; }
-
-.boutique-grille { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
-@media (min-width: 640px) { .boutique-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1000px) { .boutique-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-/* Tant que boutique.js n’a pas dessiné la collection, sa grille garde la hauteur de l’écran, sans dépasser 87,5 rem
-   (1 400 px au réglage normal ; la collection finie mesure plus : 1 480 px à 1 000 px de large, 4 445 à 360) : les
-   questions sont déjà sous l’écran et ne sautent pas quand les pièces arrivent. Sans JavaScript, la tête de
-   boutique.html annule cette réserve. */
-.boutique-grille:empty { min-height: min(100vh, 87.5rem); }
-
-.boutique-produit {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--trait);
-  border-radius: 24px;
-  background: var(--nuit-releve);
-}
-
-.boutique-produit__vitrine {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1 / 1;
-  background:
-    radial-gradient(60% 55% at 50% 44%, rgba(255, 177, 61, 0.18), rgba(255, 177, 61, 0) 72%),
-    linear-gradient(180deg, #1E2130 0%, #12141C 100%);
-}
-.boutique-produit__vitrine svg { width: 86%; height: auto; }
-
-.boutique-produit__corps { display: flex; flex: 1; flex-direction: column; gap: 12px; padding: 20px 20px 22px; }
-.boutique-produit__type {
-  margin: 0;
-  color: var(--texte-discret);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.boutique-produit__nom { margin: -6px 0 0; font-size: 1.625rem; font-weight: 800; font-stretch: 88%; line-height: 1.05; }
-.boutique-produit__texte { margin: 0; color: var(--texte-doux); font-size: 1rem; }
-.boutique-produit__prix { margin: 0; font-size: 1.25rem; font-weight: 700; }
-.boutique-produit__prix span { margin-left: 6px; color: var(--texte-discret); font-size: 0.875rem; font-weight: 500; }
-.boutique-produit__ajouter { margin-top: auto; width: 100%; }
-.boutique-produit__retour { min-height: 1.4em; margin: -2px 0 0; color: var(--goutte); font-size: 0.9375rem; }
-.boutique-produit__retour--erreur { color: var(--erreur); }
-
-.boutique-choix { margin: 0; padding: 0; border: 0; min-width: 0; }
-.boutique-choix legend { margin-bottom: 8px; padding: 0; color: var(--texte-discret); font-size: 0.875rem; }
-.boutique-choix__options { display: flex; flex-wrap: wrap; gap: 8px; }
-.boutique-puce { position: relative; }
-.boutique-puce input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.boutique-puce span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-}
-.boutique-puce input:checked + span { border-color: var(--ambre); background: rgba(255, 177, 61, 0.12); color: var(--texte); }
-.boutique-puce input:focus-visible + span { outline: 2px solid var(--ambre); outline-offset: 2px; }
-.boutique-pastille { width: 16px; height: 16px; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; }
-/* En couleurs forcées (contraste élevé de Windows), le fond ambré de la puce choisie et la teinte des pastilles
-   s’effacent : la puce choisie prend un bord Highlight plus épais (même taille : le bord gagne ce que le retrait perd),
-   et chaque pastille garde sa teinte, cernée d’un bord de la couleur du texte. */
-@media (forced-colors: active) {
-  .boutique-puce input:checked + span { padding: 0 12px; border: 3px solid Highlight; }
-  .boutique-pastille { forced-color-adjust: none; border-color: CanvasText; }
-}
-
-.boutique-sans-js { color: var(--texte-doux); }
-
-.boutique-questions { padding-top: 64px; padding-bottom: 48px; border-top: 1px solid var(--trait); }
-.boutique-questions details { max-width: 46rem; padding: 10px 0; border-bottom: 1px solid var(--trait); }
-.boutique-questions summary { padding: 8px 0; cursor: pointer; font-size: 1.125rem; font-weight: 700; }
-.boutique-questions summary:hover { color: var(--ambre); }
-.boutique-questions details p { margin: 4px 0 8px; color: var(--texte-doux); }
-
-.boutique-mention { padding-bottom: 56px; color: var(--texte-discret); font-size: 0.9375rem; }
-/* La barre de la sélection, fixée en bas, ne cache ni la fin de la page ni ce qui a le focus au clavier (WCAG 2.4.11) :
-   la page garde dessous la hauteur de la barre, texte agrandi compris, et le défilement du clavier s’arrête au-dessus. */
-body.avec-barre { padding-bottom: calc(4rem + 48px); }
-html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
-
-.boutique-barre {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 20;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px var(--gouttiere) calc(12px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--trait);
-  background: rgba(10, 11, 16, 0.88);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-}
-.boutique-barre[hidden] { display: none; }
-.boutique-barre__texte { flex: 1 1 8rem; min-width: 0; margin: 0; font-size: 0.9375rem; font-weight: 600; }
-.boutique-barre__bouton { min-height: 48px; max-width: 100%; padding: 0 20px; text-align: center; }
-
-/* ---------- Le panneau de la sélection ---------- */
-
-.panier {
-  width: min(560px, calc(100% - 24px));
-  /* Le navigateur limite une fenêtre modale à 100 % moins 2 em : à 200 % de texte sur 320 px, elle perdait 50 px et
-     « Ta sélection » se coupait au milieu du mot. Sa largeur ne dépend que de l’écran. */
-  max-width: calc(100% - 24px);
-  max-height: min(90vh, 780px);
-  margin: auto;
-  padding: 0;
-  border: 1px solid var(--trait);
-  border-radius: 24px;
-  background: var(--nuit-releve);
-  color: var(--texte);
-}
-.panier[open] { display: flex; flex-direction: column; }
-.panier::backdrop { background: rgba(0, 0, 0, 0.62); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
-
-.panier__entete { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 20px 4px; }
-/* Le titre grandit avec le texte (en rem seulement : une taille en vw ne suivrait pas le réglage, WCAG F94) ; sur un
-   téléphone il part de 22 px, pour tenir à côté du bouton de fermeture même à 200 % sur 320 px. Les lignes de la
-   sélection passent à la ligne au lieu de se couper. */
-.panier__entete h2 { min-width: 0; margin: 0; font-size: 1.375rem; font-weight: 800; font-stretch: 88%; line-height: 1.1; overflow-wrap: anywhere; }
-@media (min-width: 480px) { .panier__entete h2 { font-size: 1.75rem; } }
-.panier__fermer {
-  flex: none;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--trait);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--texte);
-  font: inherit;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-}
-.panier__corps { overflow-y: auto; padding: 4px 20px 24px; }
-
-.panier__liste { margin: 0; padding: 0; list-style: none; }
-.panier__ligne { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--trait); }
-.panier__ligne > div:first-child { flex: 1 1 9rem; min-width: 0; }
-.panier__nom { margin: 0; font-weight: 700; }
-.panier__nom span { color: var(--texte-discret); font-weight: 500; }
-.panier__detail { margin: 2px 0 0; color: var(--texte-doux); font-size: 0.9375rem; }
-.panier__retirer {
-  min-height: 44px;
-  padding: 0 2px;
-  border: 0;
-  background: none;
-  color: var(--texte-discret);
-  font: inherit;
-  font-size: 0.875rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.panier__droite { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: auto; }
-.panier__quantite { display: inline-flex; align-items: center; gap: 4px; }
-.panier__quantite button {
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  background: transparent;
-  color: var(--texte);
-  font: inherit;
-  font-size: 1.125rem;
-  cursor: pointer;
-}
-.panier__quantite output { min-width: 28px; text-align: center; font-weight: 700; }
-.panier__prix { margin: 0; font-weight: 700; }
-.panier__vide { padding: 18px 0; color: var(--texte-doux); }
-
-.panier__total { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 12px; margin: 16px 0 6px; font-size: 1.0625rem; }
-.panier__total span { color: var(--texte-doux); }
 
 .panier__etiquette { display: block; margin: 16px 0 6px; font-size: 0.9375rem; font-weight: 600; }
 .panier__etiquette span { color: var(--texte-discret); font-weight: 500; }
@@ -1206,35 +995,6 @@ html:has(body.avec-barre) { scroll-padding-bottom: calc(4rem + 48px); }
 .panier__accord { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; color: var(--texte-doux); font-size: 0.9375rem; cursor: pointer; }
 .panier__accord input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ambre); }
 .panier__envoyer { width: 100%; min-height: 56px; }
-/* Le message, juste au-dessus du bouton d’envoi (boutique.js fait défiler la fenêtre jusqu’à lui). */
-.panier__retour { margin: 0 0 14px; color: var(--goutte); font-size: 0.9375rem; }
-.panier__retour:empty { display: none; }
-/* Pendant l’envoi, la zone ne contient que « Envoi… », caché (boutique.js) : elle ne prend pas de place. */
-.panier__retour--envoi { margin: 0; }
-.panier__retour--erreur { color: var(--erreur); }
-.panier__note { margin: 12px 0 0; color: var(--texte-discret); font-size: 0.875rem; }
-.panier__note a { color: var(--texte-doux); }
-.panier__merci h3 { margin: 12px 0 8px; font-size: 1.75rem; font-weight: 800; }
-.panier__merci h3:focus { outline: none; }
-.panier__merci p { margin: 0 0 24px; color: var(--texte-doux); }
-.panier__merci strong { color: var(--texte); font-weight: 700; overflow-wrap: anywhere; }
-.panier__corriger {
-  display: block;
-  min-height: 44px;
-  margin: 8px auto 0;
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  color: var(--texte);
-  font: inherit;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 177, 61, 0.7);
-  text-underline-offset: 0.18em;
-  cursor: pointer;
-}
-.panier__corriger:hover { color: var(--ambre); }
 
 /* ---------- Le lien d’une tablée (/t/‹code›, servi par 404.html) ---------- */
 

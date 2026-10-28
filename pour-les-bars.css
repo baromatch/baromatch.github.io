@@ -61,7 +61,7 @@
 @media (min-width: 360px) { .salle__sol { transform: scale(0.6) rotateX(56deg) rotateZ(-30deg); } }
 @media (min-width: 420px) { .salle__sol { transform: scale(0.7) rotateX(56deg) rotateZ(-30deg); } }
 @media (min-width: 720px) { .salle__sol { transform: scale(0.98) rotateX(56deg) rotateZ(-30deg); } }
-@media (min-width: 1100px) { .salle__sol { transform: scale(0.86) rotateX(56deg) rotateZ(-30deg); } }
+@media (min-width: 1100px) { .salle__sol { transform: scale(0.74) rotateX(56deg) rotateZ(-30deg); } }
 .salle__mur { position: absolute; left: 0; right: 0; top: 0; height: 74px; border-radius: 16px 16px 0 0; transform-origin: 50% 0; transform: rotateX(-90deg); background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.08)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
 .salle__ecran { position: absolute; left: 110px; width: 220px; top: 10px; height: 54px; border-radius: 8px; display: grid; place-items: center; background: linear-gradient(110deg, #0F8B7E, #241D3A 52%, #3A3FA8); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12), 0 0 60px rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.92); font-size: 24px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .salle__comptoir { position: absolute; right: 16px; top: 54px; bottom: 22px; width: 22px; border-radius: 11px; transform: translateZ(12px); background: linear-gradient(180deg, rgba(255, 177, 61, 0.4), rgba(255, 177, 61, 0.12)); box-shadow: inset 0 0 0 1px rgba(255, 177, 61, 0.5), 0 0 34px rgba(255, 177, 61, 0.22); }

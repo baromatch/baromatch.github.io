@@ -8,6 +8,7 @@
     },
     "ouverte": {
       "texte": "Réserve ta place dans l’appli",
+      "texteSansBar": "Télécharge l’appli",
       "note": "Ta place ne coûte rien. Garde-la avant de partir."
     }
   },
@@ -107,7 +108,7 @@
     "statutSuite": "Vérifie auprès du bar avant de te déplacer."
   },
   "premiersBars": {
-    "_lisezMoi": "Tant qu’aucun bar n’est publié sur Baromatch : le bloc en tête des pages des matchs (la semaine, ce soir, chaque match, chaque club et chaque compétition), et des titres qui ne promettent aucun bar. Le jour où le premier bar est publié, les pages reprennent seules leurs titres « où regarder » et montrent leurs bars.",
+    "_lisezMoi": "Tant qu’aucun bar n’est publié sur Baromatch : le bloc « Pas encore de bar » sous la tête des pages des matchs (la semaine, chaque match, chaque club et chaque compétition ; sur « Ce soir », juste sous les matchs du soir), et des titres de la semaine et de « Ce soir » qui ne promettent aucun bar. Le jour où le premier bar est publié, les pages reprennent seules leurs titres « où regarder » et montrent leurs bars. Les titres des pages d’un match, d’un club et d’une compétition, eux, disent « où regarder » dès que la page montre un vrai bar, et « quand » sinon.",
     "titre": "Pas encore de bar sur Baromatch",
     "titreMatch": "Pas encore de bar pour ce match",
     "match": "Baromatch cherche ses premiers bars à Paris. Dès qu’un bar annonce ce match, il s’affiche ici.",
@@ -159,9 +160,9 @@
     "commenceA": "Commencé à",
     "commenceLe": "Commencé le",
     "rien": "Pas de match ce soir",
-    "rienSuite": "Aucun match n’est annoncé ce soir. Les prochains sont juste en dessous.",
+    "rienSuite": "Aucun match n’est annoncé ce soir. Les prochains sont plus bas.",
     "fini": "Fini pour ce soir",
-    "finiSuite": "Les matchs de ce soir sont terminés. Les prochains sont juste en dessous.",
+    "finiSuite": "Les matchs de ce soir sont terminés. Les prochains sont plus bas.",
     "prochains": "Les prochains matchs",
     "aucunProchain": "Pas d’autre match annoncé pour l’instant.",
     "soirsAuBar": "Les prochains soirs au bar",

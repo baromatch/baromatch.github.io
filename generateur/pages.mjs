@@ -16,7 +16,7 @@ import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
 import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
-import { lienDeLaCompetition, lienDuClub, sectionDesPagesSuivies } from './suivre.mjs';
+import { clubAvecBars, competitionAvecBars, lienDeLaCompetition, lienDuClub, sectionDesPagesSuivies } from './suivre.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
 export const SEMAINE_JOURS = 7;
@@ -142,9 +142,12 @@ export const fabriquerLesPages = ({
       && [m.domicile.cle, m.exterieur.cle].some((cle) => cle === match.domicile.cle || cle === match.exterieur.cle))
     .sort((a, b) => a.debut - b.debut);
 
-  // Les pages des clubs suivis et de la compétition d’un match (suivre.mjs) : « Les matchs du PSG et où les voir ».
-  const suivis = (match) => [lienDuClub(match.domicile.cle, undefined, { sansAucunBar }), lienDuClub(match.exterieur.cle, undefined, { sansAucunBar }),
-    lienDeLaCompetition(match.competition, undefined, { sansAucunBar })]
+  // Les pages des clubs suivis et de la compétition d’un match (suivre.mjs) : « Les matchs du PSG et où les voir » si
+  // la page du PSG montre un vrai bar, sinon « Les matchs du PSG ».
+  const aVenir = donnees.matchs.filter(enCoursOuAVenir);
+  const suivis = (match) => [lienDuClub(match.domicile.cle, undefined, { avecBars: clubAvecBars(match.domicile.cle, aVenir) }),
+    lienDuClub(match.exterieur.cle, undefined, { avecBars: clubAvecBars(match.exterieur.cle, aVenir) }),
+    lienDeLaCompetition(match.competition, undefined, { avecBars: competitionAvecBars(match.competition, aVenir) })]
     .filter(Boolean).map((lien) => `\n  <p class="regarder-suite">${lien}</p>`).join('');
 
   // ---------- Les pages des matchs ----------
@@ -160,15 +163,15 @@ export const fabriquerLesPages = ({
     const memoire = { slug: match.slug, ids: match.ids, debut: new Date(match.debut).toISOString(), heureConfirmee: match.heureConfirmee, competition: match.competition, domicile: match.domicile, exterieur: match.exterieur };
     // « Ajouter à mon agenda » : un match à venir, ni reporté ni annulé ; son fichier s’écrit à côté de la page.
     const evenement = vivant && aSonFichier(match, maintenant);
-    // Le titre ne promet des bars que si la page en montre : sans vrai bar, « où le regarder » ; passé ou plus au
-    // programme, ou tant qu’aucun bar n’est publié sur Baromatch, le match seul.
-    const promesse = passe || !vivant || sansAucunBar ? '' : soirees.length ? ' : les bars qui diffusent le match' : ' : où le regarder';
+    // Le titre dit « où regarder le match » seulement si la page montre au moins un vrai bar publié (ce que les fans
+    // cherchent) ; sans bar, passé ou plus au programme, le match seul, et son jour dans le titre de la page.
+    const promesse = !passe && vivant && soirees.length ? ' : où regarder le match' : '';
     const enTete = `<header class="regarder-tete">
   <p class="regarder-surtitre">${e(match.competition)}</p>
   <h1 class="regarder-titre">${e(nom)}${promesse}</h1>
   <p class="regarder-affiche">${e(match.domicile.nom)} – ${e(match.exterieur.nom)}</p>
   <p class="regarder-quand">${quand(match, { majuscule: true })}</p>
-${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}${match.statut ? `  <p class="regarder-note"><strong>${e(textes.match[match.statut])}.</strong> ${e(textes.match.statutSuite)}</p>\n` : ''}  ${blocDuMatch(match, { clubsSuivis, fichier: evenement })}
+${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.match.heureAConfirmer)}</p>\n`}${match.statut ? `  <p class="regarder-note"><strong>${e(textes.match[match.statut])}.</strong>${soirees.length ? ` ${e(textes.match.statutSuite)}` : ''}</p>\n` : ''}  ${blocDuMatch(match, { clubsSuivis, fichier: evenement })}
 </header>`;
 
     if (passe || !vivant) {
@@ -181,9 +184,10 @@ ${match.heureConfirmee || passe ? '' : `  <p class="regarder-note">${e(textes.ma
           ? `<p>${e(textes.match.passeSuite)} ${aUnePage(suivant) ? `<a href="${cheminDuMatch(suivant)}">${e(nomCourt(suivant))}</a>` : e(nomCourt(suivant))}, ${quand(suivant)}${statutDuMatch(suivant, textes)}.</p>${aUnePage(suivant) ? '' : `\n  <p><a href="/matchs/">${e(textes.fil.matchs)}</a></p>`}`
           : `<p>${e(textes.match.passeSansSuite)} <a href="/matchs/">${e(textes.fil.matchs)}</a></p>`;
       const titrePage = titre(`${nom} du ${dateCourte(match.debut)} : match passé — Baromatch`, `${nom} du ${dateCourte(match.debut)} : match passé`, `${nom} : match passé`);
+      // Aucun bar publié sur Baromatch : la description ne parle pas des bars du prochain match.
       const desc = description(
-        `${nom} (${match.competition}), ${quandCourt(match)}. ${passe ? textes.match.passe : textes.match.plusAnnonce} : le prochain match des deux clubs et les bars qui le diffusent.`,
-        `${nom}, ${quandCourt(match)}. ${passe ? textes.match.passe : textes.match.plusAnnonce} : les matchs à venir et les bars qui les diffusent.`,
+        `${nom} (${match.competition}), ${quandCourt(match)}. ${passe ? textes.match.passe : textes.match.plusAnnonce} : le prochain match des deux clubs${sansAucunBar ? '' : ' et les bars qui le diffusent'}.`,
+        `${nom}, ${quandCourt(match)}. ${passe ? textes.match.passe : textes.match.plusAnnonce} : les matchs à venir${sansAucunBar ? '' : ' et les bars qui les diffusent'}.`,
       );
       ajouter({
         type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable: false, titre: titrePage, description: desc,
@@ -200,25 +204,28 @@ ${enTete}
 
     const groupes = grouperParLieu(soirees, (s) => s.bar);
     const villesDuMatch = groupes.map((g) => g.ville.nom);
-    // Le titre (et donc og:title et le texte envoyé sur WhatsApp) : « les bars qui diffusent le match » seulement avec
-    // de vrais bars ; sans, « PSG – Barça, mardi 20 octobre : où le regarder » ; aucun bar publié sur Baromatch,
-    // « PSG – Barça, mardi 20 octobre ».
-    const titrePage = sansAucunBar
-      ? titre(`${nom}, ${jourEnLettres(match.debut)} — Baromatch`, `${nom}, ${dateCourte(match.debut)} — Baromatch`, `${nom}, ${jourEnLettres(match.debut)}`, nom)
-      : soirees.length
-      ? titre(`${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : les bars qui diffusent le match`,
-        `${nom}, ${dateCourte(match.debut)} : où voir le match`, `${nom} : où voir le match`)
-      : titre(`${nom}, ${jourEnLettres(match.debut)} : où le regarder — Baromatch`, `${nom}, ${jourEnLettres(match.debut)} : où le regarder`,
-        `${nom}, ${dateCourte(match.debut)} : où le regarder`, `${nom} : où le regarder`);
+    // Le titre (et donc og:title et le texte envoyé sur WhatsApp) : « où regarder le match » seulement avec de vrais
+    // bars (« PSG – OL, 25 octobre : où regarder le match ») ; sans, le match et son jour (« PSG – Barça, mardi 20
+    // octobre »). Rien à changer à la main : le passage qui publie un bar pour ce match lui rend son « où ».
+    const titrePage = soirees.length
+      ? titre(`${nom}, ${dateCourte(match.debut)} : où regarder le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : où regarder le match`,
+        `${nom} : où regarder le match — Baromatch`, `${nom} : où regarder le match`)
+      : titre(`${nom}, ${jourEnLettres(match.debut)} — Baromatch`, `${nom}, ${dateCourte(match.debut)} — Baromatch`, `${nom}, ${jourEnLettres(match.debut)}`, nom);
     const desc = soirees.length
       ? description(
         `${nom} (${match.competition}), ${quandCourt(match)}. ${accorder(soirees.length, 'bar')} le ${soirees.length > 1 ? 'diffusent' : 'diffuse'} sur Baromatch, à ${enumerer(villesDuMatch)} : les adresses et l’heure.`,
         `${nom}, ${quandCourt(match)}. ${accorder(soirees.length, 'bar')} le ${soirees.length > 1 ? 'diffusent' : 'diffuse'} sur Baromatch : les adresses et l’heure.`,
       )
-      : description(
-        `${nom} (${match.competition}), ${quandCourt(match)}. Aucun bar ne le diffuse encore sur Baromatch : les prochains matchs des deux clubs.`,
-        `${nom}, ${quandCourt(match)}. Aucun bar ne le diffuse encore sur Baromatch : les prochains matchs des deux clubs.`,
-      );
+      : match.statut
+        // Reporté ou annulé, sans bar : le statut, pas « encore ».
+        ? description(
+          `${nom} (${match.competition}), ${quandCourt(match)} : ${textes.match[match.statut].toLowerCase()}. Les prochains matchs des deux clubs, à l’heure de Paris.`,
+          `${nom}, ${quandCourt(match)} : ${textes.match[match.statut].toLowerCase()}. Les prochains matchs des deux clubs.`,
+        )
+        : description(
+          `${nom} (${match.competition}), ${quandCourt(match)}. Aucun bar ne le diffuse encore sur Baromatch : les prochains matchs des deux clubs.`,
+          `${nom}, ${quandCourt(match)}. Aucun bar ne le diffuse encore sur Baromatch : les prochains matchs des deux clubs.`,
+        );
     const listeDesSoirees = groupes.map(({ ville, quartiers }) => `  <h3 class="regarder-ville"><a href="${cheminDeLaVille(ville)}">${e(ville.nom)}</a></h3>
 ${quartiers.map(({ arrondissement, elements }) => `${arrondissement ? `  <h4 class="regarder-quartier">${e(arrondissement.libelle)}</h4>\n` : ''}  <ul class="regarder-cartes">
     ${elements.map((s) => carteDuBar(s.bar, textes, { soiree: s, niveau: arrondissement ? 5 : 4 })).join('\n    ')}
@@ -305,8 +312,8 @@ ${commentCaMarche(textes, marque)}`,
 </header>
 ${sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : ''}<section class="regarder-section regarder-ce-soir" aria-labelledby="titre-ce-soir">
   <h2 id="titre-ce-soir">${e(titreDuJour)}</h2>
-${ceSoir.length ? `  <ul class="regarder-matchs">\n${ceSoir.map(ligne).join('\n')}\n  </ul>
-  <p class="regarder-suite"><a href="/ce-soir/">${e(lienCeSoir)}</a></p>` : `  <p>${e(rienDuJour)}</p>`}
+${ceSoir.length ? `  <ul class="regarder-matchs">\n${ceSoir.map(ligne).join('\n')}\n  </ul>` : `  <p>${e(rienDuJour)}</p>`}${ceSoir.length || !sansAucunBar ? `
+  <p class="regarder-suite"><a href="/ce-soir/">${e(lienCeSoir)}</a></p>` : ''}
 </section>
 ${autres.length ? autres.map(({ jour, matchs }) => `<section class="regarder-section" aria-labelledby="jour-${jour}">
   <h2 id="jour-${jour}">${e(capitale(jourEnLettres(Date.parse(`${jour}T12:00:00Z`))))}</h2>

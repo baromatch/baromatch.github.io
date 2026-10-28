@@ -240,8 +240,7 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
   <p class="regarder-chapeau">${e(sansAucunBar ? textes.premiersBars.ceSoirChapeau : avecBars.length ? t.chapeau : aVenirAvecBars.length ? t.chapeauProchainsSoirs : t.chapeauSansBar)}</p>
 </header>
 ${sectionDuSoir}
-${sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : ''}
-${sectionSoirsAuBar}${sectionProchains}
+${sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : ''}${sectionSoirsAuBar}${sectionProchains}
 ${sectionVilles}
 ${appel(marque, textes)}
 ${commentCaMarche(textes, marque)}`,

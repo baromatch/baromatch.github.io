@@ -165,7 +165,7 @@ test('un soir sans bar, avec des vrais bars publiés : indexable, elle le dit, e
   sansErreur(p);
   expect(p.indexable).toBe(true);
   expect(robotsDe(p)).toBe('max-image-preview:large');
-  // Des vrais bars publiés : ni « En attendant les premiers bars », ni le titre sans promesse.
+  // Des vrais bars publiés : ni « Pas encore de bar sur Baromatch » en tête, ni le titre sans promesse.
   expect(p.contenu).not.toContain('titre-premiers');
   expect(titreDe(p)).toBe('Où regarder le match ce soir, vendredi 23 octobre');
   // Ce soir : le match du jour, et « pas encore de bar », en clair ; aucune carte de bar.
@@ -230,7 +230,7 @@ test('un match fini n’est plus listé ; il l’est encore tant qu’il peut se
   expect(fini.indexable).toBe(true);
   expect(fini.contenu).not.toContain('Brest – Nice</a>');
   expect(fini.contenu).not.toContain('regarder-carte__nom');
-  expect(sectionDe(fini, 'titre-rien')).toMatch(/^id="titre-rien">Fini pour ce soir<\/h2>\n {2}<p>Les matchs de ce soir sont terminés. Les prochains sont juste en dessous.<\/p>/);
+  expect(sectionDe(fini, 'titre-rien')).toMatch(/^id="titre-rien">Fini pour ce soir<\/h2>\n {2}<p>Les matchs de ce soir sont terminés. Les prochains sont plus bas.<\/p>/);
   expect(sectionDe(fini, 'titre-soirs')).toContain('<h3 class="regarder-jour">Samedi 24 octobre</h3>');
   expect(sectionDe(fini, 'titre-prochains')).toContain('PSG – Barça');
   // OM – Lens, la veille, n’y est jamais.

@@ -428,6 +428,10 @@ test('les écrans de la soirée ne se chargent qu’en approchant, sans rien fai
   await page.setViewportSize({ width: 412, height: 823 });
   await page.goto('/', { waitUntil: 'networkidle' });
   expect(demandes, 'aucun écran au premier affichage').toEqual([]);
+  // Loin de la soirée, ses écrans ne sont pas affichés (un navigateur charge une image paresseuse bien avant qu’elle
+  // n’arrive à l’écran, jusqu’à 2 500 px avant sur un réseau lent) : leur place est gardée.
+  await expect(page.locator('.soiree')).not.toHaveClass(/est-proche/);
+  expect(await page.locator('.instant__ecran img').evaluateAll((i) => i.map((e) => getComputedStyle(e).display))).toEqual(Array(INSTANTS.length).fill('none'));
   const premier = page.locator('.instant__ecran').first();
   const avant = await premier.boundingBox();
   await page.locator('.soiree').scrollIntoViewIfNeeded();
@@ -488,7 +492,10 @@ test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » 
   await page.waitForTimeout(300);
   await page.keyboard.up(' ');
   await expect(note).toHaveText('Lâché trop tôt : le verre se vide. Garde le doigt appuyé jusqu’au bout.');
+  // Lâché, il ne se remplit pas plus tard.
+  await page.waitForTimeout(1600);
   await expect(bouton).not.toHaveClass(/est-plein/);
+  await expect(bouton).toHaveText('Maintiens pour essayer');
   await page.keyboard.down(' ');
   await expect(bouton).toHaveText('Place gardée.', { timeout: 3000 });
   await page.keyboard.up(' ');

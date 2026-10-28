@@ -106,6 +106,18 @@
     "annule": "Match annulé",
     "statutSuite": "Vérifie auprès du bar avant de te déplacer."
   },
+  "premiersBars": {
+    "_lisezMoi": "Tant qu’aucun bar n’est publié sur Baromatch : le bloc en tête des pages des matchs (la semaine, ce soir, chaque match, chaque club et chaque compétition), et des titres qui ne promettent aucun bar. Le jour où le premier bar est publié, les pages reprennent seules leurs titres « où regarder » et montrent leurs bars.",
+    "titre": "En attendant les premiers bars",
+    "match": "Pas encore de bar sur Baromatch. Dès qu’un bar annonce ce match, il s’affiche ici.",
+    "matchs": "Pas encore de bar sur Baromatch. Dès qu’un bar annonce un de ces matchs, il s’affiche ici.",
+    "semaine": "Les matchs de la semaine",
+    "semaineChapeau": "Sept jours de foot, à l’heure de Paris.",
+    "ceSoir": "Les matchs de ce soir",
+    "ceSoirChapeau": "Les matchs du jour, à l’heure de Paris.",
+    "auProgramme": "Au programme",
+    "villesSuite": "Ce qu’il faut savoir pour regarder le match dans chaque ville."
+  },
   "semaine": {
     "titre": "Les matchs de la semaine et où les voir",
     "chapeau": "Sept jours de foot à l’heure de Paris et, pour chaque match, les bars qui le diffusent sur Baromatch.",

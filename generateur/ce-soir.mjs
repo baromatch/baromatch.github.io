@@ -18,7 +18,7 @@ import { DUREE_MATCH_MS } from './donnees.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import { adresseDe, ancreDeLaSoiree, cheminDuBar, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
-import { appel, carteDuBar, commentCaMarche, fil, ligneDeListe, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, ligneDeListe, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 
@@ -90,6 +90,10 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   const soirees = avecBars.flatMap((m) => m.soirees);
   const nombreDeBars = new Set(soirees.map((s) => s.bar.id)).size;
   const indexable = donnees.bars.length >= BARS_POUR_CE_SOIR;
+  // Aucun bar publié sur Baromatch : la page le dit en tête (enAttenteDesBars), son titre ne promet aucun bar
+  // (« Les matchs de ce soir »), et aucune ligne ne répète « Pas encore de bar ».
+  const sansAucunBar = donnees.bars.length === 0;
+  const titreDuSoir = sansAucunBar ? textes.premiersBars.ceSoir : t.titre;
   const fini = ceSoir.length === 0 && donnees.matchs.some((m) => jourDeParis(m.debut) === aujourdhui && !m.statut);
   const prochains = donnees.matchs.filter((m) => !ceSoir.includes(m) && m.debut > maintenant && !m.statut && aUnePage(m)).sort(parDebut).slice(0, PROCHAINS);
   // Les matchs à venir (après ce soir) qu’un vrai bar diffuse : la page ne parle de « bars qui les diffusent » qu’avec eux.
@@ -117,9 +121,9 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
       ${[...m.soirees].sort(parLieu).map((s) => carteDuBar(s.bar, textes, { soiree: s, niveau: 4, places: placesDe(s) })).join('\n      ')}
     </ul>
   </div>`;
-  const ligneDuSoir = (m) => `    ${ligneDeListe(e(nomCourt(m)), aUnePage(m) ? cheminDuMatch(m) : null, `${coupDEnvoi(m)} · ${e(m.competition)} · ${m.statut
-    ? `<strong>${e(textes.match[m.statut])}</strong>`
-    : `<span class="regarder-compte">${e(textes.semaine.pasDeBar)}</span>`}`)}`;
+  const ligneDuSoir = (m) => `    ${ligneDeListe(e(nomCourt(m)), aUnePage(m) ? cheminDuMatch(m) : null, `${coupDEnvoi(m)} · ${e(m.competition)}${m.statut
+    ? ` · <strong>${e(textes.match[m.statut])}</strong>`
+    : sansAucunBar ? '' : ` · <span class="regarder-compte">${e(textes.semaine.pasDeBar)}</span>`}`)}`;
 
   // ---------- Les sections ----------
   const sectionDuSoir = avecBars.length
@@ -135,8 +139,8 @@ ${autres.map(ligneDuSoir).join('\n')}
 </section>` : ''}`
     : ceSoir.length
       ? `<section class="regarder-section" aria-labelledby="titre-matchs">
-  <h2 id="titre-matchs">${e(moment.matchs)}</h2>
-${ceSoir.some((m) => !m.statut) ? `  <p class="regarder-vide">${e(moment.sansBar)}</p>
+  <h2 id="titre-matchs">${e(sansAucunBar ? textes.premiersBars.auProgramme : moment.matchs)}</h2>
+${ceSoir.some((m) => !m.statut) && !sansAucunBar ? `  <p class="regarder-vide">${e(moment.sansBar)}</p>
   ${tuTiensUnBar(textes)}
 ` : ''}  <ul class="regarder-matchs">
 ${ceSoir.map(ligneDuSoir).join('\n')}
@@ -152,7 +156,7 @@ ${ceSoir.map(ligneDuSoir).join('\n')}
   <h2 id="titre-prochains">${e(t.prochains)}</h2>
 ${prochains.length ? joursProchains.map((j) => `  <h3 class="regarder-jour">${e(capitale(jourEnLettres(Date.parse(`${j}T12:00:00Z`))))}</h3>
   <ul class="regarder-matchs">
-${prochains.filter((m) => jourDeParis(m.debut) === j).map((m) => `    ${ligneDeMatch(m, { avecPage: true, heureSeule: true, suite: ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`).join('\n')}
+${prochains.filter((m) => jourDeParis(m.debut) === j).map((m) => `    ${ligneDeMatch(m, { avecPage: true, heureSeule: true, suite: sansAucunBar ? '' : ` · <span class="regarder-compte">${m.soirees.length ? barsParVille(m.soirees) : e(textes.semaine.pasDeBar)}</span>` })}`).join('\n')}
   </ul>`).join('\n') : `  <p>${e(t.aucunProchain)}</p>`}
   <p class="regarder-suite"><a href="/matchs/">${e(textes.villes.voirLaSemaine)}</a></p>
 </section>`;
@@ -180,15 +184,15 @@ ${soirsAuBar.filter((m) => jourDeParis(m.debut) === j).map((m) => `    ${ligneDe
     .sort((a, b) => b.bars - a.bars || a.nom.localeCompare(b.nom, 'fr'));
   const sectionVilles = villes.length ? `<section class="regarder-section" aria-labelledby="titre-villes">
   <h2 id="titre-villes">${e(t.villes)}</h2>
-  <p>${e(t.villesSuite)}</p>
+  <p>${e(sansAucunBar ? textes.premiersBars.villesSuite : t.villesSuite)}</p>
   <ul class="regarder-matchs">
-${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v.nom })), v.chemin, `<span class="regarder-compte">${e(v.bars ? accorder(v.bars, 'bar') : textes.villes.sansBar)}</span>`)}`).join('\n')}
+${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v.nom })), v.chemin, sansAucunBar ? '' : `<span class="regarder-compte">${e(v.bars ? accorder(v.bars, 'bar') : textes.villes.sansBar)}</span>`)}`).join('\n')}
   </ul>
 </section>` : '';
 
   // ---------- La tête : le jour entier, dans le titre et la description ----------
   const jour = jourEnLettres(maintenant);
-  const titrePage = titre(`${t.titre}, ${jour} — Baromatch`, `${t.titre}, ${jour}`);
+  const titrePage = titre(`${titreDuSoir}, ${jour} — Baromatch`, `${titreDuSoir}, ${jour}`);
   const villesDesBars = [...new Set([...soirees].sort(parLieu).map((s) => s.bar.ville.nom))];
   // La description : le jour, puis ce que la page montre ce soir.
   const decrire = () => {
@@ -231,11 +235,11 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
     jsonld: [pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...listes.filter((l) => l.numberOfItems > 0)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">
-  <h1 class="regarder-titre">${e(t.titre)}</h1>
+  <h1 class="regarder-titre">${e(titreDuSoir)}</h1>
   <p class="regarder-quand">${e(capitale(jour))}</p>
-  <p class="regarder-chapeau">${e(avecBars.length ? t.chapeau : aVenirAvecBars.length ? t.chapeauProchainsSoirs : t.chapeauSansBar)}</p>
+  <p class="regarder-chapeau">${e(sansAucunBar ? textes.premiersBars.ceSoirChapeau : avecBars.length ? t.chapeau : aVenirAvecBars.length ? t.chapeauProchainsSoirs : t.chapeauSansBar)}</p>
 </header>
-${sectionDuSoir}
+${sansAucunBar ? `${enAttenteDesBars(marque, textes, textes.premiersBars.matchs)}\n` : ''}${sectionDuSoir}
 ${sectionSoirsAuBar}${sectionProchains}
 ${sectionVilles}
 ${appel(marque, textes)}

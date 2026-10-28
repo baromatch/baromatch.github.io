@@ -89,7 +89,12 @@ test('aujourd’hui, sans aucun bar publié : indexable avec des matchs à venir
     const p = pageDe(capture, chemin);
     expect(p.indexable, chemin).toBe(true);
     expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus/iu);
-    expect(corps(p), chemin).toContain('Aucun bar ne diffuse encore un de ces matchs sur Baromatch.');
+    // La page le dit une fois, juste sous sa tête, avant ses matchs : « En attendant les premiers bars », l’appel des
+    // fans et une ligne pour les bars. Aucune ligne de match ne le répète, et la section des bars n’est pas là.
+    expect(corps(p), chemin).toContain('En attendant les premiers bars Pas encore de bar sur Baromatch. Dès qu’un bar annonce un de ces matchs, il s’affiche ici. L’appli ouvre bientôt : préviens-moi');
+    expect(p.contenu, chemin).toMatch(/<\/header>\n<section class="regarder-section regarder-premiers" aria-labelledby="titre-premiers">[\s\S]*?<\/section>\n<section class="regarder-section" aria-labelledby="titre-matchs">/);
+    expect(corps(p).match(/Pas encore de bar/g), chemin).toHaveLength(1);
+    expect(p.contenu, chemin).not.toContain('id="titre-bars"');
     // La description ne compte aucun bar, le chapeau ne promet pas de bars.
     expect(p.description, chemin).not.toMatch(/\d+ bars? qui/);
     expect(p.contenu.match(/<p class="regarder-chapeau">([^<]*)/)[1], chemin).not.toMatch(/bars/);

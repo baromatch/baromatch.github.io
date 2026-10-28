@@ -704,6 +704,59 @@ test.describe('les pages', () => {
     expect(p.contenu).toContain('<p class="regarder-retour"><a href="/regarder-le-match/">Toutes les villes</a></p>');
   });
 
+  test('tant qu’aucun bar n’est publié : les pages des matchs le disent en tête, sans rien promettre ; le premier bar publié, tout revient', async () => {
+    // Le dépôt tel quel : bars-publies.json est vide. Le scénario a ses soirées, mais aucun de ses bars n’est publié.
+    const vide = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: VENDREDI, racine, contenu: chargerLeContenu(racine) });
+    const de = (chemin) => vide.pages.find((p) => p.chemin === chemin);
+    const t = contenu.textes.premiersBars;
+    const blocDe = (p) => p.contenu.match(/<section class="regarder-section regarder-premiers" aria-labelledby="titre-premiers">[\s\S]*?<\/section>/)?.[0];
+    // La semaine, ce soir, chaque match à venir (ceux qui se partagent), chaque club et chaque compétition : le bloc, une
+    // fois, juste sous la tête (et le bloc « Partager »), avant toute autre section ; l’appel des fans, puis la ligne des
+    // bars, vers le formulaire de leur page. Aucune ligne ne répète « Pas encore de bar », aucune carte des bars.
+    const famille = vide.pages.filter((p) => ['semaine', 'ce-soir', 'club', 'competition'].includes(p.type) || (p.type === 'match' && p.partage));
+    expect(famille.map((p) => p.type)).toEqual(expect.arrayContaining(['semaine', 'ce-soir', 'match', 'club', 'competition']));
+    expect(famille.length).toBeGreaterThan(20);
+    for (const p of famille) {
+      const bloc = blocDe(p);
+      expect(bloc, p.chemin).toBeTruthy();
+      expect(p.contenu.match(/id="titre-premiers"/g), p.chemin).toHaveLength(1);
+      expect(bloc, p.chemin).toContain(`<h2 id="titre-premiers">${t.titre}</h2>\n  <p>${p.type === 'match' ? t.match : t.matchs}</p>`);
+      expect(bloc.indexOf('<a class="capsule" href="/#attente">'), p.chemin).toBeGreaterThan(-1);
+      expect(bloc.indexOf('<a class="capsule"'), p.chemin).toBeLessThan(bloc.indexOf('<a href="/pour-les-bars.html#proposer">Proposer mon bar</a>'));
+      const main = p.contenu.split('<main')[1];
+      expect(main.indexOf(bloc), p.chemin).toBeGreaterThan(main.indexOf('<header class="regarder-tete">'));
+      expect(main.indexOf('<section'), p.chemin).toBe(main.indexOf(bloc));
+      expect(texteVisible(p.contenu).match(/Pas encore de bar/g), p.chemin).toHaveLength(1);
+      expect(p.contenu, p.chemin).not.toContain('<div class="regarder-bars-pro">');
+      expect(p.contenu, p.chemin).not.toContain('id="titre-bars"');
+    }
+    // Les titres de la semaine, de ce soir et des matchs : ni bar, ni « où regarder » (leur h1 non plus).
+    for (const p of famille.filter((x) => ['semaine', 'ce-soir', 'match'].includes(x.type))) {
+      expect(`${p.titre} · ${p.contenu.match(/<h1[^>]*>([^<]*)/)[1]}`, p.chemin).not.toMatch(/(?<!\p{L})bars?(?!\p{L})|diffus|(?<!\p{L})où(?!\p{L})/iu);
+    }
+    expect(de('/matchs/').titre).toBe('Les matchs de la semaine — Baromatch');
+    expect(de('/matchs/').contenu).toContain(`<h1 class="regarder-titre">${t.semaine}</h1>\n  <p class="regarder-chapeau">${insecables(t.semaineChapeau)}</p>`);
+    expect(de('/matchs/').description).toBe('6 matchs d’ici jeudi 29 octobre, à l’heure de Paris, avec leur compétition. Baromatch cherche ses premiers bars à Paris.');
+    expect(de('/matchs/').contenu).toContain(`<a href="/ce-soir/">${t.ceSoir}</a>`);
+    expect(de('/regarder-le-match/paris/').contenu).toContain(`<a href="/ce-soir/">${t.ceSoir}</a>`);
+    const lilleLens = de('/matchs/lille-lens-2026-10-26/');
+    expect(lilleLens.titre).toBe('Lille – Lens, lundi 26 octobre — Baromatch');
+    expect(lilleLens.contenu).toContain('<h1 class="regarder-titre">Lille – Lens</h1>');
+    expect(lilleLens.contenu).toContain(`https://wa.me/?text=${encodeURIComponent(`${lilleLens.titre} https://baromatch.fr${lilleLens.chemin}`)}`);
+    // Les pages des clubs et des compétitions gardent leur titre : dans l’index, « quand et où les regarder » est une
+    // question, qui ne promet aucun bar (suivre.spec).
+    expect(de('/matchs/club/psg/').titre).toBe('Matchs du PSG : quand et où les regarder — Baromatch');
+    // Un match passé n’a pas le bloc : sa page renvoie vers la suite.
+    for (const p of vide.pages.filter((x) => x.type === 'match' && !x.partage)) expect(p.contenu, p.chemin).not.toContain('titre-premiers');
+
+    // Dès le premier bar publié, plus aucune page n’a le bloc, et les titres « où regarder » reviennent d’eux-mêmes.
+    const unBar = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: VENDREDI, racine, contenu: { ...chargerLeContenu(racine), publies: ['b-zinc'] } });
+    expect(unBar.pages.filter((p) => p.contenu.includes('titre-premiers')).map((p) => p.chemin)).toEqual([]);
+    expect(unBar.pages.find((p) => p.chemin === '/matchs/').titre).toBe(`${contenu.textes.semaine.titre} — Baromatch`);
+    expect(unBar.pages.find((p) => p.chemin === '/matchs/lille-lens-2026-10-26/').titre).toBe('Lille – Lens, lundi 26 octobre : où le regarder — Baromatch');
+    for (const p of site.pages) expect(p.contenu, p.chemin).not.toContain('titre-premiers');
+  });
+
   test('la semaine : « Aujourd’hui » avant 17 h, « Ce soir » ensuite, « Fini pour ce soir » quand tout est joué', async () => {
     const blocA = async (instant) => (await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: Date.parse(instant), racine, contenu }))
       .pages.find((x) => x.chemin === '/matchs/').contenu.split('id="titre-ce-soir">')[1].split('</section>')[0];

@@ -206,6 +206,17 @@ export const tuTiensUnBar = (textes) => `<div class="regarder-bars-pro">
     <a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">${e(textes.match.proposerMonBar)}</a>
   </div>`;
 
+// Tant qu’aucun bar n’est publié (donnees.bars vide) : en tête des pages des matchs, juste sous leur tête, ce que la page
+// attend, l’appel des fans, puis une ligne pour les bars ; court, pour que les matchs restent près du haut de l’écran.
+// texte : celui d’un match, ou celui d’une liste de matchs. Le jour du premier bar publié, les pages reprennent seules
+// leurs titres et leurs bars : rien à changer à la main.
+export const enAttenteDesBars = (marque, textes, texte) => `<section class="regarder-section regarder-premiers" aria-labelledby="titre-premiers">
+  <h2 id="titre-premiers">${e(textes.premiersBars.titre)}</h2>
+  <p>${e(texte)}</p>
+  ${appel(marque, textes)}
+  <p class="regarder-premiers__bars"><strong>${e(textes.match.tuTiensUnBar)}</strong> <a href="/pour-les-bars.html#proposer">${e(textes.match.proposerMonBar)}</a></p>
+</section>`;
+
 // La carte d’un bar : son nom (vers sa page), son quartier et son adresse, ce qu’il dit de lui ; sur la page d’un
 // match, l’offre de la soirée ; sur « Ce soir », ses places (une phrase déjà écrite, ou rien).
 export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = '' } = {}) => [
@@ -224,7 +235,7 @@ export const statutDuMatch = (match, textes) => (match.statut ? ` · <strong>${e
 
 // Une ligne d’une liste de matchs (ou de villes) : sa tête, seule sur sa ligne (un lien de 44 px vers sa page, ou son
 // nom), et dessous ses détails, en tête de ligne (une capitale, aucun « · » devant). tete : du HTML déjà échappé.
-export const ligneDeListe = (tete, adresse, infos) => `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${tete}</a>` : `<span class="regarder-matchs__match">${tete}</span>`} <span class="regarder-matchs__infos">${infos}</span></li>`;
+export const ligneDeListe = (tete, adresse, infos) => `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${tete}</a>` : `<span class="regarder-matchs__match">${tete}</span>`}${infos ? ` <span class="regarder-matchs__infos">${infos}</span>` : ''}</li>`;
 
 // Une ligne de match : son nom court (vers sa page s’il en a une) ; dessous, le jour et l’heure (ou l’heure seule, sous
 // un titre qui donne déjà le jour), la compétition, et la suite (« · » puis les bars, ou le statut du match).

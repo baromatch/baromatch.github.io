@@ -1,6 +1,6 @@
 /* Baromatch — la page « Pour les bars » (pour-les-bars.html), et elle seule : les autres pages ne chargent pas ce
    fichier. Ce qu’on ne voit qu’en descendant (l’heure par heure, les quatre moments et leurs écrans, comment ça marche,
-   les vraies conditions, ce que tu vois des fans, le badge) et le formulaire, qui ne s’affiche qu’avec son script.
+   les vraies conditions, ce que tu vois des fans) et le formulaire, qui ne s’affiche qu’avec son script.
    pour-les-bars-amorce.js demande ce fichier une fois le premier écran affiché (aussitôt en arrivant sur une ancre) ;
    sans JavaScript, le <noscript> de la tête le charge. Il vient après styles.css et le style de la page, dont il reprend
    les jetons (:root, dont le verre et l’ombre des écrans) et les classes (.titre-section, .boutique-promesses, la bande
@@ -285,6 +285,8 @@
    hors de l’écran. Les capsules passent à la ligne. */
 .courriel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 .courriel .capsule { width: 100%; padding: 0 18px; font-size: 1rem; white-space: normal; }
+/* Contraste forcé (Windows) : un bord transparent devient visible, le bouton en verre garde sa forme. */
+.capsule--verre { border: 1px solid transparent; }
 .courriel[hidden] { display: none; }
 .courriel__etiquette { display: block; margin: 6px 0 0; color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; line-height: 1.4; }
 .courriel__texte {
@@ -334,56 +336,3 @@
 @media (prefers-reduced-motion: reduce) {
   .jauge-envoi { animation: none; }
 }
-
-/* Partager mon badge : le badge fixe (/badge/baromatch.svg, le dessin du badge vivant de chaque bar), le code à coller
-   et l’image de story. Les aperçus sont ces fichiers eux-mêmes, posés en fond : les images de la page (<img>) restent
-   les écrans de démonstration, avec leur étiquette. Le bouton « Copier le code » n’apparaît qu’avec
-   pour-les-bars.js ; sans lui, le code se sélectionne dans sa boîte. */
-.badge__intro { max-width: 40rem; margin: 18px 0 0; color: var(--texte-doux); }
-.badge__grille { display: grid; gap: 16px; margin-top: 32px; }
-@media (min-width: 720px) { .badge__grille { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); margin-top: 48px; } }
-.badge__carte {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-content: start;
-  gap: 12px;
-  padding: 18px;
-  border-radius: 24px;
-  background: var(--verre);
-  box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet);
-}
-@media (min-width: 720px) { .badge__carte { padding: 28px; } }
-.badge__titre { margin: 0; font-size: 1.1875rem; font-weight: 800; line-height: 1.2; }
-.badge__apercu { width: 100%; max-width: 360px; aspect-ratio: 5 / 1; background: url("/badge/baromatch.svg") no-repeat left center / contain; }
-.badge__etiquette { margin-top: 6px; color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; line-height: 1.4; }
-.badge__code {
-  display: block;
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--champ-bord);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--texte);
-  font: 0.875rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  overflow-wrap: anywhere;
-  resize: vertical;
-  /* Le code se lit en entier, sans défiler dans sa boîte (là où le navigateur sait ajuster la hauteur). */
-  field-sizing: content;
-}
-.badge__carte .capsule { justify-self: start; max-width: 100%; padding: 0 20px; white-space: normal; }
-.badge__retour { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
-/* La zone reste rendue en permanence (lecteurs d’écran) : vide, elle ne prend pas de place, et on reprend l’écart de la grille. */
-.badge__retour:empty { margin-top: -12px; }
-/* Contraste forcé (Windows) : un bord transparent devient visible, le bouton en verre garde sa forme. */
-.capsule--verre { border: 1px solid transparent; }
-.badge__story {
-  width: 160px;
-  aspect-ratio: 9 / 16;
-  border-radius: 16px;
-  background: var(--nuit) url("/badge/story-baromatch-apercu.webp") no-repeat center / cover;
-  box-shadow: inset 0 0 0 1px var(--verre-bord);
-}
-.badge__note { margin: 0; color: var(--texte-discret); font-size: 0.875rem; }
-.badge__vivant { max-width: 40rem; margin: 24px 0 0; color: var(--texte-doux); }
-/* L’affiche de la semaine, pour tous les bars (/matchs/affiche/) : sous le badge, la même voix. */
-.badge__affiche { max-width: 40rem; margin: 12px 0 0; color: var(--texte-doux); }

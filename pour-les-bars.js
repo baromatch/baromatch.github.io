@@ -24,8 +24,7 @@
    affiche ; le libellé d’un bouton est dans son élément [data-libelle] ; pour-les-bars-amorce.js garde la place du
    formulaire (l’attribut data-attente) et ce script la lui rend en l’affichant.
 
-   À part, en fin de fichier : ta salle, ce soir (l’ouverture), et le badge, ici pour ne pas ajouter une requête à la
-   page. */
+   À part, en fin de fichier : ta salle, ce soir (l’ouverture), ici pour ne pas ajouter une requête à la page. */
 
 (function () {
   "use strict";
@@ -1196,48 +1195,4 @@
     if (visible && !lecture && minute < FIN) jouer();
     else if (!visible && lecture) arreter();
   }, { threshold: 0.35 }).observe(figure);
-})();
-
-/* « Partager mon badge » : le bouton « Copier le code » n’existe qu’ici (sans JavaScript, il reste caché et le code se
-   sélectionne dans sa boîte). Le presse-papiers refusé ou absent : le code est sélectionné, prêt à copier, et la page
-   le dit. */
-(function () {
-  "use strict";
-
-  var actions = document.getElementById("badge-actions");
-  var bouton = document.getElementById("badge-copier");
-  var code = document.getElementById("badge-code");
-  var retour = document.getElementById("badge-retour");
-  if (!actions || !bouton || !code || !retour) return;
-
-  var libelle = bouton.querySelector("[data-libelle]");
-  var texteBouton = libelle.textContent;
-  var minuteur = null;
-
-  // La zone est vidée, puis le message écrit un instant plus tard : un même message est annoncé à chaque copie.
-  var annonce = null;
-  function dire(texte) {
-    retour.textContent = "";
-    clearTimeout(annonce);
-    annonce = setTimeout(function () { retour.textContent = texte; }, 100);
-  }
-
-  function copieImpossible() {
-    code.focus();
-    code.select();
-    dire("Ton navigateur ne nous laisse pas copier : le code est sélectionné, copie-le toi-même.");
-  }
-
-  bouton.addEventListener("click", function () {
-    var presse = navigator.clipboard;
-    if (!presse || typeof presse.writeText !== "function") return copieImpossible();
-    presse.writeText(code.value).then(function () {
-      libelle.textContent = "Code copié";
-      dire("Code copié. Colle-le sur ton site, là où le badge doit apparaître.");
-      clearTimeout(minuteur);
-      minuteur = setTimeout(function () { libelle.textContent = texteBouton; }, 2000);
-    }, copieImpossible);
-  });
-
-  actions.hidden = false;
 })();

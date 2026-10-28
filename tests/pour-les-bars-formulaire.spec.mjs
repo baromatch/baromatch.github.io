@@ -1179,7 +1179,7 @@ test.describe('les réponses du serveur', () => {
 
   test('les messages arrivent dans les deux zones déjà présentes : aucune zone annoncée n’est créée en cours de route', async ({ page }) => {
     await ouvrir(page, [refus('REQUETE_INVALIDE')]);
-    // Les zones du formulaire (#proposer) : « Partager mon badge » a la sienne, pour « Code copié ».
+    // Les zones du formulaire (#proposer) : une autre partie de la page peut avoir les siennes.
     const zones = () => page.$$eval(['status', 'alert'].map((role) => `#proposer [role="${role}"]`).concat('#proposer [aria-live]').join(', '), (e) => e.map((z) => z.id));
     expect(await zones()).toEqual(['demande-statut', 'demande-alerte']);
     await envoyerUneDemande(page);

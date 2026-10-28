@@ -1,6 +1,6 @@
 /* Baromatch — la page « Pour les bars » (pour-les-bars.html), et elle seule : les autres pages ne chargent pas ce
-   fichier. Ce qu’on ne voit qu’en descendant (l’heure par heure, les quatre moments et leurs écrans, comment ça marche,
-   les vraies conditions, ce que tu vois des fans) et le formulaire, qui ne s’affiche qu’avec son script.
+   fichier. Ce qu’on ne voit qu’en descendant (les conditions, les quatre moments et leurs écrans, pour démarrer, ce
+   que tu vois des fans) et le formulaire, qui ne s’affiche qu’avec son script.
    pour-les-bars-amorce.js demande ce fichier une fois le premier écran affiché (aussitôt en arrivant sur une ancre) ;
    sans JavaScript, le <noscript> de la tête le charge. Il vient après styles.css et le style de la page, dont il reprend
    les jetons (:root, dont le verre et l’ombre des écrans) et les classes (.titre-section, .boutique-promesses, la bande
@@ -100,28 +100,6 @@
 .questions summary:hover { color: var(--goutte); }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) { .lien-fleche:hover svg { transform: translateY(2px); } }
 
-/* ---------- Ton soir de match, heure par heure ---------- */
-
-.horaire__liste { display: grid; gap: 0; margin: 32px 0 0; }
-.horaire__moment { position: relative; display: grid; grid-template-columns: 88px minmax(0, 1fr); column-gap: 16px; padding: 0 0 26px; }
-/* Le fil de la soirée, d’une heure à la suivante. */
-.horaire__moment::before { content: ""; position: absolute; left: 6px; top: 12px; bottom: -2px; width: 1px; background: var(--verre-bord-fort); }
-.horaire__moment:last-child::before { display: none; }
-.horaire__heure { grid-row: span 2; margin: 0; padding-left: 22px; font-size: 1.375rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.horaire__heure::before { content: ""; position: absolute; left: 0; top: 4px; width: 13px; height: 13px; border-radius: 50%; background: var(--nuit); box-shadow: inset 0 0 0 2px var(--ambre); }
-.horaire__moment--envoi .horaire__heure::before { background: var(--ambre); }
-.horaire__heure--mots { font-size: 1rem; line-height: 1.2; }
-.horaire__titre { margin: 0; font-size: 1.125rem; font-weight: 700; line-height: 1.25; }
-.horaire__texte { margin: 4px 0 0; color: var(--texte-doux); font-size: 1rem; }
-@media (min-width: 1000px) {
-  .horaire__liste { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px; margin-top: 48px; }
-  .horaire__moment { display: block; padding: 34px 0 0; }
-  .horaire__moment::before { left: 7px; right: -24px; top: 6px; bottom: auto; width: auto; height: 1px; }
-  .horaire__heure { padding: 0; }
-  .horaire__heure::before { top: -1px; }
-  .horaire__titre { margin-top: 12px; }
-}
-
 /* ---------- Les écrans ---------- */
 
 /* L’étiquette « Écran de démonstration », posée sur le bord haut de chaque écran (la figure est son repère). */
@@ -170,7 +148,7 @@
 @media (min-width: 900px) { .marche__etapes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 56px; } }
 .marche__etape { padding: 22px 22px 24px; border-radius: 24px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); }
 .marche__numero { margin: 0 0 14px; }
-.marche__numero span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--nuit); box-shadow: inset 0 0 0 2px var(--ambre); color: var(--texte); font-size: 1.125rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.marche__numero span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--nuit); box-shadow: inset 0 0 0 2px var(--verre-bord-fort); color: var(--texte); font-size: 1.125rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 .marche__titre { margin: 0; font-size: 1.375rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
 .marche__etape p:not(.marche__numero) { margin: 10px 0 0; color: var(--texte-doux); font-size: 1rem; }
 
@@ -181,6 +159,10 @@
 @media (min-width: 1100px) { .conditions__liste { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .conditions__liste li { padding: 18px 20px; border-radius: 20px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); color: var(--texte-doux); }
 .conditions__liste strong { display: block; margin-bottom: 4px; color: var(--texte); font-size: 1.125rem; font-weight: 800; line-height: 1.25; }
+/* Les liens qui mènent ailleurs (comment on choisit les bars, l’affiche de la semaine) : neutres, soulignés. L’ambre
+   reste aux actions de la page. */
+.conditions__liste a, .marche .chapo a { color: var(--texte-doux); text-decoration: underline; text-decoration-color: rgba(247, 247, 249, 0.4); text-underline-offset: 0.2em; }
+.conditions__liste a:hover, .marche .chapo a:hover { color: var(--texte); text-decoration-color: currentColor; }
 
 /* ---------- Ce que tu vois des fans ---------- */
 

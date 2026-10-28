@@ -166,7 +166,9 @@ test.describe('ce que la page dit', () => {
     expect(existsSync(IMAGE_OG.slice(1)), IMAGE_OG).toBe(true);
   });
 
-  test('les sections dans l’ordre : ouverture (ta salle, ce soir), heure par heure, atouts, comment ça marche, les vraies conditions, ce que tu vois, questions, formulaire', async ({ page }) => {
+  // Après la relecture « trois visiteurs » (28 octobre 2026) : les conditions d’abord, puis ce que ça change, comment
+  // démarrer, ce que tu vois des fans, les questions et le formulaire. La soirée se raconte une fois, dans la salle.
+  test('les sections dans l’ordre : ouverture (ta salle, ce soir), les conditions, ce que ça change, pour démarrer, ce que tu vois, questions, formulaire', async ({ page }) => {
     await page.goto(PAGE);
     const sections = await page.$$eval('main > section', (liste) => liste.map((s) => ({
       id: s.id,
@@ -174,16 +176,18 @@ test.describe('ce que la page dit', () => {
     })));
     const ATTENDUES = [
       'Les soirs de match, ton bar sur Baromatch.',
-      'Ton soir de match, heure par heure',
+      'Les conditions',
       'Ce que Baromatch fait pour ton bar',
-      'Comment ça marche',
-      'Les vraies conditions',
+      'Pour démarrer',
       'Ce que tu vois des fans. Et ce que tu ne vois jamais.',
       'Les questions des bars',
       'Propose ton bar',
     ];
     expect(sections.map((s) => s.titre).filter((t) => ATTENDUES.includes(t))).toEqual(ATTENDUES);
-    expect(sections.find((s) => s.titre === 'Comment ça marche').id).toBe('comment');
+    expect(sections.find((s) => s.titre === 'Pour démarrer').id).toBe('comment');
+    expect(sections.find((s) => s.titre === 'Ce que Baromatch fait pour ton bar').id).toBe('ce-que-ca-change');
+    // La soirée n’est plus racontée une deuxième fois heure par heure.
+    await expect(page.locator('.horaire')).toHaveCount(0);
     expect(sections.find((s) => s.titre === 'Propose ton bar').id).toBe('proposer');
     await expect(page.locator('main > section').first().locator('h1')).toHaveCount(1);
   });
@@ -339,7 +343,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     // ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__etat');
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
-    await expect(etat).toHaveText('Où on en est : Baromatch n’est pas encore ouvert au public, les fans ne réservent pas encore. En test sur Android, à Paris ; pas d’appli iPhone pour l’instant.');
+    await expect(etat).toHaveText('Où on en est : Baromatch est en test sur Android, à Paris (pas encore sur iPhone). Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
     // Sous le bouton, les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du
     // gratuit des clients.
     const bouton = ouverture.locator('.actions .capsule[href="#proposer"]');
@@ -357,7 +361,8 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const fan = ouverture.locator('a[href="/#attente"]');
     await expect(fan).toHaveCount(1);
     await expect(fan).toBeInViewport({ ratio: 1 });
-    await expect(fan).toHaveAccessibleName('Tu es fan ? Par ici pour être prévenu du lancement');
+    // Il dit ce qu’on trouve en le suivant : laisser son e-mail.
+    await expect(fan).toHaveAccessibleName('Fan ? Laisse ton e-mail pour être prévenu du lancement');
     expect((await fan.boundingBox()).y + 24).toBeLessThan((await page.locator('h1').boundingBox()).y + 1);
     // Et l’ancienne pastille « Premiers bars à Paris », qui se lisait comme « il y a déjà des bars », est partie.
     await expect(ouverture).not.toContainText('Premiers bars à Paris');
@@ -406,13 +411,14 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     });
   }
 
-  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte, à l’étape 3 et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console', async ({ page }) => {
+  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console', async ({ page }) => {
     await page.goto(PAGE);
     const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });
-    await expect(carte).toContainText('c’est l’appli Baromatch, sur Android seulement pour l’instant');
-    await expect(carte).toContainText('la Console (ton espace Baromatch, dans un navigateur) valide aussi un pass');
+    await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte. Il marche sur Android pour l’instant');
+    await expect(carte).toContainText('sans Android, la page Scan de la Console valide aussi un pass, depuis un navigateur.');
+    // L’étape 3 renvoie à la réponse pour l’installation, sans répéter le détail.
     const etape = page.locator('.marche__etape').nth(2);
-    await expect(etape).toContainText('Pour l’instant, l’appli de la porte n’existe que sur Android : sans téléphone Android, la page Scan de la Console valide aussi un pass, depuis un navigateur.');
+    await expect(etape).toContainText('On t’explique comment installer l’appli de la porte.');
     const besoin = (await questions(page)).find((q) => q.question === 'De quoi j’ai besoin ?');
     expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone Android : pour l’instant, elle n’existe que sur Android\./);
     expect(besoin.reponse).toContain('On t’explique comment installer l’appli quand on te répond.');
@@ -506,10 +512,9 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(apres('Console')).toContain('Console (ton espace Baromatch');
     expect(apres('pass ', 50)).toContain('pass du fan (un QR code sur son téléphone)');
     expect(texte.slice(texte.indexOf('Mode bar') - 12, texte.indexOf('Mode bar') + 40)).toContain('c’est le Mode bar, l’écran de la porte');
-    await expect(page.locator('.horaire__titre')).toContainText(['Les places gardées sont libérées']);
     // Une place sans arrivée validée est libérée : un fan dans la salle mais jamais scanné compte absent.
-    await expect(page.locator('.horaire__moment', { hasText: 'Les places gardées sont libérées' }).locator('.horaire__texte'))
-      .toHaveText('Si l’arrivée du fan n’est pas validée, sa place est libérée et comptée absente. Cette heure, c’est toi qui la choisis.');
+    await expect(page.locator('.moment__liste li', { hasText: 'À l’heure que tu choisis' }))
+      .toHaveText('À l’heure que tu choisis, une place dont l’arrivée n’est pas validée est libérée et comptée absente.');
     expect(texte).not.toMatch(/tombent/);
     // Mot pour mot : la position n’est pas envoyée avec l’arrivée (l’appli s’en sert sur le téléphone).
     await expect(page.locator('.regard__liste li', { hasText: 'Sa position' })).toHaveText('Sa position : elle n’est pas envoyée avec son arrivée.');
@@ -526,22 +531,28 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
   });
 
-  test('« Proposer mon bar » revient à la fin des vraies conditions', async ({ page }) => {
-    await page.setViewportSize({ width: 360, height: 800 });
+  // Un seul bouton principal, « Proposer mon bar », trois fois, pas plus (la relecture « trois visiteurs » : quatre, c’est
+  // de la pression) : en haut, après ce que ça change, dans la bande ambre. Puis le formulaire. Le « + » des places de la
+  // salle n’est pas ambre : en haut de la page, seul le bouton l’est.
+  test('« Proposer mon bar » trois fois : en haut, après ce que ça change, dans la bande ambre ; en haut, rien d’autre n’est ambre plein', async ({ page }) => {
     await page.goto(PAGE);
-    // La mise en page sous le premier écran : avec sa feuille (pret), sinon elle change entre les deux mesures.
     await pret(page);
-    const bouton = page.locator('.conditions > .actions .capsule[href="#proposer"]');
-    await expect(bouton).toHaveText('Proposer mon bar');
-    const fin = await page.locator('.conditions__liste').boundingBox();
-    expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
+    expect(await page.$$eval('main a[href="#proposer"]', (liens) => liens.map((a) => [a.closest('section').className.split(' ')[0], a.textContent.trim()])))
+      .toEqual([['ouverture-bars', 'Proposer mon bar'], ['atouts', 'Proposer mon bar'], ['bars', 'Proposer mon bar']]);
+    const fonds = await page.$$eval('.ouverture-bars button, .ouverture-bars a', (cibles) => cibles.map((c) => getComputedStyle(c).backgroundColor));
+    expect(fonds.filter((f) => f === 'rgb(255, 177, 61)')).toHaveLength(1);
   });
 
-  test('avant le formulaire, ce qui est vrai sur ce site : l’accord écrit du bar, et aucun bar qui paie pour passer devant', async ({ page }) => {
+  test('dans les conditions, ce qui est vrai sur ce site : l’accord écrit du bar, et aucun bar qui paie pour passer devant ; le formulaire commence juste sous son délai', async ({ page }) => {
     await page.goto(PAGE);
-    const accord = page.locator('#proposer .contact__intro .contact__suite + .chapo');
-    await expect(accord).toHaveText('Sur ce site, ton bar n’apparaît qu’avec ton accord écrit, et aucun bar ne paie pour passer devant un autre. Comment on choisit les bars.');
-    await expect(accord.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
+    await expect(page.locator('.conditions__liste li', { hasText: 'Rien sans ton accord' }))
+      .toHaveText('Rien sans ton accord. Sur ce site, ton bar n’apparaît qu’avec ton accord écrit.');
+    const ordre = page.locator('.conditions__liste li', { hasText: 'Aucun bar ne paie' });
+    await expect(ordre).toHaveText('Aucun bar ne paie pour passer devant un autre. Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Comment on choisit les bars');
+    await expect(ordre.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
+    // Au-dessus du formulaire, rien qui le répète ou qui en éloigne : son titre et son délai.
+    expect(await page.$$eval('#proposer .contact__intro > *', (e) => e.map((x) => x.tagName.toLowerCase()))).toEqual(['h2', 'p']);
+    await expect(page.locator('#proposer .contact__intro a')).toHaveCount(0);
     // Les deux faits sont ceux de la page qui explique le choix des bars, avec la même limite, « sur ce site » : la page
     // des bars ne promet rien de plus, et rien sur l’ordre des bars dans l’appli.
     const choix = readFileSync('comment-on-choisit-les-bars.html', 'utf8');
@@ -549,12 +560,22 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(choix).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Aucun bar ne paie pour passer devant un autre.');
   });
 
-  test('les deux lignes pour les fans passent sous le formulaire, en fin de page', async ({ page }) => {
+  test('sous le formulaire, en fin de page : une ligne pour le fan, une pour le patron qu’il connaît, une pour les partenaires et la presse', async ({ page }) => {
     await page.goto(PAGE);
     const ordre = await page.$$eval('main > *', (enfants) => enfants.map((e) => e.className.split(' ')[0]));
     expect(ordre.at(-1)).toBe('egares');
     expect(ordre.indexOf('contact')).toBe(ordre.length - 2);
-    await expect(page.locator('.egares')).toContainText('Montre cette page au patron.');
+    const lignes = page.locator('.egares__ligne');
+    await expect(lignes).toHaveText([
+      'Tu cherches un bar pour regarder le match ? Baromatch est en test à Paris. Laisse ton e-mail pour être prévenu.',
+      'Ton bar préféré n’est pas sur Baromatch ? Montre cette page au patron.',
+      'Partenaire, club, ville ou journaliste ? Écris-nous, ou va sur la page Presse.',
+    ]);
+    await expect(lignes.nth(0).locator('a')).toHaveAttribute('href', '/#attente');
+    // L’e-mail des partenaires arrive avec son objet, déjà écrit ; la page Presse existe.
+    expect(await lignes.nth(2).locator('a').evaluateAll((a) => a.map((l) => l.getAttribute('href'))))
+      .toEqual(['mailto:contact@baromatch.fr?subject=Partenariat%20Baromatch', '/presse.html']);
+    expect(existsSync('presse.html')).toBe(true);
   });
 });
 
@@ -609,7 +630,7 @@ test.describe('le délai de réponse : sous 48 h', () => {
     // axe lit « C’est envoyé. » et ses liens dans tests/pour-les-bars-formulaire.spec.mjs, à 360 et 1280 px.
   });
 
-  // Dans les vraies conditions, avant le formulaire, dans « Comment je démarre » et dans « C’est envoyé. ».
+  // Dans les conditions, avant le formulaire, dans « Comment je démarre » et dans « C’est envoyé. ».
   test('un seul délai, dit quatre fois avec les mêmes mots ; la FAQ balisée le dit aussi', async ({ page }) => {
     await page.goto(PAGE);
     const texte = normaliser(await page.locator('main').textContent());
@@ -1127,7 +1148,7 @@ test.describe('sans JavaScript', () => {
     // Ce qu’un robot doit lire est dans le HTML, sans script.
     await expect(page.locator('.atout')).toHaveCount(5);
     await expect(page.locator('.marche__etape')).toHaveCount(3);
-    await expect(page.locator('.horaire__moment')).toHaveCount(5);
+    await expect(page.locator('.conditions__liste li')).toHaveCount(6);
     await expect(page.locator('.questions details')).toHaveCount(13);
     await expect(page.locator('.formulaire__ailleurs a[href="mailto:contact@baromatch.fr"]')).toBeVisible();
   });

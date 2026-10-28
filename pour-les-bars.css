@@ -31,7 +31,6 @@
      #demande-secours) est en haut de la carte ;
    - les questions, qu’on voit au-dessus de la carte en arrivant par #proposer. */
 
-@media (min-width: 1100px) { .ouverture-bars { min-height: 100svh; } }
 
 /* La lumière du match : une boîte fixe derrière la page (sa place est dans le style de la page), et ici ses halos, des
    dégradés radiaux sans flou. ::before, les deux clubs inventés des écrans de démonstration (Alvène, sarcelle, en haut à
@@ -57,8 +56,9 @@
    rotateZ), le mur se lève (rotateX -90°), les sièges sortent du sol selon leur état (translateZ). Les pastilles de la
    légende, à leur place dès le premier affichage, prennent ici les couleurs des sièges, en même temps qu’eux. À 17:00
    (le script pas encore là), les sièges qui seront pris sont en ligne. */
-.salle { perspective: 1100px; perspective-origin: 50% 10%; }
-.salle__sol { visibility: visible; position: absolute; left: 50%; top: 50%; width: 440px; height: 300px; margin: -150px 0 0 -220px; border-radius: 26px; transform-style: preserve-3d; transform: scale(0.6) rotateX(56deg) rotateZ(-30deg); background: radial-gradient(120% 90% at 30% 20%, rgba(255, 177, 61, 0.12), transparent 60%), linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 0 80px rgba(0, 0, 0, 0.55); }
+.salle { overflow-x: clip; perspective: 1100px; perspective-origin: 50% 10%; }
+.salle__sol { visibility: visible; position: absolute; left: 50%; top: 50%; width: 440px; height: 300px; margin: -150px 0 0 -220px; border-radius: 26px; transform-style: preserve-3d; transform: scale(0.55) rotateX(56deg) rotateZ(-30deg); background: radial-gradient(120% 90% at 30% 20%, rgba(255, 177, 61, 0.12), transparent 60%), linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 0 80px rgba(0, 0, 0, 0.55); }
+@media (min-width: 360px) { .salle__sol { transform: scale(0.6) rotateX(56deg) rotateZ(-30deg); } }
 @media (min-width: 420px) { .salle__sol { transform: scale(0.7) rotateX(56deg) rotateZ(-30deg); } }
 @media (min-width: 720px) { .salle__sol { transform: scale(0.98) rotateX(56deg) rotateZ(-30deg); } }
 @media (min-width: 1100px) { .salle__sol { transform: scale(0.86) rotateX(56deg) rotateZ(-30deg); } }

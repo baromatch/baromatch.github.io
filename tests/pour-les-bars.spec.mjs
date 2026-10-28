@@ -520,6 +520,8 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   test('« Proposer mon bar » revient à la fin de « Ce que Baromatch fait pour ton bar »', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto(PAGE);
+    // La mise en page sous le premier écran : avec sa feuille (pret), sinon elle change entre les deux mesures.
+    await pret(page);
     const bouton = page.locator('.atouts > .actions .capsule[href="#proposer"]');
     await expect(bouton).toHaveText('Proposer mon bar');
     const fin = await page.locator('.atouts__grille').boundingBox();
@@ -529,6 +531,8 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   test('« Proposer mon bar » revient à la fin des vraies conditions', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto(PAGE);
+    // La mise en page sous le premier écran : avec sa feuille (pret), sinon elle change entre les deux mesures.
+    await pret(page);
     const bouton = page.locator('.conditions > .actions .capsule[href="#proposer"]');
     await expect(bouton).toHaveText('Proposer mon bar');
     const fin = await page.locator('.conditions__liste').boundingBox();

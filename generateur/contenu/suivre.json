@@ -108,6 +108,8 @@
   },
   "lienDuClub": "Les matchs {de} et où les voir",
   "lienDeLaCompetition": "Les matchs de {nom} et où les voir",
+  "lienDuClubSansAucunBar": "Les matchs {de}",
+  "lienDeLaCompetitionSansAucunBar": "Les matchs de {nom}",
   "chapeauBars": " et les bars qui diffusent chacun sur Baromatch",
   "descriptionSansBar": "{n} {de} au programme, à l’heure de Paris, avec la compétition et le coup d’envoi. Le prochain : {prochain}.",
   "descriptionCompetitionSansBar": "{n} de {nom} au programme, à l’heure de Paris, avec les clubs, le jour et le coup d’envoi de chacun.",
@@ -118,5 +120,7 @@
   "clubDeLaCompetition": "{n} en {nom}",
   "titreSansBar": "Matchs {de} : quand et où les regarder",
   "titreCompetitionSansBar": "{competition} : quand et où regarder les matchs",
+  "titreSansAucunBar": "Matchs {de} : quand les regarder",
+  "titreCompetitionSansAucunBar": "{competition} : quand regarder les matchs",
   "villeSansBar": "Ce qu’il faut savoir pour regarder le match à {ville} :"
 }

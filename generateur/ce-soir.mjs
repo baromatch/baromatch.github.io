@@ -90,8 +90,8 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   const soirees = avecBars.flatMap((m) => m.soirees);
   const nombreDeBars = new Set(soirees.map((s) => s.bar.id)).size;
   const indexable = donnees.bars.length >= BARS_POUR_CE_SOIR;
-  // Aucun bar publié sur Baromatch : la page le dit en tête (enAttenteDesBars), son titre ne promet aucun bar
-  // (« Les matchs de ce soir »), et aucune ligne ne répète « Pas encore de bar ».
+  // Aucun bar publié sur Baromatch : la page le dit (enAttenteDesBars) juste sous les matchs de ce soir, qu’elle montre
+  // d’abord ; son titre ne promet aucun bar (« Les matchs de ce soir »), et aucune ligne ne répète « Pas encore de bar ».
   const sansAucunBar = donnees.bars.length === 0;
   const titreDuSoir = sansAucunBar ? textes.premiersBars.ceSoir : t.titre;
   const fini = ceSoir.length === 0 && donnees.matchs.some((m) => jourDeParis(m.debut) === aujourdhui && !m.statut);
@@ -239,7 +239,8 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
   <p class="regarder-quand">${e(capitale(jour))}</p>
   <p class="regarder-chapeau">${e(sansAucunBar ? textes.premiersBars.ceSoirChapeau : avecBars.length ? t.chapeau : aVenirAvecBars.length ? t.chapeauProchainsSoirs : t.chapeauSansBar)}</p>
 </header>
-${sansAucunBar ? `${enAttenteDesBars(marque, textes, textes.premiersBars.matchs)}\n` : ''}${sectionDuSoir}
+${sectionDuSoir}
+${sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : ''}
 ${sectionSoirsAuBar}${sectionProchains}
 ${sectionVilles}
 ${appel(marque, textes)}

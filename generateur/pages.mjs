@@ -143,7 +143,8 @@ export const fabriquerLesPages = ({
     .sort((a, b) => a.debut - b.debut);
 
   // Les pages des clubs suivis et de la compétition d’un match (suivre.mjs) : « Les matchs du PSG et où les voir ».
-  const suivis = (match) => [lienDuClub(match.domicile.cle), lienDuClub(match.exterieur.cle), lienDeLaCompetition(match.competition)]
+  const suivis = (match) => [lienDuClub(match.domicile.cle, undefined, { sansAucunBar }), lienDuClub(match.exterieur.cle, undefined, { sansAucunBar }),
+    lienDeLaCompetition(match.competition, undefined, { sansAucunBar })]
     .filter(Boolean).map((lien) => `\n  <p class="regarder-suite">${lien}</p>`).join('');
 
   // ---------- Les pages des matchs ----------
@@ -223,7 +224,7 @@ ${quartiers.map(({ arrondissement, elements }) => `${arrondissement ? `  <h4 cla
     ${elements.map((s) => carteDuBar(s.bar, textes, { soiree: s, niveau: arrondissement ? 5 : 4 })).join('\n    ')}
   </ul>`).join('\n')}`).join('\n');
     const sectionBars = sansAucunBar
-      ? enAttenteDesBars(marque, textes, textes.premiersBars.match)
+      ? enAttenteDesBars(marque, textes, { match })
       : soirees.length
       ? `<section class="regarder-section" aria-labelledby="titre-bars">
   <h2 id="titre-bars">${e(textes.match.titreBars)}</h2>
@@ -288,10 +289,9 @@ ${commentCaMarche(textes, marque)}`,
       .sort((a, b) => a.debut - b.debut);
     const etapes = [accueil, { nom: textes.fil.matchs, chemin }];
     const titrePage = sansAucunBar ? `${textes.premiersBars.semaine} — Baromatch` : textes.semaine.titrePage;
-    const desc = sansAucunBar ? description(
-      `${dansLaSemaine.length ? accorder(dansLaSemaine.length, 'match', 'matchs') : 'Aucun match'} d’ici ${dernierJour}, à l’heure de Paris, avec leur compétition. Baromatch cherche ses premiers bars à Paris.`,
-      `${dansLaSemaine.length ? accorder(dansLaSemaine.length, 'match', 'matchs') : 'Aucun match'} cette semaine, à l’heure de Paris. Baromatch cherche ses premiers bars à Paris.`,
-    ) : description(
+    const desc = sansAucunBar ? description(`${dansLaSemaine.length
+      ? `${capitale(accorder(dansLaSemaine.length, 'match', 'matchs'))} d’ici ${dernierJour}, à l’heure de Paris.`
+      : `Aucun match annoncé d’ici ${dernierJour}.`} ${textes.premiersBars.seul}`) : description(
       `${dansLaSemaine.length ? accorder(dansLaSemaine.length, 'match', 'matchs') : 'Aucun match'} d’ici ${dernierJour}, à l’heure de Paris : la compétition et les bars qui diffusent chaque match sur Baromatch.`,
       `${dansLaSemaine.length ? accorder(dansLaSemaine.length, 'match', 'matchs') : 'Aucun match'} cette semaine, à l’heure de Paris, et les bars qui les diffusent sur Baromatch.`,
     );
@@ -303,10 +303,10 @@ ${commentCaMarche(textes, marque)}`,
   <h1 class="regarder-titre">${e(sansAucunBar ? textes.premiersBars.semaine : textes.semaine.titre)}</h1>
   <p class="regarder-chapeau">${e(sansAucunBar ? textes.premiersBars.semaineChapeau : textes.semaine.chapeau)}</p>
 </header>
-${sansAucunBar ? `${enAttenteDesBars(marque, textes, textes.premiersBars.matchs)}\n` : ''}<section class="regarder-section regarder-ce-soir" aria-labelledby="titre-ce-soir">
+${sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : ''}<section class="regarder-section regarder-ce-soir" aria-labelledby="titre-ce-soir">
   <h2 id="titre-ce-soir">${e(titreDuJour)}</h2>
-${ceSoir.length ? `  <ul class="regarder-matchs">\n${ceSoir.map(ligne).join('\n')}\n  </ul>` : `  <p>${e(rienDuJour)}</p>`}
-  <p class="regarder-suite"><a href="/ce-soir/">${e(lienCeSoir)}</a></p>
+${ceSoir.length ? `  <ul class="regarder-matchs">\n${ceSoir.map(ligne).join('\n')}\n  </ul>
+  <p class="regarder-suite"><a href="/ce-soir/">${e(lienCeSoir)}</a></p>` : `  <p>${e(rienDuJour)}</p>`}
 </section>
 ${autres.length ? autres.map(({ jour, matchs }) => `<section class="regarder-section" aria-labelledby="jour-${jour}">
   <h2 id="jour-${jour}">${e(capitale(jourEnLettres(Date.parse(`${jour}T12:00:00Z`))))}</h2>

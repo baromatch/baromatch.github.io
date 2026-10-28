@@ -9,8 +9,9 @@
 // indexable, même sans vrai bar, comme l’affiche de la semaine : elle répond à une vraie question (quand joue ce club,
 // à quelle heure, et où le voir) avec des données vraies, et elle le dit quand aucun bar ne diffuse encore ses matchs.
 // Son titre ne promet un bar que si elle en montre un (« Où regarder les matchs du PSG dans un bar ») ; sans bar,
-// « Matchs du PSG : quand et où les regarder ». En dessous de 2 matchs, la page reste à son adresse (aucun lien ne
-// meurt), en noindex, et le dit.
+// « Matchs du PSG : quand et où les regarder » ; tant qu’aucun bar n’est publié sur Baromatch, « Matchs du PSG : quand
+// les regarder », et les liens vers elle disent « Les matchs du PSG ». En dessous de 2 matchs, la page reste à son
+// adresse (aucun lien ne meurt), en noindex, et le dit.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { cheminDuCalendrier, clubsDeLigue1, lienVersLAgenda, webcalDe } from './agenda.mjs';
@@ -34,10 +35,11 @@ const clubsSuivis = (t) => Object.entries(t.clubs).filter(([cle]) => !cle.starts
 const competitionsSuivies = (t) => Object.entries(t.competitions).filter(([nom]) => !nom.startsWith('_'));
 
 // Le lien vers la page d’un club suivi, ou de la compétition d’un match (pages.mjs : la page d’un match y mène).
-export const lienDuClub = (cle, t = TEXTES_SUIVRE) => (t.clubs[cle]
-  ? `<a href="${cheminDuClub(cle)}">${e(remplir(t.lienDuClub, { de: t.clubs[cle].de }))}</a>` : null);
-export const lienDeLaCompetition = (nom, t = TEXTES_SUIVRE) => (t.competitions[nom]
-  ? `<a href="${cheminDeLaCompetition(t.competitions[nom].cle)}">${e(remplir(t.lienDeLaCompetition, { nom: t.competitions[nom].nom }))}</a>` : null);
+// sansAucunBar : aucun bar publié sur Baromatch, le lien ne dit pas « et où les voir ».
+export const lienDuClub = (cle, t = TEXTES_SUIVRE, { sansAucunBar = false } = {}) => (t.clubs[cle]
+  ? `<a href="${cheminDuClub(cle)}">${e(remplir(sansAucunBar ? t.lienDuClubSansAucunBar : t.lienDuClub, { de: t.clubs[cle].de }))}</a>` : null);
+export const lienDeLaCompetition = (nom, t = TEXTES_SUIVRE, { sansAucunBar = false } = {}) => (t.competitions[nom]
+  ? `<a href="${cheminDeLaCompetition(t.competitions[nom].cle)}">${e(remplir(sansAucunBar ? t.lienDeLaCompetitionSansAucunBar : t.lienDeLaCompetition, { nom: t.competitions[nom].nom }))}</a>` : null);
 
 // « Par club et par compétition » : chaque page de la liste, depuis la semaine (/matchs/) et le guide. Les pages
 // existent toujours (une par entrée de la liste) : aucun de ces liens ne meurt.
@@ -74,10 +76,9 @@ export const fabriquerLesPagesSuivies = ({ donnees, contenu, cadre, avecPresse =
   // Les villes où Baromatch a de vrais bars publiés.
   const barsDeLaVille = new Set(donnees.bars.map((b) => b.ville.cle));
   // Aucun bar publié sur Baromatch : la page le dit juste sous sa tête (enAttenteDesBars), à la place de la section des
-  // bars, et aucune ligne ne répète « Pas encore de bar ». Le titre, lui, ne change pas : ces pages sont dans l’index, et
-  // « quand et où les regarder » y est une question, sans promettre de bar.
+  // bars ; aucune ligne ne répète « Pas encore de bar », et ni le titre ni les liens ne disent « où ».
   const sansAucunBar = donnees.bars.length === 0;
-  const premiers = sansAucunBar ? `${enAttenteDesBars(marque, textes, textes.premiersBars.matchs)}\n` : '';
+  const premiers = sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : '';
 
   const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
   const quandCourt = (m) => (m.heureConfirmee ? `${jourEnLettres(m.debut)} à ${heureDeParis(m.debut)}` : `${jourEnLettres(m.debut)}, heure à confirmer`);
@@ -158,7 +159,7 @@ ${guide}  <p>${e(t.chaine)}</p>
     const joues = matchs.filter((m) => !m.statut);
     const indexable = joues.length >= MATCHS_POUR_L_INDEX;
     const soirees = barsDe(matchs);
-    const h1 = remplir(soirees.length ? t.titre : t.titreSansBar, { de: club.de });
+    const h1 = remplir(sansAucunBar ? t.titreSansAucunBar : soirees.length ? t.titre : t.titreSansBar, { de: club.de });
     const titrePage = titreDe(h1);
     const prochain = joues[0];
     const desc = prochain
@@ -176,7 +177,7 @@ ${guide}  <p>${e(t.chaine)}</p>
   <p class="regarder-agenda__adresse"><a href="${adresseDe(cheminDuCalendrier(cle))}">${e(adresseDe(cheminDuCalendrier(cle)))}</a></p>
   ${lienVersLAgenda()}
 </section>\n` : '';
-    const competitions = [...new Set(matchs.map((m) => m.competition))].map((nom) => lienDeLaCompetition(nom, t)).filter(Boolean);
+    const competitions = [...new Set(matchs.map((m) => m.competition))].map((nom) => lienDeLaCompetition(nom, t, { sansAucunBar })).filter(Boolean);
     ajouter({
       type: 'club', cle, date: null, chemin, indexable, titre: titrePage, description: desc, barsNommes: soirees.map((s) => s.bar.id),
       jsonld: [
@@ -204,7 +205,7 @@ ${sectionBars(soirees, club.de)}${agenda}${sectionTrouver(club.ville)}
     const joues = matchs.filter((m) => !m.statut);
     const indexable = joues.length >= MATCHS_POUR_L_INDEX;
     const soirees = barsDe(matchs);
-    const h1 = remplir(soirees.length ? t.titreCompetition : t.titreCompetitionSansBar, { nom: competition.nom, competition: nom });
+    const h1 = remplir(sansAucunBar ? t.titreCompetitionSansAucunBar : soirees.length ? t.titreCompetition : t.titreCompetitionSansBar, { nom: competition.nom, competition: nom });
     const titrePage = titreDe(h1);
     const desc = joues.length
       ? remplir(soirees.length ? t.descriptionCompetition : t.descriptionCompetitionSansBar, { n: capitale(accorder(joues.length, 'match', 'matchs')), nom: competition.nom, bars: nBars(soirees), diffuse: soirees.length > 1 ? 'diffusent' : 'diffuse' })

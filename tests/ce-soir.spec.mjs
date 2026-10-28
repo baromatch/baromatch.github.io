@@ -120,17 +120,19 @@ test('un jour sans vrai bar : noindex, les matchs du jour et les suivants vers l
   expect(p.indexable).toBe(false);
   expect(robotsDe(p)).toBe('noindex');
   expect(p.contenu).not.toContain('id="titre-bars"');
-  // Aucun bar publié sur Baromatch : le titre ne promet aucun bar, et la page le dit une fois, en tête (juste sous sa
-  // tête et son bloc « Partager ») : l’appel des fans, puis une ligne pour les bars, vers le formulaire de leur page.
+  // Aucun bar publié sur Baromatch : le titre ne promet aucun bar, et la page le dit une fois, juste sous les matchs de
+  // ce soir : l’appel des fans, puis une ligne pour les bars, vers le formulaire de leur page.
   expect(titreDe(p)).toBe('Les matchs de ce soir, vendredi 23 octobre — Baromatch');
   expect(p.contenu).toContain('<h1 class="regarder-titre">Les matchs de ce soir</h1>');
   const premiers = sectionDe(p, 'titre-premiers');
-  expect(premiers).toMatch(/^id="titre-premiers">En attendant les premiers bars<\/h2>\n {2}<p>Pas encore de bar sur Baromatch\. Dès qu’un bar annonce un de ces matchs, il s’affiche ici\.<\/p>/);
+  expect(premiers).toMatch(/^id="titre-premiers">Pas encore de bar sur Baromatch<\/h2>\n {2}<p>Baromatch cherche ses premiers bars à Paris\. Dès qu’un bar annonce un match, il s’affiche ici\.<\/p>/);
+  // L’appel seul : sa note est en bas de la page, avec le second appel.
+  expect(premiers).not.toContain(sansBarPublie.textes.appel.fermee.note);
   expect(premiers).toContain('<a class="capsule" href="/#attente">');
   expect(premiers).toContain(insecables('<p class="regarder-premiers__bars"><strong>Tu tiens un bar ?</strong> <a href="/pour-les-bars.html#proposer">Proposer mon bar</a></p>'));
   const corps = p.contenu.split('<main')[1];
-  expect(corps.indexOf('id="titre-premiers"')).toBeGreaterThan(corps.indexOf('</header>'));
-  expect(corps.indexOf('id="titre-premiers"')).toBeLessThan(corps.indexOf('id="titre-matchs"'));
+  expect(corps.indexOf('id="titre-premiers"')).toBeGreaterThan(corps.indexOf('id="titre-matchs"'));
+  expect(corps.indexOf('id="titre-premiers"')).toBeLessThan(corps.indexOf('id="titre-prochains"'));
   // Les matchs du jour, « au programme » (le h1 dit déjà « les matchs de ce soir ») ; aucune ligne ne répète
   // « Pas encore de bar », et la carte des bars n’est plus que la ligne du haut.
   const matchs = sectionDe(p, 'titre-matchs');
@@ -308,7 +310,10 @@ test('un jour sans aucun match : une page utile (les prochains matchs, les ville
   // Aucun vrai bar : ni la description ni le chapeau ne parlent des bars qui diffusent les prochains matchs.
   expect(p.description).toBe('Jeudi 15 octobre : pas de match annoncé ce soir. Les prochains, à l’heure de Paris, et les villes, sur Baromatch.');
   expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.premiersBars.ceSoirChapeau}</p>`);
+  // « Pas de match ce soir » d’abord, puis « Pas encore de bar sur Baromatch », et l’appel des fans.
   expect(sectionDe(p, 'titre-premiers')).toContain('<a class="capsule" href="/#attente">');
+  const corps = p.contenu.split('<main')[1];
+  expect(corps.indexOf('id="titre-rien"')).toBeLessThan(corps.indexOf('id="titre-premiers"'));
   // Rien n’annonce ce soir : l’ItemList suit les prochains matchs, vers leurs pages.
   const [liste] = deType(p, 'ItemList');
   expect(liste.name).toBe('Les prochains matchs');

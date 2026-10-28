@@ -165,14 +165,17 @@ a:hover { color: var(--goutte); }
 .ouverture > * { grid-column: 1 / -1; }
 @media (min-width: 720px) { .ouverture { padding-top: 32px; padding-bottom: 128px; } }
 
+/* Le verre de lumière (aussi sur la page introuvable et celle d’une tablée, en grand). */
 .verre {
-  grid-column: 1;
   position: relative;
-  width: 64px;
-  height: 64px;
-  margin: 0 14px 0 0;
+  width: 176px;
+  height: 176px;
+  margin: 0 auto 28px;
 }
-@media (min-width: 720px) { .verre { width: 80px; height: 80px; margin-right: 18px; } }
+@media (min-width: 720px) { .verre { width: 232px; height: 232px; margin-bottom: 36px; } }
+/* Sur l’accueil, petit, à gauche du statut (sous 400 px de large, le statut passe dessous, pour tenir sur une ligne). */
+.ouverture .verre { grid-column: 1; width: 64px; height: 64px; margin: 0 14px 0 0; }
+@media (min-width: 720px) { .ouverture .verre { width: 80px; height: 80px; margin-right: 18px; } }
 
 /* Le statut de Baromatch, à côté du verre, juste au-dessus de la promesse « Ce soir. » : pas encore ouvert. Une puce,
    pas une action : du verre neutre (l’ambre des bords et des fonds est pour les actions), le texte en ambre clair
@@ -195,6 +198,10 @@ a:hover { color: var(--goutte); }
   letter-spacing: 0.01em;
 }
 @media (min-width: 720px) { .ouverture__statut { font-size: 0.9375rem; } }
+@media (max-width: 399px) {
+  .ouverture .verre { margin-bottom: 14px; }
+  .ouverture__statut { grid-column: 1 / -1; }
+}
 
 .verre__halo {
   position: absolute;
@@ -474,10 +481,10 @@ a:hover { color: var(--goutte); }
 
 .soiree__chapo { max-width: 34rem; margin: 20px 0 0; color: var(--texte-doux); }
 
-/* Un moment : l’heure, ce qui se passe, une phrase ou deux, puis son écran (au téléphone). */
-.moments { display: grid; gap: 64px; margin-top: 56px; }
-.moment__corps { max-width: 34rem; }
-.moment__heure {
+/* Un moment de la soirée (.instant) : l’heure, ce qui se passe, une phrase ou deux, puis son écran (au téléphone). */
+.instants { display: grid; grid-template-columns: minmax(0, 1fr); gap: 64px; margin-top: 56px; }
+.instant__corps { max-width: 34rem; }
+.instant__heure {
   margin: 0 0 6px;
   color: var(--texte-discret);
   font-size: 0.9375rem;
@@ -485,32 +492,37 @@ a:hover { color: var(--goutte); }
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
-.moment__titre { margin: 0; font-size: 1.375rem; font-weight: 750; line-height: 1.2; text-wrap: balance; }
-.moment__texte { margin: 10px 0 0; color: var(--texte-doux); }
-.moment__ecran { position: relative; width: 13rem; max-width: 100%; margin: 32px auto 0; }
+.instant__titre { margin: 0; font-size: 1.375rem; font-weight: 750; line-height: 1.2; text-wrap: balance; }
+.instant__texte { margin: 10px 0 0; color: var(--texte-doux); }
+.instant__ecran { position: relative; width: 13rem; max-width: 100%; margin: 32px auto 0; }
 /* Les écrans ne se chargent qu’en approchant de la soirée (main.js pose .est-proche) : la place de chacun est gardée,
    rien ne bouge quand il arrive. */
-.moment__ecran .telephone__ecran { aspect-ratio: 300 / 649; }
-.soiree:not(.est-proche) .moment__ecran img { display: none; }
+.instant__ecran .telephone__ecran { aspect-ratio: 300 / 649; }
+.soiree:not(.est-proche) .instant__ecran img { display: none; }
 
-/* Sur ordinateur, les moments à gauche, et leurs écrans empilés à droite, qui restent à l’écran pendant qu’on lit :
-   seul celui du moment en cours se voit (main.js). Le moment en cours passe sous le verre. */
+/* Sur ordinateur, la section entière en deux colonnes : à gauche, son titre, les moments et ce qui suit ; à droite, les
+   écrans des moments, empilés sur toute la hauteur de la section (14 rangées : 3 pour le titre, 8 moments, 3 pour la
+   suite), qui restent à l’écran pendant qu’on lit : seul celui du moment en cours se voit (main.js). Le moment en cours
+   passe sous le verre. */
 @media (min-width: 960px) {
-  .moments { grid-template-columns: minmax(0, 1fr) auto; column-gap: clamp(48px, 7vw, 112px); row-gap: 8px; margin-top: 64px; }
-  .moment { display: contents; }
-  .moment__corps {
+  .soiree { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: clamp(48px, 7vw, 112px); align-content: start; }
+  .soiree > * { grid-column: 1; }
+  .instants, .instant { display: contents; }
+  .instant__corps {
     grid-column: 1;
     max-width: 36rem;
+    margin-top: 8px;
     padding: 24px 28px;
     border-radius: 24px;
     box-shadow: inset 0 0 0 1px transparent;
     transition: background-color 0.35s var(--sortie-douce), box-shadow 0.35s var(--sortie-douce);
   }
-  .moment.est-actif .moment__corps { background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); }
-  .moment.est-actif .moment__heure { color: #FFD08A; }
-  .moment__ecran {
+  .instant:first-child .instant__corps { margin-top: 48px; }
+  .instant.est-actif .instant__corps { background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); }
+  .instant.est-actif .instant__heure { color: #FFD08A; }
+  .instant__ecran {
     grid-column: 2;
-    grid-row: 1 / span 8;
+    grid-row: 1 / span 14;
     align-self: start;
     position: sticky;
     top: max(24px, calc(50vh - 21rem));
@@ -520,11 +532,11 @@ a:hover { color: var(--goutte); }
     perspective: 1600px;
     transition: opacity 0.45s var(--sortie-douce);
   }
-  .moment.est-actif .moment__ecran { opacity: 1; }
-  .moment__ecran .telephone { transform: rotateY(-7deg) rotateX(2deg); }
+  .instant.est-actif .instant__ecran { opacity: 1; }
+  .instant__ecran .telephone { transform: rotateY(-7deg) rotateX(2deg); }
 }
 @media (min-width: 960px) and (prefers-reduced-motion: reduce) {
-  .moment__corps, .moment__ecran { transition: none; }
+  .instant__corps, .instant__ecran { transition: none; }
 }
 
 /* « Maintiens pour essayer » : le geste de l’appli, sur la page. Le verre se remplit tant qu’on tient (1,4 s), se vide
@@ -564,7 +576,7 @@ a:hover { color: var(--goutte); }
 }
 
 .soiree__notifs { max-width: 34rem; margin: 64px 0 0; color: var(--texte-doux); }
-/* Sous les moments, le lien vers les matchs de ce soir : seul sur sa ligne, 44 px à toucher. */
+/* Sous les instants, le lien vers les matchs de ce soir : seul sur sa ligne, 44 px à toucher. */
 .soiree__suite { margin: 24px 0 0; }
 /* « Préviens-moi » plus bas dans l’accueil (après la soirée, après les questions) : la capsule des pages des matchs,
    qui se coupe au téléphone au milieu de la phrase, jamais dans « préviens-moi » (comme dans regarder.css). */
@@ -576,7 +588,7 @@ a:hover { color: var(--goutte); }
    est posée sur le bord haut de l’écran (la figure est son repère) ; le téléphone est sans marque, bord de 6 px,
    rayons concentriques 34 = 28 + 6. */
 .exemple { position: absolute; top: -12px; left: 24px; z-index: 2; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; background: var(--nuit); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); color: var(--texte); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
-.telephone { position: relative; padding: 6px; border-radius: 34px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
+.telephone { position: relative; max-width: 20rem; padding: 6px; border-radius: 34px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
 .telephone__ecran { overflow: hidden; border-radius: 28px; background: var(--nuit); outline: 1px solid rgba(255, 255, 255, 0.1); outline-offset: -1px; }
 .telephone__ecran img { width: 100%; height: auto; }
 

@@ -261,12 +261,12 @@
 })();
 
 /* Un soir de match, minute par minute. Ses écrans ne se chargent qu’en approchant (.est-proche, 600 px avant) : le
-   premier affichage de l’accueil n’en paie aucun. Sur ordinateur, ils sont empilés à côté des moments, et celui du
-   moment qui passe au milieu de la fenêtre se montre (.est-actif). */
+   premier affichage de l’accueil n’en paie aucun. Sur ordinateur, ils sont empilés à côté des moments (.instant), et
+   celui du moment qui passe au milieu de la fenêtre se montre (.est-actif). */
 (function () {
   var soiree = document.querySelector(".soiree");
-  var moments = document.querySelectorAll(".moment");
-  if (!soiree || !moments.length) return;
+  var instants = document.querySelectorAll(".instant");
+  if (!soiree || !instants.length) return;
   if (!("IntersectionObserver" in window)) {
     soiree.classList.add("est-proche");
     return;
@@ -279,13 +279,27 @@
   }, { rootMargin: "600px 0px" });
   approche.observe(soiree);
 
+  // Les moments dans la bande du milieu de la fenêtre (30 % de sa hauteur) ; le plus proche du milieu est le moment en
+  // cours. Bande vide (au-dessus ou au-dessous de la liste) : le moment en cours ne change pas.
+  var dansLaBande = [];
   var milieu = new IntersectionObserver(function (entrees) {
     entrees.forEach(function (entree) {
-      if (!entree.isIntersecting) return;
-      for (var i = 0; i < moments.length; i++) moments[i].classList.toggle("est-actif", moments[i] === entree.target.parentNode);
+      var rang = dansLaBande.indexOf(entree.target);
+      if (entree.isIntersecting && rang < 0) dansLaBande.push(entree.target);
+      if (!entree.isIntersecting && rang >= 0) dansLaBande.splice(rang, 1);
     });
-  }, { rootMargin: "-50% 0px -50% 0px" });
-  for (var i = 0; i < moments.length; i++) milieu.observe(moments[i].querySelector(".moment__corps"));
+    var centre = window.innerHeight / 2;
+    var proche = null;
+    var ecart = Infinity;
+    dansLaBande.forEach(function (corps) {
+      var boite = corps.getBoundingClientRect();
+      var ici = Math.abs(boite.top + boite.height / 2 - centre);
+      if (ici < ecart) { ecart = ici; proche = corps; }
+    });
+    if (!proche) return;
+    for (var i = 0; i < instants.length; i++) instants[i].classList.toggle("est-actif", instants[i] === proche.parentNode);
+  }, { rootMargin: "-35% 0px -35% 0px" });
+  for (var i = 0; i < instants.length; i++) milieu.observe(instants[i].querySelector(".instant__corps"));
 })();
 
 /* « Maintiens pour essayer » : le geste de l’appli. Tenir le bouton (doigt, souris, ou Espace et Entrée au clavier)

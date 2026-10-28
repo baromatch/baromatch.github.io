@@ -90,8 +90,8 @@ test('les captures et le film : des images légères chargées tard, le film à 
     expect(capture.paresseuse, capture.src).toBe(true);
     expect(capture.legende.trim(), capture.src).not.toBe('');
   }
-  await expect(page.locator('a.presse__film')).toHaveAttribute('href', '/baromatch-film-16x9.mp4');
-  await expect(page.locator('a.presse__film img')).toHaveAttribute('src', '/baromatch-film-16x9.webp');
+  await expect(page.locator('a.presse__film')).toHaveAttribute('href', '/baromatch-film.mp4');
+  await expect(page.locator('a.presse__film img')).toHaveAttribute('src', '/baromatch-film.webp');
 });
 
 test('le contact presse : l’adresse de marque.json', async ({ page }) => {

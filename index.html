@@ -7,7 +7,7 @@
      liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même) ; l’empreinte du style du
      noscript. Une retouche d’un script ou d’un style en ligne change son empreinte :
      tests/politique-de-securite.spec.mjs donne la nouvelle. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-KanQSFAxCglrYpZyzwmUmT6Uns/QpODCJAsIH4o5024='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-0DwpcQg4aC7mjUIi/hLvMveB6nun9m4SkQ1RsQWj8T8='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
 <meta name="google-site-verification" content="nBxxD8vbrngLKD1Te1fRcbC8tGC2-gwezW9NG9urIaw" />
 <!-- Bing Webmaster Tools : remplace la ligne suivante par la balise de vérification que Bing donne (elle commence par <meta name="msvalidate.01"). -->
 <!-- BING_SITE_VERIFICATION -->
@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/styles.css">
 <!-- Sans JavaScript, le lecteur de secours (dans #film-cadre, avec ses commandes) prend la place du film, que main.js
      lance et arrête ; les écrans de « Un soir de match » se montrent sans attendre main.js. -->
-<noscript><style>#film { display: none; } .soiree .moment__ecran img { display: block; }</style></noscript>
+<noscript><style>#film { display: none; } .soiree:not(.est-proche) .instant__ecran img { display: block; }</style></noscript>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
@@ -143,88 +143,88 @@
     <p class="soiree__chapo">L’appli est en test à Paris. Sur ses écrans, les bars, les clubs et les pseudos sont inventés.</p>
     <!-- Sur ordinateur, les écrans restent à côté du texte, l’un sur l’autre : main.js montre celui du moment qui passe au
          milieu de la fenêtre. Au téléphone, chaque écran suit son moment. -->
-    <div class="moments">
-      <div class="moment est-actif">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>18:42</time></p>
-          <h3 class="moment__titre">«&nbsp;Ce soir&nbsp;», tout de suite</h3>
-          <p class="moment__texte">Tu ouvres l’appli&nbsp;: le match de ce soir et les bars qui le passent sont déjà là. «&nbsp;Près de toi&nbsp;» te montre les bars les plus proches qui ont encore de la place, avec le temps à pied. Ta position reste sur ton téléphone.</p>
+    <div class="instants">
+      <div class="instant est-actif">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>18:42</time></p>
+          <h3 class="instant__titre">«&nbsp;Ce soir&nbsp;», tout de suite</h3>
+          <p class="instant__texte">Tu ouvres l’appli&nbsp;: le match de ce soir et les bars qui le passent sont déjà là. «&nbsp;Près de toi&nbsp;» te montre les bars les plus proches qui ont encore de la place, avec le temps à pied. Ta position reste sur ton téléphone.</p>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ce-soir-300.webp" srcset="/img/appli/ce-soir-300.webp 300w, /img/appli/ce-soir-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="L’écran Ce soir de l’appli&nbsp;: Alvène – Orvèle à 21:00, en Coupe des Faubourgs, puis Près de toi&nbsp;: La Lucarne Lunaire à 6 min à pied, encore 7 places, et Le Onze Étoilé à 9 min, encore 12 places."></div></div>
         </figure>
       </div>
-      <div class="moment">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>18:50</time></p>
-          <h3 class="moment__titre">Complet&nbsp;? La liste d’attente</h3>
-          <p class="moment__texte">Le bar que tu voulais est plein&nbsp;? Mets-toi sur sa liste d’attente. Si une place se libère avant le coup d’envoi, l’appli te le dit, et elle va au premier qui la prend.</p>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>18:50</time></p>
+          <h3 class="instant__titre">Complet&nbsp;? La liste d’attente</h3>
+          <p class="instant__texte">Le bar que tu voulais est plein&nbsp;? Mets-toi sur sa liste d’attente. Si une place se libère avant le coup d’envoi, l’appli te le dit, et elle va au premier qui la prend.</p>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/liste-attente-300.webp" srcset="/img/appli/liste-attente-300.webp 300w, /img/appli/liste-attente-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="La page d’un bar complet, Chez Zénon&nbsp;: une place s’est libérée pour Alvène – Orvèle, et le bouton «&nbsp;Prendre ma place&nbsp;»."></div></div>
         </figure>
       </div>
-      <div class="moment">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>19:05</time></p>
-          <h3 class="moment__titre">La carte cherche pour toi</h3>
-          <p class="moment__texte">Tape un club, un bar, un quartier ou une adresse. Garde seulement les bars qui ont de la place, un grand écran, le son du match, une terrasse ou un accès PMR.</p>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:05</time></p>
+          <h3 class="instant__titre">La carte cherche pour toi</h3>
+          <p class="instant__texte">Tape un club, un bar, un quartier ou une adresse. Garde seulement les bars qui ont de la place, un grand écran, le son du match, une terrasse ou un accès PMR.</p>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/carte-recherche-300.webp" srcset="/img/appli/carte-recherche-300.webp 300w, /img/appli/carte-recherche-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="La carte de l’appli, avec la recherche «&nbsp;11e&nbsp;»&nbsp;: des bars du 11e, comme La Lucarne Lunaire rue des Crampons, et des adresses du quartier."></div></div>
         </figure>
       </div>
-      <div class="moment">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>19:12</time></p>
-          <h3 class="moment__titre">Garde ta place d’un geste</h3>
-          <p class="moment__texte">Tiens le bouton&nbsp;: le verre monte, la place est à toi. Pour toi seul ou jusqu’à 8, et c’est gratuit. Lâche avant la fin&nbsp;: rien n’est réservé.</p>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:12</time></p>
+          <h3 class="instant__titre">Garde ta place d’un geste</h3>
+          <p class="instant__texte">Tiens le bouton&nbsp;: le verre monte, la place est à toi. Pour toi seul ou jusqu’à 8, et c’est gratuit. Lâche avant la fin&nbsp;: rien n’est réservé.</p>
           <div class="essai" id="essai" hidden>
             <button class="essai__bouton" id="essai-bouton" type="button"><span class="essai__verre" aria-hidden="true"><span class="essai__liquide"></span></span><span id="essai-mot">Maintiens pour essayer</span></button>
             <p class="essai__note" id="essai-note" role="status">Ici, c’est un essai&nbsp;: rien n’est réservé.</p>
           </div>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/bar-300.webp" srcset="/img/appli/bar-300.webp 300w, /img/appli/bar-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="La page d’un bar dans l’appli&nbsp;: La Lucarne Lunaire, 14 rue des Crampons, à 6 min à pied. Coin des supporters d’Orvèle, grand écran, 5 écrans, son du match, debout, les deux camps. 4 places prises, et le bouton «&nbsp;Prendre ma place&nbsp;»."></div></div>
         </figure>
       </div>
-      <div class="moment">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>19:13</time></p>
-          <h3 class="moment__titre">Ton pass, même sans réseau</h3>
-          <p class="moment__texte">Ta place t’attend dans «&nbsp;Ta soirée&nbsp;»&nbsp;: un QR code et un code à 6 chiffres, qui s’affichent même sans réseau. «&nbsp;Y aller&nbsp;» t’ouvre le chemin à pied.</p>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:13</time></p>
+          <h3 class="instant__titre">Ton pass, même sans réseau</h3>
+          <p class="instant__texte">Ta place t’attend dans «&nbsp;Ta soirée&nbsp;»&nbsp;: un QR code et un code à 6 chiffres, qui s’affichent même sans réseau. «&nbsp;Y aller&nbsp;» t’ouvre le chemin à pied.</p>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ta-soiree-300.webp" srcset="/img/appli/ta-soiree-300.webp 300w, /img/appli/ta-soiree-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="Ta soirée dans l’appli&nbsp;: Alvène – Orvèle à 21:00, à La Lucarne Lunaire, pour 1 personne, le QR code du pass et son code, et le bouton «&nbsp;Y aller · 6 min à pied&nbsp;»."></div></div>
         </figure>
       </div>
-      <div class="moment">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>19:20</time></p>
-          <h3 class="moment__titre">Toute la bande à la même table</h3>
-          <p class="moment__texte">Tu gardes des places pour tes potes, jusqu’à 8, et tu leur envoies le lien de ta tablée. Chacun a son pass. Tu peux aussi partager l’image «&nbsp;J’y vais&nbsp;» en story.</p>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>19:20</time></p>
+          <h3 class="instant__titre">Toute la bande à la même table</h3>
+          <p class="instant__texte">Tu gardes des places pour tes potes, jusqu’à 8, et tu leur envoies le lien de ta tablée. Chacun a son pass. Tu peux aussi partager l’image «&nbsp;J’y vais&nbsp;» en story.</p>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/tablee-300.webp" srcset="/img/appli/tablee-300.webp 300w, /img/appli/tablee-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="Ta tablée, sous ton pass&nbsp;: 2 places prises sur 4, toi et plume.r, et 2 libres. «&nbsp;Envoie le lien à ta bande avant 21:00.&nbsp;» Les boutons «&nbsp;Inviter des potes&nbsp;» et «&nbsp;Copier le lien&nbsp;»."></div></div>
         </figure>
       </div>
-      <div class="moment">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>20:25</time></p>
-          <h3 class="moment__titre">«&nbsp;Je suis en retard&nbsp;»</h3>
-          <p class="moment__texte">Le métro traîne&nbsp;? Préviens le bar&nbsp;: 10, 20 ou 30 minutes. Avant d’envoyer, tu vois jusqu’à quelle heure ta place t’attend.</p>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>20:25</time></p>
+          <h3 class="instant__titre">«&nbsp;Je suis en retard&nbsp;»</h3>
+          <p class="instant__texte">Le métro traîne&nbsp;? Préviens le bar&nbsp;: 10, 20 ou 30 minutes. Avant d’envoyer, tu vois jusqu’à quelle heure ta place t’attend.</p>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/en-retard-300.webp" srcset="/img/appli/en-retard-300.webp 300w, /img/appli/en-retard-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="Ta soirée, «&nbsp;Tu arrives dans combien de temps&nbsp;?&nbsp;»&nbsp;: 10, 20 ou 30 min. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» Le bouton «&nbsp;Prévenir le bar&nbsp;»."></div></div>
         </figure>
       </div>
-      <div class="moment">
-        <div class="moment__corps">
-          <p class="moment__heure"><time>20:37</time></p>
-          <h3 class="moment__titre">Tu y es</h3>
-          <p class="moment__texte">Au bar, scanne le QR du comptoir, ou montre ton pass à l’équipe. Deux vibrations&nbsp;: tu y es. Ta soirée devient un sous-bock aux noms des deux clubs, qui se colle dans ton album.</p>
+      <div class="instant">
+        <div class="instant__corps">
+          <p class="instant__heure"><time>20:37</time></p>
+          <h3 class="instant__titre">Tu y es</h3>
+          <p class="instant__texte">Au bar, scanne le QR du comptoir, ou montre ton pass à l’équipe. Deux vibrations&nbsp;: tu y es. Ta soirée devient un sous-bock aux noms des deux clubs, qui se colle dans ton album.</p>
         </div>
-        <figure class="moment__ecran"><span class="exemple">Écran de démonstration</span>
+        <figure class="instant__ecran"><span class="exemple">Écran de démonstration</span>
           <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/tu-y-es-300.webp" srcset="/img/appli/tu-y-es-300.webp 300w, /img/appli/tu-y-es-600.webp 600w" sizes="(min-width: 960px) 320px, 208px" width="300" height="649" loading="lazy" decoding="async" alt="Tu y es&nbsp;: arrivée validée à 20:37 à La Lucarne Lunaire, coup d’envoi dans 23 minutes. Sous-bock n°08 collé."></div></div>
         </figure>
       </div>

@@ -461,83 +461,71 @@ test.describe('l’ouverture de l’accueil', () => {
   });
 });
 
-test.describe('l’affiche du film', () => {
-  test('aucune affiche n’est l’image de fin du film, qui annonce des plateformes', () => {
-    const ffmpeg = (() => { try { execFileSync('ffmpeg', ['-version']); return true; } catch { return false; } })();
-    test.skip(!ffmpeg, 'ffmpeg absent : ce test lit la dernière image du film');
-    // L’affiche et la dernière image du film, réduites à 64 × 64 par ffmpeg, en octets RGB.
+test.describe('le film de l’accueil', () => {
+  const ffmpeg = (() => { try { execFileSync('ffmpeg', ['-version']); return true; } catch { return false; } })();
+
+  test('son affiche n’est pas l’image de fin, qui annonce la plateforme ; il est sans son, en portrait, léger', () => {
+    test.skip(!ffmpeg, 'ffmpeg absent : ce test lit l’image de fin et les pistes du film');
+    // L’affiche et l’image de fin (le logo, « baromatch.fr », « Bientôt sur Android, à Paris », à 13 s ; le film repart
+    // ensuite sur sa première scène), réduites à 64 × 64 par ffmpeg, en octets RGB.
     const pixels = (...entree) => execFileSync('ffmpeg', ['-v', 'error', ...entree, '-frames:v', '1', '-vf', 'scale=64:64:flags=area',
       '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], { maxBuffer: 1024 * 1024 });
-    for (const format of ['16x9', '9x16']) {
-      const affiche = pixels('-i', duDepot(`baromatch-film-${format}.webp`));
-      const fin = pixels('-sseof', '-0.5', '-i', duDepot(`baromatch-film-${format}.mp4`));
-      expect(affiche.length).toBe(64 * 64 * 3);
-      expect(fin.length).toBe(affiche.length);
-      let somme = 0;
-      for (let i = 0; i < affiche.length; i += 1) somme += Math.abs(affiche[i] - fin[i]);
-      // Écart moyen de 0 à 255 : environ 3 pour une copie de la fin, près de 20 pour une autre scène.
-      expect(somme / affiche.length, `baromatch-film-${format}.webp ressemble à la fin du film`).toBeGreaterThan(10);
-    }
+    const affiche = pixels('-i', duDepot('baromatch-film.webp'));
+    const fin = pixels('-ss', '13', '-i', duDepot('baromatch-film.mp4'));
+    expect(affiche.length).toBe(64 * 64 * 3);
+    expect(fin.length).toBe(affiche.length);
+    let somme = 0;
+    for (let i = 0; i < affiche.length; i += 1) somme += Math.abs(affiche[i] - fin[i]);
+    // Écart moyen de 0 à 255 : environ 3 pour une copie de la fin, près de 20 pour une autre scène.
+    expect(somme / affiche.length, 'baromatch-film.webp ressemble à la fin du film').toBeGreaterThan(10);
+    // Une seule piste, l’image, en 720 × 1280 : le film n’a pas de son (la note du film le dit). Léger, et son affiche aussi.
+    const pistes = execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'stream=codec_type,width,height', '-of', 'csv=p=0', duDepot('baromatch-film.mp4')]).toString().trim().split('\n');
+    expect(pistes).toEqual(['video,720,1280']);
+    expect(statSync(duDepot('baromatch-film.mp4')).size).toBeLessThan(1.2 * 1024 * 1024);
+    expect(statSync(duDepot('baromatch-film.webp')).size).toBeLessThan(30 * 1024);
   });
 
-  test('sans JavaScript, le cadre du film montre l’affiche paysage et se lit, sans bouton qui ne marche pas', async ({ browser, baseURL }) => {
+  test('sans JavaScript, le cadre du film montre son affiche et se lit, sans bouton qui ne marche pas', async ({ browser, baseURL }) => {
     for (const largeur of [360, 1280]) {
       const contexte = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: largeur, height: 800 } });
       const onglet = await contexte.newPage();
       const demandees = [];
       onglet.on('request', (requete) => {
         const chemin = new URL(requete.url()).pathname;
-        if (/^\/baromatch-film-[^/]+\.(jpe?g|png|webp)$/.test(chemin)) demandees.push(chemin);
+        if (/^\/baromatch-film[^/]*\.(jpe?g|png|webp)$/.test(chemin)) demandees.push(chemin);
       });
       await onglet.goto('/');
       const cadre = onglet.locator('#film-cadre');
       await cadre.scrollIntoViewIfNeeded();
-      // Sans script, le cadre reste en paysage (la version portrait est choisie par main.js) : l’affiche aussi.
       const boite = await cadre.boundingBox();
-      expect(boite.width, `cadre en paysage à ${largeur} px`).toBeGreaterThan(boite.height);
+      expect(boite.height, `cadre en portrait à ${largeur} px`).toBeGreaterThan(boite.width);
       await expect(onglet.locator('#film')).toBeHidden();
       const lecteur = cadre.locator('video:visible');
       await expect(lecteur).toHaveCount(1);
-      await expect(lecteur).toHaveAttribute('poster', '/baromatch-film-16x9.webp');
+      await expect(lecteur).toHaveAttribute('poster', '/baromatch-film.webp');
       await expect(lecteur).toHaveAttribute('controls', '');
-      await expect.poll(() => demandees, { timeout: 5000 }).toEqual(['/baromatch-film-16x9.webp']);
-      await expect(onglet.locator('#film-son')).toBeHidden();
+      await expect.poll(() => demandees, { timeout: 5000 }).toEqual(['/baromatch-film.webp']);
       await expect(onglet.locator('#film-lecture')).toBeHidden();
       await contexte.close();
     }
   });
 
-  for (const ecran of [
-    { largeur: 360, hauteur: 800, affiche: '/baromatch-film-9x16.webp', film: '/baromatch-film-9x16.mp4' },
-    { largeur: 1280, hauteur: 800, affiche: '/baromatch-film-16x9.webp', film: '/baromatch-film-16x9.mp4' },
-  ]) {
-    test(`à ${ecran.largeur} px : le film se charge en arrivant à l’écran, dans la version de l’écran`, async ({ page: onglet }) => {
-      const films = [];
-      onglet.on('request', (requete) => {
-        const chemin = new URL(requete.url()).pathname;
-        if (chemin.endsWith('.mp4') && !films.includes(chemin)) films.push(chemin);
-      });
-      await onglet.setViewportSize({ width: ecran.largeur, height: ecran.hauteur });
-      await onglet.goto('/');
-      await onglet.waitForLoadState('networkidle');
-      expect(films).toEqual([]);
-      await onglet.locator('#film').scrollIntoViewIfNeeded();
-      await expect.poll(() => films, { timeout: 5000 }).toEqual([ecran.film]);
+  test('au téléphone, le film ne se charge qu’en arrivant à l’écran ; une seule affiche, en WebP', async ({ page: onglet }) => {
+    const films = [];
+    const affiches = [];
+    onglet.on('request', (requete) => {
+      const chemin = new URL(requete.url()).pathname;
+      if (chemin.endsWith('.mp4') && !films.includes(chemin)) films.push(chemin);
+      if (/^\/baromatch-film[^/]*\.(jpe?g|png|webp)$/.test(chemin)) affiches.push(chemin);
     });
-
-    test(`à ${ecran.largeur} px : une seule affiche, en WebP, celle de l’écran`, async ({ page: onglet }) => {
-      const demandees = [];
-      onglet.on('request', (requete) => {
-        const chemin = new URL(requete.url()).pathname;
-        if (/^\/baromatch-film-[^/]+\.(jpe?g|png|webp)$/.test(chemin)) demandees.push(chemin);
-      });
-      await onglet.setViewportSize({ width: ecran.largeur, height: ecran.hauteur });
-      await onglet.goto('/');
-      await expect.poll(() => demandees, { timeout: 5000 }).toContain(ecran.affiche);
-      await onglet.waitForLoadState('networkidle');
-      expect(demandees).toEqual([ecran.affiche]);
-    });
-  }
+    await onglet.setViewportSize({ width: 360, height: 800 });
+    await onglet.goto('/');
+    await onglet.waitForLoadState('networkidle');
+    expect(films).toEqual([]);
+    expect(affiches).toEqual(['/baromatch-film.webp']);
+    await onglet.locator('#film').scrollIntoViewIfNeeded();
+    await expect.poll(() => films, { timeout: 5000 }).toEqual(['/baromatch-film.mp4']);
+  });
 });
 
 for (const largeur of [360, 1280]) {

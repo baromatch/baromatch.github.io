@@ -18,18 +18,10 @@ test('le premier écran dit « pas encore ouvert », « gratuite pour les fans �
   const texte = normaliser(await ouverture.locator('.ouverture__texte').innerText());
   expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Elle n’est pas encore ouverte : rien à réserver ce soir.');
   expect(normaliser(await ouverture.innerText())).toContain(PLATEFORMES);
-  // Aucune promesse d’appli iPhone ni de date de lancement (rien n’est annoncé), dans ce que la page dit elle-même. La
-  // transcription du film (#film-texte) recopie son image de fin telle qu’elle est, « Bientôt sur Android et iPhone » :
-  // c’est le film qui le dit (question posée au propriétaire), elle est lue à part, plus bas.
-  const page_ = normaliser(await page.evaluate(() => {
-    const transcription = document.getElementById('film-texte');
-    const parent = transcription?.parentNode;
-    const suivant = transcription?.nextSibling;
-    transcription?.remove();
-    const texte = document.body.innerText;
-    if (transcription) parent.insertBefore(transcription, suivant);
-    return texte;
-  }));
+  // Aucune promesse d’appli iPhone ni de date de lancement (rien n’est annoncé), texte du film compris (son image de fin
+  // dit « Bientôt sur Android, à Paris »).
+  await page.locator('#film-texte summary').click();
+  const page_ = normaliser(await page.evaluate(() => document.body.innerText));
   expect(page_).not.toMatch(/bientôt sur (Android et )?iPhone|iPhone bientôt|disponible sur iPhone/i);
   expect(page_).not.toContain('!');
 });
@@ -88,21 +80,28 @@ for (const ecran of [
   });
 }
 
-// Plus bas dans la page, « préviens-moi » revient deux fois : après le film et après les questions. La même capsule
-// ambre que sur les pages des matchs, vers le formulaire du haut. « Voir la boutique » passe en verre : près de ces
-// rappels, l’ambre reste à l’appel des fans (« Deviens testeur Android » garde le sien).
-test('« préviens-moi » revient après le film et après les questions ; la boutique en verre', async ({ page }) => {
+// Plus bas dans la page, « préviens-moi » revient deux fois : après la soirée et après les questions. La même capsule
+// ambre que sur les pages des matchs, vers le formulaire du haut. Un seul appel principal : tout ce qui est en ambre
+// dans la page (hors de la bande des bars, ambre elle-même) mène à la liste d’attente ; « Deviens testeur Android » et
+// « Voir la boutique » sont en verre.
+test('« préviens-moi » revient après la soirée et après les questions ; l’ambre ne mène qu’à la liste d’attente', async ({ page }) => {
   await page.goto('/');
   const rappels = page.locator('main .rappel-attente a.capsule');
   await expect(rappels).toHaveCount(2);
   await expect(rappels).toHaveText(['L’appli ouvre bientôt : préviens-moi', 'L’appli ouvre bientôt : préviens-moi']);
   for (const lien of await rappels.all()) await expect(lien).toHaveAttribute('href', '#attente');
   expect(await page.$$eval('main .rappel-attente', (p) => p.map((e) => e.closest('section').className.split(' ')[0])))
-    .toEqual(['film', 'questions-fans']);
-  const boutique = page.locator('main a[href="/boutique.html"]');
-  await expect(boutique).toHaveCount(1);
-  expect(await boutique.evaluate((a) => getComputedStyle(a).backgroundColor)).not.toBe('rgb(255, 177, 61)');
-  expect(await page.locator('main a[href="/testeurs-android.html"]').evaluate((a) => getComputedStyle(a).backgroundColor)).toBe('rgb(255, 177, 61)');
+    .toEqual(['soiree', 'questions-fans']);
+  for (const lien of ['/boutique.html', '/testeurs-android.html']) {
+    const verre = page.locator(`main a[href="${lien}"]`);
+    await expect(verre).toHaveCount(1);
+    expect(await verre.evaluate((a) => getComputedStyle(a).backgroundColor), lien).not.toBe('rgb(255, 177, 61)');
+  }
+  const enAmbre = await page.$$eval('main a, main button', (elements) => elements
+    .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')
+    .map((e) => e.getAttribute('href') ?? e.closest('form')?.id));
+  expect(enAmbre.length).toBeGreaterThan(0);
+  expect(enAmbre.filter((cible) => cible !== '#attente' && cible !== 'attente')).toEqual([]);
   // Un rappel mène au formulaire, et le champ est là.
   await rappels.last().click();
   await expect(page).toHaveURL(/#attente$/);
@@ -166,8 +165,8 @@ test('la note de la liste d’attente mène droit à ce qu’on fait de l’adre
   await expect(page.locator('#liste-attente')).toBeInViewport();
 });
 
-// Le film (WCAG 2.2.2) : il part seul, muet, en arrivant à l’écran. « Pause », juste avant le son, se prend au clavier,
-// et la pause tient : revenir au film ne le relance pas. Le Chromium des tests ne lit pas le H.264 du film : la lecture
+// Le film (WCAG 2.2.2) : il part seul, muet, en arrivant à l’écran. Son bouton se prend au clavier, et la pause tient :
+// revenir au film ne le relance pas. Le Chromium des tests ne lit pas le H.264 du film : la lecture
 // est simulée (play, pause, paused et leurs événements), comme un téléphone qui le lit.
 const simulerUnLecteur = (page) => page.addInitScript(() => {
   const enPause = new WeakMap();
@@ -185,52 +184,61 @@ const lireLeFilm = (page) => page.locator('#film').evaluate((v) => ({ enPause: v
 const deuxImages = (page) => page.evaluate(() => new Promise((suite) => requestAnimationFrame(() => requestAnimationFrame(suite))));
 
 for (const largeur of [360, 1280]) {
-  test(`à ${largeur} px : « Pause » arrête le film au clavier, juste avant le son, et la pause tient en revenant au film`, async ({ page }) => {
+  test(`à ${largeur} px : le bouton du film l’arrête au clavier, juste après la liste d’attente, et la pause tient en revenant au film`, async ({ page }) => {
     await simulerUnLecteur(page);
     await page.setViewportSize({ width: largeur, height: 800 });
     await page.goto('/');
     const lecture = page.locator('#film-lecture');
-    const son = page.locator('#film-son');
     await page.locator('#film').scrollIntoViewIfNeeded();
     await expect.poll(() => lireLeFilm(page)).toEqual({ enPause: false, muet: true, controles: false });
     await expect(lecture).toBeVisible();
-    await expect(lecture).toHaveText('Pause');
-    // Au clavier : juste après le dernier lien avant le film, et juste avant le son, à côté de lui dans le cadre.
+    await expect(lecture).toHaveAccessibleName('Mettre le film en pause');
+    await expect(lecture).not.toHaveAttribute('aria-pressed', /.*/);
+    // Au clavier : juste après le dernier lien de la liste d’attente, dans le cadre du film.
     await page.locator('.attente__note a').focus();
     await page.keyboard.press('Tab');
     await expect(lecture).toBeFocused();
-    await page.keyboard.press('Tab');
-    await expect(son).toBeFocused();
-    const [boiteLecture, boiteSon, cadre] = await Promise.all([lecture.boundingBox(), son.boundingBox(), page.locator('#film-cadre').boundingBox()]);
-    for (const boite of [boiteLecture, boiteSon]) {
-      expect(boite.x).toBeGreaterThanOrEqual(cadre.x);
-      expect(boite.x + boite.width).toBeLessThanOrEqual(cadre.x + cadre.width);
-      expect(boite.y + boite.height).toBeLessThanOrEqual(cadre.y + cadre.height);
-    }
-    expect(Math.abs(boiteLecture.y - boiteSon.y), 'sur la même ligne que le son').toBeLessThan(1);
-    await page.keyboard.press('Shift+Tab');
+    const [boite, cadre] = await Promise.all([lecture.boundingBox(), page.locator('#film-cadre').boundingBox()]);
+    expect(boite.width).toBeGreaterThanOrEqual(44);
+    expect(boite.height).toBeGreaterThanOrEqual(44);
+    expect(boite.x).toBeGreaterThanOrEqual(cadre.x);
+    expect(boite.x + boite.width).toBeLessThanOrEqual(cadre.x + cadre.width);
+    expect(boite.y + boite.height).toBeLessThanOrEqual(cadre.y + cadre.height);
     await page.keyboard.press('Enter');
     await expect.poll(() => lireLeFilm(page)).toMatchObject({ enPause: true });
-    await expect(lecture).toHaveText('Lire');
+    await expect(lecture).toHaveAccessibleName('Lire le film');
     await expect(lecture).toBeFocused();
     // Le film sort de l’écran puis y revient : il reste en pause.
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await deuxImages(page);
     await page.locator('#film').scrollIntoViewIfNeeded();
     await deuxImages(page);
     await deuxImages(page);
     expect(await lireLeFilm(page)).toMatchObject({ enPause: true });
-    await expect(lecture).toHaveText('Lire');
-    // « Lire » le relance.
+    await expect(lecture).toHaveAccessibleName('Lire le film');
+    // « Lire le film » le relance.
     await lecture.press('Enter');
     await expect.poll(() => lireLeFilm(page)).toMatchObject({ enPause: false });
-    await expect(lecture).toHaveText('Pause');
+    await expect(lecture).toHaveAccessibleName('Mettre le film en pause');
   });
 }
 
-test('le film encore en chargement : « Pause » l’arrête sans faire tomber les boutons ni le focus', async ({ page }) => {
+test('le film part seul quand il arrive à l’écran, et s’arrête quand il en sort', async ({ page }) => {
+  await simulerUnLecteur(page);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/');
+  await deuxImages(page);
+  // Au téléphone, il est sous la liste d’attente : rien ne joue avant d’y arriver.
+  expect(await lireLeFilm(page)).toMatchObject({ enPause: true });
+  await page.locator('#film').scrollIntoViewIfNeeded();
+  await expect.poll(() => lireLeFilm(page)).toMatchObject({ enPause: false });
+  await page.locator('.soiree__suite').scrollIntoViewIfNeeded();
+  await expect.poll(() => lireLeFilm(page)).toMatchObject({ enPause: true });
+});
+
+test('le film encore en chargement : le bouton l’arrête sans tomber ni perdre le focus', async ({ page }) => {
   // Le vrai lecteur : sa lecture attend des données, et pause() annule cette attente (AbortError). Ce n’est pas un refus
-  // de lecture automatique : les boutons restent, sans lecteur classique.
+  // de lecture automatique : le bouton reste, sans lecteur classique.
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/');
   await page.locator('#film').scrollIntoViewIfNeeded();
@@ -240,10 +248,9 @@ test('le film encore en chargement : « Pause » l’arrête sans faire tomber l
   await deuxImages(page);
   expect(await lireLeFilm(page)).toEqual({ enPause: true, muet: true, controles: false });
   await expect(page.locator('#film-lecture')).toBeFocused();
-  await expect(page.locator('#film-son')).toBeVisible();
 });
 
-test('avec « réduire les animations », le film ne part pas : le lecteur classique, sans « Pause » ni « Mettre le son »', async ({ page }) => {
+test('avec « réduire les animations », ou en économie de données, le film ne part pas : le lecteur classique', async ({ page }) => {
   await simulerUnLecteur(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
@@ -251,50 +258,44 @@ test('avec « réduire les animations », le film ne part pas : le lecteur class
   await deuxImages(page);
   expect(await lireLeFilm(page)).toEqual({ enPause: true, muet: true, controles: true });
   await expect(page.locator('#film-lecture')).toBeHidden();
-  await expect(page.locator('#film-son')).toBeHidden();
-});
 
-// WCAG 4.1.2 : le bouton du son dit ce qu’il fera (« Mettre le son », « Couper le son ») ; il n’a pas en plus un état
-// « enfoncé », qui ferait entendre « Couper le son, enfoncé » pendant que le son joue.
-test('le bouton du son change de nom, sans état « enfoncé » qui contredirait ce nom', async ({ page }) => {
-  await simulerUnLecteur(page);
-  await page.goto('/');
-  const son = page.locator('#film-son');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.addInitScript(() => Object.defineProperty(navigator, 'connection', { configurable: true, value: { saveData: true } }));
+  await page.reload();
   await page.locator('#film').scrollIntoViewIfNeeded();
-  await expect(son).toHaveText('Mettre le son');
-  await expect(son).not.toHaveAttribute('aria-pressed', /.*/);
-  await son.click();
-  await expect(son).toHaveText('Couper le son');
-  await expect(son).not.toHaveAttribute('aria-pressed', /.*/);
-  expect(await lireLeFilm(page)).toMatchObject({ muet: false });
-  await son.click();
-  await expect(son).toHaveText('Mettre le son');
-  expect(await lireLeFilm(page)).toMatchObject({ muet: true });
+  await deuxImages(page);
+  expect(await lireLeFilm(page)).toEqual({ enPause: true, muet: true, controles: true });
+  await expect(page.locator('#film-lecture')).toBeHidden();
 });
 
-// WCAG 1.2.3 et 1.2.5 : le texte du film, à côté de lui. Ce que le film montre à l’écran, mot pour mot, lu sur ses images
-// (ffmpeg, des deux versions) : rien d’autre. L’image de fin dit « Bientôt sur Android et iPhone » : la transcription le
-// recopie tel quel (question posée au propriétaire, comme celle d’une voix dans la bande-son).
+// WCAG 1.2.1 : le film n’a pas de son ; sa version en mots, sous lui, dit ce qu’il montre à l’écran, mot pour mot, lu
+// sur ses images (ffmpeg) : rien d’autre. Un nouveau film change ces lignes et le texte ensemble.
 const LIGNES_DU_FILM = [
-  'Ce soir, y a match.',
-  'Tu le regardes où ?',
-  'Les bars qui passent ton match. Juste à côté.',
+  'On regarde le match où ce soir ?',
+  'Écrans de démonstration',
+  'La Lucarne Lunaire.',
+  'Maintiens pour réserver',
   'Maintiens.',
-  'Ça se remplit.',
-  'C’est à toi.',
-  'Ta place est gardée.',
-  'Tu y es.',
-  'La soirée, tu la gardes.',
-  'Ton match, ton bar.',
-  'Bientôt sur Android et iPhone · baromatch.fr',
+  'Le verre se remplit.',
+  'Place gardée.',
+  'Ta soirée',
+  'Scanne le QR du bar',
+  'Tu y es. Scanne-moi.',
+  'Tu y es',
+  'Sous-bock n°08 collé',
+  'Ta soirée se colle dans ton album.',
+  'Ton match. Ton bar. Ce soir.',
+  'baromatch.fr',
+  'Bientôt sur Android, à Paris',
 ];
 
 test('le texte du film est juste sous lui, replié, avec chaque phrase du film dans l’ordre', async ({ page }) => {
   await page.goto('/');
   const texte = page.locator('#film-texte');
   await expect(texte).toHaveCount(1);
-  expect(await texte.evaluate((d) => d.tagName === 'DETAILS' && d.previousElementSibling?.id === 'film-note'
-    && d.previousElementSibling.previousElementSibling?.id === 'film-cadre' && !d.open)).toBe(true);
+  // Le cadre du film, puis sa légende : la note, et le texte replié.
+  expect(await texte.evaluate((d) => d.tagName === 'DETAILS' && !d.open && d.previousElementSibling?.id === 'film-note'
+    && d.parentElement.tagName === 'FIGCAPTION' && d.parentElement.previousElementSibling?.id === 'film-cadre')).toBe(true);
   await expect(texte.locator('summary')).toHaveText('Ce que montre le film');
   await texte.locator('summary').click();
   await expect(texte.locator('li').first()).toBeVisible();
@@ -311,12 +312,11 @@ test('le texte du film est juste sous lui, replié, avec chaque phrase du film d
   expect(brut).not.toMatch(/ [?:;»]|« /);
 });
 
-// WCAG 1.2.5 : le film a une bande-son, donc le texte seul ne suffit pas au niveau AA, sauf si le film se présente
-// comme l’alternative en images d’un texte de la page. Une phrase visible le dit, et chaque lecteur du film la cite
-// (aria-describedby), avec ou sans JavaScript.
-const NOTE_DU_FILM = 'Ce film reprend en images le texte « Ce que montre le film », juste dessous. Ses bars, ses places et ses chiffres sont inventés.';
+// La note du film dit qu’il est sans le son, que le texte dessous dit ce qu’il montre, et que tout y est inventé ;
+// chaque lecteur du film la cite (aria-describedby), avec ou sans JavaScript.
+const NOTE_DU_FILM = 'Le film, sans le son, montre ce que dit le texte « Ce que montre le film », juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.';
 
-test('le film se présente comme les images du texte qui le suit, avec ou sans JavaScript', async ({ page, browser }) => {
+test('la note du film, citée par chaque lecteur, avec ou sans JavaScript', async ({ page, browser }) => {
   await page.goto('/');
   const note = page.locator('#film-note');
   await expect(note).toBeVisible();
@@ -331,10 +331,28 @@ test('le film se présente comme les images du texte qui le suit, avec ou sans J
     await expect(lecteur).toBeVisible();
     await expect(lecteur).toHaveAttribute('aria-describedby', 'film-note');
     await expect(onglet.locator('#film-note')).toBeVisible();
+    await expect(onglet.locator('#film-lecture')).toBeHidden();
   } finally {
     await sansJS.close();
   }
 });
+
+// Le film est en portrait, jamais étiré : son cadre garde le 9:16 du fichier, au téléphone sous la liste d’attente, sur
+// ordinateur à droite du titre.
+for (const [largeur, hauteur] of [[360, 800], [1280, 720], [1440, 900], [2560, 1440]]) {
+  test(`à ${largeur}×${hauteur}, le film garde son 9:16, ${largeur < 960 ? 'sous la liste d’attente' : 'à droite du titre'}`, async ({ page }) => {
+    await page.setViewportSize({ width: largeur, height: hauteur });
+    await page.goto('/');
+    const [video, titre, bouton] = await Promise.all([page.locator('#film').boundingBox(), page.locator('#titre').boundingBox(), page.locator('#attente button[type="submit"]').boundingBox()]);
+    // Le cadre est un peu tourné sur ordinateur : la boîte vue garde le rapport à 5 % près.
+    expect(Math.abs(video.height / video.width - 16 / 9) / (16 / 9)).toBeLessThan(0.05);
+    if (largeur < 960) expect(video.y).toBeGreaterThan(bouton.y + bouton.height);
+    else {
+      expect(video.x).toBeGreaterThan(titre.x + titre.width);
+      expect(video.y + video.height).toBeLessThanOrEqual(hauteur + 120);
+    }
+  });
+}
 
 // WCAG 2.2.2 : la vague du verre de l’ouverture s’arrête d’elle-même avant 5 s, sur l’image du verre immobile du logo
 // (une longueur d’onde entière, 140 px : la dernière image est la première). Sans animation en mouvement réduit.
@@ -359,18 +377,130 @@ test('la vague du verre s’arrête d’elle-même avant 5 s, sur l’image du v
   expect(await page.evaluate(() => document.getAnimations().filter((a) => a.animationName === 'bm-vague').length)).toBe(0);
 });
 
-test('les cinq étapes disent que ça va marcher ainsi, que la place est gratuite, et ce qu’est un sous-bock', async ({ page }) => {
+// Un soir de match, minute par minute : ce que l’appli fait aujourd’hui, chez les testeurs, en huit moments dans
+// l’ordre de la soirée, chacun avec son vrai écran (bar, clubs et pseudos inventés), marqué « Écran de démonstration ».
+// Les phrases qui portent une règle de l’appli sont figées : une règle qui change les change avec elle.
+const INSTANTS = [
+  { heure: '18:42', titre: '« Ce soir », tout de suite', ecran: 'ce-soir', dit: ['les bars les plus proches qui ont encore de la place', 'Ta position reste sur ton téléphone.'] },
+  { heure: '18:50', titre: 'Complet ? La liste d’attente', ecran: 'liste-attente', dit: ['avant le coup d’envoi', 'elle va au premier qui la prend'] },
+  { heure: '19:05', titre: 'La carte cherche pour toi', ecran: 'carte-recherche', dit: ['un club, un bar, un quartier ou une adresse', 'un grand écran, le son du match, une terrasse ou un accès PMR'] },
+  { heure: '19:12', titre: 'Garde ta place d’un geste', ecran: 'bar', dit: ['jusqu’à 8', 'c’est gratuit', 'Lâche avant la fin : rien n’est réservé.'] },
+  { heure: '19:13', titre: 'Ton pass, même sans réseau', ecran: 'ta-soiree', dit: ['un QR code et un code à 6 chiffres', 'même sans réseau'] },
+  { heure: '19:20', titre: 'Toute la bande à la même table', ecran: 'tablee', dit: ['jusqu’à 8', 'Chacun a son pass.', '« J’y vais »'] },
+  { heure: '20:25', titre: '« Je suis en retard »', ecran: 'en-retard', dit: ['10, 20 ou 30 minutes', 'jusqu’à quelle heure ta place t’attend'] },
+  { heure: '20:37', titre: 'Tu y es', ecran: 'tu-y-es', dit: ['scanne le QR du comptoir, ou montre ton pass à l’équipe', 'un sous-bock aux noms des deux clubs'] },
+];
+
+test('la soirée en huit moments, dans l’ordre, chacun avec son écran de démonstration', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#titre-soiree')).toHaveText('Comment ça va marcher');
-  const etapes = await page.locator('.etape').evaluateAll((li) => li.map((e) => ({
-    titre: e.querySelector('.etape__titre').textContent.replace(/\s+/g, ' ').trim(),
-    texte: e.querySelector('.etape__texte').textContent.replace(/\s+/g, ' ').trim(),
+  await expect(page.locator('#titre-soiree')).toHaveText('Un soir de match, minute par minute.');
+  expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('L’appli est en test à Paris. Sur ses écrans, les bars, les clubs et les pseudos sont inventés.');
+  const lus = await page.locator('.instant').evaluateAll((instants) => instants.map((m) => ({
+    heure: m.querySelector('.instant__heure time').textContent,
+    titre: m.querySelector('h3.instant__titre').textContent.replace(/\s+/g, ' ').trim(),
+    texte: m.querySelector('.instant__texte').textContent.replace(/\s+/g, ' ').trim(),
+    etiquette: m.querySelector('.instant__ecran .exemple')?.textContent,
+    img: ((i) => ({ src: i.src, srcset: i.getAttribute('srcset'), alt: i.alt, width: i.getAttribute('width'), height: i.getAttribute('height'), loading: i.getAttribute('loading') }))(m.querySelector('.instant__ecran img')),
   })));
-  expect(etapes).toEqual([
-    { titre: 'Choisis ton match', texte: 'Les matchs à venir, avec l’heure du coup d’envoi.' },
-    { titre: 'Trouve ton bar', texte: 'Les bars qui le diffusent près de chez toi, et les places qui leur restent.' },
-    { titre: 'Garde ta place', texte: 'Pour toi seul ou pour toute la bande, gratuitement, avant de partir.' },
-    { titre: 'Arrive et montre ton pass', texte: 'À l’entrée, l’équipe du bar scanne ton pass, ou tu scannes le QR du bar : le bar sait que tu es là.' },
-    { titre: 'Garde la soirée', texte: 'Chaque soirée validée devient un sous-bock, le souvenir du match, du bar et de la date, dans ton album.' },
-  ]);
+  expect(lus).toHaveLength(INSTANTS.length);
+  lus.forEach((lu, i) => {
+    const attendu = INSTANTS[i];
+    expect(lu.heure).toBe(attendu.heure);
+    expect(lu.titre).toBe(attendu.titre);
+    for (const morceau of attendu.dit) expect(lu.texte, `${attendu.titre} : « ${morceau} »`).toContain(morceau);
+    expect(lu.etiquette).toBe('Écran de démonstration');
+    expect(lu.img.src).toMatch(new RegExp(`/img/appli/${attendu.ecran}-300\\.webp$`));
+    expect(lu.img.srcset).toBe(`/img/appli/${attendu.ecran}-300.webp 300w, /img/appli/${attendu.ecran}-600.webp 600w`);
+    expect(lu.img.alt.length, `${attendu.titre} : un texte pour l’écran`).toBeGreaterThan(40);
+    expect([lu.img.width, lu.img.height, lu.img.loading]).toEqual(['300', '649', 'lazy']);
+  });
+  // Les heures avancent, comme la soirée.
+  expect(lus.map((m) => m.heure)).toEqual([...lus.map((m) => m.heure)].sort());
+  // Rien d’autre ne promet les notifications : au plus une par match, et la ligne calme d’une heure avant.
+  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Et au plus une notification par match. Une heure avant le coup d’envoi, une ligne calme sur ton écran verrouillé te rappelle ta place.');
+  const soiree = normaliser(await page.locator('.soiree').innerText());
+  expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone/i);
+});
+
+test('les écrans de la soirée ne se chargent qu’en approchant, sans rien faire bouger', async ({ page }) => {
+  const demandes = [];
+  page.on('request', (r) => { const chemin = new URL(r.url()).pathname; if (chemin.startsWith('/img/appli/')) demandes.push(chemin); });
+  await page.setViewportSize({ width: 412, height: 823 });
+  await page.goto('/', { waitUntil: 'networkidle' });
+  expect(demandes, 'aucun écran au premier affichage').toEqual([]);
+  const premier = page.locator('.instant__ecran').first();
+  const avant = await premier.boundingBox();
+  await page.locator('.soiree').scrollIntoViewIfNeeded();
+  await expect.poll(() => demandes.length).toBeGreaterThan(0);
+  await expect(premier.locator('img')).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const apres = await premier.boundingBox();
+  expect(apres.height).toBeCloseTo(avant.height, 0);
+  expect(apres.y).toBeCloseTo(avant.y, 0);
+});
+
+test('sans JavaScript, chaque écran de la soirée se voit, et l’essai du geste n’est pas proposé', async ({ browser }) => {
+  const contexte = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 360, height: 800 } });
+  try {
+    const page = await contexte.newPage();
+    await page.goto('/');
+    const ecrans = page.locator('.instant__ecran img');
+    await expect(ecrans).toHaveCount(INSTANTS.length);
+    for (const ecran of await ecrans.all()) {
+      await ecran.scrollIntoViewIfNeeded();
+      await expect(ecran).toBeVisible();
+    }
+    await expect(page.locator('#essai')).toBeHidden();
+  } finally {
+    await contexte.close();
+  }
+});
+
+test('sur ordinateur, l’écran à côté des moments suit la lecture : celui du moment au milieu de la fenêtre', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const visibles = () => page.locator('.instant__ecran').evaluateAll((f) => f.map((e) => getComputedStyle(e).opacity === '1'));
+  for (const rang of [0, 4, 7]) {
+    await page.locator('.instant__corps').nth(rang).evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    await expect.poll(visibles).toEqual(INSTANTS.map((_, i) => i === rang));
+    // L’écran reste à côté du texte, et dans la fenêtre.
+    const [corps, ecran] = await Promise.all([page.locator('.instant__corps').nth(rang).boundingBox(), page.locator('.instant__ecran').nth(rang).boundingBox()]);
+    expect(ecran.x).toBeGreaterThan(corps.x + corps.width);
+    expect(ecran.y).toBeGreaterThanOrEqual(0);
+    expect(ecran.y + ecran.height).toBeLessThanOrEqual(900);
+  }
+});
+
+// « Maintiens pour essayer » : le geste de l’appli, sur la page. Il se tient au clavier (Espace) comme au doigt ; lâché
+// avant 1,4 s, il se vide ; rien n’est envoyé.
+test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » ; lâché trop tôt, il se vide ; rien ne part', async ({ page }) => {
+  const envois = [];
+  page.on('request', (r) => { if (r.method() !== 'GET') envois.push(r.url()); });
+  await page.goto('/');
+  const bouton = page.locator('#essai-bouton');
+  const note = page.locator('#essai-note');
+  await bouton.scrollIntoViewIfNeeded();
+  await expect(bouton).toHaveText('Maintiens pour essayer');
+  await expect(note).toHaveText('Ici, c’est un essai : rien n’est réservé.');
+  await expect(note).toHaveAttribute('role', 'status');
+  await bouton.focus();
+  await page.keyboard.down(' ');
+  await page.waitForTimeout(300);
+  await page.keyboard.up(' ');
+  await expect(note).toHaveText('Lâché trop tôt : le verre se vide. Garde le doigt appuyé jusqu’au bout.');
+  await expect(bouton).not.toHaveClass(/est-plein/);
+  await page.keyboard.down(' ');
+  await expect(bouton).toHaveText('Place gardée.', { timeout: 3000 });
+  await page.keyboard.up(' ');
+  await expect(note).toHaveText('C’était un essai : rien n’est réservé.');
+  expect(await bouton.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe('rgb(255, 177, 61)');
+  await expect(bouton).toHaveText('Maintiens pour essayer', { timeout: 6000 });
+  expect(envois).toEqual([]);
+});
+
+test('« Maintiens pour essayer » en mouvement réduit : un appui suffit', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.locator('#essai-bouton').click();
+  await expect(page.locator('#essai-bouton')).toHaveText('Place gardée.');
 });

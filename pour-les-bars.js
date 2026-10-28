@@ -24,8 +24,8 @@
    affiche ; le libellé d’un bouton est dans son élément [data-libelle] ; pour-les-bars-amorce.js garde la place du
    formulaire (l’attribut data-attente) et ce script la lui rend en l’affichant.
 
-   À part, en fin de fichier : les verres de « Ton soir de match, heure par heure », ici pour ne pas ajouter une
-   requête à la page. */
+   À part, en fin de fichier : ta salle, ce soir (l’ouverture), et le badge, ici pour ne pas ajouter une requête à la
+   page. */
 
 (function () {
   "use strict";
@@ -1001,23 +1001,201 @@
   afficheMur = Date.now();
 })();
 
-/* Les verres de « Ton soir de match, heure par heure » se remplissent à leur niveau la première fois que la liste
-   arrive à l’écran, une seule fois (le mouvement est dans pour-les-bars.css). Sans IntersectionObserver, ou en
-   mouvement réduit, ils restent à leur niveau d’emblée. */
+/* Ta salle, ce soir (l’ouverture de la page) : 80 places qui se remplissent de 17:00 au coup d’envoi, puis les places
+   gardées libérées à 21:30. Les sièges sont dans le HTML, dans leur état de 21:00 ; avec ce script et sans « réduire
+   les animations », la page montre d’abord 17:00 (son style, @media (scripting: enabled)), et ce script joue la soirée
+   en 8 s quand la salle est à l’écran : en pause quand elle en sort, reprise quand elle revient, une seule fois. Il
+   branche aussi les boutons, présents et inactifs dès le HTML : les places sur Baromatch (− et +), l’heure (le curseur)
+   et lecture ou pause ; dès qu’on y touche, la soirée ne se joue plus d’elle-même. Avec « réduire les animations », la
+   salle reste à 21:00, et « Rejouer » avance d’un moment à l’autre, d’un coup, toutes les 1,6 s.
+   Les chiffres sont ceux de la page Ce soir de la Console de démonstration : à 21:00, 80 places, 35 sur Baromatch,
+   30 gardées, 23 arrivés, 7 encore attendus, 18 sans réservation, 5 encore en ligne. Après le coup d’envoi, plus
+   personne ne réserve : les places en ligne pas prises reviennent au bar ; trois retardataires arrivent avant 21:20 ;
+   à 21:30, une place gardée dont l’arrivée n’est pas validée est libérée et comptée absente, et ne repart pas en ligne.
+   Et la lumière du match (.lumiere) : sa force (--h) monte à mesure qu’on descend dans la page. */
 (function () {
   "use strict";
 
-  var liste = document.querySelector(".horaire__liste");
-  if (!liste || typeof window.IntersectionObserver !== "function") return;
-  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var lumiere = document.querySelector(".lumiere");
+  if (lumiere) {
+    var prevu = false;
+    var eclairer = function () {
+      prevu = false;
+      var course = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      lumiere.style.setProperty("--h", (0.45 + 0.55 * Math.min(1, window.scrollY / course)).toFixed(3));
+    };
+    window.addEventListener("scroll", function () {
+      if (prevu) return;
+      prevu = true;
+      window.requestAnimationFrame(eclairer);
+    }, { passive: true });
+    eclairer();
+  }
 
-  liste.classList.add("horaire__liste--a-verser");
-  var observateur = new window.IntersectionObserver(function (entrees) {
-    if (!entrees.some(function (entree) { return entree.isIntersecting; })) return;
-    observateur.disconnect();
-    liste.classList.add("horaire__liste--versee");
-  }, { rootMargin: "0px 0px -15% 0px" });
-  observateur.observe(liste);
+  var figure = document.querySelector(".salle-soir");
+  if (!figure) return;
+  var sieges = figure.querySelectorAll(".salle__tables i");
+  if (sieges.length !== 80) return;
+  var calme = Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  // L’ordre de la soirée : un tirage fixe (Park-Miller, graine 11), le même qui a écrit les sièges du HTML.
+  var graine = 11;
+  var tirage = [];
+  for (var n = 0; n < 80; n += 1) {
+    graine = (graine * 16807) % 2147483647;
+    tirage.push([graine, n]);
+  }
+  tirage.sort(function (a, b) { return a[0] - b[0]; });
+  var ordre = tirage.map(function (t) { return sieges[t[1]]; });
+
+  var CAPACITE = 80;
+  var ENVOI = 240; // les minutes depuis 17:00 : 21:00
+  var FIN = 270;   // 21:30, l’heure où les places gardées sont libérées
+  var DUREE_MS = 8000;
+  var PAUSE = "M7 5h3.5v14H7zM13.5 5H17v14h-3.5z";
+  var LECTURE = "M7 4.5v15l12-7.5z";
+  var quota = 35;
+  var minute = calme ? ENVOI : 0;
+  var seule = !calme;     // la soirée se joue d’elle-même, tant qu’on ne touche à rien
+  var depuisLeDebut = calme; // sans mouvement, le premier « Rejouer » repart de 17:00
+
+  var lisse = function (t, a, b) {
+    var u = Math.min(1, Math.max(0, (t - a) / (b - a)));
+    return u * u * (3 - 2 * u);
+  };
+  var heure = function (m) {
+    var total = 17 * 60 + m;
+    var h = Math.floor(total / 60);
+    var mn = total % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (mn < 10 ? "0" : "") + mn;
+  };
+  var RECITS = [
+    [0, function (q) { return "17:00 · Tu ouvres " + q + " places sur Baromatch. Les " + (CAPACITE - q) + " autres restent à toi."; }],
+    [60, function () { return "18:00 · Les fans gardent leur place. Tu vois qui vient, et à combien."; }],
+    [120, function () { return "19:00 · La porte valide les arrivées d’un scan. Ceux qui entrent sans l’appli se comptent d’un toucher."; }],
+    [ENVOI, function () { return "21:00 · Coup d’envoi. Tu sais qui est là, et qui est encore attendu."; }],
+    [FIN, function () { return "21:30 · Les places gardées sont libérées : une arrivée pas validée compte absente."; }],
+  ];
+
+  var dans = function (selecteur) { return figure.querySelector(selecteur + " .v21"); };
+  var chiffres = figure.querySelectorAll(".kpi b .v21");
+  var surQuota = figure.querySelectorAll(".kpi small")[1];
+  var lieux = {
+    heure: dans(".salle-soir__heure"),
+    recit: dans(".salle-soir__recit"),
+    ecran: figure.querySelector(".salle__ecran"),
+    quota: figure.querySelector("#salle-quota"),
+    curseur: figure.querySelector("#salle-curseur"),
+    jouer: figure.querySelector("#salle-jouer"),
+  };
+  var icone = lieux.jouer.querySelector("path");
+
+  var dessiner = function () {
+    var ouvert = minute <= ENVOI;
+    var prisFin = Math.round(quota * 30 / 35);
+    var arrivesFin = Math.round(prisFin * 23 / 30);
+    var tard = Math.round((prisFin - arrivesFin) * 3 / 7);
+    var pris = Math.round(lisse(minute, 0, 225) * prisFin);
+    var arrives = ouvert ? Math.round(lisse(minute, 110, ENVOI) * arrivesFin)
+      : arrivesFin + Math.round(Math.min(1, (minute - ENVOI) / 20) * tard);
+    var liberes = minute >= FIN ? prisFin - arrivesFin - tard : 0;
+    var sans = Math.round(lisse(minute, 90, ENVOI) * Math.min(18, CAPACITE - quota));
+    ordre.forEach(function (siege, i) {
+      var e;
+      if (i < quota) e = i < arrives ? "a" : i < pris - liberes ? "g" : i < pris || !ouvert ? "l" : "e";
+      else e = i - quota < sans ? "s" : "l";
+      if (siege.getAttribute("data-e") !== e) siege.setAttribute("data-e", e);
+    });
+    var valeurs = [arrives + sans, arrives, pris - liberes - arrives, sans, ouvert ? quota - pris : 0];
+    for (var k = 0; k < chiffres.length; k += 1) chiffres[k].textContent = String(valeurs[k]);
+    if (surQuota) surQuota.textContent = "/" + quota;
+    var recit = "";
+    RECITS.forEach(function (r) { if (minute >= r[0]) recit = r[1](quota); });
+    lieux.recit.textContent = recit;
+    lieux.heure.textContent = heure(minute);
+    lieux.ecran.textContent = heure(Math.min(minute, ENVOI));
+    lieux.quota.textContent = String(quota);
+    lieux.curseur.value = String(minute);
+    lieux.curseur.setAttribute("aria-valuetext", heure(minute));
+  };
+
+  // La lecture : de l’heure où l’on est jusqu’à 21:30. Sans mouvement, d’un moment de la soirée au suivant.
+  var lecture = null;
+  var bouton = function (enCours) {
+    icone.setAttribute("d", enCours ? PAUSE : LECTURE);
+    lieux.jouer.setAttribute("aria-label", enCours ? "Mettre la soirée en pause"
+      : minute > 0 && minute < FIN && !depuisLeDebut ? "Reprendre la soirée" : "Rejouer la soirée");
+  };
+  var arreter = function () {
+    if (!lecture) return;
+    window.cancelAnimationFrame(lecture.image);
+    window.clearTimeout(lecture.pas);
+    lecture = null;
+    bouton(false);
+  };
+  var jouer = function () {
+    arreter();
+    if (minute >= FIN || depuisLeDebut) minute = 0;
+    depuisLeDebut = false;
+    lecture = { image: 0, pas: 0 };
+    bouton(true);
+    dessiner();
+    if (calme) {
+      var suivant = function () {
+        minute = RECITS.map(function (r) { return r[0]; }).filter(function (m) { return m > minute; })[0];
+        dessiner();
+        if (minute >= FIN) arreter();
+        else lecture.pas = window.setTimeout(suivant, 1600);
+      };
+      lecture.pas = window.setTimeout(suivant, 1600);
+      return;
+    }
+    var depart = minute;
+    var t0 = null;
+    var image = function (t) {
+      if (t0 === null) t0 = t;
+      minute = Math.min(FIN, Math.round(depart + (t - t0) / DUREE_MS * FIN));
+      dessiner();
+      if (minute >= FIN) arreter();
+      else lecture.image = window.requestAnimationFrame(image);
+    };
+    lecture.image = window.requestAnimationFrame(image);
+  };
+
+  var prendreLaMain = function () {
+    seule = false;
+    depuisLeDebut = false;
+  };
+  figure.querySelectorAll("[data-pas]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      prendreLaMain();
+      quota = Math.max(10, Math.min(60, quota + Number(b.getAttribute("data-pas"))));
+      dessiner();
+    });
+  });
+  lieux.curseur.addEventListener("input", function () {
+    arreter();
+    prendreLaMain();
+    minute = Number(lieux.curseur.value);
+    dessiner();
+    bouton(false);
+  });
+  lieux.jouer.addEventListener("click", function () {
+    seule = false;
+    if (lecture) arreter();
+    else jouer();
+  });
+
+  dessiner();
+  figure.setAttribute("data-vivant", "");
+  figure.querySelectorAll(".salle-soir__commandes [disabled]").forEach(function (e) { e.disabled = false; });
+  if (!seule || typeof window.IntersectionObserver !== "function") return;
+  new window.IntersectionObserver(function (entrees) {
+    if (!seule) return;
+    var visible = entrees.some(function (entree) { return entree.isIntersecting; });
+    if (visible && !lecture && minute < FIN) jouer();
+    else if (!visible && lecture) arreter();
+  }, { threshold: 0.35 }).observe(figure);
 })();
 
 /* « Partager mon badge » : le bouton « Copier le code » n’existe qu’ici (sans JavaScript, il reste caché et le code se

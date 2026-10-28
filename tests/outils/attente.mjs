@@ -18,7 +18,7 @@ export const attendreLaPageFinie = async (onglet) => {
 // test fait avant de finir.
 export const ralentirLaPremiereImage = async (onglet) => {
   const envois = [];
-  await onglet.route('**/img/bars/console-telephone-ce-soir-*.webp', (route) => {
+  await onglet.route('**/img/bars/console-programme-reglages-*.webp', (route) => {
     const envoi = new Promise((resoudre) => { setTimeout(resoudre, 1_500); }).then(() => route.continue());
     envois.push(envoi);
     return envoi;

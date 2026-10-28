@@ -49,8 +49,11 @@
   var formulaire = document.getElementById("demande");
   var secours = document.getElementById("demande-secours");
 
-  // Le formulaire n’est pas venu : sa place revient au chemin e-mail. Rien à faire s’il est déjà affiché.
+  // Le formulaire n’est pas venu : sa place revient au chemin e-mail. Rien à faire s’il est déjà affiché. Et « Ta
+  // salle, ce soir », que la page montre à 17:00 en attendant le script, montre son état de 21:00, comme sans JavaScript.
   function rendreLaPlace() {
+    var salle = document.querySelector(".salle-soir");
+    if (salle && !salle.hasAttribute("data-vivant")) salle.setAttribute("data-vivant", "");
     if (!formulaire || !formulaire.hasAttribute("data-attente")) return;
     formulaire.hidden = true;
     formulaire.removeAttribute("data-attente");

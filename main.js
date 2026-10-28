@@ -315,8 +315,6 @@
   var DEPART = note.textContent;
   var minuteur = 0;
   var retour = 0;
-  // Vrai le temps d’une touche tenue : l’Espace lâché ne doit pas compter comme un clic de lecteur d’écran.
-  var clavier = false;
 
   function remplir() {
     bouton.classList.remove("est-tenu");
@@ -334,7 +332,6 @@
     if (evenement.type === "keydown" && (evenement.repeat || (evenement.key !== " " && evenement.key !== "Enter"))) return;
     if (evenement.type === "pointerdown" && evenement.button !== 0) return;
     evenement.preventDefault();
-    if (evenement.type === "keydown") clavier = true;
     if (bouton.classList.contains("est-plein") || bouton.classList.contains("est-tenu")) return;
     clearTimeout(retour);
     if (calme) {
@@ -345,8 +342,7 @@
     minuteur = setTimeout(remplir, 1400);
   }
 
-  function lacher(evenement) {
-    if (evenement.type === "keyup") setTimeout(function () { clavier = false; }, 0);
+  function lacher() {
     if (!bouton.classList.contains("est-tenu")) return;
     clearTimeout(minuteur);
     bouton.classList.remove("est-tenu");
@@ -362,7 +358,8 @@
   // Un lecteur d’écran active un bouton par un simple clic, sans pointeur ni touche tenue : ce clic remplit le verre, comme
   // « Réserver sans maintenir » dans l’appli.
   bouton.addEventListener("click", function (evenement) {
-    if (evenement.detail === 0 && !clavier && !bouton.classList.contains("est-plein")) {
+    // (Une touche tenue n’en fait pas : son appui est annulé dans tenir().)
+    if (evenement.detail === 0 && !bouton.classList.contains("est-plein")) {
       clearTimeout(retour);
       remplir();
     }

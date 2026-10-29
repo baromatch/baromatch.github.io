@@ -12,6 +12,7 @@ import { MOT_DU_FONDATEUR, motPourMot, SIGNATURE_DU_FONDATEUR } from './outils/f
 const PAGE = '/presse.html';
 const ORIGINE = 'https://baromatch.fr';
 const MARQUE = JSON.parse(readFileSync(path.join(racine, 'marque.json'), 'utf8'));
+const PHRASE_DROITS = 'Les logos, les captures et l’affiche de cette page peuvent être utilisés pour parler de Baromatch, sans les modifier.';
 const normaliser = (texte) => texte.replace(/[\s  ]+/g, ' ').trim();
 
 test.use({ javaScriptEnabled: false });
@@ -126,8 +127,34 @@ test('données structurées : une page « à propos » de l’Organization de l�
 test('le film en texte, les droits des visuels, et une adresse qui passe à la ligne à 200 %', async ({ page }) => {
   await page.goto(PAGE);
   await expect(page.locator('#film ~ .presse__fichiers a[href="/#film-texte"]')).toHaveText('Ce que montre le film, en texte');
-  await expect(page.locator('main')).toContainText('Logos, captures et affiche : libres d’utilisation pour parler de Baromatch.');
+  await expect(page.locator('main')).toContainText(PHRASE_DROITS);
   const adresses = await page.$$eval('a[href="mailto:contact@baromatch.fr"]', (liens) => liens.map((a) => a.innerHTML));
   expect(adresses.length).toBeGreaterThan(0);
   for (const html of adresses) expect(html).toBe('contact@<wbr>baromatch.fr');
+});
+
+test('les droits du kit presse : la phrase du propriétaire, citée mot pour mot dans les mentions légales, et plus de « libres d’utilisation »', async ({ page }) => {
+  const lire = (fichier) => readFileSync(path.join(racine, fichier), 'utf8');
+  const texteDe = (html) => normaliser(html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' '));
+  const phrase = texteDe(lire('presse.html').match(/<p>(Les logos, les captures[^<]*)<\/p>/)[1]);
+  expect(phrase).toBe(normaliser(PHRASE_DROITS));
+  const mentions = texteDe(lire('mentions-legales.html').match(/<h2>Propriété intellectuelle<\/h2>\s*<p>([\s\S]*?)<\/p>/)[1]);
+  expect(mentions).toContain(`Seule exception, celle de la page Presse : « ${phrase} »`);
+  // Rendu : la page Presse et les mentions disent la même phrase, et la citation mène à la page Presse.
+  await page.goto(PAGE);
+  expect(normaliser(await page.locator('main').textContent())).toContain(phrase);
+  await page.goto('/mentions-legales.html');
+  expect(normaliser(await page.locator('main').textContent())).toContain(`« ${phrase} »`);
+  await expect(page.locator('main a[href="/presse.html"]')).toHaveText('page Presse');
+  await expect(page.locator('.document__date')).toHaveText('Mises à jour le 29 octobre 2026');
+  // Le film reste à regarder : aucun lien de téléchargement vers le MP4.
+  expect(await page.locator('a[download][href$=".mp4"]').count()).toBe(0);
+  // L’ancienne formule n’est plus nulle part dans les fichiers publiés.
+  const publies = (dossier) => readdirSync(path.join(racine, dossier), { withFileTypes: true }).flatMap((e) => {
+    if (['node_modules', '.git', 'tests', 'docs'].includes(e.name)) return [];
+    const chemin = path.join(dossier, e.name);
+    if (e.isDirectory()) return publies(chemin);
+    return /\.(html|txt|md|json|xml|js|css)$/.test(e.name) ? [chemin] : [];
+  });
+  for (const fichier of publies('.')) expect(lire(fichier), fichier).not.toContain('libres d’utilisation');
 });

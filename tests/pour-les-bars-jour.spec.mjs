@@ -12,6 +12,7 @@ import { attendreLaPageFinie } from './outils/attente.mjs';
 import { lireCouleur, poser, rapport } from './outils/contraste.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 import { decrireLesCouples, lesCouples, mesurerLesTextes, textesTropFaibles } from './outils/textes-peints.mjs';
+import { decrireLesPlusFaibles, lignesTropFaibles, lirePng, mesurerAuPixel } from './outils/pixels-peints.mjs';
 
 const PAGE = '/pour-les-bars.html';
 const ADRESSE = 'https://api-production-8ce4.up.railway.app/api/public/bar-contact';
@@ -142,6 +143,54 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
         expect(sousLaLumiere.filter((c) => c.rapport < 4.5).map((c) => `${c.cle} : ${c.rapport}:1 (${c.quoi})`)).toEqual([]);
       });
     }
+  }
+});
+
+// Le contraste tel qu’il est PEINT : le texte est caché, la page photographiée, et derrière chaque ligne chaque pixel est
+// comparé à la couleur du texte (tests/outils/pixels-peints.mjs). La mesure du dessus n’empile que des couleurs de fond :
+// elle ne voit ni l’ombre d’un cadre d’écran sous sa légende, ni un halo de lumière, ni un dégradé.
+test.describe('le contraste, mesuré sur ce que le navigateur peint', () => {
+  // Les témoins de la mesure : sans eux, une mesure qui ne verrait rien passerait pour un site sans défaut.
+  test('témoin : la lecture des pixels est exacte (une couleur de fond, une couleur translucide posée sur du blanc)', async ({ page }) => {
+    await page.setContent('<body style="margin:0;background:#FAF7F1"><div style="width:40px;height:40px;background:#FFB13D"></div><div style="width:40px;height:40px;background:#FFFFFF"><div style="height:40px;background:rgba(10,11,16,0.5)"></div></div>');
+    const image = lirePng(await page.screenshot());
+    const pixel = (x, y) => [...image.pixels.slice((y * image.largeur + x) * 4, (y * image.largeur + x) * 4 + 4)];
+    expect(pixel(100, 100)).toEqual([250, 247, 241, 255]);
+    expect(pixel(10, 10)).toEqual([255, 177, 61, 255]);
+    // Le bleu nuit à 50 % sur du blanc : 132,5 / 133 / 135,5, à un niveau près selon l’arrondi du navigateur.
+    const [r, v, b] = pixel(10, 60);
+    expect([Math.abs(r - 132.5), Math.abs(v - 133), Math.abs(b - 135.5)].every((ecart) => ecart <= 1), `${r}, ${v}, ${b}`).toBe(true);
+  });
+
+  test('témoin : la mesure voit l’ombre d’un cadre sous sa légende, que la mesure des fonds ne voit pas', async ({ page }) => {
+    // Le cadre d’un écran de démonstration, sa légende en gris #5C5F6B (5,94:1 sur le crème) tout près, dans son ombre.
+    await page.setContent(`<body style="margin:0;background:#FAF7F1;font:14px/1.45 sans-serif">
+      <div style="width:300px;height:80px;margin:40px 40px 0;border-radius:24px;background:#0A0B10;box-shadow:0 18px 44px rgba(10,11,16,0.26)"></div>
+      <p style="margin:6px 40px;color:#5C5F6B">Une légende sous le cadre</p>`);
+    const [fonds] = await mesurerLesTextes(page, '.nuit');
+    expect(fonds.rapport).toBe(5.94);
+    const [peint] = await mesurerAuPixel(page, '.nuit');
+    // Un point et demi de moins, au pixel le plus assombri par l’ombre : la mesure des fonds disait 5,94:1.
+    expect(peint.rapport, `peint : ${peint.texte} sur ${peint.fond}`).toBeLessThan(fonds.rapport - 1.5);
+    expect(peint.rapport).toBeGreaterThan(2);
+    expect(peint.fond).not.toBe('#FAF7F1');
+  });
+
+  for (const largeur of LARGEURS) {
+    test(`à ${largeur} px : derrière chaque ligne de texte, chaque pixel tient 4,5:1 au moins (ombres et lumière comprises)`, async ({ page }, infos) => {
+      // Une vingtaine de photos de la page, du haut en bas : plus longtemps que les 30 s d’un test ordinaire, surtout sur une machine chargée.
+      test.setTimeout(150_000);
+      await page.setViewportSize({ width: largeur, height: 900 });
+      await page.goto(PAGE);
+      await attendreLaPageFinie(page);
+      await page.waitForLoadState('networkidle');
+      await toutOuvrir(page);
+      const mesures = await mesurerAuPixel(page, NUIT_DES_BARS);
+      // Des centaines de lignes (les réponses des questions comprises) : une mesure qui n’en lit presque aucune ne prouve rien.
+      expect(mesures.length).toBeGreaterThan(150);
+      infos.annotations.push({ type: 'contraste peint', description: `${mesures.length} lignes ; les plus faibles : ${decrireLesPlusFaibles(mesures)}` });
+      expect(lignesTropFaibles(mesures)).toEqual([]);
+    });
   }
 });
 

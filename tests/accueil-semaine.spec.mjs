@@ -391,6 +391,11 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
   });
 
   test('le jour même, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {
+    // Seuls les décalages de la page elle-même : sans la police. Arrivée après le premier rendu (une machine chargée),
+    // elle remplace celle de secours (font-display: swap) et ce changement compte comme un décalage, qui existe déjà en
+    // ligne et dépend du hasard de la machine. Il aura sa propre correction (les mesures de la police de secours) et son
+    // propre test.
+    await page.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
     for (const largeur of [390, 1280]) {
       await page.addInitScript(() => {
         window.decalages = 0;

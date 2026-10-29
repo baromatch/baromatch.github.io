@@ -322,9 +322,20 @@ test.describe('le bord des champs, le focus', () => {
   });
 });
 
+// Le CLS de la page elle-même, pas celui de sa police. Quand la machine est chargée, Bricolage Grotesque arrive après le
+// premier affichage, et son remplacement du texte de secours (font-display: swap) décale la page (environ 0,04 à 390 px,
+// 0,03 à 1280 px : le bloc de texte et la légende de la salle) : un décalage de la page d’aujourd’hui, qui existait avant
+// le jour, et qui aura son correctif (les métriques de la police de secours) et son test dans une autre PR. Ce test-ci
+// refuse donc la police : le texte de secours est là du premier affichage à la fin, et seuls les décalages de la page
+// comptent (les couleurs du jour n’en font aucun). Sans cela il échouait au hasard, selon l’instant d’arrivée de la police.
+const POLICE = '/fonts/bricolage-grotesque.woff2';
+
 test.describe('rien ne bouge au chargement', () => {
   for (const largeur of LARGEURS) {
-    test(`à ${largeur} px, avec les animations : CLS 0`, async ({ page }) => {
+    test(`à ${largeur} px, avec les animations et le texte de secours : CLS 0`, async ({ page }) => {
+      const refusees = [];
+      page.on('requestfailed', (requete) => refusees.push(new URL(requete.url()).pathname));
+      await page.route(`**${POLICE}`, (route) => route.abort());
       await page.addInitScript(() => {
         window.decalages = 0;
         new PerformanceObserver((liste) => { for (const e of liste.getEntries()) if (!e.hadRecentInput) window.decalages += e.value; })
@@ -335,6 +346,8 @@ test.describe('rien ne bouge au chargement', () => {
       await attendreLaPageFinie(page);
       await page.waitForLoadState('networkidle');
       await page.evaluate(() => document.fonts.ready);
+      // La police a bien été refusée (sinon ce test ne protégerait plus de rien : le chemin de la police aurait changé).
+      expect(refusees, 'la police demandée par la page').toContain(POLICE);
       expect(await page.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
     });
   }

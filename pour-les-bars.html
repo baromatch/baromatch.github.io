@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-jYmPCkqX+zfLfoIuBuCEZw1qCi0En5bsU5jplDKzrd0='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-/KNYhZ+Tk9L08PW+s+csWbSiJ/fy1kkK6J7qPv65o4k='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -168,7 +168,9 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
 /* Le jour (<html class="jour">, styles.css) : ce que le premier écran et #proposer peignent en dur, en clair. La salle
    reste une carte de nuit : sa classe « nuit » lui rend les couleurs de la nuit, sans la bande pleine largeur des sections
    de nuit (clip-path), sur un fond plein où le teal et l’indigo des deux clubs reviennent en haut. La carte du
-   formulaire devient blanche, ses champs bordés à 3:1. Le reste du jour est dans pour-les-bars.css. */
+   formulaire devient blanche, ses champs bordés à 3:1. Le contour du petit verre (devant « Pour les bars », puis dans le bouton
+   d’envoi et le merci), blanc translucide dans les définitions de la page, passe au bleu nuit, comme celui du logo. Le reste du
+   jour est dans pour-les-bars.css. */
 /* L’ombre des cadres d’écran est courte : celle de la nuit (0 24px 60px) tombait sur la première ligne de leur légende, et le gris
    #5C5F6B y passait sous 4,5:1 (4,1:1 à 390 px, au pixel). tests/pour-les-bars-jour.spec.mjs le mesure sur ce qui est peint. */
 .jour .pour-bars { --ombre-scene: 0 8px 24px rgba(10, 11, 16, 0.26); }
@@ -177,6 +179,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
 .jour .carte-formulaire { background: var(--carte); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--ombre-carte); }
 .jour .formulaire .panier__champ { border-color: var(--champ-bord); background: var(--carte) padding-box; }
 .jour .formulaire .panier__accord input { accent-color: var(--texte); }
+.jour #pb-verre stop { stop-color: #0A0B10; }
 </style>
 <noscript><link rel="stylesheet" href="/pour-les-bars.css"></noscript>
 <meta property="og:type" content="website">

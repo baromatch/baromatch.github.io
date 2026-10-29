@@ -269,8 +269,9 @@ test.describe('le jour posé', () => {
 
   // La carte du formulaire et le bord des champs se peignent dans le style de la tête : le formulaire s’affiche dès que son
   // script a tourné, sans attendre pour-les-bars.css. Sans eux, il paraîtrait le temps de cette feuille en bleu nuit sur du
-  // bleu nuit (la carte et le fond des champs de la nuit, le texte du jour).
-  test('avant l’arrivée de pour-les-bars.css, la carte du formulaire est blanche, ses champs bordés, et la salle est de nuit', async ({ page }) => {
+  // bleu nuit (la carte et le fond des champs de la nuit, le texte du jour). Le petit verre devant « Pour les bars » aussi : son
+  // contour est blanc (translucide) dans les définitions de la page, et blanc sur du crème ne se voit pas.
+  test('avant l’arrivée de pour-les-bars.css, la carte du formulaire est blanche, ses champs bordés, la salle de nuit, et le contour du petit verre bleu nuit', async ({ page }) => {
     let lacher;
     const retenue = new Promise((resoudre) => { lacher = resoudre; });
     await page.route('**/pour-les-bars.css', async (route) => { await retenue; await route.continue(); });
@@ -285,12 +286,23 @@ test.describe('le jour posé', () => {
         champ: { fond: style('#demande-bar').backgroundColor, bord: style('#demande-bar').borderTopColor, texte: style('#demande-bar').color },
         salle: style('.salle-soir').backgroundColor,
         souligne: style('.lien-fleche').textDecorationColor,
+        contourDuVerre: [...document.querySelectorAll('#pb-verre stop')].map((arret) => getComputedStyle(arret).stopColor),
       };
     });
     expect(lu.carte).toBe('rgb(255, 255, 255)');
     expect(lu.champ).toEqual({ fond: 'rgb(255, 255, 255)', bord: 'rgba(10, 11, 16, 0.5)', texte: NUIT });
     expect(lu.salle).toBe(NUIT);
     expect(lu.souligne).toBe('rgba(10, 11, 16, 0.4)');
+    expect(lu.contourDuVerre, 'les deux arrêts du dégradé du contour').toEqual([NUIT, NUIT]);
+    // Et peint : le petit verre du surtitre (24 px) a son contour sombre sur le crème, pas blanc ; son pixel le plus sombre
+    // fait 7:1 au moins contre le crème (le liquide ambre, lui, s’arrête à 3:1).
+    const verre = lirePng(await page.locator('.etiquette svg').first().screenshot());
+    const creme = { r: 250, v: 247, b: 241, a: 1 };
+    let contraste = 1;
+    for (let i = 0; i < verre.pixels.length; i += 4) {
+      contraste = Math.max(contraste, rapport({ r: verre.pixels[i], v: verre.pixels[i + 1], b: verre.pixels[i + 2], a: 1 }, creme));
+    }
+    expect(contraste, 'le pixel le plus sombre du petit verre, contre le crème').toBeGreaterThanOrEqual(7);
     lacher();
     await attendreLaPageFinie(page);
   });

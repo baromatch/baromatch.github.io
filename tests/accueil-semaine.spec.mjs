@@ -102,8 +102,12 @@ test.describe('le bloc, du générateur', () => {
   test('aucun bar publié : la phrase vraie en tête, qui mène à la liste d’attente ; avec des bars, une autre phrase', () => {
     // Sans bar publié, aucune soirée (donnees.mjs ne garde que celles des bars publiés).
     const sans = bloc({ matchs: MATCHS.map((m) => ({ ...m, soirees: [] })) });
-    expect(sans).toContain(`<p class="semaine__chapo">${textes.accueil.sansBar} <a href="#attente">${textes.accueil.sansBarLien}</a></p>`);
-    expect(textes.accueil.sansBar).toMatch(/^Baromatch cherche ses premiers bars à Paris\./);
+    // Strictement vraie, pour les deux visiteurs : le fan (la liste d’attente, avec les mots de son formulaire) et le bar.
+    expect(textes.accueil.sansBar).toBe('Baromatch cherche ses premiers bars à Paris. Quand un bar de Baromatch annonce un match, ce match passe en tête de son jour. En attendant, chaque match a sa page.');
+    expect(textes.accueil.sansBarLien).toBe(ACCUEIL.match(/<label class="attente__etiquette" for="attente-mail">([^<]+)<\/label>/)[1]);
+    expect(textes.accueil.sansBarLien).toBe('Préviens-moi quand Baromatch arrive');
+    expect(textes.accueil.sansBarProposer).toBe('Tu tiens un bar\u00a0? Propose-le');
+    expect(sans).toContain(`<p class="semaine__chapo">${textes.accueil.sansBar}</p>\n<p class="semaine__liens"><a href="#attente">${textes.accueil.sansBarLien}</a><a href="/pour-les-bars.html#proposer">${textes.accueil.sansBarProposer}</a></p>`);
     expect(sans).not.toContain('carte-match__voir');
     // La phrase le dit une fois : aucune carte ne répète « Pas encore de bar » (comme la semaine, /matchs/). Une carte
     // garde l’agenda de son match, ou rien (un match déjà commencé n’a plus de fichier d’agenda : pas de ligne vide).
@@ -116,6 +120,7 @@ test.describe('le bloc, du générateur', () => {
     const avec = bloc({ bars: [{ id: 'b1' }] });
     expect(avec).toContain(`<p class="semaine__chapo">${textes.accueil.avecBars}</p>`);
     expect(avec).not.toContain(textes.accueil.sansBar);
+    expect(avec).not.toContain('semaine__liens');
     // Aucun match annoncé : le bloc le dit, sans barre de jours.
     const vide = bloc({ matchs: [] });
     expect(vide).toContain(`<p class="semaine__rien">${textes.accueil.rienCetteSemaine}</p>`);
@@ -283,7 +288,7 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
 
   test('au clavier : un seul arrêt pour la barre, les flèches changent de jour, et le nom de chaque jour se lit', async ({ page }) => {
     const semaine = await ouvrir(page);
-    await semaine.locator('.semaine__chapo a, .semaine__toute').last().focus();
+    await semaine.locator('.semaine__liens a, .semaine__toute').last().focus();
     await page.keyboard.press('Tab');
     const aujourdhui = semaine.getByRole('radio', { name: 'Aujourd’hui 1 match' });
     await expect(aujourdhui).toBeFocused();

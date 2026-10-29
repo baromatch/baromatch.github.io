@@ -1352,7 +1352,8 @@ a:hover { color: var(--goutte); }
 .semaine__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
 .semaine__toute { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .semaine__chapo { max-width: 44rem; margin: 12px 0 0; color: var(--texte-doux); text-wrap: pretty; }
-.semaine__chapo a { font-weight: 650; }
+.semaine__liens { display: flex; flex-wrap: wrap; gap: 0 24px; margin: 4px 0 0; }
+.semaine__liens a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .semaine__rien { margin: 20px 0 0; color: var(--texte-doux); }
 .semaine__dates { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; margin: 22px 0 0; padding: 0; border: 0; }
 .semaine__date { position: relative; flex: none; }

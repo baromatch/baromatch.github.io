@@ -79,7 +79,9 @@ export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) 
   const semaine = jours.map((jour, i) => ({ jour, i, matchs: duJour(jour) }));
   const choisi = semaine.find((j) => j.matchs.length)?.jour ?? aujourdhui;
   const sansAucunBar = donnees.bars.length === 0;
-  const chapo = sansAucunBar ? `${e(t.sansBar)} <a href="#attente">${e(t.sansBarLien)}</a>` : e(t.avecBars);
+  // Sans bar publié : la phrase vraie, puis ce que chacun peut faire, le fan (la liste d’attente) et le bar.
+  const chapo = `<p class="semaine__chapo">${e(sansAucunBar ? t.sansBar : t.avecBars)}</p>${sansAucunBar
+    ? `\n<p class="semaine__liens"><a href="#attente">${e(t.sansBarLien)}</a><a href="/pour-les-bars.html#proposer">${e(t.sansBarProposer)}</a></p>` : ''}`;
 
   const nomDuJour = ({ jour, i }) => (i === 0 ? t.aujourdhui : i === 1 ? t.demain : jourCourt.format(new Date(`${jour}T12:00:00Z`)));
   const dates = semaine.map((j) => `<label class="semaine__date"><input type="radio" name="semaine-jour" value="${j.jour}"${j.jour === choisi ? ' checked' : ''}><span><b data-date="${e(jourCourt.format(new Date(`${j.jour}T12:00:00Z`)))}">${e(nomDuJour(j))}</b><small>${e(j.matchs.length ? accorder(j.matchs.length, 'match') : t.aucunMatch)}</small></span></label>`).join('\n');
@@ -93,7 +95,7 @@ ${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m
 <h2 class="titre-section" id="titre-semaine">${e(t.titre)}</h2>
 <a class="semaine__toute" href="/matchs/">${e(t.toute)}</a>
 </div>
-<p class="semaine__chapo">${chapo}</p>
+${chapo}
 ${rien ? `<p class="semaine__rien">${e(t.rienCetteSemaine)}</p>` : `<div class="semaine__jours" data-aujourdhui="${aujourdhui}">
 <fieldset class="semaine__dates">
 <legend class="visuellement-cache">${e(t.jours)}</legend>

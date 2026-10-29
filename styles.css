@@ -16,6 +16,8 @@
   --ambre: #FFB13D;
   --ambre-fonce: #D97A0C;
   --goutte: #FFF3DA;
+  /* Le contour du focus : l’ambre sur la nuit ; le bleu nuit sur les fonds clairs d’une page du jour (plus bas). */
+  --focus: var(--ambre);
   --texte: #F7F7F9;
   --texte-doux: rgba(247, 247, 249, 0.74);
   --texte-discret: rgba(247, 247, 249, 0.56);
@@ -73,7 +75,7 @@ a[href^="mailto:"], .document a { overflow-wrap: anywhere; }
 a:hover { color: var(--goutte); }
 
 :focus-visible {
-  outline: 2px solid var(--ambre);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -324,7 +326,7 @@ a:hover { color: var(--goutte); }
   .attente__bouton { height: 52px; border-radius: 999px; }
   /* Le champ n’a plus de bord : c’est la pilule qui dit où l’on tape, par le même contour que tout le site. Un
      contour, pas seulement la couleur du bord : en contraste élevé (Windows), le système le repeint, il reste visible. */
-  .attente__ligne:has(.attente__champ:focus-visible) { outline: 2px solid var(--ambre); outline-offset: 2px; }
+  .attente__ligne:has(.attente__champ:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
 }
 
 /* Une adresse refusée (aria-invalid, posé par main.js) se voit aussi sur le champ, pas seulement dans le message : un
@@ -390,7 +392,7 @@ a:hover { color: var(--goutte); }
   border-width: 0 0 2px 2px;
   transform: rotate(-45deg);
 }
-.attente__ville input:focus-visible + span { outline: 2px solid var(--ambre); outline-offset: 2px; }
+.attente__ville input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
 @media (forced-colors: active) {
   .attente__ville input:checked + span { padding: 0 6px; border: 3px solid Highlight; }
 }
@@ -1267,14 +1269,16 @@ a:hover { color: var(--goutte); }
   --verre-bord-fort: rgba(10, 11, 16, 0.22);
   --verre-reflet: 0 1px 2px rgba(10, 11, 16, 0.06);
   --ombre-carte: 0 1px 2px rgba(10, 11, 16, 0.05), 0 10px 28px rgba(10, 11, 16, 0.06);
+  /* L’ambre sur le crème ne fait que 1,7:1 : sur le clair, le contour du focus est bleu nuit (WCAG 1.4.11, 3:1). */
+  --focus: #0A0B10;
   color-scheme: light;
 }
 .jour body { background: var(--fond); }
 :where(.jour) a { color: var(--texte); text-decoration-thickness: 1.5px; }
 :where(.jour) a:hover { color: var(--texte-doux); }
-:where(.jour) :focus-visible { outline-color: var(--texte); }
 
-/* La nuit dans le jour : ses couleurs reviennent, et son fond prend toute la largeur. */
+/* La nuit dans le jour : ses couleurs reviennent (le contour du focus, ambre), et son fond prend toute la largeur. Le
+   pied de page garde sa propre couleur de texte (.pied) : il est le même que sur les autres pages. */
 :where(.jour) :is(.nuit, .pied) {
   --texte: #F7F7F9;
   --texte-doux: rgba(247, 247, 249, 0.74);
@@ -1282,6 +1286,7 @@ a:hover { color: var(--goutte); }
   --trait: rgba(255, 255, 255, 0.10);
   --erreur: #FF9C8A;
   --goutte: #FFF3DA;
+  --focus: var(--ambre);
   --champ-bord: rgba(255, 255, 255, 0.36);
   --verre: rgba(255, 255, 255, 0.07);
   --verre-fort: rgba(255, 255, 255, 0.10);
@@ -1289,14 +1294,13 @@ a:hover { color: var(--goutte); }
   --verre-bord-fort: rgba(255, 255, 255, 0.22);
   --verre-reflet: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   color-scheme: dark;
-  color: var(--texte);
   background: var(--nuit);
   box-shadow: 0 0 0 100vmax var(--nuit);
   clip-path: inset(0 -100vmax);
 }
 :where(.jour) :where(.nuit, .pied) a { color: var(--ambre); }
 :where(.jour) :where(.nuit, .pied) a:hover { color: var(--goutte); }
-:where(.jour) :where(.nuit, .pied) :focus-visible { outline-color: var(--ambre); }
+:where(.jour) .nuit { color: var(--texte); }
 
 /* Le logo et le verre de l’ouverture, sur fond clair : le verre en bleu nuit (comme le logo pour fond clair de la
    presse), sans reflet blanc ; la goutte qui tombe, en ambre. */
@@ -1308,6 +1312,9 @@ a:hover { color: var(--goutte); }
 .jour .verre__halo { opacity: 0.6; }
 .jour .entete__lien:hover, .jour .questions-fans summary:hover, .jour .film__texte summary:hover, .jour .attente__corriger:hover { color: var(--texte-doux); }
 .jour .entete__lien--bars:hover, .jour .vitrine-accueil__bouton--verre:hover { background: var(--fond-releve); }
+/* Le bouton nuit sur le clair (« Proposer mon bar ») : survolé, il prend la goutte de la nuit, pas celle du jour
+   (#7A4300 ne fait que 2,45:1 sur la nuit). Sans poids de plus : un bouton nuit d’une autre couleur garde la sienne. */
+:where(.jour) .bouton-nuit:hover { color: #FFF3DA; }
 
 /* L’ouverture, plus courte : les matchs de la semaine arrivent plus tôt. Le titre reste en bas de casse, un peu moins
    serré qu’à la nuit. Les matchs ferment l’ouverture sur ordinateur (sous le texte et le film) ; au téléphone, ils

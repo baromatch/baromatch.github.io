@@ -386,3 +386,80 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
     }
   }
 });
+
+// ---------- Le jour : le survol, le focus et le pied de page ----------
+
+// Le rapport de contraste de deux couleurs CSS (rgb ou rgba posée sur la seconde, opaque).
+const rgb = (css) => { const [r, v, b, a = 1] = css.match(/[\d.]+/g).map(Number); return { r, v, b, a }; };
+const luminance = ({ r, v, b }) => [r, v, b].map((c) => c / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)).reduce((s, c, i) => s + c * [0.2126, 0.7152, 0.0722][i], 0);
+const contraste = (dessus, dessous) => {
+  const f = rgb(dessous);
+  const t = rgb(dessus);
+  const peinte = { r: t.r * t.a + f.r * (1 - t.a), v: t.v * t.a + f.v * (1 - t.a), b: t.b * t.a + f.b * (1 - t.a) };
+  const [c, s] = [luminance(peinte), luminance(f)].sort((m, n) => n - m);
+  return Math.round(((c + 0.05) / (s + 0.05)) * 100) / 100;
+};
+
+// Ce que peint le focus de l’élément actif : son contour, ou celui de ce qui le montre (la puce d’un bouton radio
+// invisible, la pilule du champ d’e-mail), et le fond plein derrière ce contour (les fonds translucides empilés).
+const lireLeFocus = (page) => page.evaluate(() => {
+  const actif = document.activeElement;
+  if (!actif || actif === document.body) return null;
+  const visible = (e) => e.checkVisibility({ visibilityProperty: true, opacityProperty: true });
+  const contoure = (e) => { const s = getComputedStyle(e); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0; };
+  const candidats = [actif, actif.nextElementSibling, ...(function* parents() { for (let e = actif.parentElement; e; e = e.parentElement) yield e; }())]
+    .filter((e) => e && visible(e) && contoure(e) && (e === actif || e === actif.nextElementSibling || e.matches(':has(:focus-visible)')));
+  const peint = candidats[0];
+  const quoi = `${actif.tagName.toLowerCase()}${actif.className && typeof actif.className === 'string' ? `.${actif.className.split(' ')[0]}` : ''} « ${(actif.textContent || actif.getAttribute('aria-label') || actif.value || '').trim().slice(0, 30)} »`;
+  // Le lecteur classique du film (mouvement réduit) : ses commandes, dans le cadre sombre du film, ont le contour du
+  // navigateur, que le style de la page ne peint pas.
+  if (!peint) return { quoi, contour: null, lecteur: actif.matches('video[controls]') };
+  const lire = (css) => { const [r, v, b, a = 1] = css.match(/[\d.]+/g).map(Number); return { r, v, b, a }; };
+  const couches = [];
+  for (let e = peint.parentElement; e; e = e.parentElement) {
+    const f = lire(getComputedStyle(e).backgroundColor);
+    if (f.a > 0) couches.push(f);
+    if (f.a === 1) break;
+  }
+  const fond = couches.reverse().reduce((d, h) => ({ r: h.r * h.a + d.r * (1 - h.a), v: h.v * h.a + d.v * (1 - h.a), b: h.b * h.a + d.b * (1 - h.a), a: 1 }), { r: 255, v: 255, b: 255, a: 1 });
+  return { quoi, contour: getComputedStyle(peint).outlineColor, fond: `rgb(${Math.round(fond.r)}, ${Math.round(fond.v)}, ${Math.round(fond.b)})` };
+});
+
+test.describe('le jour : le survol, le focus et le pied de page de l’accueil', () => {
+  test('« Proposer mon bar » survolé reste lisible sur son bouton nuit (4,5:1 au moins)', async ({ page }) => {
+    await page.goto('/');
+    const bouton = page.locator('.bars .bouton-nuit', { hasText: 'Proposer mon bar' });
+    await bouton.hover();
+    const { couleur, fond } = await bouton.evaluate((b) => ({ couleur: getComputedStyle(b).color, fond: getComputedStyle(b).backgroundColor }));
+    expect(contraste(couleur, fond), `${couleur} sur ${fond}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  for (const largeur of [390, 1280]) {
+    test(`au clavier, à ${largeur} px : chaque contour de focus posé sur un fond clair s’en détache à 3:1 au moins`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 900 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/');
+      const arrets = [];
+      for (let i = 0; i < 250; i += 1) {
+        await page.keyboard.press('Tab');
+        const arret = await lireLeFocus(page);
+        if (!arret || (arrets.length && arret.quoi === arrets[0].quoi)) break;
+        arrets.push(arret);
+      }
+      expect(arrets.length).toBeGreaterThan(40);
+      expect(arrets.filter((a) => !a.contour && !a.lecteur).map((a) => a.quoi), 'un arrêt sans contour').toEqual([]);
+      const clairs = arrets.filter((a) => a.contour && luminance(rgb(a.fond)) > 0.5);
+      expect(clairs.length).toBeGreaterThan(20);
+      const faibles = clairs.filter((a) => contraste(a.contour, a.fond) < 3).map((a) => `${a.quoi} : ${a.contour} sur ${a.fond}, ${contraste(a.contour, a.fond)}:1`);
+      expect([...new Set(faibles)]).toEqual([]);
+    });
+  }
+
+  test('le pied de page de l’accueil a les couleurs de celui des autres pages', async ({ page }) => {
+    const couleurs = async (adresse) => {
+      await page.goto(adresse);
+      return page.evaluate(() => ['.pied', '.pied__marque span', '.pied__liens a'].map((s) => `${s} : ${getComputedStyle(document.querySelector(s)).color}`));
+    };
+    expect(await couleurs('/')).toEqual(await couleurs('/cgu.html'));
+  });
+});

@@ -51,12 +51,13 @@ const cartesDe = (html, jour) => jourDe(html, jour).split('<li class="').slice(1
 test.describe('le bloc, du générateur', () => {
   test('sept jours de Paris : « Aujourd’hui », « Demain », puis la date courte ; le premier jour qui a un match est choisi', () => {
     const html = bloc();
-    const dates = [...html.matchAll(/<input type="radio" name="semaine-jour" value="([^"]+)"( checked)?><span><b data-date="([^"]+)">([^<]+)<\/b><small>([^<]+)<\/small>/g)]
+    const dates = [...html.matchAll(/<input type="radio" name="semaine-jour" value="([^"]+)"( checked)?><span><b data-date="([^"]+)">([^<]+)<\/b><small>(.*?)<\/small>/g)]
       .map(([, valeur, choisi, court, nom, compte]) => ({ valeur, choisi: Boolean(choisi), court, nom, compte }));
     expect(dates).toEqual([
       { valeur: '2026-10-29', choisi: true, court: 'jeu. 29', nom: 'Aujourd’hui', compte: '1 match' },
       { valeur: '2026-10-30', choisi: false, court: 'ven. 30', nom: 'Demain', compte: 'aucun match' },
-      { valeur: '2026-10-31', choisi: false, court: 'sam. 31', nom: 'sam. 31', compte: '4 matchs' },
+      // OL – Angers a des bars : le point ambre, et leur nombre pour le lecteur d’écran.
+      { valeur: '2026-10-31', choisi: false, court: 'sam. 31', nom: 'sam. 31', compte: '<span class="semaine__point" aria-hidden="true"></span>4 matchs<span class="visuellement-cache">, dont 1 avec des bars</span>' },
       { valeur: '2026-11-01', choisi: false, court: 'dim. 1', nom: 'dim. 1', compte: 'aucun match' },
       { valeur: '2026-11-02', choisi: false, court: 'lun. 2', nom: 'lun. 2', compte: '1 match' },
       { valeur: '2026-11-03', choisi: false, court: 'mar. 3', nom: 'mar. 3', compte: 'aucun match' },
@@ -66,8 +67,8 @@ test.describe('le bloc, du générateur', () => {
     // Un jour sans match le dit, sans carte vide.
     expect(jourDe(html, '2026-10-30')).toContain(`<p class="semaine__rien">${textes.accueil.rienCeJour}</p>`);
     // Le jour de la barre, en toutes lettres pour le lecteur d’écran.
-    expect(jourDe(html, '2026-10-29')).toContain('<h3 class="visuellement-cache" data-date="Jeudi 29 octobre">Aujourd’hui, jeudi 29 octobre</h3>');
-    expect(jourDe(html, '2026-10-31')).toContain('<h3 class="visuellement-cache">Samedi 31 octobre</h3>');
+    expect(jourDe(html, '2026-10-29')).toContain('<h3 class="semaine__titre-jour" data-date="Jeudi 29 octobre">Aujourd’hui, jeudi 29 octobre</h3>');
+    expect(jourDe(html, '2026-10-31')).toContain('<h3 class="semaine__titre-jour">Samedi 31 octobre</h3>');
     // Les matchs finis d’hier et ceux d’après les sept jours n’y sont pas.
     expect(html).not.toContain('psg-ol-2026-10-28');
     expect(html).not.toContain('lens-om-2026-11-08');
@@ -103,8 +104,12 @@ test.describe('le bloc, du générateur', () => {
   test('aucun bar publié : la phrase vraie en tête, qui mène à la liste d’attente ; avec des bars, une autre phrase', () => {
     // Sans bar publié, aucune soirée (donnees.mjs ne garde que celles des bars publiés).
     const sans = bloc({ matchs: MATCHS.map((m) => ({ ...m, soirees: [] })) });
-    expect(sans).toContain(`<p class="semaine__chapo">${textes.accueil.sansBar} <a href="#attente">${textes.accueil.sansBarLien}</a></p>`);
-    expect(textes.accueil.sansBar).toMatch(/^Baromatch cherche ses premiers bars à Paris\./);
+    // Strictement vraie, pour les deux visiteurs : le fan (la liste d’attente, avec les mots de son formulaire) et le bar.
+    expect(textes.accueil.sansBar).toBe('Baromatch cherche ses premiers bars à Paris. Quand un bar de Baromatch annonce un match, ce match passe en tête de son jour. En attendant, chaque match a sa page.');
+    expect(textes.accueil.sansBarLien).toBe(ACCUEIL.match(/<label class="attente__etiquette" for="attente-mail">([^<]+)<\/label>/)[1]);
+    expect(textes.accueil.sansBarLien).toBe('Préviens-moi quand Baromatch arrive');
+    expect(textes.accueil.sansBarProposer).toBe('Tu tiens un bar\u00a0? Propose-le');
+    expect(sans).toContain(`<p class="semaine__chapo">${textes.accueil.sansBar}</p>\n<p class="semaine__liens"><a href="#attente">${textes.accueil.sansBarLien}</a><a href="/pour-les-bars.html#proposer">${textes.accueil.sansBarProposer}</a></p>`);
     expect(sans).not.toContain('carte-match__voir');
     // La phrase le dit une fois : aucune carte ne répète « Pas encore de bar » (comme la semaine, /matchs/). Une carte
     // garde l’agenda de son match, ou rien (un match déjà commencé n’a plus de fichier d’agenda : pas de ligne vide).
@@ -117,10 +122,41 @@ test.describe('le bloc, du générateur', () => {
     const avec = bloc({ bars: [{ id: 'b1' }] });
     expect(avec).toContain(`<p class="semaine__chapo">${textes.accueil.avecBars}</p>`);
     expect(avec).not.toContain(textes.accueil.sansBar);
+    expect(avec).not.toContain('semaine__liens');
     // Aucun match annoncé : le bloc le dit, sans barre de jours.
     const vide = bloc({ matchs: [] });
     expect(vide).toContain(`<p class="semaine__rien">${textes.accueil.rienCetteSemaine}</p>`);
     expect(vide).not.toContain('semaine__dates');
+  });
+
+  test('un jour qui a des matchs avec des bars le montre sur sa puce : un point ambre, et « dont N avec des bars » pour le lecteur d’écran', () => {
+    const html = bloc({ bars: [{ id: 'b1' }] });
+    const puce = (jour) => html.split(`value="${jour}"`)[1].split('</label>')[0];
+    // Samedi : OL – Angers a deux bars ; Bayern – Dortmund, reporté, ne compte pas.
+    expect(puce('2026-10-31')).toContain('<small><span class="semaine__point" aria-hidden="true"></span>4 matchs<span class="visuellement-cache">, dont 1 avec des bars</span></small>');
+    expect(puce('2026-10-29')).toContain('<small>1 match</small>');
+    expect(puce('2026-10-30')).toContain(`<small>${textes.accueil.aucunMatch}</small>`);
+    // Le jour choisi reste le premier qui a un match, même sans bar.
+    expect(html).toContain('value="2026-10-29" checked');
+    expect(html).not.toContain('value="2026-10-31" checked');
+    const deux = MATCHS.map((m) => (m.slug === 'nice-rennes-2026-10-31' ? { ...m, soirees: [soiree('Paris')] } : m));
+    expect(bloc({ matchs: deux, bars: [{ id: 'b1' }] })).toContain('4 matchs<span class="visuellement-cache">, dont 2 avec des bars</span>');
+  });
+
+  test('un long jour : toutes ses cartes dans la page, et au-delà de 4 matchs, un lien vers ce jour dans la semaine', () => {
+    const encore = (n, jour) => Array.from({ length: n }, (_, i) => unMatch({
+      slug: `club-${i}-autre-${i}-${jour}`, debut: `${jour}T${String(10 + i).padStart(2, '0')}:00:00Z`, domicile: club(`club-${i}`, `Club ${i}`), exterieur: club(`autre-${i}`, `Autre ${i}`),
+    }));
+    // Samedi, 4 matchs : pas de lien.
+    expect(jourDe(bloc(), '2026-10-31')).not.toContain('semaine__tous');
+    const html = bloc({ matchs: [...MATCHS, ...encore(3, '2026-10-31'), ...encore(4, '2026-10-29'), ...encore(5, '2026-10-30')], bars: [{ id: 'b1' }] });
+    expect(cartesDe(html, '2026-10-31')).toHaveLength(7);
+    expect(cartesDe(html, '2026-10-31')[0]).toContain('ol-angers-2026-10-31');
+    expect(jourDe(html, '2026-10-31')).toContain('</ul>\n<p class="semaine__tous"><a href="/matchs/#jour-2026-10-31">Tous les matchs de samedi 31 octobre</a></p>');
+    // Aujourd’hui : la semaine l’ouvre sous « titre-ce-soir » ; lu un autre jour, le lien dit sa date.
+    expect(jourDe(html, '2026-10-29')).toContain('<p class="semaine__tous"><a href="/matchs/#titre-ce-soir" data-date="Tous les matchs de jeudi 29 octobre">Tous les matchs d’aujourd’hui</a></p>');
+    expect(jourDe(html, '2026-10-30')).toContain('<p class="semaine__tous"><a href="/matchs/#jour-2026-10-30" data-date="Tous les matchs de vendredi 30 octobre">Tous les matchs de demain</a></p>');
+    expect(controlerLaSemaine(html)).toEqual([]);
   });
 
   test('deux disques aux couleurs des clubs, jamais un écusson ; un club sans couleurs connues reste neutre', () => {
@@ -199,12 +235,38 @@ test.describe('l’accueil : le générateur n’écrit que le bloc', () => {
       // Le scénario a des bars publiés : leurs matchs ont « Voir les bars ».
       expect(premier.accueil.bloc).toContain('carte-match--bars');
       expect(premier.accueil.bloc).toContain('data-aujourdhui="2026-10-23"');
+      // Le lien d’un long jour vise une ancre de la semaine : « titre-ce-soir » pour aujourd’hui, « jour-AAAA-MM-JJ »
+      // pour chaque autre jour qui a des matchs (samedi et dimanche, dans le scénario).
+      const laSemaine = readFileSync(path.join(dossier, 'matchs', 'index.html'), 'utf8');
+      for (const ancre of ['titre-ce-soir', 'jour-2026-10-24', 'jour-2026-10-25']) expect(laSemaine).toContain(`<h2 id="${ancre}">`);
       const { construire } = await import('../generateur/construire.mjs');
       const second = await construire({
         source: `scenario:${path.join(racine, 'tests', 'donnees', 'scenario.json')}`, sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario(), rendu: null, qr: null,
       });
       expect(second.accueil.ecrit).toBe(false);
       expect(readFileSync(path.join(dossier, 'index.html'), 'utf8')).toBe(ecrit);
+    } finally {
+      rmSync(dossier, { recursive: true, force: true });
+    }
+  });
+});
+
+test.describe('l’accueil : un bloc qui ne se fait pas n’arrête pas les pages des matchs', () => {
+  test('des textes sans le bloc « accueil » : l’accueil reste comme il est, le journal le dit, les pages des matchs s’écrivent', async () => {
+    const dossier = mkdtempSync(path.join(tmpdir(), 'accueil-sans-textes-'));
+    try {
+      const contenu = contenuDuScenario();
+      const sansAccueil = { ...contenu.textes };
+      delete sansAccueil.accueil;
+      const journal = [];
+      const resultat = await construireLeSiteDExemple(dossier, { rendu: null, qr: null, contenu: { ...contenu, textes: sansAccueil }, journal: (ligne) => journal.push(ligne) });
+      expect(resultat.accueil.ecrit).toBe(false);
+      expect(resultat.avertissements.filter((a) => a.startsWith('accueil :'))).toHaveLength(1);
+      expect(resultat.avertissements.find((a) => a.startsWith('accueil :'))).toMatch(/l’accueil reste comme il est$/);
+      expect(journal.some((ligne) => ligne.startsWith('avertissement : accueil :'))).toBe(true);
+      expect(readFileSync(path.join(dossier, 'index.html'), 'utf8')).toBe(ACCUEIL);
+      expect(resultat.ecrits).toContain('/matchs/');
+      expect(readFileSync(path.join(dossier, 'matchs', 'index.html'), 'utf8')).toContain('<h2 id="titre-ce-soir">');
     } finally {
       rmSync(dossier, { recursive: true, force: true });
     }
@@ -262,7 +324,7 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
 
   test('au clavier : un seul arrêt pour la barre, les flèches changent de jour, et le nom de chaque jour se lit', async ({ page }) => {
     const semaine = await ouvrir(page);
-    await semaine.locator('.semaine__chapo a, .semaine__toute').last().focus();
+    await semaine.locator('.semaine__liens a, .semaine__toute').last().focus();
     await page.keyboard.press('Tab');
     const aujourdhui = semaine.getByRole('radio', { name: 'Aujourd’hui 1 match' });
     await expect(aujourdhui).toBeFocused();
@@ -287,7 +349,54 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     await expect(semaine).not.toContainText('Demain');
   });
 
+  test('lu sept ou huit jours plus tard (le générateur arrêté) : aucun jour passé ne reste, la barre et ses cartes s’en vont', async ({ page }) => {
+    for (const jour of ['2026-10-30', '2026-10-31']) {
+      const semaine = await ouvrir(page, { quand: Date.parse(`${jour}T10:00:00Z`) });
+      await expect(semaine.locator('.semaine__jours'), jour).toBeHidden();
+      await expect(semaine.locator('.carte-match:visible'), jour).toHaveCount(0);
+      await expect(semaine.locator('.semaine__date:visible'), jour).toHaveCount(0);
+      // Le titre, la phrase et « Toute la semaine » restent : la semaine, elle, est refaite à chaque passage.
+      await expect(semaine.getByRole('heading', { level: 2, name: textes.accueil.titre })).toBeVisible();
+      await expect(semaine.locator('.semaine__chapo')).toBeVisible();
+      await expect(semaine.getByRole('link', { name: textes.accueil.toute })).toBeVisible();
+    }
+    // Le jour de Paris se lit en parties (année, mois, jour), pas dans la forme d’une langue.
+    expect(readFileSync(path.join(racine, 'main.js'), 'utf8')).not.toContain('fr-CA');
+  });
+
+  test('sans :has() (un navigateur ancien) : pas de barre des jours, mais chaque jour sous son titre, visible ; avec :has(), le titre est pour le lecteur d’écran', async ({ page }) => {
+    // Les deux branches sont dans la feuille de style.
+    const feuille = readFileSync(path.join(racine, 'styles.css'), 'utf8');
+    const branche = (debut) => feuille.split(debut)[1].split('\n}\n')[0];
+    expect(branche('@supports selector(:has(*)) {')).toMatch(/\.semaine__titre-jour \{[^}]*clip: rect\(0 0 0 0\)/);
+    expect(branche('@supports not selector(:has(*)) {')).toMatch(/\.semaine__dates \{ display: none; \}/);
+    // Avec :has() : la barre, un seul jour, et son titre pour le lecteur d’écran seulement.
+    let semaine = await ouvrir(page);
+    await expect(semaine.locator('.semaine__dates')).toBeVisible();
+    await expect(semaine.locator('.semaine__jour:visible')).toHaveCount(1);
+    const titre = semaine.getByRole('heading', { level: 3, name: 'Aujourd’hui, vendredi 23 octobre' });
+    await expect(titre).toHaveCount(1);
+    expect((await titre.boundingBox()).height).toBeLessThanOrEqual(1);
+    // Un navigateur sans :has() : la feuille, telle qu’il la lit (la condition « :has() » fausse).
+    await page.route('**/styles.css', async (route) => {
+      const reponse = await route.fetch();
+      await route.fulfill({ response: reponse, body: (await reponse.text()).replaceAll('selector(:has(*))', 'selector(:pas-de-has(*))') });
+    });
+    semaine = await ouvrir(page);
+    await expect(semaine.locator('.semaine__dates')).toBeHidden();
+    await expect(semaine.locator('.semaine__jour:visible')).toHaveCount(7);
+    await expect(semaine.locator('.semaine__titre-jour:visible')).toHaveText([
+      'Aujourd’hui, vendredi 23 octobre', 'Demain, samedi 24 octobre', 'Dimanche 25 octobre', 'Lundi 26 octobre', 'Mardi 27 octobre', 'Mercredi 28 octobre', 'Jeudi 29 octobre',
+    ]);
+    for (const t of await semaine.locator('.semaine__titre-jour').all()) expect((await t.boundingBox()).height).toBeGreaterThan(16);
+  });
+
   test('le jour même, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {
+    // Seuls les décalages de la page elle-même : sans la police. Arrivée après le premier rendu (une machine chargée),
+    // elle remplace celle de secours (font-display: swap) et ce changement compte comme un décalage, qui existe déjà en
+    // ligne et dépend du hasard de la machine. Il aura sa propre correction (les mesures de la police de secours) et son
+    // propre test.
+    await page.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
     for (const largeur of [390, 1280]) {
       await page.addInitScript(() => {
         window.decalages = 0;
@@ -300,6 +409,35 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
       expect(await page.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
     }
   });
+});
+
+test.describe('un long jour, dans le navigateur', () => {
+  // L’accueil avec un bloc d’essai : samedi 31 octobre a 8 matchs, dont un avec des bars.
+  const encore = Array.from({ length: 4 }, (_, i) => unMatch({
+    slug: `club-${i}-autre-${i}-2026-10-31`, debut: `2026-10-31T${String(10 + i).padStart(2, '0')}:00:00Z`, domicile: club(`club-${i}`, `Club ${i}`), exterieur: club(`autre-${i}`, `Autre ${i}`),
+  }));
+  const essai = accueilAvecLaSemaine(ACCUEIL, bloc({ matchs: [...MATCHS, ...encore], bars: [{ id: 'b1' }] }));
+  for (const [largeur, nombre] of [[390, 4], [1280, 6]]) {
+    test(`à ${largeur} px : ${nombre} cartes au plus, les bars d’abord, puis « Tous les matchs de samedi 31 octobre »`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date(JEUDI));
+      await page.setViewportSize({ width: largeur, height: 900 });
+      await page.route((adresse) => adresse.pathname === '/', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: essai }));
+      await page.goto('/');
+      const semaine = page.locator('#semaine');
+      // Chromium sépare d’une espace le texte caché (position absolue) : « 8 matchs , dont… ».
+      const samedi = semaine.getByRole('radio', { name: /^sam\. 31 8 matchs ?, dont 1 avec des bars$/ });
+      await expect(samedi).toHaveCount(1);
+      await expect(semaine.locator('label', { hasText: 'sam. 31' }).locator('.semaine__point')).toBeVisible();
+      await semaine.locator('label', { hasText: 'sam. 31' }).click();
+      const cartes = semaine.locator('.carte-match:visible');
+      await expect(cartes).toHaveCount(nombre);
+      await expect(cartes.first()).toHaveClass(/carte-match--bars/);
+      await expect(semaine.locator('.semaine__jour[data-jour="2026-10-31"] .carte-match')).toHaveCount(8);
+      const tous = semaine.getByRole('link', { name: 'Tous les matchs de samedi 31 octobre' });
+      await expect(tous).toBeVisible();
+      await expect(tous).toHaveAttribute('href', '/matchs/#jour-2026-10-31');
+    });
+  }
 });
 
 // ---------- Le contraste des petits textes, peints sur le clair ----------
@@ -346,4 +484,81 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
       });
     }
   }
+});
+
+// ---------- Le jour : le survol, le focus et le pied de page ----------
+
+// Le rapport de contraste de deux couleurs CSS (rgb ou rgba posée sur la seconde, opaque).
+const rgb = (css) => { const [r, v, b, a = 1] = css.match(/[\d.]+/g).map(Number); return { r, v, b, a }; };
+const luminance = ({ r, v, b }) => [r, v, b].map((c) => c / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)).reduce((s, c, i) => s + c * [0.2126, 0.7152, 0.0722][i], 0);
+const contraste = (dessus, dessous) => {
+  const f = rgb(dessous);
+  const t = rgb(dessus);
+  const peinte = { r: t.r * t.a + f.r * (1 - t.a), v: t.v * t.a + f.v * (1 - t.a), b: t.b * t.a + f.b * (1 - t.a) };
+  const [c, s] = [luminance(peinte), luminance(f)].sort((m, n) => n - m);
+  return Math.round(((c + 0.05) / (s + 0.05)) * 100) / 100;
+};
+
+// Ce que peint le focus de l’élément actif : son contour, ou celui de ce qui le montre (la puce d’un bouton radio
+// invisible, la pilule du champ d’e-mail), et le fond plein derrière ce contour (les fonds translucides empilés).
+const lireLeFocus = (page) => page.evaluate(() => {
+  const actif = document.activeElement;
+  if (!actif || actif === document.body) return null;
+  const visible = (e) => e.checkVisibility({ visibilityProperty: true, opacityProperty: true });
+  const contoure = (e) => { const s = getComputedStyle(e); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0; };
+  const candidats = [actif, actif.nextElementSibling, ...(function* parents() { for (let e = actif.parentElement; e; e = e.parentElement) yield e; }())]
+    .filter((e) => e && visible(e) && contoure(e) && (e === actif || e === actif.nextElementSibling || e.matches(':has(:focus-visible)')));
+  const peint = candidats[0];
+  const quoi = `${actif.tagName.toLowerCase()}${actif.className && typeof actif.className === 'string' ? `.${actif.className.split(' ')[0]}` : ''} « ${(actif.textContent || actif.getAttribute('aria-label') || actif.value || '').trim().slice(0, 30)} »`;
+  // Le lecteur classique du film (mouvement réduit) : ses commandes, dans le cadre sombre du film, ont le contour du
+  // navigateur, que le style de la page ne peint pas.
+  if (!peint) return { quoi, contour: null, lecteur: actif.matches('video[controls]') };
+  const lire = (css) => { const [r, v, b, a = 1] = css.match(/[\d.]+/g).map(Number); return { r, v, b, a }; };
+  const couches = [];
+  for (let e = peint.parentElement; e; e = e.parentElement) {
+    const f = lire(getComputedStyle(e).backgroundColor);
+    if (f.a > 0) couches.push(f);
+    if (f.a === 1) break;
+  }
+  const fond = couches.reverse().reduce((d, h) => ({ r: h.r * h.a + d.r * (1 - h.a), v: h.v * h.a + d.v * (1 - h.a), b: h.b * h.a + d.b * (1 - h.a), a: 1 }), { r: 255, v: 255, b: 255, a: 1 });
+  return { quoi, contour: getComputedStyle(peint).outlineColor, fond: `rgb(${Math.round(fond.r)}, ${Math.round(fond.v)}, ${Math.round(fond.b)})` };
+});
+
+test.describe('le jour : le survol, le focus et le pied de page de l’accueil', () => {
+  test('« Proposer mon bar » survolé reste lisible sur son bouton nuit (4,5:1 au moins)', async ({ page }) => {
+    await page.goto('/');
+    const bouton = page.locator('.bars .bouton-nuit', { hasText: 'Proposer mon bar' });
+    await bouton.hover();
+    const { couleur, fond } = await bouton.evaluate((b) => ({ couleur: getComputedStyle(b).color, fond: getComputedStyle(b).backgroundColor }));
+    expect(contraste(couleur, fond), `${couleur} sur ${fond}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  for (const largeur of [390, 1280]) {
+    test(`au clavier, à ${largeur} px : chaque contour de focus posé sur un fond clair s’en détache à 3:1 au moins`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 900 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/');
+      const arrets = [];
+      for (let i = 0; i < 250; i += 1) {
+        await page.keyboard.press('Tab');
+        const arret = await lireLeFocus(page);
+        if (!arret || (arrets.length && arret.quoi === arrets[0].quoi)) break;
+        arrets.push(arret);
+      }
+      expect(arrets.length).toBeGreaterThan(40);
+      expect(arrets.filter((a) => !a.contour && !a.lecteur).map((a) => a.quoi), 'un arrêt sans contour').toEqual([]);
+      const clairs = arrets.filter((a) => a.contour && luminance(rgb(a.fond)) > 0.5);
+      expect(clairs.length).toBeGreaterThan(20);
+      const faibles = clairs.filter((a) => contraste(a.contour, a.fond) < 3).map((a) => `${a.quoi} : ${a.contour} sur ${a.fond}, ${contraste(a.contour, a.fond)}:1`);
+      expect([...new Set(faibles)]).toEqual([]);
+    });
+  }
+
+  test('le pied de page de l’accueil a les couleurs de celui des autres pages', async ({ page }) => {
+    const couleurs = async (adresse) => {
+      await page.goto(adresse);
+      return page.evaluate(() => ['.pied', '.pied__marque span', '.pied__liens a'].map((s) => `${s} : ${getComputedStyle(document.querySelector(s)).color}`));
+    };
+    expect(await couleurs('/')).toEqual(await couleurs('/cgu.html'));
+  });
 });

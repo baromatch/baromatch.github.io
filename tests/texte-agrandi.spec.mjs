@@ -80,3 +80,28 @@ for (const largeur of [320, 360]) {
     expect(lu.defile, 'la page défile de côté').toBe(false);
   });
 }
+
+// L’étiquette « Écran de démonstration », posée à cheval sur le haut d’un écran : à 200 %, elle passe sur deux lignes.
+// Son texte doit rester dans sa pilule nuit (sinon sa première ligne, claire, sort sur le crème de l’accueil : 1:1).
+for (const chemin of ['/', '/pour-les-bars.html']) {
+  for (const largeur of [320, 1280]) {
+    test(`${chemin} à ${largeur} px, texte à 200 % : le texte de chaque « Écran de démonstration » reste dans sa pilule`, async ({ page: onglet }) => {
+      await couperLAPI(onglet);
+      await onglet.emulateMedia({ reducedMotion: 'reduce' });
+      await onglet.setViewportSize({ width: largeur, height: 800 });
+      await onglet.goto(chemin);
+      await attendreLaPageFinie(onglet);
+      await agrandir(onglet, 200);
+      const lu = await onglet.evaluate(() => [...document.querySelectorAll('.exemple')].filter((e) => e.checkVisibility()).map((e) => {
+        const boite = e.getBoundingClientRect();
+        const plage = document.createRange();
+        plage.selectNodeContents(e);
+        const lignes = [...plage.getClientRects()];
+        const dehors = lignes.filter((l) => l.top < boite.top - 0.5 || l.bottom > boite.bottom + 0.5 || l.left < boite.left - 0.5 || l.right > boite.right + 0.5);
+        return { lignes: lignes.length, dehors: dehors.map((l) => `${Math.round(l.top)}–${Math.round(l.bottom)} px pour ${Math.round(boite.top)}–${Math.round(boite.bottom)} px`) };
+      }));
+      expect(lu.length).toBeGreaterThan(0);
+      expect(lu.flatMap((e) => e.dehors)).toEqual([]);
+    });
+  }
+}

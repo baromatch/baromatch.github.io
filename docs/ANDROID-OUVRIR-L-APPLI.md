@@ -1,6 +1,6 @@
-# Ouvrir l’appli depuis un lien baromatch.fr (Android)
+# Ouvrir l’appli depuis un lien baromatch.fr (Android et iPhone)
 
-Mis à jour le 26 octobre 2026.
+Mis à jour le 29 octobre 2026.
 
 ## En bref
 
@@ -54,10 +54,25 @@ en ont encore besoin. Le site refuse tout ce qui n’est pas une vraie empreinte
 - **Avec un ordinateur et un câble** (facultatif) : `adb shell pm get-app-links fr.baromatch.app` doit dire
   `baromatch.fr: verified`.
 
-## Rien à faire pour l’iPhone
+## Sur iPhone
 
-Il n’y a pas d’appli iPhone. Le jour où il y en a une, il faudra un autre fichier (`apple-app-site-association`) :
-ce sera une autre mission.
+Le site a maintenant aussi le fichier que lit l’iPhone : `https://baromatch.fr/.well-known/apple-app-site-association`
+(sans « .json » à la fin : c’est voulu). Il dit à l’iPhone que les liens `baromatch.fr/t/…`, et seulement eux,
+s’ouvrent dans l’appli Baromatch.
+
+- **Ce qu’il contient** : `2B8AUDU8R8.fr.baromatch.app`. `2B8AUDU8R8` est le « Team ID », l’identifiant de ton
+  compte de développeur Apple, lu le 29 octobre 2026 dans le journal de fabrication de l’appli iPhone (à la ligne
+  `TeamIdentifierPrefix`) ; `fr.baromatch.app`, c’est l’appli. Un Team ID **n’est pas un secret** : chaque site qui
+  ouvre une appli iPhone publie le sien.
+- **Ce qui attend encore** : la version 0.2.0 de l’appli, qui dit à l’iPhone qu’elle ouvre les liens de baromatch.fr
+  (`applinks:baromatch.fr`). D’ici là, rien ne change : sur iPhone, un lien de tablée s’ouvre dans le navigateur, sur
+  la page de la tablée. Le fichier en ligne avant elle ne gêne rien : l’iPhone ne le lit que pour une appli installée
+  qui le demande. Ensuite, sur un iPhone qui a cette version, touche un lien de tablée reçu dans Messages ou
+  WhatsApp : l’appli doit s’ouvrir directement.
+- **Ta vérification, le lendemain de la fusion** : ouvre https://app-site-association.cdn-apple.com/a/v1/baromatch.fr
+  dans un navigateur. C’est la copie du fichier qu’Apple garde pour les iPhone : tu dois y lire
+  « 2B8AUDU8R8.fr.baromatch.app ». Si elle ne le montre pas encore, réessaie un jour plus tard : Apple ne relit pas
+  le fichier tout de suite.
 
 ## Pour mémoire : la page d’un lien de tablée
 

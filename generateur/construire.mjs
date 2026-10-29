@@ -138,19 +138,21 @@ export const construire = async ({
   const refuses = [...fichiers.map((f) => f.chemin), ...supprimees].filter((chemin) => !estPermis(fichierDuChemin(chemin)));
   if (refuses.length) throw new Error(`Chemins refusés (hors de la liste blanche du générateur), rien n’est écrit : ${refuses.join(', ')}`);
 
-  // L’accueil : son bloc des matchs de la semaine, des mêmes données. Un bloc refusé par son contrôle, ou un accueil
-  // sans ses repères, laisse l’accueil comme il est (le journal le dit) : les pages des matchs s’écrivent quand même.
-  const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
-  const erreursDuBloc = controlerLaSemaine(bloc);
+  // L’accueil : son bloc des matchs de la semaine, des mêmes données. Un bloc qui ne se fait pas (des textes sans le
+  // sien), un bloc refusé par son contrôle, ou un accueil sans ses repères, laisse l’accueil comme il est (le journal le
+  // dit) : les pages des matchs s’écrivent quand même.
+  let bloc = null;
   let accueil = null;
-  if (erreursDuBloc.length) {
-    avertissements.push(`accueil : le bloc des matchs de la semaine est refusé (${erreursDuBloc.join(' ; ')}) : l’accueil reste comme il est`);
-  } else {
-    try {
+  try {
+    bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
+    const erreursDuBloc = controlerLaSemaine(bloc);
+    if (erreursDuBloc.length) {
+      avertissements.push(`accueil : le bloc des matchs de la semaine est refusé (${erreursDuBloc.join(' ; ')}) : l’accueil reste comme il est`);
+    } else {
       accueil = preparerLAccueil({ racine, sortie, bloc });
-    } catch (erreur) {
-      avertissements.push(`accueil : ${erreur.message} : l’accueil reste comme il est`);
     }
+  } catch (erreur) {
+    avertissements.push(`accueil : ${erreur.message} : l’accueil reste comme il est`);
   }
 
   // Tout est prêt et contrôlé : seulement maintenant, l’écriture.

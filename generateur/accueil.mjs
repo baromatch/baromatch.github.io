@@ -26,6 +26,10 @@ export const ACCUEIL = 'index.html';
 export const REPERES = { debut: '<!-- semaine:debut -->', fin: '<!-- semaine:fin -->' };
 
 const COULEUR = /^#[0-9A-F]{6}$/i;
+// Au-delà de ce nombre de matchs, un jour finit par un lien vers lui dans la semaine (/matchs/) : styles.css n’en montre
+// que 4 au téléphone, 6 à partir de 720 px (les autres cartes restent dans la page).
+const CARTES_AU_TELEPHONE = 4;
+const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const jourCourt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short', day: 'numeric' });
 
 // Un club, un disque : sa première couleur de midi dans le sens des aiguilles d’une montre, sur la part que
@@ -79,21 +83,39 @@ export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) 
   const semaine = jours.map((jour, i) => ({ jour, i, matchs: duJour(jour) }));
   const choisi = semaine.find((j) => j.matchs.length)?.jour ?? aujourdhui;
   const sansAucunBar = donnees.bars.length === 0;
-  const chapo = sansAucunBar ? `${e(t.sansBar)} <a href="#attente">${e(t.sansBarLien)}</a>` : e(t.avecBars);
+  // Sans bar publié : la phrase vraie, puis ce que chacun peut faire, le fan (la liste d’attente) et le bar.
+  const chapo = `<p class="semaine__chapo">${e(sansAucunBar ? t.sansBar : t.avecBars)}</p>${sansAucunBar
+    ? `\n<p class="semaine__liens"><a href="#attente">${e(t.sansBarLien)}</a><a href="/pour-les-bars.html#proposer">${e(t.sansBarProposer)}</a></p>` : ''}`;
 
   const nomDuJour = ({ jour, i }) => (i === 0 ? t.aujourdhui : i === 1 ? t.demain : jourCourt.format(new Date(`${jour}T12:00:00Z`)));
-  const dates = semaine.map((j) => `<label class="semaine__date"><input type="radio" name="semaine-jour" value="${j.jour}"${j.jour === choisi ? ' checked' : ''}><span><b data-date="${e(jourCourt.format(new Date(`${j.jour}T12:00:00Z`)))}">${e(nomDuJour(j))}</b><small>${e(j.matchs.length ? accorder(j.matchs.length, 'match') : t.aucunMatch)}</small></span></label>`).join('\n');
+  // La puce d’un jour dit combien de matchs ; s’il y en a qu’un bar diffuse, un point ambre devant, et leur nombre pour
+  // le lecteur d’écran.
+  const compte = (j) => {
+    const avec = j.matchs.filter(avecBars).length;
+    if (!j.matchs.length) return e(t.aucunMatch);
+    if (!avec) return e(accorder(j.matchs.length, 'match'));
+    return `<span class="semaine__point" aria-hidden="true"></span>${e(accorder(j.matchs.length, 'match'))}<span class="visuellement-cache">${e(remplir(t.dontAvecBars, { nombre: avec }))}</span>`;
+  };
+  const dates = semaine.map((j) => `<label class="semaine__date"><input type="radio" name="semaine-jour" value="${j.jour}"${j.jour === choisi ? ' checked' : ''}><span><b data-date="${e(jourCourt.format(new Date(`${j.jour}T12:00:00Z`)))}">${e(nomDuJour(j))}</b><small>${compte(j)}</small></span></label>`).join('\n');
   const enLettres = (jour) => capitale(jourEnLettres(Date.parse(`${jour}T12:00:00Z`)));
+  // Un long jour : son lien vers la semaine, qui ouvre aujourd’hui sous « titre-ce-soir » et chaque autre jour sous
+  // « jour-AAAA-MM-JJ » (pages.mjs). « Aujourd’hui » et « Demain » portent aussi leur date (data-date), pour main.js.
+  const tous = (j) => {
+    if (j.matchs.length <= CARTES_AU_TELEPHONE) return '';
+    const date = remplir(t.tousLesMatchs, { jour: jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`)) });
+    const texte = j.i === 0 ? t.tousLesMatchsAujourdhui : j.i === 1 ? remplir(t.tousLesMatchs, { jour: t.demain.toLowerCase() }) : date;
+    return `\n<p class="semaine__tous"><a href="/matchs/#${j.i === 0 ? 'titre-ce-soir' : `jour-${j.jour}`}"${j.i < 2 ? ` data-date="${e(date)}"` : ''}>${e(texte)}</a></p>`;
+  };
   const panneaux = semaine.map((j) => `<div class="semaine__jour" data-jour="${j.jour}">
-<h3 class="visuellement-cache"${j.i < 2 ? ` data-date="${e(enLettres(j.jour))}">${e(`${nomDuJour(j)}, ${jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`))}`)}` : `>${e(enLettres(j.jour))}`}</h3>
-${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m, { textes, couleurs, maintenant, sansAucunBar })).join('\n')}\n</ul>` : `<p class="semaine__rien">${e(t.rienCeJour)}</p>`}
+<h3 class="semaine__titre-jour"${j.i < 2 ? ` data-date="${e(enLettres(j.jour))}">${e(`${nomDuJour(j)}, ${jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`))}`)}` : `>${e(enLettres(j.jour))}`}</h3>
+${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m, { textes, couleurs, maintenant, sansAucunBar })).join('\n')}\n</ul>${tous(j)}` : `<p class="semaine__rien">${e(t.rienCeJour)}</p>`}
 </div>`).join('\n');
   const rien = semaine.every((j) => !j.matchs.length);
   return insecables(`<div class="semaine__tete">
 <h2 class="titre-section" id="titre-semaine">${e(t.titre)}</h2>
 <a class="semaine__toute" href="/matchs/">${e(t.toute)}</a>
 </div>
-<p class="semaine__chapo">${chapo}</p>
+${chapo}
 ${rien ? `<p class="semaine__rien">${e(t.rienCetteSemaine)}</p>` : `<div class="semaine__jours" data-aujourdhui="${aujourdhui}">
 <fieldset class="semaine__dates">
 <legend class="visuellement-cache">${e(t.jours)}</legend>

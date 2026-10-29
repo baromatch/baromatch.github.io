@@ -35,10 +35,13 @@ const KO = 1024;
 // 29 octobre 2026 : styles.css gagne le jour (l’accueil en clair) et les matchs de la semaine de l’accueil : de 50,8 à
 // 61,4 Ko (2,6 Ko de plus, compressés) : chaque seuil de CSS monte de 11 Ko (celui de l’accueil et des pages fixes, au
 // plus juste, de 58 à 62), et le JS de l’accueil de 16 à 17 Ko (main.js remet les dates de la semaine lue un autre jour).
+// 29 octobre 2026, après relecture : styles.css gagne le contour du focus du jour, la semaine sans :has(), le point des
+// jours qui ont des bars et les longs jours (de 61,4 à 63,7 Ko) : le CSS de l’accueil et des pages fixes monte de 62 à
+// 65 Ko ; main.js retire la semaine toute passée (de 17,1 à 17,8 Ko) : le JS de l’accueil, de 17 à 18 Ko.
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 185, js: 17, css: 62, images: 24 } },
-  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 158, js: 0, css: 62, images: 0 } },
-  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 158, js: 0, css: 62, images: 0 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 185, js: 18, css: 65, images: 24 } },
+  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
+  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 260, js: 68, css: 97, images: 72 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
   { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },

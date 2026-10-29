@@ -216,7 +216,7 @@
     "apercu": "Aperçu du badge : {texte}"
   },
   "accueil": {
-    "_lisezMoi": "Le bloc « Les matchs de la semaine » de l’accueil, que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : une barre des sept prochains jours, puis une carte par match. Les matchs qu’un bar publié diffuse passent en tête de leur jour et leur carte dit combien de bars ; les autres, plus discrètes, proposent l’agenda du match et, dès qu’un bar est publié, disent « Pas encore de bar ». Tant qu’aucun bar n’est publié, la phrase sous le titre (sansBar) le dit une fois pour toutes.",
+    "_lisezMoi": "Le bloc « Les matchs de la semaine » de l’accueil, que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : une barre des sept prochains jours, puis une carte par match. Les matchs qu’un bar publié diffuse passent en tête de leur jour et leur carte dit combien de bars ; les autres, plus discrètes, proposent l’agenda du match et, dès qu’un bar est publié, disent « Pas encore de bar ». Tant qu’aucun bar n’est publié, la phrase sous le titre (sansBar) le dit une fois pour toutes.",
     "titre": "Les matchs de la semaine",
     "toute": "Toute la semaine",
     "jours": "Choisis un jour",

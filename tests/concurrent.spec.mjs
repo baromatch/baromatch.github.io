@@ -5,7 +5,7 @@
 // contienne pas ; un mot qui le prolonge (une « fanzone ») ne compte pas.
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 
@@ -14,7 +14,8 @@ const NOM = new RegExp(`(?<![\\p{L}\\p{N}])${['fan', 'zo'].join('')}(?![\\p{L}\\
 
 const FICHIERS = [...new Set(execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
   { cwd: racine, encoding: 'utf8' }).split('\0'))]
-  .filter((fichier) => fichier && existsSync(path.join(racine, fichier)))
+  // Un fichier, pas un dossier (un lien vers node_modules, dans une copie de travail) ni un lien cassé.
+  .filter((fichier) => fichier && statSync(path.join(racine, fichier), { throwIfNoEntry: false })?.isFile())
   .sort();
 
 const lignesAvecLeNom = (texte) => texte.split('\n').flatMap((ligne, i) => (ligne.match(NOM) ? [i + 1] : []));

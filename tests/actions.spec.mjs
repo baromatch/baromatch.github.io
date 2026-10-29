@@ -43,6 +43,8 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
   <url><loc>https://baromatch.fr/matchs/a/</loc><lastmod>${date}</lastmod></url>
 </urlset>
 `;
+  // L’accueil : écrit à la main, sauf le bloc des matchs de la semaine, entre ses deux repères.
+  const ACCUEIL = (bloc, pied = '<p>Pied</p>') => `<p>Accueil</p>\n<!-- semaine:debut -->\n${bloc}\n<!-- semaine:fin -->\n${pied}\n`;
 
   // Un dépôt d’origine (le main de GitHub), le dépôt du passage (actions/checkout) et un autre envoi sur main.
   const preparer = () => {
@@ -68,7 +70,7 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     mkdirSync(depart);
     git(depart, 'init', '-q', '-b', 'main');
     ecrire(depart, 'sitemap.xml', PLAN('2026-10-20'));
-    ecrire(depart, 'index.html', '<p>Accueil</p>\n');
+    ecrire(depart, 'index.html', ACCUEIL('<p>Semaine</p>'));
     ecrire(depart, 'cgu.html', '<p>CGU</p>\n');
     ecrire(depart, 'confidentialite.html', '<p>Confidentialité</p>\n');
     ecrire(depart, 'matchs/a/index.html', '<p>A</p>\n');
@@ -111,7 +113,7 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     const fichiersDeMain = () => git(origine, 'ls-tree', '-r', '--name-only', 'main').split('\n');
     const lireSurMain = (relatif) => git(origine, 'show', `main:${relatif}`);
     return {
-      dossier, git, origine, passage, generer, envoiPendantLePassage, lancer, fichiersDeMain, lireSurMain,
+      dossier, git, origine, passage, temp, generer, ecrire, envoiPendantLePassage, lancer, fichiersDeMain, lireSurMain,
       nodeLance: () => (existsSync(appels) ? readFileSync(appels, 'utf8') : ''),
       ranger: () => rmSync(dossier, { recursive: true, force: true }),
     };
@@ -139,7 +141,7 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     const d = preparer();
     try {
       d.generer();
-      const sienne = d.envoiPendantLePassage('index.html', '<p>Accueil, changé pendant le passage</p>\n');
+      const sienne = d.envoiPendantLePassage('index.html', ACCUEIL('<p>Semaine</p>', '<p>Pied, changé pendant le passage</p>'));
       const fin = d.lancer();
       expect(fin.code, fin.journal).toBe(0);
       expect(fin.sortie).toBe('envoye=oui\n');
@@ -149,7 +151,7 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
       expect(d.git(d.origine, 'log', '-1', '--format=%s', 'main')).toMatch(/^Pages des matchs : mise à jour du \d{2}\/\d{2}\/\d{4} à \d{2}:\d{2}$/);
       expect(d.git(d.origine, 'diff', '--name-only', 'main~1', 'main').split('\n').sort())
         .toEqual(['confidentialite.html', 'matchs/a/index.html', 'matchs/b/index.html', 'sitemap.xml']);
-      expect(d.lireSurMain('index.html')).toBe('<p>Accueil, changé pendant le passage</p>');
+      expect(d.lireSurMain('index.html')).toBe(ACCUEIL('<p>Semaine</p>', '<p>Pied, changé pendant le passage</p>').trim());
       expect(d.lireSurMain('cgu.html')).toBe('<p>CGU</p>');
       expect(d.fichiersDeMain()).not.toContain('notes.txt');
       expect(d.nodeLance()).toBe('');
@@ -183,15 +185,56 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     const d = preparer();
     try {
       d.generer();
-      writeFileSync(path.join(d.passage, 'index.html'), '<p>Accueil, avec les matchs de la semaine</p>\n');
+      d.ecrire(d.passage, 'index.html', ACCUEIL('<p>Les matchs de la semaine</p>'));
       const fin = d.lancer();
       expect(fin.code, fin.journal).toBe(0);
       expect(fin.sortie).toBe('envoye=oui\n');
       expect(d.git(d.origine, 'diff', '--name-only', 'main~1', 'main').split('\n').sort())
         .toEqual(['confidentialite.html', 'index.html', 'matchs/a/index.html', 'matchs/b/index.html', 'sitemap.xml']);
-      expect(d.lireSurMain('index.html')).toBe('<p>Accueil, avec les matchs de la semaine</p>');
+      expect(d.lireSurMain('index.html')).toBe(ACCUEIL('<p>Les matchs de la semaine</p>').trim());
       expect(d.lireSurMain('cgu.html')).toBe('<p>CGU</p>');
       expect(d.fichiersDeMain()).not.toContain('notes.txt');
+    } finally {
+      d.ranger();
+    }
+  });
+
+  test('l’accueil changé hors de son bloc (ou sans ses repères) : rien n’est enregistré ni envoyé, et l’Action le dit', () => {
+    for (const accueil of [
+      ACCUEIL('<p>Les matchs de la semaine</p>', '<p>Pied changé</p>'),
+      `<p>Accueil changé</p>\n${ACCUEIL('<p>Semaine</p>')}`,
+      '<p>Accueil</p>\n<p>Les matchs de la semaine</p>\n<p>Pied</p>\n',
+      ACCUEIL('<p>Semaine</p>').replace('<!-- semaine:fin -->\n', ''),
+      `${ACCUEIL('<p>Semaine</p>')}<!-- semaine:debut -->\n<p>Encore</p>\n<!-- semaine:fin -->\n`,
+    ]) {
+      const d = preparer();
+      try {
+        const avant = d.git(d.origine, 'rev-parse', 'main');
+        d.generer();
+        d.ecrire(d.passage, 'index.html', accueil);
+        const fin = d.lancer();
+        expect(fin.code, accueil).toBe(1);
+        expect(fin.journal).toContain('::error::index.html a changé hors du bloc des matchs de la semaine : rien n’est enregistré ni envoyé.');
+        expect(fin.sortie).toBe('');
+        expect(d.git(d.origine, 'rev-parse', 'main')).toBe(avant);
+        expect(d.git(d.passage, 'rev-parse', 'HEAD')).toBe(avant);
+        expect(d.nodeLance()).toBe('');
+      } finally {
+        d.ranger();
+      }
+    }
+  });
+
+  test('l’accueil réécrit par la mesure (dans sa liste) part avec les pages, même hors de son bloc', () => {
+    const d = preparer();
+    try {
+      d.generer();
+      writeFileSync(path.join(d.temp, 'mesure.txt'), 'confidentialite.html\nindex.html\n');
+      d.ecrire(d.passage, 'index.html', ACCUEIL('<p>Les matchs de la semaine</p>', '<p>Pied, avec la mesure</p>'));
+      const fin = d.lancer();
+      expect(fin.code, fin.journal).toBe(0);
+      expect(fin.sortie).toBe('envoye=oui\n');
+      expect(d.lireSurMain('index.html')).toBe(ACCUEIL('<p>Les matchs de la semaine</p>', '<p>Pied, avec la mesure</p>').trim());
     } finally {
       d.ranger();
     }

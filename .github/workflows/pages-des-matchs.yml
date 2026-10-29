@@ -21,7 +21,7 @@
 # « pas de mesure d’audience » pendant que les pages des matchs comptent encore.
 # Seuls matchs/, regarder-le-match/, bar/, ce-soir/, en/ (les pages en anglais), agenda/ (« Ton club dans ton
 # agenda »), sitemap.xml, index.html (le générateur n’y change que le bloc des matchs de la semaine : il vérifie le
-# reste avant d’écrire) et les pages que la mesure a réécrites sont enregistrés, avec un message clair, puis envoyés
+# reste avant d’écrire, et l’envoi le revérifie avec git seul) et les pages que la mesure a réécrites sont enregistrés, avec un message clair, puis envoyés
 # sur main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
 # elle-même (d’où « pages: write »), puis prévient IndexNow des adresses indexables qui ont changé.
 # Si main change pendant un passage, les pages partent par-dessus sa nouvelle version ; si ce changement touche les
@@ -126,6 +126,18 @@ jobs:
             if git diff --cached --name-only | grep -vxF -f "$mesure" | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\.xml$|^index\.html$'; then
               echo "::error::Un fichier hors de la liste blanche du générateur allait être enregistré."
               exit 1
+            fi
+            # L’accueil : le générateur n’y change que le bloc des matchs de la semaine, entre ses deux repères (une fois
+            # chacun). Hors d’eux, il doit rester celui de main, ligne pour ligne, sauf si la mesure l’a réécrit (sa liste
+            # le dit). Sinon, rien n’est enregistré ni envoyé.
+            if ! git diff --cached --quiet -- index.html && ! grep -qxF index.html "$mesure"; then
+              horsDuBloc() { sed '/<!-- semaine:debut -->/,/<!-- semaine:fin -->/d'; }
+              if [ "$(git show :index.html | grep -c '<!-- semaine:debut -->')" != 1 ] \
+                || [ "$(git show :index.html | grep -c '<!-- semaine:fin -->')" != 1 ] \
+                || ! diff -q <(git show HEAD:index.html | horsDuBloc) <(git show :index.html | horsDuBloc) > /dev/null; then
+                echo "::error::index.html a changé hors du bloc des matchs de la semaine : rien n’est enregistré ni envoyé."
+                exit 1
+              fi
             fi
             git commit -q -m "Pages des matchs : mise à jour du $(TZ=Europe/Paris date '+%d/%m/%Y à %H:%M')"
           }

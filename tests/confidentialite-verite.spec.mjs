@@ -103,14 +103,14 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   expect(messages).toContain('Par match, au plus une de ces notifications : ton club qui joue, une soirée qui ouvre, ou ce message. Aucune pour un match où tu as déjà ta place.');
   expect(messages).not.toContain('Offres des bars');
   expect(messages).toContain('Pour ne plus les recevoir, coupe « Messages de Baromatch » dans Réglages : ton accord est retiré.');
-  // Couper les notifications du téléphone les cache, sans retirer l’accord gardé par le serveur (soir-de-match #143).
+  // Couper les notifications du téléphone les cache, sans retirer l’accord gardé avec le compte.
   expect(messages).toContain('Couper les notifications de Baromatch dans les réglages de ton téléphone les cache aussi, sans retirer ton accord.');
   // Aujourd’hui, rien ne part encore du serveur : la page le dit toujours, juste avant.
   await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
   // Sa base est écrite, et le résumé « en clair » des intérêts légitimes, auquel renvoie le droit de s’opposer, la compte.
   const base = page.locator('#pourquoi + p + ul > li', { hasText: 'T’envoyer de temps en temps un message sur un match' });
   await expect(base).toHaveCount(1);
-  // Depuis soir-de-match #143 : un accord, coupé au départ, plus notre intérêt légitime.
+  // Un accord, coupé au départ, plus notre intérêt légitime.
   await expect(base).toContainText('ton accord, donné en allumant « Messages de Baromatch » dans Réglages (il est coupé au départ), quand les notifications de notre serveur arriveront sur ton téléphone');
   await expect(base).not.toContainText('intérêt légitime');
   await expect(base).toContainText('ou qu’il arrive à la mi-temps');

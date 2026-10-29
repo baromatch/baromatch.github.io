@@ -65,8 +65,8 @@ test.describe('le bloc, du générateur', () => {
     // Un jour sans match le dit, sans carte vide.
     expect(jourDe(html, '2026-10-30')).toContain(`<p class="semaine__rien">${textes.accueil.rienCeJour}</p>`);
     // Le jour de la barre, en toutes lettres pour le lecteur d’écran.
-    expect(jourDe(html, '2026-10-29')).toContain('<h3 class="visuellement-cache" data-date="Jeudi 29 octobre">Aujourd’hui, jeudi 29 octobre</h3>');
-    expect(jourDe(html, '2026-10-31')).toContain('<h3 class="visuellement-cache">Samedi 31 octobre</h3>');
+    expect(jourDe(html, '2026-10-29')).toContain('<h3 class="semaine__titre-jour" data-date="Jeudi 29 octobre">Aujourd’hui, jeudi 29 octobre</h3>');
+    expect(jourDe(html, '2026-10-31')).toContain('<h3 class="semaine__titre-jour">Samedi 31 octobre</h3>');
     // Les matchs finis d’hier et ceux d’après les sept jours n’y sont pas.
     expect(html).not.toContain('psg-ol-2026-10-28');
     expect(html).not.toContain('lens-om-2026-11-08');
@@ -321,6 +321,33 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     }
     // Le jour de Paris se lit en parties (année, mois, jour), pas dans la forme d’une langue.
     expect(readFileSync(path.join(racine, 'main.js'), 'utf8')).not.toContain('fr-CA');
+  });
+
+  test('sans :has() (un navigateur ancien) : pas de barre des jours, mais chaque jour sous son titre, visible ; avec :has(), le titre est pour le lecteur d’écran', async ({ page }) => {
+    // Les deux branches sont dans la feuille de style.
+    const feuille = readFileSync(path.join(racine, 'styles.css'), 'utf8');
+    const branche = (debut) => feuille.split(debut)[1].split('\n}\n')[0];
+    expect(branche('@supports selector(:has(*)) {')).toMatch(/\.semaine__titre-jour \{[^}]*clip: rect\(0 0 0 0\)/);
+    expect(branche('@supports not selector(:has(*)) {')).toMatch(/\.semaine__dates \{ display: none; \}/);
+    // Avec :has() : la barre, un seul jour, et son titre pour le lecteur d’écran seulement.
+    let semaine = await ouvrir(page);
+    await expect(semaine.locator('.semaine__dates')).toBeVisible();
+    await expect(semaine.locator('.semaine__jour:visible')).toHaveCount(1);
+    const titre = semaine.getByRole('heading', { level: 3, name: 'Aujourd’hui, vendredi 23 octobre' });
+    await expect(titre).toHaveCount(1);
+    expect((await titre.boundingBox()).height).toBeLessThanOrEqual(1);
+    // Un navigateur sans :has() : la feuille, telle qu’il la lit (la condition « :has() » fausse).
+    await page.route('**/styles.css', async (route) => {
+      const reponse = await route.fetch();
+      await route.fulfill({ response: reponse, body: (await reponse.text()).replaceAll('selector(:has(*))', 'selector(:pas-de-has(*))') });
+    });
+    semaine = await ouvrir(page);
+    await expect(semaine.locator('.semaine__dates')).toBeHidden();
+    await expect(semaine.locator('.semaine__jour:visible')).toHaveCount(7);
+    await expect(semaine.locator('.semaine__titre-jour:visible')).toHaveText([
+      'Aujourd’hui, vendredi 23 octobre', 'Demain, samedi 24 octobre', 'Dimanche 25 octobre', 'Lundi 26 octobre', 'Mardi 27 octobre', 'Mercredi 28 octobre', 'Jeudi 29 octobre',
+    ]);
+    for (const t of await semaine.locator('.semaine__titre-jour').all()) expect((await t.boundingBox()).height).toBeGreaterThan(16);
   });
 
   test('le jour même, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {

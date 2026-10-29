@@ -85,7 +85,7 @@ export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) 
   const dates = semaine.map((j) => `<label class="semaine__date"><input type="radio" name="semaine-jour" value="${j.jour}"${j.jour === choisi ? ' checked' : ''}><span><b data-date="${e(jourCourt.format(new Date(`${j.jour}T12:00:00Z`)))}">${e(nomDuJour(j))}</b><small>${e(j.matchs.length ? accorder(j.matchs.length, 'match') : t.aucunMatch)}</small></span></label>`).join('\n');
   const enLettres = (jour) => capitale(jourEnLettres(Date.parse(`${jour}T12:00:00Z`)));
   const panneaux = semaine.map((j) => `<div class="semaine__jour" data-jour="${j.jour}">
-<h3 class="visuellement-cache"${j.i < 2 ? ` data-date="${e(enLettres(j.jour))}">${e(`${nomDuJour(j)}, ${jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`))}`)}` : `>${e(enLettres(j.jour))}`}</h3>
+<h3 class="semaine__titre-jour"${j.i < 2 ? ` data-date="${e(enLettres(j.jour))}">${e(`${nomDuJour(j)}, ${jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`))}`)}` : `>${e(enLettres(j.jour))}`}</h3>
 ${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m, { textes, couleurs, maintenant, sansAucunBar })).join('\n')}\n</ul>` : `<p class="semaine__rien">${e(t.rienCeJour)}</p>`}
 </div>`).join('\n');
   const rien = semaine.every((j) => !j.matchs.length);

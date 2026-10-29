@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["2B8AUDU8R8.fr.baromatch.app"],
+        "components": [
+          { "/": "/t/*", "comment": "Le lien d'une tablée : https://baromatch.fr/t/‹code›" }
+        ]
+      }
+    ]
+  }
+}

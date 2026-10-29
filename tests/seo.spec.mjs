@@ -488,6 +488,14 @@ test.describe('le film de l’accueil', () => {
   test('sans JavaScript, le cadre du film montre son affiche et se lit, sans bouton qui ne marche pas', async ({ browser, baseURL }) => {
     for (const largeur of [360, 1280]) {
       const contexte = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: largeur, height: 800 } });
+      // L’affiche servie comme GitHub Pages la sert (max-age=600), pas comme le serveur des tests (no-store). Sans
+      // JavaScript, deux lecteurs portent la même affiche (#film, caché, et celui du noscript) : le second reprend celle
+      // du premier, sauf si elle est « no-store » et déjà arrivée (Chromium avant 147), ce qui dépend du moment où
+      // l’analyseur de la page fait une pause entre les deux. Le site n’envoie jamais no-store.
+      await contexte.route('**/baromatch-film.webp', async (route) => {
+        const reponse = await route.fetch();
+        await route.fulfill({ response: reponse, headers: { ...reponse.headers(), 'cache-control': 'max-age=600' } });
+      });
       const onglet = await contexte.newPage();
       const demandees = [];
       onglet.on('request', (requete) => {

@@ -380,11 +380,16 @@ document.addEventListener("click", function (evenement) {
 })();
 
 /* Les matchs de la semaine : le générateur les écrit pour le jour de son passage (data-aujourdhui). Lus un autre jour
-   (un passage manqué), « Aujourd’hui » et « Demain » redeviennent des dates (data-date), et les jours passés s’effacent. */
+   (un passage manqué), « Aujourd’hui » et « Demain » redeviennent des dates (data-date), et les jours passés s’effacent,
+   avec leurs matchs. Si tous les jours sont passés (le générateur arrêté une semaine), la barre et ses cartes s’en vont :
+   restent le titre, la phrase et « Toute la semaine ». Le jour de Paris se lit en parties (année, mois, jour). */
 (function () {
   var semaine = document.querySelector("[data-aujourdhui]");
   if (!semaine) return;
-  var jour = new Intl.DateTimeFormat("fr-CA", { timeZone: "Europe/Paris" }).format(new Date());
+  var parties = {};
+  new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(new Date()).forEach(function (partie) { parties[partie.type] = partie.value; });
+  var jour = parties.year + "-" + parties.month + "-" + parties.day;
   if (jour === semaine.getAttribute("data-aujourdhui")) return;
   semaine.querySelectorAll("[data-date]").forEach(function (date) { date.textContent = date.getAttribute("data-date"); });
   var restants = [];
@@ -392,5 +397,12 @@ document.addEventListener("click", function (evenement) {
     if (choix.value < jour) choix.closest("label").hidden = true;
     else restants.push(choix);
   });
-  if (restants.length && !restants.some(function (choix) { return choix.checked; })) restants[0].checked = true;
+  semaine.querySelectorAll(".semaine__jour[data-jour]").forEach(function (panneau) {
+    if (panneau.getAttribute("data-jour") < jour) panneau.hidden = true;
+  });
+  if (!restants.length) {
+    semaine.hidden = true;
+    return;
+  }
+  if (!restants.some(function (choix) { return choix.checked; })) restants[0].checked = true;
 })();

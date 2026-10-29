@@ -1364,7 +1364,7 @@ a:hover { color: var(--goutte); }
 .semaine__date input:checked + span { border-color: var(--texte); background: var(--texte); color: var(--fond, var(--nuit)); }
 .semaine__date input:checked + span small { color: inherit; }
 .semaine__date input:focus-visible + span { outline: 2px solid var(--texte); outline-offset: 2px; }
-.semaine__date[hidden] { display: none; }
+.semaine__date[hidden], .semaine__jours[hidden], .semaine__jours > .semaine__jour[hidden] { display: none; }
 @media (forced-colors: active) { .semaine__date input:checked + span { border: 3px solid Highlight; } }
 /* Le jour choisi, seul (les autres restent dans la page, pour les moteurs) ; sans :has(), tous les jours se suivent. */
 @supports selector(:has(*)) {

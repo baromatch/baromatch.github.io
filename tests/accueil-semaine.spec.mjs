@@ -286,6 +286,21 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     await expect(semaine).not.toContainText('Demain');
   });
 
+  test('lu sept ou huit jours plus tard (le générateur arrêté) : aucun jour passé ne reste, la barre et ses cartes s’en vont', async ({ page }) => {
+    for (const jour of ['2026-10-30', '2026-10-31']) {
+      const semaine = await ouvrir(page, { quand: Date.parse(`${jour}T10:00:00Z`) });
+      await expect(semaine.locator('.semaine__jours'), jour).toBeHidden();
+      await expect(semaine.locator('.carte-match:visible'), jour).toHaveCount(0);
+      await expect(semaine.locator('.semaine__date:visible'), jour).toHaveCount(0);
+      // Le titre, la phrase et « Toute la semaine » restent : la semaine, elle, est refaite à chaque passage.
+      await expect(semaine.getByRole('heading', { level: 2, name: textes.accueil.titre })).toBeVisible();
+      await expect(semaine.locator('.semaine__chapo')).toBeVisible();
+      await expect(semaine.getByRole('link', { name: textes.accueil.toute })).toBeVisible();
+    }
+    // Le jour de Paris se lit en parties (année, mois, jour), pas dans la forme d’une langue.
+    expect(readFileSync(path.join(racine, 'main.js'), 'utf8')).not.toContain('fr-CA');
+  });
+
   test('le jour même, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {
     for (const largeur of [390, 1280]) {
       await page.addInitScript(() => {

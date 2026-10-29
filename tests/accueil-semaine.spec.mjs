@@ -17,6 +17,7 @@ import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { racine } from './outils/environnement.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, MAINTENANT_DU_SCENARIO } from './outils/site-genere.mjs';
+import { decrireLesCouples, mesurerLesTextes, textesTropFaibles } from './outils/textes-peints.mjs';
 
 const CONTENU = chargerLeContenu(racine);
 const { textes, couleurs } = CONTENU;
@@ -303,44 +304,10 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
 
 // ---------- Le contraste des petits textes, peints sur le clair ----------
 
-// Chaque élément qui porte du texte visible, hors des moments de nuit (la soirée, le film, le pied de page) : la couleur
-// de son texte posée sur son vrai fond (les fonds translucides empilés jusqu’au premier fond plein), et sa taille.
-// Le texte de remplacement des champs (::placeholder) aussi. Les petits textes (moins de 24 px, ou 18,66 px en gras)
-// doivent faire 4,5:1 ; ici, on l’exige de tous.
-const mesurerLesTextes = (page) => page.evaluate(() => {
-  const lire = (css) => { const [r, v, b, a = 1] = css.match(/[\d.]+/g).map(Number); return { r, v, b, a }; };
-  const poser = (dessus, dessous) => ({ r: dessus.r * dessus.a + dessous.r * (1 - dessus.a), v: dessus.v * dessus.a + dessous.v * (1 - dessus.a), b: dessus.b * dessus.a + dessous.b * (1 - dessus.a), a: 1 });
-  const lum = ({ r, v, b }) => [r, v, b].map((c) => c / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)).reduce((s, c, i) => s + c * [0.2126, 0.7152, 0.0722][i], 0);
-  const rapport = (x, y) => { const [c, s] = [lum(x), lum(y)].sort((m, n) => n - m); return (c + 0.05) / (s + 0.05); };
-  const fondDe = (element) => {
-    const couches = [];
-    for (let e = element; e; e = e.parentElement) {
-      const f = lire(getComputedStyle(e).backgroundColor);
-      if (f.a > 0) couches.push(f);
-      if (f.a === 1) break;
-    }
-    return couches.reverse().reduce((dessous, dessus) => poser(dessus, dessous), { r: 255, v: 255, b: 255, a: 1 });
-  };
-  const hex = ({ r, v, b }) => `#${[r, v, b].map((c) => Math.round(c).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
-  const mesures = [];
-  const nuit = '.nuit, .pied, .film__cadre, .visuellement-cache, .lien-evitement, .attente__piege';
-  for (const element of document.querySelectorAll('body *')) {
-    if (element.closest(nuit) || !element.checkVisibility({ visibilityProperty: true, opacityProperty: true })) continue;
-    const texte = [...element.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
-    const style = getComputedStyle(element);
-    const champ = element.matches('input[placeholder]') ? getComputedStyle(element, '::placeholder') : null;
-    if (!texte && !champ) continue;
-    const fond = fondDe(element);
-    const couleur = lire((champ ?? style).color);
-    const peinte = poser(couleur, fond);
-    const taille = parseFloat(style.fontSize);
-    mesures.push({
-      quoi: `${element.tagName.toLowerCase()}${element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : ''}${champ ? '::placeholder' : ''} « ${(texte || element.placeholder).slice(0, 28)} »`,
-      rapport: Math.round(rapport(peinte, fond) * 100) / 100, texte: hex(peinte), fond: hex(fond), petit: taille < 24 && !(taille >= 18.66 && Number(style.fontWeight) >= 700), taille,
-    });
-  }
-  return mesures;
-});
+// La mesure (chaque élément qui porte du texte visible, hors des moments de nuit : sa couleur posée sur son vrai fond,
+// et sa taille) est dans tests/outils/textes-peints.mjs : « Pour les bars » la reprend. Ici, les moments de nuit de
+// l’accueil : la soirée, le pied de page, le cadre du film, et le piège à robots de la liste d’attente.
+const NUIT_DE_L_ACCUEIL = '.nuit, .pied, .film__cadre, .attente__piege';
 
 test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
   for (const [nom, preparer] of [
@@ -366,18 +333,12 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
           const jours = page.locator('#semaine .semaine__date:visible');
           for (let i = 0; i < Math.max(1, await jours.count()); i += 1) {
             if (await jours.count()) await jours.nth(i).click();
-            mesures.push(...await mesurerLesTextes(page));
+            mesures.push(...await mesurerLesTextes(page, NUIT_DE_L_ACCUEIL));
           }
           expect(mesures.length).toBeGreaterThan(40);
-          const faibles = mesures.filter((m) => m.rapport < 4.5).map((m) => `${m.quoi} : ${m.rapport}:1 (${m.texte} sur ${m.fond}, ${m.taille} px)`);
           // Le rapport de la PR : chaque couple de couleurs des petits textes, et son contraste le plus faible.
-          const couples = new Map();
-          for (const m of mesures.filter((x) => x.petit)) {
-            const cle = `${m.texte} sur ${m.fond}`;
-            if (!couples.has(cle) || couples.get(cle).rapport > m.rapport) couples.set(cle, m);
-          }
-          infos.annotations.push({ type: 'contraste', description: [...couples.entries()].sort((a, b) => a[1].rapport - b[1].rapport).map(([cle, m]) => `${m.rapport}:1 ${cle} (${m.quoi})`).join(' | ') });
-          expect([...new Set(faibles)]).toEqual([]);
+          infos.annotations.push({ type: 'contraste', description: decrireLesCouples(mesures) });
+          expect(textesTropFaibles(mesures)).toEqual([]);
         } finally {
           await site?.serveur?.arreter();
           if (site) rmSync(site.dossier, { recursive: true, force: true });

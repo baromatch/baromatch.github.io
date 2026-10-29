@@ -216,7 +216,7 @@
     "apercu": "Aperçu du badge : {texte}"
   },
   "accueil": {
-    "_lisezMoi": "Le bloc « Les matchs de la semaine » de l’accueil, que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : une barre des sept prochains jours, puis une carte par match. Les matchs qu’un bar publié diffuse passent en tête de leur jour et leur carte dit combien de bars ; les autres, plus discrètes, proposent l’agenda du match et, dès qu’un bar est publié, disent « Pas encore de bar ». Tant qu’aucun bar n’est publié, la phrase sous le titre (sansBar) le dit une fois pour toutes, suivie de deux liens : la liste d’attente (sansBarLien, les mots de son formulaire) et « Pour les bars » (sansBarProposer).",
+    "_lisezMoi": "Le bloc « Les matchs de la semaine » de l’accueil, que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : une barre des sept prochains jours (un point ambre sur un jour qui a des matchs avec des bars, dontAvecBars pour le lecteur d’écran), puis une carte par match ; au-delà de 4 matchs, un jour finit par un lien vers lui dans la semaine (tousLesMatchs). Les matchs qu’un bar publié diffuse passent en tête de leur jour et leur carte dit combien de bars ; les autres, plus discrètes, proposent l’agenda du match et, dès qu’un bar est publié, disent « Pas encore de bar ». Tant qu’aucun bar n’est publié, la phrase sous le titre (sansBar) le dit une fois pour toutes, suivie de deux liens : la liste d’attente (sansBarLien, les mots de son formulaire) et « Pour les bars » (sansBarProposer).",
     "titre": "Les matchs de la semaine",
     "toute": "Toute la semaine",
     "jours": "Choisis un jour",
@@ -227,6 +227,9 @@
     "sansBarProposer": "Tu tiens un bar ? Propose-le",
     "avecBars": "À l’heure de Paris. Les matchs qu’un bar diffuse sur Baromatch passent en tête de leur jour.",
     "aucunMatch": "aucun match",
+    "dontAvecBars": ", dont {nombre} avec des bars",
+    "tousLesMatchs": "Tous les matchs de {jour}",
+    "tousLesMatchsAujourdhui": "Tous les matchs d’aujourd’hui",
     "rienCeJour": "Pas de match annoncé ce jour-là.",
     "rienCetteSemaine": "Aucun match annoncé ces sept prochains jours.",
     "pasDeBar": "Pas encore de bar",

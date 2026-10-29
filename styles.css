@@ -1358,12 +1358,14 @@ a:hover { color: var(--goutte); }
 .semaine__dates { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; margin: 22px 0 0; padding: 0; border: 0; }
 .semaine__date { position: relative; flex: none; }
 .semaine__date input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.semaine__date span { display: grid; min-width: 4.5rem; min-height: 52px; padding: 6px 12px; border: 1px solid var(--verre-bord-fort); border-radius: 14px; background: var(--carte, var(--verre)); line-height: 1.3; }
+.semaine__date > span { display: grid; min-width: 4.5rem; min-height: 52px; padding: 6px 12px; border: 1px solid var(--verre-bord-fort); border-radius: 14px; background: var(--carte, var(--verre)); line-height: 1.3; }
 .semaine__date b { font-size: 0.9375rem; font-weight: 700; }
-@media (min-width: 720px) { .semaine__dates { gap: 8px; } .semaine__date span { min-width: 6.25rem; min-height: 56px; padding: 7px 14px; border-radius: 16px; } .semaine__date b { font-size: 1rem; } }
+@media (min-width: 720px) { .semaine__dates { gap: 8px; } .semaine__date > span { min-width: 6.25rem; min-height: 56px; padding: 7px 14px; border-radius: 16px; } .semaine__date b { font-size: 1rem; } }
 .semaine__date small { color: var(--texte-discret); font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .semaine__date input:checked + span { border-color: var(--texte); background: var(--texte); color: var(--fond, var(--nuit)); }
 .semaine__date input:checked + span small { color: inherit; }
+/* Un jour qui a des matchs avec des bars : un point ambre devant son nombre de matchs (cerné : il se voit sur le blanc). */
+.semaine__point { display: inline-block; width: 8px; height: 8px; margin: 0 6px 0.1em 0; border-radius: 50%; background: var(--ambre); box-shadow: inset 0 0 0 1px rgba(10, 11, 16, 0.35); vertical-align: middle; }
 .semaine__date input:focus-visible + span { outline: 2px solid var(--texte); outline-offset: 2px; }
 .semaine__date[hidden], .semaine__jours[hidden], .semaine__jours > .semaine__jour[hidden] { display: none; }
 @media (forced-colors: active) { .semaine__date input:checked + span { border: 3px solid Highlight; } }
@@ -1388,6 +1390,15 @@ a:hover { color: var(--goutte); }
 .semaine__cartes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin: 16px 0 0; padding: 0; list-style: none; }
 @media (min-width: 720px) { .semaine__cartes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1040px) { .semaine__cartes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Un long jour : 4 cartes au téléphone, 6 à partir de 720 px (les bars d’abord, le générateur les range ainsi), puis
+   son lien vers la semaine. Les autres cartes restent dans la page. */
+.semaine__cartes > li:nth-child(n+5) { display: none; }
+@media (min-width: 720px) {
+  .semaine__cartes > li:nth-child(n+5) { display: grid; }
+  .semaine__cartes > li:nth-child(n+7) { display: none; }
+}
+.semaine__tous { margin: 8px 0 0; }
+.semaine__tous a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .carte-match { display: grid; align-content: start; gap: 10px; padding: 16px 18px 6px; border: 1px solid var(--trait); border-radius: 20px; background: rgba(255, 255, 255, 0.55); }
 .carte-match--bars { border-color: var(--verre-bord-fort); background: var(--carte, var(--verre)); box-shadow: var(--ombre-carte, none); }
 .carte-match__haut { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0; }

@@ -50,12 +50,13 @@ const cartesDe = (html, jour) => jourDe(html, jour).split('<li class="').slice(1
 test.describe('le bloc, du générateur', () => {
   test('sept jours de Paris : « Aujourd’hui », « Demain », puis la date courte ; le premier jour qui a un match est choisi', () => {
     const html = bloc();
-    const dates = [...html.matchAll(/<input type="radio" name="semaine-jour" value="([^"]+)"( checked)?><span><b data-date="([^"]+)">([^<]+)<\/b><small>([^<]+)<\/small>/g)]
+    const dates = [...html.matchAll(/<input type="radio" name="semaine-jour" value="([^"]+)"( checked)?><span><b data-date="([^"]+)">([^<]+)<\/b><small>(.*?)<\/small>/g)]
       .map(([, valeur, choisi, court, nom, compte]) => ({ valeur, choisi: Boolean(choisi), court, nom, compte }));
     expect(dates).toEqual([
       { valeur: '2026-10-29', choisi: true, court: 'jeu. 29', nom: 'Aujourd’hui', compte: '1 match' },
       { valeur: '2026-10-30', choisi: false, court: 'ven. 30', nom: 'Demain', compte: 'aucun match' },
-      { valeur: '2026-10-31', choisi: false, court: 'sam. 31', nom: 'sam. 31', compte: '4 matchs' },
+      // OL – Angers a des bars : le point ambre, et leur nombre pour le lecteur d’écran.
+      { valeur: '2026-10-31', choisi: false, court: 'sam. 31', nom: 'sam. 31', compte: '<span class="semaine__point" aria-hidden="true"></span>4 matchs<span class="visuellement-cache">, dont 1 avec des bars</span>' },
       { valeur: '2026-11-01', choisi: false, court: 'dim. 1', nom: 'dim. 1', compte: 'aucun match' },
       { valeur: '2026-11-02', choisi: false, court: 'lun. 2', nom: 'lun. 2', compte: '1 match' },
       { valeur: '2026-11-03', choisi: false, court: 'mar. 3', nom: 'mar. 3', compte: 'aucun match' },
@@ -125,6 +126,36 @@ test.describe('le bloc, du générateur', () => {
     const vide = bloc({ matchs: [] });
     expect(vide).toContain(`<p class="semaine__rien">${textes.accueil.rienCetteSemaine}</p>`);
     expect(vide).not.toContain('semaine__dates');
+  });
+
+  test('un jour qui a des matchs avec des bars le montre sur sa puce : un point ambre, et « dont N avec des bars » pour le lecteur d’écran', () => {
+    const html = bloc({ bars: [{ id: 'b1' }] });
+    const puce = (jour) => html.split(`value="${jour}"`)[1].split('</label>')[0];
+    // Samedi : OL – Angers a deux bars ; Bayern – Dortmund, reporté, ne compte pas.
+    expect(puce('2026-10-31')).toContain('<small><span class="semaine__point" aria-hidden="true"></span>4 matchs<span class="visuellement-cache">, dont 1 avec des bars</span></small>');
+    expect(puce('2026-10-29')).toContain('<small>1 match</small>');
+    expect(puce('2026-10-30')).toContain(`<small>${textes.accueil.aucunMatch}</small>`);
+    // Le jour choisi reste le premier qui a un match, même sans bar.
+    expect(html).toContain('value="2026-10-29" checked');
+    expect(html).not.toContain('value="2026-10-31" checked');
+    const deux = MATCHS.map((m) => (m.slug === 'nice-rennes-2026-10-31' ? { ...m, soirees: [soiree('Paris')] } : m));
+    expect(bloc({ matchs: deux, bars: [{ id: 'b1' }] })).toContain('4 matchs<span class="visuellement-cache">, dont 2 avec des bars</span>');
+  });
+
+  test('un long jour : toutes ses cartes dans la page, et au-delà de 4 matchs, un lien vers ce jour dans la semaine', () => {
+    const encore = (n, jour) => Array.from({ length: n }, (_, i) => unMatch({
+      slug: `club-${i}-autre-${i}-${jour}`, debut: `${jour}T${String(10 + i).padStart(2, '0')}:00:00Z`, domicile: club(`club-${i}`, `Club ${i}`), exterieur: club(`autre-${i}`, `Autre ${i}`),
+    }));
+    // Samedi, 4 matchs : pas de lien.
+    expect(jourDe(bloc(), '2026-10-31')).not.toContain('semaine__tous');
+    const html = bloc({ matchs: [...MATCHS, ...encore(3, '2026-10-31'), ...encore(4, '2026-10-29'), ...encore(5, '2026-10-30')], bars: [{ id: 'b1' }] });
+    expect(cartesDe(html, '2026-10-31')).toHaveLength(7);
+    expect(cartesDe(html, '2026-10-31')[0]).toContain('ol-angers-2026-10-31');
+    expect(jourDe(html, '2026-10-31')).toContain('</ul>\n<p class="semaine__tous"><a href="/matchs/#jour-2026-10-31">Tous les matchs de samedi 31 octobre</a></p>');
+    // Aujourd’hui : la semaine l’ouvre sous « titre-ce-soir » ; lu un autre jour, le lien dit sa date.
+    expect(jourDe(html, '2026-10-29')).toContain('<p class="semaine__tous"><a href="/matchs/#titre-ce-soir" data-date="Tous les matchs de jeudi 29 octobre">Tous les matchs d’aujourd’hui</a></p>');
+    expect(jourDe(html, '2026-10-30')).toContain('<p class="semaine__tous"><a href="/matchs/#jour-2026-10-30" data-date="Tous les matchs de vendredi 30 octobre">Tous les matchs de demain</a></p>');
+    expect(controlerLaSemaine(html)).toEqual([]);
   });
 
   test('deux disques aux couleurs des clubs, jamais un écusson ; un club sans couleurs connues reste neutre', () => {
@@ -203,6 +234,10 @@ test.describe('l’accueil : le générateur n’écrit que le bloc', () => {
       // Le scénario a des bars publiés : leurs matchs ont « Voir les bars ».
       expect(premier.accueil.bloc).toContain('carte-match--bars');
       expect(premier.accueil.bloc).toContain('data-aujourdhui="2026-10-23"');
+      // Le lien d’un long jour vise une ancre de la semaine : « titre-ce-soir » pour aujourd’hui, « jour-AAAA-MM-JJ »
+      // pour chaque autre jour qui a des matchs (samedi et dimanche, dans le scénario).
+      const laSemaine = readFileSync(path.join(dossier, 'matchs', 'index.html'), 'utf8');
+      for (const ancre of ['titre-ce-soir', 'jour-2026-10-24', 'jour-2026-10-25']) expect(laSemaine).toContain(`<h2 id="${ancre}">`);
       const { construire } = await import('../generateur/construire.mjs');
       const second = await construire({
         source: `scenario:${path.join(racine, 'tests', 'donnees', 'scenario.json')}`, sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario(), rendu: null, qr: null,
@@ -368,6 +403,35 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
       expect(await page.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
     }
   });
+});
+
+test.describe('un long jour, dans le navigateur', () => {
+  // L’accueil avec un bloc d’essai : samedi 31 octobre a 8 matchs, dont un avec des bars.
+  const encore = Array.from({ length: 4 }, (_, i) => unMatch({
+    slug: `club-${i}-autre-${i}-2026-10-31`, debut: `2026-10-31T${String(10 + i).padStart(2, '0')}:00:00Z`, domicile: club(`club-${i}`, `Club ${i}`), exterieur: club(`autre-${i}`, `Autre ${i}`),
+  }));
+  const essai = accueilAvecLaSemaine(ACCUEIL, bloc({ matchs: [...MATCHS, ...encore], bars: [{ id: 'b1' }] }));
+  for (const [largeur, nombre] of [[390, 4], [1280, 6]]) {
+    test(`à ${largeur} px : ${nombre} cartes au plus, les bars d’abord, puis « Tous les matchs de samedi 31 octobre »`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date(JEUDI));
+      await page.setViewportSize({ width: largeur, height: 900 });
+      await page.route((adresse) => adresse.pathname === '/', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: essai }));
+      await page.goto('/');
+      const semaine = page.locator('#semaine');
+      // Chromium sépare d’une espace le texte caché (position absolue) : « 8 matchs , dont… ».
+      const samedi = semaine.getByRole('radio', { name: /^sam\. 31 8 matchs ?, dont 1 avec des bars$/ });
+      await expect(samedi).toHaveCount(1);
+      await expect(semaine.locator('label', { hasText: 'sam. 31' }).locator('.semaine__point')).toBeVisible();
+      await semaine.locator('label', { hasText: 'sam. 31' }).click();
+      const cartes = semaine.locator('.carte-match:visible');
+      await expect(cartes).toHaveCount(nombre);
+      await expect(cartes.first()).toHaveClass(/carte-match--bars/);
+      await expect(semaine.locator('.semaine__jour[data-jour="2026-10-31"] .carte-match')).toHaveCount(8);
+      const tous = semaine.getByRole('link', { name: 'Tous les matchs de samedi 31 octobre' });
+      await expect(tous).toBeVisible();
+      await expect(tous).toHaveAttribute('href', '/matchs/#jour-2026-10-31');
+    });
+  }
 });
 
 // ---------- Le contraste des petits textes, peints sur le clair ----------

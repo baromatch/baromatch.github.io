@@ -378,3 +378,19 @@ document.addEventListener("click", function (evenement) {
   });
   essai.hidden = false;
 })();
+
+/* Les matchs de la semaine : le générateur les écrit pour le jour de son passage (data-aujourdhui). Lus un autre jour
+   (un passage manqué), « Aujourd’hui » et « Demain » redeviennent des dates (data-date), et les jours passés s’effacent. */
+(function () {
+  var semaine = document.querySelector("[data-aujourdhui]");
+  if (!semaine) return;
+  var jour = new Intl.DateTimeFormat("fr-CA", { timeZone: "Europe/Paris" }).format(new Date());
+  if (jour === semaine.getAttribute("data-aujourdhui")) return;
+  semaine.querySelectorAll("[data-date]").forEach(function (date) { date.textContent = date.getAttribute("data-date"); });
+  var restants = [];
+  semaine.querySelectorAll('input[name="semaine-jour"]').forEach(function (choix) {
+    if (choix.value < jour) choix.closest("label").hidden = true;
+    else restants.push(choix);
+  });
+  if (restants.length && !restants.some(function (choix) { return choix.checked; })) restants[0].checked = true;
+})();

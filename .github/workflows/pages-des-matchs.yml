@@ -1,7 +1,8 @@
 # Les pages « Où regarder le match » : la semaine (matchs/), une page par match, les villes (regarder-le-match/), une
 # page et un badge par vrai bar (bar/), « Ce soir » (ce-soir/), les pages en anglais (en/), les agendas (agenda/ et le
 # fichier de chaque match), les affiches à imprimer (matchs/affiche/ et celle de chaque vrai bar), l’image de partage
-# des pages de match, de ville, de bar, de « Ce soir » et de l’affiche de la semaine, et le plan du site.
+# des pages de match, de ville, de bar, de « Ce soir » et de l’affiche de la semaine, le plan du site, et le bloc
+# « Les matchs de la semaine » de l’accueil (index.html, entre ses deux repères, et rien d’autre de la page).
 # Le générateur (generateur/construire.mjs, Node seul ; seuls le rendu des images de partage et l’encodeur des QR codes
 # s’installent, dans generateur/images) les écrit d’après les listes publiques de l’appli ; cette Action le lance
 # toutes les 3 heures, juste après minuit à Paris (pour que « Ce soir » passe au nouveau jour), à la main (onglet
@@ -19,7 +20,8 @@
 # jusqu’au premier passage qui réussit. Enregistrer seules les pages écrites à la main ferait dire à Confidentialité
 # « pas de mesure d’audience » pendant que les pages des matchs comptent encore.
 # Seuls matchs/, regarder-le-match/, bar/, ce-soir/, en/ (les pages en anglais), agenda/ (« Ton club dans ton
-# agenda »), sitemap.xml et les pages que la mesure a réécrites sont enregistrés, avec un message clair, puis envoyés
+# agenda »), sitemap.xml, index.html (le générateur n’y change que le bloc des matchs de la semaine : il vérifie le
+# reste avant d’écrire) et les pages que la mesure a réécrites sont enregistrés, avec un message clair, puis envoyés
 # sur main. Un envoi fait par le jeton de l’Action ne lance pas la publication de GitHub Pages : l’Action la demande
 # elle-même (d’où « pages: write »), puis prévient IndexNow des adresses indexables qui ont changé.
 # Si main change pendant un passage, les pages partent par-dessus sa nouvelle version ; si ce changement touche les
@@ -116,12 +118,12 @@ jobs:
           mesure="$RUNNER_TEMP/mesure.txt"
           [ -e "$mesure" ] || : > "$mesure"
           enregistrer() {
-            for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do
+            for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml index.html; do
               if [ -e "$chemin" ] || [ -n "$(git ls-files -- "$chemin")" ]; then git add -A -- "$chemin"; fi
             done
             if [ -s "$mesure" ]; then xargs -d '\n' -a "$mesure" git add --; fi
             if git diff --cached --quiet; then return 1; fi
-            if git diff --cached --name-only | grep -vxF -f "$mesure" | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\.xml$'; then
+            if git diff --cached --name-only | grep -vxF -f "$mesure" | grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\.xml$|^index\.html$'; then
               echo "::error::Un fichier hors de la liste blanche du générateur allait être enregistré."
               exit 1
             fi

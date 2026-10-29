@@ -194,7 +194,7 @@ const lireLeFilm = (page) => page.locator('#film').evaluate((v) => ({ enPause: v
 const deuxImages = (page) => page.evaluate(() => new Promise((suite) => requestAnimationFrame(() => requestAnimationFrame(suite))));
 
 for (const largeur of [360, 1280]) {
-  test(`à ${largeur} px : le bouton du film l’arrête au clavier, juste après la liste d’attente, et la pause tient en revenant au film`, async ({ page }) => {
+  test(`à ${largeur} px : le bouton du film l’arrête au clavier, juste après les matchs de la semaine, et la pause tient en revenant au film`, async ({ page }) => {
     await simulerUnLecteur(page);
     await page.setViewportSize({ width: largeur, height: 800 });
     await page.goto('/');
@@ -204,8 +204,9 @@ for (const largeur of [360, 1280]) {
     await expect(lecture).toBeVisible();
     await expect(lecture).toHaveAccessibleName('Mettre le film en pause');
     await expect(lecture).not.toHaveAttribute('aria-pressed', /.*/);
-    // Au clavier : juste après le dernier lien de la liste d’attente, dans le cadre du film.
-    await page.locator('.attente__note a').focus();
+    // Au clavier : juste après le dernier lien des matchs du jour choisi (sous la liste d’attente : au téléphone, le film
+    // vient après eux), dans le cadre du film.
+    await page.locator('#semaine').locator('a:visible, input:checked').last().focus();
     await page.keyboard.press('Tab');
     await expect(lecture).toBeFocused();
     const [boite, cadre] = await Promise.all([lecture.boundingBox(), page.locator('#film-cadre').boundingBox()]);

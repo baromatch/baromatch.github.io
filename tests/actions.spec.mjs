@@ -179,6 +179,24 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     }
   });
 
+  test('l’accueil, dont le générateur a réécrit le bloc des matchs de la semaine, part avec les pages', () => {
+    const d = preparer();
+    try {
+      d.generer();
+      writeFileSync(path.join(d.passage, 'index.html'), '<p>Accueil, avec les matchs de la semaine</p>\n');
+      const fin = d.lancer();
+      expect(fin.code, fin.journal).toBe(0);
+      expect(fin.sortie).toBe('envoye=oui\n');
+      expect(d.git(d.origine, 'diff', '--name-only', 'main~1', 'main').split('\n').sort())
+        .toEqual(['confidentialite.html', 'index.html', 'matchs/a/index.html', 'matchs/b/index.html', 'sitemap.xml']);
+      expect(d.lireSurMain('index.html')).toBe('<p>Accueil, avec les matchs de la semaine</p>');
+      expect(d.lireSurMain('cgu.html')).toBe('<p>CGU</p>');
+      expect(d.fichiersDeMain()).not.toContain('notes.txt');
+    } finally {
+      d.ranger();
+    }
+  });
+
   test('rien n’a changé : rien n’est enregistré ni envoyé', () => {
     const d = preparer();
     try {

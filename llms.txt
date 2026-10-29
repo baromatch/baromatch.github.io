@@ -22,7 +22,7 @@ Les faits, pour ne pas se tromper :
 
 ## Baromatch
 
-- [Accueil](https://baromatch.fr/): ce qu’est Baromatch, le film de présentation, et la liste d’attente pour être prévenu à l’ouverture.
+- [Accueil](https://baromatch.fr/): ce qu’est Baromatch, les matchs des sept prochains jours (à l’heure de Paris, chacun vers sa page et son agenda ; ceux qu’un bar publié diffuse en tête de leur jour), le film de présentation, et la liste d’attente pour être prévenu à l’ouverture.
 - [Presse](https://baromatch.fr/presse.html): Baromatch en bref, ce qu’il n’est pas, les logos, des images de l’appli et le contact presse.
 - [Deviens testeur Android](https://baromatch.fr/testeurs-android.html): le test fermé de l’appli sur Google Play : qui peut s’inscrire (18 ans ou plus, un téléphone Android, un compte Google), ce que font les testeurs (rester inscrits au moins 14 jours d’affilée, s’en servir, donner leurs retours), et le formulaire. Rien n’est payé.
 - [À propos](https://baromatch.fr/a-propos.html): pourquoi Baromatch existe, où il en est, les règles qu’il s’impose et qui le publie.

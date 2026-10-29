@@ -210,6 +210,28 @@ test.describe('l’accueil : le générateur n’écrit que le bloc', () => {
   });
 });
 
+test.describe('l’accueil : un bloc qui ne se fait pas n’arrête pas les pages des matchs', () => {
+  test('des textes sans le bloc « accueil » : l’accueil reste comme il est, le journal le dit, les pages des matchs s’écrivent', async () => {
+    const dossier = mkdtempSync(path.join(tmpdir(), 'accueil-sans-textes-'));
+    try {
+      const contenu = contenuDuScenario();
+      const sansAccueil = { ...contenu.textes };
+      delete sansAccueil.accueil;
+      const journal = [];
+      const resultat = await construireLeSiteDExemple(dossier, { rendu: null, qr: null, contenu: { ...contenu, textes: sansAccueil }, journal: (ligne) => journal.push(ligne) });
+      expect(resultat.accueil.ecrit).toBe(false);
+      expect(resultat.avertissements.filter((a) => a.startsWith('accueil :'))).toHaveLength(1);
+      expect(resultat.avertissements.find((a) => a.startsWith('accueil :'))).toMatch(/l’accueil reste comme il est$/);
+      expect(journal.some((ligne) => ligne.startsWith('avertissement : accueil :'))).toBe(true);
+      expect(readFileSync(path.join(dossier, 'index.html'), 'utf8')).toBe(ACCUEIL);
+      expect(resultat.ecrits).toContain('/matchs/');
+      expect(readFileSync(path.join(dossier, 'matchs', 'index.html'), 'utf8')).toContain('<h2 id="titre-ce-soir">');
+    } finally {
+      rmSync(dossier, { recursive: true, force: true });
+    }
+  });
+});
+
 // ---------- Dans le navigateur ----------
 
 const portLibre = () => new Promise((resoudre) => {

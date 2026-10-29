@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" class="jour">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-VGvM9jjzpw5CTP/mXPRjSl90WataBinCxz3t74UdBLQ='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-s+01k9ekHLjYych1QMCMfYCaD1HqE4gRZlC0/Q1OKEQ='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
 <link rel="canonical" href="https://baromatch.fr/pour-les-bars.html">
-<meta name="theme-color" content="#0A0B10">
+<meta name="theme-color" content="#FAF7F1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -164,6 +164,17 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
   .capsule, .pour-bars .panier__envoyer, .pour-bars .bouton-nuit, .lien-fleche svg { transition: none; }
   .questions summary, .questions summary svg { transition: none; }
 }
+
+/* Le jour (<html class="jour">, styles.css) : ce que le premier écran et #proposer peignent en dur, en clair. La salle
+   reste une carte de nuit : sa classe « nuit » lui rend les couleurs de la nuit, sans la bande pleine largeur des sections
+   de nuit (clip-path), sur un fond plein où le teal et l’indigo des deux clubs reviennent en haut. La carte du
+   formulaire devient blanche, ses champs bordés à 3:1. Le reste du jour est dans pour-les-bars.css. */
+.jour .pour-bars { --ombre-scene: 0 18px 44px rgba(10, 11, 16, 0.26); }
+.jour .lien-fleche, .jour .lien-fan { text-decoration-color: rgba(10, 11, 16, 0.4); }
+.jour .salle-soir { clip-path: none; background: radial-gradient(circle 26rem at 0% 0%, rgba(15, 139, 126, 0.2), transparent 70%), radial-gradient(circle 26rem at 100% 0%, rgba(58, 63, 168, 0.26), transparent 70%), var(--nuit); }
+.jour .carte-formulaire { background: var(--carte); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--ombre-carte); }
+.jour .formulaire .panier__champ { border-color: var(--champ-bord); background: var(--carte) padding-box; }
+.jour .formulaire .panier__accord input { accent-color: var(--texte); }
 </style>
 <noscript><link rel="stylesheet" href="/pour-les-bars.css"></noscript>
 <meta property="og:type" content="website">
@@ -235,7 +246,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
       </ul>
     </div>
 
-    <figure class="salle-soir" aria-labelledby="salle-titre">
+    <figure class="salle-soir nuit" aria-labelledby="salle-titre">
       <div class="salle-soir__tete">
         <p class="salle-soir__titre" id="salle-titre">Ta salle, ce soir <span class="salle-soir__exemple">Exemple</span></p>
         <p class="salle-soir__heure"><span class="v21">21:00</span><span class="v17">17:00</span></p>

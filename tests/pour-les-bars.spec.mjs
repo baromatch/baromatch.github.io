@@ -540,9 +540,10 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(await page.$$eval('main a[href="#proposer"]', (liens) => liens.map((a) => [a.closest('section').className.split(' ')[0], a.className, a.textContent.trim()])))
       .toEqual([['ouverture-bars', 'capsule', 'Proposer mon bar'], ['conditions', '', 'Propose ton bar'], ['atouts', 'capsule', 'Proposer mon bar'], ['bars', 'bouton-nuit', 'Proposer mon bar']]);
     // Après les conditions, un simple lien vers le formulaire, sans fond ni ambre : la question du prix réglée, on peut
-    // écrire sans remonter ni descendre six écrans.
+    // écrire sans remonter ni descendre six écrans. Le gris de texte du jour (#3D404D, 10:1 sur la carte blanche) : la page
+    // est en clair (<html class="jour">) ; ce lien avait le blanc translucide de la nuit (rgba(247, 247, 249, 0.74)).
     expect(await page.locator('.conditions a[href="#proposer"]').evaluate((a) => [getComputedStyle(a).color, getComputedStyle(a).backgroundColor]))
-      .toEqual(['rgba(247, 247, 249, 0.74)', 'rgba(0, 0, 0, 0)']);
+      .toEqual(['rgb(61, 64, 77)', 'rgba(0, 0, 0, 0)']);
     const fonds = await page.$$eval('.ouverture-bars button, .ouverture-bars a', (cibles) => cibles.map((c) => getComputedStyle(c).backgroundColor));
     expect(fonds.filter((f) => f === 'rgb(255, 177, 61)')).toHaveLength(1);
   });
@@ -898,10 +899,11 @@ test.describe('le premier écran d’abord', () => {
     expect(m.ajoutes.feuille).toBeGreaterThan(m.affichage);
     expect(m.ajoutes.script).toBeGreaterThan(m.affichage);
     expect(Math.abs(m.ajoutes.script - m.ajoutes.feuille)).toBeLessThan(50);
-    // La feuille est encore retenue, et le formulaire est là, ses champs bordés comme sur la page finie.
+    // La feuille est encore retenue, et le formulaire est là, ses champs bordés comme sur la page finie. Le bord du jour
+    // (--champ-bord : du bleu nuit à 50 % sur la carte blanche, 3,7:1) ; celui de la nuit était du blanc à 34 %.
     expect(m.feuilleArrivee).toBeNull();
     expect(await page.evaluate(() => [...document.styleSheets].some((f) => f.href?.endsWith('/pour-les-bars.css')))).toBe(false);
-    expect(await page.locator('#demande-bar').evaluate((c) => getComputedStyle(c).borderTopColor)).toBe('rgba(255, 255, 255, 0.34)');
+    expect(await page.locator('#demande-bar').evaluate((c) => getComputedStyle(c).borderTopColor)).toBe('rgba(10, 11, 16, 0.5)');
     lacher();
     await policeArrivee();
   });

@@ -596,8 +596,9 @@ a:hover { color: var(--goutte); }
 
 /* Un écran de l’appli dans son téléphone de verre (l’accueil, « Pour les bars ») : l’étiquette « Écran de démonstration »
    est posée sur le bord haut de l’écran (la figure est son repère) ; le téléphone est sans marque, bord de 6 px,
-   rayons concentriques 34 = 28 + 6. */
-.exemple { position: absolute; top: -12px; left: 24px; z-index: 2; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; background: var(--nuit); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); color: var(--texte); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
+   rayons concentriques 34 = 28 + 6. L’étiquette grandit avec son texte (à 200 %, elle passe sur deux lignes) : une
+   hauteur fixe laissait sa première ligne, claire, sortir de la pilule sur le crème. */
+.exemple { position: absolute; top: -12px; left: 24px; z-index: 2; display: inline-flex; align-items: center; height: auto; min-height: 24px; padding: 3px 10px; line-height: 1.2; border-radius: 999px; background: var(--nuit); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); color: var(--texte); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
 .telephone { position: relative; max-width: 20rem; padding: 6px; border-radius: 34px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
 .telephone__ecran { overflow: hidden; border-radius: 28px; background: var(--nuit); outline: 1px solid rgba(255, 255, 255, 0.1); outline-offset: -1px; }
 .telephone__ecran img { width: 100%; height: auto; }

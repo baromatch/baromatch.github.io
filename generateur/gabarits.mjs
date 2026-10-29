@@ -36,7 +36,7 @@ export const lireLeCadre = (racine) => {
 // langue : « fr », ou « en » pour une page en anglais (anglais.mjs).
 // mesure : la mesure d’audience (mesure.mjs) ; active, la page charge /mesure.js.
 const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [], langue = 'fr', mesure }) => `<!doctype html>
-<html lang="${langue}">
+<html lang="${langue}" class="jour">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -47,7 +47,7 @@ const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, f
 <meta name="description" content="${e(description)}">
 <meta name="robots" content="${indexable ? 'max-image-preview:large' : 'noindex'}">
 <link rel="canonical" href="${adresseDe(chemin)}">
-<meta name="theme-color" content="#0A0B10">
+<meta name="theme-color" content="#FAF7F1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">

@@ -3,6 +3,7 @@
 // et le bouton de la liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… pas encore ouverte »).
 // La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque.
 import { test, expect } from '@playwright/test';
+import { arreterLHorloge } from './outils/horloge.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
@@ -522,9 +523,17 @@ test('sur ordinateur, l’écran à côté des moments suit la lecture : celui d
 
 // « Maintiens pour essayer » : le geste de l’appli, sur la page. Il se tient au clavier (Espace) comme au doigt ; lâché
 // avant 1,4 s, il se vide ; rien n’est envoyé.
+// L’horloge de la page est arrêtée (page.clock) : seul runFor fait passer le temps du geste. En temps réel, le temps
+// tenu était celui que la machine mettait entre keydown et keyup : sur une machine très chargée, les 300 ms (ou les huit
+// répétitions de 100 ms, plus bas) duraient plus de 1,4 s, la touche était vraiment tenue jusqu’au bout, et le verre se
+// remplissait, à juste titre, avant le lâcher.
+const HORLOGE_DU_GESTE = Date.UTC(2026, 9, 29, 18, 0);
+const TENIR_MS = 1400;
+
 test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » ; lâché trop tôt, il se vide ; rien ne part', async ({ page }) => {
   const envois = [];
   page.on('request', (r) => { if (r.method() !== 'GET') envois.push(r.url()); });
+  await arreterLHorloge(page, HORLOGE_DU_GESTE);
   await page.goto('/');
   const bouton = page.locator('#essai-bouton');
   const note = page.locator('#essai-note');
@@ -534,19 +543,26 @@ test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » 
   await expect(note).toHaveAttribute('role', 'status');
   await bouton.focus();
   await page.keyboard.down(' ');
-  await page.waitForTimeout(300);
+  await page.clock.runFor(300);
   await page.keyboard.up(' ');
   await expect(note).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
   // Lâché, il ne se remplit pas plus tard.
-  await page.waitForTimeout(1600);
+  await page.clock.runFor(1600);
   await expect(bouton).not.toHaveClass(/est-plein/);
   await expect(bouton).toHaveText('Maintiens pour essayer');
+  // Tenu : pas plein à 1 ms près, plein à 1,4 s.
   await page.keyboard.down(' ');
-  await expect(bouton).toHaveText('Place gardée.', { timeout: 3000 });
+  await page.clock.runFor(TENIR_MS - 1);
+  await expect(bouton).not.toHaveClass(/est-plein/);
+  await expect(bouton).toHaveText('Maintiens pour essayer');
+  await page.clock.runFor(1);
+  await expect(bouton).toHaveText('Place gardée.');
   await page.keyboard.up(' ');
   await expect(note).toHaveText('C’était un essai : rien n’est réservé.');
-  expect(await bouton.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe('rgb(255, 177, 61)');
-  await expect(bouton).toHaveText('Maintiens pour essayer', { timeout: 6000 });
+  // Le fond passe à l’ambre par une transition CSS, en temps réel : l’assertion attend sa fin.
+  await expect(bouton).toHaveCSS('background-color', 'rgb(255, 177, 61)');
+  await page.clock.runFor(3500);
+  await expect(bouton).toHaveText('Maintiens pour essayer');
   expect(envois).toEqual([]);
 });
 
@@ -569,18 +585,19 @@ test('« Maintiens pour essayer » avec un lecteur d’écran : un clic sans poi
 // avant 1,4 s, le verre se vide, comme au doigt.
 for (const touche of [' ', 'Enter']) {
   test(`« Maintiens pour essayer » : ${touche === ' ' ? 'Espace' : 'Entrée'} tenue avec ses répétitions, lâchée trop tôt, ne remplit rien`, async ({ page }) => {
+    await arreterLHorloge(page, HORLOGE_DU_GESTE);
     await page.goto('/');
     const bouton = page.locator('#essai-bouton');
     await bouton.scrollIntoViewIfNeeded();
     await bouton.focus();
     await page.keyboard.down(touche);
     for (let i = 0; i < 8; i += 1) {
-      await page.waitForTimeout(100);
+      await page.clock.runFor(100);
       await page.keyboard.down(touche);
     }
     await page.keyboard.up(touche);
     await expect(page.locator('#essai-note')).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
-    await page.waitForTimeout(1600);
+    await page.clock.runFor(1600);
     await expect(bouton).not.toHaveClass(/est-plein/);
     await expect(bouton).toHaveText('Maintiens pour essayer');
   });

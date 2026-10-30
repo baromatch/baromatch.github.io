@@ -18,7 +18,7 @@ import { DUREE_MATCH_MS } from './donnees.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import { adresseDe, ancreDeLaSoiree, cheminDuBar, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
-import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, ligneDeListe, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDuMatch, ligneDeListe, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 
@@ -123,7 +123,7 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   </div>`;
   const ligneDuSoir = (m) => `    ${ligneDeListe(e(nomCourt(m)), aUnePage(m) ? cheminDuMatch(m) : null, `${coupDEnvoi(m)} · ${e(m.competition)}${m.statut
     ? ` · <strong>${e(textes.match[m.statut])}</strong>`
-    : sansAucunBar ? '' : ` · <span class="regarder-compte">${e(textes.semaine.pasDeBar)}</span>`}`)}`;
+    : sansAucunBar ? '' : ` · <span class="regarder-compte">${e(textes.semaine.pasDeBar)}</span>`}`, insignesDuMatch(m))}`;
 
   // ---------- Les sections ----------
   const sectionDuSoir = avecBars.length

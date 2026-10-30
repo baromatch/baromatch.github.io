@@ -145,6 +145,8 @@ test('comment on choisit les bars : les matchs, les places tenues par le bar, et
   expect(places).toContain('le coup d’envoi, 15 ou 30 minutes après');
   const refus = (await page.locator('#refus + ul > li > strong').allTextContents()).map(normaliser);
   expect(refus).toEqual(['Les faux bars.', 'Les faux avis.', 'Les chiffres inventés.', 'Ce qui pousse à boire.', 'Les écussons et les logos.', 'Le direct du match.', 'Les paris.']);
+  // Ni écusson, ni logo : l’insigne de l’appli (generateur/insigne.mjs), et le nom écrit.
+  expect(normaliser(await page.locator('#refus + ul > li', { hasText: 'Les écussons et les logos.' }).textContent())).toBe('Les écussons et les logos. Ni écusson, ni logo : un club a son insigne Baromatch, celui de l’appli (ses couleurs, le motif de son maillot, un code de trois lettres tiré d’un lieu du club, le plus souvent sa ville), et son nom est toujours écrit en toutes lettres. Aucun logo de compétition ni de chaîne.');
   expect(normaliser(await page.locator('#refus + ul').textContent())).toContain(`« ${MENTION_SANTE} »`);
 });
 

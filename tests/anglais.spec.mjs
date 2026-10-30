@@ -9,6 +9,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { sansInsignes } from './outils/insignes.mjs';
 import { PIED } from './outils/pied.mjs';
 import { contenuDuScenario, PUBLIES_DU_SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
@@ -177,7 +178,7 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
     expect(en.description).toBe('2 bars in Paris on Baromatch are showing Premier League, European or PSG matches soon. Kick-off in Paris time, and the addresses.');
     // Les matchs à venir, sous leur jour ; les deux vrais bars de Paris, pas ceux de Lyon ni de Rennes.
     expect(en.contenu).toContain('<h3 class="regarder-jour">Saturday 24 October</h3>');
-    expect(en.contenu).toContain('<li><a class="regarder-matchs__match" href="/en/matches/psg-barca-2026-10-24/">Paris Saint-Germain v FC Barcelona</a> <span class="regarder-matchs__infos"><time datetime="2026-10-24T21:00:00+02:00">9:00 pm</time> · Champions League · <span class="regarder-compte">2 bars in Paris</span></span></li>');
+    expect(sansInsignes(en.contenu)).toContain('<li><a class="regarder-matchs__match" href="/en/matches/psg-barca-2026-10-24/">Paris Saint-Germain v FC Barcelona</a> <span class="regarder-matchs__infos"><time datetime="2026-10-24T21:00:00+02:00">9:00 pm</time> · Champions League · <span class="regarder-compte">2 bars in Paris</span></span></li>');
     expect(en.contenu).not.toMatch(/Cave des Gones|Bon Coin|Café des Sports/);
     expect(en.barsNommes.sort()).toEqual(['b-comptoir', 'b-zinc']);
   });
@@ -276,7 +277,7 @@ test.describe('d’autres jours', () => {
     expect([hreflangs(en), hreflangs(fr)]).toEqual([[], []]);
     expect(en.contenu).toContain('<time datetime="2026-10-24T16:00:00+02:00">Sat 24 Oct, 4:00 pm (Paris time)</time>');
     expect(en.contenu).toContain('That’s 3:00 pm in the UK.');
-    expect(pageDe(site, '/en/premier-league/').contenu).toContain('<a class="regarder-matchs__match" href="/en/matches/arsenal-chelsea-2026-10-24/">Arsenal FC v Chelsea FC</a> <span class="regarder-matchs__infos"><time datetime="2026-10-24T16:00:00+02:00">4:00 pm</time> · Premier League · <span class="regarder-compte">1 bar in Paris</span></span>');
+    expect(sansInsignes(pageDe(site, '/en/premier-league/').contenu)).toContain('<a class="regarder-matchs__match" href="/en/matches/arsenal-chelsea-2026-10-24/">Arsenal FC v Chelsea FC</a> <span class="regarder-matchs__infos"><time datetime="2026-10-24T16:00:00+02:00">4:00 pm</time> · Premier League · <span class="regarder-compte">1 bar in Paris</span></span>');
   });
 
   test('deux vrais bars de Paris le montrent : la page du match indexable, hreflang dans les deux sens', async () => {

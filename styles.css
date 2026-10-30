@@ -1378,6 +1378,11 @@ a:hover { color: var(--goutte); }
 /* La bande des bars : une carte blanche, l’ambre reste au bouton. */
 .jour .bars { background: var(--carte); border-block: 1px solid var(--trait); }
 
+/* L’étiquette des écrans de nuit reste claire ; la page courante, bleu nuit (l’ambre : 1,7:1 sur le crème). */
+.jour .exemple { color: #F7F7F9; }
+.jour .entete__lien[aria-current="page"] { color: var(--texte); }
+.jour .entete__lien--bars[aria-current="page"] { border-color: var(--texte); }
+
 /* ---------- Les matchs de la semaine, sur l’accueil ---------- */
 
 /* Le bloc vient du générateur (generateur/accueil.mjs). Une barre des sept jours (des boutons radio : elle marche sans
@@ -1447,15 +1452,27 @@ a:hover { color: var(--goutte); }
 .carte-match__haut { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; margin: 0; }
 .carte-match__heure { font-size: 1.375rem; font-weight: 750; font-stretch: 92%; font-variant-numeric: tabular-nums; line-height: 1.2; }
 .carte-match__compet { color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; text-align: right; }
-/* Les clubs mènent au match : la flèche, et toute la carte (ses liens devant). */
-.carte-match__clubs { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; color: var(--texte); font-size: 1.0625rem; font-weight: 650; text-decoration: none; }
+/* Les clubs mènent au match : la flèche, et toute la carte (ses liens devant). Leurs insignes d’abord (la paire de
+   l’appli, 64 × 30, à cheval sur les deux noms), puis leurs noms. */
+.carte-match__clubs { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 6px 14px; color: var(--texte); font-size: 1.0625rem; font-weight: 650; text-decoration: none; }
 .carte-match__clubs::before { content: ""; position: absolute; inset: 0; }
-.carte-match__clubs::after { content: "›"; content: "›" / ""; grid-area: 1 / 2 / 3; align-self: center; color: var(--texte-discret); font-size: 1.5rem; line-height: 1; }
+.carte-match__clubs::after { content: "›"; content: "›" / ""; grid-area: 1 / 3 / 3; align-self: center; color: var(--texte-discret); font-size: 1.5rem; line-height: 1; }
+.carte-match__clubs > .insignes { grid-area: 1 / 1 / 3; }
 .carte-match__bas a { position: relative; z-index: 1; }
 .carte-match__clubs:hover .carte-match__club { text-decoration: underline; }
-.carte-match__club { grid-column: 1; display: flex; align-items: center; gap: 10px; min-height: 28px; }
-.disque { flex: none; width: 24px; height: 24px; border-radius: 50%; outline: 1px solid rgba(10, 11, 16, 0.18); outline-offset: -1px; }
-.disque--neutre circle { fill: #D6D3CC; }
+.carte-match__club { grid-column: 2; display: flex; align-items: center; min-height: 28px; }
+/* Moins de 14 rem (texte agrandi ; 15 à 100 % dès 320 px) : la paire au-dessus des noms. */
+.carte-match { container-type: inline-size; }
+@container (max-width: 14rem) {
+  .carte-match__clubs { grid-template-columns: minmax(0, 1fr) auto; }
+  .carte-match__clubs > .insignes { grid-area: 1 / 1; }
+  .carte-match__club { grid-column: 1; }
+  .carte-match__clubs::after { grid-area: 1 / 2 / 4; }
+}
+/* Les insignes des clubs (generateur/insigne.mjs) : à leur taille, jamais étirés ; une paire qui compte une sélection,
+   deux dessins à 4 px. */
+.insigne, .insignes { display: block; flex: none; }
+.insignes--drapeau { display: flex; gap: 4px; align-items: center; }
 .carte-match__bas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; margin: 2px 0 0; padding-top: 4px; border-top: 1px solid var(--trait); font-size: 0.9375rem; }
 .carte-match__etat, .carte-match__statut { padding: 10px 0; color: var(--texte-discret); }
 .carte-match__statut { color: var(--texte); }

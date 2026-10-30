@@ -14,7 +14,7 @@ import {
 import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agenda.mjs';
 import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
-import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDeLEnTete, insignesDuMatch, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 import { clubAvecBars, competitionAvecBars, lienDeLaCompetition, lienDuClub, sectionDesPagesSuivies } from './suivre.mjs';
 
@@ -169,7 +169,7 @@ export const fabriquerLesPages = ({
     const ouRegarder = !passe && vivant && !match.statut && soirees.length > 0;
     const promesse = ouRegarder ? ' : où regarder le match' : '';
     const enTete = `<header class="regarder-tete">
-  <p class="regarder-surtitre">${e(match.competition)}</p>
+${insignesDeLEnTete(match.domicile, match.exterieur)}  <p class="regarder-surtitre">${e(match.competition)}</p>
   <h1 class="regarder-titre">${e(nom)}${promesse}</h1>
   <p class="regarder-affiche">${e(match.domicile.nom)} – ${e(match.exterieur.nom)}</p>
   <p class="regarder-quand">${quand(match, { majuscule: true })}</p>
@@ -258,7 +258,7 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
       barsNommes: soirees.map((s) => s.bar.id), evenement: evenement ? match : null,
-      partage: { sorte: 'match', match, soirees },
+      partage: { sorte: 'match', match, soirees, maintenant },
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
       corps: `${fil(etapes)}
 ${enTete}
@@ -389,7 +389,7 @@ ${groupes.flatMap((g) => g.quartiers).map(({ arrondissement, elements }) => `${a
     const sectionSoirees = `<section class="regarder-section" aria-labelledby="titre-soirees">
   <h2 id="titre-soirees">${e(remplir(textes.ville.titreSoirees, { ville: nomVille }))}</h2>
 ${ville.soirees.length ? `  <ul class="regarder-matchs">
-${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    ${ligneDeListe(e(nomCourt(s.match)), aUnePage(s.match) ? cheminDuMatch(s.match) : null, `${quand(s.match, { majuscule: true })}${statutDuMatch(s.match, textes)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}`)}`).join('\n')}
+${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    ${ligneDeListe(e(nomCourt(s.match)), aUnePage(s.match) ? cheminDuMatch(s.match) : null, `${quand(s.match, { majuscule: true })}${statutDuMatch(s.match, textes)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}`, insignesDuMatch(s.match))}`).join('\n')}
   </ul>` : `  <p>${e(textes.ville.sansSoiree)}</p>`}
 ${autresMatchs.length ? `  <h3 class="regarder-jour">${e(remplir(textes.ville.aussi, { ville: nomVille }))}</h3>
   <ul class="regarder-matchs">
@@ -515,7 +515,7 @@ ${commentCaMarche(textes, marque)}`,
     const listeSoirees = soirees.length
       ? `  <ul class="regarder-cartes">
 ${soirees.map((s) => `    <li class="regarder-carte" id="${ancreDeLaSoiree(s.match)}">
-      <h3 class="regarder-carte__nom">${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))}</h3>
+      <h3 class="regarder-carte__nom">${insignesDuMatch(s.match)}${aUnePage(s.match) ? `<a href="${cheminDuMatch(s.match)}">${e(nomCourt(s.match))}</a>` : e(nomCourt(s.match))}</h3>
       <p class="regarder-carte__lieu">${quand(s.match, { majuscule: true })} · ${e(s.match.competition)}${statutDuMatch(s.match, textes)}</p>
       ${offre(s.offre, textes)}
     </li>`).join('\n')}

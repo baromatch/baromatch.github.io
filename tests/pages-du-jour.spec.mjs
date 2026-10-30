@@ -242,6 +242,8 @@ for (const { chemin, feuille, ambre } of PAGES) {
         expect(lu).not.toMatch(/!|%/);
         expect(lu).not.toMatch(/\bvous\b|\bvotre\b|\bvos\b/i);
         expect(lu).not.toMatch(/Soir de Match/);
+        // L’appli ne coûte rien au fan, mais la boutique vend des pièces : jamais « tu ne paies rien à Baromatch ».
+        expect(lu).not.toMatch(/ne paies rien|ne payez rien/i);
         expect(lu).not.toMatch(/disponible sur Google Play|télécharge(?:r|z)? (?:l’appli )?sur Google Play/i);
         expect(lu).not.toMatch(/avis vérifiés?|affiche (?:QR|imprimée)|QR imprimé|notifications?/i);
         expect(lu).not.toMatch(/happy[\s-]*hour|tournée|verre offert|\b(?:bières?|pintes?|cocktails?|whisky|vodka|rhum|pastis|apéro|apéritif)\b/i);
@@ -270,3 +272,138 @@ test('/a-propos.html à 390 px : la bande de nuit tient sous 1 300 px, chaque l�
   const colonnes = await page.$$eval('.apropos__ecran', (li) => li.map((e) => Math.round(e.getBoundingClientRect().top)));
   expect(new Set(colonnes).size).toBe(1);
 });
+
+// ---------- Après relecture : le petit téléphone, la police qui arrive tard, les liens, les images ----------
+
+// L’iPhone SE (320 × 568) : le premier écran montre l’action. Sur Presse, l’icône s’efface et « Écrire pour la presse »
+// tient dans l’écran ; sur À propos, au moins la première entrée.
+test('iPhone SE (320 × 568) : le premier écran montre « Écrire pour la presse », et la première entrée d’À propos', async ({ page }) => {
+  await ouvrir(page, '/presse.html', 320, 568);
+  await expect(page.locator('.presse__icone')).toBeHidden();
+  expect((await page.locator('.presse__actions .capsule').boundingBox()).y + (await page.locator('.presse__actions .capsule').boundingBox()).height).toBeLessThanOrEqual(568);
+  await ouvrir(page, '/a-propos.html', 320, 568);
+  const premiere = await page.locator('.apropos__entrees li').first().boundingBox();
+  expect(premiere.y + premiere.height).toBeLessThanOrEqual(568);
+  // Dès 360 px, l’icône revient.
+  await ouvrir(page, '/presse.html', 360, 740);
+  await expect(page.locator('.presse__icone')).toBeVisible();
+});
+
+// La police retenue jusqu’au premier affichage, puis lâchée (comme tests/police.spec.mjs) : la page s’affiche dans la
+// police de secours, et quand Bricolage Grotesque arrive, rien ne bouge. Sous 360 px, chaque entrée d’À propos tient sur
+// deux lignes quelle que soit la police (avant, elle passait d’une à deux lignes : 0,003 sur un iPhone SE). À 390 px,
+// deux polices ne coupent jamais leurs lignes tout à fait aux mêmes pixels : 0,0001 au plus (mesuré 0,00004 et 0,00009).
+for (const { chemin } of PAGES) {
+  for (const [largeur, hauteur] of [[320, 568], [390, 844]]) {
+    test(`${chemin} à ${largeur} px : quand la police arrive tard, rien ne bouge (CLS ${largeur < 360 ? '0' : 'sous 0,0001'})`, async ({ browser, baseURL }) => {
+      const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: hauteur }, reducedMotion: 'reduce', locale: 'fr-FR' });
+      await contexte.addInitScript(() => {
+        window.decalages = [];
+        const garder = (entrees) => { for (const e of entrees) if (!e.hadRecentInput) window.decalages.push(e.value); };
+        window.observateurDesDecalages = new PerformanceObserver((liste) => garder(liste.getEntries()));
+        window.observateurDesDecalages.observe({ type: 'layout-shift', buffered: true });
+        window.relever = () => garder(window.observateurDesDecalages.takeRecords());
+      });
+      const onglet = await contexte.newPage();
+      let lacher;
+      const porte = new Promise((resoudre) => { lacher = resoudre; });
+      const retenues = [];
+      await onglet.route('**/fonts/*.woff2', (route) => { const envoi = porte.then(() => route.continue()); retenues.push(envoi); return envoi; });
+      try {
+        await onglet.goto(chemin, { waitUntil: 'domcontentloaded' });
+        await onglet.waitForFunction(() => performance.getEntriesByName('first-contentful-paint').length > 0);
+        expect(retenues.length).toBeGreaterThan(0);
+        lacher();
+        await onglet.waitForFunction(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
+        await onglet.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+        const total = await onglet.evaluate(() => { window.relever(); return window.decalages.reduce((t, v) => t + v, 0); });
+        if (largeur < 360) expect(total).toBe(0);
+        else expect(total).toBeLessThanOrEqual(0.0001);
+      } finally {
+        lacher();
+        await Promise.all(retenues);
+        await contexte.close();
+      }
+    });
+  }
+}
+
+// Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés) : 44 px de haut eux aussi.
+test('les liens pris dans une phrase des deux pages se touchent sur 44 px', async ({ page }) => {
+  const hauteurs = [];
+  for (const [chemin, selecteur] of [['/a-propos.html', '.apropos__rassure a, .apropos__note-carte a, .apropos__qui-publie a'], ['/presse.html', '.presse__police a, .presse__autre-format a, .presse__bar a']]) {
+    await ouvrir(page, chemin, 390);
+    hauteurs.push(...await page.$$eval(selecteur, (liens) => liens.map((a) => [a.textContent.trim(), Math.round(a.getBoundingClientRect().height)])));
+  }
+  expect(hauteurs.length).toBe(7);
+  expect(hauteurs.filter(([, h]) => h < 44)).toEqual([]);
+});
+
+// Les écrans de l’appli ne sont jamais agrandis : l’image chargée a au moins autant de pixels que sa place à l’écran,
+// à 320 px (deux par ligne sur Presse) comme avec le texte à 200 % (un par ligne, plus large).
+for (const pourcent of [100, 200]) {
+  test(`à 320 px (×2), texte à ${pourcent} % : chaque écran de l’appli est chargé assez grand pour sa place`, async ({ browser, baseURL }) => {
+    const contexte = await browser.newContext({ baseURL, viewport: { width: 320, height: 568 }, deviceScaleFactor: 2, reducedMotion: 'reduce' });
+    await contexte.addInitScript((p) => { document.addEventListener('DOMContentLoaded', () => { document.documentElement.style.fontSize = `${p}%`; }); }, pourcent);
+    const onglet = await contexte.newPage();
+    try {
+      for (const { chemin } of PAGES) {
+        await onglet.goto(chemin);
+        await chargerLesImages(onglet);
+        const ecrans = await onglet.$$eval('main img[src^="/img/appli/"]', (images) => images.map((img) => ({
+          // La largeur du fichier chargé, dite par son nom (-300 ou -600) : naturalWidth, lui, suit l’attribut sizes.
+          src: img.currentSrc.replace(/^.*\/img\//, ''), largeur: Number(img.currentSrc.match(/-(\d+)\.webp$/)[1]), place: Math.round(img.getBoundingClientRect().width * devicePixelRatio), haut: Math.round(img.getBoundingClientRect().top + scrollY),
+        })));
+        expect(ecrans.length, chemin).toBeGreaterThan(2);
+        expect(ecrans.filter((e) => e.largeur + 1 < e.place).map((e) => `${e.src} : ${e.largeur} px pour ${e.place}`), chemin).toEqual([]);
+        // Sur Presse, à 100 %, deux écrans par ligne.
+        if (chemin === '/presse.html' && pourcent === 100) expect(ecrans[0].haut).toBe(ecrans[1].haut);
+      }
+    } finally {
+      await contexte.close();
+    }
+  });
+}
+
+// La carte des couleurs à 320 px, texte à 200 % : le disque passe au-dessus de son texte, qui garde toute la largeur.
+test('Presse à 320 px, texte à 200 % : chaque disque de couleur est au-dessus de son nom', async ({ page }) => {
+  await ouvrir(page, '/presse.html', 320, 700);
+  await agrandir(page, 200);
+  const teintes = await page.$$eval('.presse__teintes li', (li) => li.map((l) => {
+    const disque = l.querySelector('.presse__disque').getBoundingClientRect();
+    const nom = l.querySelector('.presse__teinte-nom').getBoundingClientRect();
+    return disque.bottom <= nom.top + 0.5;
+  }));
+  expect(teintes).toEqual([true, true]);
+});
+
+// Le nombre de lignes d’un texte : ses morceaux de texte, regroupés quand ils se chevauchent en hauteur (un lien de
+// 44 px dans la ligne ne compte pas pour une ligne de plus).
+const lignesDe = (page, selecteur) => page.$$eval(selecteur, (elements) => elements.map((e) => {
+  const rects = [];
+  const parcours = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+  while (parcours.nextNode()) {
+    const plage = document.createRange();
+    plage.selectNodeContents(parcours.currentNode);
+    rects.push(...[...plage.getClientRects()].filter((r) => r.width > 0));
+  }
+  const lignes = [];
+  for (const r of rects.sort((a, b) => a.top - b.top)) {
+    const milieu = (r.top + r.bottom) / 2;
+    if (!lignes.some((l) => milieu > l.top && milieu < l.bottom)) lignes.push({ top: r.top, bottom: r.bottom });
+  }
+  return lignes.length;
+}));
+
+// L’adresse de la phrase de secours, d’un seul tenant dès 360 px ; les petites phrases sous les boutons de la fin
+// d’À propos, sur une ligne.
+for (const largeur of [320, 375, 390, 1280]) {
+  test(`à ${largeur} px : sous chaque bouton de la fin d’À propos, une ligne ; l’adresse de secours de Presse ${largeur >= 360 ? 'd’un seul tenant' : 'peut passer à la ligne'}`, async ({ page }) => {
+    await ouvrir(page, '/a-propos.html', largeur);
+    expect(await lignesDe(page, '.apropos__rassure')).toEqual([1, 1, 1]);
+    await ouvrir(page, '/presse.html', largeur);
+    const adresse = await page.locator('.presse__adresse').evaluate((e) => getComputedStyle(e).whiteSpace);
+    expect(adresse).toBe(largeur >= 360 ? 'nowrap' : 'normal');
+    if (largeur >= 360) expect(await lignesDe(page, '.presse__adresse')).toEqual([1]);
+  });
+}

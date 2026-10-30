@@ -38,6 +38,11 @@ const KO = 1024;
 // 29 octobre 2026, après relecture : styles.css gagne le contour du focus du jour, la semaine sans :has(), le point des
 // jours qui ont des bars et les longs jours (de 61,4 à 63,7 Ko) : le CSS de l’accueil et des pages fixes monte de 62 à
 // 65 Ko ; main.js retire la semaine toute passée (de 17,1 à 17,8 Ko) : le JS de l’accueil, de 17 à 18 Ko.
+// 30 octobre 2026 : « Pour les bars » passe au jour. pour-les-bars.css va de 24,3 à 28,6 Ko, styles.css est à 64,4 Ko
+// (l’accueil au jour, et l’étiquette des écrans et la page courante de l’en-tête du jour) ; aucun seuil ne bouge.
+// Mesuré ce jour-là (Ko) : accueil 6 requêtes, 177 transférés, JS 17,8, CSS 64,4, images 19 ; CGU 4, 147, 0, 64,4, 0 ;
+// pour les bars 7, 185, 64, 92,9 (styles.css et pour-les-bars.css), 0 (ses captures se chargent au défilement) ;
+// « Ce soir » 6, 150, 2, 80,9, 0 ; l’affiche de la semaine 6, 154, 0, 97,2, 0.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 185, js: 18, css: 65, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },

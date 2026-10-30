@@ -1,5 +1,5 @@
 {
- "_lisezMoi": "Copie du générateur d’insignes de l’appli Baromatch, écrite par generateur/outils/insignes/exporter.mjs : ne pas la modifier à la main. Elle est à jour tant que empreinteDesSources et empreinteDesDrapeaux sont celles des sources du dessin et des drapeaux de l’appli ; quand l’une ne correspond plus, on refait l’export. © Baromatch, tous droits réservés.",
+ "_lisezMoi": "Copie du générateur d’insignes de l’appli Baromatch, écrite par generateur/outils/insignes/exporter.mjs : ne pas la modifier à la main. Elle est à jour tant que empreinteDesSources et empreinteDesDrapeaux sont celles des sources du dessin et des drapeaux de l’appli ; quand l’une ne correspond plus, on refait l’export. © Baromatch, tous droits réservés, sauf glyphs.generated.mjs : contours des lettres de Bricolage Grotesque, sous licence SIL OFL 1.1 (fonts/LICENSE-OFL.txt).",
  "versionDeLAppli": "0.1.0",
  "typescript": "5.9.3",
  "renommage": "Dans la copie, un nom écrit en capitales qui finit par « _FROM » finit par « _AT » ; rien d’autre n’est renommé.",

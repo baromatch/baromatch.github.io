@@ -16,7 +16,10 @@
 //    chaque variante, avec le même code ;
 //  - si le fichier des empreintes des insignes est donné, redonner celles des insignes ;
 //  - donner les bandes des drapeaux exactement comme la table d’où elles viennent, dans le même ordre ;
-//  - ne contenir aucun commentaire, et passer le contrôle des documents publics (tests/outils/fuites.mjs).
+//  - ne contenir aucun commentaire, et passer le contrôle des documents publics (tests/outils/fuites.mjs) ;
+//  - n’avoir, dans le module de la table, que ses déclarations connues (TETE_DE_LA_TABLE) ;
+//  - n’avoir, dans aucun module copié, de chaîne de texte que la copie commitée (HEAD) n’a pas déjà : une chaîne nouvelle
+//    arrête l’export et s’affiche, jusqu’à ce qu’une personne la relise et l’accepte (--accepter-chaines).
 // Sinon rien n’est écrit, et la sortie dit pourquoi. Deux lancements sur les mêmes sources écrivent les mêmes octets.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -35,14 +38,15 @@ export const DONNEES_DES_TESTS = path.join(SITE, 'tests', 'donnees', 'insignes')
 // TypeScript, à une version fixée.
 export const VERSION_DE_TYPESCRIPT = '5.9.3';
 
-export const USAGE = `Usage : node generateur/outils/insignes/exporter.mjs --dessin <dossier> --drapeaux <fichier> --compile <fichier> --version <fichier> [--empreintes <fichier>] [--typescript <dossier>]
+export const USAGE = `Usage : node generateur/outils/insignes/exporter.mjs --dessin <dossier> --drapeaux <fichier> --compile <fichier> --version <fichier> [--empreintes <fichier>] [--typescript <dossier>] [--accepter-chaines]
   --dessin      le dossier des sources du dessin des insignes (ceux de ses modules que le site importe sont copiés)
   --drapeaux    le fichier source des bandes des drapeaux (seules ses données sont copiées)
   --compile     le module d’entrée du paquet compilé qui contient ce même dessin
   --version     le fichier de configuration de l’appli, qui porte sa version
   --empreintes  (facultatif) le fichier des empreintes des insignes, vérifiées sans être copiées
   --typescript  (facultatif) un dossier qui contient déjà TypeScript ${VERSION_DE_TYPESCRIPT} (node_modules/typescript) ; sans lui,
-                cette version est installée une fois, à part, dans le dossier temporaire de la machine`;
+                cette version est installée une fois, à part, dans le dossier temporaire de la machine
+  --accepter-chaines  (facultatif) accepte les chaînes de texte nouvelles des modules copiés, après les avoir relues`;
 
 // L’en-tête de chaque fichier copié. Les contours des lettres sont une partie de la police Bricolage Grotesque, changée
 // de format : ce fichier reste sous sa licence (SIL OFL 1.1, dont le texte est à côté des polices du site), avec la
@@ -70,6 +74,9 @@ export const CHAMPS = {
   },
   neutre: { slug: MOT, code: /^$/, colours: COULEURS, pattern: MOT, neutral: 'oui-non' },
 };
+// Le module de la table, une fois copié (ses types et la fonction « spec » disparaissent) : ses déclarations de tête,
+// exactement celles-ci ; une autre (une constante ajoutée, un import, une instruction), et rien n’est écrit.
+export const TETE_DE_LA_TABLE = ['NEUTRAL_BADGE', 'fallbackCode', 'fallbackBadgeSpec', 'CLUB_BADGE_SPECS', 'badgeSpecFor', 'CLUB_BADGE_SLUGS'];
 // Dans les sources, une fiche est un appel « spec(…) » : ses paramètres sont lus dans la signature de la fonction, et
 // seuls ceux de CHAMPS.fiche sont pris (les autres, ce que l’appli sait en plus du club, sont laissés). Ses réglages en
 // plus (EN_PLUS, un objet) et sa géographie ont aussi des champs que le dessin ne lit pas, laissés de côté (LAISSES) :
@@ -257,6 +264,43 @@ const commentaires = (ts, code) => {
   return [...trouves];
 };
 
+// Les déclarations de tête d’un module copié, par leur nom (une instruction sans nom : sa sorte, entre parenthèses).
+const declarationsDeTete = (ts, code) => ts.createSourceFile('module.mjs', code, ts.ScriptTarget.ES2020, true, ts.ScriptKind.JS).statements.map((instruction) => {
+  if (ts.isFunctionDeclaration(instruction) && instruction.name) return instruction.name.text;
+  const declarations = ts.isVariableStatement(instruction) ? instruction.declarationList.declarations : [];
+  if (declarations.length === 1 && ts.isIdentifier(declarations[0].name)) return declarations[0].name.text;
+  return `(${ts.SyntaxKind[instruction.kind]})`;
+});
+// Celles qui ne sont pas dans la liste connue.
+export const declarationsInconnues = (noms) => noms.filter((nom) => !TETE_DE_LA_TABLE.includes(nom));
+
+// Les chaînes de texte d’un module (chaînes, gabarits, expressions régulières), lues par l’analyseur de TypeScript.
+const chainesDe = (ts, code) => {
+  const trouvees = new Set();
+  const visiter = (noeud) => {
+    if (ts.isStringLiteral(noeud) || ts.isNoSubstitutionTemplateLiteral(noeud) || ts.isTemplateHead(noeud) || ts.isTemplateMiddle(noeud)
+      || ts.isTemplateTail(noeud) || ts.isRegularExpressionLiteral(noeud)) trouvees.add(noeud.text);
+    ts.forEachChild(noeud, visiter);
+  };
+  visiter(ts.createSourceFile('module.mjs', code, ts.ScriptTarget.ES2020, true, ts.ScriptKind.JS));
+  return trouvees;
+};
+// Les chaînes d’une copie qui ne sont pas dans une autre (la copie commitée), dans l’ordre.
+export const chainesNouvelles = (commitees, copiees) => {
+  const avant = new Set(commitees);
+  return [...new Set(copiees)].filter((chaine) => !avant.has(chaine)).sort();
+};
+// Les modules de la copie commitée (HEAD) : { nom du fichier : son texte } ; rien sans git ou sans copie.
+const copieCommitee = () => {
+  const git = (...args) => execFileSync('git', ['-C', SITE, ...args], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+  try {
+    return Object.fromEntries(git('ls-tree', '--name-only', 'HEAD', `${path.relative(SITE, SORTIE)}/`).split('\n').filter((f) => f.endsWith('.mjs'))
+      .map((f) => [path.basename(f), git('show', `HEAD:${f}`)]));
+  } catch {
+    return {};
+  }
+};
+
 // ---------- Ce qui est lu ----------
 
 export const lireLesSources = ({ dessin, drapeaux, compile, version, empreintes }) => {
@@ -378,7 +422,7 @@ const tableDesDrapeaux = (module) => Object.values(module).find((valeur) => vale
 
 // ---------- L’exportation ----------
 
-export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees = DONNEES_DES_TESTS }) => {
+export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees = DONNEES_DES_TESTS, accepterChaines = false }) => {
   const ts = chargerTypescript(typescript);
   const lu = lireLesSources(sources);
 
@@ -409,6 +453,17 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
       refuser('fonts/LICENSE-OFL.txt n’a plus la ligne de copyright citée par les contours des lettres');
     }
     for (const nom of copies) fichiers[`${nom}.mjs`] = `${nom === GLYPHES ? MENTION_DE_LA_POLICE : MENTION}\n${transpiles.get(nom).code}`;
+
+    // Le module de la table : ses seules déclarations connues.
+    if (!copies.includes('specs')) refuser('le module de la table (specs) n’est pas copié');
+    const inconnues = declarationsInconnues(declarationsDeTete(ts, transpiles.get('specs').code));
+    if (inconnues.length) refuser(`specs : des déclarations de tête inconnues (${inconnues.join(', ')})`);
+    // Les chaînes de texte : aucune que la copie commitée n’ait déjà, sauf acceptée après relecture.
+    const commitees = Object.values(copieCommitee()).flatMap((texte) => [...chainesDe(ts, texte)]);
+    const nouvelles = chainesNouvelles(commitees, copies.flatMap((nom) => [...chainesDe(ts, transpiles.get(nom).code)]));
+    if (nouvelles.length && !accepterChaines) {
+      refuser(`${nouvelles.length} chaîne(s) de texte nouvelle(s) dans les modules copiés ; relis-les, puis relance avec --accepter-chaines :\n${nouvelles.slice(0, 40).map((c) => `  « ${c.length > 120 ? `${c.slice(0, 120)}…` : c} »`).join('\n')}`);
+    }
 
     // Les drapeaux : les données seulement, dans l’ordre de leur table, lues dans le module transpilé à part (jamais
     // copié), puis comparées à leur table, ordre des clés compris.
@@ -452,7 +507,7 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
 
     // 3. La provenance, puis le contrôle des documents publics sur tout ce qui sera écrit.
     fichiers['provenance.json'] = json({
-      _lisezMoi: 'Copie du générateur d’insignes de l’appli Baromatch, écrite par generateur/outils/insignes/exporter.mjs : ne pas la modifier à la main. Elle est à jour tant que empreinteDesSources et empreinteDesDrapeaux sont celles des sources du dessin et des drapeaux de l’appli ; quand l’une ne correspond plus, on refait l’export. © Baromatch, tous droits réservés.',
+      _lisezMoi: 'Copie du générateur d’insignes de l’appli Baromatch, écrite par generateur/outils/insignes/exporter.mjs : ne pas la modifier à la main. Elle est à jour tant que empreinteDesSources et empreinteDesDrapeaux sont celles des sources du dessin et des drapeaux de l’appli ; quand l’une ne correspond plus, on refait l’export. © Baromatch, tous droits réservés, sauf glyphs.generated.mjs : contours des lettres de Bricolage Grotesque, sous licence SIL OFL 1.1 (fonts/LICENSE-OFL.txt).',
       versionDeLAppli: lu.version,
       typescript: VERSION_DE_TYPESCRIPT,
       renommage: RENOMMAGE,
@@ -478,7 +533,7 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
     mkdirSync(sortie, { recursive: true });
     mkdirSync(donnees, { recursive: true });
     for (const { cible, texte } of ecrits) writeFileSync(cible, texte);
-    return { version: lu.version, fichiers: Object.keys(fichiers).length, empreintes };
+    return { version: lu.version, fichiers: Object.keys(fichiers).length, empreintes, chainesAcceptees: nouvelles.length };
   } finally {
     rmSync(atelier, { recursive: true, force: true });
   }
@@ -489,6 +544,8 @@ const OPTIONS = ['dessin', 'drapeaux', 'compile', 'version', 'empreintes', 'type
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const options = {};
+  const accepterChaines = args.includes('--accepter-chaines');
+  if (accepterChaines) args.splice(args.indexOf('--accepter-chaines'), 1);
   for (let i = 0; i < args.length; i += 2) {
     const cle = args[i].replace(/^--/, '');
     if (!args[i].startsWith('--') || !OPTIONS.includes(cle) || args[i + 1] === undefined) {
@@ -499,8 +556,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   }
   const { typescript, ...sources } = options;
   try {
-    const { version, fichiers, empreintes } = await exporter({ sources, typescript });
-    console.log(`Insignes de l’appli ${version} : ${fichiers} fichiers écrits dans generateur/insignes/, le même dessin que le paquet compilé${empreintes ? `, ${empreintes} empreintes redonnées` : ''}.`);
+    const { version, fichiers, empreintes, chainesAcceptees } = await exporter({ sources, typescript, accepterChaines });
+    console.log(`Insignes de l’appli ${version} : ${fichiers} fichiers écrits dans generateur/insignes/, le même dessin que le paquet compilé${empreintes ? `, ${empreintes} empreintes redonnées` : ''}${chainesAcceptees ? `, ${chainesAcceptees} chaîne(s) nouvelle(s) acceptée(s)` : ''}.`);
   } catch (erreur) {
     if (!(erreur instanceof Refus)) throw erreur;
     console.error(`Rien n’est écrit : ${erreur.message}`);

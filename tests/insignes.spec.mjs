@@ -15,7 +15,7 @@ import { pathToFileURL } from 'node:url';
 import { blocDeLaSemaine, REPERES } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { clubDe, indexerLesClubs } from '../generateur/donnees.mjs';
-import { ecartsDeLaTable } from '../generateur/outils/insignes/exporter.mjs';
+import { chainesNouvelles, declarationsInconnues, ecartsDeLaTable, TETE_DE_LA_TABLE, USAGE } from '../generateur/outils/insignes/exporter.mjs';
 import { bandesDe, identifiantsUniques, insigne, paireDInsignes, TAILLES } from '../generateur/insigne.mjs';
 import { svgDeLaCarte } from '../generateur/partage.mjs';
 import * as badge from '../generateur/insignes/badge.mjs';
@@ -82,6 +82,26 @@ test.describe('la copie du générateur de l’appli', () => {
       expect(texte.slice(entete.length), fichier).not.toMatch(/^\s*\/\/|\/\*/m);
     }
     expect(readFileSync(path.join(COPIE, 'glyphs.generated.mjs'), 'utf8')).not.toContain('©');
+  });
+
+  test('la provenance met à part les contours des lettres, sous la licence de leur police', () => {
+    expect(PROVENANCE._lisezMoi).toMatch(/© Baromatch, tous droits réservés, sauf glyphs\.generated\.mjs : contours des lettres de Bricolage Grotesque, sous licence SIL OFL 1\.1 \(fonts\/LICENSE-OFL\.txt\)\.$/);
+  });
+
+  test('le module de la table n’a que ses déclarations connues ; une chaîne de texte nouvelle arrête l’export, jusqu’à ce qu’on l’accepte', () => {
+    // La table copiée : ses déclarations de tête (en début de ligne dans le code copié), exactement celles de la liste.
+    const table = readFileSync(path.join(COPIE, 'specs.mjs'), 'utf8');
+    const tete = [...table.matchAll(/^(?:export )?(?:const|let|var|function|class) ([A-Za-z_$][\w$]*)/gm)].map(([, nom]) => nom);
+    expect(tete.sort()).toEqual([...TETE_DE_LA_TABLE].sort());
+    expect(table).not.toMatch(/^import\b/m);
+    // Une déclaration hors de la liste est refusée.
+    expect(declarationsInconnues(TETE_DE_LA_TABLE)).toEqual([]);
+    expect(declarationsInconnues([...TETE_DE_LA_TABLE, 'NOTE_DE_RELECTURE', '(ExpressionStatement)'])).toEqual(['NOTE_DE_RELECTURE', '(ExpressionStatement)']);
+    // Les chaînes nouvelles par rapport à la copie commitée, chacune une fois, dans l’ordre ; aucune quand rien ne change.
+    expect(chainesNouvelles(['night', 'light'], ['light', 'à relire', 'night', 'à relire'])).toEqual(['à relire']);
+    expect(chainesNouvelles(['night', 'light'], ['light'])).toEqual([]);
+    // Les accepter demande une option explicite.
+    expect(USAGE).toMatch(/--accepter-chaines\s+\(facultatif\) accepte les chaînes de texte nouvelles des modules copiés, après les avoir relues/);
   });
 
   test('un seul renommage, une règle générale écrite dans la provenance : aucun nom en capitales n’y finit par « _FROM »', () => {

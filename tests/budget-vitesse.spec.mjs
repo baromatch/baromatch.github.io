@@ -67,20 +67,30 @@ const KO = 1024;
 // styles.css garde aussi les trois règles du jour de « Pour les bars » (l’étiquette des écrans, la page courante de
 // l’en-tête) : 72,5 Ko ; le CSS des affiches mesure 105,4 Ko (105,6 avant leur commentaire raccourci) : leur seuil
 // passe de 105 à 106.
+// 30 octobre 2026, les insignes des clubs (ceux de l’appli, generateur/insigne.mjs) : styles.css et regarder.css gagnent
+// leurs règles (0,7 Ko ; avec les règles de « Pour les bars », 89,8 Ko pour les pages générées, 106,2 avec affiche.css) :
+// le CSS des pages générées monte de 89 à 90 Ko, celui des affiches reste à 106. Le HTML gagne les dessins : mesuré, chaque page
+// générée du scénario de 2,4 à 5,9 Ko compressés (une paire de 30 px par ligne de match, deux insignes de 58 px en
+// tête d’un match) ; transférés, de 137 à 145 Ko, sous leurs seuils. L’accueil du scénario : 4,7 Ko de plus (6 cartes).
+// L’accueil d’une semaine pleine (la copie enregistrée des listes publiques : 25 matchs sur sept jours, 50 insignes) est
+// mesuré à part, le scénario n’en ayant que 6 : 164 Ko transférés sans les insignes, 182 avec (les insignes de l’appli
+// ajoutent environ 18 à 21 Ko compressés, surtout les tracés de leurs lettres) ; seuil 185. Lighthouse au téléphone
+// reste à 99-100 sur l’accueil réel.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
+  { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 185, js: 18, css: 73, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 176, js: 67, css: 103, images: 4 } },
-  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 89, images: 4 } },
-  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 145, js: 4, css: 89, images: 6 } },
-  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
+  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 90, images: 4 } },
+  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 145, js: 4, css: 90, images: 6 } },
+  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
   { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
   { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
 ];
@@ -134,15 +144,22 @@ test.beforeAll(async () => {
     sites.push({ dossier });
     await construireLeSiteDExemple(dossier, { rendu: null, marque });
     sites.at(-1).serveur = await demarrerServeur(await portLibre(), -1, { dossier });
+    // L’accueil d’une vraie semaine : la copie enregistrée des listes publiques, 25 matchs sur ses sept jours.
+    const plein = mkdtempSync(path.join(tmpdir(), 'budget-vitesse-'));
+    sites.at(-1).plein = { dossier: plein };
+    await construireLeSiteDExemple(plein, { source: `capture:${path.join(racine, 'tests', 'donnees', 'capture')}`, maintenant: Date.parse('2026-10-15T19:44:29Z'), rendu: null, marque });
+    sites.at(-1).plein.serveur = await demarrerServeur(await portLibre(), -1, { dossier: plein });
   }
 });
 // Un même processus de test peut repasser par ce fichier (tests en parallèle : un second lot de ses tests, après un autre
 // fichier) : beforeAll repart alors d’une liste vide, sinon sites[rang] serait encore un serveur arrêté par afterAll
 // (« net::ERR_CONNECTION_REFUSED », vu une fois sous charge).
 test.afterAll(async () => {
-  for (const { dossier, serveur } of sites) {
+  for (const { dossier, serveur, plein } of sites) {
     await serveur?.arreter();
     rmSync(dossier, { recursive: true, force: true });
+    await plein?.serveur?.arreter();
+    if (plein) rmSync(plein.dossier, { recursive: true, force: true });
   }
   sites.length = 0;
 });
@@ -150,7 +167,7 @@ test.afterAll(async () => {
 for (const [rang, { nom, marque, plus }] of MESURES.entries()) {
   for (const page of PAGES) {
     test(`${page.nom}, ${nom} : dans son budget sur un téléphone`, async ({ browser }) => {
-      const origine = sites[rang].serveur.adresse;
+      const origine = (page.semainePleine ? sites[rang].plein : sites[rang]).serveur.adresse;
       const { ressources, ratees, scriptsBloquants } = await mesurer(browser, `${origine}${page.chemin}`);
       expect(ratees).toEqual([]);
       const mesure = {

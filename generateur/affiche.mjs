@@ -21,6 +21,7 @@ import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
 import { fil, page } from './gabarits.mjs';
+import { paireDInsignes } from './insigne.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { adresseDe, cheminDeLaVille, cheminDuBar, debutDe, filDAriane, pageWeb } from './jsonld.mjs';
 import { description as decrire, SEMAINE_JOURS, titre as intituler } from './pages.mjs';
@@ -81,9 +82,10 @@ export const VERRE = '<svg class="affiche-verre" viewBox="0 0 200 200" aria-hidd
 // L’heure d’une ligne : « 20:45 » ; une heure provisoire n’est pas écrite (« Heure à confirmer »).
 const heureDeLaLigne = (m) => `<time class="affiche-heure${m.heureConfirmee ? '' : ' affiche-heure--a-confirmer'}" datetime="${debutDe(m)}">${e(m.heureConfirmee ? heureDeParis(m.debut) : TEXTES_DES_AFFICHES.feuille.heureAConfirmer)}</time>`;
 
-// Une ligne : l’heure, le match, la compétition. cochable : une case la précède, et l’étiquette est la ligne entière.
+// Une ligne : l’heure, le match (ses deux insignes, sur le papier de l’affiche : fond clair, puis son nom), la
+// compétition. cochable : une case la précède, et l’étiquette est la ligne entière.
 const ligne = (m, { cochable }) => {
-  const texte = `${heureDeLaLigne(m)} <span class="affiche-match">${e(nomCourt(m))}</span> <span class="affiche-competition">${e(m.competition)}</span>`;
+  const texte = `${heureDeLaLigne(m)} <span class="affiche-match">${paireDInsignes(m.domicile, m.exterieur, { fond: 'light' })}${e(nomCourt(m))}</span> <span class="affiche-competition">${e(m.competition)}</span>`;
   if (!cochable) return `      <li class="affiche-ligne"><span class="affiche-ligne__texte">${texte}</span></li>`;
   const id = `affiche-${m.slug}`;
   return `      <li class="affiche-ligne"><input class="affiche-case" type="checkbox" id="${id}" aria-describedby="jour-${jourDeParis(m.debut)}"><label class="affiche-ligne__texte" for="${id}">${texte}</label></li>`;

@@ -86,10 +86,12 @@
 label.affiche-ligne__texte { cursor: pointer; }
 .affiche-heure { grid-area: heure; white-space: nowrap; font-size: 1.5rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
 .affiche-heure--a-confirmer { align-self: center; white-space: normal; font-size: 0.8125rem; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
-.affiche-match { grid-area: match; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
+/* Les insignes devant le nom, ou au-dessus quand la place manque. */
+.affiche-match { grid-area: match; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; overflow-wrap: anywhere; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
 .affiche-competition { grid-area: competition; color: var(--encre-douce); font-size: 0.875rem; font-weight: 600; }
+/* La compétition : 40 % au plus (texte agrandi). */
 @media (min-width: 720px) {
-  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) auto; grid-template-areas: "heure match competition"; }
+  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(40%); grid-template-areas: "heure match competition"; }
   .affiche-competition { text-align: right; }
 }
 /* Ce qui sera imprimé : la ligne cochée surlignée ; dès qu’une case est cochée, les autres pâlissent. */

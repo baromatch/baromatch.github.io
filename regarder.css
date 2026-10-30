@@ -59,6 +59,8 @@
 }
 
 .regarder-affiche { margin: 0; color: var(--texte-doux); font-size: 1.125rem; }
+/* Les insignes de l’en-tête d’un match (les deux clubs) ou d’un club : 58 px chacun, comme dans l’appli. */
+.regarder-insignes { display: flex; gap: 12px; margin: 0 0 14px; }
 
 .regarder-quand {
   margin: 16px 0 0;
@@ -174,6 +176,8 @@
 .regarder-carte p { margin: 0; }
 
 .regarder-carte__nom { margin: 0 0 4px; font-size: 1.1875rem; font-weight: 700; line-height: 1.25; }
+/* Un club et son insigne (l’agenda), un match et ses insignes (les soirées d’un bar). */
+.regarder-carte__nom:has(> .insigne, > .insignes) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
 /* Les liens des cartes, des listes de matchs et de retour : 44 px de haut à toucher du doigt. */
 .regarder-carte__nom a { display: inline-block; padding: 10px 0; color: var(--texte); text-decoration-color: var(--ambre); }
 .regarder-carte__nom a:hover { color: var(--goutte); }
@@ -214,9 +218,9 @@
 .regarder-matchs li { padding: 4px 0 12px; border-bottom: 1px solid var(--trait); line-height: 1.5; }
 .regarder-matchs li:last-child { border-bottom: 0; }
 .regarder-matchs a { display: inline-block; padding: 10px 0; font-weight: 650; }
-/* Le match, seul sur sa ligne : un lien de 44 px de haut (ou son nom, sans page) ; dessous, ses détails (l’heure, la
-   compétition, les bars), en texte discret. */
-.regarder-matchs .regarder-matchs__match { display: block; box-sizing: border-box; width: fit-content; max-width: 100%; min-height: 44px; padding: 10px 0; font-weight: 650; }
+/* Le match, seul sur sa ligne : un lien de 44 px de haut (ou son nom, sans page), ses deux insignes devant (la paire de
+   l’appli, 64 × 30) ; dessous, ses détails (l’heure, la compétition, les bars), en texte discret. */
+.regarder-matchs .regarder-matchs__match { display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: fit-content; max-width: 100%; min-height: 44px; padding: 10px 0; font-weight: 650; }
 .regarder-matchs__infos { display: block; color: var(--texte-doux); }
 .regarder-matchs__infos time { color: var(--texte); }
 .regarder-matchs time { font-weight: 650; }

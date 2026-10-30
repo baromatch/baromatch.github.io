@@ -3,6 +3,7 @@
 // et le bouton de la liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… pas encore ouverte »).
 // La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque.
 import { test, expect } from '@playwright/test';
+import { arreterLHorloge, auJourDeLAccueil } from './outils/horloge.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
@@ -193,9 +194,17 @@ const lireLeFilm = (page) => page.locator('#film').evaluate((v) => ({ enPause: v
 // Deux images peintes : l’observateur de défilement a parlé.
 const deuxImages = (page) => page.evaluate(() => new Promise((suite) => requestAnimationFrame(() => requestAnimationFrame(suite))));
 
-for (const largeur of [360, 1280]) {
-  test(`à ${largeur} px : le bouton du film l’arrête au clavier, juste après les matchs de la semaine, et la pause tient en revenant au film`, async ({ page }) => {
+// L’ordre du clavier est celui du HTML, choisi pour le téléphone : l’inscription, les matchs de la semaine, puis le
+// film. Sur ordinateur, le film est affiché à droite, au-dessus des matchs (styles.css, .ouverture > .semaine) : il vient
+// quand même au clavier après eux. Le test garde cet ordre voulu aux deux largeurs, chacune sous son nom.
+for (const [largeur, nom] of [
+  [360, 'au téléphone (360 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, affichés au-dessus de lui'],
+  [1280, 'sur ordinateur (1280 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, bien que le film soit affiché au-dessus d’eux (l’ordre suit le téléphone)'],
+]) {
+  test(`${nom} ; la pause tient en revenant au film`, async ({ page }) => {
     await simulerUnLecteur(page);
+    // Le jour du bloc enregistré : une semaine après, la barre des jours et ses cartes s’effacent (main.js).
+    await auJourDeLAccueil(page);
     await page.setViewportSize({ width: largeur, height: 800 });
     await page.goto('/');
     const lecture = page.locator('#film-lecture');
@@ -204,11 +213,14 @@ for (const largeur of [360, 1280]) {
     await expect(lecture).toBeVisible();
     await expect(lecture).toHaveAccessibleName('Mettre le film en pause');
     await expect(lecture).not.toHaveAttribute('aria-pressed', /.*/);
-    // Au clavier : juste après le dernier lien des matchs du jour choisi (sous la liste d’attente : au téléphone, le film
-    // vient après eux), dans le cadre du film.
+    // Au clavier : juste après le dernier lien des matchs du jour choisi, dans le cadre du film.
     await page.locator('#semaine').locator('a:visible, input:checked').last().focus();
     await page.keyboard.press('Tab');
     await expect(lecture).toBeFocused();
+    // Ce que chaque largeur affiche : au téléphone, le film sous les matchs ; sur ordinateur, au-dessus d’eux.
+    const [film, matchs] = await Promise.all([page.locator('#film-cadre').boundingBox(), page.locator('#semaine').boundingBox()]);
+    if (largeur < 960) expect(film.y).toBeGreaterThan(matchs.y + matchs.height);
+    else expect(film.y + film.height).toBeLessThan(matchs.y);
     const [boite, cadre] = await Promise.all([lecture.boundingBox(), page.locator('#film-cadre').boundingBox()]);
     expect(boite.width).toBeGreaterThanOrEqual(44);
     expect(boite.height).toBeGreaterThanOrEqual(44);
@@ -456,10 +468,11 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   });
   // Les heures avancent, comme la soirée.
   expect(lus.map((m) => m.heure)).toEqual([...lus.map((m) => m.heure)].sort());
-  // Rien d’autre ne promet les notifications : au plus une par match, et la ligne calme d’une heure avant.
-  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass. Pour le reste, au plus une notification par match.');
+  // Seule la ligne calme d’une heure avant, que le téléphone pose lui-même : aucune notification du serveur n’est
+  // promise (elles n’arrivent pas sur Android dans la version de test), et le mot n’est nulle part dans la soirée.
+  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass.');
   const soiree = normaliser(await page.locator('.soiree').innerText());
-  expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone/i);
+  expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone|notification/i);
 });
 
 test('les écrans de la soirée ne se chargent qu’en approchant, sans rien faire bouger', async ({ page }) => {
@@ -522,9 +535,17 @@ test('sur ordinateur, l’écran à côté des moments suit la lecture : celui d
 
 // « Maintiens pour essayer » : le geste de l’appli, sur la page. Il se tient au clavier (Espace) comme au doigt ; lâché
 // avant 1,4 s, il se vide ; rien n’est envoyé.
+// L’horloge de la page est arrêtée (page.clock) : seul runFor fait passer le temps du geste. En temps réel, le temps
+// tenu était celui que la machine mettait entre keydown et keyup : sur une machine très chargée, les 300 ms (ou les huit
+// répétitions de 100 ms, plus bas) duraient plus de 1,4 s, la touche était vraiment tenue jusqu’au bout, et le verre se
+// remplissait, à juste titre, avant le lâcher.
+const HORLOGE_DU_GESTE = Date.UTC(2026, 9, 29, 18, 0);
+const TENIR_MS = 1400;
+
 test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » ; lâché trop tôt, il se vide ; rien ne part', async ({ page }) => {
   const envois = [];
   page.on('request', (r) => { if (r.method() !== 'GET') envois.push(r.url()); });
+  await arreterLHorloge(page, HORLOGE_DU_GESTE);
   await page.goto('/');
   const bouton = page.locator('#essai-bouton');
   const note = page.locator('#essai-note');
@@ -534,19 +555,26 @@ test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » 
   await expect(note).toHaveAttribute('role', 'status');
   await bouton.focus();
   await page.keyboard.down(' ');
-  await page.waitForTimeout(300);
+  await page.clock.runFor(300);
   await page.keyboard.up(' ');
   await expect(note).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
   // Lâché, il ne se remplit pas plus tard.
-  await page.waitForTimeout(1600);
+  await page.clock.runFor(1600);
   await expect(bouton).not.toHaveClass(/est-plein/);
   await expect(bouton).toHaveText('Maintiens pour essayer');
+  // Tenu : pas plein à 1 ms près, plein à 1,4 s.
   await page.keyboard.down(' ');
-  await expect(bouton).toHaveText('Place gardée.', { timeout: 3000 });
+  await page.clock.runFor(TENIR_MS - 1);
+  await expect(bouton).not.toHaveClass(/est-plein/);
+  await expect(bouton).toHaveText('Maintiens pour essayer');
+  await page.clock.runFor(1);
+  await expect(bouton).toHaveText('Place gardée.');
   await page.keyboard.up(' ');
   await expect(note).toHaveText('C’était un essai : rien n’est réservé.');
-  expect(await bouton.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe('rgb(255, 177, 61)');
-  await expect(bouton).toHaveText('Maintiens pour essayer', { timeout: 6000 });
+  // Le fond passe à l’ambre par une transition CSS, en temps réel : l’assertion attend sa fin.
+  await expect(bouton).toHaveCSS('background-color', 'rgb(255, 177, 61)');
+  await page.clock.runFor(3500);
+  await expect(bouton).toHaveText('Maintiens pour essayer');
   expect(envois).toEqual([]);
 });
 
@@ -569,18 +597,19 @@ test('« Maintiens pour essayer » avec un lecteur d’écran : un clic sans poi
 // avant 1,4 s, le verre se vide, comme au doigt.
 for (const touche of [' ', 'Enter']) {
   test(`« Maintiens pour essayer » : ${touche === ' ' ? 'Espace' : 'Entrée'} tenue avec ses répétitions, lâchée trop tôt, ne remplit rien`, async ({ page }) => {
+    await arreterLHorloge(page, HORLOGE_DU_GESTE);
     await page.goto('/');
     const bouton = page.locator('#essai-bouton');
     await bouton.scrollIntoViewIfNeeded();
     await bouton.focus();
     await page.keyboard.down(touche);
     for (let i = 0; i < 8; i += 1) {
-      await page.waitForTimeout(100);
+      await page.clock.runFor(100);
       await page.keyboard.down(touche);
     }
     await page.keyboard.up(touche);
     await expect(page.locator('#essai-note')).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
-    await page.waitForTimeout(1600);
+    await page.clock.runFor(1600);
     await expect(bouton).not.toHaveClass(/est-plein/);
     await expect(bouton).toHaveText('Maintiens pour essayer');
   });

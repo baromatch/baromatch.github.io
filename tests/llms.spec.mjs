@@ -62,6 +62,11 @@ test('les faits qui évitent les erreurs : ce que Baromatch est, ce qu’il n’
   expect(texte).not.toMatch(/pronostic/i);
   expect(texte).toContain('Baromatch n’est pas un diffuseur');
   expect(texte).toContain('Baromatch ne vend pas d’alcool.');
+  // Les clubs : nommés en texte, et sur l’accueil, chacun avec un disque à ses deux couleurs (les cartes des matchs de la
+  // semaine) ; jamais un écusson ni un logo.
+  expect(texte).not.toContain('en texte seulement');
+  expect(texte).toContain('chaque club a aussi un disque à ses deux couleurs');
+  expect(texte).toContain('Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.');
   expect(texte).toContain('L’appli est gratuite pour les fans.');
   expect(texte).toContain('en test sur Android, à Paris');
   if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle n’est pas encore ouverte au public');

@@ -798,6 +798,77 @@ test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
   }
 });
 
+// ---------- Les noms des clubs dans leur carte, le texte à 100 et à 200 % ----------
+
+// Chaque nom de club des cartes visibles, mesuré sur son texte (une plage) : son bord droit, le début de la colonne de la
+// flèche, le bord intérieur de la carte ; et la paire d’insignes, à côté des noms (à gauche) ou au-dessus.
+const lireLesNoms = (page) => page.evaluate(() => [...document.querySelectorAll('#semaine .carte-match')].filter((c) => c.checkVisibility()).flatMap((carte) => {
+  const lien = carte.querySelector('.carte-match__clubs');
+  const style = getComputedStyle(carte);
+  const bord = carte.getBoundingClientRect().right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+  const pistes = getComputedStyle(lien).gridTemplateColumns.split(' ').map(parseFloat);
+  const fleche = lien.getBoundingClientRect().right - pistes.at(-1);
+  const paire = lien.querySelector('.insignes').getBoundingClientRect();
+  return [...carte.querySelectorAll('.carte-match__club')].map((club) => {
+    const plage = document.createRange();
+    plage.selectNodeContents(club);
+    const lignes = [...plage.getClientRects()].filter((r) => r.width > 0);
+    const gauche = Math.min(...lignes.map((r) => r.left));
+    const droite = Math.max(...lignes.map((r) => r.right));
+    return { nom: club.textContent, surLaFleche: Math.round(droite - fleche), horsDeLaCarte: Math.round(droite - bord), aCote: paire.right <= gauche, dessus: paire.bottom <= Math.min(...lignes.map((r) => r.top)) };
+  });
+}));
+// Chaque jour de la barre, l’un après l’autre : les noms de ses cartes visibles.
+const lireChaqueJour = async (page) => {
+  const jours = page.locator('#semaine .semaine__date');
+  const lus = [];
+  for (let i = 0; i < await jours.count(); i += 1) {
+    await jours.nth(i).click();
+    lus.push(...await lireLesNoms(page));
+  }
+  return lus;
+};
+// Des noms longs, d’un seul mot pour la plupart (ceux qui sortaient de leur carte à 320 et 360 px, texte à 200 %).
+const NOMS_LONGS = [['leverkusen', 'Leverkusen'], ['strasbourg', 'Strasbourg'], ['newcastle', 'Newcastle'], ['bodo-glimt', 'Bodø/Glimt'], ['olympiacos', 'Olympiacos'],
+  ['nordsjaelland', 'Nordsjælland'], ['guadalajara', 'Guadalajara'], ['galatasaray', 'Galatasaray'], ['fenerbahce', 'Fenerbahçe'], ['hearts', 'Heart of Midlothian']];
+const MATCHS_AUX_NOMS_LONGS = Array.from({ length: NOMS_LONGS.length / 2 }, (_, i) => {
+  const [[a, nomA], [b, nomB]] = NOMS_LONGS.slice(i * 2, i * 2 + 2);
+  return unMatch({ slug: `${a}-${b}-2026-10-${29 + (i % 2)}`, debut: `2026-10-${29 + (i % 2)}T${17 + i}:00:00Z`, domicile: club(a, nomA), exterieur: club(b, nomB), competition: 'Ligue Europa' });
+});
+
+test.describe('les noms des clubs d’une carte, à 100 et 200 %', () => {
+  for (const largeur of [320, 360, 390, 412]) {
+    test(`à ${largeur} px : chaque nom tient dans sa colonne, avant la flèche, et dans sa carte ; à 100 %, la paire reste à côté des noms`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.setViewportSize({ width: largeur, height: 800 });
+      const essai = accueilAvecLaSemaine(ACCUEIL, bloc({ matchs: MATCHS_AUX_NOMS_LONGS }));
+      const lu = {};
+      // L’accueil tel qu’il est (sa semaine), puis l’accueil avec une semaine aux noms longs.
+      for (const [quoi, ouvrir] of [
+        ['l’accueil', async () => { await auJourDeLAccueil(page); await page.goto('/'); }],
+        ['les noms longs', async () => {
+          await page.clock.setFixedTime(new Date(JEUDI));
+          await page.route((adresse) => adresse.pathname === '/', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: essai }));
+          await page.goto('/');
+        }],
+      ]) {
+        await ouvrir();
+        await page.evaluate(() => document.fonts.ready);
+        for (const pourcent of [100, 200]) {
+          await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          lu[`${quoi}, ${pourcent} %`] = await lireChaqueJour(page);
+        }
+      }
+      expect(lu['les noms longs, 200 %'].map((n) => n.nom)).toEqual(expect.arrayContaining(['Nordsjælland', 'Olympiacos', 'Bodø/Glimt']));
+      for (const [cas, noms] of Object.entries(lu)) {
+        expect(noms.filter((n) => n.surLaFleche > 0 || n.horsDeLaCarte > 0).map((n) => `${n.nom} : +${n.surLaFleche} px sur la flèche, +${n.horsDeLaCarte} px hors de la carte`), cas).toEqual([]);
+        // À 100 % (où tout tient), la carte reste comme elle est : la paire à gauche des noms.
+        if (cas.endsWith('100 %')) expect(noms.filter((n) => !n.aCote).map((n) => n.nom), cas).toEqual([]);
+      }
+    });
+  }
+});
+
 // ---------- Le contraste des petits textes, peints sur le clair ----------
 
 // La mesure (chaque élément qui porte du texte visible, hors des moments de nuit : sa couleur posée sur son vrai fond,

@@ -1461,6 +1461,15 @@ a:hover { color: var(--goutte); }
 .carte-match__bas a { position: relative; z-index: 1; }
 .carte-match__clubs:hover .carte-match__club { text-decoration: underline; }
 .carte-match__club { grid-column: 2; display: flex; align-items: center; min-height: 28px; }
+/* Une carte de moins de 14 rem (le texte agrandi ; à 100 %, elle en a plus de 15 dès 320 px) : la paire au-dessus des
+   noms, qui prennent sa place. */
+.carte-match { container-type: inline-size; }
+@container (max-width: 14rem) {
+  .carte-match__clubs { grid-template-columns: minmax(0, 1fr) auto; }
+  .carte-match__clubs > .insignes { grid-area: 1 / 1; }
+  .carte-match__club { grid-column: 1; }
+  .carte-match__clubs::after { grid-area: 1 / 2 / 4; }
+}
 /* Les insignes des clubs (generateur/insigne.mjs) : à leur taille, jamais étirés ; une paire qui compte une sélection,
    deux dessins à 4 px. */
 .insigne, .insignes { display: block; flex: none; }

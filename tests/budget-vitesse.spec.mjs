@@ -38,10 +38,17 @@ const KO = 1024;
 // 29 octobre 2026, après relecture : styles.css gagne le contour du focus du jour, la semaine sans :has(), le point des
 // jours qui ont des bars et les longs jours (de 61,4 à 63,7 Ko) : le CSS de l’accueil et des pages fixes monte de 62 à
 // 65 Ko ; main.js retire la semaine toute passée (de 17,1 à 17,8 Ko) : le JS de l’accueil, de 17 à 18 Ko.
+// 30 octobre 2026 : À propos et Presse et partenariats passent au jour, chacune avec sa feuille, chargée seulement par
+// elle (a-propos.css 10,8 Ko, presse.css 13,7 Ko), comme « Pour les bars » : elles ont leur propre budget, un peu
+// au-dessus de leur mesure (À propos : 5 requêtes, 149 Ko transférés, CSS 72 Ko, aucune image au premier écran ;
+// Presse : 8, 156, CSS 75, images 22, l’icône et les trois logos en SVG). styles.css perd les règles de l’ancienne page
+// Presse (de 63,9 à 61,2 Ko) : le seuil des pages fixes ne bouge pas.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 185, js: 18, css: 65, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
+  { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 6, transfere: 158, js: 0, css: 74, images: 2 } },
+  { nom: 'Presse et partenariats', chemin: '/presse.html', budget: { requetes: 9, transfere: 165, js: 0, css: 77, images: 26 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 260, js: 68, css: 97, images: 72 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
   { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },

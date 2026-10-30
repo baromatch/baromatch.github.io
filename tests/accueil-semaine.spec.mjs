@@ -340,13 +340,24 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     await expect(semaine.locator('.carte-match:visible .carte-match__clubs').first()).toBeFocused();
   });
 
-  test('lu deux jours plus tard (un passage manqué) : plus d’« Aujourd’hui » ni de « Demain », les jours passés s’effacent', async ({ page }) => {
+  test('lu deux jours plus tard (un passage manqué) : plus d’« Aujourd’hui » ni de « Demain », les jours passés s’effacent ; un jour choisi passé laisse la place au premier jour restant qui a des matchs', async ({ page }) => {
     const semaine = await ouvrir(page, { quand: Date.parse('2026-10-25T10:00:00Z') });
     await expect(semaine.locator('.semaine__date:visible b')).toHaveText(['dim. 25', 'lun. 26', 'mar. 27', 'mer. 28', 'jeu. 29']);
     await expect(semaine.getByRole('radio', { name: /dim\. 25/ })).toBeChecked();
     await expect(visibles(semaine)).toHaveText(['Le Havre – Auxerre', 'PSG – OL']);
     await expect(semaine).not.toContainText('Aujourd’hui');
     await expect(semaine).not.toContainText('Demain');
+    // Lu le mardi 27, un jour sans match : comme le générateur ce jour-là, le premier jour restant qui a des matchs est
+    // choisi (mercredi 28), pas un panneau « Pas de match annoncé ». Mardi reste dans la barre.
+    const mardi = await ouvrir(page, { quand: Date.parse('2026-10-27T10:00:00Z') });
+    await expect(mardi.getByRole('radio', { name: /mer\. 28/ })).toBeChecked();
+    await expect(mardi.getByRole('radio', { name: /mar\. 27/ })).not.toBeChecked();
+    await expect(mardi.locator('.semaine__date:visible b')).toHaveText(['mar. 27', 'mer. 28', 'jeu. 29']);
+    await expect(visibles(mardi)).toHaveText(['OM – Nice']);
+    // Lu le jeudi 29, le dernier jour : plus aucun jour restant n’a de match, ce jour-là est choisi, et le dit.
+    const jeudi = await ouvrir(page, { quand: Date.parse('2026-10-29T10:00:00Z') });
+    await expect(jeudi.getByRole('radio', { name: /jeu\. 29/ })).toBeChecked();
+    await expect(jeudi.locator('.semaine__rien:visible')).toHaveText(textes.accueil.rienCeJour);
   });
 
   test('lu sept ou huit jours plus tard (le générateur arrêté) : aucun jour passé ne reste, la barre et ses cartes s’en vont', async ({ page }) => {

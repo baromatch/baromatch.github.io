@@ -381,8 +381,9 @@ document.addEventListener("click", function (evenement) {
 
 /* Les matchs de la semaine : le générateur les écrit pour le jour de son passage (data-aujourdhui). Lus un autre jour
    (un passage manqué), « Aujourd’hui » et « Demain » redeviennent des dates (data-date), et les jours passés s’effacent,
-   avec leurs matchs. Si tous les jours sont passés (le générateur arrêté une semaine), la barre et ses cartes s’en vont :
-   restent le titre, la phrase et « Toute la semaine ». Le jour de Paris se lit en parties (année, mois, jour). */
+   avec leurs matchs ; si le jour choisi en était, le premier jour restant qui a des matchs est choisi, comme le fait le
+   générateur (sinon le premier restant). Si tous les jours sont passés (le générateur arrêté une semaine), la barre et
+   ses cartes s’en vont : restent le titre, la phrase et « Toute la semaine ». Le jour de Paris se lit en parties. */
 (function () {
   var semaine = document.querySelector("[data-aujourdhui]");
   if (!semaine) return;
@@ -404,5 +405,10 @@ document.addEventListener("click", function (evenement) {
     semaine.hidden = true;
     return;
   }
-  if (!restants.some(function (choix) { return choix.checked; })) restants[0].checked = true;
+  if (restants.some(function (choix) { return choix.checked; })) return;
+  var choisi = restants[0];
+  for (var i = restants.length - 1; i >= 0; i -= 1) {
+    if (semaine.querySelector('.semaine__jour[data-jour="' + restants[i].value + '"] .semaine__cartes')) choisi = restants[i];
+  }
+  choisi.checked = true;
 })();

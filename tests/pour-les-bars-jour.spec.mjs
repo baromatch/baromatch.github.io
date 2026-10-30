@@ -274,7 +274,8 @@ test.describe('le jour posé', () => {
   // du bouton survolé, lu dans le style et vérifié peint : le pixel du bord intérieur du bouton est bien ce fond.
   test('« Proposer mon bar » survolé reste lisible : 4,5:1 au moins sur le fond du bouton survolé, chacun des trois', async ({ page }) => {
     await ouvrir(page, 1280);
-    const boutons = page.getByRole('link', { name: 'Proposer mon bar', exact: true });
+    // Les trois boutons ; les liens discrets des moments ont le survol des liens (le gris du texte), sans fond.
+    const boutons = page.locator(':is(.capsule, .bouton-nuit)', { hasText: 'Proposer mon bar' });
     await expect(boutons).toHaveCount(3);
     for (let i = 0; i < 3; i += 1) {
       const bouton = boutons.nth(i);

@@ -131,6 +131,8 @@
 .moment__liste li { position: relative; padding-left: 22px; color: var(--texte-doux); }
 .moment__liste li::before { content: ""; position: absolute; left: 2px; top: 0.62em; width: 8px; height: 8px; border-radius: 50%; background: var(--texte-discret); }
 .moment__liste strong { color: var(--texte); font-weight: 700; }
+/* Au bout de chaque moment, le même chemin vers le formulaire : un lien, pas un bouton (l’ambre reste aux trois boutons). */
+.moment__suite { margin: 18px 0 0; }
 .moment__visuel { width: 100%; max-width: 360px; margin: 12px auto 0; }
 .moment__visuel--duo { max-width: 520px; }
 .moment__visuel--console { max-width: 640px; }

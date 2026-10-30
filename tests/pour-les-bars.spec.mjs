@@ -588,14 +588,25 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
   });
 
-  // Un seul bouton principal, « Proposer mon bar », trois fois, pas plus (la relecture « trois visiteurs » : quatre, c’est
-  // de la pression) : en haut, après ce que ça change, dans la bande ambre. Puis le formulaire. Le « + » des places de la
-  // salle n’est pas ambre : en haut de la page, seul le bouton l’est.
-  test('« Proposer mon bar » trois fois : en haut, après ce que ça change, dans la bande ambre ; en haut, rien d’autre n’est ambre plein', async ({ page }) => {
+  // Un seul formulaire, qu’on rejoint depuis chaque moment (la décision du propriétaire) : un bouton principal,
+  // « Proposer mon bar », trois fois (en haut, après ce que ça change, dans la bande ambre), et au bout de chacun des
+  // quatre moments le même chemin, en lien discret (ni fond ni ambre, une cible de 44 px), pour le patron convaincu en
+  // chemin. Puis le formulaire. Le « + » des places de la salle n’est pas ambre : en haut de la page, seul le bouton l’est.
+  test('« Proposer mon bar » : trois boutons (en haut, après ce que ça change, dans la bande ambre), et un lien discret au bout de chaque moment ; en haut, rien d’autre n’est ambre plein', async ({ page }) => {
     await page.goto(PAGE);
     await pret(page);
+    const moment = ['atouts', 'lien-fleche', 'Proposer mon bar'];
     expect(await page.$$eval('main a[href="#proposer"]', (liens) => liens.map((a) => [a.closest('section').className.split(' ')[0], a.className, a.textContent.trim()])))
-      .toEqual([['ouverture-bars', 'capsule', 'Proposer mon bar'], ['conditions', '', 'Propose ton bar'], ['atouts', 'capsule', 'Proposer mon bar'], ['bars', 'bouton-nuit', 'Proposer mon bar']]);
+      .toEqual([['ouverture-bars', 'capsule', 'Proposer mon bar'], ['conditions', '', 'Propose ton bar'], moment, moment, moment, moment, ['atouts', 'capsule', 'Proposer mon bar'], ['bars', 'bouton-nuit', 'Proposer mon bar']]);
+    // Chaque moment a le sien, à la fin de son texte.
+    expect(await page.$$eval('.moment', (moments) => moments.map((m) => m.querySelector('.moment__texte > :last-child a[href="#proposer"]')?.textContent.trim() ?? null)))
+      .toEqual(Array(4).fill('Proposer mon bar'));
+    const liens = await page.$$eval('.moment .moment__suite a', (liste) => liste.map((a) => {
+      const style = getComputedStyle(a);
+      const boite = a.getBoundingClientRect();
+      return { fond: style.backgroundColor, texte: style.color, hauteur: boite.height >= 44 };
+    }));
+    expect(liens).toEqual(Array(4).fill({ fond: 'rgba(0, 0, 0, 0)', texte: 'rgb(10, 11, 16)', hauteur: true }));
     // Après les conditions, un simple lien vers le formulaire, sans fond ni ambre : la question du prix réglée, on peut
     // écrire sans remonter ni descendre six écrans. Le gris de texte du jour (#3D404D, 10:1 sur la carte blanche) : la page
     // est en clair (<html class="jour">) ; ce lien avait le blanc translucide de la nuit (rgba(247, 247, 249, 0.74)).

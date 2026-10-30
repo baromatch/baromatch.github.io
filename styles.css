@@ -815,6 +815,37 @@ a:hover { color: var(--goutte); }
 @media (min-width: 48em) { .pied__tete { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); } }
 @media (min-width: 64em) { .pied__plan { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr) minmax(0, 1.1fr) minmax(0, 0.8fr) minmax(0, 1.3fr); } }
 
+/* ---------- Transition : l’ancien en-tête et l’ancien pied ----------
+   Les pages des matchs publiées avant cette navigation gardent leur ancien en-tête (.entete__nav) et leur ancien pied
+   (.pied__liens) jusqu’au premier passage réussi de l’Action « Pages des matchs », qui les réécrit avec le cadre neuf.
+   Ces règles les mettent encore en forme, comme avant. À retirer, avec son test (tests/cadre.spec.mjs, « l’ancien
+   cadre »), quand plus aucune page du dépôt ne les porte : le test le dira. */
+.entete__nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; margin-inline-start: auto; }
+.entete__lien { color: var(--texte); font-weight: 600; font-size: 0.9375rem; text-decoration: none; padding: 10px 2px; padding-block: max(2px, calc((45px - 1lh - 1px) / 2)); border-bottom: 1px solid rgba(255, 177, 61, 0.55); }
+.entete__lien:hover, .entete__lien[aria-current="page"] { color: var(--ambre); }
+@media (max-width: 400px) { .entete__nav { column-gap: 14px; } }
+@media (max-width: 359px) {
+  .entete:has(> .entete__nav) { column-gap: 4px; }
+  .entete__nav { column-gap: 4px; }
+  .entete__lien { font-size: 0.875rem; }
+}
+@media (min-width: 401px) {
+  .entete__lien--bars { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--verre-bord-fort); border-radius: 999px; background: var(--verre-fort); box-shadow: var(--verre-reflet); }
+  .entete__lien--bars:hover { background: rgba(255, 255, 255, 0.15); }
+}
+.jour .entete__lien { border-bottom-color: rgba(10, 11, 16, 0.4); }
+.jour .entete__lien:hover { color: var(--texte-doux); }
+@media (min-width: 401px) {
+  .jour .entete__lien--bars { border-color: var(--verre-bord-fort); }
+  .jour .entete__lien--bars:hover { background: var(--fond-releve); }
+}
+.pied:has(> .pied__liens) { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px; color: var(--texte-discret); }
+.pied:has(> .pied__liens) > .pied__langue { flex-basis: 100%; margin: 0; }
+.pied > .pied__marque { color: inherit; font-size: inherit; font-weight: inherit; font-stretch: inherit; }
+.pied > .pied__marque svg { width: 30px; height: 30px; }
+.pied__liens { display: flex; flex-wrap: wrap; gap: 0 24px; }
+.pied__liens a { display: inline-flex; align-items: center; min-height: 44px; }
+
 /* Le bandeau du bas, au téléphone debout (22 em de large au moins : 352 px à texte normal ; 30 em de haut). Il ne cache
    jamais rien : le pied de page garde sa place au bout de la page (--bandeau : un rang tout juste au texte normal, de la
    place pour plusieurs rangs dès que le texte grandit), le focus et les ancres s’arrêtent au-dessus (scroll-padding),

@@ -6,7 +6,7 @@
    Chaque grand texte se règle en rem et en vw : avec le texte à 200 % sur 320 px, son plus long mot tient sur sa ligne
    (tests/pages-du-jour.spec.mjs le mesure). Chargée seulement par a-propos.html. */
 
-.apropos { --apropos-air: clamp(56px, 9vw, 128px); }
+.apropos { --apropos-air: clamp(44px, 9vw, 128px); }
 
 /* ---------- L’ouverture : la phrase, puis une entrée pour chacun ---------- */
 

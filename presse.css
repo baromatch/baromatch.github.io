@@ -6,7 +6,7 @@
    Chaque grand texte se règle en rem et en vw, et chaque grille d’écrans en em : avec le texte à 200 % sur 320 px, son
    plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Chargée seulement par presse.html. */
 
-.presse { --presse-air: clamp(48px, 6.5vw, 88px); }
+.presse { --presse-air: clamp(40px, 6.5vw, 88px); }
 .presse p, .presse ul, .presse dl, .presse figure { margin: 0; }
 
 /* ---------- L’ouverture : ce que c’est, ce qu’on peut en faire, à qui écrire ---------- */
@@ -111,9 +111,10 @@
 
 /* ---------- Le logo ---------- */
 
-.presse .presse__logos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 32px; padding: 0; list-style: none; }
-@media (min-width: 760px) { .presse .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.presse__logo { display: grid; align-content: start; gap: 12px; padding: 16px 16px 20px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
+/* Deux cartes par ligne au téléphone (des colonnes de 9 em : une seule avec le texte à 200 %), trois sur ordinateur. */
+.presse .presse__logos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr)); gap: 12px; margin-top: 28px; padding: 0; list-style: none; }
+@media (min-width: 760px) { .presse .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } }
+.presse__logo { display: grid; align-content: start; gap: 10px; padding: 12px 12px 16px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
 /* Au téléphone, un aperçu plus bas (5:2) : les trois cartes tiennent en moins de deux écrans. */
 .presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 5 / 2; padding: 16px 20px; border-radius: 12px; }
 @media (min-width: 760px) { .presse__apercu { aspect-ratio: 16 / 9; padding: 20px; } }
@@ -123,12 +124,12 @@
 .presse__apercu--icone { background: var(--fond-releve); }
 .presse__apercu--icone img { width: auto; height: 100%; border-radius: 22%; }
 .presse__legende { font-weight: 700; }
-.presse .presse__fichiers { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.presse .presse__fichiers { display: flex; flex-wrap: wrap; gap: 8px; }
 .presse__fichiers a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 18px;
+  padding: 0 14px;
   border: 1.5px solid var(--champ-bord);
   border-radius: 999px;
   background: var(--carte);

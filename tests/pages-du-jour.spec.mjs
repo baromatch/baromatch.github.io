@@ -407,3 +407,15 @@ for (const largeur of [320, 375, 390, 1280]) {
     if (largeur >= 360) expect(await lignesDe(page, '.presse__adresse')).toEqual([1]);
   });
 }
+
+// Presse au téléphone, plus courte : les cartes du logo vont par deux (une seule par ligne avec le texte à 200 %).
+test('Presse au téléphone : les cartes du logo par deux à 100 %, une par ligne à 200 %', async ({ page }) => {
+  for (const largeur of [360, 390, 412]) {
+    await ouvrir(page, '/presse.html', largeur);
+    const hauts = await page.$$eval('.presse__logo', (cartes) => cartes.map((c) => Math.round(c.getBoundingClientRect().top)));
+    expect(hauts[0], `${largeur} px`).toBe(hauts[1]);
+  }
+  await agrandir(page, 200);
+  const colonnes = await page.$$eval('.presse__logo', (cartes) => new Set(cartes.map((c) => Math.round(c.getBoundingClientRect().left))).size);
+  expect(colonnes).toBe(1);
+});

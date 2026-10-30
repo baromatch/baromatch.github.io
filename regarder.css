@@ -1,6 +1,7 @@
 /* Baromatch — les pages « Où regarder le match » (matchs, villes, bars), écrites par le générateur.
-   Elles reprennent styles.css (la nuit, le verre, la police, l’en-tête et le pied de page) ; ici, seulement leur
-   mise en page. L’ambre reste aux liens et à l’appel à l’action. Aucune animation. Les chiffres sont tabulaires. */
+   Elles reprennent styles.css (le jour, le verre, la police, l’en-tête et le pied de page) ; ici, seulement leur
+   mise en page. L’ambre reste à l’appel à l’action. Au jour, une valeur de nuit prend la sienne par
+   var(--fond-releve, …), qui n’existe qu’au jour. Aucune animation. Les chiffres sont tabulaires. */
 
 .regarder {
   padding-top: 8px;
@@ -137,7 +138,7 @@
   text-wrap: balance;
   text-decoration: none;
 }
-.regarder-bars-pro__bouton:hover { background: rgba(255, 255, 255, 0.15); color: var(--texte); }
+.regarder-bars-pro__bouton:hover { background: var(--fond-releve, rgba(255, 255, 255, 0.15)); color: var(--texte); }
 
 /* Le bloc du soir, en haut de la semaine : une carte de verre. */
 .regarder-ce-soir {
@@ -168,7 +169,7 @@
   border: 1px solid var(--verre-bord);
   border-radius: 18px;
   background: var(--verre);
-  box-shadow: var(--verre-reflet);
+  box-shadow: var(--ombre-carte, var(--verre-reflet));
   scroll-margin-top: 24px;
 }
 .regarder-carte p { margin: 0; }
@@ -199,7 +200,7 @@
   margin-top: 12px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: var(--verre-fort);
+  background: var(--fond-releve, var(--verre-fort));
 }
 .regarder-offre__etiquette { display: block; margin-bottom: 2px; color: var(--texte-doux); font-size: 0.8125rem; font-weight: 600; }
 .regarder-offre__texte { font-weight: 600; }
@@ -285,7 +286,7 @@
   padding: 10px 12px;
   border: 1px solid var(--champ-bord);
   border-radius: 10px;
-  background: var(--nuit-releve);
+  background: var(--fond-releve, var(--nuit-releve));
   color: var(--texte);
   font: 0.8125rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   /* La boîte prend la hauteur du code, sans ascenseur (là où le navigateur le sait). */
@@ -338,7 +339,7 @@
   text-decoration: none;
   cursor: pointer;
 }
-.partage__bouton:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
+.partage__bouton:hover { background: var(--fond-releve, rgba(255, 255, 255, 0.14)); color: var(--texte); }
 /* L’adresse de la page, en lien : sans JavaScript, ou quand la copie est refusée, elle se copie à la main. */
 .partage__lien { display: inline-block; padding: 11px 0; color: var(--texte-doux); font-size: 0.9375rem; overflow-wrap: anywhere; }
 .partage [hidden] { display: none; }
@@ -365,7 +366,7 @@
   font-weight: 700;
   text-decoration: none;
 }
-.regarder-agenda__bouton:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
+.regarder-agenda__bouton:hover { background: var(--fond-releve, rgba(255, 255, 255, 0.14)); color: var(--texte); }
 .regarder-agenda__clubs { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
 /* Chaque club, une capsule de 44 × 44 px au moins (« OL » est court) : jamais collée à sa voisine. */
 .regarder-agenda__clubs a {
@@ -396,3 +397,13 @@
 .regarder-carte__suite a { display: inline-block; padding: 11px 0; font-weight: 650; }
 /* Sur une page en anglais, le pied de page (en français) le dit d’abord, sur sa propre ligne. */
 .pied__langue { flex-basis: 100%; margin: 0; color: var(--texte-doux); }
+
+/* ---------- Le jour ---------- */
+
+/* Les liens soulignés de leur couleur, survolés en bleu doux, comme sur l’accueil ; la pilule de la liste d’attente,
+   au focus, garde un bord bleu nuit (l’ambre : 1,7:1). */
+.jour :is(.regarder-carte__nom, .regarder-soir__match) a { text-decoration-color: currentColor; }
+.jour :is(.regarder-carte__nom, .regarder-soir__match) a:hover { color: var(--texte-doux); }
+.jour .regarder-fil a:hover { color: var(--texte); }
+.jour .regarder-agenda__clubs a:hover { background: var(--fond-releve); }
+.jour .regarder-attente .attente__ligne:focus-within { border-color: var(--texte); }

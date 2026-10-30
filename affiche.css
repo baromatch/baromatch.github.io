@@ -2,7 +2,7 @@
    bar publié (/bar/<bar>/affiche/) et la feuille à laisser au patron (/matchs/affiche/pour-le-patron/), écrites par le
    générateur (generateur/affiche.mjs, generateur/feuille-du-patron.mjs). Elles reprennent styles.css et regarder.css ;
    ici, la feuille et son impression.
-   À l’écran : la nuit du site, et l’affiche en aperçu sur une feuille blanche.
+   À l’écran : le jour du site, et l’affiche en aperçu sur une feuille blanche (son ombre courte, un trait autour).
    À l’impression : seulement la feuille, papier blanc, encre noire, une seule touche d’ambre (le verre de la marque).
    Une affiche pleine nuit viderait la cartouche d’un bar. Seules les lignes cochées s’impriment ; si rien n’est coché,
    toutes. Un navigateur sans :has() imprime tous les matchs : rien ne casse. La taille du papier n’est pas fixée
@@ -25,8 +25,11 @@
   font-weight: 650;
   cursor: pointer;
 }
-.affiche-format__choix:has(:checked) { border-color: var(--ambre); }
-.affiche-format input { width: 20px; height: 20px; margin: 0; accent-color: var(--ambre); }
+/* Le choix et les cases cochées à la couleur du texte (l’encre sur la feuille) : l’ambre, sur le clair, ne ferait que
+   1,9:1 (WCAG 1.4.11). */
+.affiche-format__choix:hover { background: var(--fond-releve, var(--verre-fort)); }
+.affiche-format__choix:has(:checked) { border-color: var(--texte); }
+.affiche-format input { width: 20px; height: 20px; margin: 0; accent-color: var(--texte); }
 
 /* ---------- La feuille, à l’écran ---------- */
 
@@ -46,6 +49,7 @@
   box-shadow: var(--ombre-scene);
   font-variant-numeric: tabular-nums;
 }
+@media screen { .jour .affiche { box-shadow: 0 0 0 1px var(--trait), var(--ombre-carte); } }
 .affiche :focus-visible { outline-color: var(--encre); }
 
 .affiche-tete { padding-bottom: 14px; border-bottom: 3px solid var(--encre); }
@@ -69,7 +73,7 @@
 
 .affiche-lignes { margin: 0; padding: 0; list-style: none; }
 .affiche-ligne { display: flex; align-items: center; gap: 12px; }
-.affiche-case { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--ambre); cursor: pointer; }
+.affiche-case { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--encre); cursor: pointer; }
 /* La ligne entière est l’étiquette de sa case : 44 px de haut au moins, au doigt. */
 .affiche-ligne__texte {
   flex: 1;
@@ -138,7 +142,7 @@ label.affiche-ligne__texte { cursor: pointer; }
 @media print {
   @page { margin: 12mm; }
   :root { color-scheme: light; }
-  html, body { background: #FFFFFF; color: #000000; }
+  html, body, .jour body { background: #FFFFFF; color: #000000; }
   /* Seulement la feuille : ni l’en-tête du site, ni son pied, ni le mode d’emploi, ni les cases. */
   body > :not(main), main > :not(.affiche-zone), .affiche-zone > :not(.affiche), .affiche-case, .affiche-stylo { display: none !important; }
   main.page { max-width: none; margin: 0; padding: 0; }
@@ -221,7 +225,7 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche--patron .affiche-pied { margin-top: 20px; padding-top: 16px; border-top: 3px solid var(--encre); }
 .affiche--patron .affiche-appel { font-size: 1.25rem; }
 /* « Laissée par : » et sa ligne vide, à remplir au stylo : imprimée, et un dessin pour un lecteur d’écran. */
-.affiche-laissee { display: flex; align-items: flex-end; gap: 8px; max-width: 22rem; margin: 0 0 16px; font-weight: 650; }
+.affiche-laissee { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; max-width: 22rem; margin: 0 0 16px; font-weight: 650; }
 .affiche-laissee__trait { flex: 1; min-width: 6rem; height: 1.5em; border-bottom: 1px solid var(--encre-douce); }
 .affiche--patron .affiche-qr__code { width: 144px; height: 144px; }
 

@@ -1,7 +1,7 @@
 // Les clubs, dessinés comme l’appli les dessine : chaque club est son insigne Baromatch (ses couleurs, le motif de son
-// maillot, trois lettres de sa ville), jamais un écusson ni un logo. Le dessin vient du générateur de l’appli, copié dans
-// generateur/insignes/ (generateur/outils/insignes/exporter.mjs) ; ce fichier le pose dans les pages comme l’appli le
-// pose dans ses écrans :
+// maillot, un code de trois lettres tiré d’un lieu du club, le plus souvent sa ville), jamais un écusson ni un logo. Le
+// dessin vient du générateur de l’appli, copié dans generateur/insignes/ (generateur/outils/insignes/exporter.mjs) ; ce
+// fichier le pose dans les pages comme l’appli le pose dans ses écrans :
 // - un insigne seul (l’en-tête d’une page de match, l’image de partage) : le dessin de l’appli à cette taille, dans un
 //   <svg> carré de 200 unités ;
 // - deux insignes côte à côte, domicile puis extérieur (une ligne de match) : comme sa paire de la liste « Les matchs »,

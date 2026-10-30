@@ -595,6 +595,60 @@ test.describe('un long jour, dans le navigateur', () => {
   }
 });
 
+// ---------- Le texte agrandi à 200 %, sur un petit téléphone ----------
+
+// Le réglage « taille du texte » du navigateur : par le style de l’élément racine (comme tests/texte-agrandi.spec.mjs).
+const agrandir = (page) => page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+// L’accueil avec un bloc d’essai, servi à la place de index.html.
+const ouvrirLEssai = async (page, bloc, { largeur, hauteur }) => {
+  await page.clock.setFixedTime(new Date(JEUDI));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: largeur, height: hauteur });
+  await page.route((adresse) => adresse.pathname === '/', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: accueilAvecLaSemaine(ACCUEIL, bloc) }));
+  await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
+  await agrandir(page);
+};
+// Les mots coupés sur deux lignes dans ce que `selecteur` désigne (visible) : « Baromatc / h ».
+const motsCoupes = (page, selecteur) => page.evaluate((s) => [...document.querySelectorAll(s)].filter((e) => e.checkVisibility()).flatMap((e) => {
+  const coupes = [];
+  const marcheur = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+  for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+    for (const mot of n.data.matchAll(/\S+/g)) {
+      const plage = document.createRange();
+      plage.setStart(n, mot.index);
+      plage.setEnd(n, mot.index + mot[0].length);
+      if (new Set([...plage.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size > 1) coupes.push(`« ${mot[0]} » dans « ${e.textContent.trim()} »`);
+    }
+  }
+  return coupes;
+}), selecteur);
+
+test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
+  // Des noms de compétition longs (« Ligue Conférence », le plus long d’un mot à l’autre) : à 320 px et 200 %, ils ne
+  // tenaient plus à côté de l’heure, et sortaient du bord de la carte.
+  test('à 320 px, chaque jour choisi : le nom de la compétition reste dans sa carte (il passe sous l’heure)', async ({ page }) => {
+    const longues = { 'fiorentina-atalanta-2026-10-29': 'Ligue Conférence', 'nice-rennes-2026-10-31': 'Ligue des champions', 'troyes-le-mans-2026-10-31': 'Bundesliga' };
+    await ouvrirLEssai(page, bloc({ matchs: MATCHS.map((m) => (longues[m.slug] ? { ...m, competition: longues[m.slug] } : m)), bars: [{ id: 'b1' }] }), { largeur: 320, hauteur: 568 });
+    const jours = page.locator('#semaine .semaine__date');
+    const lu = { cartes: 0, dehors: [] };
+    for (let i = 0; i < await jours.count(); i += 1) {
+      await jours.nth(i).click();
+      const jour = await page.evaluate(() => [...document.querySelectorAll('.carte-match')].filter((c) => c.checkVisibility()).map((carte) => {
+        const boite = carte.getBoundingClientRect();
+        const plage = document.createRange();
+        plage.selectNodeContents(carte.querySelector('.carte-match__haut'));
+        return [...plage.getClientRects()].filter((r) => r.left < boite.left - 0.5 || r.right > boite.right + 0.5)
+          .map((r) => `« ${carte.querySelector('.carte-match__haut').textContent} » de ${Math.round(r.left)} à ${Math.round(r.right)} px, la carte de ${Math.round(boite.left)} à ${Math.round(boite.right)} px`);
+      }));
+      lu.cartes += jour.length;
+      lu.dehors.push(...jour.flat());
+    }
+    expect(lu.cartes).toBeGreaterThan(5);
+    expect(lu.dehors).toEqual([]);
+  });
+});
+
 // ---------- Le contraste des petits textes, peints sur le clair ----------
 
 // La mesure (chaque élément qui porte du texte visible, hors des moments de nuit : sa couleur posée sur son vrai fond,

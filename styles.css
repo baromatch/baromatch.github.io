@@ -1461,8 +1461,7 @@ a:hover { color: var(--goutte); }
 .carte-match__bas a { position: relative; z-index: 1; }
 .carte-match__clubs:hover .carte-match__club { text-decoration: underline; }
 .carte-match__club { grid-column: 2; display: flex; align-items: center; min-height: 28px; }
-/* Une carte de moins de 14 rem (le texte agrandi ; à 100 %, elle en a plus de 15 dès 320 px) : la paire au-dessus des
-   noms, qui prennent sa place. */
+/* Moins de 14 rem (texte agrandi ; 15 à 100 % dès 320 px) : la paire au-dessus des noms. */
 .carte-match { container-type: inline-size; }
 @container (max-width: 14rem) {
   .carte-match__clubs { grid-template-columns: minmax(0, 1fr) auto; }

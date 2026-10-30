@@ -76,6 +76,10 @@ const KO = 1024;
 // mesuré à part, le scénario n’en ayant que 6 : 164 Ko transférés sans les insignes, 182 avec (les insignes de l’appli
 // ajoutent environ 18 à 21 Ko compressés, surtout les tracés de leurs lettres) ; seuil 185. Lighthouse au téléphone
 // reste à 99-100 sur l’accueil réel.
+// 30 octobre 2026, après relecture des insignes : les affiches gagnent leurs insignes à l’impression et la paire du
+// prochain match d’un bar (affiche.css de 16 915 à 17 474 octets, ses commentaires raccourcis) : leur CSS mesure
+// 107,22 Ko (109 797 octets), seuil de 106 à 107. Les pages générées mesurent 90,36 Ko (92 524 octets), l’accueil et les
+// pages fixes 73,20 Ko (74 954 octets) : leurs seuils restent.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 185, js: 18, css: 73, images: 24 } },
@@ -91,8 +95,8 @@ const PAGES = [
   { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
   { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
   { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 107, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 107, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };

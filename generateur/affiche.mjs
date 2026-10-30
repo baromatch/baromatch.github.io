@@ -21,7 +21,7 @@ import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
 import { fil, page } from './gabarits.mjs';
-import { paireDInsignes } from './insigne.mjs';
+import { paireDInsignes, TAILLES } from './insigne.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { adresseDe, cheminDeLaVille, cheminDuBar, debutDe, filDAriane, pageWeb } from './jsonld.mjs';
 import { description as decrire, SEMAINE_JOURS, titre as intituler } from './pages.mjs';
@@ -85,7 +85,7 @@ const heureDeLaLigne = (m) => `<time class="affiche-heure${m.heureConfirmee ? ''
 // Une ligne : l’heure, le match (ses deux insignes, sur le papier de l’affiche : fond clair, puis son nom), la
 // compétition. cochable : une case la précède, et l’étiquette est la ligne entière.
 const ligne = (m, { cochable }) => {
-  const texte = `${heureDeLaLigne(m)} <span class="affiche-match">${paireDInsignes(m.domicile, m.exterieur, { fond: 'light' })}${e(nomCourt(m))}</span> <span class="affiche-competition">${e(m.competition)}</span>`;
+  const texte = `${heureDeLaLigne(m)} <span class="affiche-match">${paireDInsignes(m.domicile, m.exterieur, { fond: 'light' })}<span class="affiche-match__nom">${e(nomCourt(m))}</span></span> <span class="affiche-competition">${e(m.competition)}</span>`;
   if (!cochable) return `      <li class="affiche-ligne"><span class="affiche-ligne__texte">${texte}</span></li>`;
   const id = `affiche-${m.slug}`;
   return `      <li class="affiche-ligne"><input class="affiche-case" type="checkbox" id="${id}" aria-describedby="jour-${jourDeParis(m.debut)}"><label class="affiche-ligne__texte" for="${id}">${texte}</label></li>`;
@@ -249,7 +249,7 @@ ${modeDEmploi(t.etapes, [t.miseAJour])}
   <div class="affiche-tete">
     <p class="affiche-bar">${e(bar.nom)}</p>
     <h3 class="affiche-titre">${e(annonce(prochaine, maintenant))}</h3>
-${prochaine ? `    <p class="affiche-prochain"><span class="affiche-prochain__match">${e(nomCourt(prochaine.match))}</span> <span class="affiche-prochain__quand">${e(capitale(jourEnLettres(prochaine.match.debut)))} · ${heureDeLaLigne(prochaine.match)}</span> <span class="affiche-competition">${e(prochaine.match.competition)}</span></p>\n` : ''}  </div>
+${prochaine ? `    <p class="affiche-prochain"><span class="affiche-prochain__match">${paireDInsignes(prochaine.match.domicile, prochaine.match.exterieur, { taille: TAILLES.entete, fond: 'light' })}${e(nomCourt(prochaine.match))}</span> <span class="affiche-prochain__quand">${e(capitale(jourEnLettres(prochaine.match.debut)))} · ${heureDeLaLigne(prochaine.match)}</span> <span class="affiche-competition">${e(prochaine.match.competition)}</span></p>\n` : ''}  </div>
 ${suivantes.length ? `  <h4 class="affiche-sous-titre">${e(t.suivantes)}</h4>\n${lesJours(suivantes, { cochable: false, niveau: 5 })}\n` : ''}${piedDeLaFeuille({ phrase: remplir(t.prepare, { jour: jourEnLettres(maintenant) }), svg: svgDuQr(qr.matrice(adresse), { etiquette: remplir(t.qr, { bar: bar.nom }) }), adresse: adresse.replace(/^https:\/\//, ''), appel })}
   </div>
 </section>`;

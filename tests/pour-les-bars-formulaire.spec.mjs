@@ -1114,8 +1114,11 @@ test.describe('les réponses du serveur', () => {
     for (const [nom, valeur] of Object.entries(SAISIE)) await expect(page.locator(CHAMPS[nom])).toHaveValue(valeur);
     // La messagerie, qui sait garder un mail à envoyer plus tard, est proposée en second choix (verre).
     await expect(page.locator('#demande-courriel')).toBeVisible();
+    // Les fonds au repos : la souris, restée là où le bouton a été touché, peut se retrouver sur lui une fois le message
+    // montré (sa zone défile), et le survol changerait son fond.
+    await page.mouse.move(0, 0);
     expect(await fond(page.locator('#demande-courriel-lien'))).not.toBe(AMBRE);
-    expect(await fond(page.locator('#demande-envoyer'))).toBe(AMBRE);
+    await expect.poll(() => fond(page.locator('#demande-envoyer'))).toBe(AMBRE);
 
     await context.setOffline(false);
     await expect(page.locator('#demande-envoyee')).toBeVisible();
@@ -1796,27 +1799,33 @@ test.describe('le texte agrandi à 200 %, sur un téléphone de 320 × 568', () 
     expect(haut.haut).toBeLessThan(40);
   });
 
-  test('après un 429, le focus va au lien qui ouvre la messagerie, dans l’écran', async ({ page }) => {
-    await ouvrirPetit(page, [reponse(429, { statusCode: 429, message: 'Rate limit exceeded' })]);
-    await envoyerUneDemande(page);
-    await attendreMessage(page.locator('#demande-alerte'), TEXTES.tropDEnvois);
-    const lien = page.locator('#demande-courriel-lien');
-    await expect(lien).toBeFocused();
-    await expect(lien).toBeInViewport();
-  });
 
-  test('hors ligne, le bouton d’envoi garde le focus et se voit', async ({ page, context }) => {
-    await ouvrirPetit(page, [CREEE]);
-    await context.setOffline(true);
-    await envoyerUneDemande(page);
-    await attendreMessage(page.locator('#demande-statut'), TEXTES.horsLigne);
-    const bouton = page.locator('#demande-envoyer');
-    await expect(bouton).toBeFocused();
-    // Tout entier dans l’écran, au pixel près (le texte agrandi donne des tailles fractionnaires).
-    const boite = await place(bouton);
-    expect(boite.haut).toBeGreaterThanOrEqual(-1);
-    expect(boite.bas).toBeLessThanOrEqual(HAUTEUR + 1);
-  });
+  // Après un refus ou un échec, le message se lit par son haut (sa zone défile d’abord), le focus va où il doit sans
+  // faire défiler à son tour, et la zone garde son rôle (status, ou alert pour une erreur) : le lecteur d’écran l’annonce
+  // comme avant.
+  const MESSAGES = [
+    { nom: 'après un 429', reponses: [reponse(429, { statusCode: 429, message: 'Rate limit exceeded' })], zone: '#demande-alerte', role: 'alert', texte: TEXTES.tropDEnvois, focus: '#demande-courriel-lien' },
+    { nom: 'après un 400 REQUETE_INVALIDE', reponses: [refus('REQUETE_INVALIDE')], zone: '#demande-alerte', role: 'alert', texte: TEXTES.invalide, focus: '#demande-courriel-lien' },
+    { nom: 'après un 500, puis un 500 au nouvel essai', reponses: [reponse(500, {})], zone: '#demande-statut', role: 'status', texte: TEXTES.courriel, focus: '#demande-courriel-lien', essais: 2 },
+    { nom: 'la page périmée', reponses: [refus('FORMULAIRE_EXPIRE')], zone: '#demande-statut', role: 'status', texte: TEXTES.expiree, focus: 'Recharger la page' },
+    { nom: 'hors ligne', reponses: [CREEE], horsLigne: true, zone: '#demande-statut', role: 'status', texte: TEXTES.horsLigne, focus: '#demande-envoyer' },
+  ];
+  for (const cas of MESSAGES) {
+    test(`${cas.nom} : le message se lit par son haut, le focus est où il doit, la zone garde son rôle`, async ({ page, context }) => {
+      const { envois } = await ouvrirPetit(page, cas.reponses);
+      if (cas.horsLigne) await context.setOffline(true);
+      await envoyerUneDemande(page);
+      if (cas.essais) await attendreEnvois(page, envois, cas.essais);
+      const zone = page.locator(cas.zone);
+      await attendreMessage(zone, cas.texte);
+      await expect(zone).toHaveAttribute('role', cas.role);
+      const message = await place(zone.locator('.message'));
+      expect(message.haut, 'le haut du message, dans l’écran').toBeGreaterThanOrEqual(0);
+      expect(message.haut, 'le haut du message, en haut de l’écran').toBeLessThan(40);
+      const voulu = cas.focus.startsWith('#') ? page.locator(cas.focus) : zone.getByRole('button', { name: cas.focus });
+      await expect(voulu).toBeFocused();
+    });
+  }
 
   test('la page périmée : « Recharger la page » reste dans la largeur de l’écran', async ({ page }) => {
     await ouvrirPetit(page, [refus('FORMULAIRE_EXPIRE')]);

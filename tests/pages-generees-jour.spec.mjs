@@ -21,30 +21,31 @@ import { lireLeCadre } from '../generateur/gabarits.mjs';
 import { pageDeRepli } from '../generateur/refus.mjs';
 
 // Chaque type de page. site : le scénario inventé (des bars publiés), ou la copie enregistrée (aucun bar publié).
+// partage : la page a le bloc « Partager » (et partage.js).
 // etat : ce qui amène un second état à mesurer (une case cochée, une autre ville choisie). textes : le moins de textes
 // que la mesure doit lire (une mesure qui ne lit presque rien ne prouve rien) ; la page neutre n’en a que quelques-uns.
 const cocherLaPremiereCase = (onglet) => onglet.locator('.affiche-case').first().check();
 const TYPES = [
   { nom: 'la semaine', chemin: '/matchs/' },
-  { nom: 'un match avec un bar inventé', chemin: '/matchs/psg-ol-2026-10-25/' },
-  { nom: 'un match sans bar', chemin: '/matchs/lille-lens-2026-10-26/' },
-  { nom: 'ce soir', chemin: '/ce-soir/' },
+  { nom: 'un match avec un bar inventé', chemin: '/matchs/psg-ol-2026-10-25/', partage: true },
+  { nom: 'un match sans bar', chemin: '/matchs/lille-lens-2026-10-26/', partage: true },
+  { nom: 'ce soir', chemin: '/ce-soir/', partage: true },
   { nom: 'l’agenda', chemin: '/agenda/' },
   { nom: 'un club', chemin: '/matchs/club/psg/' },
   { nom: 'une compétition', chemin: '/matchs/competition/ligue-1/' },
-  { nom: 'une ville', chemin: '/regarder-le-match/paris/' },
+  { nom: 'une ville', chemin: '/regarder-le-match/paris/', partage: true },
   { nom: 'la liste des villes', chemin: '/regarder-le-match/' },
-  { nom: 'la page d’un bar et son code', chemin: '/bar/le-zinc-des-amis-paris-11/' },
+  { nom: 'la page d’un bar et son code', chemin: '/bar/le-zinc-des-amis-paris-11/', partage: true },
   { nom: 'l’affiche de la semaine', chemin: '/matchs/affiche/', etat: cocherLaPremiereCase },
   { nom: 'l’affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/' },
   { nom: 'la feuille du patron', chemin: '/matchs/affiche/pour-le-patron/' },
   { nom: 'la page neutre', chemin: '/matchs/page-neutre/', textes: 6 },
-  { nom: 'Paris en anglais', chemin: '/en/' },
-  { nom: 'un match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/' },
-  { nom: 'une ligue en anglais', chemin: '/en/premier-league/' },
+  { nom: 'Paris en anglais', chemin: '/en/', partage: true },
+  { nom: 'un match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', partage: true },
+  { nom: 'une ligue en anglais', chemin: '/en/premier-league/', partage: true },
   { nom: 'sans bar publié, la semaine', chemin: '/matchs/', site: 'sansBar' },
-  { nom: 'sans bar publié, un match', chemin: '/matchs/psg-barca-2026-10-20/', site: 'sansBar' },
-  { nom: 'sans bar publié, une ville et sa liste d’attente', chemin: '/regarder-le-match/paris/', site: 'sansBar', etat: (onglet) => onglet.locator('.attente__ville', { hasText: 'Lyon' }).click() },
+  { nom: 'sans bar publié, un match', chemin: '/matchs/psg-barca-2026-10-20/', site: 'sansBar', partage: true },
+  { nom: 'sans bar publié, une ville et sa liste d’attente', chemin: '/regarder-le-match/paris/', site: 'sansBar', partage: true, etat: (onglet) => onglet.locator('.attente__ville', { hasText: 'Lyon' }).click() },
 ];
 const LARGEURS = [390, 1280];
 // Les moments de nuit d’une page générée : le pied de page. Et ce qui n’est pas à voir : le piège à robots de la liste.
@@ -381,11 +382,8 @@ test.describe('le texte à 200 % sur 320 px', () => {
   }
 });
 
-// Rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur : la mise en page du jour elle-même. Sans la
-// police : son remplacement (font-display: swap) a sa propre correction et son propre test, comme sur l’accueil. Et sans
-// partage.js, le seul script de ces pages : il remplace l’adresse du bloc « Partager » par ses boutons, parfois après la
-// première image, et les sections du dessous remontent alors (0,014 à 0,030 à 390 px, déjà ainsi à la nuit). Ce
-// décalage-là n’est pas une affaire de couleurs : il aura sa propre correction et son propre test.
+// Rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur : la vraie page, partage.js compris. Sans la
+// police : son remplacement (font-display: swap) a sa propre correction et son propre test, comme sur l’accueil.
 test.describe('CLS 0 sans la police', () => {
   const compterLesDecalages = (onglet) => onglet.addInitScript(() => {
     window.decalages = 0;
@@ -408,7 +406,7 @@ test.describe('CLS 0 sans la police', () => {
 
   for (const type of TYPES) {
     test(`${type.nom} : rien ne bouge au chargement, à 390 et 1280 px`, async ({ page: onglet }) => {
-      await onglet.route(/\/(fonts\/bricolage-grotesque\.woff2|partage\.js)$/, (route) => route.abort());
+      await onglet.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
       await compterLesDecalages(onglet);
       for (const largeur of LARGEURS) {
         await onglet.setViewportSize({ width: largeur, height: 900 });
@@ -417,5 +415,40 @@ test.describe('CLS 0 sans la police', () => {
         expect(await onglet.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
       }
     });
+  }
+
+  // partage.js arrivé tard (un réseau lent) : la page est déjà peinte quand il montre ses boutons, avec ses deux réponses
+  // (le bouton « Partager » du téléphone, ou WhatsApp et « Copier le lien »), à 320, 390 et 1280 px, le texte à 100 et à
+  // 200 %. Avant sa correction, l’adresse en lien laissait sa place aux boutons et les sections du dessous remontaient.
+  for (const type of TYPES.filter((t) => t.partage)) {
+    for (const telephone of [false, true]) {
+      test(`${type.nom}, partage.js en retard, ${telephone ? 'avec' : 'sans'} le bouton du téléphone : rien ne bouge, à 100 et 200 %`, async ({ page: onglet }) => {
+        let texte = 100;
+        await onglet.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
+        await onglet.route('**/styles.css', async (route) => {
+          const reponse = await route.fetch();
+          await route.fulfill({ response: reponse, body: `${await reponse.text()}\n:root { font-size: ${texte}%; }\n` });
+        });
+        await onglet.route('**/partage.js', async (route) => {
+          await new Promise((r) => { setTimeout(r, 300); });
+          await route.continue();
+        });
+        await onglet.addInitScript((avec) => {
+          if (avec) Object.defineProperty(Navigator.prototype, 'share', { configurable: true, value: async () => {} });
+          else delete Navigator.prototype.share;
+          Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => ({ writeText: async () => {} }) });
+        }, telephone);
+        await compterLesDecalages(onglet);
+        for (const [largeur, taille] of [[320, 200], [390, 100], [390, 200], [1280, 100]]) {
+          texte = taille;
+          await onglet.setViewportSize({ width: largeur, height: 900 });
+          await onglet.goto(adresseDe(type));
+          // partage.js est passé : ses boutons sont là.
+          await expect(onglet.locator(telephone ? '.partage__natif' : '.partage__copier')).toBeVisible();
+          await onglet.evaluate(() => new Promise((r) => { requestAnimationFrame(() => requestAnimationFrame(r)); }));
+          expect(await onglet.evaluate(() => window.decalages), `${largeur} px, texte à ${taille} %`).toBe(0);
+        }
+      });
+    }
   }
 });

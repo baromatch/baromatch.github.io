@@ -258,7 +258,7 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
       barsNommes: soirees.map((s) => s.bar.id), evenement: evenement ? match : null,
-      partage: { sorte: 'match', match, soirees },
+      partage: { sorte: 'match', match, soirees, maintenant },
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
       corps: `${fil(etapes)}
 ${enTete}

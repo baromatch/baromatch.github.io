@@ -8,12 +8,14 @@
 // ensuite par generateur/images/rendu.mjs, que seule l’Action installe : sans lui, la page garde l’image générale.
 // Les chiffres sont les vrais : le nombre de vrais bars publiés qui diffusent le match, jamais « 0 bar ». Sans vrai bar,
 // la carte ne promet rien : le match, son jour et son heure ; la ville, sans « Où regarder le match ». Ni écusson, ni
-// logo de club ou de compétition, ni score : des mots.
+// logo de club ou de compétition, ni score : des mots, et pour un match, les insignes Baromatch des deux clubs (ceux de
+// l’appli, insigne.mjs), de part et d’autre du texte.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { empreinte } from './etat.mjs';
 import { heureDeParis, jourEnLettres, quandEnLettres } from './heure.mjs';
+import { insigne, saisonDe, TAILLES } from './insigne.mjs';
 import { adresseDe } from './jsonld.mjs';
 import { accorder, capitale, echapper as e, enumerer, insecables, sansAccents } from './texte.mjs';
 
@@ -129,7 +131,7 @@ const barsEtVilles = (soirees) => {
 // Chaque ligne avec la typographie française (insecables) : l’espace insécable a la largeur d’une espace dans la police.
 export const lignesDeLaCarte = (partage, textes = TEXTES, textesDuSite = {}) => {
   const lignes = lignesBrutes(partage, textes, textesDuSite);
-  return Object.fromEntries(Object.entries(lignes).map(([cle, texte]) => [cle, insecables(texte)]));
+  return Object.fromEntries(Object.entries(lignes).map(([cle, texte]) => [cle, typeof texte === 'string' ? insecables(texte) : texte]));
 };
 
 const lignesBrutes = (partage, textes, textesDuSite) => {
@@ -144,9 +146,12 @@ const lignesBrutes = (partage, textes, textesDuSite) => {
         : villes.length <= 2 ? `${accorder(nombre, 'bar')} ${verbe} à ${enumerer(villes)}`
           : `${accorder(nombre, 'bar')} ${verbe}`);
     const quand = quandEnLettres(match.debut, match.heureConfirmee);
+    // Les deux clubs, pour leurs insignes : ce qui les dessine (le nom de l’insigne, la clé, le nom), et la saison.
+    const club = ({ slug, cle, nom }) => ({ slug, cle, nom });
     return {
       surtitre: match.competition, titre: nomCourt(match), ligne: capitale(quand), ambre,
       alt: phrase(`${nomCourt(match)}, ${match.competition}, ${quand}`, ambre),
+      ...(partage.maintenant ? { insignes: { domicile: club(match.domicile), exterieur: club(match.exterieur), saison: saisonDe(partage.maintenant) } } : {}),
     };
   }
   if (partage.sorte === 'ce-soir') {
@@ -198,6 +203,10 @@ const lignesBrutes = (partage, textes, textesDuSite) => {
 const MARGE = 48;
 const CARTE = { x: MARGE, y: MARGE, largeur: LARGEUR - 2 * MARGE, hauteur: HAUTEUR - 2 * MARGE, rayon: 44 };
 const PLACE = CARTE.largeur - 2 * 64;
+// Les insignes d’un match : 160 px (la taille de référence de l’appli), sur la nuit, à 64 px des bords de la carte ;
+// le texte garde 32 px de plus de chaque côté.
+const INSIGNE = { taille: TAILLES.partage, bord: 64, ecart: 32 };
+const PLACE_ENTRE_LES_INSIGNES = PLACE - 2 * (INSIGNE.taille + INSIGNE.ecart);
 
 // Un texte trop long pour sa place, coupé à la fin d’un mot et terminé par « … ».
 const raccourcir = (police, texte, taille, espacement, place) => {
@@ -223,17 +232,17 @@ const ajuster = (police, texte, { max, min, espacement = 0, place = PLACE }) => 
 
 // Le titre : sur une ligne, grand ; sinon sur deux lignes, coupé entre deux mots là où les deux moitiés sont les plus
 // égales (pour un match, de préférence après le tiret) ; sinon coupé proprement.
-const ajusterLeTitre = (police, texte) => {
+const ajusterLeTitre = (police, texte, place = PLACE) => {
   const espacement = -0.01;
-  const une = ajuster(police, texte, { max: 156, min: 116, espacement });
-  if (police.largeur(une.lignes[0], une.taille, espacement * une.taille) <= PLACE && !une.lignes[0].endsWith('…')) return une;
+  const une = ajuster(police, texte, { max: 156, min: 116, espacement, place });
+  if (police.largeur(une.lignes[0], une.taille, espacement * une.taille) <= place && !une.lignes[0].endsWith('…')) return une;
   const mots = texte.split(' ');
   const coupes = mots.slice(1).map((_, i) => [mots.slice(0, i + 1).join(' '), mots.slice(i + 1).join(' ')])
     .filter(([a, b]) => !/^[–-]$/.test(b.split(' ')[0]) && !/^[–-]$/.test(a));
   // Pour chaque coupe, la plus grande taille où ses deux lignes tiennent (0 : jamais) ; la meilleure est la plus grande,
   // puis la plus égale. La coupe après le tiret d’un match passe devant, si elle ne rapetisse pas trop le titre.
   const tailleDe = (coupe) => {
-    for (let taille = 112; taille >= 76; taille -= 2) if (coupe.every((l) => police.largeur(l, taille, espacement * taille) <= PLACE)) return taille;
+    for (let taille = 112; taille >= 76; taille -= 2) if (coupe.every((l) => police.largeur(l, taille, espacement * taille) <= place)) return taille;
     return 0;
   };
   const ecart = (coupe) => Math.abs(police.largeur(coupe[0], 100) - police.largeur(coupe[1], 100));
@@ -245,9 +254,9 @@ const ajusterLeTitre = (police, texte) => {
     return { lignes: choisie.c, taille: choisie.taille };
   }
   const [premiere, ...reste] = mots;
-  if (!reste.length) return { lignes: [raccourcir(police, texte, 76, espacement * 76, PLACE)], taille: 76 };
-  const ligne1 = raccourcir(police, premiere, 76, espacement * 76, PLACE);
-  return { lignes: [ligne1, raccourcir(police, reste.join(' '), 76, espacement * 76, PLACE)], taille: 76 };
+  if (!reste.length) return { lignes: [raccourcir(police, texte, 76, espacement * 76, place)], taille: 76 };
+  const ligne1 = raccourcir(police, premiere, 76, espacement * 76, place);
+  return { lignes: [ligne1, raccourcir(police, reste.join(' '), 76, espacement * 76, place)], taille: 76 };
 };
 
 // Le verre de la marque, ses dégradés renommés pour ce fichier, à la place et à la taille voulues.
@@ -266,10 +275,12 @@ export const svgDeLaCarte = (lignesBrutes, { verre }) => {
     ligne: propre(lignesBrutes.ligne, policeTexte),
     ambre: propre(lignesBrutes.ambre, policeTexte),
   };
-  const surtitre = lignes.surtitre ? ajuster(policeTexte, lignes.surtitre, { max: 34, min: 26, espacement: 0.04 }) : null;
-  const titre = ajusterLeTitre(policeTitre, lignes.titre);
-  const ligne = lignes.ligne ? ajuster(policeTexte, lignes.ligne, { max: 50, min: 34 }) : null;
-  const ambre = lignes.ambre ? ajuster(policeTexte, lignes.ambre, { max: 50, min: 34 }) : null;
+  // Avec les insignes d’un match, le texte tient entre eux.
+  const place = lignesBrutes.insignes ? PLACE_ENTRE_LES_INSIGNES : PLACE;
+  const surtitre = lignes.surtitre ? ajuster(policeTexte, lignes.surtitre, { max: 34, min: 26, espacement: 0.04, place }) : null;
+  const titre = ajusterLeTitre(policeTitre, lignes.titre, place);
+  const ligne = lignes.ligne ? ajuster(policeTexte, lignes.ligne, { max: 50, min: 34, place }) : null;
+  const ambre = lignes.ambre ? ajuster(policeTexte, lignes.ambre, { max: 50, min: 34, place }) : null;
 
   // La pile, centrée dans la carte sous la marque : chaque bloc a sa hauteur (les lettres capitales) et son écart.
   const interligneDuTitre = titre.taille * 0.94;
@@ -295,6 +306,15 @@ export const svgDeLaCarte = (lignesBrutes, { verre }) => {
     return dessin;
   });
 
+  // Les insignes : domicile à gauche, extérieur à droite, au milieu de la hauteur du texte ; chacun dans son propre
+  // <svg>, posé à sa place (le dessin de l’appli, sans rien d’autre).
+  const insignes = lignesBrutes.insignes ? [
+    [lignesBrutes.insignes.domicile, CARTE.x + INSIGNE.bord],
+    [lignesBrutes.insignes.exterieur, CARTE.x + CARTE.largeur - INSIGNE.bord - INSIGNE.taille],
+  ].map(([club, x]) => insigne(club, { taille: INSIGNE.taille, fond: 'night', saison: lignesBrutes.insignes.saison })
+    .replace(/^<svg class="insigne" width="(\d+)" height="(\d+)" viewBox="([^"]+)" aria-hidden="true" focusable="false">/,
+      (_, largeur, hauteur, boite) => `<svg x="${x}" y="${(haut + bas) / 2 - INSIGNE.taille / 2}" width="${largeur}" height="${hauteur}" viewBox="${boite}">`)) : [];
+
   const marque = 'Baromatch';
   const tailleMarque = 34;
   const coteVerre = 52;
@@ -316,7 +336,7 @@ export const svgDeLaCarte = (lignesBrutes, { verre }) => {
 ${verreDeLaCarte(verre, xMarque.toFixed(1), 70, coteVerre)}
 <text x="${(xMarque + coteVerre + 12).toFixed(1)}" y="${70 + coteVerre / 2 + tailleMarque * 0.36}" font-family="${policeTexte.famille}" font-size="${tailleMarque}" fill="${BLANC}">${marque}</text>
 ${dessins.join('\n')}
-</svg>
+${insignes.length ? `${insignes.join('\n')}\n` : ''}</svg>
 `;
 };
 

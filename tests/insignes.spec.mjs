@@ -13,6 +13,7 @@ import { blocDeLaSemaine, REPERES } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { clubDe, indexerLesClubs } from '../generateur/donnees.mjs';
 import { bandesDe, identifiantsUniques, insigne, paireDInsignes, TAILLES } from '../generateur/insigne.mjs';
+import { svgDeLaCarte } from '../generateur/partage.mjs';
 import * as insignes from '../generateur/insignes/index.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { racine } from './outils/environnement.mjs';
@@ -239,6 +240,18 @@ test.describe('les pages générées : les insignes là où l’appli les montre
       for (const [, cible] of p.contenu.matchAll(/url\(#([^)]+)\)/g)) expect(ids, p.chemin).toContain(cible);
       for (const dessin of p.contenu.match(/<svg class="insignes?"[^>]*>/g) ?? []) expect(dessin, p.chemin).toMatch(/ aria-hidden="true" focusable="false">$/);
     }
+  });
+
+  test('l’image de partage d’un match : les deux insignes de l’appli à 160 px, sur la nuit, la saison écrite', () => {
+    const page = site.pages.find((p) => p.chemin === '/matchs/le-havre-psg-2026-10-30/');
+    expect(page.carte.insignes).toEqual({ domicile: { slug: 'le-havre-ac', cle: 'le-havre', nom: 'Le Havre AC' }, exterieur: { slug: 'paris-saint-germain', cle: 'psg', nom: 'Paris Saint-Germain' }, saison: '26/27' });
+    const svg = svgDeLaCarte(page.carte, { verre: site.cadre.verre });
+    // À 64 px des bords de la carte (x 48, largeur 1104), au milieu de la hauteur du texte (de 150 à 538).
+    expect(svg).toContain(`<svg x="928" y="264" width="160" height="160" viewBox="0 0 200 200">${sansRacine(REFERENCES['paris-saint-germain@160/night'])}</svg>`);
+    expect(svg).toMatch(/<svg x="112" y="264" width="160" height="160" viewBox="0 0 200 200">/);
+    expect(svg).not.toMatch(/<image|href=|aria-hidden/);
+    // Sans les insignes (une autre sorte de page), la carte reste celle d’avant.
+    expect(svgDeLaCarte({ ...page.carte, insignes: undefined }, { verre: site.cadre.verre })).not.toContain('width="160"');
   });
 });
 

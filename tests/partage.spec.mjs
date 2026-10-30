@@ -101,8 +101,10 @@ test.describe('les images de partage', () => {
   test('le vrai nombre de vrais bars : « 1 bar le diffuse », « 2 bars le diffusent » ; sans bar, ni nombre ni promesse', () => {
     const carteDe = (chemin) => resultat.fichiers.find((f) => f.chemin === chemin).carte;
     // Un match sans vrai bar : le match, son jour et son heure, rien de plus.
+    // Et les insignes des deux clubs (insigne.mjs), de part et d’autre du texte, à la saison du passage.
     expect(carteDe('/matchs/lille-lens-2026-10-26/')).toEqual({
       surtitre: 'Ligue 1', titre: 'Lille – Lens', ligne: 'Lundi 26 octobre · 20:00', ambre: '', alt: 'Lille – Lens, Ligue 1, lundi 26 octobre · 20:00.',
+      insignes: { domicile: { slug: 'losc-lille', cle: 'lille', nom: 'LOSC Lille' }, exterieur: { slug: 'rc-lens', cle: 'lens', nom: 'RC Lens' }, saison: '26/27' },
     });
     expect(carteDe('/matchs/brest-nice-2026-10-23/')).toMatchObject({ titre: 'Brest – Nice', ambre: '1 bar le diffuse à Lyon' });
     expect(carteDe('/matchs/psg-ol-2026-10-25/')).toMatchObject({ titre: 'PSG – OL', ligne: 'Dimanche 25 octobre · 20:45', ambre: '2 bars le diffusent à Lyon et Paris' });

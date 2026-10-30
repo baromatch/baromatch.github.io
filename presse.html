@@ -8,7 +8,7 @@
      tests/politique-de-securite.spec.mjs donne la nouvelle. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Presse et partenariats : le kit de Baromatch</title>
-<meta name="description" content="Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, film, texte à copier et contact.">
+<meta name="description" content="Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, affiche du film, texte à copier et contact.">
 <meta name="robots" content="max-image-preview:large">
 <link rel="canonical" href="https://baromatch.fr/presse.html">
 <meta name="theme-color" content="#FAF7F1">
@@ -22,7 +22,7 @@
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
 <meta property="og:title" content="Presse et partenariats : le kit de Baromatch">
-<meta property="og:description" content="Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, film, texte à copier et contact.">
+<meta property="og:description" content="Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, affiche du film, texte à copier et contact.">
 <meta property="og:url" content="https://baromatch.fr/presse.html">
 <meta property="og:image" content="https://baromatch.fr/img/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -35,7 +35,7 @@
 {"@context": "https://schema.org", "@graph": [
  {"@type": "AboutPage", "@id": "https://baromatch.fr/presse.html#page", "url": "https://baromatch.fr/presse.html",
   "name": "Presse et partenariats : le kit de Baromatch",
-  "description": "Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, film, texte à copier et contact.",
+  "description": "Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, affiche du film, texte à copier et contact.",
   "inLanguage": "fr-FR", "dateModified": "2026-10-30", "isPartOf": {"@id": "https://baromatch.fr/#site"}, "about": {"@id": "https://baromatch.fr/#organisation"},
   "breadcrumb": {"@id": "https://baromatch.fr/presse.html#fil"}},
  {"@type": "Organization", "@id": "https://baromatch.fr/#organisation", "name": "Baromatch", "url": "https://baromatch.fr/",
@@ -78,6 +78,7 @@
         <li><a href="#partenariats">Partenariats</a></li>
         <li><a href="#couleurs">Couleurs</a></li>
         <li><a href="#texte">Texte</a></li>
+        <li><a href="#n-est-pas">Ce qu’il n’est pas</a></li>
         <li><a href="#contact">Écrire</a></li>
       </ul>
     </nav>
@@ -108,7 +109,7 @@
   <div class="presse__nuit nuit page">
     <section class="presse__bloc" aria-labelledby="ecrans">
       <h2 class="presse__titre-section" id="ecrans">Les écrans de l’appli</h2>
-      <p class="presse__intro">Cinq captures de l’appli, à télécharger. Sur ces écrans, les bars, les clubs et les pseudos sont inventés.</p>
+      <p class="presse__intro">Cinq captures de l’appli, à télécharger. Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.</p>
       <ul class="presse__ecrans">
         <li class="presse__ecran">
           <figure>
@@ -158,13 +159,14 @@
       <div class="presse__film-texte">
         <h2 class="presse__titre-section" id="film">Le film</h2>
         <p>Le film de présentation de Baromatch&nbsp;: 15&nbsp;secondes, sans le son, en portrait. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
+        <p class="presse__film-droits">Le film se regarde, il ne se reprend pas. Seule son affiche peut être utilisée.</p>
         <ul class="presse__liens-film">
           <li><a href="/baromatch-film.mp4">Voir le film (MP4)</a></li>
           <li><a href="/#film-texte">Ce que montre le film, en texte</a></li>
           <li><a href="/baromatch-film.webp" download>Télécharger l’affiche<span class="visuellement-cache"> du film</span> <span class="presse__poids">(WebP)</span></a></li>
         </ul>
       </div>
-      <a class="presse__affiche" href="/baromatch-film.mp4"><img src="/baromatch-film.webp" width="540" height="960" loading="lazy" decoding="async" alt="Voir le film de Baromatch&nbsp;: son affiche, «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;», au-dessus d’un quartier où des bars s’allument"></a>
+      <a class="presse__affiche" href="/baromatch-film.mp4"><img src="/baromatch-film.webp" srcset="/baromatch-film.webp 540w, /baromatch-film-720.webp 720w" sizes="(min-width: 800px) 250px, 230px" width="540" height="960" loading="lazy" decoding="async" alt="Voir le film de Baromatch&nbsp;: son affiche, «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;», au-dessus d’un quartier où des bars s’allument"></a>
     </section>
   </div>
 

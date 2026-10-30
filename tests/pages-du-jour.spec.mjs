@@ -190,7 +190,7 @@ for (const { chemin, feuille, ambre } of PAGES) {
       }));
       expect(ecrans.length).toBe(chemin === '/presse.html' ? 5 : 3);
       for (const ecran of ecrans) expect([ecran.src, ecran.etiquette, ecran.visible]).toEqual([ecran.src, 'Écran de démonstration', true]);
-      expect(normaliser(await page.locator('main').textContent())).toContain('Sur ces écrans, les bars, les clubs et les pseudos sont inventés.');
+      expect(normaliser(await page.locator('main').textContent())).toContain('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.');
     });
 
     for (const mouvement of ['reduce', 'no-preference']) {

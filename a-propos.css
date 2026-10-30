@@ -189,7 +189,7 @@
   .apropos__carte { display: grid; grid-row: span 4; grid-template-rows: subgrid; align-content: start; }
 }
 .apropos__corps .apropos__action { padding-top: 20px; }
-.apropos__corps .apropos__rassure { margin-top: 14px; font-size: 0.9375rem; }
+.apropos__corps .apropos__rassure { margin-top: 14px; font-size: 0.875rem; }
 .apropos__rassure a, .apropos__note-carte a, .apropos__qui-publie a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .apropos .capsule, .apropos__bouton { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; }
 .apropos__bouton {

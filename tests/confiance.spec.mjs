@@ -80,7 +80,7 @@ test('à propos : ce qu’est Baromatch avec les mots de marque.json, où il en 
   const editeur = normaliser(await page.locator('h2:has-text("Directeur de la publication") + p').textContent());
   await page.goto(A_PROPOS);
   // Deux lignes sous la citation du fondateur, qui renvoient aux mentions légales pour le reste.
-  expect(normaliser(await page.locator('#mot-du-fondateur ~ .apropos__qui-publie #qui').textContent())).toBe(`Édité par ${editeur}, son fondateur, à titre personnel. Détails dans les mentions légales.`);
+  expect(normaliser(await page.locator('#mot-du-fondateur ~ .apropos__qui-publie #qui').textContent())).toBe(`Édité par ${editeur}, son fondateur, à titre personnel pour le moment. Détails dans les mentions légales.`);
   expect(texte.match(new RegExp(editeur, 'g'))).toHaveLength(1);
 });
 
@@ -126,7 +126,7 @@ test('à propos : ce qu’on refuse, des phrases déjà publiées, et plus de «
   ]);
   const texte = normaliser(await page.locator('main').textContent());
   expect(texte).not.toMatch(/Et aussi|Tu ne paies rien|Ni écusson/);
-  expect(normaliser(await page.locator('.apropos__carte', { hasText: 'Tu es fan' }).textContent())).toContain('Pour les 18 ans et plus.');
+  expect(normaliser(await page.locator('.apropos__carte', { hasText: 'Tu es fan' }).textContent())).toContain('L’appli est pour les 18 ans et plus.');
   // Ce que ces phrases promettent est déjà publié sur les autres pages, avec les mêmes mots.
   const ailleurs = ['comment-on-choisit-les-bars.html', 'pour-les-bars.html', 'cgu.html']
     .map((f) => normaliser(readFileSync(path.join(racine, f), 'utf8').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ')))
@@ -147,9 +147,9 @@ test('à propos : des phrases qui se lisent seules, et l’arrivée d’un bar s
   await page.goto(A_PROPOS);
   const pourquoi = (await page.locator('section[aria-labelledby="pourquoi"] p').allTextContents()).map(normaliser);
   expect(pourquoi).toEqual([
-    'Pour voir un match, il faut un bar qui le diffuse, et de la place pour toute la bande. Souvent, on ne le sait qu’en poussant la porte.',
+    'Pour voir un match au bar, il faut en trouver un qui le diffuse, et de la place pour toute la bande. Souvent, on ne le sait qu’en poussant la porte.',
     'Avant de sortir, tu sais quels bars passent ton match, combien de places il leur reste, et une place t’attend.',
-    'Il sait à l’avance combien de fans viennent. Une place gardée pour quelqu’un qui ne vient pas est libérée à l’heure qu’il a choisie.',
+    'Il sait à l’avance combien de fans viennent. Une place gardée pour quelqu’un qui ne vient pas est libérée à l’heure qu’il a choisie. Gratuit pendant le lancement, sans engagement.',
     'Un soir de match se raconte longtemps : chaque soirée validée devient un sous-bock dans ton album, avec le match, le bar et la date.',
   ]);
   const paris = normaliser(await page.locator('#paris ~ .apropos__corps .apropos__lead').textContent());
@@ -180,7 +180,10 @@ test('à propos : une entrée pour le bar, le fan et la presse, en haut comme en
     ['Presse, partenaire, club ou ville', 'apropos__bouton', 'Écrire à Baromatch', `mailto:${MARQUE.contact}?subject=Partenariat%20ou%20presse%20%E2%80%93%20Baromatch`],
   ]);
   // Sous chaque bouton, une petite phrase d’une ligne (tests/pages-du-jour.spec.mjs la mesure).
-  expect(cartes.map((c) => c.rassure)).toEqual(['Une réponse sous 48 h.', 'Pour les 18 ans et plus.', 'Logos et écrans : la page Presse']);
+  // (la liste d’attente ne demande pas l’âge : c’est l’appli qui est pour les 18 ans et plus).
+  expect(cartes.map((c) => c.rassure)).toEqual(['Une réponse sous 48 h.', 'L’appli est pour les 18 ans et plus.', 'Logos et écrans : la page Presse']);
+  // « Écris-nous quand même » mène au formulaire de « Pour les bars ».
+  await expect(page.locator('main a', { hasText: 'Écris-nous quand même' })).toHaveAttribute('href', '/pour-les-bars.html#proposer');
   // « Me prévenir » : les mots du bouton de la liste d’attente de l’accueil, où il mène.
   await page.goto('/');
   await expect(page.locator('#attente button[type="submit"]')).toHaveText('Me prévenir');
@@ -198,7 +201,7 @@ test('à propos : trois écrans de démonstration, ce qui se passe côté bar, e
     ['/img/appli/ta-soiree-300.webp', 'Écran de démonstration', 'Côté bar : à la porte, l’équipe voit ton pseudo et le nombre de personnes.'],
     ['/img/appli/tu-y-es-300.webp', 'Écran de démonstration', 'Côté bar : après le match, l’Historique compte les réservations, les arrivées et les absents.'],
   ]);
-  expect(normaliser(await page.locator('.apropos__note').textContent())).toBe('Sur ces écrans, les bars, les clubs et les pseudos sont inventés. Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
+  expect(normaliser(await page.locator('.apropos__note').textContent())).toBe('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés. Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
   const bars = normaliser(readFileSync(path.join(racine, 'pour-les-bars.html'), 'utf8').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' '));
   expect(bars).toContain('À la porte : le pseudo et le nombre de personnes.');
   expect(bars).toContain('l’Historique fait les comptes : réservations, arrivées, absents');

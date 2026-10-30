@@ -122,7 +122,7 @@ test('les écrans et le film : cinq écrans d’aujourd’hui chargés tard, cha
     expect(ecran.telecharger[1], nom).toBe(true);
     expect(ecran.telecharger[2], nom).toMatch(/^Télécharger l’écran .+ \(WebP, 600 px\)$/);
   }
-  expect(normaliser(await page.locator('#ecrans + p').textContent())).toContain('Sur ces écrans, les bars, les clubs et les pseudos sont inventés.');
+  expect(normaliser(await page.locator('#ecrans + p').textContent())).toContain('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.');
   const source = readFileSync(path.join(racine, 'presse.html'), 'utf8');
   expect(source).not.toMatch(/capture-|Oberkampf|1 place par compte/);
   expect(readdirSync(path.join(racine, 'presse')).filter((nom) => nom.startsWith('capture-'))).toEqual([]);
@@ -186,6 +186,15 @@ test('données structurées : une page « à propos » de l’Organization de l�
 test('le film en texte, les droits des visuels, et une adresse qui passe à la ligne à 200 %', async ({ page }) => {
   await page.goto(PAGE);
   await expect(page.locator('#film ~ .presse__liens-film a[href="/#film-texte"]')).toHaveText('Ce que montre le film, en texte');
+  // Le film reste à regarder, et la page le dit : un lien pour le voir, aucun pour le télécharger ; l’affiche, elle,
+  // se télécharge, et c’est elle que la description de la page nomme.
+  await expect(page.locator('#film ~ p.presse__film-droits')).toHaveText('Le film se regarde, il ne se reprend pas. Seule son affiche peut être utilisée.');
+  const description = 'Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, affiche du film, texte à copier et contact.';
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);
+  expect(JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())['@graph'].find((n) => n['@type'] === 'AboutPage').description).toBe(description);
+  // L’affiche du film, en 540 et 720 px : jamais agrandie sur un téléphone à ×3 (tests/pages-du-jour.spec.mjs).
+  await expect(page.locator('a.presse__affiche img')).toHaveAttribute('srcset', '/baromatch-film.webp 540w, /baromatch-film-720.webp 720w');
   // Le film reste à regarder : un lien pour le voir, aucun pour le télécharger ; l’affiche, elle, se télécharge.
   await expect(page.locator('#film ~ .presse__liens-film a[href="/baromatch-film.mp4"]')).toHaveText('Voir le film (MP4)');
   expect(await page.locator('a[download][href$=".mp4"]').count()).toBe(0);
@@ -238,7 +247,7 @@ test('l’ouverture : écrire pour la presse ou pour un partenariat, une ligne p
   // Sur cette page : cinq entrées, chacune vers un titre de la page.
   const sommaire = page.getByRole('navigation', { name: 'Sur cette page' });
   const entrees = await sommaire.locator('a').evaluateAll((a) => a.map((l) => [l.textContent.trim(), l.getAttribute('href')]));
-  expect(entrees).toEqual([['Logo', '#logos'], ['Écrans', '#ecrans'], ['Film', '#film'], ['Partenariats', '#partenariats'], ['Couleurs', '#couleurs'], ['Texte', '#texte'], ['Écrire', '#contact']]);
+  expect(entrees).toEqual([['Logo', '#logos'], ['Écrans', '#ecrans'], ['Film', '#film'], ['Partenariats', '#partenariats'], ['Couleurs', '#couleurs'], ['Texte', '#texte'], ['Ce qu’il n’est pas', '#n-est-pas'], ['Écrire', '#contact']]);
   for (const [, ancre] of entrees) await expect(page.locator(`h2${ancre}`)).toHaveCount(1);
   // Dans l’ordre réel de la page.
   const ordre = await page.locator('main h2').evaluateAll((h) => h.map((e) => `#${e.id}`));

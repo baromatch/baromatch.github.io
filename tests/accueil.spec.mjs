@@ -505,7 +505,7 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   await expect(page.locator('#titre-soiree')).toHaveText('Un soir de match, minute par minute.');
   // Ce que montrent ces moments est publié dans la version de test de l’appli (le propriétaire, 28 octobre).
   await expect(page.locator('.soiree .surtitre')).toHaveText('Dans la version de test de l’appli');
-  expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('Sur ces écrans, les bars, les clubs et les pseudos sont inventés.');
+  expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.');
   const lus = await page.locator('.instant').evaluateAll((instants) => instants.map((m) => ({
     heure: m.querySelector('.instant__heure time').textContent,
     titre: m.querySelector('h3.instant__titre').textContent.replace(/\s+/g, ' ').trim(),

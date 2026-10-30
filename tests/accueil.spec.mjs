@@ -468,10 +468,11 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   });
   // Les heures avancent, comme la soirée.
   expect(lus.map((m) => m.heure)).toEqual([...lus.map((m) => m.heure)].sort());
-  // Rien d’autre ne promet les notifications : au plus une par match, et la ligne calme d’une heure avant.
-  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass. Pour le reste, au plus une notification par match.');
+  // Seule la ligne calme d’une heure avant, que le téléphone pose lui-même : aucune notification du serveur n’est
+  // promise (elles n’arrivent pas sur Android dans la version de test), et le mot n’est nulle part dans la soirée.
+  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass.');
   const soiree = normaliser(await page.locator('.soiree').innerText());
-  expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone/i);
+  expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone|notification/i);
 });
 
 test('les écrans de la soirée ne se chargent qu’en approchant, sans rien faire bouger', async ({ page }) => {

@@ -595,7 +595,7 @@ test.describe('le prochain match dans un bar, dans le navigateur (le scénario d
       await expect(semaine.locator('.carte-match--bars:visible')).toHaveCount(0);
       const ligne = semaine.locator('.semaine__prochain');
       await expect(ligne).toBeVisible();
-      await expect(ligne).toHaveText('Le prochain match dans un bar\u00a0: Le Havre – PSG, vendredi 30 octobre · 19:00, 1 bar à Paris. Voir les bars\u00a0: Le Havre – PSG');
+      await expect(ligne).toHaveText('Le prochain match dans un bar\u00a0: Le Havre – PSG, vendredi 30 octobre\u00a0· 19:00, 1 bar à Paris. Voir les bars\u00a0: Le Havre – PSG');
       // Juste sous la phrase, avant la barre des jours.
       expect(await ligne.evaluate((p) => p.previousElementSibling.className)).toBe('semaine__chapo');
       const voir = ligne.getByRole('link', { name: /^Voir les bars\s*:\s*Le Havre – PSG$/ });

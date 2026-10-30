@@ -32,9 +32,11 @@ const DRAPEAUX = JSON.parse(readFileSync(new URL('./insignes/drapeaux.json', imp
 // gardé par l’état sans ce nom) se retrouve par sa clé, le premier de ses noms dans l’appli.
 const CLUBS = JSON.parse(readFileSync(new URL('./contenu/clubs.json', import.meta.url), 'utf8'));
 // Le drapeau : chaque bande déborde de 0,5 sous la suivante (aucun fil de fond entre deux bandes) ; l’anneau intérieur,
-// blanc à 18 %, à 0,5 du bord, d’un trait de 1 (une bande blanche se lit sur un fond sombre).
+// à 0,5 du bord, d’un trait de 1 : blanc à 18 % sur un fond sombre, comme l’appli (une bande blanche s’y lit). L’appli
+// ne pose jamais un drapeau sur un fond clair ; ici, sur le papier d’une affiche ou une carte claire, une bande blanche
+// s’y perdrait : l’anneau y est le filet d’encre que l’insigne d’un club prend sur un fond clair (encre à 60 %).
 const RECOUVREMENT = 0.5;
-const ANNEAU_DU_DRAPEAU = 'rgba(255,255,255,0.18)';
+const ANNEAU_DU_DRAPEAU = { night: 'rgba(255,255,255,0.18)', light: 'rgba(20,21,31,0.6)' };
 
 const arrondi = (valeur) => Number(valeur.toFixed(3));
 
@@ -93,11 +95,11 @@ const rectanglesDe = (centre, taille, { direction, bands }) => {
 const ouvrir = (classe, largeur, hauteur, boite) => `<svg class="${classe}" width="${largeur}" height="${hauteur}" viewBox="${boite}" aria-hidden="true" focusable="false">`;
 
 // Le disque d’une sélection : ses bandes découpées dans un cercle, puis l’anneau.
-const drapeau = (bandes, { taille, slug }) => {
+const drapeau = (bandes, { taille, slug, fond }) => {
   const centre = taille / 2;
   const rayon = taille / 2;
   const decoupe = `drapeau-${codeDuPays(slug)}-${taille}`.replace(/[^a-zA-Z0-9_-]/g, '');
-  return `${ouvrir('insigne', taille, taille, `0 0 ${taille} ${taille}`)}<defs><clipPath id="${decoupe}"><circle cx="${centre}" cy="${centre}" r="${rayon}"/></clipPath></defs><g clip-path="url(#${decoupe})">${rectanglesDe(centre, rayon * 2, bandes)}</g><circle cx="${centre}" cy="${centre}" r="${rayon - 0.5}" stroke="${ANNEAU_DU_DRAPEAU}" stroke-width="1" fill="none"/></svg>`;
+  return `${ouvrir('insigne', taille, taille, `0 0 ${taille} ${taille}`)}<defs><clipPath id="${decoupe}"><circle cx="${centre}" cy="${centre}" r="${rayon}"/></clipPath></defs><g clip-path="url(#${decoupe})">${rectanglesDe(centre, rayon * 2, bandes)}</g><circle cx="${centre}" cy="${centre}" r="${rayon - 0.5}" stroke="${ANNEAU_DU_DRAPEAU[fond] ?? ANNEAU_DU_DRAPEAU.night}" stroke-width="1" fill="none"/></svg>`;
 };
 
 // La saison écrite sur le bord (à partir de 128 px) : celle de l’instant du passage ; aucune sans lui (une liste, où
@@ -108,7 +110,7 @@ export const saisonDe = (maintenant) => (Number.isFinite(maintenant) ? seasonMar
 // maintenant : l’instant du passage (la saison), ou saison : la saison elle-même (« 26/27 »).
 export const insigne = (club, { taille, fond, maintenant, saison = saisonDe(maintenant) }) => {
   const dessin = dessinDe(club);
-  if (dessin.bandes) return drapeau(dessin.bandes, { taille, slug: dessin.slug });
+  if (dessin.bandes) return drapeau(dessin.bandes, { taille, slug: dessin.slug, fond });
   return `${ouvrir('insigne', taille, taille, `0 0 ${BOITE} ${BOITE}`)}${elements(dessin.fiche, { taille, fond, saison })}</svg>`;
 };
 

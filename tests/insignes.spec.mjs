@@ -137,10 +137,14 @@ test.describe('les insignes, posés comme l’appli les pose', () => {
     expect(bandesDe('nt-fr')).toEqual({ direction: 'vertical', bands: ['#0055A4', '#FFFFFF', '#EF4135'] });
     expect(bandesDe('nt-zz')).toBeUndefined();
     expect(bandesDe('paris-saint-germain')).toBeUndefined();
-    expect(insigne({ slug: 'nt-fr', nom: 'France' }, { taille: 30, fond: 'light', maintenant: JEUDI })).toBe(`${ouverture('insigne', 30, 30, '0 0 30 30')}`
+    const france = `${ouverture('insigne', 30, 30, '0 0 30 30')}`
       + '<defs><clipPath id="drapeau-fr-30"><circle cx="15" cy="15" r="15"/></clipPath></defs><g clip-path="url(#drapeau-fr-30)">'
       + '<rect x="0" y="0" width="10.5" height="30" fill="#0055A4"/><rect x="10" y="0" width="10.5" height="30" fill="#FFFFFF"/><rect x="20" y="0" width="10" height="30" fill="#EF4135"/>'
-      + '</g><circle cx="15" cy="15" r="14.5" stroke="rgba(255,255,255,0.18)" stroke-width="1" fill="none"/></svg>');
+      + '</g><circle cx="15" cy="15" r="14.5" stroke="rgba(255,255,255,0.18)" stroke-width="1" fill="none"/></svg>';
+    expect(insigne({ slug: 'nt-fr', nom: 'France' }, { taille: 30, fond: 'night', maintenant: JEUDI })).toBe(france);
+    // Sur un fond clair (que l’appli ne connaît pas pour un drapeau), l’anneau est le filet d’encre des insignes clairs :
+    // la bande blanche ne se perd pas dans le papier.
+    expect(insigne({ slug: 'nt-fr', nom: 'France' }, { taille: 30, fond: 'light', maintenant: JEUDI })).toBe(france.replace('rgba(255,255,255,0.18)', 'rgba(20,21,31,0.6)'));
     // Une sélection que la table ne connaît pas : l’insigne neutre de son nom, comme dans l’appli.
     expect(insigne({ slug: 'nt-zz', nom: 'Zedland' }, { taille: 30, fond: 'light', maintenant: JEUDI })).toContain('fill="#1B1D27"');
     const paire = paireDInsignes({ slug: 'nt-fr', nom: 'France' }, { slug: 'paris-saint-germain', nom: 'PSG' }, { fond: 'light', maintenant: JEUDI });

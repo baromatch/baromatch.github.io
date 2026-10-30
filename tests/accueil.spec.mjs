@@ -194,8 +194,14 @@ const lireLeFilm = (page) => page.locator('#film').evaluate((v) => ({ enPause: v
 // Deux images peintes : l’observateur de défilement a parlé.
 const deuxImages = (page) => page.evaluate(() => new Promise((suite) => requestAnimationFrame(() => requestAnimationFrame(suite))));
 
-for (const largeur of [360, 1280]) {
-  test(`à ${largeur} px : le bouton du film l’arrête au clavier, juste après les matchs de la semaine, et la pause tient en revenant au film`, async ({ page }) => {
+// L’ordre du clavier est celui du HTML, choisi pour le téléphone : l’inscription, les matchs de la semaine, puis le
+// film. Sur ordinateur, le film est affiché à droite, au-dessus des matchs (styles.css, .ouverture > .semaine) : il vient
+// quand même au clavier après eux. Le test garde cet ordre voulu aux deux largeurs, chacune sous son nom.
+for (const [largeur, nom] of [
+  [360, 'au téléphone (360 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, affichés au-dessus de lui'],
+  [1280, 'sur ordinateur (1280 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, bien que le film soit affiché au-dessus d’eux (l’ordre suit le téléphone)'],
+]) {
+  test(`${nom} ; la pause tient en revenant au film`, async ({ page }) => {
     await simulerUnLecteur(page);
     // Le jour du bloc enregistré : une semaine après, la barre des jours et ses cartes s’effacent (main.js).
     await auJourDeLAccueil(page);
@@ -207,11 +213,14 @@ for (const largeur of [360, 1280]) {
     await expect(lecture).toBeVisible();
     await expect(lecture).toHaveAccessibleName('Mettre le film en pause');
     await expect(lecture).not.toHaveAttribute('aria-pressed', /.*/);
-    // Au clavier : juste après le dernier lien des matchs du jour choisi (sous la liste d’attente : au téléphone, le film
-    // vient après eux), dans le cadre du film.
+    // Au clavier : juste après le dernier lien des matchs du jour choisi, dans le cadre du film.
     await page.locator('#semaine').locator('a:visible, input:checked').last().focus();
     await page.keyboard.press('Tab');
     await expect(lecture).toBeFocused();
+    // Ce que chaque largeur affiche : au téléphone, le film sous les matchs ; sur ordinateur, au-dessus d’eux.
+    const [film, matchs] = await Promise.all([page.locator('#film-cadre').boundingBox(), page.locator('#semaine').boundingBox()]);
+    if (largeur < 960) expect(film.y).toBeGreaterThan(matchs.y + matchs.height);
+    else expect(film.y + film.height).toBeLessThan(matchs.y);
     const [boite, cadre] = await Promise.all([lecture.boundingBox(), page.locator('#film-cadre').boundingBox()]);
     expect(boite.width).toBeGreaterThanOrEqual(44);
     expect(boite.height).toBeGreaterThanOrEqual(44);

@@ -1348,6 +1348,8 @@ a:hover { color: var(--goutte); }
 .semaine { margin-top: 48px; padding: 48px 0 56px; background: var(--fond-releve, var(--nuit-releve)); box-shadow: 0 0 0 100vmax var(--fond-releve, var(--nuit-releve)); clip-path: inset(0 -100vmax); }
 .ouverture > .semaine { grid-column: 1 / -1; }
 @media (min-width: 720px) { .semaine { padding: 64px 0 80px; } }
+/* Sur ordinateur, le film est affiché au-dessus des matchs mais vient au clavier après eux : l’ordre est celui du HTML,
+   choisi pour le téléphone (les matchs sous l’inscription, puis le film). */
 @media (min-width: 960px) { .ouverture > .semaine { grid-row: 6; margin-top: 72px; } }
 .semaine .titre-section { max-width: none; }
 .semaine__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }

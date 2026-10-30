@@ -14,6 +14,7 @@ import {
   accueilAvecLaSemaine, blocDeLaSemaine, controlerLaSemaine, disque, ecrireLAccueil, preparerLAccueil, REPERES,
 } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
+import { echapper, insecables } from '../generateur/texte.mjs';
 import { racine } from './outils/environnement.mjs';
 import { auJourDeLAccueil } from './outils/horloge.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
@@ -107,8 +108,10 @@ test.describe('le bloc, du générateur', () => {
   test('aucun bar publié : la phrase vraie en tête, qui mène à la liste d’attente ; avec des bars, une autre phrase', () => {
     // Sans bar publié, aucune soirée (donnees.mjs ne garde que celles des bars publiés).
     const sans = bloc({ matchs: MATCHS.map((m) => ({ ...m, soirees: [] })) });
-    // Strictement vraie, pour les deux visiteurs : le fan (la liste d’attente, avec les mots de son formulaire) et le bar.
-    expect(textes.accueil.sansBar).toBe('Baromatch cherche ses premiers bars à Paris. Quand un bar de Baromatch annonce un match, ce match passe en tête de son jour. En attendant, chaque match a sa page.');
+    // Strictement vraie, pour les deux visiteurs : le fan (ce qu’il trouve d’abord, puis la vérité : aucun bar encore,
+    // puis la liste d’attente, avec les mots de son formulaire) et le bar. Avec des bars : ce que le fan y gagne.
+    expect(textes.accueil.sansBar).toBe('Les matchs des sept prochains jours, à l’heure de Paris, chacun avec sa page. Aucun bar ne les annonce encore sur Baromatch.');
+    expect(textes.accueil.avecBars).toBe('Les matchs des sept prochains jours, à l’heure de Paris. Ceux que tu peux voir dans un bar passent en premier.');
     expect(textes.accueil.sansBarLien).toBe(ACCUEIL.match(/<label class="attente__etiquette" for="attente-mail">([^<]+)<\/label>/)[1]);
     expect(textes.accueil.sansBarLien).toBe('Préviens-moi quand Baromatch arrive');
     expect(textes.accueil.sansBarProposer).toBe('Tu tiens un bar\u00a0? Propose-le');
@@ -229,6 +232,10 @@ test.describe('l’accueil : le générateur n’écrit que le bloc', () => {
     expect(ACCUEIL.split(REPERES.fin)).toHaveLength(2);
     const dedans = ACCUEIL.split(REPERES.debut)[1].split(REPERES.fin)[0];
     expect(controlerLaSemaine(dedans)).toEqual([]);
+    // Sa phrase de tête est celle de textes.json, telle que le générateur l’écrit : une phrase changée change aussi le bloc
+    // enregistré (le reste du bloc vient des données du passage ; l’Action le réécrit dans les 3 heures).
+    const phrases = [textes.accueil.sansBar, textes.accueil.avecBars].map((phrase) => insecables(`<p class="semaine__chapo">${echapper(phrase)}</p>`));
+    expect(phrases).toContain(dedans.match(/<p class="semaine__chapo">[^<]*<\/p>/)?.[0]);
     // Le bloc est dans l’ouverture, juste avant le film : au téléphone, les matchs viennent après la liste d’attente.
     const ouverture = ACCUEIL.split('<section class="ouverture')[1].split('\n  </section>')[0];
     expect(ouverture.indexOf(REPERES.debut)).toBeGreaterThan(ouverture.indexOf('</form>'));

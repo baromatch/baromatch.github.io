@@ -54,12 +54,16 @@ export const lireLeCadre = () => {
 const lien = (href, contenu, chemin, classe = '') => `<a${classe ? ` class="${classe}"` : ''} href="${href}"${href === chemin ? ' aria-current="page"' : ''}>${contenu}</a>`;
 
 // L’en-tête. action : null (l’accueil, « Pour les bars », les pages légales, la page introuvable, les affiches),
-// « ambre » ou « contour ». Une page en anglais garde l’en-tête en français, et le dit.
-export const entete = (cadre, { chemin = '', action = null, langue = 'fr' } = {}) => {
+// « ambre » ou « contour ». cible : où mène « Préviens-moi » (la liste d’attente de l’accueil, ou celle de la page quand
+// elle a la sienne). Dans le HTML, « Préviens-moi » vient avant le menu : au téléphone, il est en haut, à côté du logo,
+// et le menu en dessous ; à l’ordinateur, styles.css le met au bout de la ligne. Une page en anglais garde l’en-tête en
+// français, et le dit.
+export const entete = (cadre, { chemin = '', action = null, cible = '/#attente', langue = 'fr' } = {}) => {
   const m = cadre.textes.menu;
   const entree = (href, texte) => `<li>${lien(href, e(texte), chemin, 'menu__lien')}</li>`;
   return `<header class="entete page"${langue === 'en' ? ' lang="fr"' : ''}>
-<a class="entete__logo" href="/" aria-label="Baromatch, accueil">${cadre.logo}</a>
+<a class="entete__logo" href="/" aria-label="Baromatch, accueil">${cadre.logo}</a>${action ? `
+<a class="entete__attente${action === 'contour' ? ' entete__attente--contour' : ''}" href="${cible}">${e(cadre.textes.action)}<span class="visuellement-cache">${e(cadre.textes.actionSuite)}</span></a>` : ''}
 <nav class="menu" aria-label="${e(m.nom)}">
 <ul class="menu__liste">
 <li class="menu__groupe">
@@ -71,8 +75,7 @@ ${entree('/matchs/', m.semaine)}
 ${entree('/pour-les-bars.html', m.bars)}
 ${entree('/a-propos.html', m.aPropos)}
 </ul>
-</nav>${action ? `
-<a class="entete__attente${action === 'contour' ? ' entete__attente--contour' : ''}" href="/#attente">${e(cadre.textes.action)}</a>` : ''}
+</nav>
 </header>`;
 };
 
@@ -88,6 +91,8 @@ export const actionDeLaPage = (contenu) => (aUnBoutonAmbre(contenu) ? 'contour' 
 // Les pages du générateur portent « Préviens-moi », sauf les affiches à imprimer et la feuille du patron (/affiche/) :
 // elles servent au patron d’un bar.
 export const pageDuGenerateurAvecLAction = (chemin) => !chemin.includes('/affiche/');
+// Une page qui a sa propre liste d’attente (une ville) : « Préviens-moi » mène à elle, sur la page.
+export const cibleDeLAction = (contenu) => (/<form\b[^>]*\bid="attente"/.test(contenu) ? '#attente' : '/#attente');
 
 // Le pied de page, de nuit. marque : marque.json (le contact, X, le slogan, l’état de l’appli). avecPresse : la page
 // Presse existe. Sur une page en anglais, le même pied, dit en français (lang="fr"), sous une phrase en anglais.
@@ -115,7 +120,7 @@ export const pied = (cadre, { marque, chemin = '', avecPresse = true, langue = '
 <li>${lien('/#attente', e(t.attente), chemin, 'pied__action')}</li>
 <li>${lien('/pour-les-bars.html#proposer', e(t.proposer), chemin, 'pied__action')}</li>
 </ul>
-<p>${e(t.contact)}\u00A0: <a href="mailto:${e(marque.contact)}">${e(marque.contact).replace('@', '@<wbr>')}</a></p>${x ? `
+<p>${avecPresse ? lien('/presse.html', e(t.contact), chemin) : e(t.contact)}\u00A0: <a href="mailto:${e(marque.contact)}">${e(marque.contact).replace('@', '@<wbr>')}</a></p>${x ? `
 <p><a href="${e(x)}" rel="me noopener">X\u00A0: @${e(x.replace(/\/+$/, '').split('/').pop())}</a></p>` : ''}
 </div>
 </div>
@@ -178,13 +183,13 @@ const entre = (html, { debut, fin }) => {
 };
 
 // La page avec son cadre : l’en-tête et le pied écrits entre leurs repères, rien d’autre de changé. Le style de
-// « Préviens-moi » se lit dans le reste de la page (hors de l’en-tête et du pied).
+// « Préviens-moi » et sa cible se lisent dans le reste de la page (hors de l’en-tête et du pied).
 export const pageAvecLeCadre = (html, { chemin, action }, { cadre = lireLeCadre(), marque, avecPresse = true } = {}) => {
   const haut = entre(html, REPERES_DU_CADRE.entete);
   const bas = entre(haut.apres, REPERES_DU_CADRE.pied);
   const reste = `${haut.avant}${bas.avant}${bas.apres}`;
   const style = action ? actionDeLaPage(reste) : null;
-  return `${haut.avant}\n${entete(cadre, { chemin, action: style })}\n${bas.avant}\n${pied(cadre, { marque, chemin, avecPresse })}\n${bas.apres}`;
+  return `${haut.avant}\n${entete(cadre, { chemin, action: style, cible: cibleDeLAction(reste) })}\n${bas.avant}\n${pied(cadre, { marque, chemin, avecPresse })}\n${bas.apres}`;
 };
 
 // Réécrit le cadre de chaque page écrite à la main (toutes contrôlées avant d’en écrire une seule) ; verifier : n’écrit

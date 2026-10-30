@@ -3,7 +3,7 @@
 // lisible par un robot qui n’exécute rien ; seul le bloc « Partager » (partage.mjs) charge un fichier du site,
 // partage.js, qui l’enrichit sans rien changer au reste, et la mesure d’audience, quand marque.json l’active, charge
 // /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
-import { actionDeLaPage, entete, pageDuGenerateurAvecLAction, pied } from './cadre.mjs';
+import { actionDeLaPage, cibleDeLAction, entete, pageDuGenerateurAvecLAction, pied } from './cadre.mjs';
 import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
@@ -71,12 +71,12 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
   : corps);
 
 // L’en-tête et le pied de page : ceux de cadre.mjs, avec « Préviens-moi » (ambre, ou en contour si le corps a déjà son
-// bouton ambre), sauf sur les affiches. Une page en anglais garde l’en-tête et le pied du site, en français : ils le
-// disent (lang="fr").
+// bouton ambre ; vers la liste d’attente de la page quand elle en a une), sauf sur les affiches. Une page en anglais
+// garde l’en-tête et le pied du site, en français : ils le disent (lang="fr").
 export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => {
   const contenu = avecLePartage(corps, { partage, titre, chemin, textesDuPartage });
   const action = pageDuGenerateurAvecLAction(chemin) ? actionDeLaPage(contenu) : null;
-  return insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, langue })}
+  return insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, cible: cibleDeLAction(contenu), langue })}
 
 <main id="contenu" class="regarder page">
 ${contenu}

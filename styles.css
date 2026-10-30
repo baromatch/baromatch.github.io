@@ -215,6 +215,8 @@ a:hover { color: var(--goutte); }
 .menu__lien[aria-current="page"],
 .menu__lien[aria-current="page"]:hover { background: var(--menu-courant); color: var(--menu-envers); }
 .menu__lien[aria-current="page"]::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ambre); }
+/* L’anneau du focus passe devant la pilule voisine, séparé d’elle par le fond du menu. */
+.menu__lien:focus-visible { z-index: 1; box-shadow: 0 0 0 3px var(--menu-fond); }
 
 /* « Préviens-moi » : ambre ; en contour (le bord à 3:1) sur une page qui a déjà son bouton ambre (cadre.mjs). */
 .entete__attente {
@@ -245,14 +247,14 @@ a:hover { color: var(--goutte); }
    « Pour les bars » et « À propos » à droite. Les rangs restent permis : si la place manque, la ligne se plie. */
 @media (min-width: 60em) {
   .entete { column-gap: 32px; padding-top: 16px; padding-bottom: 16px; }
-  .menu { flex: 1 1 auto; order: 0; }
+  .menu { flex: 1 1 auto; order: 1; }
   .menu__liste { align-items: center; gap: 4px; padding: 0; border: 0; border-radius: 0; background: none; }
   .menu__liste > li, .menu__liste > .menu__groupe, .menu__matchs > li { flex: none; }
   .menu__liste > li:nth-child(2) { margin-inline-start: auto; }
   .menu__matchs { flex-wrap: nowrap; padding: 3px; border: 1px solid var(--menu-bord); border-radius: 999px; background: var(--menu-fond); }
   .menu__lien { flex: none; flex-wrap: nowrap; min-height: 44px; padding: 0 20px; border-radius: 999px; font-size: 1rem; font-stretch: 100%; white-space: nowrap; }
   .menu__liste > li:not(.menu__groupe) .menu__lien { padding: 0 16px; }
-  .entete__attente { order: 0; margin-inline-start: 8px; font-size: 1rem; }
+  .entete__attente { order: 2; margin-inline-start: 8px; font-size: 1rem; }
 }
 
 /* ---------- Ouverture (hero) ---------- */
@@ -545,7 +547,8 @@ a:hover { color: var(--goutte); }
 
 /* Un téléphone de 880 px de haut ou moins (barre du navigateur comprise) : les marges se resserrent, pour que le
    statut, la ville, le champ et le bouton de la liste d’attente soient dans le premier écran. En dessous de 744 px de
-   haut, le verre de l’ouverture s’efface (celui du logo reste) : le formulaire passe avant lui. */
+   haut, le verre de l’ouverture s’efface (celui du logo reste) : le formulaire passe avant lui, le statut à 8 px sous le
+   rang du menu. */
 @media (max-width: 719px) and (max-height: 880px) {
   .ouverture { padding-top: 4px; }
   .ouverture__titre { margin-top: 16px; font-size: clamp(2.75rem, 13vw, 3.4rem); }
@@ -557,7 +560,7 @@ a:hover { color: var(--goutte); }
 }
 @media (max-width: 719px) and (max-height: 743px) {
   .ouverture .verre { display: none; }
-  .ouverture { padding-top: 16px; }
+  .ouverture { padding-top: 8px; }
 }
 
 /* Un ordinateur de 800 px de haut ou moins (1 280 × 720, 1 366 × 768, barre du navigateur ôtée) : les marges se
@@ -788,10 +791,15 @@ a:hover { color: var(--goutte); }
 .pied p { margin: 0; }
 .pied a { color: var(--texte-doux); text-decoration: none; overflow-wrap: anywhere; }
 .pied a:hover { color: var(--ambre); text-decoration: underline; text-underline-offset: 0.2em; }
-.pied a[aria-current="page"] { color: var(--texte); }
+/* La page où tu es, dans le pied : plus claire, et soulignée (pas seulement une couleur). */
+.pied a[aria-current="page"] { color: var(--texte); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.25em; }
 .pied .pied__action { color: var(--ambre); font-weight: 700; text-decoration: underline; text-decoration-color: rgba(255, 177, 61, 0.5); text-underline-offset: 0.25em; }
 .pied .pied__action:hover { color: var(--goutte); text-decoration-color: var(--ambre); }
 .pied__contact a, .pied__plan a, .pied__legal a { display: inline-flex; align-items: center; min-height: 44px; }
+/* Dans la ligne « Presse et partenariats : contact@… », les deux liens soulignés se distinguent du texte. */
+.pied__contact p a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+/* Un lien de liste prend toute sa case : « Lyon » se touche sur toute la largeur de la colonne. */
+.pied__plan li a { display: flex; }
 .pied__tete { display: grid; gap: 24px 48px; }
 .pied__marque { display: flex; align-items: center; gap: 12px; color: var(--texte); font-size: 1.375rem; font-weight: 800; font-stretch: 92%; }
 .pied__marque svg { width: 36px; height: 36px; }
@@ -811,9 +819,13 @@ a:hover { color: var(--goutte); }
 .pied__legal { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 32px; margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--trait); }
 .pied__legal ul { display: flex; flex-wrap: wrap; column-gap: 24px; }
 .pied__legal p { padding: 10px 0; color: var(--texte-discret); font-size: 0.875rem; }
-@media (min-width: 40em) { .pied__plan { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Dès 40 em, des colonnes de 10 rem au moins (les clubs sur deux) : autant que la largeur en tient, moins quand le texte
+   grandit ; aucun titre ne se coupe en plein mot. */
+@media (min-width: 40em) {
+  .pied__plan { grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); }
+  .pied__plan > div:nth-child(2) { grid-column: span 2; }
+}
 @media (min-width: 48em) { .pied__tete { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); } }
-@media (min-width: 64em) { .pied__plan { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr) minmax(0, 1.1fr) minmax(0, 0.8fr) minmax(0, 1.3fr); } }
 
 /* ---------- Transition : l’ancien en-tête et l’ancien pied ----------
    Les pages des matchs publiées avant cette navigation gardent leur ancien en-tête (.entete__nav) et leur ancien pied
@@ -846,38 +858,65 @@ a:hover { color: var(--goutte); }
 .pied__liens { display: flex; flex-wrap: wrap; gap: 0 24px; }
 .pied__liens a { display: inline-flex; align-items: center; min-height: 44px; }
 
-/* Le bandeau du bas, au téléphone debout (22 em de large au moins : 352 px à texte normal ; 30 em de haut). Il ne cache
-   jamais rien : le pied de page garde sa place au bout de la page (--bandeau : un rang tout juste au texte normal, de la
-   place pour plusieurs rangs dès que le texte grandit), le focus et les ancres s’arrêtent au-dessus (scroll-padding),
-   il s’efface quand un champ texte a le focus (le clavier est là ; pas pour les puces), et il laisse la barre de
-   sélection de la boutique seule en bas. 10 px au-dessus du bord, plus la zone basse de l’iPhone ; rien en hauteur
-   d’écran (vh). */
-@media screen and (min-width: 22em) and (max-width: 59.99em) and (min-height: 30em) {
-  :root { --bandeau: clamp(58px, 58px + (1rem - 16px) * 1000, max(118px, 6rem)); }
-  html { scroll-padding-bottom: calc(var(--bandeau) + var(--zone-basse) + 18px); }
-  .menu { position: fixed; z-index: 30; left: 10px; right: 10px; bottom: calc(10px + var(--zone-basse)); max-width: 28rem; margin-inline: auto; }
-  .menu__liste { box-shadow: var(--menu-ombre); }
+/* Au téléphone (22,5 à 45 em de large : 360 à 719 px à texte normal), les quatre mots sur un seul rang sous le logo, un
+   cran plus étroits (86 %) que le texte courant ; la place du rang est gardée, le même que l’écran soit debout ou couché.
+   --bandeau, mesuré de 360 à 719 px avec Bricolage et avec la police de secours : un rang (50 px) jusqu’à 18,4 px de
+   texte (115 %) ; au-delà, deux rangs (96 à 115 px jusqu’à 200 %), puis plus (178 px à 250 %, 268 px à 300 %) ;
+   122 px, puis 11,5 rem moins 274 px, gardent 7 à 10 px de marge sans réserver bien plus que le rang. */
+@media screen and (min-width: 22.5em) and (max-width: 44.99em) {
+  :root { --bandeau: clamp(50px, 50px + (1rem - 18.4px) * 1000, max(122px, 11.5rem - 274px)); }
+  /* L’en-tête serré, pour que le rang ne pousse pas l’appel du premier écran hors de l’écran : le logo garde sa zone
+     de 44 px (12 px au-dessus, 9 dessous, jusqu’au bord des entrées), chaque entrée ses 44 px, le rang 50 px.
+     « Préviens-moi », passé sous le logo (texte agrandi), commence lui aussi au bord de cette zone. */
+  .entete { row-gap: 6px; padding-top: 12px; padding-bottom: 0; }
+  .entete__logo { padding: 12px 0 9px; margin: -12px 0 -9px; }
+  .entete__attente { margin-top: 3px; }
+  .menu { min-height: var(--bandeau); }
+  .menu__liste { max-width: 28rem; margin-inline: auto; padding: 2px; }
   .menu__liste > li, .menu__matchs > li { flex: 1 1 auto; }
   .menu__liste > .menu__groupe { flex: 1.7 1 auto; }
-  /* Les quatre mots tiennent sur un rang dès 352 px, un cran plus étroits (86 %) que le texte courant. */
-  .menu__lien { gap: 6px; padding-inline: 5px; font-size: 0.875rem; font-stretch: 86%; }
+  .menu__lien { gap: 6px; min-height: 44px; padding-inline: 5px; font-size: 0.875rem; font-stretch: 86%; }
   .menu__lien[aria-current="page"] { padding-bottom: 12px; }
   .menu__lien[aria-current="page"]::before { position: absolute; bottom: 6px; left: 50%; margin-left: -3.5px; }
-  .pied { padding-bottom: calc(40px + var(--bandeau) + var(--zone-basse) + 10px); }
-  body.avec-barre .menu,
-  body:has(:is(input:not([type="radio"], [type="checkbox"], [type="range"], [type="submit"], [type="button"], [type="reset"], [type="image"], [type="file"], [type="color"]), textarea):focus) .menu { visibility: hidden; }
 }
-@media screen and (min-width: 36em) and (max-width: 59.99em) and (min-height: 30em) {
-  .menu { max-width: 32rem; }
+@media screen and (min-width: 36em) and (max-width: 44.99em) {
+  .menu__liste { max-width: 32rem; }
   .menu__lien { padding-inline: 10px; font-size: 1rem; font-stretch: 100%; }
 }
+/* Le bandeau du bas : au téléphone debout (25 em de haut au moins : 400 px, plus qu’un téléphone couché, moins qu’un
+   téléphone debout dont les barres du navigateur reviennent), le rang devient un bandeau fixe en bas de l’écran
+   dès qu’il est sorti par le haut, et redevient le rang quand on remonte. À l’arrivée, il ne couvre donc rien : il est
+   à sa place, sous le logo. Sans animation liée au défilement (un navigateur plus ancien), le rang reste sous le logo.
+   Il ne cache jamais rien : le pied garde sa place au bout de la page, le focus et les ancres s’arrêtent au-dessus de
+   lui (scroll-padding), et il rentre dans son rang quand on écrit dans un formulaire (pas pour une puce) et sur la
+   boutique quand sa barre de sélection est là. 10 px au-dessus du bord, plus la zone basse de l’iPhone ; rien en
+   hauteur d’écran (vh). Le rang gardé sous le logo fait qu’aucun passage de l’un à l’autre ne déplace la page. */
+@supports (animation-timeline: view()) {
+  @media screen and (min-width: 22.5em) and (max-width: 44.99em) and (min-height: 25em) {
+    html { scroll-padding-bottom: calc(var(--bandeau) + var(--zone-basse) + 18px); }
+    .pied { padding-bottom: calc(40px + var(--bandeau) + var(--zone-basse) + 10px); }
+    .menu { view-timeline: --menu block; }
+    .menu__liste { animation: bandeau-du-bas linear both; animation-timeline: --menu; animation-range: exit 0% exit 100%; }
+    body.avec-barre .menu__liste { animation: none; }
+  }
+}
+@supports (animation-timeline: view()) and selector(:has(*)) {
+  @media screen and (min-width: 22.5em) and (max-width: 44.99em) and (min-height: 25em) {
+    body:has(:is(form :focus, input:focus, textarea:focus, select:focus):not([type="radio"])) .menu__liste { animation: none; }
+  }
+}
+@keyframes bandeau-du-bas {
+  0%, 99.9% { position: static; }
+  100% { position: fixed; z-index: 30; left: 10px; right: 10px; bottom: calc(10px + var(--zone-basse)); box-shadow: var(--menu-ombre); }
+}
 
-/* Le contraste élevé de Windows : la page où l’on est cernée, les pilules des clubs aussi, et le logo dans la couleur du
-   texte (sinon noir sur noir). */
+/* Le contraste élevé de Windows : la page où l’on est soulignée (le contour reste au focus), les pilules des clubs
+   cernées, et le logo dans la couleur du texte, au jour comme à la nuit (sinon noir sur noir). */
 @media (forced-colors: active) {
-  .menu__lien[aria-current="page"] { outline: 3px solid Highlight; outline-offset: -3px; }
+  .menu__lien[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.3em; }
   .pied .pied__club { border: 1px solid CanvasText; }
-  .entete__logo path[fill="#F7F7F9"] { fill: CanvasText; }
+  :root:root .entete__logo path[fill="#F7F7F9"] { fill: CanvasText; }
+  :root .entete__logo #en-verre stop { stop-color: CanvasText; }
 }
 
 /* ---------- Pages de texte (mentions, confidentialité, 404) ---------- */
@@ -1151,6 +1190,8 @@ a:hover { color: var(--goutte); }
 }
 @media (min-width: 720px) { .vitrine-accueil { padding-top: 120px; padding-bottom: 128px; } }
 .testeurs-accueil__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); }
+/* Les boutons ambre. Un bouton ambre de plus : l’ajouter aussi à AMBRES (generateur/cadre.mjs), pour que « Préviens-moi »
+   passe en contour sur sa page. */
 .vitrine-accueil__bouton,
 .inscription__bouton,
 .boutique-produit__ajouter,

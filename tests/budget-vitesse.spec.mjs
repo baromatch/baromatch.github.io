@@ -57,22 +57,29 @@ const KO = 1024;
 // de l’ancien menu et de l’ancien pied : styles.css passe de 72,2 à 79,9 Ko (1,9 Ko de plus, compressés). Les seuils de
 // CSS montent d’autant : l’accueil et les pages fixes de 73 à 80 Ko, les pages générées de 89 à 97, les affiches de 105
 // à 113, « Pour les bars » de 100 à 104. Toujours aucun script sur les pages fixes.
+// 30 octobre 2026, la même navigation après sa relecture : rien de fixe au premier écran (le rang sous le logo, qui ne
+// devient le bandeau du bas qu’une fois sorti de l’écran), l’en-tête serré au téléphone, les retours des formulaires
+// au-dessus du bandeau, et le bloc qui met encore en forme l’ancien en-tête et l’ancien pied des pages des matchs déjà
+// publiées (2,3 Ko, à retirer quand l’Action les aura réécrites). styles.css passe de 79,9 à 85,1 Ko (de 72,2 avant la
+// navigation ; compressé, de 17,6 à 21,0 Ko en tout). Les seuils de CSS : l’accueil et les pages fixes de 80 à 86 Ko,
+// les pages générées de 97 à 103, les affiches de 113 à 119, « Pour les bars » de 104 à 111. main.js : 18,8 Ko (le
+// retour de la liste d’attente amené à l’écran) : le JS de l’accueil de 18 à 19 Ko.
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 80, images: 24 } },
-  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 80, images: 0 } },
-  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 80, images: 0 } },
-  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 245, js: 68, css: 104, images: 72 } },
-  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 97, images: 4 } },
-  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 97, images: 4 } },
-  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 97, images: 4 } },
-  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 97, images: 4 } },
-  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 97, images: 4 } },
-  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 145, js: 4, css: 97, images: 6 } },
-  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 97, images: 4 } },
-  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 97, images: 4 } },
-  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 97, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 113, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 113, images: 4 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 19, css: 86, images: 24 } },
+  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 86, images: 0 } },
+  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 86, images: 0 } },
+  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 245, js: 68, css: 111, images: 72 } },
+  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 103, images: 4 } },
+  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 103, images: 4 } },
+  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 103, images: 4 } },
+  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 103, images: 4 } },
+  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 103, images: 4 } },
+  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 145, js: 4, css: 103, images: 6 } },
+  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 103, images: 4 } },
+  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 103, images: 4 } },
+  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 103, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 119, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 119, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };

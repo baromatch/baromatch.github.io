@@ -765,6 +765,8 @@
     if (ouverteDepuisMs() > PAGE_MAX_MS) return aller("expire");
     if (correctionPerdue(demande)) return aller("courriel", { icone: "courriel", contenu: TEXTES.correction });
     aller("envoi");
+    // Le bouton, devenu « Envoi… », reste en entier au-dessus du bandeau du bas (sur iPhone, il n’a pas le focus).
+    if (bouton.scrollIntoView) bouton.scrollIntoView({ block: "nearest" });
     apresRemplissageMin(function () { essayer(demande, 1); });
   }
 

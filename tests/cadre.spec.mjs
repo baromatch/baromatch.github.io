@@ -3,8 +3,10 @@
 //   retouche à la main de l’en-tête ou du pied est refusée ; les pages du générateur ont le même cadre, et, à la page où
 //   l’on est et à l’action près, l’en-tête et le pied sont les mêmes partout ;
 // - la page où l’on est le dit (aria-current), dans le menu et le pied, et se voit : la pilule pleine et le point ambre ;
+//   dans le pied, elle est soulignée (pas seulement une couleur) ;
 // - « Préviens-moi » est dans l’en-tête des pages décidées, ambre si la page n’a pas déjà son bouton ambre, en contour
-//   sinon (lu tel qu’il est peint) ;
+//   sinon (lu tel qu’il est peint) ; il mène à la liste d’attente de la page quand elle en a une (une ville) ;
+// - le pied : ses deux actions, « Presse et partenariats » vers la page Presse, l’adresse e-mail soulignée ;
 // - la ligne d’état du pied suit marque.json (comme la pilule de l’accueil) ;
 // - l’ancien cadre (les pages des matchs publiées avant cette navigation) reste en forme avec la feuille de style neuve ;
 // - les contrastes, mesurés tels qu’ils sont peints, la nuit et au jour : 4,5:1 pour le texte, 3:1 pour le focus et les
@@ -15,7 +17,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
-  actionDeLaPage, ecrireLeCadre, entete, lireLeCadre, pageAvecLeCadre, PAGES_DU_CADRE, pageDuGenerateurAvecLAction, pied,
+  actionDeLaPage, cibleDeLAction, ecrireLeCadre, entete, lireLeCadre, pageAvecLeCadre, PAGES_DU_CADRE, pageDuGenerateurAvecLAction, pied,
 } from '../generateur/cadre.mjs';
 import { pagesEcritesALaMain } from '../generateur/mesure.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
@@ -96,7 +98,7 @@ test.describe('une seule source pour l’en-tête et le pied', () => {
       const langue = p.langue ?? 'fr';
       const corps = p.contenu.slice(p.contenu.indexOf('<main'), p.contenu.indexOf('</main>'));
       const action = pageDuGenerateurAvecLAction(p.chemin) ? actionDeLaPage(corps) : null;
-      expect(p.contenu.match(ENTETE)[0], p.chemin).toBe(entete(cadre, { chemin: p.chemin, action, langue }));
+      expect(p.contenu.match(ENTETE)[0], p.chemin).toBe(entete(cadre, { chemin: p.chemin, action, cible: cibleDeLAction(corps), langue }));
       expect(p.contenu.match(PIED)[0], p.chemin).toBe(pied(cadre, { marque: MARQUE, chemin: p.chemin, langue }));
     }
     const toutes = [...ecrites, ...generees.map((p) => ({ chemin: p.chemin, html: p.contenu }))];
@@ -155,6 +157,44 @@ test.describe('la page où l’on est', () => {
   }
 });
 
+// Le contraste élevé de Windows (couleurs forcées, thème sombre et clair), la nuit (À propos) et le jour (l’accueil, qui
+// n’a pas de page courante dans le menu ; « La semaine » y est essayée) : la page où l’on est se distingue sans couleur
+// (soulignée), son focus se voit (l’image du menu change quand elle le prend), et le mot du logo prend la couleur du
+// texte (pas noir sur noir).
+for (const schema of ['dark', 'light']) {
+  for (const largeur of [390, 1280]) {
+    test(`couleurs forcées (${schema === 'dark' ? 'sombre' : 'clair'}) à ${largeur} px : la page où l’on est soulignée, son focus visible, le logo lisible`, async ({ browser }) => {
+      const contexte = await browser.newContext({ viewport: { width: largeur, height: 800 }, forcedColors: 'active', colorScheme: schema });
+      try {
+        const onglet = await contexte.newPage();
+        for (const chemin of ['/a-propos.html', '/']) {
+          await couperLAPI(onglet);
+          await onglet.goto(chemin);
+          await onglet.evaluate(() => document.fonts.ready);
+          const lu = await onglet.evaluate(() => {
+            const mot = document.querySelector('.entete__logo path[fill="#F7F7F9"]');
+            const courant = document.querySelector('.menu__lien[aria-current="page"]');
+            return { fond: getComputedStyle(document.body).backgroundColor, mot: getComputedStyle(mot).fill, trait: courant ? getComputedStyle(courant).textDecorationLine : null };
+          });
+          expect(rapport(lireCouleur(lu.mot), lireCouleur(lu.fond)), `${chemin} : le mot du logo sur le fond`).toBeGreaterThanOrEqual(4.5);
+          if (chemin === '/a-propos.html') expect(lu.trait, 'la page où l’on est, soulignée').toBe('underline');
+          const lien = onglet.locator(chemin === '/' ? '.menu__lien[href="/matchs/"]' : '.menu__lien[aria-current="page"]');
+          const menu = onglet.locator('.menu__liste');
+          const sans = await menu.screenshot({ animations: 'disabled' });
+          await onglet.keyboard.press('Shift');
+          await lien.focus();
+          expect(await lien.evaluate((a) => a.matches(':focus-visible'))).toBe(true);
+          const avec = await menu.screenshot({ animations: 'disabled' });
+          expect(avec.equals(sans), `${chemin} : le focus ne se voit pas`).toBe(false);
+          await lien.blur();
+        }
+      } finally {
+        await contexte.close();
+      }
+    });
+  }
+}
+
 // ---------- L’action de l’en-tête ----------
 
 const portLibre = () => new Promise((resoudre) => {
@@ -186,6 +226,25 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
     const avecUnEntete = pagesHtml(pages);
     expect(avecUnEntete.some((p) => p.chemin.includes('/affiche/'))).toBe(true);
     for (const p of avecUnEntete) expect(actionDe(p.contenu) !== null, p.chemin).toBe(!p.chemin.includes('/affiche/'));
+  });
+
+  // Une page qui a sa propre liste d’attente (une ville, et sa version anglaise) : « Préviens-moi » mène à elle, sur la
+  // page ; ailleurs, à celle de l’accueil. Son nom dit de quoi on est prévenu.
+  test('vers la liste d’attente de la page quand elle en a une, sinon vers celle de l’accueil', async () => {
+    const lien = (html) => html.match(ENTETE)[0].match(/<a class="entete__attente[^"]*" href="([^"]+)">([\s\S]*?)<\/a>/);
+    const { pages } = await scenario();
+    const toutes = [
+      ...PAGES_DU_CADRE.map((p) => ({ chemin: p.chemin, html: lire(p.fichier) })),
+      ...pagesHtml(pages).map((p) => ({ chemin: p.chemin, html: p.contenu })),
+    ].filter((p) => lien(p.html));
+    const avecSaListe = toutes.filter((p) => /<form\b[^>]*\bid="attente"/.test(p.html)).map((p) => p.chemin);
+    expect(avecSaListe).toContain('/regarder-le-match/paris/');
+    for (const p of toutes) {
+      const [, cible, nom] = lien(p.html);
+      expect(cible, p.chemin).toBe(avecSaListe.includes(p.chemin) ? '#attente' : '/#attente');
+      expect(nom.replace(/<[^>]+>/g, ''), p.chemin).toBe(`${TEXTES.action}${TEXTES.actionSuite}`);
+    }
+    expect(`${TEXTES.action}${TEXTES.actionSuite}`).toBe('Préviens-moi quand Baromatch arrive');
   });
 
   // Tel qu’il est peint : une page qui montre un bouton ambre (hors de l’en-tête et du pied) a « Préviens-moi » en
@@ -228,6 +287,70 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
     }
   }
 });
+
+// ---------- Le contact du pied ----------
+
+// « Presse et partenariats » mène à la page Presse (et, à côté, l’adresse e-mail) ; sans page Presse, le titre seul. Les
+// deux actions ambre du pied, et seulement elles. Tel qu’il est peint : les deux liens de la ligne sont soulignés (ils
+// se distinguent du texte), et la page où l’on est aussi (pas seulement par sa couleur).
+test.describe('le contact du pied de page', () => {
+  test('« Presse et partenariats » vers la page Presse, l’adresse e-mail à côté, et les deux actions', () => {
+    const cadre = lireLeCadre();
+    const ligne = (html) => html.match(PIED)[0].match(/<div class="pied__contact">[\s\S]*?<\/div>/)[0];
+    for (const p of PAGES_DU_CADRE) {
+      const contact = ligne(lire(p.fichier));
+      expect(contact, p.fichier).toMatch(new RegExp(`<p><a href="/presse\\.html"( aria-current="page")?>${TEXTES.pied.contact}</a>\u00A0: <a href="mailto:${MARQUE.contact}">`));
+      expect([...contact.matchAll(/class="pied__action" href="([^"]+)"/g)].map((m) => m[1]), p.fichier).toEqual(['/#attente', '/pour-les-bars.html#proposer']);
+      expect(lire(p.fichier).match(PIED)[0].match(/pied__action/g), p.fichier).toHaveLength(2);
+    }
+    expect(ligne(pied(cadre, { marque: MARQUE, avecPresse: false }))).toContain(`<p>${TEXTES.pied.contact}\u00A0: <a href="mailto:`);
+  });
+
+  for (const largeur of [390, 1280]) {
+    test(`à ${largeur} px : l’adresse e-mail et « Presse et partenariats » soulignés, la page où l’on est aussi`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.goto('/presse.html');
+      const lu = await page.evaluate(() => [...document.querySelectorAll('.pied__contact p a, .pied a[aria-current="page"]')]
+        .map((a) => ({ texte: a.textContent.replace(/\s+/g, ' '), trait: getComputedStyle(a).textDecorationLine, courant: a.getAttribute('aria-current') })));
+      expect(lu.map((l) => l.texte)).toEqual(['Presse et partenariats', 'contact@baromatch.fr', 'X : @baromatchapp', 'Presse et partenariats']);
+      for (const l of lu) expect(l.trait, l.texte).toBe('underline');
+      expect(lu.filter((l) => l.courant).map((l) => l.texte)).toEqual(['Presse et partenariats', 'Presse et partenariats']);
+    });
+  }
+});
+
+// Le pied, texte à 100 et 200 %, au téléphone et à l’ordinateur : aucun titre, lien ni phrase coupé en plein mot
+// (« Compétitions » à 200 % sur ordinateur), et chaque lien se touche sur 44 × 44 px au moins (« Lyon », « Lille »
+// prennent toute leur case).
+for (const largeur of [360, 390, 1280]) {
+  test(`le pied à ${largeur} px, texte à 100 et 200 % : aucun mot coupé, chaque lien de 44 × 44 px au moins`, async ({ page }) => {
+    await page.setViewportSize({ width: largeur, height: 800 });
+    await page.goto('/cgu.html');
+    await page.evaluate(() => document.fonts.ready);
+    for (const pourcent of [100, 200]) {
+      const lu = await page.evaluate((p) => {
+        document.documentElement.style.fontSize = `${p}%`;
+        const coupes = [];
+        for (const e of document.querySelectorAll('.pied h2, .pied a, .pied p')) {
+          const marcheur = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+          for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+            for (const mot of n.data.matchAll(/\S+/g)) {
+              const plage = document.createRange();
+              plage.setStart(n, mot.index);
+              plage.setEnd(n, mot.index + mot[0].length);
+              if (new Set([...plage.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size > 1) coupes.push(`« ${mot[0]} » dans « ${e.textContent.trim()} »`);
+            }
+          }
+        }
+        const petits = [...document.querySelectorAll('.pied a')].map((a) => ({ texte: a.textContent.trim(), r: a.getBoundingClientRect() }))
+          .filter(({ r }) => r.width < 44 || r.height < 44).map(({ texte, r }) => `${texte} : ${Math.round(r.width)} × ${Math.round(r.height)}`);
+        return { coupes: [...new Set(coupes)], petits };
+      }, pourcent);
+      expect(lu.coupes, `${pourcent} % : mots coupés`).toEqual([]);
+      expect(lu.petits, `${pourcent} % : liens sous 44 px`).toEqual([]);
+    }
+  });
+}
 
 // ---------- L’ancien cadre ----------
 

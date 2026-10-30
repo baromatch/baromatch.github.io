@@ -647,6 +647,25 @@ test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
     expect(lu.cartes).toBeGreaterThan(5);
     expect(lu.dehors).toEqual([]);
   });
+
+  // Une semaine ordinaire : chaque jour a ses matchs (comme l’accueil en ligne). À 200 % sur 320 × 568, la barre des jours
+  // faisait 7 rangées, plus haute que l’écran : toucher un jour semblait ne rien faire (ses cartes s’affichaient dessous).
+  const UNE_SEMAINE = [['2026-10-29', 1], ['2026-10-30', 2], ['2026-10-31', 10], ['2026-11-01', 5], ['2026-11-02', 1], ['2026-11-03', 2], ['2026-11-04', 1]]
+    .flatMap(([jour, n]) => Array.from({ length: n }, (_, i) => unMatch({
+      slug: `club-${i}-autre-${i}-${jour}`, debut: `${jour}T${String(12 + i).padStart(2, '0')}:00:00Z`, domicile: club(`club-${i}`, `Club ${i}`), exterieur: club(`autre-${i}`, `Autre ${i}`),
+    })));
+  const AVEC_UN_BAR = UNE_SEMAINE.map((m) => (m.slug === 'club-0-autre-0-2026-10-30' ? { ...m, soirees: [soiree('Paris')] } : m));
+  for (const [nom, matchs, bars] of [['sans bar', UNE_SEMAINE, []], ['avec un bar (demain)', AVEC_UN_BAR, [{ id: 'b1' }]]]) {
+    test(`à 320 × 568, ${nom} : la barre des jours tient dans l’écran, sans mot coupé ni texte hors de sa puce`, async ({ page }) => {
+      await ouvrirLEssai(page, bloc({ matchs, bars }), { largeur: 320, hauteur: 568 });
+      const barre = await page.locator('.semaine__dates').boundingBox();
+      expect(barre.height).toBeLessThan(568);
+      expect(await motsCoupes(page, '.semaine__date b, .semaine__date small')).toEqual([]);
+      const debordes = await page.locator('.semaine__date > span').evaluateAll((puces) => puces.filter((p) => p.scrollWidth > p.clientWidth || [...p.children].some((e) => e.getBoundingClientRect().right > p.getBoundingClientRect().right + 0.5)).map((p) => p.textContent));
+      expect(debordes).toEqual([]);
+      if (bars.length) await expect(page.locator('.semaine__point')).toHaveCount(1);
+    });
+  }
 });
 
 // ---------- Le contraste des petits textes, peints sur le clair ----------

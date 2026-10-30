@@ -17,6 +17,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import jsQR from 'jsqr';
 import { racine } from './outils/environnement.mjs';
+import { sansInsignes } from './outils/insignes.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, MAINTENANT_DU_SCENARIO, PUBLIES_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
@@ -88,10 +89,10 @@ const pageDe = (site, chemin) => {
 };
 const robotsDe = (p) => p.contenu.match(/<meta name="robots" content="([^"]*)">/)[1];
 // Les lignes de l’affiche : « 2026-10-23T20:45:00+02:00 Brest – Nice ».
-const lignesDe = (html) => [...html.matchAll(/<li class="affiche-ligne">[\s\S]*?<time class="affiche-heure[^"]*" datetime="([^"]+)">[^<]*<\/time> <span class="affiche-match">([^<]+)<\/span>/g)].map((m) => `${m[1]} ${m[2]}`);
+const lignesDe = (html) => [...sansInsignes(html).matchAll(/<li class="affiche-ligne">[\s\S]*?<time class="affiche-heure[^"]*" datetime="([^"]+)">[^<]*<\/time> <span class="affiche-match">([^<]+)<\/span>/g)].map((m) => `${m[1]} ${m[2]}`);
 // Les lignes des jours de /matchs/ (le bloc du jour et les jours suivants, sans « La semaine d’après », qui mène aux
 // pages des matchs plus lointains), dans le même format.
-const lignesDeLaSemaine = (html) => [...html.split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]*")?>([^<]+?)<\/(?:a|span)> <span class="regarder-matchs__infos"><time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
+const lignesDeLaSemaine = (html) => [...sansInsignes(html).split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]*")?>([^<]+?)<\/(?:a|span)> <span class="regarder-matchs__infos"><time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
 // Les modules d’un QR code dessiné par svgDuQr, relus dans son SVG (marge comprise).
 const matriceDuSvg = (svg) => {
   const cote = Number(svg.match(/viewBox="0 0 (\d+) \1"/)[1]);
@@ -252,7 +253,7 @@ test('les lignes sont les matchs des sept jours de /matchs/, dans l’ordre, san
   expect(affiche).toContain('<p class="affiche-dates">Du vendredi 23 au jeudi 29 octobre</p>');
   expect(affiche).toContain('<h4 class="affiche-jour__nom" id="jour-2026-10-25"><time datetime="2026-10-25">Dimanche 25</time></h4>');
   // Une heure provisoire n’est pas écrite.
-  expect(affiche).toContain('<time class="affiche-heure affiche-heure--a-confirmer" datetime="2026-10-28">Heure à confirmer</time> <span class="affiche-match">Paris FC – Angers</span>');
+  expect(sansInsignes(affiche)).toContain('<time class="affiche-heure affiche-heure--a-confirmer" datetime="2026-10-28">Heure à confirmer</time> <span class="affiche-match">Paris FC – Angers</span>');
   // Le passé (le match d’hier) et l’au-delà des sept jours (vendredi 30) n’y sont pas.
   expect(affiche).not.toMatch(/OM – Lens|Le Havre – PSG/);
   // Le pied : la phrase de préparation et le QR code vers l’accueil, sans aucun paramètre de suivi.

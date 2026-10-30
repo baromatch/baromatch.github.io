@@ -4,16 +4,18 @@
 // (provenance.json : empreinteDesSources).
 //
 // Ce qui est copié : les modules du dessin que le site importe (de proche en proche, depuis generateur/insigne.mjs),
-// transpilés en JavaScript sans aucun commentaire, et rien d’autre. Dans la table des clubs, chaque fiche ne garde que
-// ce que le dessin lit et le nom du club (FICHE ci-dessous) ; tout le reste est laissé de côté. Des bandes des drapeaux,
-// seulement les données (code du pays → sens et couleurs, sans retouche), en JSON ; le petit dessin du drapeau est écrit
-// par le site (generateur/insigne.mjs).
+// transpilés en JavaScript sans aucun commentaire, et rien d’autre. Dans la table des clubs (la fiche de chaque club et
+// l’insigne neutre), seulement les champs que lisent les modules copiés, à chaque niveau (CHAMPS ci-dessous). Des bandes
+// des drapeaux, seulement les données (code du pays → sens et couleurs, sans retouche, dans l’ordre de la table), en
+// JSON ; le petit dessin du drapeau est écrit par le site (generateur/insigne.mjs).
 //
 // Avant d’écrire quoi que ce soit, la copie doit :
+//  - n’avoir dans sa table que des champs de CHAMPS, chacun de sa forme ; un autre champ dans les sources, à n’importe
+//    quel niveau, ou une autre forme (une chaîne là où un nombre est attendu…), et rien n’est écrit ;
 //  - dessiner exactement comme le paquet compilé de l’appli : chaque club, à chaque taille, sur chaque fond, dans
-//    chaque variante, et le même nom, la même ville et le même code ;
+//    chaque variante, avec le même code ;
 //  - si le fichier des empreintes des insignes est donné, redonner celles des insignes ;
-//  - donner les bandes des drapeaux exactement comme la table d’où elles viennent ;
+//  - donner les bandes des drapeaux exactement comme la table d’où elles viennent, dans le même ordre ;
 //  - ne contenir aucun commentaire, et passer le contrôle des documents publics (tests/outils/fuites.mjs).
 // Sinon rien n’est écrit, et la sortie dit pourquoi. Deux lancements sur les mêmes sources écrivent les mêmes octets.
 import { execFileSync } from 'node:child_process';
@@ -42,23 +44,39 @@ export const USAGE = `Usage : node generateur/outils/insignes/exporter.mjs --des
   --typescript  (facultatif) un dossier qui contient déjà TypeScript ${VERSION_DE_TYPESCRIPT} (node_modules/typescript) ; sans lui,
                 cette version est installée une fois, à part, dans le dossier temporaire de la machine`;
 
-// L’en-tête de chaque fichier copié, et celui des contours des lettres (la police, sous licence SIL OFL 1.1, demande
-// d’être citée ; son texte est à côté des polices du site).
+// L’en-tête de chaque fichier copié. Les contours des lettres sont une partie de la police Bricolage Grotesque, changée
+// de format : ce fichier reste sous sa licence (SIL OFL 1.1, dont le texte est à côté des polices du site), avec la
+// ligne de copyright de fonts/LICENSE-OFL.txt, mot pour mot.
 const MENTION = '/* © Baromatch, tous droits réservés. Copie produite par generateur/outils/insignes/exporter.mjs (voir provenance.json) : ne pas modifier à la main. */';
-const POLICE = [
-  '/* Bricolage Grotesque (SIL Open Font License 1.1), ExtraBold, condensed; outlines in font units, y up. */',
-  '/* Texte de la licence : fonts/LICENSE-OFL.txt. */',
-];
+const LICENCE_DE_LA_POLICE = path.join(SITE, 'fonts', 'LICENSE-OFL.txt');
+const COPYRIGHT_DE_LA_POLICE = 'Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)';
+const MENTION_DE_LA_POLICE = `/* Contours des lettres de Bricolage Grotesque, ${COPYRIGHT_DE_LA_POLICE}, sous licence SIL OFL 1.1 (texte : fonts/LICENSE-OFL.txt). Copie produite par generateur/outils/insignes/exporter.mjs : ne pas modifier à la main. */`;
 const GLYPHES = 'glyphs.generated';
 
-// Les noms en capitales qui finissent par « _FROM » finissent par « _AT » dans la copie.
+// Le renommage, une règle générale : un nom en capitales qui finit par « _FROM » finit par « _AT » dans la copie.
+const RENOMMAGE = 'Dans la copie, un nom écrit en capitales qui finit par « _FROM » finit par « _AT » ; rien d’autre n’est renommé.';
 const renommage = (nom) => (/^[A-Z][A-Z0-9_]*_FROM$/.test(nom) ? nom.replace(/_FROM$/, '_AT') : nom);
 
-// La table des clubs : ce que chaque fiche garde (ses paramètres sont lus dans la signature de sa fonction), les
-// réglages en plus qu’elle garde, et ce que garde son maillot extérieur.
-const FICHE = { garde: ['slug', 'name', 'city', 'code', 'pattern', 'colours', 'founded', 'geography'], enPlus: 'extras' };
-const EN_PLUS = ['density', 'away', 'kern', 'nudge', 'band', 'split', 'letters', 'yearOnFace'];
-const EXTERIEUR = ['pattern', 'colours', 'density', 'split'];
+// Les champs de la table des clubs, à chaque niveau : exactement ceux que lisent les modules copiés, chacun avec sa
+// forme (une expression : une chaîne qui la suit ; « nombre » ; « oui-non » ; un objet : ses propres champs ; « * » :
+// des clés en chiffres, le crénage lettre par lettre). fiche : la fiche d’un club ; neutre : l’insigne neutre.
+const MOT = /^[a-z]+$/;
+const COULEUR = /^#[0-9A-Fa-f]{6}$/;
+const COULEURS = { primary: COULEUR, secondary: COULEUR, tertiary: COULEUR };
+export const CHAMPS = {
+  fiche: {
+    slug: /^[a-z0-9-]+$/, code: /^[A-Z]{3}$/, pattern: MOT, colours: COULEURS, founded: 'nombre', geography: { lat: 'nombre', lon: 'nombre' },
+    density: MOT, kern: { '*': 'nombre' }, nudge: { x: 'nombre', y: 'nombre' }, band: MOT, split: 'oui-non', letters: MOT, yearOnFace: 'oui-non',
+  },
+  neutre: { slug: MOT, code: /^$/, colours: COULEURS, pattern: MOT, neutral: 'oui-non' },
+};
+// Dans les sources, une fiche est un appel « spec(…) » : ses paramètres sont lus dans la signature de la fonction, et
+// seuls ceux de CHAMPS.fiche sont pris (les autres, ce que l’appli sait en plus du club, sont laissés). Ses réglages en
+// plus (EN_PLUS, un objet) et sa géographie ont aussi des champs que le dessin ne lit pas, laissés de côté (LAISSES) :
+// tout autre champ, et rien n’est écrit.
+const EN_PLUS = 'extras';
+const REGLAGES = ['density', 'kern', 'nudge', 'band', 'split', 'letters', 'yearOnFace'];
+const LAISSES = { [EN_PLUS]: ['away'], geography: ['feature', 'angle', 'place'] };
 
 // Le module du site qui importe la copie : le départ de l’ensemble des modules copiés.
 const IMPORTATEUR = path.join(SITE, 'generateur', 'insigne.mjs');
@@ -130,26 +148,48 @@ const renommer = (ts) => (contexte) => {
   return (fichier) => ts.visitNode(fichier, visiter);
 };
 
-const nomDe = (ts, propriete) => (propriete.name && (ts.isIdentifier(propriete.name) || ts.isStringLiteral(propriete.name)) ? propriete.name.text : null);
+const nomDe = (ts, propriete) => (propriete.name && (ts.isIdentifier(propriete.name) || ts.isStringLiteral(propriete.name) || ts.isNumericLiteral(propriete.name)) ? propriete.name.text : null);
 
-// D’un objet écrit tel quel, les seules propriétés gardées.
-const garder = (ts, factory, objet, garde, ou, enfants = {}) => {
-  if (!ts.isObjectLiteralExpression(objet)) refuser(`${ou} : un objet écrit tel quel est attendu`);
+// La forme d’un champ, dans CHAMPS : la sienne, ou celle des clés en chiffres (« * »).
+const formeDe = (forme, cle) => (Object.hasOwn(forme, cle) ? forme[cle] : Object.hasOwn(forme, '*') && /^\d+$/.test(cle) ? forme['*'] : undefined);
+
+// Une valeur écrite dans les sources, vérifiée contre sa forme : une chaîne, un nombre, oui ou non, écrits tels quels ;
+// un objet écrit tel quel, dont chaque champ est permis (ou laissé de côté, s’il est dans « laisses ») et de sa forme.
+// L’objet est récrit avec ses seuls champs permis ; tout le reste est refusé.
+const verifierLeNoeud = (ts, factory, noeud, forme, ou, laisses = []) => {
+  if (forme instanceof RegExp) {
+    if (!ts.isStringLiteral(noeud) || !forme.test(noeud.text)) refuser(`${ou} : une chaîne de la forme ${forme} est attendue`);
+    return noeud;
+  }
+  if (forme === 'nombre') {
+    const chiffres = ts.isPrefixUnaryExpression(noeud) && noeud.operator === ts.SyntaxKind.MinusToken ? noeud.operand : noeud;
+    if (!ts.isNumericLiteral(chiffres)) refuser(`${ou} : un nombre est attendu`);
+    return noeud;
+  }
+  if (forme === 'oui-non') {
+    if (noeud.kind !== ts.SyntaxKind.TrueKeyword && noeud.kind !== ts.SyntaxKind.FalseKeyword) refuser(`${ou} : true ou false est attendu`);
+    return noeud;
+  }
+  if (!ts.isObjectLiteralExpression(noeud)) refuser(`${ou} : un objet écrit tel quel est attendu`);
   const gardees = [];
-  for (const propriete of objet.properties) {
-    const nom = ts.isPropertyAssignment(propriete) || ts.isShorthandPropertyAssignment(propriete) ? nomDe(ts, propriete) : null;
-    if (!nom || !garde.includes(nom)) continue;
-    gardees.push(enfants[nom] && ts.isPropertyAssignment(propriete)
-      ? factory.createPropertyAssignment(nom, garder(ts, factory, propriete.initializer, enfants[nom], `${ou}.${nom}`))
-      : propriete);
+  for (const propriete of noeud.properties) {
+    const nom = ts.isPropertyAssignment(propriete) ? nomDe(ts, propriete) : null;
+    if (nom === null) refuser(`${ou} : seulement des champs écrits tels quels`);
+    const sienne = formeDe(forme, nom);
+    if (sienne === undefined) {
+      if (laisses.includes(nom)) continue;
+      refuser(`${ou} : le champ « ${nom} » n’est pas permis`);
+    }
+    gardees.push(factory.createPropertyAssignment(propriete.name, verifierLeNoeud(ts, factory, propriete.initializer, sienne, `${ou}.${nom}`, LAISSES[nom])));
   }
   return factory.createObjectLiteralExpression(gardees, false);
 };
 
-// La table des clubs : chaque appel « spec(…) » devient la fiche elle-même, avec ce qui se garde seulement ; la
-// fonction qui les fabriquait disparaît.
+// La table des clubs : chaque appel « spec(…) » devient la fiche elle-même, avec ses seuls champs permis ; la fonction
+// qui les fabriquait disparaît. L’insigne neutre est vérifié de même.
 const tableAllegee = (ts) => (contexte) => {
   const { factory } = contexte;
+  const reglages = Object.fromEntries(REGLAGES.map((nom) => [nom, CHAMPS.fiche[nom]]));
   return (fichier) => {
     let parametres = null;
     for (const instruction of fichier.statements) {
@@ -161,23 +201,31 @@ const tableAllegee = (ts) => (contexte) => {
       }
     }
     if (!parametres) refuser('specs : la fonction « spec » n’a pas été trouvée');
+    if (!parametres.includes(EN_PLUS)) refuser(`specs : la fonction « spec » n’a pas de paramètre « ${EN_PLUS} »`);
     let fiches = 0;
+    let neutre = false;
     const visiter = (noeud) => {
       if (ts.isVariableStatement(noeud) && noeud.declarationList.declarations.some((d) => ts.isIdentifier(d.name) && d.name.text === 'spec')) {
         return undefined;
+      }
+      if (ts.isVariableDeclaration(noeud) && ts.isIdentifier(noeud.name) && noeud.name.text === 'NEUTRAL_BADGE' && noeud.initializer) {
+        neutre = true;
+        return factory.updateVariableDeclaration(noeud, noeud.name, noeud.exclamationToken, noeud.type, verifierLeNoeud(ts, factory, noeud.initializer, CHAMPS.neutre, 'specs : l’insigne neutre'));
       }
       if (ts.isCallExpression(noeud) && ts.isIdentifier(noeud.expression) && noeud.expression.text === 'spec') {
         fiches += 1;
         const valeurs = Object.fromEntries(parametres.map((p, i) => [p, noeud.arguments[i]]));
         const ou = `specs : la fiche ${valeurs.slug && ts.isStringLiteral(valeurs.slug) ? valeurs.slug.text : fiches}`;
-        const proprietes = FICHE.garde.filter((p) => valeurs[p]).map((p) => factory.createPropertyAssignment(p, valeurs[p]));
-        if (valeurs[FICHE.enPlus]) proprietes.push(...garder(ts, factory, valeurs[FICHE.enPlus], EN_PLUS, ou, { away: EXTERIEUR }).properties);
+        const proprietes = parametres.filter((p) => valeurs[p] && Object.hasOwn(CHAMPS.fiche, p))
+          .map((p) => factory.createPropertyAssignment(p, verifierLeNoeud(ts, factory, valeurs[p], CHAMPS.fiche[p], `${ou}.${p}`, LAISSES[p])));
+        if (valeurs[EN_PLUS]) proprietes.push(...verifierLeNoeud(ts, factory, valeurs[EN_PLUS], reglages, `${ou}.${EN_PLUS}`, LAISSES[EN_PLUS]).properties);
         return factory.createObjectLiteralExpression(proprietes, false);
       }
       return ts.visitEachChild(noeud, visiter, contexte);
     };
     const resultat = ts.visitNode(fichier, visiter);
     if (!fiches) refuser('specs : aucune fiche trouvée');
+    if (!neutre) refuser('specs : l’insigne neutre (NEUTRAL_BADGE) n’a pas été trouvé');
     return resultat;
   };
 };
@@ -233,6 +281,29 @@ export const lireLesSources = ({ dessin, drapeaux, compile, version, empreintes 
 
 // ---------- La preuve ----------
 
+// Une valeur de la table, telle que la copie la donne, contre sa forme : la liste des champs qui n’y sont pas permis ou
+// pas de leur forme, vide sinon.
+const ecartsDe = (valeur, forme, ou) => {
+  if (forme instanceof RegExp) return typeof valeur === 'string' && forme.test(valeur) ? [] : [ou];
+  if (forme === 'nombre') return typeof valeur === 'number' && Number.isFinite(valeur) ? [] : [ou];
+  if (forme === 'oui-non') return typeof valeur === 'boolean' ? [] : [ou];
+  if (!valeur || typeof valeur !== 'object' || Object.getPrototypeOf(valeur) !== Object.prototype) return [ou];
+  return Reflect.ownKeys(valeur).flatMap((cle) => {
+    const sienne = typeof cle === 'string' ? formeDe(forme, cle) : undefined;
+    return sienne === undefined ? [`${ou}.${String(cle)}`] : ecartsDe(valeur[cle], sienne, `${ou}.${cle}`);
+  });
+};
+
+// La table de la copie (module specs) : chaque fiche, et l’insigne neutre, n’ont que des champs de CHAMPS, chacun de sa
+// forme ; une fiche est rangée sous son slug. La liste des écarts, vide sinon.
+export const ecartsDeLaTable = ({ CLUB_BADGE_SPECS, NEUTRAL_BADGE }) => {
+  if (!CLUB_BADGE_SPECS || typeof CLUB_BADGE_SPECS !== 'object' || !Object.keys(CLUB_BADGE_SPECS).length) return ['CLUB_BADGE_SPECS'];
+  return [
+    ...ecartsDe(NEUTRAL_BADGE, CHAMPS.neutre, 'NEUTRAL_BADGE'),
+    ...Object.entries(CLUB_BADGE_SPECS).flatMap(([slug, fiche]) => [...(fiche?.slug === slug ? [] : [`${slug}.slug`]), ...ecartsDe(fiche, CHAMPS.fiche, slug)]),
+  ];
+};
+
 // La copie et le paquet compilé dessinent-ils pareil ? La liste des écarts, vide sinon.
 export const comparerLesDessins = (copie, compile) => {
   const ecarts = [];
@@ -246,7 +317,7 @@ export const comparerLesDessins = (copie, compile) => {
   ];
   for (const [cle, a, b] of fiches) {
     if (!a || !b) { ecarts.push(cle); continue; }
-    comparer(`${cle} : nom, ville, code`, JSON.stringify([a.slug, a.name, a.city, a.code]), JSON.stringify([b.slug, b.name, b.city, b.code]));
+    comparer(`${cle} : slug et code`, JSON.stringify([a.slug, a.code]), JSON.stringify([b.slug, b.code]));
     for (const size of tailles) {
       for (const surface of fonds) {
         for (const variant of variantes) {
@@ -334,21 +405,24 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
     }
     copies.sort();
     const fichiers = {};
-    for (const nom of copies) fichiers[`${nom}.mjs`] = `${MENTION}\n${nom === GLYPHES ? `${POLICE.join('\n')}\n` : ''}${transpiles.get(nom).code}`;
+    if (copies.includes(GLYPHES) && !readFileSync(LICENCE_DE_LA_POLICE, 'utf8').split('\n').includes(COPYRIGHT_DE_LA_POLICE)) {
+      refuser('fonts/LICENSE-OFL.txt n’a plus la ligne de copyright citée par les contours des lettres');
+    }
+    for (const nom of copies) fichiers[`${nom}.mjs`] = `${nom === GLYPHES ? MENTION_DE_LA_POLICE : MENTION}\n${transpiles.get(nom).code}`;
 
-    // Les drapeaux : les données seulement, lues dans le module transpilé à part (jamais copié), puis comparées à leur
-    // table, à l’octet près.
+    // Les drapeaux : les données seulement, dans l’ordre de leur table, lues dans le module transpilé à part (jamais
+    // copié), puis comparées à leur table, ordre des clés compris.
     writeFileSync(path.join(atelier, 'drapeaux-lus.mjs'), transpiler(ts, lu.drapeaux.fichier, lu.drapeaux.texte));
     const bandes = tableDesDrapeaux(await import(pathToFileURL(path.join(atelier, 'drapeaux-lus.mjs')).href));
     if (!bandes) refuser('--drapeaux : aucune table de bandes trouvée');
-    const drapeaux = Object.fromEntries(Object.keys(bandes).sort().map((code) => {
+    const drapeaux = Object.fromEntries(Object.keys(bandes).map((code) => {
       const { direction, bands } = bandes[code];
       if (!['vertical', 'horizontal'].includes(direction) || !bands.every((b) => /^#[0-9A-F]{6}$/.test(b))) refuser(`drapeaux : ${code} illisible`);
       return [code, { direction, bands: [...bands] }];
     }));
     fichiers['drapeaux.json'] = json(drapeaux);
     const relus = JSON.parse(fichiers['drapeaux.json']);
-    const memesDrapeaux = Object.keys(relus).length === Object.keys(bandes).length && Object.keys(bandes).every((code) => relus[code]
+    const memesDrapeaux = Object.keys(relus).join() === Object.keys(bandes).join() && Object.keys(bandes).every((code) => relus[code]
       && Object.keys(relus[code]).join() === 'direction,bands' && relus[code].direction === bandes[code].direction
       && relus[code].bands.length === bandes[code].bands.length && relus[code].bands.every((b, i) => b === bandes[code].bands[i]));
     if (!memesDrapeaux) refuser('drapeaux.json ne redonne pas la table des bandes à l’identique');
@@ -361,6 +435,8 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
     // données.
     const modules = await Promise.all(copies.map((nom) => import(pathToFileURL(path.join(copie, `${nom}.mjs`)).href)));
     const insignes = Object.assign({}, ...modules);
+    const horsDeLaTable = ecartsDeLaTable(insignes);
+    if (horsDeLaTable.length) refuser(`la table copiée a des champs hors de CHAMPS : ${horsDeLaTable.slice(0, 5).join(', ')}`);
     const compile = createRequire(import.meta.url)(path.resolve(lu.compile));
     const ecarts = comparerLesDessins(insignes, compile);
     if (ecarts.length) refuser(`la copie ne dessine pas comme le paquet compilé : ${ecarts.length} écart(s) (${ecarts.slice(0, 5).join(', ')}…)`);
@@ -379,6 +455,7 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
       _lisezMoi: 'Copie du générateur d’insignes de l’appli Baromatch, écrite par generateur/outils/insignes/exporter.mjs : ne pas la modifier à la main. Elle est à jour tant que empreinteDesSources et empreinteDesDrapeaux sont celles des sources du dessin et des drapeaux de l’appli ; quand l’une ne correspond plus, on refait l’export. © Baromatch, tous droits réservés.',
       versionDeLAppli: lu.version,
       typescript: VERSION_DE_TYPESCRIPT,
+      renommage: RENOMMAGE,
       empreinteDesSources: sha256(JSON.stringify(copies.map((nom) => [nom, transpiles.get(nom).texte]))),
       empreinteDesDrapeaux: sha256(lu.drapeaux.texte),
       fichiers: Object.fromEntries(Object.keys(fichiers).filter((nom) => nom !== 'provenance.json').sort().map((nom) => [nom, sha256(fichiers[nom])])),

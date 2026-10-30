@@ -7,12 +7,14 @@
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { blocDeLaSemaine, REPERES } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { clubDe, indexerLesClubs } from '../generateur/donnees.mjs';
+import { ecartsDeLaTable } from '../generateur/outils/insignes/exporter.mjs';
 import { bandesDe, identifiantsUniques, insigne, paireDInsignes, TAILLES } from '../generateur/insigne.mjs';
 import { svgDeLaCarte } from '../generateur/partage.mjs';
 import * as badge from '../generateur/insignes/badge.mjs';
@@ -56,17 +58,34 @@ test.describe('la copie du générateur de l’appli', () => {
     expect(PROVENANCE.versionDeLAppli).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
-  test('aucun commentaire copié : seulement l’en-tête de l’exportation, et la licence de la police des lettres', () => {
-    for (const fichier of readdirSync(COPIE).filter((f) => f.endsWith('.mjs'))) {
+  test('aucun commentaire copié : seulement l’en-tête de l’exportation ; les contours des lettres, sous la licence de leur police', () => {
+    // La ligne de copyright de la police, mot pour mot, telle que fonts/LICENSE-OFL.txt l’écrit.
+    const licence = readFileSync(path.join(racine, 'fonts', 'LICENSE-OFL.txt'), 'utf8');
+    const copyright = licence.split('\n')[0];
+    expect(copyright).toBe('Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)');
+    expect(licence).toContain('SIL OPEN FONT LICENSE Version 1.1');
+    const ENTETES = {
+      // Une partie de Bricolage Grotesque, changée de format : elle reste sous sa licence, la SIL OFL 1.1.
+      'glyphs.generated.mjs': `/* Contours des lettres de Bricolage Grotesque, ${copyright}, sous licence SIL OFL 1.1 (texte : fonts/LICENSE-OFL.txt). Copie produite par generateur/outils/insignes/exporter.mjs : ne pas modifier à la main. */\n`,
+      autres: '/* © Baromatch, tous droits réservés. Copie produite par generateur/outils/insignes/exporter.mjs (voir provenance.json) : ne pas modifier à la main. */\n',
+    };
+    const modules = readdirSync(COPIE).filter((f) => f.endsWith('.mjs'));
+    expect(modules).toContain('glyphs.generated.mjs');
+    for (const fichier of modules) {
       const texte = readFileSync(path.join(COPIE, fichier), 'utf8');
-      const entete = texte.match(/^(?:\/\*[^\n]*\*\/\n)+/)[0];
-      expect(entete, fichier).toMatch(/^\/\* © Baromatch, tous droits réservés\. Copie produite par generateur\/outils\/insignes\/exporter\.mjs \(voir provenance\.json\) : ne pas modifier à la main\. \*\/\n/);
-      if (fichier === 'glyphs.generated.mjs') expect(entete).toContain('/* Bricolage Grotesque (SIL Open Font License 1.1)');
+      const entete = ENTETES[fichier] ?? ENTETES.autres;
+      expect(texte.startsWith(entete), fichier).toBe(true);
       // Ni « // » en début de ligne, ni « /* » après l’en-tête (le code copié n’a ni l’un ni l’autre ailleurs).
       expect(texte.slice(entete.length), fichier).not.toMatch(/^\s*\/\/|\/\*/m);
     }
-    // La licence de la police, à côté des polices du site, citée par l’en-tête des lettres.
-    expect(readFileSync(path.join(racine, 'fonts', 'LICENSE-OFL.txt'), 'utf8')).toContain('SIL OPEN FONT LICENSE Version 1.1');
+    expect(readFileSync(path.join(COPIE, 'glyphs.generated.mjs'), 'utf8')).not.toContain('©');
+  });
+
+  test('un seul renommage, une règle générale écrite dans la provenance : aucun nom en capitales n’y finit par « _FROM »', () => {
+    expect(PROVENANCE.renommage).toBe('Dans la copie, un nom écrit en capitales qui finit par « _FROM » finit par « _AT » ; rien d’autre n’est renommé.');
+    for (const fichier of readdirSync(COPIE).filter((f) => f.endsWith('.mjs'))) {
+      expect(readFileSync(path.join(COPIE, fichier), 'utf8'), fichier).not.toMatch(/\b[A-Z][A-Z0-9_]*_FROM\b/);
+    }
   });
 
   test('les drapeaux : pour chaque pays, seulement le sens des bandes et leurs couleurs, ni tracé, ni image', () => {
@@ -84,17 +103,65 @@ test.describe('la copie du générateur de l’appli', () => {
     expect(PROVENANCE.empreinteDesDrapeaux).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  test('la table des clubs ne garde que ce que le dessin lit, et le nom du club', () => {
+  // Les champs de la table, à chaque niveau, avec leur sorte : exactement ceux que lisent les modules copiés (badge.mjs,
+  // patterns.mjs, type.mjs). De la géographie, seulement les coordonnées du stade (écrites sur le bord) ; ni le nom du
+  // club, ni sa ville, ni son maillot extérieur. « kern.# » : le crénage, lettre par lettre.
+  const CHAMPS_D_UNE_FICHE = {
+    slug: 'string', code: 'string', pattern: 'string', 'colours.primary': 'string', 'colours.secondary': 'string', 'colours.tertiary': 'string',
+    founded: 'number', 'geography.lat': 'number', 'geography.lon': 'number', density: 'string', 'kern.#': 'number', 'nudge.x': 'number', 'nudge.y': 'number',
+    band: 'string', split: 'boolean', letters: 'string', yearOnFace: 'boolean',
+  };
+  const CHAMPS_DE_L_INSIGNE_NEUTRE = { slug: 'string', code: 'string', 'colours.primary': 'string', 'colours.secondary': 'string', pattern: 'string', neutral: 'boolean' };
+  // Chaque valeur au bout d’un chemin (« geography.lat »), avec sa sorte ; un tableau se lit comme un objet (« x.0 »).
+  const feuilles = (valeur, ou = '') => (valeur !== null && typeof valeur === 'object'
+    ? Object.keys(valeur).flatMap((cle) => feuilles(valeur[cle], ou ? `${ou}.${cle}` : cle))
+    : [[ou, typeof valeur]]);
+
+  test('la table des clubs ne garde que les champs que le dessin lit, à chaque niveau, et aucun autre', () => {
     const texte = readFileSync(path.join(COPIE, 'specs.mjs'), 'utf8');
     expect(texte).not.toMatch(/https?:/);
-    // Les champs d’une fiche : ceux que le dessin lit, et le nom du club ; ceux du maillot extérieur, son motif et ses
-    // couleurs (generateur/outils/insignes/exporter.mjs n’en laisse passer aucun autre).
-    const DESSIN = ['slug', 'name', 'city', 'code', 'pattern', 'colours', 'founded', 'geography', 'density', 'away', 'kern', 'nudge', 'band', 'split', 'letters', 'yearOnFace'];
+    expect(texte).not.toMatch(/\b(?:name|city|away|feature|angle|place|reason|season|source)\s*:/);
+    expect(insignes.CLUB_BADGE_SLUGS.length).toBeGreaterThan(50);
     for (const slug of insignes.CLUB_BADGE_SLUGS) {
       const fiche = insignes.badgeSpecFor(slug);
-      for (const champ of Object.keys(fiche)) expect(DESSIN, `${slug} : ${champ}`).toContain(champ);
-      for (const champ of Object.keys(fiche.away ?? {})) expect(['pattern', 'colours', 'density', 'split'], `${slug} : away.${champ}`).toContain(champ);
-      for (const champ of ['slug', 'name', 'code', 'pattern', 'colours']) expect(fiche[champ], `${slug} : ${champ}`).toBeTruthy();
+      for (const [chemin, sorte] of feuilles(fiche)) expect(CHAMPS_D_UNE_FICHE[chemin.replace(/^kern\.\d+$/, 'kern.#')], `${slug} : ${chemin}`).toBe(sorte);
+      for (const champ of ['slug', 'code', 'pattern', 'colours']) expect(fiche[champ], `${slug} : ${champ}`).toBeTruthy();
+    }
+    for (const [chemin, sorte] of feuilles(insignes.NEUTRAL_BADGE)) expect(CHAMPS_DE_L_INSIGNE_NEUTRE[chemin], `l’insigne neutre : ${chemin}`).toBe(sorte);
+  });
+
+  test('une copie dont la table aurait un autre champ, à n’importe quel niveau, ou une autre sorte, est refusée par l’exportation', async () => {
+    // La copie telle qu’elle est : rien à refuser.
+    expect(ecartsDeLaTable(insignes)).toEqual([]);
+    // Des copies modifiées, dans un dossier temporaire : une note glissée dans un champ imbriqué, ou une chaîne là où un
+    // nombre est attendu.
+    const MODIFICATIONS = [
+      ['geography.note', "geography: { lat: 45.478, lon: 9.124 }", "geography: { lat: 45.478, lon: 9.124, note: 'à relire' }"],
+      ['colours.note', "colours: { primary: '#FB090B', secondary: '#111111' }", "colours: { primary: '#FB090B', secondary: '#111111', note: 'à relire' }"],
+      ['kern.note', "geography: { lat: 45.478, lon: 9.124 }", "geography: { lat: 45.478, lon: 9.124 }, kern: { 0: 1, note: 'à relire' }"],
+      ['kern.0', "geography: { lat: 45.478, lon: 9.124 }", "geography: { lat: 45.478, lon: 9.124 }, kern: { 0: 'à relire' }"],
+      ['nudge.note', "geography: { lat: 45.478, lon: 9.124 }", "geography: { lat: 45.478, lon: 9.124 }, nudge: { x: 1, note: 'à relire' }"],
+      ['founded', 'founded: 1899', "founded: '1899'"],
+      ['geography.lat', 'lat: 45.478', "lat: '45.478'"],
+      ['name', "{ slug: 'ac-milan',", "{ slug: 'ac-milan', name: 'AC Milan',"],
+      ['away', "geography: { lat: 45.478, lon: 9.124 }", "geography: { lat: 45.478, lon: 9.124 }, away: { pattern: 'solid' }"],
+    ];
+    const dossier = mkdtempSync(path.join(tmpdir(), 'insignes-copie-'));
+    try {
+      for (const fichier of readdirSync(COPIE)) copyFileSync(path.join(COPIE, fichier), path.join(dossier, fichier));
+      const table = readFileSync(path.join(COPIE, 'specs.mjs'), 'utf8');
+      const essayer = async (nom, texte) => {
+        writeFileSync(path.join(dossier, `specs-${nom}.mjs`), texte);
+        return ecartsDeLaTable(await import(pathToFileURL(path.join(dossier, `specs-${nom}.mjs`)).href));
+      };
+      for (const [champ, avant, apres] of MODIFICATIONS) {
+        expect(table.split(avant).length, champ).toBeGreaterThan(1);
+        expect(await essayer(champ.replace('.', '-'), table.replace(avant, apres)), champ).toEqual([`ac-milan.${champ}`]);
+      }
+      // L’insigne neutre, de même.
+      expect(await essayer('neutre', table.replace('neutral: true }', "neutral: true, note: 'à relire' }"))).toEqual(['NEUTRAL_BADGE.note']);
+    } finally {
+      rmSync(dossier, { recursive: true, force: true });
     }
   });
 });
@@ -318,9 +385,26 @@ test.describe('plus aucun ancien disque, et jamais un écusson', () => {
     expect(FICHIERS).not.toContain('generateur/contenu/couleurs.json');
   });
 
-  test('le générateur ne lit jamais l’écusson d’un club : seulement son nom, pour son insigne', () => {
-    const generateur = FICHIERS.filter((f) => /^generateur\/.*\.mjs$/.test(f));
-    expect(generateur.filter((f) => /crestAsset|LogoUrl|logoQuality/i.test(lireDuDepot(f)))).toEqual([]);
+  test('le générateur ne lit d’un club que son slug et son nom (canonicalName), rien d’autre', () => {
+    // Le club d’un match n’entre que par clubDe (generateur/donnees.mjs), et la copie réduite des matchs enregistrés ne
+    // garde que ces deux champs (generateur/outils/reduire-capture.mjs).
+    const generateur = FICHIERS.filter((f) => /^generateur\/.*\.mjs$/.test(f) && !f.startsWith('generateur/insignes/'));
+    expect(generateur.filter((f) => /\b(?:home|away)Club\b/.test(lireDuDepot(f)))).toEqual(['generateur/donnees.mjs', 'generateur/outils/reduire-capture.mjs']);
+    expect(lireDuDepot('generateur/outils/reduire-capture.mjs')).toContain("const CLUB = ['slug', 'canonicalName'];");
+    // clubDe ne lit que ces deux champs : chaque usage du club est la lecture de l’un d’eux.
+    const source = clubDe.toString();
+    const usages = [...source.matchAll(/\bclubBrut\b(\??\.\w+)?/g)].slice(1);
+    expect(usages.length).toBeGreaterThan(0);
+    expect([...new Set(usages.map(([, lecture]) => lecture?.replace(/^\?/, '')))].sort()).toEqual(['.canonicalName', '.slug']);
+    // Et un club qui porterait d’autres champs donne exactement le même résultat.
+    const index = indexerLesClubs(chargerLeContenu(racine).clubs);
+    for (const [club, equipe] of [
+      [{ slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' }, 'Paris Saint-Germain'],
+      [{ slug: 'fc-nordsj-lland', canonicalName: 'FC Nordsjælland' }, 'FC Nordsjælland'],
+      [{ slug: 'club-inconnu', canonicalName: 'Club Inconnu' }, 'Club Inconnu'],
+    ]) {
+      expect(clubDe(index, { ...club, autre: 'x', image: 'x' }, equipe), club.slug).toEqual(clubDe(index, club, equipe));
+    }
   });
 
   test('sur l’accueil, chaque insigne est décoratif, fait de formes, et suivi du nom écrit du club', async () => {

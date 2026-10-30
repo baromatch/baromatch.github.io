@@ -162,6 +162,52 @@ test.describe('chaque caractère que le site dessine avec Bricolage Grotesque es
   }
 });
 
+// La police de secours (styles.css : Arial, Liberation Sans ou Roboto aux mesures de Bricolage Grotesque) : sur une
+// connexion lente, la page s’affiche avant que la police arrive ; quand elle arrive, le texte change de police en
+// poussant le moins possible ce qui suit. Mesuré comme Chrome le mesure (les décalages de mise en page, layout-shift),
+// la police retenue 1,5 s. Sans elle (jusqu’au 30 octobre 2026), à 390 px, la Confidentialité se décalait de 0,20 et
+// une page de match de 0,16 ; avec elle, 0,085 et 0,032. Deux polices ne coupent jamais leurs lignes tout à fait aux
+// mêmes mots : le seuil est celui que Google dit « bon », 0,1 (web.dev/cls).
+const SEUIL_DECALAGE = 0.1;
+test.describe('la police de secours : quand Bricolage Grotesque arrive tard, la page bouge à peine', () => {
+  for (const [largeur, hauteur] of [[390, 844], [1280, 800]]) {
+    for (const chemin of ['/', '/cgu.html', '/confidentialite.html', '/matchs/psg-ol-2026-10-25/']) {
+      test(`${chemin} à ${largeur} px : décalage sous ${SEUIL_DECALAGE}`, async ({ browser, baseURL }) => {
+        const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: hauteur }, reducedMotion: 'reduce', locale: 'fr-FR' });
+        await contexte.addInitScript(() => {
+          window.decalages = [];
+          new PerformanceObserver((liste) => {
+            for (const e of liste.getEntries()) if (!e.hadRecentInput) window.decalages.push(e.value);
+          }).observe({ type: 'layout-shift', buffered: true });
+        });
+        const onglet = await contexte.newPage();
+        const retenues = [];
+        await onglet.route('**/fonts/*.woff2', (route) => {
+          const envoi = new Promise((resoudre) => { setTimeout(resoudre, 1_500); }).then(() => route.continue());
+          retenues.push(envoi);
+          return envoi;
+        });
+        try {
+          await onglet.goto(chemin, { waitUntil: 'domcontentloaded' });
+          // La page s’affiche d’abord sans la police : sinon le test ne mesurerait pas l’arrivée tardive.
+          await onglet.waitForFunction(() => performance.getEntriesByName('first-contentful-paint').length > 0);
+          expect(await onglet.evaluate(() => [...document.fonts].filter((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded').length)).toBe(0);
+          // … dessinée avec la police de secours, trouvée sur cette machine (Arial, Liberation Sans ou Roboto).
+          expect(await onglet.evaluate(() => [...document.fonts].some((f) => f.family.startsWith('Bricolage repli') && f.status === 'loaded'))).toBe(true);
+          await onglet.waitForFunction(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
+          await onglet.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(suite, 300))); }));
+          expect(retenues.length).toBeGreaterThan(0);
+          const total = await onglet.evaluate(() => window.decalages.reduce((s, v) => s + v, 0));
+          expect(total).toBeLessThanOrEqual(SEUIL_DECALAGE);
+        } finally {
+          await Promise.all(retenues);
+          await contexte.close();
+        }
+      });
+    }
+  }
+});
+
 const portLibre = () => new Promise((resoudre) => {
   const sonde = createServer();
   sonde.listen(0, '127.0.0.1', () => {

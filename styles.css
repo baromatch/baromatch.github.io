@@ -29,6 +29,17 @@
   font-display: swap;
   unicode-range: U+100-130, U+132-151, U+154-17F, U+218-21B;
 }
+/* Le temps qu’elle arrive (une connexion lente) : Arial ou Roboto aux mesures de Bricolage Grotesque, la même largeur
+   de texte (size-adjust, mesuré sur le texte du site : le corps, le gras, les titres à 88 %, l’ouverture à 84 %) et la
+   même hauteur de ligne (ascent-, descent-, line-gap-override). Son arrivée décale bien moins (tests/police.spec.mjs). */
+@font-face { font-family: "Bricolage repli"; src: local("Arial"), local("Liberation Sans"), local("Arimo"); font-weight: 100 599; font-stretch: 50% 100%; size-adjust: 103.6%; ascent-override: 89.8%; descent-override: 26.1%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage repli"; src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold"); font-weight: 600 1000; font-stretch: 93% 100%; size-adjust: 100.4%; ascent-override: 92.6%; descent-override: 26.9%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage repli"; src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold"); font-weight: 600 1000; font-stretch: 86% 92%; size-adjust: 83.1%; ascent-override: 111.9%; descent-override: 32.5%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage repli"; src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold"); font-weight: 600 1000; font-stretch: 50% 85%; size-adjust: 75.8%; ascent-override: 122.7%; descent-override: 35.6%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto"), local("Roboto-Regular"); font-weight: 100 599; font-stretch: 50% 100%; size-adjust: 104.7%; ascent-override: 88.8%; descent-override: 25.8%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); font-weight: 600 1000; font-stretch: 93% 100%; size-adjust: 107.1%; ascent-override: 86.8%; descent-override: 25.2%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); font-weight: 600 1000; font-stretch: 86% 92%; size-adjust: 88.8%; ascent-override: 104.7%; descent-override: 30.4%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); font-weight: 600 1000; font-stretch: 50% 85%; size-adjust: 81%; ascent-override: 114.8%; descent-override: 33.3%; line-gap-override: 0%; }
 
 :root {
   --nuit: #0A0B10;
@@ -70,7 +81,7 @@ body {
   margin: 0;
   background: var(--nuit);
   color: var(--texte);
-  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Bricolage Grotesque", "Bricolage repli", "Bricolage repli Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.55;
   font-variation-settings: "opsz" 16;

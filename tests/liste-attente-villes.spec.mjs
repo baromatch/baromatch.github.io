@@ -9,7 +9,6 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { ouvrirEntiere } from './outils/attente.mjs';
 import { violationsAxe } from './outils/axe.mjs';
 import { racine } from './outils/environnement.mjs';
 import { simulerFormspree } from './outils/formspree.mjs';
@@ -51,8 +50,50 @@ const verifierLeChamp = async (onglet, choisie) => {
   await expect(groupe).toHaveAccessibleDescription(/On t’écrit seulement quand Baromatch ouvre dans ta ville/);
 };
 
-const tropPetites = (onglet) => onglet.locator('.attente__ville span').evaluateAll((puces) => puces
-  .map((p) => p.getBoundingClientRect()).filter((r) => r.height < 44 || r.width < 44).length);
+// Les puces mesurées, et de quoi comprendre une mesure fausse : la taille de chaque puce (sa boîte peinte et sa boîte
+// de mise en page), son min-height et son display ; display, transform et animation de chaque ancêtre ; les feuilles
+// de style et ce qu’elles lisent ; l’état du document, sa navigation, le mouvement réduit et la largeur de la fenêtre.
+const lireLesPuces = (onglet) => onglet.evaluate(() => {
+  const puces = [...document.querySelectorAll('.attente__ville span')];
+  const ancetres = [];
+  for (let e = puces[0]?.parentElement; e; e = e.parentElement) {
+    const s = getComputedStyle(e);
+    ancetres.push(`${e.tagName.toLowerCase()}.${String(e.className).trim().split(/\s+/).join('.')} display=${s.display} transform=${s.transform} scale=${s.scale} zoom=${s.zoom} animation=${s.animationName}`);
+  }
+  const navigation = performance.getEntriesByType('navigation')[0];
+  return {
+    petites: puces.filter((p) => { const r = p.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length,
+    diagnostic: {
+      puces: puces.map((p) => { const r = p.getBoundingClientRect(); const s = getComputedStyle(p); return `${p.textContent} ${r.width}×${r.height} (mise en page ${p.offsetWidth}×${p.offsetHeight}) min-height=${s.minHeight} display=${s.display}`; }),
+      ancetres,
+      feuilles: [...document.styleSheets].map((f) => { try { return `${f.href ?? 'en ligne'} : ${f.cssRules.length} règles`; } catch (erreur) { return `${f.href} : ${erreur.name}`; } }),
+      document: `${document.readyState}, ${location.href}, navigation ${navigation?.type} à ${Math.round(performance.timeOrigin)}, il y a ${Math.round(performance.now())} ms`,
+      vue: `${innerWidth}×${innerHeight}, mouvement réduit : ${matchMedia('(prefers-reduced-motion: reduce)').matches}`,
+      animations: document.getAnimations().map((a) => `${a.animationName ?? a.transitionProperty} ${a.playState}`),
+    },
+  };
+});
+// Mesure les puces, la page au repos (le document chargé, sa police prête, aucune animation en cours, deux images
+// peintes) ; une mesure fausse dit tout ce qu’elle a vu, et chaque navigation de la page depuis son ouverture.
+// Ce test est tombé deux fois sous forte charge (cinq puces sous 44 px), une fois avec la feuille de style chargée :
+// la cause n’est pas reproduite (plus de 1 500 ouvertures, processeur ralenti six fois, ou mêlées aux autres fichiers),
+// ce diagnostic la nommera.
+const verifierLesPuces = async (onglet, navigations) => {
+  await onglet.waitForFunction(() => document.readyState === 'complete');
+  await onglet.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {})));
+    await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
+  });
+  const lu = await lireLesPuces(onglet);
+  expect(lu.petites, JSON.stringify({ ...lu.diagnostic, navigations }, null, 1)).toBe(0);
+};
+const suivreLesNavigations = (onglet) => {
+  const navigations = [];
+  onglet.on('framenavigated', (cadre) => { if (cadre === onglet.mainFrame()) navigations.push(`${cadre.url()} à ${Date.now()}`); });
+  onglet.on('crash', () => navigations.push(`page plantée à ${Date.now()}`));
+  return navigations;
+};
 
 test.describe('l’accueil', () => {
   // L’ouverture de l’accueil glisse au chargement : immobile, elle se mesure et se touche tout de suite.
@@ -60,34 +101,14 @@ test.describe('l’accueil', () => {
 
   test('le champ des villes : cinq villes, Paris choisi d’avance, aucun champ libre, 44 px à 360 px', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await ouvrirEntiere(page, '/');
+    const navigations = suivreLesNavigations(page);
+    await page.goto('/');
+    navigations.push(`ouverte à ${Date.now()}`);
     await verifierLeChamp(page, 'Paris');
-    expect(await tropPetites(page)).toBe(0);
+    await verifierLesPuces(page, navigations);
     // « Autre » n’ouvre aucun champ.
     await page.getByRole('radio', { name: 'Autre' }).check();
     await verifierLeChamp(page, 'Autre');
-  });
-
-  // Ce que voyait le test des 44 px, qui tombait une fois sur neuf passages sous charge : /styles.css perdu en route,
-  // la page ouverte sans sa feuille, et ses cinq puces sous 44 px. ouvrirEntiere (tests/outils/attente.mjs) recharge
-  // une page incomplète, une fois, et nomme la feuille si elle manque encore.
-  test('/styles.css perdu en route : la page s’ouvre sans sa feuille (les cinq puces sous 44 px) ; ouvrirEntiere la recharge, et la nomme si elle manque encore', async ({ page }) => {
-    await page.setViewportSize({ width: 360, height: 800 });
-    let aPerdre = 0;
-    await page.route('**/styles.css', (route) => {
-      if (aPerdre <= 0) return route.continue();
-      aPerdre -= 1;
-      return route.abort('connectionreset');
-    });
-    aPerdre = 1;
-    await page.goto('/');
-    expect(await tropPetites(page)).toBe(5);
-    aPerdre = 1;
-    await ouvrirEntiere(page, '/');
-    expect(await tropPetites(page)).toBe(0);
-    expect(test.info().annotations.find((a) => a.type === 'page rechargée')?.description).toMatch(/^\/styles\.css manquait ; requêtes perdues : .*\/styles\.css \(net::ERR_CONNECTION_RESET\)/);
-    aPerdre = 2;
-    await expect(ouvrirEntiere(page, '/')).rejects.toThrow(/Page incomplète deux fois de suite : \/styles\.css ne s’est pas chargée/);
   });
 
   test('hors de Paris, la phrase « pas de date » suit la ville choisie, avec et sans JavaScript', async ({ browser, baseURL }) => {
@@ -212,10 +233,12 @@ test.describe('les pages de ville', () => {
   ]) {
     test(`${chemin} : ${choisie} choisi d’avance, puces de 44 px`, async ({ page }) => {
       await page.setViewportSize({ width: 360, height: 800 });
-      await ouvrirEntiere(page, `${serveur.adresse}${chemin}`);
+      const navigations = suivreLesNavigations(page);
+      await page.goto(`${serveur.adresse}${chemin}`);
+      navigations.push(`ouverte à ${Date.now()}`);
       await verifierLeChamp(page, choisie);
       await expect(page.locator('.attente__date:visible')).toHaveText(phrases);
-      expect(await tropPetites(page)).toBe(0);
+      await verifierLesPuces(page, navigations);
     });
   }
 

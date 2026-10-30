@@ -125,6 +125,19 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   const enAmbre = await ouMeneLAmbre(page);
   expect(enAmbre.filter(({ cible }) => cible === '#attente').length).toBeGreaterThan(0);
   expect(ambreAilleurs(enAmbre)).toEqual([]);
+  // L’en-tête non plus : ni bord ni souligné ambre, même translucide, sur ses liens (souligné au téléphone, capsule de
+  // « Pour les bars » dès 401 px).
+  for (const largeur of [360, 1280]) {
+    await page.setViewportSize({ width: largeur, height: 800 });
+    const enteteAmbre = await page.$$eval('header a', (liens) => liens.flatMap((a) => {
+      const s = getComputedStyle(a);
+      const bords = ['Top', 'Right', 'Bottom', 'Left'].filter((cote) => parseFloat(s[`border${cote}Width`]) > 0).map((cote) => [`bord ${cote}`, s[`border${cote}Color`]]);
+      const souligne = s.textDecorationLine.includes('underline') ? [['souligné', s.textDecorationColor]] : [];
+      return [...bords, ...souligne].filter(([, couleur]) => /^rgba?\(255, 177, 61/.test(couleur)).map(([quoi, couleur]) => `${a.textContent.trim()} : ${quoi} ${couleur}`);
+    }));
+    expect(enteteAmbre, `${largeur} px`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 1280, height: 720 });
   // Un rappel mène au formulaire, et le champ est là.
   await rappels.last().click();
   await expect(page).toHaveURL(/#attente$/);

@@ -254,6 +254,31 @@ test.describe('le jour posé', () => {
     expect(lu.textes).toEqual([]);
   });
 
+  // « Proposer mon bar », survolé : les deux capsules ambre (#FFC163 au survol, le texte de nuit) et le bouton nuit de la
+  // bande des bars (la goutte de la nuit, #FFF3DA ; celle du jour, #7A4300, n’y faisait que 2,45:1). Le texte contre le fond
+  // du bouton survolé, lu dans le style et vérifié peint : le pixel du bord intérieur du bouton est bien ce fond.
+  test('« Proposer mon bar » survolé reste lisible : 4,5:1 au moins sur le fond du bouton survolé, chacun des trois', async ({ page }) => {
+    await ouvrir(page, 1280);
+    const boutons = page.getByRole('link', { name: 'Proposer mon bar', exact: true });
+    await expect(boutons).toHaveCount(3);
+    for (let i = 0; i < 3; i += 1) {
+      const bouton = boutons.nth(i);
+      await bouton.scrollIntoViewIfNeeded();
+      await bouton.hover();
+      const lu = await bouton.evaluate((e) => ({ quoi: e.className, survole: e.matches(':hover'), texte: getComputedStyle(e).color, fond: getComputedStyle(e).backgroundColor }));
+      expect(lu.survole, lu.quoi).toBe(true);
+      const fond = lireCouleur(lu.fond);
+      expect(fond.a, `${lu.quoi} : un fond plein`).toBe(1);
+      expect(rapport(poser(lireCouleur(lu.texte), fond), fond), `${lu.quoi} survolé : ${lu.texte} sur ${lu.fond}`).toBeGreaterThanOrEqual(4.5);
+      const image = lirePng(await bouton.screenshot());
+      const x = 4;
+      const y = Math.floor(image.hauteur / 2);
+      const o = (y * image.largeur + x) * 4;
+      const peint = { r: image.pixels[o], v: image.pixels[o + 1], b: image.pixels[o + 2] };
+      expect(peint, `${lu.quoi} : le fond peint au bord du bouton`).toEqual({ r: fond.r, v: fond.v, b: fond.b });
+    }
+  });
+
   test('l’étiquette « Écran de démonstration » se lit : du texte clair sur sa pastille de nuit, 4,5:1 au moins', async ({ page }) => {
     await ouvrir(page, 1280);
     const etiquettes = await page.locator('.moment__visuel > .exemple').evaluateAll((liste) => liste.map((e) => {

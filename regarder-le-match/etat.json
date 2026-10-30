@@ -4,7 +4,7 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "naNwsEcxubgxgWOXnSf_ow",
+   "empreinte": "6cajm8YnQazkY_vOxzTiJg",
    "change": "2026-10-30",
    "indexable": true,
    "bars": []
@@ -45,8 +45,8 @@
   "/agenda/le-havre.ics": {
    "type": "calendrier",
    "cle": "le-havre",
-   "empreinte": "jQO8Gr5qJXxlfQsO0Iezjw",
-   "change": "2026-10-25",
+   "empreinte": "Noa8mNoU_4EIxNBmO8gi1w",
+   "change": "2026-10-30",
    "indexable": false,
    "memoire": {
     "court": "Le Havre",
@@ -155,8 +155,8 @@
   "/agenda/psg.ics": {
    "type": "calendrier",
    "cle": "psg",
-   "empreinte": "PdORSskEuwO3kPWbFRe_YQ",
-   "change": "2026-10-26",
+   "empreinte": "sLPyTyKyiWHOXh0vxs8x8Q",
+   "change": "2026-10-30",
    "indexable": false,
    "memoire": {
     "court": "PSG",
@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "8Y4z3I1AeeENRQycLd2yLQ",
+   "empreinte": "cSn2U0_ckavf63knehvOpQ",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -225,7 +225,7 @@
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "iyh-t80v5HAwtGBLljXJxg",
+   "empreinte": "qhT_NNAdgRWJDYZsmRRhDA",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -323,7 +323,7 @@
    "type": "match-en",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "OFyPZdu4B8oET0_LRLNwug",
+   "empreinte": "p8BkicbwvhMRM83f_3_Eaw",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -413,7 +413,7 @@
    "type": "match-en",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "in3DSkFtv8B0C97yh4cTSw",
+   "empreinte": "JXuLsi7gAmcbI_pQ7IEBDA",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -422,7 +422,7 @@
    "type": "match-en",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "sSiAXfBu1sqhD75jKVH-KQ",
+   "empreinte": "YEkm0AGVQBaWX26KRyXpwA",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -458,7 +458,7 @@
    "type": "match-en",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "HAO7Ygr96McTF7aEelLNmw",
+   "empreinte": "Od6zGDmVp5NNUPqnKq3GZQ",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -492,7 +492,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "ITDSjFg4cTLUxBjc3OjtGw",
+   "empreinte": "D_aSfqpi6ZDtdo6pPQXc_w",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -500,7 +500,7 @@
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "rE9335axadVn8NruuXZlPg",
+   "empreinte": "aY3Xa_2StVuTGz6ExoZmiQ",
    "change": "2026-10-30",
    "indexable": true,
    "bars": []
@@ -1209,7 +1209,7 @@
   "/matchs/club/psg/": {
    "type": "club",
    "cle": "psg",
-   "empreinte": "om6bLwTKaqLmc8xl18__gw",
+   "empreinte": "gIiRPnKtYxvCZh5n7XcTGQ",
    "change": "2026-10-30",
    "indexable": true,
    "bars": []
@@ -1241,7 +1241,7 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "JMadq_sYnJAUTcTs21_Evg",
+   "empreinte": "q9iD17dZIK8dF6AWCaVWyg",
    "change": "2026-10-30",
    "indexable": true,
    "bars": []
@@ -1618,7 +1618,7 @@
    "type": "match",
    "cle": "le-havre-auxerre-2026-10-18",
    "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "EsIP-nHZodt3dCaaPfgeSQ",
+   "empreinte": "toVzRMtQ4NuId-GvAKiVBA",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -1692,7 +1692,7 @@
    "type": "match",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "t1kFTl-CDwq-V_i6rPrZ0Q",
+   "empreinte": "DR3gp2giqCUDG-TPkRZStg",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -1717,20 +1717,6 @@
      "slug": "paris-saint-germain"
     }
    }
-  },
-  "/matchs/le-havre-psg-2026-10-30/match.ics": {
-   "type": "evenement",
-   "cle": "le-havre-psg-2026-10-30",
-   "empreinte": "fb6-R0QEBr_nsZirzfBM2A",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/le-havre-psg-2026-10-30/partage.png": {
-   "type": "partage",
-   "cle": "le-havre-psg-2026-10-30",
-   "empreinte": "MVpZRh0HNvooabJuDqkvfg",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/le-mans-monaco-2026-11-08/": {
    "type": "match",
@@ -2120,7 +2106,7 @@
    "type": "match",
    "cle": "lille-lens-2026-10-30",
    "date": "2026-10-30T20:05:00.000Z",
-   "empreinte": "sf-D_y56Sc8qWaqv2cfIIQ",
+   "empreinte": "fkSZ0Af0a5aLkr6kPQ02_w",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -2145,13 +2131,6 @@
      "slug": "rc-lens"
     }
    }
-  },
-  "/matchs/lille-lens-2026-10-30/match.ics": {
-   "type": "evenement",
-   "cle": "lille-lens-2026-10-30",
-   "empreinte": "jTdVIsrquIlAKZYklC76uQ",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/lille-lens-2026-10-30/partage.png": {
    "type": "partage",
@@ -2770,7 +2749,7 @@
    "type": "match",
    "cle": "om-le-havre-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "bKGSU55FAeD_cLaNSdZU0Q",
+   "empreinte": "zLLeGUgH5aJhPWExAode6A",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -2918,7 +2897,7 @@
    "type": "match",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "CGujeotpkJ0OEsTMpQjv0A",
+   "empreinte": "u7Aci4NvFrnR64KP145V_Q",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -2949,7 +2928,7 @@
    "type": "match",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "Ov_efvoz-Gf8EQGryBiJhw",
+   "empreinte": "3_eocvXinCLt94sI_Gti9Q",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -3259,7 +3238,7 @@
    "type": "match",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "iFjhI8ANTqtEp8TBnUUzvQ",
+   "empreinte": "20TZBVjHTi1fdT5Nu_0Aag",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -3590,28 +3569,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5jq2001jryqjwmoopuma@baromatch.fr": {
-   "ids": [
-    "cmv6e5jq2001jryqjwmoopuma"
-   ],
-   "slug": "le-havre-psg-2026-10-30",
-   "debut": "2026-10-30T18:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "le-havre",
-    "court": "Le Havre",
-    "nom": "Le Havre AC"
-   },
-   "exterieur": {
-    "cle": "psg",
-    "court": "PSG",
-    "nom": "Paris Saint-Germain"
-   },
-   "empreinte": "aoJfeRCMt88aLu5Zg7dwrQ",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmv6e5jqs001lryqj10w6b44j@baromatch.fr": {
    "ids": [
     "cmv6e5jqs001lryqj10w6b44j"

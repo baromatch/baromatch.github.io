@@ -368,15 +368,19 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await expect(ouverture).not.toContainText('Premiers bars à Paris');
   });
 
-  // Sur un iPhone (393 × 659 de page, sous la barre du navigateur), « Gratuit pendant le lancement, sans engagement. » se
-  // lit sans défiler : sous la ligne d’état, elle commençait à 702 px.
-  test('à 393 × 659, comme un iPhone : « Gratuit pendant le lancement, sans engagement. » dans le premier écran', async ({ page }) => {
-    await page.setViewportSize({ width: 393, height: 659 });
-    await page.goto(PAGE);
-    await page.evaluate(() => document.fonts.ready);
-    await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
-    await expect(page.locator('.ouverture-bars__prix')).toBeInViewport({ ratio: 1 });
-  });
+  // Sur un iPhone (393 × 659 de page, sous la barre du navigateur) et un Pixel 7 (412 × 839), « Gratuit pendant le
+  // lancement, sans engagement. » se lit sans défiler (sous la ligne d’état, elle commençait à 702 px), et le bouton
+  // « Proposer mon bar » est entier dans le premier écran (le prix remonté l’avait poussé de 13 px sous le bas de l’iPhone).
+  for (const [appareil, largeur, hauteur] of [['un iPhone', 393, 659], ['un Pixel 7', 412, 839]]) {
+    test(`à ${largeur} × ${hauteur}, comme ${appareil} : « Gratuit pendant le lancement, sans engagement. » et le bouton « Proposer mon bar » dans le premier écran`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: hauteur });
+      await page.goto(PAGE);
+      await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
+      await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
+      await expect(page.locator('.ouverture-bars__prix')).toBeInViewport({ ratio: 1 });
+      await expect(page.locator('.ouverture-bars .actions .capsule')).toBeInViewport({ ratio: 1 });
+    });
+  }
 
   test('le lien du fan tient sur la ligne de « Pour les bars » à 360 px, sans pousser le titre', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });

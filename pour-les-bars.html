@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-ZKJk5hpyUuRXrm4weHZLuNhgMnaYJKPyFXMNI7Talys='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-D24z2kqaJ02gPyGvRyMjGY+x4tyZc32baJsXWfNoAnE='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -46,6 +46,8 @@
 .lien-fleche { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--texte); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(247, 247, 249, 0.4); text-underline-offset: 0.22em; }
 .lien-fleche svg { width: 18px; height: 18px; transition: transform 150ms ease-out; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; margin-top: 28px; }
+/* Au téléphone, le bouton du premier écran remonte (le prix passé au-dessus de la ligne d’état l’avait poussé sous le bas d’un iPhone). */
+@media (max-width: 719px) { .ouverture-bars .actions { margin-top: 14px; } .ouverture-bars .ouverture-bars__etat { margin-top: 12px; } }
 
 .legende { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 16px 0 0; color: var(--texte-discret); font-size: 0.875rem; line-height: 1.45; }
 main figure { position: relative; }

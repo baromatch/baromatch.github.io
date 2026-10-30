@@ -20,6 +20,7 @@ import { bandesDe, identifiantsUniques, insigne, paireDInsignes, TAILLES } from 
 import { svgDeLaCarte } from '../generateur/partage.mjs';
 import * as badge from '../generateur/insignes/badge.mjs';
 import * as specs from '../generateur/insignes/specs.mjs';
+import { chargerLeQr } from '../generateur/qr.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { racine } from './outils/environnement.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
@@ -351,13 +352,40 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     expect(zinc).toContain(`<h3 class="regarder-carte__nom">${paireDInsignes(psgOl.domicile, psgOl.exterieur, { fond: 'night' })}<a href="/matchs/psg-ol-2026-10-25/">PSG – OL</a></h3>`);
   });
 
-  test('chaque page : des identifiants uniques, chaque renvoi vers l’un d’eux, aucun dessin qui ne soit un insigne décoratif', () => {
-    for (const p of site.pages.filter((q) => q.chemin.endsWith('/'))) {
+  test('chaque page : des identifiants uniques, chaque renvoi vers l’un d’eux, aucun dessin qui ne soit un insigne décoratif', async () => {
+    // Avec la semaine des planches, une semaine où un même club et une même sélection jouent deux fois : Monaco (dont
+    // l’insigne de 30 px a ses identifiants) et la France (son drapeau), sur la semaine, leurs pages, l’agenda.
+    const dossier = mkdtempSync(path.join(tmpdir(), 'insignes-doublons-'));
+    let doublons;
+    try {
+      const fichier = path.join(dossier, 'scenario.json');
+      const club = (slug, canonicalName) => ({ slug, canonicalName });
+      const match = (id, startAt, league, [domicile, nomDomicile], [exterieur, nomExterieur]) => ({
+        id, startAt, league, homeTeam: nomDomicile, awayTeam: nomExterieur, homeClub: club(domicile, nomDomicile), awayClub: club(exterieur, nomExterieur),
+      });
+      writeFileSync(fichier, JSON.stringify({
+        matches: [
+          match('d-monaco-lens', '2026-10-30T19:00:00.000Z', 'Ligue 1', ['as-monaco', 'AS Monaco'], ['rc-lens', 'RC Lens']),
+          match('d-nice-monaco', '2026-11-01T16:00:00.000Z', 'Ligue 1', ['ogc-nice', 'OGC Nice'], ['as-monaco', 'AS Monaco']),
+          match('d-france-italie', '2026-10-31T19:45:00.000Z', 'Match amical', ['nt-fr', 'France'], ['nt-it', 'Italie']),
+          match('d-espagne-france', '2026-11-03T19:45:00.000Z', 'Match amical', ['nt-es', 'Espagne'], ['nt-fr', 'France']),
+        ],
+        bars: [],
+        matchNights: [],
+      }));
+      doublons = await construireEnMemoire({ source: `scenario:${fichier}`, maintenant: JEUDI, racine });
+    } finally {
+      rmSync(dossier, { recursive: true, force: true });
+    }
+    for (const p of [...site.pages, ...doublons.pages].filter((q) => q.chemin.endsWith('/'))) {
       const ids = [...p.contenu.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
       expect(ids.length - new Set(ids).size, p.chemin).toBe(0);
       for (const [, cible] of p.contenu.matchAll(/url\(#([^)]+)\)/g)) expect(ids, p.chemin).toContain(cible);
       for (const dessin of p.contenu.match(/<svg class="insignes?"[^>]*>/g) ?? []) expect(dessin, p.chemin).toMatch(/ aria-hidden="true" focusable="false">$/);
     }
+    // Ces pages ont bien des insignes dessinés deux fois : sans identifiantsUniques, leurs identifiants seraient doublés.
+    const renommes = doublons.pages.filter((p) => / id="(?:ib-f-|drapeau-)[^"]+-2"/.test(p.contenu)).map((p) => p.chemin);
+    expect(renommes).toEqual(expect.arrayContaining(['/matchs/', '/matchs/club/monaco/']));
   });
 
   test('chaque image de partage, du scénario et de la semaine des planches : son texte dessiné en entier ; celle d’un match dit ce que dit son texte alternatif', async () => {
@@ -384,6 +412,39 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     const olAngers = scenario.pages.find((p) => p.chemin === '/matchs/ol-angers-2026-10-31/');
     expect(olAngers.carte.ligne).toBe('Samedi 31 octobre · heure à confirmer');
     expect(svgDeLaCarte(olAngers.carte, { verre: scenario.cadre.verre })).toMatch(/<svg x="112" y="\d+(?:\.\d+)?" width="128" height="128" viewBox="0 0 200 200">/);
+  });
+
+  // Le fond d’un insigne, lu dans son dessin : sur un fond clair, chaque insigne a son filet d’encre à 60 % (un club, un
+  // drapeau) ou son bord d’encre (l’insigne neutre) ; sur la nuit, ni l’un ni l’autre. Une paire en compte deux.
+  const FILET_CLAIR = /stroke="rgba\(20,21,31,0\.6\)"|stroke="#14151F" stroke-width="[\d.]+" stroke-opacity="0\.85"/g;
+  const fondDuDessin = (dessin) => {
+    const filets = (dessin.match(FILET_CLAIR) ?? []).length;
+    const insignes = dessin.startsWith('<svg class="insignes"') ? 2 : 1;
+    return filets === 0 ? 'night' : filets === insignes ? 'light' : `mêlé (${filets} sur ${insignes})`;
+  };
+  // Les insignes d’une page qui ne suivent pas son thème : <html class="jour"> donne le clair, sinon la nuit ; sur le
+  // papier d’une affiche, toujours le clair.
+  const horsDuTheme = (p) => {
+    const jour = /<html[^>]*\sclass="[^"]*\bjour\b/.test(p.contenu);
+    const attendu = p.type?.startsWith('affiche') || jour ? 'light' : 'night';
+    return (p.contenu.match(/<svg class="insignes?"[\s\S]*?<\/svg>/g) ?? []).map(fondDuDessin).filter((f) => f !== attendu).map((f) => `${p.chemin} : ${f} au lieu de ${attendu}`);
+  };
+
+  test('le fond des insignes suit le thème de chaque page : <html class="jour"> donne le clair, sinon la nuit ; sur une affiche, le clair', async () => {
+    // Le fond, lu sur des dessins connus : un club, l’insigne neutre, un drapeau, une paire.
+    for (const club of [{ slug: 'paris-saint-germain' }, { slug: 'pafos-fc', nom: 'Pafos FC' }, { slug: 'nt-fr', nom: 'France' }]) {
+      for (const taille of [30, 58]) for (const fond of ['light', 'night']) expect(fondDuDessin(insigne(club, { taille, fond })), `${club.slug}, ${taille}, ${fond}`).toBe(fond);
+    }
+    for (const fond of ['light', 'night']) expect(fondDuDessin(paireDInsignes({ slug: 'le-havre-ac' }, { slug: 'rc-lens' }, { fond }))).toBe(fond);
+    // Chaque page générée, de la semaine des planches et du scénario (affiches comprises).
+    const scenario = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario(), qr: chargerLeQr().qr });
+    const pages = [...site.pages, ...scenario.pages].filter((p) => /<svg class="insignes?"/.test(p.contenu ?? ''));
+    expect(pages.length).toBeGreaterThan(30);
+    expect(pages.some((p) => p.type === 'affiche')).toBe(true);
+    expect(pages.flatMap(horsDuTheme)).toEqual([]);
+    // Une page générée passée au jour sans que ses insignes suivent : ce test le voit.
+    const match = site.pages.find((p) => p.chemin === '/matchs/le-havre-psg-2026-10-30/');
+    expect(horsDuTheme({ ...match, contenu: match.contenu.replace('<html lang="fr">', '<html lang="fr" class="jour">') }).length).toBeGreaterThan(2);
   });
 
   test('l’image de partage d’un match : les deux insignes de l’appli à 160 px, sur la nuit, la saison écrite', () => {

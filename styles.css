@@ -1,5 +1,9 @@
 /* Baromatch — feuille de style du site */
 
+/* Bricolage Grotesque 1.001 (fonts/LICENSE-OFL.txt), réduite avec fontTools en trois fichiers. Le cœur, préchargé par
+   chaque page, a tout ce que le site écrit : le latin de base, les lettres du latin-1, la ponctuation française, €, ‹ › −.
+   Les deux autres ne viennent que pour un caractère qu’ils sont seuls à avoir : un signe rare (½, ±, ¿…), une lettre du
+   latin étendu (le Ş, le ł ou le ğ d’un nom de club). tests/police.spec.mjs vérifie les trois. */
 @font-face {
   font-family: "Bricolage Grotesque";
   src: url("fonts/bricolage-grotesque.woff2") format("woff2-variations"),
@@ -8,6 +12,22 @@
   font-stretch: 75% 100%;
   font-style: normal;
   font-display: swap;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("fonts/bricolage-grotesque-signes.woff2") format("woff2-variations"), url("fonts/bricolage-grotesque-signes.woff2") format("woff2");
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  unicode-range: U+A1-A3, U+A5-A8, U+AA, U+AC, U+AF, U+B1-B6, U+B8-BA, U+BC-BF, U+F7, U+131, U+2C6, U+2DA, U+2DC, U+2002, U+2032-2033, U+2044, U+2191, U+2193;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("fonts/bricolage-grotesque-etendu.woff2") format("woff2-variations"), url("fonts/bricolage-grotesque-etendu.woff2") format("woff2");
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  unicode-range: U+100-130, U+132-151, U+154-17F, U+218-21B;
 }
 
 :root {

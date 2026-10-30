@@ -33,7 +33,7 @@ test('Baromatch en bref : le slogan, la phrase et la description de marque.json,
   expect(await fait('Qui publie')).toBe('Skander Kamoun, fondateur. Détails dans les mentions légales.');
   expect(texte).not.toMatch(/Tu ne paies rien|Gratuit\. Ce qu’ils/);
   // Le chapô : la description de marque.json, puis ce qu’on trouve sur la page.
-  expect(normaliser(await page.locator('.presse__chapo').textContent())).toBe(`${normaliser(MARQUE.description)} Ici : le logo, les écrans, le film et un texte à copier.`);
+  expect(normaliser(await page.locator('.presse__chapo').textContent())).toBe(`${normaliser(MARQUE.description)} Ici : le logo, les écrans, le film à regarder et un texte à copier.`);
 });
 
 // Une seule liste : ce que Baromatch n’est pas, et ce qu’il refuse (les écussons et les logos de compétition ou de

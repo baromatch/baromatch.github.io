@@ -1,0 +1,19 @@
+{
+ "_lisezMoi": "Copie du générateur d’insignes de l’appli Baromatch, écrite par generateur/outils/insignes/exporter.mjs : ne pas la modifier à la main. Elle est à jour tant que empreinteDesSources et empreinteDesDrapeaux sont celles des sources du dessin et des drapeaux de l’appli ; quand l’une ne correspond plus, on refait l’export. © Baromatch, tous droits réservés.",
+ "versionDeLAppli": "0.1.0",
+ "typescript": "5.9.3",
+ "renommage": "Dans la copie, un nom écrit en capitales qui finit par « _FROM » finit par « _AT » ; rien d’autre n’est renommé.",
+ "empreinteDesSources": "1e80e1ac1f8aa3883a555acebcbc2d46db07fa41bc8c318429481bba596fb666",
+ "empreinteDesDrapeaux": "4bf461841d6ae39240dd4e3dd8c7412cc3e3b508a7219d800f8dbed65dabb7c1",
+ "fichiers": {
+  "badge.mjs": "183bcbc0cfdace3a726f0105e0f9ecc4c2c001f9d7cedce19a77831ee3317180",
+  "coaster.mjs": "92230bd27fe1217077c3001a3952e8bb506719fc4a90f5e674f70a7c05ef72b0",
+  "colour.mjs": "f8b6e3a865c09fd2087c1d0ebef3ba912811af9a759c163311a650a2b577e297",
+  "drapeaux.json": "301b4f7ff303d3ca3f6084f9f93aa2edca8c9fde9dadfac5af40115b341b374b",
+  "glyphs.generated.mjs": "43288870ac4e5812de97e7b0419856090f6ddfbcbcbb71de5df6908e13806f07",
+  "patterns.mjs": "88e66b67313a57124d58e1fe26885bba180c1699bd133da3826762995a6ffda1",
+  "specs.mjs": "92cb874a1c2b8bb8ab6bdc7e65cd79230a01177537a66557e68d760242b8d3f4",
+  "svg.mjs": "a03a2a468fc362e746e1560b4db54e8fe0ee68f12c89c5f4a5143860089b163e",
+  "type.mjs": "dc09de5ed69d05eac11b4577df2ee539d54638578d85dd84653315c271f24bb4"
+ }
+}

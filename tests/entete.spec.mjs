@@ -3,6 +3,7 @@
 // (WCAG 2.2, 2.5.8 : 24 × 24 px au moins ; on vise 44 px, notre minimum). Avec un texte agrandi (125, 150, 200 %),
 // l’en-tête passe sur deux lignes au lieu de déborder.
 import { test, expect } from '@playwright/test';
+import { lireCouleur, rapport } from './outils/contraste.mjs';
 import { couperLAPI } from './outils/invitation.mjs';
 import { PAGES } from './outils/pages.mjs';
 
@@ -87,8 +88,9 @@ for (const page of PAGES) {
 }
 
 // « Pour les bars », l’entrée des patrons : une capsule de verre dès 401 px (bord tout autour, rayon de capsule, fond
-// de verre, jamais l’ambre des appels) ; en dessous, le lien souligné comme « Boutique ». Sur la page des bars, son texte
-// reste ambre (aria-current).
+// de verre, jamais l’ambre des appels) ; en dessous, le lien souligné comme « Boutique ». Sur la page des bars, en nuit,
+// son texte est ambre (aria-current) ; en clair (<html class="jour">, la page des bars depuis le 29 octobre), il est bleu
+// nuit : l’ambre fait 1,8:1 sur le blanc et 1,7:1 sur le crème.
 for (const largeur of [360, 400, 401, 1280]) {
   test(`à ${largeur} px, « Pour les bars » ${largeur >= 401 ? 'est une capsule de verre' : 'reste un lien souligné'}`, async ({ page: onglet }) => {
     await onglet.setViewportSize({ width: largeur, height: 700 });
@@ -110,10 +112,15 @@ for (const largeur of [360, 400, 401, 1280]) {
   });
 }
 
-test('sur la page des bars, la capsule garde son texte ambre (la page où l’on est)', async ({ page: onglet }) => {
+test('sur la page des bars (en clair), la capsule prend le bleu nuit, bord plein, et non l’ambre : la page où l’on est se lit sur le blanc', async ({ page: onglet }) => {
   await onglet.setViewportSize({ width: 1280, height: 700 });
   await onglet.goto('/pour-les-bars.html');
   const lien = onglet.locator('.entete__lien--bars');
   await expect(lien).toHaveAttribute('aria-current', 'page');
-  expect(await lien.evaluate((a) => getComputedStyle(a).color)).toBe('rgb(255, 177, 61)');
+  const lu = await lien.evaluate((a) => {
+    const s = getComputedStyle(a);
+    return { texte: s.color, bord: s.borderTopColor, fond: s.backgroundColor };
+  });
+  expect(lu).toEqual({ texte: 'rgb(10, 11, 16)', bord: 'rgb(10, 11, 16)', fond: 'rgb(255, 255, 255)' });
+  expect(rapport(lireCouleur(lu.texte), lireCouleur(lu.fond))).toBeGreaterThanOrEqual(4.5);
 });

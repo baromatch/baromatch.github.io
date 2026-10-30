@@ -1378,6 +1378,11 @@ a:hover { color: var(--goutte); }
 /* La bande des bars : une carte blanche, l’ambre reste au bouton. */
 .jour .bars { background: var(--carte); border-block: 1px solid var(--trait); }
 
+/* L’étiquette des écrans de nuit reste claire ; la page courante, bleu nuit (l’ambre : 1,7:1 sur le crème). */
+.jour .exemple { color: #F7F7F9; }
+.jour .entete__lien[aria-current="page"] { color: var(--texte); }
+.jour .entete__lien--bars[aria-current="page"] { border-color: var(--texte); }
+
 /* ---------- Les matchs de la semaine, sur l’accueil ---------- */
 
 /* Le bloc vient du générateur (generateur/accueil.mjs). Une barre des sept jours (des boutons radio : elle marche sans

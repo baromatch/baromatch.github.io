@@ -2,10 +2,13 @@
 // doit avoir chaque caractère que le site dessine avec elle : sinon le navigateur le prend dans une autre police, ou
 // charge un second fichier, et la page change d’aspect. Seule exception : une lettre du latin étendu (le Ş de
 // « Galatasaray A.Ş. »), qui vient du nom d’un club donné par l’appli ; le fichier étendu la dessine.
-// Vérifié dans les fichiers eux-mêmes (leur table cmap, tests/outils/police.mjs), sur chaque page publiée et chaque
-// page que le générateur écrit (le scénario inventé et la capture enregistrée), ouvertes dans le navigateur : le texte,
-// les contenus CSS (« › » du fil d’Ariane), les textes d’exemple des champs ; et dans les textes que les scripts du site
-// et le générateur écrivent plus tard (un message du formulaire, une carte de la boutique).
+// Vérifié dans les fichiers eux-mêmes (leur table cmap, tests/outils/police.mjs), sur tout ce que le site écrit lui-même :
+// les pages écrites à la main et les pages que le générateur écrit sur des données figées (le scénario inventé et la
+// capture enregistrée), ouvertes dans le navigateur (le texte, les contenus CSS comme le « › » du fil d’Ariane, les textes
+// d’exemple des champs) ; et les textes que les scripts du site et le générateur écrivent plus tard (un message du
+// formulaire, une carte de la boutique). Pas les pages des matchs publiées : leurs noms de clubs et de bars viennent des
+// données du jour (l’Action les publie toutes les trois heures, sans lancer les tests) ; un caractère que Bricolage
+// Grotesque n’a pas y est dessiné par le système, comme avant.
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
@@ -127,22 +130,17 @@ const fichiersHtml = (dossier, garder) => {
   return res.filter(garder).sort();
 };
 
-// Les pages publiées : chaque HTML du dépôt que le site sert (pas les tests, ni le générateur, ni les documents), et le
-// lien d’une tablée (servi par 404.html, l’API coupée).
-const PUBLIEES = execFileSync('git', ['ls-files', '*.html'], { cwd: racine, encoding: 'utf8' }).trim().split('\n')
-  .filter((f) => !/^(?:tests|generateur|docs)\//.test(f)).map((f) => `/${f}`);
+// Les pages écrites à la main : chaque HTML du dépôt que le site sert, hors des dossiers que le générateur écrit (et
+// hors des tests, du générateur et des documents).
+const A_LA_MAIN = execFileSync('git', ['ls-files', '*.html'], { cwd: racine, encoding: 'utf8' }).trim().split('\n')
+  .filter((f) => !/^(?:tests|generateur|docs|matchs|en|regarder-le-match|ce-soir|agenda|bar)\//.test(f)).map((f) => `/${f}`);
 
 test.describe('chaque caractère que le site dessine avec Bricolage Grotesque est dans le cœur', () => {
   test.describe.configure({ timeout: 240_000 });
 
+  // Et le lien d’une tablée (servi par 404.html, l’API coupée).
   test('les pages écrites à la main', async ({ page }) => {
-    const chemins = [...PUBLIEES.filter((c) => !/^\/(?:matchs|en|regarder-le-match|ce-soir|agenda|bar)\//.test(c)), '/t/abcdefghjkmn'];
-    expect(chemins.length).toBeGreaterThan(10);
-    expect(await parcourir(page, '', chemins)).toEqual({});
-  });
-
-  test('les pages des matchs en ligne (écrites par le générateur, publiées)', async ({ page }) => {
-    const chemins = PUBLIEES.filter((c) => /^\/(?:matchs|en|regarder-le-match|ce-soir|agenda|bar)\//.test(c));
+    const chemins = [...A_LA_MAIN, '/t/abcdefghjkmn'];
     expect(chemins.length).toBeGreaterThan(10);
     expect(await parcourir(page, '', chemins)).toEqual({});
   });
@@ -222,7 +220,8 @@ const portLibre = () => new Promise((resoudre) => {
   });
 });
 
-// Les chaînes d’un script (entre ' ', " " ou ` `), sans ses commentaires ni ses expressions régulières.
+// Les chaînes d’un script (entre ' ', " " ou ` `), sans ses commentaires ni ses expressions régulières. Leurs
+// échappements (\u2192, \u{1F37A}, \x41) sont décodés : le dépôt écrit ainsi ses caractères spéciaux (pour-les-bars.js).
 const chainesDuScript = (source) => {
   const chaines = [];
   let i = 0;
@@ -248,7 +247,17 @@ const chainesDuScript = (source) => {
       let j = i + 1;
       let texte = '';
       while (j < source.length && source[j] !== c) {
-        if (source[j] === '\\') { texte += source[j + 1]; j += 2; continue; }
+        if (source[j] === '\\') {
+          const echappe = /^\\(?:u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2}))/.exec(source.slice(j, j + 12));
+          if (echappe) {
+            texte += String.fromCodePoint(parseInt(echappe[1] ?? echappe[2] ?? echappe[3], 16));
+            j += echappe[0].length;
+          } else {
+            texte += { n: '\n', r: '\r', t: '\t' }[source[j + 1]] ?? source[j + 1];
+            j += 2;
+          }
+          continue;
+        }
         texte += source[j];
         j += 1;
       }
@@ -287,7 +296,9 @@ test('les textes que les scripts du site et le générateur écrivent plus tard 
   expect(releve).toEqual({});
 });
 
-test('l’outil de lecture des scripts : il garde les chaînes, laisse les commentaires et les expressions régulières', () => {
+test('l’outil de lecture des scripts : il garde les chaînes, laisse les commentaires et les expressions régulières, décode les échappements', () => {
   expect(chainesDuScript('var a = "un ½"; // « ✓ » commentaire\n/* ł */ var b = /["✓]/.test(x) ? \'deux\' : `trois ${a}`;'))
     .toEqual(['un ½', 'deux', 'trois ${a}']);
+  expect(chainesDuScript('var c = "\\u2192 \\u{1F37A} \\x41\\u00a0fin \\"cité\\" \\\\";'))
+    .toEqual(['→ 🍺 A\u00a0fin "cité" \\']);
 });

@@ -74,11 +74,15 @@ const KO = 1024;
 // l’ancienne page Presse (de 72,5 à 69,8 Ko) : aucun autre seuil ne bouge.
 // 30 octobre 2026, après relecture d’À propos et Presse : main.js ouvre le texte du film quand on arrive par
 // /#film-texte (le lien de la page Presse) : de 18,3 à 18,7 Ko, le JS de l’accueil de 18 à 19 Ko.
+// Le même jour, À propos suit l’ordre du propriétaire : les écrans de l’appli viennent juste après « Pourquoi », à
+// moins de 1 250 px du premier écran, où Chromium charge déjà les images paresseuses. Chaque écran se demande à la
+// largeur de son cadre au téléphone (152 px : le WebP de 300 px, 10 à 16 Ko). Mesuré (Ko) : 7 requêtes, 165
+// transférés, CSS 81, images 31 (deux écrans) ; seuils 8, 176, 0, 82, 42 (les trois écrans).
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 19, css: 73, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
-  { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 6, transfere: 140, js: 0, css: 82, images: 2 } },
+  { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 82, images: 42 } },
   { nom: 'Presse et partenariats', chemin: '/presse.html', budget: { requetes: 9, transfere: 147, js: 0, css: 85, images: 26 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 176, js: 67, css: 103, images: 4 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },

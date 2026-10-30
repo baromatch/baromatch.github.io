@@ -23,13 +23,7 @@
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
-.apropos__titre .surtitre {
-  display: block;
-  margin: 0 0 clamp(18px, 3vw, 28px);
-  font-stretch: 100%;
-  font-variation-settings: "opsz" 14;
-  line-height: 1.4;
-}
+.apropos__ouverture .surtitre { margin-bottom: clamp(16px, 3vw, 28px); }
 
 .apropos__chapo { max-width: 36rem; margin: clamp(24px, 4vw, 40px) 0 0; color: var(--texte-doux); font-size: 1.1875rem; text-wrap: pretty; }
 @media (min-width: 720px) { .apropos__chapo { font-size: 1.3125rem; } }
@@ -56,6 +50,16 @@
 .apropos__quoi::after { content: ""; display: inline-block; width: 0.42em; height: 0.42em; margin-left: 0.35em; border-top: 2px solid currentColor; border-right: 2px solid currentColor; vertical-align: 0.12em; transform: rotate(45deg); }
 .apropos__entrees a:hover .apropos__quoi { color: var(--texte-doux); }
 @media (min-width: 760px) { .apropos__entrees a { flex-direction: column; justify-content: flex-start; } }
+/* Sous 360 px, chaque entrée tient sur deux lignes quelle que soit la police : celle de secours (plus étroite) et
+   Bricolage Grotesque, arrivée après, ne la font plus passer d’une à deux lignes (le décalage mesuré sur un iPhone SE).
+   L’ouverture se resserre : la première entrée se voit dans le premier écran (320 × 568). */
+@media (max-width: 359px) {
+  .apropos__entrees a { flex-direction: column; justify-content: flex-start; }
+  .apropos__ouverture { padding-top: 20px; }
+  .apropos__titre { font-size: 2rem; }
+  .apropos__chapo { margin-top: 16px; font-size: 1.0625rem; line-height: 1.5; }
+  .apropos__entrees { margin-top: 20px; }
+}
 
 /* ---------- Une rubrique : un rail qui la nomme, un corps qui la dit ---------- */
 
@@ -89,6 +93,7 @@
 }
 .apropos__corps .apropos__lead { max-width: 38rem; margin-top: clamp(18px, 3vw, 28px); color: var(--texte-doux); font-size: 1.1875rem; text-wrap: pretty; }
 @media (min-width: 720px) { .apropos__corps .apropos__lead { font-size: 1.25rem; } }
+.apropos__corps .apropos__lead--premier { max-width: 34rem; margin-top: 0; color: var(--texte); font-size: clamp(1.3125rem, 1rem + 1.2vw, 1.75rem); font-weight: 600; line-height: 1.35; }
 
 .apropos__petit-titre { margin: 0 0 10px; font-size: 1.125rem; font-weight: 750; font-stretch: 96%; line-height: 1.3; }
 
@@ -165,11 +170,6 @@
   .apropos__refus li { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; align-items: start; }
   .apropos__refus li p { padding-top: 0.4rem; }
 }
-.apropos__aussi-titre { margin-top: clamp(36px, 5vw, 56px); }
-.apropos__corps .apropos__aussi { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 40px; padding: 0; list-style: none; }
-.apropos__aussi li { color: var(--texte-doux); text-wrap: pretty; }
-.apropos__aussi strong { color: var(--texte); font-weight: 700; }
-@media (min-width: 800px) { .apropos__corps .apropos__aussi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .apropos__corps .apropos__suite { max-width: 40rem; margin-top: 24px; color: var(--texte-doux); }
 
 /* ---------- Où va Baromatch ---------- */
@@ -190,7 +190,7 @@
 }
 .apropos__corps .apropos__action { padding-top: 20px; }
 .apropos__corps .apropos__rassure { margin-top: 14px; font-size: 0.9375rem; }
-.apropos__rassure a { font-weight: 650; }
+.apropos__rassure a, .apropos__note-carte a, .apropos__qui-publie a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .apropos .capsule, .apropos__bouton { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; }
 .apropos__bouton {
   display: inline-flex;
@@ -206,11 +206,12 @@
 }
 .apropos__bouton:hover { background: var(--fond-releve); color: var(--texte); }
 
-/* ---------- Qui publie Baromatch ---------- */
+/* ---------- Qui publie Baromatch : deux lignes sous la citation ---------- */
 
-.apropos__qui-publie { display: grid; gap: 14px; max-width: 38rem; }
-.apropos__qui-publie p { color: var(--texte-doux); text-wrap: pretty; }
-.apropos__corps .document__date { margin: 6px 0 0; }
+.apropos__qui-publie { display: grid; gap: 6px; max-width: 42rem; padding-top: 18px; border-top: 1px solid rgba(10, 11, 16, 0.22); }
+@media (min-width: 960px) { .apropos__rubrique > .apropos__qui-publie { grid-column: 2; } }
+.apropos__qui-publie p { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; text-wrap: pretty; }
+.apropos__qui-publie .document__date { margin: 0; }
 
 @media (forced-colors: active) {
   .apropos__bouton, .apropos__carte, .apropos__note-carte { border: 1px solid CanvasText; }

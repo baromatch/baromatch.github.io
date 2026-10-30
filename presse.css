@@ -1,8 +1,8 @@
 /* Presse et partenariats, « le kit sur la page » : la page est le kit. Le jour (styles.css, « Le jour » : ses fonds, le
    bleu nuit pour le texte), avec un seul bouton ambre, « Écrire pour la presse » ; toute autre action a un contour à
-   3,6:1. La nuit revient pour les écrans de l’appli et le film (la section « nuit » et le téléphone de verre de
-   styles.css), sans lien ambre : ses liens sont en blanc doux, soulignés. Les deux couleurs se montrent en petits
-   disques sur une carte blanche, pas en surfaces. Rien ne bouge : ni animation, ni script.
+   3,5:1 au moins (3,6:1 sur le crème). La nuit revient pour les écrans de l’appli et le film (la section « nuit » et le
+   téléphone de verre de styles.css), sans lien ambre : ses liens sont en blanc doux, soulignés. Les deux couleurs se
+   montrent en petits disques sur une carte blanche, pas en surfaces. Rien ne bouge : ni animation, ni script.
    Chaque grand texte se règle en rem et en vw, et chaque grille d’écrans en em : avec le texte à 200 % sur 320 px, son
    plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Chargée seulement par presse.html. */
 
@@ -167,7 +167,7 @@
 .presse .presse__teintes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 0; list-style: none; }
 @media (min-width: 560px) { .presse .presse__teintes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__teintes li { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-content: start; column-gap: 16px; }
-.presse__disque { grid-row: span 3; width: 72px; height: 72px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(10, 11, 16, 0.14); }
+.presse__disque { grid-row: span 4; width: 72px; height: 72px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(10, 11, 16, 0.14); }
 .presse__disque--ambre { background: var(--ambre); }
 .presse__disque--nuit { background: var(--nuit); }
 .presse__teinte-nom { font-size: 1.125rem; font-weight: 750; }

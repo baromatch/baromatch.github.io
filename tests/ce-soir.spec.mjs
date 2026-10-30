@@ -211,8 +211,8 @@ test('la copie des listes publiques, un samedi soir : le bar de démo n’est ja
   expect(p.contenu).not.toMatch(/démo|Exemple/i);
   const matchs = sectionDe(p, 'titre-matchs');
   expect(matchs).toMatch(/^id="titre-matchs">Au programme<\/h2>/);
-  expect(matchs).toContain('Strasbourg – PSG</a> <span class="regarder-matchs__infos">Commencé à <time datetime="2026-10-17T17:15:00+02:00">17:15</time>');
-  expect(matchs).toContain('Lille – Brest</a> <span class="regarder-matchs__infos"><time datetime="2026-10-17T20:45:00+02:00">20:45</time>');
+  expect(sansInsignes(matchs)).toContain('Strasbourg – PSG</a> <span class="regarder-matchs__infos">Commencé à <time datetime="2026-10-17T17:15:00+02:00">17:15</time>');
+  expect(sansInsignes(matchs)).toContain('Lille – Brest</a> <span class="regarder-matchs__infos"><time datetime="2026-10-17T20:45:00+02:00">20:45</time>');
   expect(matchs).not.toContain('Everton');
   expect(matchs).not.toContain('Espanyol');
 });
@@ -229,7 +229,7 @@ test('un match fini n’est plus listé ; il l’est encore tant qu’il peut se
   const fini = await ceSoir({ maintenant: '2026-10-23T21:46:00Z' });
   sansErreur(fini);
   expect(fini.indexable).toBe(true);
-  expect(fini.contenu).not.toContain('Brest – Nice</a>');
+  expect(sansInsignes(fini.contenu)).not.toContain('Brest – Nice</a>');
   expect(fini.contenu).not.toContain('regarder-carte__nom');
   expect(sectionDe(fini, 'titre-rien')).toMatch(/^id="titre-rien">Fini pour ce soir<\/h2>\n {2}<p>Les matchs de ce soir sont terminés. Les prochains sont plus bas.<\/p>/);
   expect(sectionDe(fini, 'titre-soirs')).toContain('<h3 class="regarder-jour">Samedi 24 octobre</h3>');

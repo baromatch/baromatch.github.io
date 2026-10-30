@@ -219,8 +219,8 @@
 .regarder-matchs li:last-child { border-bottom: 0; }
 .regarder-matchs a { display: inline-block; padding: 10px 0; font-weight: 650; }
 /* Le match, seul sur sa ligne : un lien de 44 px de haut (ou son nom, sans page), ses deux insignes devant (la paire de
-   l’appli, 64 × 30) ; dessous, ses détails (l’heure, la compétition, les bars), en texte discret. */
-.regarder-matchs .regarder-matchs__match { display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: fit-content; max-width: 100%; min-height: 44px; padding: 10px 0; font-weight: 650; }
+   l’appli, 64 × 30), son nom dessous s’il ne tient pas à côté ; ses détails ensuite, en texte discret. */
+.regarder-matchs .regarder-matchs__match { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; box-sizing: border-box; width: fit-content; max-width: 100%; min-height: 44px; padding: 10px 0; font-weight: 650; }
 .regarder-matchs__infos { display: block; color: var(--texte-doux); }
 .regarder-matchs__infos time { color: var(--texte); }
 .regarder-matchs time { font-weight: 650; }

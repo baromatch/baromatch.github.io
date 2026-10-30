@@ -7,6 +7,7 @@
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { createServer } from 'node:net';
 import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -21,7 +22,8 @@ import * as badge from '../generateur/insignes/badge.mjs';
 import * as specs from '../generateur/insignes/specs.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { racine } from './outils/environnement.mjs';
-import { contenuDuScenario, MAINTENANT_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
+import { demarrerServeur } from './outils/serveur.mjs';
+import { construireLeSiteDExemple, contenuDuScenario, MAINTENANT_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 
 const DONNEES = path.join(racine, 'tests', 'donnees', 'insignes');
 const lire = (fichier) => JSON.parse(readFileSync(path.join(DONNEES, fichier), 'utf8'));
@@ -292,12 +294,12 @@ test.describe('les pages générées : les insignes là où l’appli les montre
       const liens = [...p.contenu.matchAll(/<a class="regarder-matchs__match" href="(\/(?:en\/)?match(?:s|es)\/[^"]+-20\d\d-\d\d-\d\d\/)">([\s\S]*?)<\/a>/g)];
       expect(liens.length, p.chemin).toBeGreaterThan(0);
       for (const [, adresse, dedans] of liens) {
-        expect(dedans, `${p.chemin} → ${adresse}`).toMatch(/^(?:<svg class="insignes" width="64" height="30" viewBox="0 0 426\.6666666666667 200" aria-hidden="true" focusable="false">[\s\S]*?<\/svg>|<span class="insignes insignes--drapeau" aria-hidden="true">(?:<svg class="insigne" width="30" height="30"[\s\S]*?<\/svg>){2}<\/span>)[^<]+$/);
+        expect(dedans, `${p.chemin} → ${adresse}`).toMatch(/^(?:<svg class="insignes" width="64" height="30" viewBox="0 0 426\.6666666666667 200" aria-hidden="true" focusable="false">[\s\S]*?<\/svg>|<span class="insignes insignes--drapeau" aria-hidden="true">(?:<svg class="insigne" width="30" height="30"[\s\S]*?<\/svg>){2}<\/span>)<span class="regarder-matchs__nom">[^<]+<\/span>$/);
       }
     }
     // Le Havre – PSG, dans la semaine : exactement la paire de l’appli, sur la nuit.
     expect(pageDe('/matchs/')).toContain('<svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false">'
-      + `<g>${sansRacine(REFERENCES['le-havre-ac@30/night'])}</g><g transform="translate(226.66666666666666 0)">${sansRacine(REFERENCES['paris-saint-germain@30/night'])}</g></svg>Le Havre – PSG</a>`);
+      + `<g>${sansRacine(REFERENCES['le-havre-ac@30/night'])}</g><g transform="translate(226.66666666666666 0)">${sansRacine(REFERENCES['paris-saint-germain@30/night'])}</g></svg><span class="regarder-matchs__nom">Le Havre – PSG</span></a>`);
   });
 
   test('l’en-tête d’un club et l’agenda : l’insigne du club, à côté de son nom', () => {
@@ -369,6 +371,87 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     // Sans les insignes (une autre sorte de page), la carte reste celle d’avant.
     expect(svgDeLaCarte({ ...page.carte, insignes: undefined }, { verre: site.cadre.verre })).not.toContain('width="160"');
   });
+});
+
+test.describe('les lignes de match, dans le navigateur (le scénario)', () => {
+  let dossier;
+  let serveur;
+  const portLibre = () => new Promise((resoudre) => {
+    const sonde = createServer();
+    sonde.listen(0, '127.0.0.1', () => { const { port } = sonde.address(); sonde.close(() => resoudre(port)); });
+  });
+  test.beforeAll(async () => {
+    dossier = mkdtempSync(path.join(tmpdir(), 'insignes-lignes-'));
+    await construireLeSiteDExemple(dossier, { rendu: null });
+    serveur = await demarrerServeur(await portLibre(), -1, { dossier });
+  });
+  test.afterAll(async () => {
+    await serveur?.arreter();
+    if (dossier) rmSync(dossier, { recursive: true, force: true });
+  });
+
+  // Les pages où un long nom suit sa paire (« Paris Saint-Germain v FC Barcelona », en anglais), et celles en français.
+  const PAGES_DES_LIGNES = ['/en/', '/en/champions-league/', '/en/matches/psg-barca-2026-10-24/', '/matchs/', '/ce-soir/', '/matchs/club/psg/', '/regarder-le-match/paris/'];
+  // Chaque ligne de match visible qui a sa paire : chaque dessin (sa largeur, celle de son attribut), la paire, le nom
+  // (le texte seul) et ses mots coupés sur deux lignes (« Saint- / Germain »).
+  const lireLesLignes = (page) => page.evaluate(() => [...document.querySelectorAll('.regarder-matchs__match')].filter((l) => l.checkVisibility() && l.querySelector('.insignes')).map((ligne) => {
+    const paire = ligne.querySelector('.insignes').getBoundingClientRect();
+    // Le nom : son élément (le texte de la ligne, s’il n’en a pas).
+    const nom = ligne.querySelector('.regarder-matchs__nom') ?? ligne;
+    const rects = [];
+    const coupes = [];
+    const marcheur = document.createTreeWalker(nom, NodeFilter.SHOW_TEXT);
+    for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+      for (const mot of n.data.matchAll(/\S+/g)) {
+        const plage = document.createRange();
+        plage.setStart(n, mot.index);
+        plage.setEnd(n, mot.index + mot[0].length);
+        const lignes = [...plage.getClientRects()].filter((r) => r.width > 0);
+        rects.push(...lignes);
+        if (new Set(lignes.map((r) => Math.round(r.top))).size > 1) coupes.push(mot[0]);
+      }
+    }
+    return {
+      nom: nom.textContent.trim(),
+      dessins: [...ligne.querySelectorAll('svg')].map((d) => [d.getBoundingClientRect().width, Number(d.getAttribute('width'))]),
+      paire: { gauche: paire.left, droite: paire.right, haut: paire.top, bas: paire.bottom },
+      texte: { gauche: Math.min(...rects.map((r) => r.left)), haut: Math.min(...rects.map((r) => r.top)), basPremiere: Math.min(...rects.map((r) => r.bottom)) },
+      coupes,
+    };
+  }));
+
+  for (const largeur of [320, 360, 393, 412]) {
+    test(`à ${largeur} px, texte à 100 et 200 % : chaque nom à côté de sa paire ou dessous, la paire à sa taille, aucun mot coupé (à 200 %, dès 393 px)`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date(MAINTENANT_DU_SCENARIO));
+      await page.setViewportSize({ width: largeur, height: 900 });
+      let lignes = 0;
+      let dessous = 0;
+      for (const chemin of PAGES_DES_LIGNES) {
+        await page.goto(`${serveur.adresse}${chemin}`);
+        await page.evaluate(() => document.fonts.ready);
+        for (const pourcent of [100, 200]) {
+          await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          const cas = `${chemin}, ${pourcent} %`;
+          const lus = await lireLesLignes(page);
+          lignes += lus.length;
+          const ecarts = [];
+          for (const l of lus) {
+            for (const [vue, attendue] of l.dessins) if (Math.abs(vue - attendue) > 0.5) ecarts.push(`${l.nom} : un insigne de ${vue} px au lieu de ${attendue}`);
+            const aCote = l.texte.gauche >= l.paire.droite - 0.5 && l.texte.haut < l.paire.bas && l.texte.basPremiere > l.paire.haut;
+            const auDessous = l.texte.haut >= l.paire.bas - 0.5;
+            if (auDessous) dessous += 1;
+            if (!aCote && !auDessous) ecarts.push(`${l.nom} : ni à côté de sa paire, ni dessous`);
+            // À 320 et 360 px, texte à 200 %, « Saint-Germain » se coupe à son trait d’union, comme sans les insignes :
+            // la ligne n’a pas la place d’un mot de plus.
+            if (pourcent === 100 || largeur >= 393) for (const mot of l.coupes) ecarts.push(`${l.nom} : « ${mot} » coupé`);
+          }
+          expect(ecarts, cas).toEqual([]);
+        }
+      }
+      expect(lignes).toBeGreaterThan(20);
+      expect(dessous).toBeGreaterThan(0);
+    });
+  }
 });
 
 test.describe('plus aucun ancien disque, et jamais un écusson', () => {

@@ -696,8 +696,8 @@ test.describe('les pages', () => {
     expect(ceSoir).toContain('1 bar à Lyon');
     expect(p.contenu).toContain('<h2 id="jour-2026-10-25">Dimanche 25 octobre</h2>');
     // Sous le titre du jour, la ligne ne répète pas la date : l’heure seule, la date complète dans datetime.
-    expect(p.contenu).toMatch(/PSG – OL<\/a> <span class="regarder-matchs__infos"><time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
-    expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
+    expect(sansInsignes(p.contenu)).toMatch(/PSG – OL<\/a> <span class="regarder-matchs__infos"><time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
+    expect(sansInsignes(p.contenu)).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
     // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
     expect(p.contenu).not.toContain('jour-2026-10-30');
     // Le titre de la page dit ce que dit son h1 (la semaine, pas « ce soir », qui a sa page), entre 15 et 60 caractères.
@@ -878,7 +878,8 @@ test.describe('les pages', () => {
     brut.matches = brut.matches.map((m) => (m.id === 'm-psg-ol' ? { ...m, status: 'POSTPONED' } : m.id === 'm-lehavre-psg' ? { ...m, status: 'CANCELLED' } : m));
     const enMemoire = (instant, anciens) => construireEnMemoire({ brut: structuredClone(brut), maintenant: Date.parse(instant), racine, contenu, anciens });
     const autre = await enMemoire('2026-10-23T08:00:00Z');
-    const page = (chemin) => autre.pages.find((p) => p.chemin === chemin).contenu;
+    // Chaque page sans ses insignes (décoratifs) : ses lignes se lisent par le nom de leur match.
+    const page = (chemin) => sansInsignes(autre.pages.find((p) => p.chemin === chemin).contenu);
     const ligneDe = (html, debut) => html.split('\n').find((l) => l.includes(debut));
     const reporte = '<strong>Match reporté</strong>';
     const annule = '<strong>Match annulé</strong>';

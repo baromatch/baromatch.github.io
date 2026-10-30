@@ -253,8 +253,12 @@ export const statutDuMatch = (match, textes) => (match.statut ? ` · <strong>${e
 
 // Une ligne d’une liste de matchs (ou de villes) : sa tête, seule sur sa ligne (un lien de 44 px vers sa page, ou son
 // nom), et dessous ses détails, en tête de ligne (une capitale, aucun « · » devant). tete : du HTML déjà échappé ;
-// insignes : ceux du match, devant son nom (insignesDuMatch).
-export const ligneDeListe = (tete, adresse, infos, insignes = '') => `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${insignes}${tete}</a>` : `<span class="regarder-matchs__match">${insignes}${tete}</span>`}${infos ? ` <span class="regarder-matchs__infos">${infos}</span>` : ''}</li>`;
+// insignes : ceux du match, devant son nom (insignesDuMatch), qui a alors son propre élément (il passe sous la paire
+// quand il ne tient pas à côté, sans couper de mot).
+export const ligneDeListe = (tete, adresse, infos, insignes = '') => {
+  const dedans = insignes ? `${insignes}<span class="regarder-matchs__nom">${tete}</span>` : tete;
+  return `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${dedans}</a>` : `<span class="regarder-matchs__match">${dedans}</span>`}${infos ? ` <span class="regarder-matchs__infos">${infos}</span>` : ''}</li>`;
+};
 
 // Une ligne de match : son nom court (vers sa page s’il en a une) ; dessous, le jour et l’heure (ou l’heure seule, sous
 // un titre qui donne déjà le jour), la compétition, et la suite (« · » puis les bars, ou le statut du match).

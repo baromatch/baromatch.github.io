@@ -113,16 +113,19 @@ const lirePlages = (texte) => texte.split(',').map((morceau) => {
   return [parseInt(m[1], 16), parseInt(m[2] ?? m[1], 16)];
 });
 
-// Les @font-face de Bricolage Grotesque dans styles.css, dans leur ordre : { fichier, plages (null : tout), dans(code) }.
-export const facesDeBricolage = (feuille = readFileSync(path.join(racine, 'styles.css'), 'utf8')) => [...feuille.matchAll(/@font-face\s*\{([^}]*)\}/g)]
-  .map(([, corps]) => corps)
-  .filter((corps) => /font-family:\s*"Bricolage Grotesque"/.test(corps))
-  .map((corps) => {
+// Les @font-face de styles.css, dans leur ordre : { famille, fichier (le woff2, ou rien pour une police locale), plages
+// (null : tout), dans(code) }.
+export const lireLesFaces = (feuille = readFileSync(path.join(racine, 'styles.css'), 'utf8')) => [...feuille.matchAll(/@font-face\s*\{([^}]*)\}/g)]
+  .map(([, corps]) => {
+    const famille = /font-family:\s*"([^"]+)"/.exec(corps)?.[1];
     const fichier = /url\("([^"]+\.woff2)"\)/.exec(corps)?.[1];
     const plage = /unicode-range:\s*([^;]+);/.exec(corps)?.[1];
     const plages = plage ? lirePlages(plage) : null;
-    return { fichier, plages, dans: (code) => !plages || plages.some(([a, b]) => code >= a && code <= b) };
+    return { famille, fichier, plages, dans: (code) => !plages || plages.some(([a, b]) => code >= a && code <= b) };
   });
+
+// Celles de Bricolage Grotesque, ses trois fichiers.
+export const facesDeBricolage = (feuille) => lireLesFaces(feuille).filter((face) => face.famille === 'Bricolage Grotesque');
 
 // La face que le navigateur essaie d’abord pour un caractère : la dernière déclarée dont l’unicode-range le contient.
 // Elle doit avoir le caractère ; sinon le navigateur charge son fichier pour rien avant d’essayer la suivante.

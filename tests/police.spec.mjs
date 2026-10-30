@@ -17,7 +17,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 import { couperLAPI } from './outils/invitation.mjs';
-import { caracteresDuFichier, facesDeBricolage, premiereFace } from './outils/police.mjs';
+import { caracteresDuFichier, facesDeBricolage, lireLesFaces, premiereFace } from './outils/police.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { CAPTURE, MAINTENANT_DE_LA_CAPTURE, construireLeSiteDExemple } from './outils/site-genere.mjs';
 
@@ -51,6 +51,20 @@ test('trois fichiers : chacun a ses caractères, et le navigateur va d’abord a
   const doubles = [...couverture[SIGNES], ...couverture[ETENDU]].filter((code) => coeur.has(code)
     || (couverture[SIGNES].has(code) && couverture[ETENDU].has(code)));
   expect(doubles.map(nom)).toEqual([]);
+});
+
+test('la police de secours ne dessine que ce que Bricolage Grotesque sait dessiner : au-delà, le système, comme avant', () => {
+  const secours = lireLesFaces().filter((face) => face.famille.startsWith('Bricolage repli'));
+  expect(secours.map((face) => face.famille)).toEqual([...Array(4).fill('Bricolage repli'), ...Array(4).fill('Bricolage repli Roboto')]);
+  // Son unicode-range : exactement la réunion des trois fichiers, ni plus (un caractère que Bricolage n’a pas, comme le
+  // cyrillique d’un nom de club, serait dessiné en Arial réduit au lieu de la police du système), ni moins.
+  const reunion = new Set([...coeur, ...couverture[SIGNES], ...couverture[ETENDU]]);
+  for (const face of secours) {
+    expect(face.plages, `${face.famille} : une unicode-range`).not.toBeNull();
+    const annonces = new Set(face.plages.flatMap(([debut, fin]) => plage(debut, fin)));
+    expect([...annonces].filter((code) => !reunion.has(code)).map(nom), `${face.famille} : en trop`).toEqual([]);
+    expect([...reunion].filter((code) => !annonces.has(code)).map(nom), `${face.famille} : en moins`).toEqual([]);
+  }
 });
 
 test('aucun caractère perdu : tout ce que l’ancienne police dessinait l’est encore, et le cœur garde ce qu’écrit le site', () => {

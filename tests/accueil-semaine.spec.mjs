@@ -24,6 +24,7 @@ import {
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { decrireLesCouples, mesurerLesTextes, textesTropFaibles } from './outils/textes-peints.mjs';
 import { decrireLesPlusFaibles, lignesTropFaibles, mesurerAuPixel } from './outils/pixels-peints.mjs';
+import { lireCouleur, poser, rapport } from './outils/contraste.mjs';
 
 const CONTENU = chargerLeContenu(racine);
 const { textes, couleurs } = CONTENU;
@@ -384,6 +385,53 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     // Après la barre, les liens des cartes du jour choisi seulement.
     await page.keyboard.press('Tab');
     await expect(semaine.locator('.carte-match:visible .carte-match__clubs').first()).toBeFocused();
+  });
+
+  // Les noms des clubs ouvrent la page du match : une flèche le montre au doigt (le survol n’existe pas au téléphone), et
+  // toute la carte y mène ; chaque autre lien de la carte (l’agenda, « Voir les bars ») reste devant, vers sa cible.
+  test('une carte : la flèche des clubs se voit (3:1 au moins), toute la carte mène à la page du match, et ses autres liens restent devant, vers leur cible', async ({ page }) => {
+    const semaine = await ouvrir(page);
+    const fondDeLaBande = lireCouleur(await semaine.evaluate((s) => getComputedStyle(s).backgroundColor));
+    const jours = semaine.locator('.semaine__date');
+    const cartes = [];
+    for (let i = 0; i < await jours.count(); i += 1) {
+      await jours.nth(i).click();
+      cartes.push(...await page.evaluate(() => [...document.querySelectorAll('.carte-match')].filter((c) => c.checkVisibility()).map((carte) => {
+        carte.scrollIntoView({ block: 'center', behavior: 'instant' });
+        const clubs = carte.querySelector('.carte-match__clubs');
+        const fleche = getComputedStyle(clubs, '::after');
+        const au = (r) => document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return {
+          match: clubs.getAttribute('href'),
+          fleche: fleche.content,
+          largeur: parseFloat(fleche.width),
+          couleur: fleche.color,
+          fond: getComputedStyle(carte).backgroundColor,
+          // Un point de la carte hors des noms : son heure.
+          heure: au(carte.querySelector('.carte-match__heure').getBoundingClientRect())?.closest('a')?.getAttribute('href') ?? null,
+          autres: [...carte.querySelectorAll('a:not(.carte-match__clubs)')].map((a) => ({ href: a.getAttribute('href'), devant: a.contains(au(a.getBoundingClientRect())) })),
+        };
+      })));
+    }
+    expect(cartes.length).toBeGreaterThan(5);
+    expect(cartes.some((c) => c.autres.some((a) => a.href.endsWith('#titre-bars')))).toBe(true);
+    expect(cartes.some((c) => c.autres.some((a) => a.href.endsWith('match.ics')))).toBe(true);
+    for (const carte of cartes) {
+      expect(carte.fleche, carte.match).toContain('›');
+      expect(carte.largeur, carte.match).toBeGreaterThan(4);
+      const fond = poser(lireCouleur(carte.fond), fondDeLaBande);
+      expect(rapport(poser(lireCouleur(carte.couleur), fond), fond), carte.match).toBeGreaterThanOrEqual(3);
+      expect(carte.heure, carte.match).toBe(carte.match);
+      for (const autre of carte.autres) {
+        expect(autre.devant, `${carte.match} : ${autre.href}`).toBe(true);
+        expect(autre.href.startsWith(carte.match), autre.href).toBe(true);
+      }
+    }
+    // Un vrai toucher sur l’heure d’une carte : la page du match s’ouvre.
+    await semaine.locator('label', { hasText: 'Aujourd’hui' }).click();
+    // (Au coin de la carte, sur son heure : la page du match la recouvre, Playwright touche donc la carte elle-même.)
+    await semaine.locator('.carte-match:visible').first().click({ position: { x: 30, y: 24 } });
+    await expect(page).toHaveURL(new RegExp(`${cartes[0].match}$`));
   });
 
   // L’ambre seulement pour l’action (le propriétaire) : le point d’un jour qui a des bars, et celui de « 1 bar à Paris »,

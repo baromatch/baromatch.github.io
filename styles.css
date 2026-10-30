@@ -503,7 +503,7 @@ a:hover { color: var(--goutte); }
 .titre-section {
   margin: 0;
   text-wrap: balance;
-  max-width: 18ch;
+  max-width: 9.612em; /* 18ch en Bricolage (« 0 » de 0,534em) : la même boîte quelle que soit la police affichée */
   font-weight: 800;
   font-stretch: 88%;
   font-variation-settings: "opsz" 72;
@@ -661,7 +661,7 @@ a:hover { color: var(--goutte); }
 .bars__verre { width: 112px; order: -1; }
 @media (min-width: 820px) { .bars__verre { width: 220px; order: 0; } }
 
-.bars .titre-section { max-width: 16ch; overflow-wrap: break-word; }
+.bars .titre-section { max-width: 8.544em; overflow-wrap: break-word; } /* 16ch en Bricolage, comme .titre-section */
 
 .bars__texte {
   max-width: 36rem;

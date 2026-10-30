@@ -16,6 +16,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { attendreLaPageFinie, laPoliceEstLa } from './outils/attente.mjs';
 import { couperLAPI } from './outils/invitation.mjs';
 import { caracteresDuFichier, facesDeBricolage, lireLesFaces, premiereFace } from './outils/police.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
@@ -233,6 +234,30 @@ test.describe('la police de secours : quand Bricolage Grotesque arrive tard, la 
       });
     }
   }
+});
+
+// La boîte d’un titre ne dépend pas de la police affichée. Une largeur en ch suit le « 0 » de la police : celui de la
+// police de secours est 13 % plus étroit que celui de Bricolage Grotesque, et le titre d’une page de ville passait sur
+// deux lignes en attendant la police (0,022 de décalage à 1280 px). Les largeurs des titres sont donc en em.
+test('la boîte d’un titre est la même avec Bricolage Grotesque et avec la police de secours', async ({ browser, baseURL }) => {
+  const mesurer = async (sansLaPolice) => {
+    const contexte = await browser.newContext({ baseURL, viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
+    const onglet = await contexte.newPage();
+    if (sansLaPolice) await onglet.route('**/fonts/*.woff2', (route) => route.abort());
+    const largeurs = {};
+    for (const chemin of ['/', '/pour-les-bars.html', '/regarder-le-match/paris/']) {
+      await onglet.goto(chemin);
+      await attendreLaPageFinie(onglet);
+      if (!sansLaPolice) await onglet.waitForFunction(laPoliceEstLa);
+      largeurs[chemin] = await onglet.evaluate(() => [...document.querySelectorAll('.titre-section, .regarder-titre')]
+        .filter((titre) => titre.getClientRects().length > 0).map((titre) => Math.round(titre.getBoundingClientRect().width * 10) / 10));
+    }
+    await contexte.close();
+    return largeurs;
+  };
+  const avecLaPolice = await mesurer(false);
+  expect(Object.values(avecLaPolice).flat().length).toBeGreaterThan(5);
+  expect(await mesurer(true)).toEqual(avecLaPolice);
 });
 
 const portLibre = () => new Promise((resoudre) => {

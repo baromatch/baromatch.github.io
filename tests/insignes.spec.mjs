@@ -208,6 +208,28 @@ test.describe('l’accueil', () => {
   });
 });
 
+test.describe('le bloc de la semaine de l’accueil', () => {
+  test('un club et une sélection qui jouent deux fois (Monaco, la France) : chaque identifiant n’y sert qu’une fois, chaque renvoi vise le sien', () => {
+    const club = (cle, court, slug) => ({ cle, court, nom: court, slug });
+    const match = (slug, debut, domicile, exterieur) => ({ slug, ids: [slug], debut: Date.parse(debut), heureConfirmee: true, statut: null, competition: 'Ligue 1', domicile, exterieur, soirees: [] });
+    const monaco = club('monaco', 'Monaco', 'as-monaco');
+    const france = club('france', 'France', 'nt-fr');
+    const matchs = [
+      match('monaco-lens-2026-10-29', '2026-10-29T19:00:00Z', monaco, club('lens', 'Lens', 'rc-lens')),
+      match('nice-monaco-2026-10-30', '2026-10-30T19:00:00Z', club('nice', 'Nice', 'ogc-nice'), monaco),
+      match('france-italie-2026-10-31', '2026-10-31T19:45:00Z', france, club('italie', 'Italie', 'nt-it')),
+      match('espagne-france-2026-11-01', '2026-11-01T19:45:00Z', club('espagne', 'Espagne', 'nt-es'), france),
+    ];
+    const bloc = blocDeLaSemaine({ donnees: { matchs, bars: [] }, textes: chargerLeContenu(racine).textes, maintenant: JEUDI });
+    const ids = [...bloc.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
+    // Les insignes de Monaco (30 px) et le drapeau de la France ont leurs identifiants, dessinés deux fois chacun.
+    expect(ids.filter((id) => id.startsWith('ib-f-as-monaco-')).length).toBeGreaterThan(1);
+    expect(ids.filter((id) => id.startsWith('drapeau-fr-')).length).toBe(2);
+    expect(ids.length - new Set(ids).size).toBe(0);
+    for (const [, cible] of bloc.matchAll(/url\(#([^)]+)\)/g)) expect(ids).toContain(cible);
+  });
+});
+
 test.describe('les insignes, posés comme l’appli les pose', () => {
   test('un insigne seul : le dessin de l’appli à sa taille, dans un carré de 200 unités, décoratif', () => {
     for (const [slug, fond] of [['paris-saint-germain', 'night'], ['rc-lens', 'night'], ['paris-saint-germain', 'light']]) {

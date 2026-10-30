@@ -1,5 +1,9 @@
 /* Baromatch — feuille de style du site */
 
+/* Bricolage Grotesque 1.001 (fonts/LICENSE-OFL.txt), réduite avec fontTools en trois fichiers. Le cœur, préchargé par
+   chaque page, a tout ce que le site écrit : le latin de base, les lettres du latin-1 et ı, la ponctuation française, €, ‹ › −.
+   Les deux autres ne viennent que pour un caractère qu’ils sont seuls à avoir : un signe rare (½, ±, ¿…), une lettre du
+   latin étendu (le Ş, le ł ou le ğ d’un nom de club). tests/police.spec.mjs vérifie les trois. */
 @font-face {
   font-family: "Bricolage Grotesque";
   src: url("fonts/bricolage-grotesque.woff2") format("woff2-variations"),
@@ -9,6 +13,35 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("fonts/bricolage-grotesque-signes.woff2") format("woff2-variations"), url("fonts/bricolage-grotesque-signes.woff2") format("woff2");
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  unicode-range: U+A1-A3, U+A5-A8, U+AA, U+AC, U+AF, U+B1-B6, U+B8-BA, U+BC-BF, U+F7, U+2C6, U+2DA, U+2DC, U+2002, U+2032-2033, U+2044, U+2191, U+2193;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("fonts/bricolage-grotesque-etendu.woff2") format("woff2-variations"), url("fonts/bricolage-grotesque-etendu.woff2") format("woff2");
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  unicode-range: U+100-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-130, U+132-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-151, U+154-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B;
+}
+/* Le temps qu’elle arrive (une connexion lente) : Arial ou Roboto aux mesures de Bricolage Grotesque, la même largeur
+   de texte (size-adjust, mesuré sur le texte du site : le corps, le gras, les titres à 88 %, l’ouverture à 84 %) et la
+   même hauteur de ligne (ascent-, descent-, line-gap-override). Son arrivée décale bien moins (tests/police.spec.mjs).
+   Seulement pour les caractères des trois fichiers (leur réunion, que imprime generateur/outils/polices) : un caractère
+   que Bricolage Grotesque n’a pas reste à la police du système, comme avant. */
+@font-face { font-family: "Bricolage repli"; src: local("Arial"), local("Liberation Sans"), local("Arimo"); font-weight: 100 599; font-stretch: 50% 100%; size-adjust: 103.6%; ascent-override: 89.8%; descent-override: 26.1%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
+@font-face { font-family: "Bricolage repli"; src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold"); font-weight: 600 1000; font-stretch: 93% 100%; size-adjust: 100.4%; ascent-override: 92.6%; descent-override: 26.9%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
+@font-face { font-family: "Bricolage repli"; src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold"); font-weight: 600 1000; font-stretch: 86% 92%; size-adjust: 83.1%; ascent-override: 111.9%; descent-override: 32.5%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
+@font-face { font-family: "Bricolage repli"; src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold"); font-weight: 600 1000; font-stretch: 50% 85%; size-adjust: 75.8%; ascent-override: 122.7%; descent-override: 35.6%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto"), local("Roboto-Regular"); font-weight: 100 599; font-stretch: 50% 100%; size-adjust: 104.7%; ascent-override: 88.8%; descent-override: 25.8%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); font-weight: 600 1000; font-stretch: 93% 100%; size-adjust: 107.1%; ascent-override: 86.8%; descent-override: 25.2%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); font-weight: 600 1000; font-stretch: 86% 92%; size-adjust: 88.8%; ascent-override: 104.7%; descent-override: 30.4%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
+@font-face { font-family: "Bricolage repli Roboto"; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); font-weight: 600 1000; font-stretch: 50% 85%; size-adjust: 81%; ascent-override: 114.8%; descent-override: 33.3%; line-gap-override: 0%; unicode-range: U+20-7E, U+A0-A3, U+A5-AC, U+AE-107, U+10A-113, U+116-11B, U+11E-123, U+126-12B, U+12E-133, U+136-137, U+139-13E, U+141-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+168-17E, U+218-21B, U+2C6, U+2DA, U+2DC, U+2002, U+2009, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212; }
 
 :root {
   --nuit: #0A0B10;
@@ -64,7 +97,7 @@ body {
   margin: 0;
   background: var(--nuit);
   color: var(--texte);
-  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Bricolage Grotesque", "Bricolage repli", "Bricolage repli Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.55;
   font-variation-settings: "opsz" 16;
@@ -548,7 +581,7 @@ a:hover { color: var(--goutte); }
 .titre-section {
   margin: 0;
   text-wrap: balance;
-  max-width: 18ch;
+  max-width: 9.612em; /* 18ch en Bricolage (« 0 » de 0,534em) : la même boîte quelle que soit la police affichée */
   font-weight: 800;
   font-stretch: 88%;
   font-variation-settings: "opsz" 72;
@@ -707,7 +740,7 @@ a:hover { color: var(--goutte); }
 .bars__verre { width: 112px; order: -1; }
 @media (min-width: 820px) { .bars__verre { width: 220px; order: 0; } }
 
-.bars .titre-section { max-width: 16ch; overflow-wrap: break-word; }
+.bars .titre-section { max-width: 8.544em; overflow-wrap: break-word; } /* 16ch en Bricolage, comme .titre-section */
 
 .bars__texte {
   max-width: 36rem;
@@ -1342,7 +1375,7 @@ a:hover { color: var(--goutte); }
   --fond: #FAF7F1;
   --fond-releve: #F3EEE5;
   --carte: #FFFFFF;
-  --texte: #0A0B10;
+  --texte: var(--nuit);
   --texte-doux: #3D404D;
   --texte-discret: #5C5F6B;
   --trait: rgba(10, 11, 16, 0.12);
@@ -1356,7 +1389,7 @@ a:hover { color: var(--goutte); }
   --verre-reflet: 0 1px 2px rgba(10, 11, 16, 0.06);
   --ombre-carte: 0 1px 2px rgba(10, 11, 16, 0.05), 0 10px 28px rgba(10, 11, 16, 0.06);
   /* L’ambre sur le crème ne fait que 1,7:1 : sur le clair, le contour du focus est bleu nuit (WCAG 1.4.11, 3:1). */
-  --focus: #0A0B10;
+  --focus: var(--nuit);
   --menu-fond: #FFFFFF;
   --menu-releve: #F3EEE5;
   --menu-bord: rgba(10, 11, 16, 0.5);
@@ -1398,7 +1431,7 @@ a:hover { color: var(--goutte); }
 /* Le logo et le verre de l’ouverture, sur fond clair : le verre en bleu nuit (comme le logo pour fond clair de la
    presse), sans reflet blanc ; la goutte qui tombe, en ambre. */
 .jour .entete__logo path[fill="#F7F7F9"] { fill: var(--texte); }
-.jour #en-verre stop, .jour #hx-verre stop { stop-color: #0A0B10; }
+.jour #en-verre stop, .jour #hx-verre stop { stop-color: var(--nuit); }
 .jour .entete__logo path[stroke="#FFFFFF"], .jour .verre .bm-reflet { display: none; }
 .jour .verre .bm-goutte-chute { fill: var(--ambre); }
 .jour .verre .bm-onde { stroke: var(--ambre); }
@@ -1420,6 +1453,8 @@ a:hover { color: var(--goutte); }
   .jour .film { width: clamp(220px, calc((100vh - 360px) * 0.5625), 18rem); }
 }
 .jour .ouverture__statut { color: var(--texte); }
+/* Sous 360 px, à 200 %, un titre tient son plus long mot. */
+@media (max-width: 359px) { .jour .titre-section { font-size: 2rem; } }
 .jour .attente__champ { background: var(--carte); }
 @media (min-width: 560px) {
   .jour .attente__ligne { background: var(--carte); box-shadow: var(--ombre-carte); }
@@ -1427,7 +1462,7 @@ a:hover { color: var(--goutte); }
 }
 .jour .attente__ville span { background: var(--carte); }
 .jour .attente__ville input:checked + span { border-color: var(--texte); background: rgba(255, 177, 61, 0.24); }
-.jour .film__cadre { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), 0 24px 60px rgba(10, 11, 16, 0.26); }
+.jour .film__cadre { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), 0 24px 60px -24px rgba(10, 11, 16, 0.22); }
 
 /* La bande des bars : une carte blanche, l’ambre reste au bouton. */
 .jour .bars { background: var(--carte); border-block: 1px solid var(--trait); }
@@ -1440,25 +1475,29 @@ a:hover { color: var(--goutte); }
 .semaine { margin-top: 48px; padding: 48px 0 56px; background: var(--fond-releve, var(--nuit-releve)); box-shadow: 0 0 0 100vmax var(--fond-releve, var(--nuit-releve)); clip-path: inset(0 -100vmax); }
 .ouverture > .semaine { grid-column: 1 / -1; }
 @media (min-width: 720px) { .semaine { padding: 64px 0 80px; } }
+/* Ordinateur : le film, au-dessus, vient au clavier après les matchs, dans l’ordre du téléphone. */
 @media (min-width: 960px) { .ouverture > .semaine { grid-row: 6; margin-top: 72px; } }
-.semaine .titre-section { max-width: none; }
+/* Une boîte en em, pas à la largeur du texte : la même avec la police de secours (tests/police.spec.mjs). */
+.semaine .titre-section { max-width: none; flex: 0 1 10em; }
 .semaine__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
 .semaine__toute { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .semaine__chapo { max-width: 44rem; margin: 12px 0 0; color: var(--texte-doux); text-wrap: pretty; }
+.semaine__prochain { max-width: 44rem; margin: 12px 0 0; }
 .semaine__liens { display: flex; flex-wrap: wrap; gap: 0 24px; margin: 4px 0 0; }
 .semaine__liens a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .semaine__rien { margin: 20px 0 0; color: var(--texte-doux); }
 .semaine__dates { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; margin: 22px 0 0; padding: 0; border: 0; }
 .semaine__date { position: relative; flex: none; }
 .semaine__date input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.semaine__date > span { display: grid; min-width: 4.5rem; min-height: 52px; padding: 6px 12px; border: 1px solid var(--verre-bord-fort); border-radius: 14px; background: var(--carte, var(--verre)); line-height: 1.3; }
+.semaine__date > span { display: grid; min-width: 4.25rem; min-height: 52px; padding: 6px 12px; border: 1px solid var(--verre-bord-fort); border-radius: 14px; background: var(--carte, var(--verre)); line-height: 1.3; }
 .semaine__date b { font-size: 0.9375rem; font-weight: 700; }
 @media (min-width: 720px) { .semaine__dates { gap: 8px; } .semaine__date > span { min-width: 6.25rem; min-height: 56px; padding: 7px 14px; border-radius: 16px; } .semaine__date b { font-size: 1rem; } }
 .semaine__date small { color: var(--texte-discret); font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .semaine__date input:checked + span { border-color: var(--texte); background: var(--texte); color: var(--fond, var(--nuit)); }
 .semaine__date input:checked + span small { color: inherit; }
-/* Un jour qui a des matchs avec des bars : un point ambre devant son nombre de matchs (cerné : il se voit sur le blanc). */
-.semaine__point { display: inline-block; width: 8px; height: 8px; margin: 0 6px 0.1em 0; border-radius: 50%; background: var(--ambre); box-shadow: inset 0 0 0 1px rgba(10, 11, 16, 0.35); vertical-align: middle; }
+/* Des bars ce jour-là : un point couleur du texte, en em, au coin de la puce ; « 1 bar » aussi. */
+.semaine__point { position: absolute; top: -0.2em; right: -0.2em; width: 0.6em; height: 0.6em; border-radius: 50%; background: currentColor; }
+.semaine__date input:checked + span .semaine__point { box-shadow: 0 0 0 2px var(--texte); }
 .semaine__date input:focus-visible + span { outline: 2px solid var(--texte); outline-offset: 2px; }
 .semaine__date[hidden], .semaine__jours[hidden], .semaine__jours > .semaine__jour[hidden] { display: none; }
 @media (forced-colors: active) { .semaine__date input:checked + span { border: 3px solid Highlight; } }
@@ -1492,14 +1531,18 @@ a:hover { color: var(--goutte); }
 }
 .semaine__tous { margin: 8px 0 0; }
 .semaine__tous a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
-.carte-match { display: grid; align-content: start; gap: 10px; padding: 16px 18px 6px; border: 1px solid var(--trait); border-radius: 20px; background: rgba(255, 255, 255, 0.55); }
+.carte-match { position: relative; display: grid; align-content: start; gap: 10px; padding: 16px 18px 6px; border: 1px solid var(--trait); border-radius: 20px; background: rgba(255, 255, 255, 0.55); }
 .carte-match--bars { border-color: var(--verre-bord-fort); background: var(--carte, var(--verre)); box-shadow: var(--ombre-carte, none); }
-.carte-match__haut { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0; }
+.carte-match__haut { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; margin: 0; }
 .carte-match__heure { font-size: 1.375rem; font-weight: 750; font-stretch: 92%; font-variant-numeric: tabular-nums; line-height: 1.2; }
 .carte-match__compet { color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; text-align: right; }
-.carte-match__clubs { display: grid; gap: 6px; color: var(--texte); font-size: 1.0625rem; font-weight: 650; text-decoration: none; }
+/* Les clubs mènent au match : la flèche, et toute la carte (ses liens devant). */
+.carte-match__clubs { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; color: var(--texte); font-size: 1.0625rem; font-weight: 650; text-decoration: none; }
+.carte-match__clubs::before { content: ""; position: absolute; inset: 0; }
+.carte-match__clubs::after { content: "›"; content: "›" / ""; grid-area: 1 / 2 / 3; align-self: center; color: var(--texte-discret); font-size: 1.5rem; line-height: 1; }
+.carte-match__bas a { position: relative; z-index: 1; }
 .carte-match__clubs:hover .carte-match__club { text-decoration: underline; }
-.carte-match__club { display: flex; align-items: center; gap: 10px; min-height: 28px; }
+.carte-match__club { grid-column: 1; display: flex; align-items: center; gap: 10px; min-height: 28px; }
 .disque { flex: none; width: 24px; height: 24px; border-radius: 50%; outline: 1px solid rgba(10, 11, 16, 0.18); outline-offset: -1px; }
 .disque--neutre circle { fill: #D6D3CC; }
 .carte-match__bas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; margin: 2px 0 0; padding-top: 4px; border-top: 1px solid var(--trait); font-size: 0.9375rem; }
@@ -1509,7 +1552,7 @@ a:hover { color: var(--goutte); }
 /* L’agenda, dessiné en CSS (un carré, son haut épais) : pas d’image de plus par carte. */
 .carte-match__agenda::before { content: ""; flex: none; width: 14px; height: 13px; border: 1.5px solid currentColor; border-top-width: 4px; border-radius: 3px; }
 .carte-match__bars { display: inline-flex; align-items: center; gap: 8px; padding: 10px 0; font-weight: 650; }
-.carte-match__bars::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--ambre); box-shadow: inset 0 0 0 1px rgba(10, 11, 16, 0.25); }
-.carte-match__voir { display: inline-flex; align-items: center; min-height: 44px; margin: 6px 0 10px; padding: 0 18px; border-radius: 999px; background: var(--ambre); color: var(--nuit); font-weight: 700; text-decoration: none; }
-:where(.jour) .carte-match__voir { color: var(--nuit); }
-.carte-match__voir:hover { background: #FFC163; color: var(--nuit); }
+.carte-match__bars::before { content: ""; flex: none; width: 0.65em; height: 0.65em; border-radius: 50%; background: currentColor; }
+@media (forced-colors: active) { .semaine__point, .carte-match__bars::before { forced-color-adjust: none; background: CanvasText; } }
+.carte-match__voir, .semaine__voir { display: inline-flex; align-items: center; min-height: 44px; margin: 6px 0 10px; padding: 0 18px; border-radius: 999px; background: var(--ambre); color: var(--nuit); font-weight: 700; text-decoration: none; }
+:is(.carte-match__voir, .semaine__voir):hover { background: #FFC163; color: var(--nuit); }

@@ -6,8 +6,9 @@
 // les deux clubs (un disque à leurs couleurs, jamais un écusson), et une action qui existe. Un match qu’un bar publié
 // diffuse passe en tête de son jour, et sa carte dit combien de bars, avec « Voir les bars » ; les autres, plus
 // discrètes, proposent l’agenda du match, et disent « Pas encore de bar » dès qu’un bar est publié ailleurs : tant
-// qu’aucun ne l’est, la phrase sous le titre le dit une fois pour toutes (comme la semaine, /matchs/). Les données
-// sont celles des pages des matchs (les mêmes matchs que la semaine), rien d’autre.
+// qu’aucun ne l’est, la phrase sous le titre le dit une fois pour toutes (comme la semaine, /matchs/). Si le jour
+// choisi n’a aucun match qu’un bar diffuse et qu’un autre jour en a, une ligne sous la phrase nomme le prochain. Les
+// données sont celles des pages des matchs (les mêmes matchs que la semaine), rien d’autre.
 // Les mots « Aujourd’hui » et « Demain » valent pour le jour du passage (data-aujourdhui) : chacun porte sa date sans
 // eux (data-date), que main.js remet, avec les jours passés retirés, si la page est lue un autre jour (un passage
 // manqué).
@@ -35,18 +36,25 @@ const jourCourt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', w
 // Un club, un disque à ses deux couleurs (jamais un écusson) : le même que dans le pied de page de chaque page (cadre.mjs).
 export { disque };
 
+const nomDe = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
+// « 2 bars à Paris », ou le nombre seul quand ses bars sont dans plusieurs villes : sur la carte, et sur la ligne du
+// prochain match dans un bar.
+const lesBars = (m) => {
+  const villes = [...new Set(m.soirees.map((s) => s.bar.ville.nom))];
+  return `${accorder(m.soirees.length, 'bar')}${villes.length === 1 ? ` à ${villes[0]}` : ''}`;
+};
+
 // Une carte : l’heure et la compétition, les deux clubs (le lien vers la page du match), puis ce qu’on peut faire.
 const carte = (m, { textes, couleurs, maintenant, sansAucunBar }) => {
   const t = textes.accueil;
   const chemin = cheminDuMatch(m);
-  const nom = `${m.domicile.court} – ${m.exterieur.court}`;
+  const nom = nomDe(m);
   const pour = `<span class="visuellement-cache"> : ${e(nom)}</span>`;
-  const villes = [...new Set(m.soirees.map((s) => s.bar.ville.nom))];
   let bas;
   if (m.statut) {
     bas = `<strong class="carte-match__statut">${e(textes.match[m.statut])}</strong>`;
   } else if (m.soirees.length) {
-    bas = `<span class="carte-match__bars">${e(accorder(m.soirees.length, 'bar'))}${villes.length === 1 ? ` à ${e(villes[0])}` : ''}</span><a class="carte-match__voir" href="${chemin}#titre-bars">${e(t.voirLesBars)}${pour}</a>`;
+    bas = `<span class="carte-match__bars">${e(lesBars(m))}</span><a class="carte-match__voir" href="${chemin}#titre-bars">${e(t.voirLesBars)}${pour}</a>`;
   } else {
     bas = `${sansAucunBar ? '' : `<span class="carte-match__etat">${e(t.pasDeBar)}</span>`}${aSonFichier(m, maintenant) ? `<a class="carte-match__agenda" href="${chemin}match.ics" type="text/calendar">${e(t.agenda)}${pour}</a>` : ''}`;
   }
@@ -76,10 +84,16 @@ export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) 
   // Sans bar publié : la phrase vraie, puis ce que chacun peut faire, le fan (la liste d’attente) et le bar.
   const chapo = `<p class="semaine__chapo">${e(sansAucunBar ? t.sansBar : t.avecBars)}</p>${sansAucunBar
     ? `\n<p class="semaine__liens"><a href="#attente">${e(t.sansBarLien)}</a><a href="/pour-les-bars.html#proposer">${e(t.sansBarProposer)}</a></p>` : ''}`;
+  // Des bars publiés, mais aucun match qu’un bar diffuse le jour choisi : une ligne sous la phrase nomme le prochain,
+  // par sa date (jamais « demain » : lue un autre jour, elle reste vraie ; main.js l’efface une fois ce jour passé),
+  // son heure et ses bars, avec « Voir les bars ». Sans elle, son match restait derrière un jour à deviner. Une espace
+  // insécable avant « · » : la ligne ne se coupe jamais sur « · 20:45 » (à 320 px, texte à 200 %).
+  const prochain = (sansAucunBar || semaine.find((j) => j.jour === choisi)?.matchs.some(avecBars)) ? null : semaine.flatMap((j) => j.matchs).find(avecBars);
+  const ligneDuProchain = prochain ? `\n<p class="semaine__prochain" data-jour="${jourDeParis(prochain.debut)}">${remplir(e(t.prochainDansUnBar), { match: e(nomDe(prochain)), quand: quand(prochain).replace(' · ', '\u00a0· '), bars: e(lesBars(prochain)) })} <a class="semaine__voir" href="${cheminDuMatch(prochain)}#titre-bars">${e(t.voirLesBars)}<span class="visuellement-cache"> : ${e(nomDe(prochain))}</span></a></p>` : '';
 
   const nomDuJour = ({ jour, i }) => (i === 0 ? t.aujourdhui : i === 1 ? t.demain : jourCourt.format(new Date(`${jour}T12:00:00Z`)));
-  // La puce d’un jour dit combien de matchs ; s’il y en a qu’un bar diffuse, un point ambre devant, et leur nombre pour
-  // le lecteur d’écran.
+  // La puce d’un jour dit combien de matchs ; s’il y en a qu’un bar diffuse, un point devant (de la couleur du texte :
+  // l’ambre est pour l’action), et leur nombre pour le lecteur d’écran.
   const compte = (j) => {
     const avec = j.matchs.filter(avecBars).length;
     if (!j.matchs.length) return e(t.aucunMatch);
@@ -105,7 +119,7 @@ ${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m
 <h2 class="titre-section" id="titre-semaine">${e(t.titre)}</h2>
 <a class="semaine__toute" href="/matchs/">${e(t.toute)}</a>
 </div>
-${chapo}
+${chapo}${ligneDuProchain}
 ${rien ? `<p class="semaine__rien">${e(t.rienCetteSemaine)}</p>` : `<div class="semaine__jours" data-aujourdhui="${aujourdhui}">
 <fieldset class="semaine__dates">
 <legend class="visuellement-cache">${e(t.jours)}</legend>

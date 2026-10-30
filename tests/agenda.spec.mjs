@@ -487,6 +487,6 @@ test('git ne touche pas aux fins de ligne des agendas, et l’Action les enregis
   const attributs = readFileSync(path.join(racine, '.gitattributes'), 'utf8').split(/\r?\n/);
   expect(attributs).toContain('*.ics -text');
   const action = readFileSync(path.join(racine, '.github', 'workflows', 'pages-des-matchs.yml'), 'utf8');
-  expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do');
-  expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$'");
+  expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml index.html; do');
+  expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$|^index\\.html$'");
 });

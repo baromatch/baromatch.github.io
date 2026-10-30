@@ -1650,8 +1650,8 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // jeton : plus bas) ; seuls les chemins de la liste blanche sont enregistrés.
     expect(action.split('node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option')).toHaveLength(2);
     expect(action.match(/node generateur\/construire\.mjs[^\n]*/g)).toHaveLength(1);
-    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do');
-    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$'");
+    expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml index.html; do');
+    expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$|^index\\.html$'");
     expect(action).toContain('git pull -q --rebase --autostash origin main');
     // Le jeton n’est pas gardé dans la configuration de git (le générateur tourne sans lui) : seule l’étape qui envoie
     // le reçoit pour git, le temps de l’envoi, comme actions/checkout le fait lui-même ; la demande de publication à

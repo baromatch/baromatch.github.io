@@ -49,6 +49,8 @@
   --ambre: #FFB13D;
   --ambre-fonce: #D97A0C;
   --goutte: #FFF3DA;
+  /* Le contour du focus : l’ambre sur la nuit ; le bleu nuit sur les fonds clairs d’une page du jour (plus bas). */
+  --focus: var(--ambre);
   --texte: #F7F7F9;
   --texte-doux: rgba(247, 247, 249, 0.74);
   --texte-discret: rgba(247, 247, 249, 0.56);
@@ -106,7 +108,7 @@ a[href^="mailto:"], .document a { overflow-wrap: anywhere; }
 a:hover { color: var(--goutte); }
 
 :focus-visible {
-  outline: 2px solid var(--ambre);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -271,7 +273,7 @@ a:hover { color: var(--goutte); }
 
 /* Sur ordinateur, le texte au milieu de la hauteur du film : les rangées vides du haut et du bas prennent ce qui reste. */
 @media (min-width: 960px) {
-  .ouverture { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: 1fr auto auto auto 1fr; }
+  .ouverture { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: 1fr auto auto auto 1fr auto; }
   .ouverture > * { grid-column: 1 / 3; }
   .ouverture .verre, .ouverture__statut { grid-row: 2; }
   .ouverture .verre { grid-column: 1; }
@@ -357,7 +359,7 @@ a:hover { color: var(--goutte); }
   .attente__bouton { height: 52px; border-radius: 999px; }
   /* Le champ n’a plus de bord : c’est la pilule qui dit où l’on tape, par le même contour que tout le site. Un
      contour, pas seulement la couleur du bord : en contraste élevé (Windows), le système le repeint, il reste visible. */
-  .attente__ligne:has(.attente__champ:focus-visible) { outline: 2px solid var(--ambre); outline-offset: 2px; }
+  .attente__ligne:has(.attente__champ:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
 }
 
 /* Une adresse refusée (aria-invalid, posé par main.js) se voit aussi sur le champ, pas seulement dans le message : un
@@ -423,7 +425,7 @@ a:hover { color: var(--goutte); }
   border-width: 0 0 2px 2px;
   transform: rotate(-45deg);
 }
-.attente__ville input:focus-visible + span { outline: 2px solid var(--ambre); outline-offset: 2px; }
+.attente__ville input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
 @media (forced-colors: active) {
   .attente__ville input:checked + span { padding: 0 6px; border: 3px solid Highlight; }
 }
@@ -627,8 +629,9 @@ a:hover { color: var(--goutte); }
 
 /* Un écran de l’appli dans son téléphone de verre (l’accueil, « Pour les bars ») : l’étiquette « Écran de démonstration »
    est posée sur le bord haut de l’écran (la figure est son repère) ; le téléphone est sans marque, bord de 6 px,
-   rayons concentriques 34 = 28 + 6. */
-.exemple { position: absolute; top: -12px; left: 24px; z-index: 2; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; background: var(--nuit); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); color: var(--texte); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
+   rayons concentriques 34 = 28 + 6. L’étiquette grandit avec son texte (à 200 %, elle passe sur deux lignes) : une
+   hauteur fixe laissait sa première ligne, claire, sortir de la pilule sur le crème. */
+.exemple { position: absolute; top: -12px; left: 24px; z-index: 2; display: inline-flex; align-items: center; height: auto; min-height: 24px; padding: 3px 10px; line-height: 1.2; border-radius: 999px; background: var(--nuit); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); color: var(--texte); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
 .telephone { position: relative; max-width: 20rem; padding: 6px; border-radius: 34px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
 .telephone__ecran { overflow: hidden; border-radius: 28px; background: var(--nuit); outline: 1px solid rgba(255, 255, 255, 0.1); outline-offset: -1px; }
 .telephone__ecran img { width: 100%; height: auto; }
@@ -891,7 +894,7 @@ a:hover { color: var(--goutte); }
 @media (min-width: 960px) {
   .film {
     grid-column: 3;
-    grid-row: 1 / -1;
+    grid-row: 1 / 6;
     align-self: center;
     width: clamp(240px, calc((100vh - 230px) * 0.5625), 23rem);
     margin: 0 0 0 clamp(32px, 6vw, 96px);
@@ -1274,3 +1277,193 @@ a:hover { color: var(--goutte); }
 
 .presse__film { display: block; width: min(100%, 18rem); margin-top: 16px; overflow: hidden; border: 1px solid var(--verre-bord); border-radius: 18px; }
 .presse__film img { width: 100%; height: auto; }
+
+/* ---------- Le jour : une page en clair (l’accueil, pour commencer) ---------- */
+
+/* Le site est le jour, l’appli est la nuit (choisi le 29 octobre) : une page dont la racine porte « jour »
+   (<html class="jour">) passe au clair. Des fonds clairs et chauds, le bleu nuit de la marque pour le texte, l’ambre
+   seulement pour l’action. Ses moments de nuit (la section « nuit », le pied de page) gardent les couleurs de la nuit,
+   sur toute la largeur de l’écran. Chaque gris de texte se lit à 4,5:1 au moins sur chaque fond clair : #5C5F6B fait
+   5,5:1 sur le plus foncé (#F3EEE5), #3D404D 8,9:1 (tests/accueil-semaine.spec.mjs les mesure, peints). Les sélecteurs
+   en :where() gardent le poids des règles de base : un composant (un bouton, un lien du pied) garde ses couleurs. */
+:root.jour {
+  --fond: #FAF7F1;
+  --fond-releve: #F3EEE5;
+  --carte: #FFFFFF;
+  --texte: var(--nuit);
+  --texte-doux: #3D404D;
+  --texte-discret: #5C5F6B;
+  --trait: rgba(10, 11, 16, 0.12);
+  --erreur: #B42318;
+  --goutte: #7A4300;
+  --champ-bord: rgba(10, 11, 16, 0.5);
+  --verre: #FFFFFF;
+  --verre-fort: #FFFFFF;
+  --verre-bord: rgba(10, 11, 16, 0.12);
+  --verre-bord-fort: rgba(10, 11, 16, 0.22);
+  --verre-reflet: 0 1px 2px rgba(10, 11, 16, 0.06);
+  --ombre-carte: 0 1px 2px rgba(10, 11, 16, 0.05), 0 10px 28px rgba(10, 11, 16, 0.06);
+  /* L’ambre sur le crème ne fait que 1,7:1 : sur le clair, le contour du focus est bleu nuit (WCAG 1.4.11, 3:1). */
+  --focus: var(--nuit);
+  color-scheme: light;
+}
+.jour body { background: var(--fond); }
+:where(.jour) a { color: var(--texte); text-decoration-thickness: 1.5px; }
+:where(.jour) a:hover { color: var(--texte-doux); }
+
+/* La nuit dans le jour : ses couleurs reviennent (le contour du focus, ambre), et son fond prend toute la largeur. Le
+   pied de page garde sa propre couleur de texte (.pied) : il est le même que sur les autres pages. */
+:where(.jour) :is(.nuit, .pied) {
+  --texte: #F7F7F9;
+  --texte-doux: rgba(247, 247, 249, 0.74);
+  --texte-discret: rgba(247, 247, 249, 0.56);
+  --trait: rgba(255, 255, 255, 0.10);
+  --erreur: #FF9C8A;
+  --goutte: #FFF3DA;
+  --focus: var(--ambre);
+  --champ-bord: rgba(255, 255, 255, 0.36);
+  --verre: rgba(255, 255, 255, 0.07);
+  --verre-fort: rgba(255, 255, 255, 0.10);
+  --verre-bord: rgba(255, 255, 255, 0.14);
+  --verre-bord-fort: rgba(255, 255, 255, 0.22);
+  --verre-reflet: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  color-scheme: dark;
+  background: var(--nuit);
+  box-shadow: 0 0 0 100vmax var(--nuit);
+  clip-path: inset(0 -100vmax);
+}
+:where(.jour) :where(.nuit, .pied) a { color: var(--ambre); }
+:where(.jour) :where(.nuit, .pied) a:hover { color: var(--goutte); }
+:where(.jour) .nuit { color: var(--texte); }
+
+/* Le logo et le verre de l’ouverture, sur fond clair : le verre en bleu nuit (comme le logo pour fond clair de la
+   presse), sans reflet blanc ; la goutte qui tombe, en ambre. */
+.jour .entete__logo path[fill="#F7F7F9"] { fill: var(--texte); }
+.jour #en-verre stop, .jour #hx-verre stop { stop-color: var(--nuit); }
+.jour .entete__logo path[stroke="#FFFFFF"], .jour .verre .bm-reflet { display: none; }
+.jour .verre .bm-goutte-chute { fill: var(--ambre); }
+.jour .verre .bm-onde { stroke: var(--ambre); }
+.jour .verre__halo { opacity: 0.6; }
+.jour .entete__lien:hover, .jour .questions-fans summary:hover, .jour .film__texte summary:hover, .jour .attente__corriger:hover { color: var(--texte-doux); }
+.jour .entete__lien--bars:hover, .jour .vitrine-accueil__bouton--verre:hover { background: var(--fond-releve); }
+/* L’en-tête sur le clair : souligné bleu nuit, capsule au bord uniforme (l’ambre est pour l’action). */
+.jour .entete__lien { border-bottom-color: rgba(10, 11, 16, 0.4); }
+@media (min-width: 401px) { .jour .entete__lien--bars { border-color: var(--verre-bord-fort); } }
+/* Le bouton nuit sur le clair (« Proposer mon bar ») : survolé, il prend la goutte de la nuit, pas celle du jour
+   (#7A4300 ne fait que 2,45:1 sur la nuit). Sans poids de plus : un bouton nuit d’une autre couleur garde la sienne. */
+:where(.jour) .bouton-nuit:hover { color: #FFF3DA; }
+
+/* L’ouverture, plus courte : les matchs de la semaine arrivent plus tôt. Le titre reste en bas de casse, un peu moins
+   serré qu’à la nuit. Les matchs ferment l’ouverture sur ordinateur (sous le texte et le film) ; au téléphone, ils
+   viennent juste après la liste d’attente, le film ensuite. */
+.jour .ouverture { padding-bottom: 56px; }
+@media (min-width: 960px) { .jour .ouverture { padding-bottom: 0; } }
+.jour .ouverture__titre { font-stretch: 90%; }
+@media (min-width: 960px) {
+  .jour .ouverture__titre { font-size: clamp(3.25rem, 5vw, 4.75rem); }
+  .jour .film { width: clamp(220px, calc((100vh - 360px) * 0.5625), 18rem); }
+}
+.jour .ouverture__statut { color: var(--texte); }
+/* Sous 360 px, à 200 %, un titre tient son plus long mot. */
+@media (max-width: 359px) { .jour .titre-section { font-size: 2rem; } }
+.jour .attente__champ { background: var(--carte); }
+@media (min-width: 560px) {
+  .jour .attente__ligne { background: var(--carte); box-shadow: var(--ombre-carte); }
+  .jour .attente__champ { background: transparent; }
+}
+.jour .attente__ville span { background: var(--carte); }
+.jour .attente__ville input:checked + span { border-color: var(--texte); background: rgba(255, 177, 61, 0.24); }
+.jour .film__cadre { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), 0 24px 60px -24px rgba(10, 11, 16, 0.22); }
+
+/* La bande des bars : une carte blanche, l’ambre reste au bouton. */
+.jour .bars { background: var(--carte); border-block: 1px solid var(--trait); }
+
+/* ---------- Les matchs de la semaine, sur l’accueil ---------- */
+
+/* Le bloc vient du générateur (generateur/accueil.mjs). Une barre des sept jours (des boutons radio : elle marche sans
+   script), qui passe à la ligne plutôt que de sortir de l’écran (texte agrandi), puis les cartes du jour choisi. Une carte avec des bars est blanche, avec son ombre et « Voir les bars » ;
+   sans bar, elle est plus discrète : sans ombre, sur le fond de la bande. */
+.semaine { margin-top: 48px; padding: 48px 0 56px; background: var(--fond-releve, var(--nuit-releve)); box-shadow: 0 0 0 100vmax var(--fond-releve, var(--nuit-releve)); clip-path: inset(0 -100vmax); }
+.ouverture > .semaine { grid-column: 1 / -1; }
+@media (min-width: 720px) { .semaine { padding: 64px 0 80px; } }
+/* Ordinateur : le film, au-dessus, vient au clavier après les matchs, dans l’ordre du téléphone. */
+@media (min-width: 960px) { .ouverture > .semaine { grid-row: 6; margin-top: 72px; } }
+/* Une boîte en em, pas à la largeur du texte : la même avec la police de secours (tests/police.spec.mjs). */
+.semaine .titre-section { max-width: none; flex: 0 1 10em; }
+.semaine__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
+.semaine__toute { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
+.semaine__chapo { max-width: 44rem; margin: 12px 0 0; color: var(--texte-doux); text-wrap: pretty; }
+.semaine__prochain { max-width: 44rem; margin: 12px 0 0; }
+.semaine__liens { display: flex; flex-wrap: wrap; gap: 0 24px; margin: 4px 0 0; }
+.semaine__liens a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
+.semaine__rien { margin: 20px 0 0; color: var(--texte-doux); }
+.semaine__dates { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; margin: 22px 0 0; padding: 0; border: 0; }
+.semaine__date { position: relative; flex: none; }
+.semaine__date input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.semaine__date > span { display: grid; min-width: 4.25rem; min-height: 52px; padding: 6px 12px; border: 1px solid var(--verre-bord-fort); border-radius: 14px; background: var(--carte, var(--verre)); line-height: 1.3; }
+.semaine__date b { font-size: 0.9375rem; font-weight: 700; }
+@media (min-width: 720px) { .semaine__dates { gap: 8px; } .semaine__date > span { min-width: 6.25rem; min-height: 56px; padding: 7px 14px; border-radius: 16px; } .semaine__date b { font-size: 1rem; } }
+.semaine__date small { color: var(--texte-discret); font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.semaine__date input:checked + span { border-color: var(--texte); background: var(--texte); color: var(--fond, var(--nuit)); }
+.semaine__date input:checked + span small { color: inherit; }
+/* Des bars ce jour-là : un point couleur du texte, en em, au coin de la puce ; « 1 bar » aussi. */
+.semaine__point { position: absolute; top: -0.2em; right: -0.2em; width: 0.6em; height: 0.6em; border-radius: 50%; background: currentColor; }
+.semaine__date input:checked + span .semaine__point { box-shadow: 0 0 0 2px var(--texte); }
+.semaine__date input:focus-visible + span { outline: 2px solid var(--texte); outline-offset: 2px; }
+.semaine__date[hidden], .semaine__jours[hidden], .semaine__jours > .semaine__jour[hidden] { display: none; }
+@media (forced-colors: active) { .semaine__date input:checked + span { border: 3px solid Highlight; } }
+/* Le jour choisi, seul (les autres restent dans la page, pour les moteurs), son titre pour le lecteur d’écran
+   seulement (la barre le montre déjà). Sans :has(), la barre ne choisirait rien : elle s’efface, et les sept jours se
+   suivent, chacun sous son titre, visible (sinon chaque carte se lirait « aujourd’hui »). */
+@supports selector(:has(*)) {
+  .semaine__jour { display: none; }
+  .semaine__titre-jour { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .semaine__jours:has(label:nth-of-type(1) :checked) > div:nth-of-type(1),
+  .semaine__jours:has(label:nth-of-type(2) :checked) > div:nth-of-type(2),
+  .semaine__jours:has(label:nth-of-type(3) :checked) > div:nth-of-type(3),
+  .semaine__jours:has(label:nth-of-type(4) :checked) > div:nth-of-type(4),
+  .semaine__jours:has(label:nth-of-type(5) :checked) > div:nth-of-type(5),
+  .semaine__jours:has(label:nth-of-type(6) :checked) > div:nth-of-type(6),
+  .semaine__jours:has(label:nth-of-type(7) :checked) > div:nth-of-type(7) { display: block; }
+}
+@supports not selector(:has(*)) {
+  .semaine__dates { display: none; }
+  .semaine__titre-jour { margin: 28px 0 0; font-size: 1.125rem; font-weight: 700; line-height: 1.3; }
+}
+.semaine__cartes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin: 16px 0 0; padding: 0; list-style: none; }
+@media (min-width: 720px) { .semaine__cartes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1040px) { .semaine__cartes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Un long jour : 4 cartes au téléphone, 6 à partir de 720 px (les bars d’abord, le générateur les range ainsi), puis
+   son lien vers la semaine. Les autres cartes restent dans la page. */
+.semaine__cartes > li:nth-child(n+5) { display: none; }
+@media (min-width: 720px) {
+  .semaine__cartes > li:nth-child(n+5) { display: grid; }
+  .semaine__cartes > li:nth-child(n+7) { display: none; }
+}
+.semaine__tous { margin: 8px 0 0; }
+.semaine__tous a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
+.carte-match { position: relative; display: grid; align-content: start; gap: 10px; padding: 16px 18px 6px; border: 1px solid var(--trait); border-radius: 20px; background: rgba(255, 255, 255, 0.55); }
+.carte-match--bars { border-color: var(--verre-bord-fort); background: var(--carte, var(--verre)); box-shadow: var(--ombre-carte, none); }
+.carte-match__haut { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; margin: 0; }
+.carte-match__heure { font-size: 1.375rem; font-weight: 750; font-stretch: 92%; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.carte-match__compet { color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; text-align: right; }
+/* Les clubs mènent au match : la flèche, et toute la carte (ses liens devant). */
+.carte-match__clubs { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; color: var(--texte); font-size: 1.0625rem; font-weight: 650; text-decoration: none; }
+.carte-match__clubs::before { content: ""; position: absolute; inset: 0; }
+.carte-match__clubs::after { content: "›"; content: "›" / ""; grid-area: 1 / 2 / 3; align-self: center; color: var(--texte-discret); font-size: 1.5rem; line-height: 1; }
+.carte-match__bas a { position: relative; z-index: 1; }
+.carte-match__clubs:hover .carte-match__club { text-decoration: underline; }
+.carte-match__club { grid-column: 1; display: flex; align-items: center; gap: 10px; min-height: 28px; }
+.disque { flex: none; width: 24px; height: 24px; border-radius: 50%; outline: 1px solid rgba(10, 11, 16, 0.18); outline-offset: -1px; }
+.disque--neutre circle { fill: #D6D3CC; }
+.carte-match__bas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; margin: 2px 0 0; padding-top: 4px; border-top: 1px solid var(--trait); font-size: 0.9375rem; }
+.carte-match__etat, .carte-match__statut { padding: 10px 0; color: var(--texte-discret); }
+.carte-match__statut { color: var(--texte); }
+.carte-match__agenda { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 650; }
+/* L’agenda, dessiné en CSS (un carré, son haut épais) : pas d’image de plus par carte. */
+.carte-match__agenda::before { content: ""; flex: none; width: 14px; height: 13px; border: 1.5px solid currentColor; border-top-width: 4px; border-radius: 3px; }
+.carte-match__bars { display: inline-flex; align-items: center; gap: 8px; padding: 10px 0; font-weight: 650; }
+.carte-match__bars::before { content: ""; flex: none; width: 0.65em; height: 0.65em; border-radius: 50%; background: currentColor; }
+@media (forced-colors: active) { .semaine__point, .carte-match__bars::before { forced-color-adjust: none; background: CanvasText; } }
+.carte-match__voir, .semaine__voir { display: inline-flex; align-items: center; min-height: 44px; margin: 6px 0 10px; padding: 0 18px; border-radius: 999px; background: var(--ambre); color: var(--nuit); font-weight: 700; text-decoration: none; }
+:is(.carte-match__voir, .semaine__voir):hover { background: #FFC163; color: var(--nuit); }

@@ -23,7 +23,8 @@ import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS, HEURE_MS, JOUR_MS } from './donnees.mjs';
 import { empreinte } from './etat.mjs';
-import { appel, fil, insecables, page } from './gabarits.mjs';
+import { appel, fil, FOND_DES_PAGES, insecables, page } from './gabarits.mjs';
+import { insigne, TAILLES } from './insigne.mjs';
 import { heureDeParis, jourDeParis, jourEnLettres } from './heure.mjs';
 import { echapperTexte, ecrireLeFichier, instantUtc, jourIcal, lendemain } from './ical.mjs';
 import { adresseDe, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
@@ -134,7 +135,7 @@ export const fabriquerLaPageAgenda = ({ donnees, contenu, cadre, avecPresse = fa
     const aVenir = n ? remplir(n > 1 ? t.aVenirPluriel : t.aVenir, { n }) : t.aucunAVenir;
     const adresse = adresseDe(cheminDuCalendrier(club.cle));
     return `    <li class="regarder-carte" id="${ancreDuClub(club.cle)}">
-      <h3 class="regarder-carte__nom">${e(club.court)}</h3>
+      <h3 class="regarder-carte__nom">${insigne(club, { taille: TAILLES.liste, fond: FOND_DES_PAGES })}${e(club.court)}</h3>
       <p class="regarder-carte__lieu">${club.nom && club.nom !== club.court ? `${e(club.nom)} · ` : ''}${e(aVenir)}</p>
       <p class="regarder-agenda"><a class="regarder-agenda__bouton" href="${webcalDe(club.cle)}">${e(t.sAbonner)}<span class="visuellement-cache"> : ${e(club.court)}</span></a></p>
       <p class="regarder-agenda__adresse"><a href="${adresse}">${e(adresse)}</a></p>

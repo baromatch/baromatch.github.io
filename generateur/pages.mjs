@@ -14,7 +14,7 @@ import {
 import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agenda.mjs';
 import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
-import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDeLEnTete, insignesDuMatch, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 import { clubAvecBars, competitionAvecBars, lienDeLaCompetition, lienDuClub, sectionDesPagesSuivies } from './suivre.mjs';
 
@@ -169,7 +169,7 @@ export const fabriquerLesPages = ({
     const ouRegarder = !passe && vivant && !match.statut && soirees.length > 0;
     const promesse = ouRegarder ? ' : où regarder le match' : '';
     const enTete = `<header class="regarder-tete">
-  <p class="regarder-surtitre">${e(match.competition)}</p>
+${insignesDeLEnTete(match.domicile, match.exterieur)}  <p class="regarder-surtitre">${e(match.competition)}</p>
   <h1 class="regarder-titre">${e(nom)}${promesse}</h1>
   <p class="regarder-affiche">${e(match.domicile.nom)} – ${e(match.exterieur.nom)}</p>
   <p class="regarder-quand">${quand(match, { majuscule: true })}</p>
@@ -389,7 +389,7 @@ ${groupes.flatMap((g) => g.quartiers).map(({ arrondissement, elements }) => `${a
     const sectionSoirees = `<section class="regarder-section" aria-labelledby="titre-soirees">
   <h2 id="titre-soirees">${e(remplir(textes.ville.titreSoirees, { ville: nomVille }))}</h2>
 ${ville.soirees.length ? `  <ul class="regarder-matchs">
-${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    ${ligneDeListe(e(nomCourt(s.match)), aUnePage(s.match) ? cheminDuMatch(s.match) : null, `${quand(s.match, { majuscule: true })}${statutDuMatch(s.match, textes)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}`)}`).join('\n')}
+${ville.soirees.slice(0, SOIREES_PAR_VILLE).map((s) => `    ${ligneDeListe(e(nomCourt(s.match)), aUnePage(s.match) ? cheminDuMatch(s.match) : null, `${quand(s.match, { majuscule: true })}${statutDuMatch(s.match, textes)} · <a href="${cheminDuBar(s.bar)}#${ancreDeLaSoiree(s.match)}">${e(s.bar.nom)}</a>, ${e(s.bar.quartier)}`, insignesDuMatch(s.match))}`).join('\n')}
   </ul>` : `  <p>${e(textes.ville.sansSoiree)}</p>`}
 ${autresMatchs.length ? `  <h3 class="regarder-jour">${e(remplir(textes.ville.aussi, { ville: nomVille }))}</h3>
   <ul class="regarder-matchs">

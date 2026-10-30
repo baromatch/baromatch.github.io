@@ -28,6 +28,9 @@ const BOITE = 200;
 
 // Les bandes des drapeaux, par code de pays (les données de l’appli, copiées avec le dessin).
 const DRAPEAUX = JSON.parse(readFileSync(new URL('./insignes/drapeaux.json', import.meta.url), 'utf8'));
+// Les clubs du site (clubs.json) : le nom de l’insigne d’un club que les données ne nomment plus (un match d’avant,
+// gardé par l’état sans ce nom) se retrouve par sa clé, le premier de ses noms dans l’appli.
+const CLUBS = JSON.parse(readFileSync(new URL('./contenu/clubs.json', import.meta.url), 'utf8'));
 // Le drapeau : chaque bande déborde de 0,5 sous la suivante (aucun fil de fond entre deux bandes) ; l’anneau intérieur,
 // blanc à 18 %, à 0,5 du bord, d’un trait de 1 (une bande blanche se lit sur un fond sombre).
 const RECOUVREMENT = 0.5;
@@ -49,12 +52,16 @@ export const bandesDe = (slug) => {
   return code && Object.hasOwn(DRAPEAUX, code) ? DRAPEAUX[code] : undefined;
 };
 
+// Le nom de l’insigne d’un club : le sien (donnees.mjs, clubDe), sinon celui de sa clé dans clubs.json.
+export const slugDe = (club) => club?.slug ?? (club?.cle && !club.cle.startsWith('_') ? CLUBS[club.cle]?.slugs?.[0] : undefined);
+
 // Ce qu’on dessine pour un club : { slug, nom } (le nom de l’appli, celui que l’insigne neutre abrège) → son drapeau,
 // sa fiche, ou l’insigne neutre de son nom.
 export const dessinDe = (club) => {
-  const bandes = bandesDe(club?.slug);
-  if (bandes) return { bandes };
-  return { fiche: badgeSpecFor(club?.slug) ?? fallbackBadgeSpec(club?.nom) };
+  const slug = slugDe(club);
+  const bandes = bandesDe(slug);
+  if (bandes) return { bandes, slug };
+  return { fiche: badgeSpecFor(slug) ?? fallbackBadgeSpec(club?.nom) };
 };
 
 // Le préfixe que l’appli donne aux identifiants d’un insigne de club (variante standard, sans tampon).
@@ -93,15 +100,16 @@ const drapeau = (bandes, { taille, slug }) => {
   return `${ouvrir('insigne', taille, taille, `0 0 ${taille} ${taille}`)}<defs><clipPath id="${decoupe}"><circle cx="${centre}" cy="${centre}" r="${rayon}"/></clipPath></defs><g clip-path="url(#${decoupe})">${rectanglesDe(centre, rayon * 2, bandes)}</g><circle cx="${centre}" cy="${centre}" r="${rayon - 0.5}" stroke="${ANNEAU_DU_DRAPEAU}" stroke-width="1" fill="none"/></svg>`;
 };
 
-// La saison écrite sur le bord (à partir de 128 px) : celle de l’instant du passage.
-export const saisonDe = (maintenant) => seasonMark(new Date(maintenant));
+// La saison écrite sur le bord (à partir de 128 px) : celle de l’instant du passage ; aucune sans lui (une liste, où
+// elle ne s’écrit pas).
+export const saisonDe = (maintenant) => (Number.isFinite(maintenant) ? seasonMark(new Date(maintenant)) : null);
 
 // Un insigne seul. club : { slug, nom } ; taille en px ; fond : 'night' (un fond sombre) ou 'light' (un fond clair) ;
-// maintenant : l’instant du passage (la saison).
-export const insigne = (club, { taille, fond, maintenant }) => {
+// maintenant : l’instant du passage (la saison), ou saison : la saison elle-même (« 26/27 »).
+export const insigne = (club, { taille, fond, maintenant, saison = saisonDe(maintenant) }) => {
   const dessin = dessinDe(club);
-  if (dessin.bandes) return drapeau(dessin.bandes, { taille, slug: club.slug });
-  return `${ouvrir('insigne', taille, taille, `0 0 ${BOITE} ${BOITE}`)}${elements(dessin.fiche, { taille, fond, saison: saisonDe(maintenant) })}</svg>`;
+  if (dessin.bandes) return drapeau(dessin.bandes, { taille, slug: dessin.slug });
+  return `${ouvrir('insigne', taille, taille, `0 0 ${BOITE} ${BOITE}`)}${elements(dessin.fiche, { taille, fond, saison })}</svg>`;
 };
 
 // Les deux clubs d’un match, domicile puis extérieur, comme la paire de l’appli.

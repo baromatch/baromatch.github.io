@@ -24,7 +24,7 @@ import { cheminDuFichierDuMatch } from './agenda.mjs';
 import { ENVOI_DE_LA_LISTE } from './attente.mjs';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
-import { ligneDeListe, page } from './gabarits.mjs';
+import { insignesDeLEnTete, insignesDuMatch, ligneDeListe, page } from './gabarits.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe, cheminDuBar, debutDe, filDAriane, IMAGE, listeDesBars, pageWeb } from './jsonld.mjs';
 import { couper, SEUILS } from './pages.mjs';
@@ -138,7 +138,7 @@ ${etapes.map((etape, i) => (i === etapes.length - 1
     return `<time datetime="${debutDe(m)}">${e(majuscule ? capitale(texte) : texte)}</time>`;
   };
   // Une ligne d’une liste de matchs : le match seul sur sa ligne, ses détails dessous (gabarits.mjs).
-  const ligneDuMatch = (m, infos) => ligneDeListe(e(nomDuMatch(m)), avecPage.has(m.slug) ? cheminEnAnglais(m.slug) : null, infos);
+  const ligneDuMatch = (m, infos) => ligneDeListe(e(nomDuMatch(m)), avecPage.has(m.slug) ? cheminEnAnglais(m.slug) : null, infos, insignesDuMatch(m));
   const lienDuMatch = (m) => (avecPage.has(m.slug) ? `<a href="${cheminEnAnglais(m.slug)}">${e(nomDuMatch(m))}</a>` : e(nomDuMatch(m)));
   const compte = (n) => remplir(n > 1 ? t.bars.comptePluriel : t.bars.compte, { n });
   // Un match reporté ou annulé le dit partout où il est listé : « · Match postponed » après son jour et son heure.
@@ -242,7 +242,7 @@ ${etapes.map((etape) => `    <li><strong>${e(etape.titre)}</strong> ${e(etape.te
     const prochains = donnees.matchs.filter((m) => m.slug !== match.slug && m.debut > Math.max(match.debut, maintenant - DUREE_MATCH_MS) && enCoursOuAVenir(m)
       && [m.domicile.cle, m.exterieur.cle].some((cle) => clubs.includes(cle))).sort((a, b) => a.debut - b.debut);
     const enTete = `<header class="regarder-tete">
-  <p class="regarder-surtitre">${e(competition)}</p>
+${insignesDeLEnTete(match.domicile, match.exterieur)}  <p class="regarder-surtitre">${e(competition)}</p>
   <h1 class="regarder-titre">${e(vivant ? remplir(t.match.titreH1, { match: nom }) : nom)}</h1>
   <p class="regarder-quand">${temps(match)}</p>
 ${vivant && match.heureConfirmee ? `  <p class="regarder-note">${e(remplir(t.quand.royaumeUni, { heure: heureALAnglaise(match.debut, 'Europe/London') }))}</p>\n` : ''}${vivant && !match.heureConfirmee ? `  <p class="regarder-note">${e(t.match.heureAConfirmer)}</p>\n` : ''}${vivant && match.statut ? `  <p class="regarder-note"><strong>${e(t.match[match.statut])}.</strong> ${e(t.match.statutSuite)}</p>\n` : ''}${vivant && fr.evenement ? `  <div class="regarder-agenda">

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-/KNYhZ+Tk9L08PW+s+csWbSiJ/fy1kkK6J7qPv65o4k='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-ZKJk5hpyUuRXrm4weHZLuNhgMnaYJKPyFXMNI7Talys='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -56,6 +56,8 @@ main figure { position: relative; }
 .ouverture-bars__titre { margin: 0; font-weight: 800; font-stretch: 82%; font-variation-settings: "opsz" 96; font-size: clamp(2.625rem, 13.4vw, 5.5rem); line-height: 0.92; letter-spacing: -0.03em; }
 .ouverture-bars__titre span { display: block; }
 @media (min-width: 1100px) { .ouverture-bars__titre { font-size: min(5rem, 6.6vw); } }
+/* Sous 360 px, le texte agrandi : le plancher du titre passe à 2rem (64 px à 200 %, au lieu de 84), et « Baromatch. » tient sur sa ligne ; à 100 %, rien ne change (13,4vw). */
+@media (max-width: 359px) { .ouverture-bars__titre { font-size: clamp(2rem, 13.4vw, 5.5rem); } }
 .ouverture-bars__texte { max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); font-size: 1.125rem; }
 @media (min-width: 720px) { .ouverture-bars__texte { font-size: 1.25rem; } }
 .ouverture-bars__haut { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; margin: 0 0 18px; }
@@ -102,7 +104,8 @@ main figure { position: relative; }
 .kpi--attendus b { color: #FFD08A; }
 
 .salle-soir__commandes { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin: 12px 0 0; }
-.pas { display: inline-flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: 10px; padding: 4px 14px 4px 4px; border-radius: 999px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord); }
+/* Le réglage des places : un rayon fixe ; quand le texte agrandi le fait passer sur deux lignes, il reste un rectangle arrondi (999px en faisait un ovale qui coupait le « − » et « places »). */
+.pas { display: inline-flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: 10px; padding: 4px 14px 4px 4px; border-radius: 28px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord); }
 .pas__bouton, .lecture__bouton { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--verre-fort); box-shadow: inset 0 0 0 1px var(--verre-bord-fort); color: var(--texte); font: inherit; font-size: 1.375rem; font-weight: 800; line-height: 1; cursor: pointer; }
 .pas__bouton:disabled, .lecture__bouton:disabled, .lecture__heure input:disabled { opacity: 0.45; cursor: default; }
 .pas__valeur { min-width: 2.4ch; text-align: center; font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }

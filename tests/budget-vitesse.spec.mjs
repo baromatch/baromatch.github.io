@@ -64,6 +64,9 @@ const KO = 1024;
 // 30 octobre 2026, la police allégée et « Pour les bars » au jour ensemble : le seuil de la page serre au plus juste.
 // Mesuré (Ko) : 7 requêtes, 172 transférés, JS 65,7 (pour-les-bars.js 60,3, l’amorce 5,4), CSS 101,3 (styles.css 72,5,
 // pour-les-bars.css 28,7), images 0 (ses captures se chargent au défilement) : seuils 8, 176, 67, 103, 4.
+// styles.css garde aussi les trois règles du jour de « Pour les bars » (l’étiquette des écrans, la page courante de
+// l’en-tête) : 72,5 Ko ; le CSS des affiches mesure 105,4 Ko (105,6 avant leur commentaire raccourci) : leur seuil
+// passe de 105 à 106.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
@@ -78,8 +81,8 @@ const PAGES = [
   { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
   { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
   { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 105, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 105, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };

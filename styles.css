@@ -1378,8 +1378,7 @@ a:hover { color: var(--goutte); }
 /* La bande des bars : une carte blanche, l’ambre reste au bouton. */
 .jour .bars { background: var(--carte); border-block: 1px solid var(--trait); }
 
-/* Sur le clair, les écrans de démonstration gardent leur cadre de nuit : l’étiquette garde son texte clair. La page
-   courante de l’en-tête n’est plus en ambre (1,7:1 sur le crème) : bleu nuit, et un bord plein pour la capsule. */
+/* L’étiquette des écrans de nuit reste claire ; la page courante, bleu nuit (l’ambre : 1,7:1 sur le crème). */
 .jour .exemple { color: #F7F7F9; }
 .jour .entete__lien[aria-current="page"] { color: var(--texte); }
 .jour .entete__lien--bars[aria-current="page"] { border-color: var(--texte); }

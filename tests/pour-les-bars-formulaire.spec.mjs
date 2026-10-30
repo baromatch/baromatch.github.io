@@ -934,7 +934,7 @@ test.describe('les réponses du serveur', () => {
 
   // Le wifi d’un bar est partagé : le message dit la règle sans accuser, et l’e-mail (qui passe tout de suite)
   // devient le geste principal ; « Envoyer ma demande » reste, en second, pour réessayer dans une heure.
-  test('429 : « Beaucoup d’envois depuis cette connexion. », la règle dite sans accuser ; l’e-mail en geste principal, le bouton d’envoi reste en second', async ({ page }) => {
+  test('429 : « Beaucoup d’envois depuis cette connexion. », la règle dite sans accuser ; l’e-mail en geste principal, qui prend le focus, le bouton d’envoi reste en second', async ({ page }) => {
     const { envois } = await ouvrir(page, [reponse(429, { statusCode: 429, message: 'Rate limit exceeded' })]);
     await envoyerUneDemande(page);
     const alerte = page.locator('#demande-alerte');
@@ -947,7 +947,8 @@ test.describe('les réponses du serveur', () => {
     expect(await fond(page.locator('#demande-courriel-lien'))).toBe(AMBRE);
     await expect(page.locator('#demande-envoyer')).toBeVisible();
     expect(await fond(page.locator('#demande-envoyer'))).not.toBe(AMBRE);
-    await expect(page.locator('#demande-envoyer')).toBeFocused();
+    // Le focus passe du bouton d’envoi, désormais en second, au geste principal.
+    await expect(page.locator('#demande-courriel-lien')).toBeFocused();
     await page.clock.runFor(10_000);
     await partiesEnTout(page, envois, 1);
   });
@@ -1756,4 +1757,96 @@ test.describe('accessibilité du formulaire (axe)', () => {
       expect(await analyser(page)).toEqual([]);
     });
   }
+});
+
+// Le texte agrandi à 200 % (le réglage du navigateur, par le style de l’élément racine) sur un petit téléphone : ce que
+// le formulaire montre après un geste se lit par son début, et ce qu’il propose reste dans l’écran.
+test.describe('le texte agrandi à 200 %, sur un téléphone de 320 × 568', () => {
+  const agrandir = (page) => page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  const HAUTEUR = 568;
+  // Le haut et le bas d’un élément, dans l’écran.
+  const place = (locator) => locator.evaluate((e) => { const r = e.getBoundingClientRect(); return { haut: Math.round(r.top), bas: Math.round(r.bottom), gauche: Math.round(r.left), droite: Math.round(r.right) }; });
+  const ouvrirPetit = async (page, reponses) => {
+    await page.setViewportSize({ width: 320, height: HAUTEUR });
+    const ouvert = await ouvrir(page, reponses);
+    await agrandir(page);
+    return ouvert;
+  };
+
+  test('envoyée, « C’est envoyé. » se lit en haut de l’écran, le merci a le focus', async ({ page }) => {
+    await ouvrirPetit(page, [CREEE]);
+    await envoyerUneDemande(page);
+    const merci = page.locator('#demande-envoyee');
+    await expect(merci).toBeFocused();
+    const titre = await place(merci.locator('.merci__titre'));
+    expect(titre.haut, 'le titre du merci, dans l’écran').toBeGreaterThanOrEqual(0);
+    expect(titre.bas, 'le titre du merci, dans l’écran').toBeLessThanOrEqual(HAUTEUR);
+    expect((await place(merci)).haut).toBeLessThan(40);
+  });
+
+  test('des informations à corriger : le résumé se lit par son titre, en haut de l’écran, et a le focus', async ({ page }) => {
+    await ouvrirPetit(page, [CREEE]);
+    await page.fill('#demande-email', 'camille@');
+    await apresTroisSecondes(page);
+    await envoyer(page);
+    const resume = page.locator('#demande-resume');
+    await expect(resume).toBeFocused();
+    const haut = await place(resume);
+    expect(haut.haut, 'le haut du résumé, dans l’écran').toBeGreaterThanOrEqual(0);
+    expect(haut.haut).toBeLessThan(40);
+  });
+
+  test('après un 429, le focus va au lien qui ouvre la messagerie, dans l’écran', async ({ page }) => {
+    await ouvrirPetit(page, [reponse(429, { statusCode: 429, message: 'Rate limit exceeded' })]);
+    await envoyerUneDemande(page);
+    await attendreMessage(page.locator('#demande-alerte'), TEXTES.tropDEnvois);
+    const lien = page.locator('#demande-courriel-lien');
+    await expect(lien).toBeFocused();
+    await expect(lien).toBeInViewport();
+  });
+
+  test('hors ligne, le bouton d’envoi garde le focus et se voit', async ({ page, context }) => {
+    await ouvrirPetit(page, [CREEE]);
+    await context.setOffline(true);
+    await envoyerUneDemande(page);
+    await attendreMessage(page.locator('#demande-statut'), TEXTES.horsLigne);
+    const bouton = page.locator('#demande-envoyer');
+    await expect(bouton).toBeFocused();
+    // Tout entier dans l’écran, au pixel près (le texte agrandi donne des tailles fractionnaires).
+    const boite = await place(bouton);
+    expect(boite.haut).toBeGreaterThanOrEqual(-1);
+    expect(boite.bas).toBeLessThanOrEqual(HAUTEUR + 1);
+  });
+
+  test('la page périmée : « Recharger la page » reste dans la largeur de l’écran', async ({ page }) => {
+    await ouvrirPetit(page, [refus('FORMULAIRE_EXPIRE')]);
+    await envoyerUneDemande(page);
+    await attendreMessage(page.locator('#demande-statut'), TEXTES.expiree);
+    const recharger = page.locator('#demande-statut').getByRole('button', { name: 'Recharger la page' });
+    const boite = await place(recharger);
+    expect(boite.gauche).toBeGreaterThanOrEqual(0);
+    expect(boite.droite, 'le bouton, dans les 320 px').toBeLessThanOrEqual(320);
+    expect(await recharger.evaluate((b) => b.scrollWidth <= b.clientWidth)).toBe(true);
+  });
+
+  test('envoyée : « e-mail » ne se coupe jamais en deux dans le merci', async ({ page }) => {
+    await ouvrirPetit(page, [CREEE]);
+    await envoyerUneDemande(page);
+    await expect(page.locator('#demande-envoyee')).toBeVisible();
+    const coupes = await page.locator('#demande-envoyee').evaluate((merci) => {
+      const lus = [];
+      const marcheur = document.createTreeWalker(merci, NodeFilter.SHOW_TEXT);
+      for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+        for (const mot of n.data.matchAll(/e-mail/g)) {
+          const plage = document.createRange();
+          plage.setStart(n, mot.index);
+          plage.setEnd(n, mot.index + mot[0].length);
+          lus.push(new Set([...plage.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size);
+        }
+      }
+      return lus;
+    });
+    expect(coupes.length).toBe(2);
+    expect(coupes).toEqual([1, 1]);
+  });
 });

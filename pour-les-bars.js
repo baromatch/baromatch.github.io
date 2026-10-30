@@ -545,7 +545,10 @@
     });
     titrerResume();
     resume.hidden = false;
-    resume.focus();
+    // Par son haut : avec le texte agrandi, le résumé est plus haut que l’écran, et le focus seul le montrerait par
+    // son milieu (son titre au-dessus de l’écran).
+    if (resume.scrollIntoView) resume.scrollIntoView({ block: "start" });
+    resume.focus({ preventScroll: true });
   }
 
   function cacherResume() {
@@ -745,6 +748,13 @@
   function garderLeFocus(avant, vue, action) {
     if (etat === "envoye") return;
     var surLaPage = !avant || avant === document.body;
+    // Le chemin e-mail devient le geste principal (après un 429, la messagerie ouverte) : le focus qui était sur le
+    // bouton d’envoi, ou sur la page, va au lien qui ouvre la messagerie. Le bouton, passé en second, reste plus bas,
+    // souvent sous l’écran.
+    if (vue.courriel === "principal" && (surLaPage || avant === bouton)) return courrielLien.focus();
+    // Hors ligne, le focus reste sur le bouton d’envoi, et le bouton se montre : le message et le chemin e-mail qui
+    // s’affichent au-dessus le poussent vers le bas.
+    if (etat === "attente-reseau" && avant === bouton && bouton.scrollIntoView) bouton.scrollIntoView({ block: "nearest" });
     var ici = !surLaPage && (avant === bouton || courriel.contains(avant) || statut.contains(avant) || alerte.contains(avant));
     if (surLaPage ? vue.bouton : !ici) return;
     if (!surLaPage && document.contains(avant) && avant.getClientRects().length > 0) return;
@@ -899,7 +909,10 @@
     verifies.forEach(effacerErreur);
     envoyeeEmail.textContent = demande.email;
     aller("envoye");
-    envoyee.focus();
+    // Par son haut : avec le texte agrandi, le merci est plus haut que l’écran, et le focus seul n’en montrerait que le
+    // bas (« C’est envoyé. » au-dessus de l’écran).
+    envoyee.focus({ preventScroll: true });
+    if (envoyee.scrollIntoView) envoyee.scrollIntoView({ block: "start" });
   }
 
   // ---------- Les gestes ----------

@@ -17,7 +17,10 @@ import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { racine } from './outils/environnement.mjs';
 import { auJourDeLAccueil } from './outils/horloge.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
-import { construireLeSiteDExemple, contenuDuScenario, MAINTENANT_DU_SCENARIO } from './outils/site-genere.mjs';
+import {
+  construireLeSiteDExemple, contenuDuScenario, MAINTENANT_DU_SCENARIO, PUBLIES_DU_SCENARIO, SCENARIO,
+} from './outils/site-genere.mjs';
+import { construireEnMemoire } from '../generateur/site.mjs';
 
 const CONTENU = chargerLeContenu(racine);
 const { textes, couleurs } = CONTENU;
@@ -141,6 +144,40 @@ test.describe('le bloc, du générateur', () => {
     expect(html).not.toContain('value="2026-10-31" checked');
     const deux = MATCHS.map((m) => (m.slug === 'nice-rennes-2026-10-31' ? { ...m, soirees: [soiree('Paris')] } : m));
     expect(bloc({ matchs: deux, bars: [{ id: 'b1' }] })).toContain('4 matchs<span class="visuellement-cache">, dont 2 avec des bars</span>');
+  });
+
+  test('des bars publiés, aucun le jour choisi : sous la phrase, une ligne nomme le prochain match dans un bar (sa date, son heure, ses bars) avec « Voir les bars » ; sans bar publié, ou quand le jour choisi a le sien, aucune', () => {
+    const avec = bloc({ bars: [{ id: 'b1' }] });
+    // Jeudi 29 n’a que Fiorentina – Atalanta, sans bar : la ligne nomme OL – Angers, samedi.
+    expect(avec).toContain(`<p class="semaine__chapo">${textes.accueil.avecBars}</p>\n<p class="semaine__prochain" data-jour="2026-10-31">Le prochain match dans un bar\u00a0: OL – Angers, <time datetime="2026-10-31T20:45:00+01:00">samedi 31 octobre · 20:45</time>, 2 bars à Paris. <a class="semaine__voir" href="/matchs/ol-angers-2026-10-31/#titre-bars">Voir les bars<span class="visuellement-cache">\u00a0: OL – Angers</span></a></p>`);
+    expect(avec.match(/semaine__prochain/g)).toHaveLength(1);
+    expect(controlerLaSemaine(avec)).toEqual([]);
+    // Demain, il est dit par sa date, jamais « demain » : la ligne reste vraie lue un autre jour. 1 bar, au singulier
+    // (la règle des cartes) ; des bars dans plusieurs villes, le nombre seul.
+    const demain = [...MATCHS, unMatch({ slug: 'brest-lens-2026-10-30', debut: '2026-10-30T19:00:00Z', domicile: club('brest', 'Brest'), exterieur: club('lens', 'Lens'), soirees: [soiree('Paris')] })];
+    const ligne = bloc({ matchs: demain, bars: [{ id: 'b1' }] }).match(/<p class="semaine__prochain"[^]*?<\/p>/)[0];
+    expect(ligne).toContain('data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Brest – Lens, <time datetime="2026-10-30T20:00:00+01:00">vendredi 30 octobre · 20:00</time>, 1 bar à Paris.');
+    expect(ligne).not.toMatch(/demain|aujourd/i);
+    const ailleurs = MATCHS.map((m) => (m.slug === 'ol-angers-2026-10-31' ? { ...m, soirees: [soiree('Paris'), soiree('Lyon'), soiree('Lyon')] } : m));
+    expect(bloc({ matchs: ailleurs, bars: [{ id: 'b1' }] })).toContain('samedi 31 octobre · 20:45</time>, 3 bars. <a class="semaine__voir"');
+    // Sans bar publié : aucune ligne. Le jour choisi a déjà son match dans un bar : aucune. Seul un match reporté a des
+    // bars : aucune.
+    expect(bloc()).not.toContain('semaine__prochain');
+    const deja = MATCHS.map((m) => (m.slug === 'fiorentina-atalanta-2026-10-29' ? { ...m, soirees: [soiree('Paris')] } : m));
+    expect(bloc({ matchs: deja, bars: [{ id: 'b1' }] })).not.toContain('semaine__prochain');
+    const reporte = MATCHS.map((m) => (m.slug === 'ol-angers-2026-10-31' ? { ...m, soirees: [] } : m));
+    expect(bloc({ matchs: reporte, bars: [{ id: 'b1' }] })).not.toContain('semaine__prochain');
+  });
+
+  test('le scénario (des bars inventés) : la ligne du prochain match dans un bar le 26 octobre (lundi sans bar, vendredi avec), aucune le 23 (le jour choisi a le sien), ni sans bar publié', async () => {
+    const blocDuScenario = async (maintenant, publies = PUBLIES_DU_SCENARIO) => {
+      const site = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant, racine, contenu: { ...contenuDuScenario(), publies } });
+      return blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
+    };
+    const lundi = Date.parse('2026-10-26T08:00:00Z');
+    expect(await blocDuScenario(lundi)).toContain('<p class="semaine__prochain" data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Le Havre – PSG, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre · 19:00</time>, 1 bar à Paris. <a class="semaine__voir" href="/matchs/le-havre-psg-2026-10-30/#titre-bars">');
+    expect(await blocDuScenario(lundi, [])).not.toContain('semaine__prochain');
+    expect(await blocDuScenario(MAINTENANT_DU_SCENARIO)).not.toContain('semaine__prochain');
   });
 
   test('un long jour : toutes ses cartes dans la page, et au-delà de 4 matchs, un lien vers ce jour dans la semaine', () => {
@@ -471,6 +508,51 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
       await page.waitForLoadState('networkidle');
       await page.evaluate(() => document.fonts.ready);
       expect(await page.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
+    }
+  });
+});
+
+test.describe('le prochain match dans un bar, dans le navigateur (le scénario du lundi 26 octobre)', () => {
+  const LUNDI = Date.parse('2026-10-26T08:00:00Z');
+  const site = {};
+  test.beforeAll(async () => {
+    site.dossier = mkdtempSync(path.join(tmpdir(), 'accueil-prochain-'));
+    await construireLeSiteDExemple(site.dossier, { maintenant: LUNDI, rendu: null, qr: null });
+    site.serveur = await demarrerServeur(await portLibre(), -1, { dossier: site.dossier });
+  });
+  test.afterAll(async () => {
+    await site.serveur?.arreter();
+    rmSync(site.dossier, { recursive: true, force: true });
+  });
+
+  for (const [appareil, largeur] of [['un iPhone', 390], ['un Pixel', 412]]) {
+    test(`sur ${appareil} (${largeur} px), sans rien toucher : la ligne se voit sous la phrase, et « Voir les bars » mène aux bars du match`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date(LUNDI + 2 * H));
+      await page.setViewportSize({ width: largeur, height: 844 });
+      await page.goto(`${site.serveur.adresse}/`);
+      const semaine = page.locator('#semaine');
+      // Le jour choisi, lundi, n’a que Lille – Lens, sans bar.
+      await expect(semaine.getByRole('radio', { name: /Aujourd’hui/ })).toBeChecked();
+      await expect(semaine.locator('.carte-match--bars:visible')).toHaveCount(0);
+      const ligne = semaine.locator('.semaine__prochain');
+      await expect(ligne).toBeVisible();
+      await expect(ligne).toHaveText('Le prochain match dans un bar\u00a0: Le Havre – PSG, vendredi 30 octobre · 19:00, 1 bar à Paris. Voir les bars\u00a0: Le Havre – PSG');
+      // Juste sous la phrase, avant la barre des jours.
+      expect(await ligne.evaluate((p) => p.previousElementSibling.className)).toBe('semaine__chapo');
+      const voir = ligne.getByRole('link', { name: /^Voir les bars\s*:\s*Le Havre – PSG$/ });
+      expect((await voir.boundingBox()).height).toBeGreaterThanOrEqual(44);
+      await voir.click();
+      await expect(page).toHaveURL(/\/matchs\/le-havre-psg-2026-10-30\/#titre-bars$/);
+      await expect(page.locator('#titre-bars')).toBeInViewport();
+    });
+  }
+
+  test('lue un autre jour : la ligne reste jusqu’au jour de son match (vendredi 30), et s’efface le lendemain', async ({ page }) => {
+    for (const [jour, visible] of [['2026-10-30', true], ['2026-10-31', false]]) {
+      await page.clock.setFixedTime(new Date(`${jour}T10:00:00Z`));
+      await page.goto(`${site.serveur.adresse}/`);
+      if (visible) await expect(page.locator('.semaine__prochain'), jour).toBeVisible();
+      else await expect(page.locator('.semaine__prochain'), jour).toBeHidden();
     }
   });
 });

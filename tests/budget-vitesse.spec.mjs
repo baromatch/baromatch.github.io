@@ -5,7 +5,8 @@
 // - le poids transféré : celui de GitHub Pages, qui compresse le texte (HTML, CSS, JS, SVG) en gzip ; la police et les
 //   images passent telles quelles ;
 // - le nombre de requêtes, et le poids (non compressé) du JavaScript, du CSS et des images ;
-// - une seule police (Bricolage Grotesque, un seul fichier) ;
+// - une seule police : le cœur de Bricolage Grotesque, préchargé (ses deux autres fichiers, les signes rares et le
+//   latin étendu, ne viennent que pour un caractère que ces pages n’écrivent pas) ;
 // - rien d’un autre site pendant le chargement, et aucun script qui bloque l’affichage (chaque script de fichier est
 //   defer ou async).
 // Deux fois : la mesure d’audience arrêtée (le code de marque.json vide), puis active (un code d’essai). Active, chaque
@@ -38,22 +39,41 @@ const KO = 1024;
 // 29 octobre 2026, après relecture : styles.css gagne le contour du focus du jour, la semaine sans :has(), le point des
 // jours qui ont des bars et les longs jours (de 61,4 à 63,7 Ko) : le CSS de l’accueil et des pages fixes monte de 62 à
 // 65 Ko ; main.js retire la semaine toute passée (de 17,1 à 17,8 Ko) : le JS de l’accueil, de 17 à 18 Ko.
+// 30 octobre 2026 : la police allégée (105 Ko au lieu de 121 : le crénage et les chiffres tabulaires seulement, les
+// signes rares à part). Chaque seuil de transfert baisse de 15 Ko ; mesuré : accueil 157, CGU 128, le guide 127, pour
+// les bars 165, les pages générées 130 à 133, les affiches 135. Le CSS gagne 3,8 Ko (les @font-face et la police de
+// secours) : ses seuils restent.
+// 30 octobre 2026, après relecture : la police de secours ne dessine plus que les caractères des trois fichiers (8 fois
+// la même unicode-range, 365 octets ; 0,2 Ko compressé) : styles.css passe de 55,8 à 57,7 Ko. Les seuils de CSS montent
+// d’autant : l’accueil et les pages fixes de 58 à 59 Ko, les pages générées de 72 à 75, les affiches de 87 à 91.
+// 30 octobre 2026, la police allégée et l’accueil au jour ensemble : les seuils de la police (ci-dessus), plus ce que
+// l’accueil ajoute vraiment. styles.css : 57,8 Ko de la police, plus 14,3 Ko de l’accueil (le jour, les matchs de la
+// semaine) : 72,1 Ko. Mesuré (Ko de CSS) : l’accueil et les pages fixes 72,1, les pages générées 88,7 (avec regarder.css),
+// les affiches 105,0 (et affiche.css), pour les bars 96,5 (et pour-les-bars.css). Chaque seuil de CSS monte de 14 Ko :
+// l’accueil et les pages fixes de 59 à 73, les pages générées de 75 à 89, les affiches de 91 à 105, pour les bars de 86
+// à 100. main.js : 18,3 Ko (16,2 avant l’accueil), le JS de l’accueil de 16 à 18 Ko. Le transfert de l’accueil garde
+// les 5 Ko du bloc de la semaine (165 à 170), celui des pages fixes les 3 Ko de leur CSS (140 à 143).
+// 30 octobre 2026, les pages générées au jour : regarder.css gagne les valeurs du jour (les survols, la boîte du code
+// du badge, les liens, la pilule de la liste d’attente) et la place des boutons du partage (CLS 0 quand partage.js
+// arrive tard) : de 16,6 à 17,7 Ko. Mesuré (Ko de CSS) : les pages générées 90,0, les affiches 105,5 (affiche.css a
+// raccourci ses commentaires : 15,6 Ko). Leurs seuils de CSS montent de 1 Ko : de 89 à 90, de 105 à 106. Les seuils de
+// transfert restent ceux de main.
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 185, js: 18, css: 65, images: 24 } },
-  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
-  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
-  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 260, js: 68, css: 97, images: 72 } },
-  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
-  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
-  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
-  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
-  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 83, images: 4 } },
-  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 160, js: 4, css: 83, images: 6 } },
-  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
-  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
-  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 98, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 98, images: 4 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
+  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
+  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
+  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 245, js: 68, css: 100, images: 72 } },
+  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 90, images: 4 } },
+  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 145, js: 4, css: 90, images: 6 } },
+  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };
@@ -62,7 +82,8 @@ const MESURES = [
   { nom: 'la mesure d’audience arrêtée', marque: { ...MARQUE, mesure: { ...MARQUE.mesure, code: '' } }, plus: {} },
   { nom: 'la mesure d’audience active', marque: { ...MARQUE, mesure: { ...MARQUE.mesure, outil: 'goatcounter', code: 'essai' } }, plus: AVEC_LA_MESURE },
 ];
-const POLICES_MAX = 1;
+// La seule police de ces pages : le cœur, celui que chaque page précharge.
+const POLICES = ['/fonts/bricolage-grotesque.woff2'];
 const TEXTE = /^(?:text\/|application\/(?:javascript|json|ld\+json|xml)|image\/svg\+xml)/;
 
 const portLibre = () => new Promise((resoudre) => {
@@ -106,11 +127,15 @@ test.beforeAll(async () => {
     sites.at(-1).serveur = await demarrerServeur(await portLibre(), -1, { dossier });
   }
 });
+// Un même processus de test peut repasser par ce fichier (tests en parallèle : un second lot de ses tests, après un autre
+// fichier) : beforeAll repart alors d’une liste vide, sinon sites[rang] serait encore un serveur arrêté par afterAll
+// (« net::ERR_CONNECTION_REFUSED », vu une fois sous charge).
 test.afterAll(async () => {
   for (const { dossier, serveur } of sites) {
     await serveur?.arreter();
     rmSync(dossier, { recursive: true, force: true });
   }
+  sites.length = 0;
 });
 
 for (const [rang, { nom, marque, plus }] of MESURES.entries()) {
@@ -132,8 +157,8 @@ for (const [rang, { nom, marque, plus }] of MESURES.entries()) {
       // /mesure.js, seulement quand la mesure est active (hors de baromatch.fr, il ne compte rien et n’envoie rien).
       const actif = Boolean(marque.mesure.code);
       expect(ressources.filter((r) => new URL(r.adresse).pathname === '/mesure.js')).toHaveLength(actif ? 1 : 0);
-      // Une seule police, et rien d’un autre site : ni script, ni style, ni police, ni envoi de la mesure d’audience.
-      expect(ressources.filter((r) => r.type === 'font').map((r) => new URL(r.adresse).pathname)).toHaveLength(POLICES_MAX);
+      // Une seule police, le cœur, et rien d’un autre site : ni script, ni style, ni police, ni envoi de la mesure d’audience.
+      expect(ressources.filter((r) => r.type === 'font').map((r) => new URL(r.adresse).pathname)).toEqual(POLICES);
       expect(ressources.filter((r) => new URL(r.adresse).origin !== origine).map((r) => r.adresse)).toEqual([]);
       expect(scriptsBloquants).toEqual([]);
     });

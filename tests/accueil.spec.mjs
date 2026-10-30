@@ -3,7 +3,21 @@
 // et le bouton de la liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… pas encore ouverte »).
 // La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque.
 import { test, expect } from '@playwright/test';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { createServer } from 'node:net';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { arreterLHorloge, auJourDeLAccueil } from './outils/horloge.mjs';
+import { demarrerServeur } from './outils/serveur.mjs';
+import { construireLeSiteDExemple } from './outils/site-genere.mjs';
+
+const portLibre = () => new Promise((resoudre) => {
+  const sonde = createServer();
+  sonde.listen(0, '127.0.0.1', () => {
+    const { port } = sonde.address();
+    sonde.close(() => resoudre(port));
+  });
+});
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
@@ -82,11 +96,19 @@ for (const ecran of [
 }
 
 // Plus bas dans la page, « préviens-moi » revient deux fois : après la soirée et après les questions. La même capsule
-// ambre que sur les pages des matchs, vers le formulaire du haut. Un seul appel principal : tout ce qui est en ambre
-// dans la page (hors de la bande des bars, ambre elle-même) mène à la liste d’attente ; « Deviens testeur Android » est
-// en verre. La boutique n’est plus présentée dans l’accueil : on la trouve dans le menu et le pied de page (décision du
+// ambre que sur les pages des matchs, vers le formulaire du haut. L’ambre est pour l’action : tout ce qui est en ambre
+// dans la page (hors de la bande des bars) mène à la liste d’attente, ou, dans les matchs de la semaine, aux bars d’un
+// match (« Voir les bars », vers #titre-bars de sa page), dès qu’un bar est publié ; « Deviens testeur Android » est en
+// verre. La boutique n’est plus présentée dans l’accueil : on la trouve dans le menu et le pied de page (décision du
 // propriétaire, 28 octobre).
-test('« préviens-moi » revient après la soirée et après les questions ; l’ambre ne mène qu’à la liste d’attente', async ({ page }) => {
+const ouMeneLAmbre = (page) => page.$$eval('main a, main button', (elements) => elements
+  .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')
+  .map((e) => ({ cible: e.getAttribute('href') ?? e.closest('form')?.id, semaine: Boolean(e.closest('#semaine')) })));
+const ambreAilleurs = (enAmbre) => enAmbre
+  .filter(({ cible, semaine }) => cible !== '#attente' && cible !== 'attente' && !(semaine && /^\/matchs\/[a-z0-9-]+\/#titre-bars$/.test(cible)))
+  .map(({ cible }) => cible);
+
+test('« préviens-moi » revient après la soirée et après les questions ; l’ambre ne mène qu’à la liste d’attente, ou aux bars d’un match', async ({ page }) => {
   await page.goto('/');
   const rappels = page.locator('main .rappel-attente a.capsule');
   await expect(rappels).toHaveCount(2);
@@ -100,11 +122,22 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
   expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
   await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(1);
-  const enAmbre = await page.$$eval('main a, main button', (elements) => elements
-    .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')
-    .map((e) => e.getAttribute('href') ?? e.closest('form')?.id));
-  expect(enAmbre.length).toBeGreaterThan(0);
-  expect(enAmbre.filter((cible) => cible !== '#attente' && cible !== 'attente')).toEqual([]);
+  const enAmbre = await ouMeneLAmbre(page);
+  expect(enAmbre.filter(({ cible }) => cible === '#attente').length).toBeGreaterThan(0);
+  expect(ambreAilleurs(enAmbre)).toEqual([]);
+  // L’en-tête non plus : ni bord ni souligné ambre, même translucide, sur ses liens (souligné au téléphone, capsule de
+  // « Pour les bars » dès 401 px).
+  for (const largeur of [360, 1280]) {
+    await page.setViewportSize({ width: largeur, height: 800 });
+    const enteteAmbre = await page.$$eval('header a', (liens) => liens.flatMap((a) => {
+      const s = getComputedStyle(a);
+      const bords = ['Top', 'Right', 'Bottom', 'Left'].filter((cote) => parseFloat(s[`border${cote}Width`]) > 0).map((cote) => [`bord ${cote}`, s[`border${cote}Color`]]);
+      const souligne = s.textDecorationLine.includes('underline') ? [['souligné', s.textDecorationColor]] : [];
+      return [...bords, ...souligne].filter(([, couleur]) => /^rgba?\(255, 177, 61/.test(couleur)).map(([quoi, couleur]) => `${a.textContent.trim()} : ${quoi} ${couleur}`);
+    }));
+    expect(enteteAmbre, `${largeur} px`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 1280, height: 720 });
   // Un rappel mène au formulaire, et le champ est là.
   await rappels.last().click();
   await expect(page).toHaveURL(/#attente$/);
@@ -117,6 +150,32 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await premier.focus();
   await premier.click({ modifiers: ['Control'] });
   await expect(premier).toBeFocused();
+});
+
+// La même règle, le jour où un bar est publié : le site d’exemple (le scénario inventé, construit le lundi 26 octobre),
+// où les matchs de la semaine ont leurs « Voir les bars », sur la ligne du prochain match et sur sa carte.
+test.describe('l’ambre, avec des bars publiés (le site d’exemple, lundi 26 octobre)', () => {
+  const LUNDI = Date.parse('2026-10-26T08:00:00Z');
+  const site = {};
+  test.beforeAll(async () => {
+    site.dossier = mkdtempSync(path.join(tmpdir(), 'accueil-ambre-'));
+    await construireLeSiteDExemple(site.dossier, { maintenant: LUNDI, rendu: null, qr: null });
+    site.serveur = await demarrerServeur(await portLibre(), -1, { dossier: site.dossier });
+  });
+  test.afterAll(async () => {
+    await site.serveur?.arreter();
+    rmSync(site.dossier, { recursive: true, force: true });
+  });
+
+  test('l’ambre ne mène qu’à la liste d’attente, ou aux bars d’un match de la semaine', async ({ page }) => {
+    await page.clock.setFixedTime(new Date(LUNDI + 3_600_000));
+    await page.goto(`${site.serveur.adresse}/`);
+    const enAmbre = await ouMeneLAmbre(page);
+    expect(enAmbre.filter(({ cible }) => cible === '#attente').length).toBeGreaterThan(0);
+    // La ligne du prochain match et la carte du match : deux « Voir les bars », dans la semaine.
+    expect(enAmbre.filter(({ cible, semaine }) => semaine && cible === '/matchs/le-havre-psg-2026-10-30/#titre-bars')).toHaveLength(2);
+    expect(ambreAilleurs(enAmbre)).toEqual([]);
+  });
 });
 
 for (const largeur of [320, 360]) {

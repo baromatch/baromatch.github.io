@@ -6,7 +6,7 @@
 // et « Demain » ne mentent pas un autre jour ; et le contraste de chaque petit texte, mesuré tel qu’il est peint, sur
 // les fonds clairs de l’accueil (4,5:1 au moins, partout).
 import { test, expect } from '@playwright/test';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -155,17 +155,19 @@ test.describe('le bloc, du générateur', () => {
   test('des bars publiés, aucun le jour choisi : sous la phrase, une ligne nomme le prochain match dans un bar (sa date, son heure, ses bars) avec « Voir les bars » ; sans bar publié, ou quand le jour choisi a le sien, aucune', () => {
     const avec = bloc({ bars: [{ id: 'b1' }] });
     // Jeudi 29 n’a que Fiorentina – Atalanta, sans bar : la ligne nomme OL – Angers, samedi.
-    expect(avec).toContain(`<p class="semaine__chapo">${textes.accueil.avecBars}</p>\n<p class="semaine__prochain" data-jour="2026-10-31">Le prochain match dans un bar\u00a0: OL – Angers, <time datetime="2026-10-31T20:45:00+01:00">samedi 31 octobre · 20:45</time>, 2 bars à Paris. <a class="semaine__voir" href="/matchs/ol-angers-2026-10-31/#titre-bars">Voir les bars<span class="visuellement-cache">\u00a0: OL – Angers</span></a></p>`);
+    expect(avec).toContain(`<p class="semaine__chapo">${textes.accueil.avecBars}</p>\n<p class="semaine__prochain" data-jour="2026-10-31">Le prochain match dans un bar\u00a0: OL – Angers, <time datetime="2026-10-31T20:45:00+01:00">samedi 31 octobre\u00a0· 20:45</time>, 2 bars à Paris. <a class="semaine__voir" href="/matchs/ol-angers-2026-10-31/#titre-bars">Voir les bars<span class="visuellement-cache">\u00a0: OL – Angers</span></a></p>`);
     expect(avec.match(/semaine__prochain/g)).toHaveLength(1);
     expect(controlerLaSemaine(avec)).toEqual([]);
     // Demain, il est dit par sa date, jamais « demain » : la ligne reste vraie lue un autre jour. 1 bar, au singulier
     // (la règle des cartes) ; des bars dans plusieurs villes, le nombre seul.
     const demain = [...MATCHS, unMatch({ slug: 'brest-lens-2026-10-30', debut: '2026-10-30T19:00:00Z', domicile: club('brest', 'Brest'), exterieur: club('lens', 'Lens'), soirees: [soiree('Paris')] })];
     const ligne = bloc({ matchs: demain, bars: [{ id: 'b1' }] }).match(/<p class="semaine__prochain"[^]*?<\/p>/)[0];
-    expect(ligne).toContain('data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Brest – Lens, <time datetime="2026-10-30T20:00:00+01:00">vendredi 30 octobre · 20:00</time>, 1 bar à Paris.');
+    expect(ligne).toContain('data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Brest – Lens, <time datetime="2026-10-30T20:00:00+01:00">vendredi 30 octobre\u00a0· 20:00</time>, 1 bar à Paris.');
     expect(ligne).not.toMatch(/demain|aujourd/i);
+    // « · » ne commence jamais une ligne : une espace insécable le tient à la date.
+    expect(ligne).not.toMatch(/ ·/);
     const ailleurs = MATCHS.map((m) => (m.slug === 'ol-angers-2026-10-31' ? { ...m, soirees: [soiree('Paris'), soiree('Lyon'), soiree('Lyon')] } : m));
-    expect(bloc({ matchs: ailleurs, bars: [{ id: 'b1' }] })).toContain('samedi 31 octobre · 20:45</time>, 3 bars. <a class="semaine__voir"');
+    expect(bloc({ matchs: ailleurs, bars: [{ id: 'b1' }] })).toContain('samedi 31 octobre\u00a0· 20:45</time>, 3 bars. <a class="semaine__voir"');
     // Sans bar publié : aucune ligne. Le jour choisi a déjà son match dans un bar : aucune. Seul un match reporté a des
     // bars : aucune.
     expect(bloc()).not.toContain('semaine__prochain');
@@ -181,7 +183,7 @@ test.describe('le bloc, du générateur', () => {
       return blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
     };
     const lundi = Date.parse('2026-10-26T08:00:00Z');
-    expect(await blocDuScenario(lundi)).toContain('<p class="semaine__prochain" data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Le Havre – PSG, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre · 19:00</time>, 1 bar à Paris. <a class="semaine__voir" href="/matchs/le-havre-psg-2026-10-30/#titre-bars">');
+    expect(await blocDuScenario(lundi)).toContain('<p class="semaine__prochain" data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Le Havre – PSG, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre\u00a0· 19:00</time>, 1 bar à Paris. <a class="semaine__voir" href="/matchs/le-havre-psg-2026-10-30/#titre-bars">');
     expect(await blocDuScenario(lundi, [])).not.toContain('semaine__prochain');
     expect(await blocDuScenario(MAINTENANT_DU_SCENARIO)).not.toContain('semaine__prochain');
   });
@@ -279,6 +281,15 @@ test.describe('l’accueil : le générateur n’écrit que le bloc', () => {
       const hors = (html) => html.slice(0, html.indexOf(REPERES.debut)) + html.slice(html.indexOf(REPERES.fin));
       expect(hors(ecrit)).toBe(hors(ACCUEIL));
       expect(ecrit).toContain(premier.accueil.bloc);
+      // Chaque lien du bloc mène à un fichier que ce même passage a écrit, et chaque ancre à un id de la page visée.
+      const liensDuBloc = [...premier.accueil.bloc.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1]);
+      expect(liensDuBloc.length).toBeGreaterThan(10);
+      for (const lien of liensDuBloc) {
+        const [chemin, ancre] = lien.split('#');
+        const fichier = path.join(dossier, chemin.endsWith('/') ? `${chemin}index.html` : chemin);
+        expect(existsSync(fichier), lien).toBe(true);
+        if (ancre && fichier.endsWith('.html')) expect(readFileSync(fichier, 'utf8'), lien).toContain(`id="${ancre}"`);
+      }
       // Le scénario a des bars publiés : leurs matchs ont « Voir les bars ».
       expect(premier.accueil.bloc).toContain('carte-match--bars');
       expect(premier.accueil.bloc).toContain('data-aujourdhui="2026-10-23"');
@@ -549,24 +560,62 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     for (const t of await semaine.locator('.semaine__titre-jour').all()) expect((await t.boundingBox()).height).toBeGreaterThan(16);
   });
 
-  test('le jour même, sans la police, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {
-    // Seuls les décalages de la page elle-même : sans la police. Arrivée après le premier rendu (une machine chargée),
-    // elle remplace celle de secours (font-display: swap) et ce changement compte comme un décalage (0,005 sur
-    // ordinateur), qui existe déjà en ligne et dépend du hasard de la machine. Ce test ne le mesure pas : une police de
-    // secours aux mêmes mesures arrive dans une autre PR, avec le test qui servira la police en retard.
-    await page.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
-    for (const largeur of [390, 1280]) {
-      await page.addInitScript(() => {
-        window.decalages = 0;
-        new PerformanceObserver((liste) => { for (const e of liste.getEntries()) if (!e.hadRecentInput) window.decalages += e.value; })
-          .observe({ type: 'layout-shift', buffered: true });
+  // La police arrivée tard (une connexion lente, une machine chargée) : la page s’affiche d’abord dans la police de
+  // secours, aux mesures de Bricolage Grotesque (styles.css), puis la police la remplace. Mesuré comme
+  // tests/police.spec.mjs : les polices retenues jusqu’au premier affichage, puis libérées ; les décalages de mise en
+  // page relevés deux images après leur arrivée. Mesuré le 30 octobre 2026, six fois chacun, toujours le même :
+  // 0,0123 à 390 px, 0,00002 à 1280 px. Les seuils, au plus juste.
+  const SEUILS_DE_DECALAGE = { 390: 0.015, 1280: 0.001 };
+  for (const largeur of [390, 1280]) {
+    test(`le jour même, à ${largeur} px, la police arrivée après le premier affichage : la page bouge de moins de ${SEUILS_DE_DECALAGE[largeur]} (décalage de mise en page)`, async ({ browser }) => {
+      const contexte = await browser.newContext({ viewport: { width: largeur, height: 844 }, reducedMotion: 'reduce', locale: 'fr-FR', timezoneId: 'Europe/Paris' });
+      await contexte.addInitScript(() => {
+        window.decalages = [];
+        const garder = (entrees) => { for (const e of entrees) if (!e.hadRecentInput) window.decalages.push(e.value); };
+        window.observateurDesDecalages = new PerformanceObserver((liste) => garder(liste.getEntries()));
+        window.observateurDesDecalages.observe({ type: 'layout-shift', buffered: true });
+        window.relever = () => garder(window.observateurDesDecalages.takeRecords());
       });
-      await ouvrir(page, { largeur });
-      await page.waitForLoadState('networkidle');
-      await page.evaluate(() => document.fonts.ready);
-      expect(await page.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
-    }
-  });
+      // Le jour du scénario, par la date seule (Date décalée) : l’horloge de Playwright remplacerait aussi les mesures de
+      // performance, dont les décalages.
+      await contexte.addInitScript((cible) => {
+        const Vraie = Date;
+        const ecart = cible - Vraie.now();
+        globalThis.Date = class extends Vraie {
+          constructor(...valeurs) { super(...(valeurs.length ? valeurs : [Vraie.now() + ecart])); }
+          static now() { return Vraie.now() + ecart; }
+        };
+      }, MAINTENANT_DU_SCENARIO + 2 * H);
+      const page = await contexte.newPage();
+      let ouvrirLaPorte;
+      const porte = new Promise((resoudre) => { ouvrirLaPorte = resoudre; });
+      const retenues = [];
+      await page.route('**/fonts/*.woff2', (route) => {
+        const envoi = porte.then(() => route.continue());
+        retenues.push(envoi);
+        return envoi;
+      });
+      try {
+        await page.goto(`${site.serveur.adresse}/`, { waitUntil: 'domcontentloaded' });
+        await page.waitForFunction(() => performance.getEntriesByName('first-contentful-paint').length > 0);
+        expect(retenues.length).toBeGreaterThan(0);
+        // Le jour du scénario : « Aujourd’hui » est vendredi 23, ses cartes sont là.
+        await expect(page.getByRole('radio', { name: /Aujourd’hui/ })).toBeChecked();
+        await expect(page.locator('#semaine .carte-match:visible')).not.toHaveCount(0);
+        expect(await page.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'))).toBe(false);
+        ouvrirLaPorte();
+        await page.waitForFunction(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
+        await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+        const total = await page.evaluate(() => { window.relever(); return window.decalages.reduce((somme, v) => somme + v, 0); });
+        test.info().annotations.push({ type: 'décalage', description: `${total}` });
+        expect(total).toBeLessThan(SEUILS_DE_DECALAGE[largeur]);
+      } finally {
+        ouvrirLaPorte();
+        await Promise.all(retenues);
+        await contexte.close();
+      }
+    });
+  }
 });
 
 test.describe('le prochain match dans un bar, dans le navigateur (le scénario du lundi 26 octobre)', () => {
@@ -593,7 +642,7 @@ test.describe('le prochain match dans un bar, dans le navigateur (le scénario d
       await expect(semaine.locator('.carte-match--bars:visible')).toHaveCount(0);
       const ligne = semaine.locator('.semaine__prochain');
       await expect(ligne).toBeVisible();
-      await expect(ligne).toHaveText('Le prochain match dans un bar\u00a0: Le Havre – PSG, vendredi 30 octobre · 19:00, 1 bar à Paris. Voir les bars\u00a0: Le Havre – PSG');
+      await expect(ligne).toHaveText('Le prochain match dans un bar\u00a0: Le Havre – PSG, vendredi 30 octobre\u00a0· 19:00, 1 bar à Paris. Voir les bars\u00a0: Le Havre – PSG');
       // Juste sous la phrase, avant la barre des jours.
       expect(await ligne.evaluate((p) => p.previousElementSibling.className)).toBe('semaine__chapo');
       const voir = ligne.getByRole('link', { name: /^Voir les bars\s*:\s*Le Havre – PSG$/ });
@@ -604,13 +653,18 @@ test.describe('le prochain match dans un bar, dans le navigateur (le scénario d
     });
   }
 
-  test('lue un autre jour : la ligne reste jusqu’au jour de son match (vendredi 30), et s’efface le lendemain', async ({ page }) => {
-    for (const [jour, visible] of [['2026-10-30', true], ['2026-10-31', false]]) {
+  test('lue un autre jour : la ligne reste jusqu’à la veille de son match, et s’efface le jour même (sa carte est alors la première du jour choisi)', async ({ page }) => {
+    for (const [jour, visible] of [['2026-10-29', true], ['2026-10-30', false], ['2026-10-31', false]]) {
       await page.clock.setFixedTime(new Date(`${jour}T10:00:00Z`));
       await page.goto(`${site.serveur.adresse}/`);
       if (visible) await expect(page.locator('.semaine__prochain'), jour).toBeVisible();
       else await expect(page.locator('.semaine__prochain'), jour).toBeHidden();
     }
+    // Le jour même : vendredi 30 est choisi, et la carte du match avec son bar vient en premier.
+    await page.clock.setFixedTime(new Date('2026-10-30T10:00:00Z'));
+    await page.goto(`${site.serveur.adresse}/`);
+    await expect(page.getByRole('radio', { name: /ven\. 30/ })).toBeChecked();
+    await expect(page.locator('#semaine .carte-match:visible').first()).toHaveClass(/carte-match--bars/);
   });
 });
 
@@ -703,7 +757,11 @@ test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
       slug: `club-${i}-autre-${i}-${jour}`, debut: `${jour}T${String(12 + i).padStart(2, '0')}:00:00Z`, domicile: club(`club-${i}`, `Club ${i}`), exterieur: club(`autre-${i}`, `Autre ${i}`),
     })));
   const AVEC_UN_BAR = UNE_SEMAINE.map((m) => (m.slug === 'club-0-autre-0-2026-10-30' ? { ...m, soirees: [soiree('Paris')] } : m));
-  for (const [nom, matchs, bars] of [['sans bar', UNE_SEMAINE, []], ['avec un bar (demain)', AVEC_UN_BAR, [{ id: 'b1' }]]]) {
+  // Des bars chaque jour : un point sur chaque puce. Dans le texte, il élargissait chaque puce (7 rangées, 644 px).
+  const UN_BAR_CHAQUE_JOUR = UNE_SEMAINE.map((m) => (m.slug.startsWith('club-0-') ? { ...m, soirees: [soiree('Paris')] } : m));
+  for (const [nom, matchs, bars, points] of [
+    ['sans bar', UNE_SEMAINE, [], 0], ['avec un bar (demain)', AVEC_UN_BAR, [{ id: 'b1' }], 1], ['un point sur chaque jour', UN_BAR_CHAQUE_JOUR, [{ id: 'b1' }], 7],
+  ]) {
     test(`à 320 × 568, ${nom} : la barre des jours tient dans l’écran, sans mot coupé ni texte hors de sa puce`, async ({ page }) => {
       await ouvrirLEssai(page, bloc({ matchs, bars }), { largeur: 320, hauteur: 568 });
       const barre = await page.locator('.semaine__dates').boundingBox();
@@ -711,7 +769,25 @@ test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
       expect(await motsCoupes(page, '.semaine__date b, .semaine__date small')).toEqual([]);
       const debordes = await page.locator('.semaine__date > span').evaluateAll((puces) => puces.filter((p) => p.scrollWidth > p.clientWidth || [...p.children].some((e) => e.getBoundingClientRect().right > p.getBoundingClientRect().right + 0.5)).map((p) => p.textContent));
       expect(debordes).toEqual([]);
-      if (bars.length) await expect(page.locator('.semaine__point')).toHaveCount(1);
+      await expect(page.locator('.semaine__point')).toHaveCount(points);
+      // Le point est dans le coin de sa puce, sans rien couvrir de son texte.
+      const couverts = await page.locator('.semaine__point').evaluateAll((liste) => liste.flatMap((point) => {
+        const p = point.getBoundingClientRect();
+        const puce = point.closest('label').querySelector('span').getBoundingClientRect();
+        // Les lignes de texte de la puce (ses nœuds de texte seulement, sans le point).
+        const textes = [];
+        const marcheur = document.createTreeWalker(point.closest('label'), NodeFilter.SHOW_TEXT);
+        for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+          if (!n.data.trim() || n.parentElement.closest('.visuellement-cache')) continue;
+          const plage = document.createRange();
+          plage.selectNodeContents(n);
+          textes.push(...plage.getClientRects());
+        }
+        const dedans = p.left < puce.right && p.right > puce.left && p.top < puce.bottom && p.bottom > puce.top;
+        const couvre = textes.some((t) => p.left < t.right && p.right > t.left && p.top < t.bottom && p.bottom > t.top);
+        return dedans && !couvre ? [] : [point.closest('label').textContent];
+      }));
+      expect(couverts).toEqual([]);
     });
   }
 });
@@ -772,8 +848,9 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
 test.describe('le contraste de chaque ligne de texte sur le clair, mesuré au pixel', () => {
   for (const largeur of [390, 1280]) {
     test(`l’accueil tel qu’il est, à ${largeur} px : derrière chaque ligne de texte, chaque pixel tient 4,5:1 au moins (ombres et lumière comprises)`, async ({ page }, infos) => {
-      // Une vingtaine de photos de la page, du haut en bas : plus longtemps que les 30 s d’un test ordinaire.
-      test.setTimeout(180_000);
+      // Une vingtaine de photos de la page, du haut en bas : plus longtemps que les 30 s d’un test ordinaire. Sous une
+      // forte charge (un passage de 9,6 min au lieu de 4,8), 180 s ne suffisaient pas.
+      test.setTimeout(360_000);
       await auJourDeLAccueil(page);
       await page.setViewportSize({ width: largeur, height: 900 });
       await page.emulateMedia({ reducedMotion: 'reduce' });

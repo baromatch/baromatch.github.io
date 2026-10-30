@@ -15,7 +15,7 @@ Les faits, pour ne pas se tromper :
 - Baromatch n’est pas un site de paris sportifs. Malgré un nom qui peut y faire penser, on n’y parie pas : ni mise, ni cote, ni argent en jeu.
 - Baromatch n’est pas un diffuseur : il ne montre pas les matchs. Ce sont les bars qui les diffusent. Le site ne dit pas sur quelle chaîne passe un match.
 - Baromatch ne vend pas d’alcool.
-- Les clubs et les compétitions sont nommés en texte ; sur l’accueil, chaque club a aussi un disque à ses deux couleurs. Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.
+- Les clubs et les compétitions sont nommés en texte ; sur l’accueil, chaque club a aussi un disque à ses couleurs, gris si elles ne sont pas connues. Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.
 - Les pages des matchs et des villes sont refaites plusieurs fois par jour à partir de ce que les bars annoncent dans l’appli, à l’heure de Paris. Seuls les bars inscrits y figurent : aucun bar, aucun avis, aucune note n’est inventé.
 - Un bar n’apparaît sur le site qu’avec son accord écrit. Les matchs viennent des calendriers officiels des compétitions ; les places, c’est le bar qui les règle, dans sa Console.
 - Site : https://baromatch.fr/ · Contact : contact@baromatch.fr · X : https://x.com/baromatchapp

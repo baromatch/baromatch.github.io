@@ -1,5 +1,5 @@
 // Le contraste des petits textes, mesuré tel qu’il est peint, sur les fonds clairs d’une page « jour » (<html class="jour">,
-// styles.css) : l’accueil (tests/accueil-semaine.spec.mjs) et « Pour les bars » (tests/pour-les-bars-jour.spec.mjs).
+// styles.css) : l’accueil (tests/accueil-semaine.spec.mjs), et les autres pages à mesure qu’elles passent au jour.
 //
 // mesurerLesTextes lit la page ouverte : chaque élément qui porte du texte visible, hors des moments de nuit (que la page
 // nomme dans `nuit` : un sélecteur CSS), la couleur de son texte posée sur son vrai fond (les fonds translucides empilés

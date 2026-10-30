@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "DwscEzKHoYb8JgDyCfY1Kw",
-   "change": "2026-10-29",
+   "empreinte": "fhixXnReOmRZmxPAzkqG9Q",
+   "change": "2026-10-30",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "FToDQQGz10QUmdsJh-NFAw",
-   "change": "2026-10-29",
+   "empreinte": "CB_CqBBh2qxOE_f7hF5DdQ",
+   "change": "2026-10-30",
    "indexable": false
   },
   "/en/": {
@@ -492,31 +492,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "y-UWmvmtD-YSoFC_zOXWrw",
-   "change": "2026-10-29",
+   "empreinte": "cm1dwMjjKBt38zsvZvGCYw",
+   "change": "2026-10-30",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "Ox_naVJRA-nCbzF8VHvnkw",
-   "change": "2026-10-29",
+   "empreinte": "eA60He5s0CZ46dtTgGK2Hg",
+   "change": "2026-10-30",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "RJ38LpSuLSxLHss2Wn-jKA",
-   "change": "2026-10-29",
+   "empreinte": "SKwYmavR8Zzy-hZpLKYtCw",
+   "change": "2026-10-30",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "UcXKdN-XLRkSZQ2H00GarA",
-   "change": "2026-10-29",
+   "empreinte": "vyz__-F8cP95TvKpmoMGCA",
+   "change": "2026-10-30",
    "indexable": false,
    "bars": []
   },
@@ -1245,8 +1245,8 @@
   "/matchs/competition/serie-a/": {
    "type": "competition",
    "cle": "serie-a",
-   "empreinte": "SNOoRM8fhnPcyWn_qGGjDQ",
-   "change": "2026-10-28",
+   "empreinte": "qKe9MwkXP1TTyDj3WFoAAw",
+   "change": "2026-10-30",
    "indexable": true,
    "bars": []
   },
@@ -1338,8 +1338,8 @@
    "type": "match",
    "cle": "fiorentina-atalanta-2026-10-29",
    "date": "2026-10-29T19:45:00.000Z",
-   "empreinte": "TRQ64cUV4uStx4XNWnLgew",
-   "change": "2026-10-28",
+   "empreinte": "TZj-fz8Z2GqPGq6JHTOMSw",
+   "change": "2026-10-30",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1361,20 +1361,6 @@
      "nom": "Atalanta BC"
     }
    }
-  },
-  "/matchs/fiorentina-atalanta-2026-10-29/match.ics": {
-   "type": "evenement",
-   "cle": "fiorentina-atalanta-2026-10-29",
-   "empreinte": "YOA_vtjKlTq8ejCz396uKA",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/fiorentina-atalanta-2026-10-29/partage.png": {
-   "type": "partage",
-   "cle": "fiorentina-atalanta-2026-10-29",
-   "empreinte": "qNVb3BI21IP11gacn-NWdQ",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/fiorentina-juventus-2026-11-08/": {
    "type": "match",
@@ -1450,8 +1436,8 @@
    "type": "match",
    "cle": "inter-fiorentina-2026-10-25",
    "date": "2026-10-25T11:30:00.000Z",
-   "empreinte": "uAQLhDL0XxIHt6NhuIN3gg",
-   "change": "2026-10-28",
+   "empreinte": "w6SUwbEKJ6kLcjYi9LKOZw",
+   "change": "2026-10-30",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2248,8 +2234,8 @@
    "type": "match",
    "cle": "milan-atalanta-2026-10-18",
    "date": "2026-10-18T16:00:00.000Z",
-   "empreinte": "HfZTWkQqQM09v_6ZEOUu1A",
-   "change": "2026-10-28",
+   "empreinte": "M_Od-yH8igTk91HqYt4y_A",
+   "change": "2026-10-30",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3448,28 +3434,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5jpb001hryqjm51ofxyp@baromatch.fr": {
-   "ids": [
-    "cmv6e5jpb001hryqjm51ofxyp"
-   ],
-   "slug": "fiorentina-atalanta-2026-10-29",
-   "debut": "2026-10-29T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Serie A",
-   "domicile": {
-    "cle": "fiorentina",
-    "court": "Fiorentina",
-    "nom": "ACF Fiorentina"
-   },
-   "exterieur": {
-    "cle": "atalanta",
-    "court": "Atalanta",
-    "nom": "Atalanta BC"
-   },
-   "empreinte": "cIquH-rhLPXVYSzmFngp6Q",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmv6e5jq2001jryqjwmoopuma@baromatch.fr": {
    "ids": [
     "cmv6e5jq2001jryqjwmoopuma"

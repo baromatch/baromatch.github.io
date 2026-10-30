@@ -6,8 +6,8 @@
    Chaque grand texte se règle en rem et en vw, et chaque grille d’écrans en em : avec le texte à 200 % sur 320 px, son
    plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Les colonnes suivent la taille du texte,
    pas la largeur de l’écran : la page est un conteneur (« presse »), et chaque grille passe en colonnes à une largeur
-   dite en em (le seuil d’avant divisé par 18 px, ou 17 sous 720 px) ; à 100 %, rien ne change dès 1 024 px. Chargée
-   seulement par presse.html. */
+   dite en rem (le seuil d’avant en px divisé par 16 : un rem suit la racine) ; à 100 %, les seuils d’avant au pixel
+   près, à 200 %, leur double. Chargée seulement par presse.html. */
 
 .presse { --presse-air: clamp(40px, 6.5vw, 88px); container: presse / inline-size; }
 .presse p, .presse ul, .presse dl, .presse figure { margin: 0; }
@@ -25,7 +25,7 @@
 .presse__ouverture-texte { grid-area: texte; min-width: 0; }
 .presse__icone { grid-area: icone; width: 76px; height: auto; border-radius: 18px; box-shadow: 0 14px 36px rgba(10, 11, 16, 0.22); }
 .presse__sommaire { grid-area: sommaire; }
-@container presse (min-width: 50em) {
+@container presse (min-width: 56.25rem) {
   .presse__ouverture { grid-template-columns: minmax(0, 1fr) 260px; grid-template-areas: "texte icone" "sommaire icone"; column-gap: 72px; align-items: center; }
   .presse__icone { width: 260px; justify-self: end; border-radius: 58px; box-shadow: 0 24px 60px rgba(10, 11, 16, 0.26); }
 }
@@ -120,11 +120,11 @@
 
 /* Deux cartes par ligne au téléphone (des colonnes de 9 em : une seule avec le texte à 200 %), trois sur ordinateur. */
 .presse .presse__logos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr)); gap: 12px; margin-top: 28px; padding: 0; list-style: none; }
-@container presse (min-width: 42em) { .presse .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } }
+@container presse (min-width: 47.5rem) { .presse .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } }
 .presse__logo { display: grid; align-content: start; gap: 10px; padding: 12px 12px 16px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
 /* Au téléphone, un aperçu plus bas (5:2) : les trois cartes tiennent en moins de deux écrans. */
 .presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 5 / 2; padding: 16px 20px; border-radius: 12px; }
-@container presse (min-width: 42em) { .presse__apercu { aspect-ratio: 16 / 9; padding: 20px; } }
+@container presse (min-width: 47.5rem) { .presse__apercu { aspect-ratio: 16 / 9; padding: 20px; } }
 .presse__apercu img { width: min(100%, 300px); height: auto; }
 .presse__apercu--clair { background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); }
 .presse__apercu--sombre { background: var(--nuit); }
@@ -158,7 +158,7 @@
    colonne fait deux fois plus large : un écran par ligne, et l’étiquette tient sur deux lignes, sans couper un mot.
    L’étiquette se pose au-dessus de l’écran : la colonne est trop étroite pour qu’elle chevauche son bord. */
 .presse .presse__ecrans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8em), 1fr)); gap: 40px 16px; margin-top: 36px; padding: 0; list-style: none; }
-@container presse (min-width: 55em) { .presse .presse__ecrans { gap: 40px 24px; } }
+@container presse (min-width: 62.5rem) { .presse .presse__ecrans { gap: 40px 24px; } }
 .presse__ecran figure { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
 /* Le cadre ne dépasse jamais 206 px : l’écran (196 px) n’est jamais plus large que le WebP de 600 px servi, même à ×3. */
 .presse__cadre { width: min(100%, 13rem, 206px); }
@@ -170,23 +170,23 @@
 .presse__ecran figcaption a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; justify-self: start; min-height: 44px; font-weight: 650; }
 
 .presse__film { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: center; }
-@container presse (min-width: 44em) { .presse__film { grid-template-columns: minmax(0, 1fr) 260px; gap: 72px; } }
+@container presse (min-width: 50rem) { .presse__film { grid-template-columns: minmax(0, 1fr) 260px; gap: 72px; } }
 .presse__film-texte > p { max-width: 36rem; margin-top: 12px; color: var(--texte-doux); text-wrap: pretty; }
 .presse .presse__liens-film { display: grid; justify-items: start; gap: 2px; margin-top: 20px; padding: 0; list-style: none; }
 .presse__liens-film a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; min-height: 44px; font-weight: 650; }
 .presse__affiche { display: block; width: min(100%, 240px); padding: 5px; border-radius: 28px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
 .presse__affiche img { width: 100%; height: auto; border-radius: 23px; }
-@container presse (min-width: 44em) { .presse__affiche { width: 260px; } }
+@container presse (min-width: 50rem) { .presse__affiche { width: 260px; } }
 
 /* ---------- Les couleurs et la police : une carte, deux disques ---------- */
 
 .presse__marque { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; margin-top: 28px; padding: 28px; border: 1px solid var(--trait); border-radius: 22px; background: var(--carte); box-shadow: var(--ombre-carte); }
-@container presse (min-width: 48em) { .presse__marque { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; } }
+@container presse (min-width: 53.75rem) { .presse__marque { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; } }
 .presse .presse__teintes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 0; list-style: none; }
-@container presse (min-width: 33em) { .presse .presse__teintes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container presse (min-width: 35rem) { .presse .presse__teintes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__teintes li { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-content: start; column-gap: 16px; }
-/* Sous 30 em de page (510 px à 100 %), le disque passe au-dessus de son texte : à 200 %, le texte garde toute la largeur. */
-@container presse (max-width: 30em) {
+/* Sous 30 rem de page (480 px à 100 %), le disque passe au-dessus de son texte : à 200 %, le texte garde toute la largeur. */
+@container presse (max-width: 30rem) {
   .presse__teintes li { grid-template-columns: minmax(0, 1fr); row-gap: 2px; }
   .presse__teintes .presse__disque { grid-row: auto; margin-bottom: 10px; }
 }
@@ -196,7 +196,7 @@
 .presse__teinte-nom { font-size: 1.125rem; font-weight: 750; }
 .presse .presse__role { color: var(--texte-doux); text-wrap: pretty; }
 .presse__police .presse__role { margin-top: 6px; }
-.presse__police a, .presse__autre-format a, .presse__bar a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
+.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .presse code { font: inherit; font-weight: 700; white-space: nowrap; -webkit-user-select: all; user-select: all; }
 
 /* ---------- Le texte à copier, et Baromatch en bref ---------- */
@@ -211,7 +211,7 @@
 
 .presse .presse__faits { margin-top: 16px; border-top: 1px solid var(--trait); }
 .presse__faits > div { display: grid; gap: 2px 24px; padding: 14px 0; border-bottom: 1px solid var(--trait); }
-@container presse (min-width: 40em) { .presse__faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
+@container presse (min-width: 45rem) { .presse__faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
 .presse__faits dt { font-weight: 700; }
 .presse__faits dd { margin: 0; color: var(--texte-doux); text-wrap: pretty; }
 .presse__faits dd a { font-weight: 650; }
@@ -239,7 +239,7 @@
 /* ---------- Écrire à Baromatch ---------- */
 
 .presse .presse__ecrire { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px 20px; max-width: 46rem; margin-top: 28px; padding: 0; list-style: none; }
-@container presse (min-width: 37em) { .presse .presse__ecrire { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container presse (min-width: 40rem) { .presse .presse__ecrire { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__ecrire li { display: grid; align-content: start; gap: 8px; }
 .presse__ecrire p { color: var(--texte-discret); font-size: 0.9375rem; }
 /* L’adresse, d’un seul tenant (Chromium coupe à un <wbr> même sans retour à la ligne permis : un bloc en ligne la

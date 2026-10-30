@@ -268,6 +268,12 @@ test('/a-propos.html à 390 px : la bande de nuit tient sous 1 300 px, chaque l�
   }));
   expect(lu.hauteur).toBeLessThan(1300);
   expect(lu.cotes).toEqual([{ cadre: 152, aCote: true }, { cadre: 152, aCote: true }, { cadre: 152, aCote: true }]);
+  // Jusqu’à 699 px, à 100 %, chaque légende reste à côté de son écran (avant, sous 500 px de place seulement).
+  for (const largeur of [600, 696]) {
+    await ouvrir(page, '/a-propos.html', largeur);
+    const cote = await page.$$eval('.apropos__ecran', (li) => li.map((e) => e.querySelector('figcaption').getBoundingClientRect().left >= e.querySelector('.apropos__cadre').getBoundingClientRect().right));
+    expect(cote, `${largeur} px`).toEqual([true, true, true]);
+  }
   // Sur ordinateur, trois colonnes, la légende sous l’écran.
   await ouvrir(page, '/a-propos.html', 1280);
   const colonnes = await page.$$eval('.apropos__ecran', (li) => li.map((e) => Math.round(e.getBoundingClientRect().top)));
@@ -299,11 +305,12 @@ test('iPhone SE (320 × 568) : le premier écran montre « Écrire pour la press
 // La police retenue jusqu’au premier affichage, puis lâchée (comme tests/police.spec.mjs) : la page s’affiche dans la
 // police de secours, et quand Bricolage Grotesque arrive, rien ne bouge. Sous 360 px, chaque entrée d’À propos tient sur
 // deux lignes quelle que soit la police (avant, elle passait d’une à deux lignes : 0,003 sur un iPhone SE). À 390 px,
-// deux polices ne coupent jamais leurs lignes tout à fait aux mêmes pixels : 0,001 au plus (mesuré 0,00004 à 0,0003 ;
-// Google dit « bon » sous 0,1).
+// les deux polices n’ont pas tout à fait la même largeur : dans une rangée de capsules ou de liens (le sommaire de
+// Presse, « Proposer mon bar », « Me prévenir »), chacun glisse de quelques pixels de côté ; aucune ligne ne se coupe
+// autrement. 0,0005 au plus (mesuré 0,00004 et 0,00024 ; Google dit « bon » sous 0,1).
 for (const { chemin } of PAGES) {
   for (const [largeur, hauteur] of [[320, 568], [390, 844]]) {
-    test(`${chemin} à ${largeur} px : quand la police arrive tard, rien ne bouge (CLS ${largeur < 360 ? '0' : 'sous 0,001'})`, async ({ browser, baseURL }) => {
+    test(`${chemin} à ${largeur} px : quand la police arrive tard, rien ne bouge (CLS ${largeur < 360 ? '0' : 'sous 0,0005'})`, async ({ browser, baseURL }) => {
       const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: hauteur }, reducedMotion: 'reduce', locale: 'fr-FR' });
       await contexte.addInitScript(() => {
         window.decalages = [];
@@ -326,7 +333,7 @@ for (const { chemin } of PAGES) {
         await onglet.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
         const total = await onglet.evaluate(() => { window.relever(); return window.decalages.reduce((t, v) => t + v, 0); });
         if (largeur < 360) expect(total).toBe(0);
-        else expect(total).toBeLessThanOrEqual(0.001);
+        else expect(total).toBeLessThanOrEqual(0.0005);
       } finally {
         lacher();
         await Promise.all(retenues);
@@ -339,11 +346,11 @@ for (const { chemin } of PAGES) {
 // Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés) : 44 px de haut eux aussi.
 test('les liens pris dans une phrase des deux pages se touchent sur 44 px', async ({ page }) => {
   const hauteurs = [];
-  for (const [chemin, selecteur] of [['/a-propos.html', '.apropos__rassure a, .apropos__note-carte a, .apropos__qui-publie a'], ['/presse.html', '.presse__police a, .presse__autre-format a, .presse__bar a']]) {
+  for (const [chemin, selecteur] of [['/a-propos.html', '.apropos__rassure a, .apropos__note-carte a, .apropos__qui-publie a, .apropos__suite a'], ['/presse.html', '.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a']]) {
     await ouvrir(page, chemin, 390);
     hauteurs.push(...await page.$$eval(selecteur, (liens) => liens.map((a) => [a.textContent.trim(), Math.round(a.getBoundingClientRect().height)])));
   }
-  expect(hauteurs.length).toBe(7);
+  expect(hauteurs.length).toBe(14);
   expect(hauteurs.filter(([, h]) => h < 44)).toEqual([]);
 });
 
@@ -408,7 +415,8 @@ const lignesDe = (page, selecteur) => page.$$eval(selecteur, (elements) => eleme
 
 // L’adresse de la phrase de secours, d’un seul tenant dès 360 px ; les petites phrases sous les boutons de la fin
 // d’À propos, sur une ligne.
-for (const largeur of [320, 375, 390, 1280]) {
+// Les trois cartes vont côte à côte seulement dès 72 rem (1 152 px à 100 %), là où chaque petite phrase tient sur une ligne.
+for (const largeur of [320, 375, 390, 820, 1024, 1280]) {
   test(`à ${largeur} px : sous chaque bouton de la fin d’À propos, une ligne ; l’adresse de secours de Presse ${largeur >= 360 ? 'd’un seul tenant' : 'peut passer à la ligne'}`, async ({ page }) => {
     await ouvrir(page, '/a-propos.html', largeur);
     expect(await lignesDe(page, '.apropos__rassure')).toEqual([1, 1, 1]);
@@ -457,4 +465,24 @@ test('À propos : les titres de rubrique gardent leur casse dans l’arbre d’a
   const titres = nodes.filter((n) => n.role?.value === 'heading' && n.properties?.some((p) => p.name === 'level' && p.value.value === 2)).map((n) => n.name?.value);
   expect(titres).toEqual(['Pourquoi Baromatch existe', 'Ce que fait l’appli', 'Ce qu’on refuse', 'Le mot du fondateur', 'Où va Baromatch', 'Et maintenant']);
   expect(await page.locator('.apropos__rail').first().evaluate((e) => getComputedStyle(e).fontVariantCaps)).toBe('all-small-caps');
+  // Des petites capitales fabriquées à 70 % : à 1,125 rem, chaque titre est au moins aussi grand que dans ses capitales
+  // de 13 px d’avant (la largeur rendue du même texte, en capitales, 0,8125 rem, mêmes graisse et espacement).
+  for (const largeur of [390, 1280]) {
+    await page.setViewportSize({ width: largeur, height: 900 });
+    const tailles = await page.$$eval('.apropos__rail', (titres) => titres.map((titre) => {
+      const plage = document.createRange();
+      plage.selectNodeContents(titre);
+      const rendu = plage.getBoundingClientRect().width;
+      const avant = document.createElement('span');
+      Object.assign(avant.style, { position: 'absolute', whiteSpace: 'nowrap', fontSize: '0.8125rem', fontWeight: '700', letterSpacing: '0.14em', textTransform: 'uppercase', fontVariantCaps: 'normal' });
+      avant.textContent = titre.textContent;
+      document.body.append(avant);
+      const largeurAvant = avant.getBoundingClientRect().width;
+      avant.remove();
+      return { titre: titre.textContent, lignes: plage.getClientRects().length, rendu: Math.round(rendu), avant: Math.round(largeurAvant) };
+    }));
+    // Un titre sur une ligne se mesure à sa largeur ; sur deux (le rail de 12 rem sur ordinateur), il est au moins aussi haut.
+    for (const t of tailles.filter((x) => x.lignes === 1)) expect(t.rendu, `${t.titre} à ${largeur} px`).toBeGreaterThanOrEqual(t.avant);
+    expect(await page.locator('.apropos__rail').first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(18);
+  }
 });

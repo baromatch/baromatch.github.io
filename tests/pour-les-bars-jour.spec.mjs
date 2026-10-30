@@ -4,11 +4,11 @@
 // sur le clair (4,5:1, mesuré par tests/outils/textes-peints.mjs, comme l’accueil), la page au repos et chacun de ses
 // états ; le bord des champs (3:1) ; le focus, bleu nuit sur le clair et ambre sur la nuit ; l’étiquette « Écran de
 // démonstration » ; la carte du formulaire blanche dès le premier affichage, avant l’arrivée de pour-les-bars.css ; et
-// CLS 0. Le texte agrandi, axe et la politique de sécurité ont leurs tests (texte-agrandi, accessibilite et
+// le décalage au chargement, la police arrivée après le premier affichage. Le texte agrandi, axe et la politique de sécurité ont leurs tests (texte-agrandi, accessibilite et
 // pour-les-bars.spec.mjs, qui donne l’empreinte du style de la tête : le style en ligne n’a pas d’attribut style).
 // Le serveur est simulé (page.route) : aucun test n’écrit à l’API de production.
 import { test, expect } from '@playwright/test';
-import { attendreLaPageFinie } from './outils/attente.mjs';
+import { attendreLaPageFinie, laPoliceEstLa } from './outils/attente.mjs';
 import { lireCouleur, poser, rapport } from './outils/contraste.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 import { decrireLesCouples, lesCouples, mesurerLesTextes, textesTropFaibles } from './outils/textes-peints.mjs';
@@ -450,33 +450,52 @@ test.describe('le bord des champs, le focus', () => {
   });
 });
 
-// Le CLS de la page elle-même, pas celui de sa police. Quand la machine est chargée, Bricolage Grotesque arrive après le
-// premier affichage, et son remplacement du texte de secours (font-display: swap) décale la page (environ 0,04 à 390 px,
-// 0,03 à 1280 px : le bloc de texte et la légende de la salle) : un décalage de la page d’aujourd’hui, qui existait avant
-// le jour, et qui aura son correctif (les métriques de la police de secours) et son test dans une autre PR. Ce test-ci
-// refuse donc la police : le texte de secours est là du premier affichage à la fin, et seuls les décalages de la page
-// comptent (les couleurs du jour n’en font aucun). Sans cela il échouait au hasard, selon l’instant d’arrivée de la police.
-const POLICE = '/fonts/bricolage-grotesque.woff2';
+// Ce qui bouge au chargement, la police comprise, mesuré comme tests/police.spec.mjs : les polices sont retenues derrière
+// une porte, que le test n’ouvre qu’après avoir vu le premier affichage (dans la police de secours, aux mesures de
+// Bricolage Grotesque), sans minuteur ; puis la page finit (sa feuille, son script, le formulaire) et la police arrive.
+// Les décalages relevés (layout-shift, comme Chrome) : le remplacement de la police et tout ce que la page fait d’elle-même,
+// animations comprises. Avant la police de secours, ce remplacement décalait la page de 0,04 à 0,05 ; avec elle, mesuré
+// cinq fois de suite : 0,0011 à 390 px, 0,0002 à 1280 px. Le seuil, SEUIL_CLS, est serré au-dessus.
+const SEUIL_CLS = 0.003;
 
-test.describe('rien ne bouge au chargement', () => {
+test.describe('rien ne bouge au chargement, la police arrivée après le premier affichage', () => {
   for (const largeur of LARGEURS) {
-    test(`à ${largeur} px, avec les animations et le texte de secours : CLS 0`, async ({ page }) => {
-      const refusees = [];
-      page.on('requestfailed', (requete) => refusees.push(new URL(requete.url()).pathname));
-      await page.route(`**${POLICE}`, (route) => route.abort());
+    test(`à ${largeur} px, avec les animations, la police retenue jusqu’au premier affichage : décalage sous ${SEUIL_CLS}`, async ({ page }, infos) => {
       await page.addInitScript(() => {
-        window.decalages = 0;
-        new PerformanceObserver((liste) => { for (const e of liste.getEntries()) if (!e.hadRecentInput) window.decalages += e.value; })
-          .observe({ type: 'layout-shift', buffered: true });
+        window.decalages = [];
+        const garder = (entrees) => { for (const e of entrees) if (!e.hadRecentInput) window.decalages.push(e.value); };
+        window.observateurDesDecalages = new PerformanceObserver((liste) => garder(liste.getEntries()));
+        window.observateurDesDecalages.observe({ type: 'layout-shift', buffered: true });
+        window.relever = () => garder(window.observateurDesDecalages.takeRecords());
       });
-      await page.setViewportSize({ width: largeur, height: 900 });
-      await page.goto(PAGE);
-      await attendreLaPageFinie(page);
-      await page.waitForLoadState('networkidle');
-      await page.evaluate(() => document.fonts.ready);
-      // La police a bien été refusée (sinon ce test ne protégerait plus de rien : le chemin de la police aurait changé).
-      expect(refusees, 'la police demandée par la page').toContain(POLICE);
-      expect(await page.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
+      let lacher;
+      const porte = new Promise((resoudre) => { lacher = resoudre; });
+      const retenues = [];
+      await page.route('**/fonts/*.woff2', (route) => {
+        const envoi = porte.then(() => route.continue());
+        retenues.push(envoi);
+        return envoi;
+      });
+      try {
+        await page.setViewportSize({ width: largeur, height: 900 });
+        await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
+        // Le premier affichage, sans Bricolage Grotesque, dans la police de secours.
+        await page.waitForFunction(() => performance.getEntriesByName('first-contentful-paint').length > 0);
+        expect(retenues.length, 'la police demandée par la page').toBeGreaterThan(0);
+        expect(await page.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'))).toBe(false);
+        expect(await page.evaluate(() => [...document.fonts].some((f) => f.family.startsWith('Bricolage repli') && f.status === 'loaded'))).toBe(true);
+        lacher();
+        await page.waitForFunction(laPoliceEstLa);
+        await attendreLaPageFinie(page);
+        await page.waitForLoadState('networkidle');
+        await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+        const total = await page.evaluate(() => { window.relever(); return window.decalages.reduce((somme, v) => somme + v, 0); });
+        infos.annotations.push({ type: 'décalage', description: `${largeur} px : ${total.toFixed(4)}` });
+        expect(total, `${largeur} px`).toBeLessThanOrEqual(SEUIL_CLS);
+      } finally {
+        lacher();
+        await Promise.all(retenues);
+      }
     });
   }
 });

@@ -1257,7 +1257,7 @@ a:hover { color: var(--goutte); }
   --fond: #FAF7F1;
   --fond-releve: #F3EEE5;
   --carte: #FFFFFF;
-  --texte: #0A0B10;
+  --texte: var(--nuit);
   --texte-doux: #3D404D;
   --texte-discret: #5C5F6B;
   --trait: rgba(10, 11, 16, 0.12);
@@ -1271,7 +1271,7 @@ a:hover { color: var(--goutte); }
   --verre-reflet: 0 1px 2px rgba(10, 11, 16, 0.06);
   --ombre-carte: 0 1px 2px rgba(10, 11, 16, 0.05), 0 10px 28px rgba(10, 11, 16, 0.06);
   /* L’ambre sur le crème ne fait que 1,7:1 : sur le clair, le contour du focus est bleu nuit (WCAG 1.4.11, 3:1). */
-  --focus: #0A0B10;
+  --focus: var(--nuit);
   color-scheme: light;
 }
 .jour body { background: var(--fond); }
@@ -1306,7 +1306,7 @@ a:hover { color: var(--goutte); }
 /* Le logo et le verre de l’ouverture, sur fond clair : le verre en bleu nuit (comme le logo pour fond clair de la
    presse), sans reflet blanc ; la goutte qui tombe, en ambre. */
 .jour .entete__logo path[fill="#F7F7F9"] { fill: var(--texte); }
-.jour #en-verre stop, .jour #hx-verre stop { stop-color: #0A0B10; }
+.jour #en-verre stop, .jour #hx-verre stop { stop-color: var(--nuit); }
 .jour .entete__logo path[stroke="#FFFFFF"], .jour .verre .bm-reflet { display: none; }
 .jour .verre .bm-goutte-chute { fill: var(--ambre); }
 .jour .verre .bm-onde { stroke: var(--ambre); }

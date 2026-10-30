@@ -38,6 +38,12 @@ test('trois fichiers : chacun a ses caractères, et le navigateur va d’abord a
   const egarees = Object.entries(couverture).flatMap(([fichier, codes]) => [...codes]
     .filter((code) => essayee(code)?.fichier !== fichier).map((code) => `${nom(code)} : dans ${fichier}, essayé d’abord dans ${essayee(code)?.fichier}`));
   expect(egarees).toEqual([]);
+  // Et l’inverse : une plage n’annonce aucun caractère que son fichier n’a pas (sinon le navigateur le charge pour rien,
+  // puis dessine le caractère dans une autre police).
+  const annonces = faces.filter((face) => face.plages).flatMap((face) => face.plages
+    .flatMap(([debut, fin]) => plage(debut, fin)).filter((code) => !couverture[face.fichier].has(code))
+    .map((code) => `${nom(code)} : dans l’unicode-range de ${face.fichier}, pas dans le fichier`));
+  expect(annonces).toEqual([]);
   // Aucun caractère dans deux fichiers.
   const doubles = [...couverture[SIGNES], ...couverture[ETENDU]].filter((code) => coeur.has(code)
     || (couverture[SIGNES].has(code) && couverture[ETENDU].has(code)));
@@ -50,9 +56,9 @@ test('aucun caractère perdu : tout ce que l’ancienne police dessinait l’est
   const ancienne = [...plage(0x20, 0x7e), ...plage(0xa0, 0xff).filter((c) => ![0xa4, 0xad].includes(c)), 0x152, 0x153,
     0x2009, 0x2013, 0x2014, 0x2018, 0x2019, 0x201a, 0x201c, 0x201d, 0x201e, 0x2022, 0x2026, 0x20ac, 0x2122];
   expect(ancienne.filter((code) => !tous.has(code)).map(nom)).toEqual([]);
-  // Le cœur : le latin de base, toutes les lettres du latin-1 (les noms de clubs : Bodø, Atlético, Malmö…), la
-  // ponctuation française, l’euro, et ‹ › − que le site écrit.
-  const attendus = [...plage(0x20, 0x7e), ...plage(0xc0, 0xff).filter((c) => c !== 0xf7), ...'«»’‘“”–—…·°©€Œœ‹›−'].map((c) => (typeof c === 'string' ? c.codePointAt(0) : c));
+  // Le cœur : le latin de base, toutes les lettres du latin-1 et ı (les noms de clubs : Bodø, Atlético, Malmö,
+  // Kasımpaşa…), la ponctuation française, l’euro, et ‹ › − que le site écrit.
+  const attendus = [...plage(0x20, 0x7e), ...plage(0xc0, 0xff).filter((c) => c !== 0xf7), ...'ı«»’‘“”–—…·°©€Œœ‹›−'].map((c) => (typeof c === 'string' ? c.codePointAt(0) : c));
   expect(attendus.filter((code) => !coeur.has(code)).map(nom)).toEqual([]);
 });
 

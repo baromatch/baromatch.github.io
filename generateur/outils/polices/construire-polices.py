@@ -15,8 +15,9 @@
 # 4. Le même dessin qu’avant : verifier-identite.py, dans ce dossier (uharfbuzz 0.57.0 en plus).
 #
 # Ce que garde chaque fichier
-# - Le cœur, préchargé par chaque page : le latin de base, chaque lettre du latin-1 (les noms de clubs), la ponctuation
-#   française, l’euro, et ‹ › − ; le crénage (kern) et les chiffres tabulaires (tnum) seulement.
+# - Le cœur, préchargé par chaque page : le latin de base, chaque lettre du latin-1 et ı (les noms de clubs), la
+#   ponctuation française, l’euro, et ‹ › − ; le crénage (kern) et les chiffres tabulaires (tnum) seulement. ı vient du
+#   fichier latin, le seul qui l’a : dans le cœur, un nom turc (Kasımpaşa) n’ajoute que le fichier étendu.
 # - Les signes : le reste du fichier latin de Google (½, ±, ¿…), sans les accents seuls (U+0300 à U+036F) ni les
 #   caractères invisibles ; le crénage.
 # - Le latin étendu : ses lettres de U+0100 à U+017F et Ș ș Ț ț (U+0218 à U+021B), hors du cœur ; sans crénage.
@@ -51,7 +52,7 @@ def cmap(chemin):
     return set(TTFont(chemin).getBestCmap())
 
 
-COEUR = codes((0x20, 0x7E), 0xA0, '©«®°·»', (0xC0, 0xFF), 'Œœ', 0x2009, '–—‘’‚“”„•…‹›€™−') - {0xF7}
+COEUR = codes((0x20, 0x7E), 0xA0, '©«®°·»', (0xC0, 0xFF), 'ıŒœ', 0x2009, '–—‘’‚“”„•…‹›€™−') - {0xF7}
 latin, etendu = cmap(LATIN), cmap(ETENDU_SOURCE)
 assert COEUR <= latin, sorted(hex(c) for c in COEUR - latin)
 SIGNES = latin - COEUR - codes((0x300, 0x36F), 0x200B, 0xFEFF) - etendu

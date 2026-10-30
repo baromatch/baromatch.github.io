@@ -56,7 +56,7 @@ test.describe('le bloc, du générateur', () => {
     expect(dates).toEqual([
       { valeur: '2026-10-29', choisi: true, court: 'jeu. 29', nom: 'Aujourd’hui', compte: '1 match' },
       { valeur: '2026-10-30', choisi: false, court: 'ven. 30', nom: 'Demain', compte: 'aucun match' },
-      // OL – Angers a des bars : le point ambre, et leur nombre pour le lecteur d’écran.
+      // OL – Angers a des bars : le point, et leur nombre pour le lecteur d’écran.
       { valeur: '2026-10-31', choisi: false, court: 'sam. 31', nom: 'sam. 31', compte: '<span class="semaine__point" aria-hidden="true"></span>4 matchs<span class="visuellement-cache">, dont 1 avec des bars</span>' },
       { valeur: '2026-11-01', choisi: false, court: 'dim. 1', nom: 'dim. 1', compte: 'aucun match' },
       { valeur: '2026-11-02', choisi: false, court: 'lun. 2', nom: 'lun. 2', compte: '1 match' },
@@ -129,7 +129,7 @@ test.describe('le bloc, du générateur', () => {
     expect(vide).not.toContain('semaine__dates');
   });
 
-  test('un jour qui a des matchs avec des bars le montre sur sa puce : un point ambre, et « dont N avec des bars » pour le lecteur d’écran', () => {
+  test('un jour qui a des matchs avec des bars le montre sur sa puce : un point, et « dont N avec des bars » pour le lecteur d’écran', () => {
     const html = bloc({ bars: [{ id: 'b1' }] });
     const puce = (jour) => html.split(`value="${jour}"`)[1].split('</label>')[0];
     // Samedi : OL – Angers a deux bars ; Bayern – Dortmund, reporté, ne compte pas.
@@ -338,6 +338,59 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     // Après la barre, les liens des cartes du jour choisi seulement.
     await page.keyboard.press('Tab');
     await expect(semaine.locator('.carte-match:visible .carte-match__clubs').first()).toBeFocused();
+  });
+
+  // L’ambre seulement pour l’action (le propriétaire) : le point d’un jour qui a des bars, et celui de « 1 bar à Paris »,
+  // ne sont pas des actions. De la couleur de leur texte, ils grandissent avec lui, et se voient en couleurs forcées
+  // (un fond y est repeint : sans réglage, le point disparaissait).
+  test('les bars publiés : sur chaque jour, aucun fond ambre hors d’un lien ou d’un bouton ; les points sont de la couleur de leur texte, grandissent avec lui et se voient en couleurs forcées', async ({ page }) => {
+    const semaine = await ouvrir(page);
+    const ambreHorsAction = () => page.evaluate(() => {
+      const trouves = [];
+      for (const e of document.querySelectorAll('main *')) {
+        if (e.closest('.nuit') || !e.checkVisibility({ visibilityProperty: true, opacityProperty: true })) continue;
+        for (const pseudo of [null, '::before', '::after']) {
+          const style = getComputedStyle(e, pseudo);
+          if (pseudo && style.content === 'none') continue;
+          if (style.backgroundColor === 'rgb(255, 177, 61)' && !e.closest('a, button')) trouves.push(`${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]}${pseudo ?? ''}`);
+        }
+      }
+      return trouves;
+    });
+    const jours = semaine.locator('.semaine__date');
+    await expect(semaine.locator('.semaine__point')).toHaveCount(3);
+    for (let i = 0; i < await jours.count(); i += 1) {
+      await jours.nth(i).click();
+      expect(await ambreHorsAction(), await jours.nth(i).innerText()).toEqual([]);
+    }
+    // De la couleur du texte : gris sur un jour, crème sur le jour choisi (le bleu nuit y serait invisible).
+    await semaine.locator('label', { hasText: 'Aujourd’hui' }).click();
+    const couleurs = await semaine.locator('.semaine__point').evaluateAll((points) => points.map((p) => [getComputedStyle(p).backgroundColor, getComputedStyle(p).color]));
+    for (const [fond, texte] of couleurs) expect(fond).toBe(texte);
+    expect(new Set(couleurs.map(([fond]) => fond)).size).toBe(2);
+    const pastille = () => semaine.locator('.carte-match__bars:visible').first().evaluate((b) => ({ fond: getComputedStyle(b, '::before').backgroundColor, texte: getComputedStyle(b).color, largeur: parseFloat(getComputedStyle(b, '::before').width) }));
+    expect((await pastille()).fond).toBe((await pastille()).texte);
+    // À sa taille : le texte à 200 %, le point fait deux fois plus.
+    const point = () => semaine.locator('.semaine__point').first().evaluate((p) => p.getBoundingClientRect().width);
+    const [avant, avantPastille] = [await point(), (await pastille()).largeur];
+    await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+    expect(await point()).toBeGreaterThanOrEqual(avant * 1.9);
+    expect((await pastille()).largeur).toBeGreaterThanOrEqual(avantPastille * 1.9);
+    await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
+    // En couleurs forcées : le point et la pastille gardent une couleur pleine, autre que le fond qui les porte.
+    await page.emulateMedia({ forcedColors: 'active' });
+    const forces = await page.evaluate(() => {
+      const fond = (e) => getComputedStyle(e).backgroundColor;
+      return [
+        ...[...document.querySelectorAll('.semaine__point')].map((p) => [fond(p), fond(p.closest('label').querySelector('span'))]),
+        ...[...document.querySelectorAll('.carte-match__bars')].filter((b) => b.checkVisibility()).map((b) => [getComputedStyle(b, '::before').backgroundColor, fond(b.closest('.carte-match'))]),
+      ];
+    });
+    expect(forces.length).toBeGreaterThan(3);
+    for (const [point, dessous] of forces) {
+      expect(point).not.toBe(dessous);
+      expect(point).not.toMatch(/rgba\(.*, 0\)$|transparent/);
+    }
   });
 
   test('lu deux jours plus tard (un passage manqué) : plus d’« Aujourd’hui » ni de « Demain », les jours passés s’effacent ; un jour choisi passé laisse la place au premier jour restant qui a des matchs', async ({ page }) => {

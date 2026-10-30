@@ -88,8 +88,8 @@ export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) 
     ? `\n<p class="semaine__liens"><a href="#attente">${e(t.sansBarLien)}</a><a href="/pour-les-bars.html#proposer">${e(t.sansBarProposer)}</a></p>` : ''}`;
 
   const nomDuJour = ({ jour, i }) => (i === 0 ? t.aujourdhui : i === 1 ? t.demain : jourCourt.format(new Date(`${jour}T12:00:00Z`)));
-  // La puce d’un jour dit combien de matchs ; s’il y en a qu’un bar diffuse, un point ambre devant, et leur nombre pour
-  // le lecteur d’écran.
+  // La puce d’un jour dit combien de matchs ; s’il y en a qu’un bar diffuse, un point devant (de la couleur du texte :
+  // l’ambre est pour l’action), et leur nombre pour le lecteur d’écran.
   const compte = (j) => {
     const avec = j.matchs.filter(avecBars).length;
     if (!j.matchs.length) return e(t.aucunMatch);

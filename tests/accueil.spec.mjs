@@ -3,6 +3,21 @@
 // et le bouton de la liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… pas encore ouverte »).
 // La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque.
 import { test, expect } from '@playwright/test';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { createServer } from 'node:net';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { arreterLHorloge, auJourDeLAccueil } from './outils/horloge.mjs';
+import { demarrerServeur } from './outils/serveur.mjs';
+import { construireLeSiteDExemple } from './outils/site-genere.mjs';
+
+const portLibre = () => new Promise((resoudre) => {
+  const sonde = createServer();
+  sonde.listen(0, '127.0.0.1', () => {
+    const { port } = sonde.address();
+    sonde.close(() => resoudre(port));
+  });
+});
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
@@ -81,11 +96,19 @@ for (const ecran of [
 }
 
 // Plus bas dans la page, « préviens-moi » revient deux fois : après la soirée et après les questions. La même capsule
-// ambre que sur les pages des matchs, vers le formulaire du haut. Un seul appel principal : tout ce qui est en ambre
-// dans la page (hors de la bande des bars, ambre elle-même) mène à la liste d’attente ; « Deviens testeur Android » est
-// en verre. La boutique n’est plus présentée dans l’accueil : on la trouve dans le menu et le pied de page (décision du
+// ambre que sur les pages des matchs, vers le formulaire du haut. L’ambre est pour l’action : tout ce qui est en ambre
+// dans la page (hors de la bande des bars) mène à la liste d’attente, ou, dans les matchs de la semaine, aux bars d’un
+// match (« Voir les bars », vers #titre-bars de sa page), dès qu’un bar est publié ; « Deviens testeur Android » est en
+// verre. La boutique n’est plus présentée dans l’accueil : on la trouve dans le menu et le pied de page (décision du
 // propriétaire, 28 octobre).
-test('« préviens-moi » revient après la soirée et après les questions ; l’ambre ne mène qu’à la liste d’attente', async ({ page }) => {
+const ouMeneLAmbre = (page) => page.$$eval('main a, main button', (elements) => elements
+  .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')
+  .map((e) => ({ cible: e.getAttribute('href') ?? e.closest('form')?.id, semaine: Boolean(e.closest('#semaine')) })));
+const ambreAilleurs = (enAmbre) => enAmbre
+  .filter(({ cible, semaine }) => cible !== '#attente' && cible !== 'attente' && !(semaine && /^\/matchs\/[a-z0-9-]+\/#titre-bars$/.test(cible)))
+  .map(({ cible }) => cible);
+
+test('« préviens-moi » revient après la soirée et après les questions ; l’ambre ne mène qu’à la liste d’attente, ou aux bars d’un match', async ({ page }) => {
   await page.goto('/');
   const rappels = page.locator('main .rappel-attente a.capsule');
   await expect(rappels).toHaveCount(2);
@@ -99,11 +122,9 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
   expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
   await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(1);
-  const enAmbre = await page.$$eval('main a, main button', (elements) => elements
-    .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')
-    .map((e) => e.getAttribute('href') ?? e.closest('form')?.id));
-  expect(enAmbre.length).toBeGreaterThan(0);
-  expect(enAmbre.filter((cible) => cible !== '#attente' && cible !== 'attente')).toEqual([]);
+  const enAmbre = await ouMeneLAmbre(page);
+  expect(enAmbre.filter(({ cible }) => cible === '#attente').length).toBeGreaterThan(0);
+  expect(ambreAilleurs(enAmbre)).toEqual([]);
   // Un rappel mène au formulaire, et le champ est là.
   await rappels.last().click();
   await expect(page).toHaveURL(/#attente$/);
@@ -116,6 +137,32 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await premier.focus();
   await premier.click({ modifiers: ['Control'] });
   await expect(premier).toBeFocused();
+});
+
+// La même règle, le jour où un bar est publié : le site d’exemple (le scénario inventé, construit le lundi 26 octobre),
+// où les matchs de la semaine ont leurs « Voir les bars », sur la ligne du prochain match et sur sa carte.
+test.describe('l’ambre, avec des bars publiés (le site d’exemple, lundi 26 octobre)', () => {
+  const LUNDI = Date.parse('2026-10-26T08:00:00Z');
+  const site = {};
+  test.beforeAll(async () => {
+    site.dossier = mkdtempSync(path.join(tmpdir(), 'accueil-ambre-'));
+    await construireLeSiteDExemple(site.dossier, { maintenant: LUNDI, rendu: null, qr: null });
+    site.serveur = await demarrerServeur(await portLibre(), -1, { dossier: site.dossier });
+  });
+  test.afterAll(async () => {
+    await site.serveur?.arreter();
+    rmSync(site.dossier, { recursive: true, force: true });
+  });
+
+  test('l’ambre ne mène qu’à la liste d’attente, ou aux bars d’un match de la semaine', async ({ page }) => {
+    await page.clock.setFixedTime(new Date(LUNDI + 3_600_000));
+    await page.goto(`${site.serveur.adresse}/`);
+    const enAmbre = await ouMeneLAmbre(page);
+    expect(enAmbre.filter(({ cible }) => cible === '#attente').length).toBeGreaterThan(0);
+    // La ligne du prochain match et la carte du match : deux « Voir les bars », dans la semaine.
+    expect(enAmbre.filter(({ cible, semaine }) => semaine && cible === '/matchs/le-havre-psg-2026-10-30/#titre-bars')).toHaveLength(2);
+    expect(ambreAilleurs(enAmbre)).toEqual([]);
+  });
 });
 
 for (const largeur of [320, 360]) {
@@ -193,9 +240,17 @@ const lireLeFilm = (page) => page.locator('#film').evaluate((v) => ({ enPause: v
 // Deux images peintes : l’observateur de défilement a parlé.
 const deuxImages = (page) => page.evaluate(() => new Promise((suite) => requestAnimationFrame(() => requestAnimationFrame(suite))));
 
-for (const largeur of [360, 1280]) {
-  test(`à ${largeur} px : le bouton du film l’arrête au clavier, juste après les matchs de la semaine, et la pause tient en revenant au film`, async ({ page }) => {
+// L’ordre du clavier est celui du HTML, choisi pour le téléphone : l’inscription, les matchs de la semaine, puis le
+// film. Sur ordinateur, le film est affiché à droite, au-dessus des matchs (styles.css, .ouverture > .semaine) : il vient
+// quand même au clavier après eux. Le test garde cet ordre voulu aux deux largeurs, chacune sous son nom.
+for (const [largeur, nom] of [
+  [360, 'au téléphone (360 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, affichés au-dessus de lui'],
+  [1280, 'sur ordinateur (1280 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, bien que le film soit affiché au-dessus d’eux (l’ordre suit le téléphone)'],
+]) {
+  test(`${nom} ; la pause tient en revenant au film`, async ({ page }) => {
     await simulerUnLecteur(page);
+    // Le jour du bloc enregistré : une semaine après, la barre des jours et ses cartes s’effacent (main.js).
+    await auJourDeLAccueil(page);
     await page.setViewportSize({ width: largeur, height: 800 });
     await page.goto('/');
     const lecture = page.locator('#film-lecture');
@@ -204,11 +259,14 @@ for (const largeur of [360, 1280]) {
     await expect(lecture).toBeVisible();
     await expect(lecture).toHaveAccessibleName('Mettre le film en pause');
     await expect(lecture).not.toHaveAttribute('aria-pressed', /.*/);
-    // Au clavier : juste après le dernier lien des matchs du jour choisi (sous la liste d’attente : au téléphone, le film
-    // vient après eux), dans le cadre du film.
+    // Au clavier : juste après le dernier lien des matchs du jour choisi, dans le cadre du film.
     await page.locator('#semaine').locator('a:visible, input:checked').last().focus();
     await page.keyboard.press('Tab');
     await expect(lecture).toBeFocused();
+    // Ce que chaque largeur affiche : au téléphone, le film sous les matchs ; sur ordinateur, au-dessus d’eux.
+    const [film, matchs] = await Promise.all([page.locator('#film-cadre').boundingBox(), page.locator('#semaine').boundingBox()]);
+    if (largeur < 960) expect(film.y).toBeGreaterThan(matchs.y + matchs.height);
+    else expect(film.y + film.height).toBeLessThan(matchs.y);
     const [boite, cadre] = await Promise.all([lecture.boundingBox(), page.locator('#film-cadre').boundingBox()]);
     expect(boite.width).toBeGreaterThanOrEqual(44);
     expect(boite.height).toBeGreaterThanOrEqual(44);
@@ -456,10 +514,11 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   });
   // Les heures avancent, comme la soirée.
   expect(lus.map((m) => m.heure)).toEqual([...lus.map((m) => m.heure)].sort());
-  // Rien d’autre ne promet les notifications : au plus une par match, et la ligne calme d’une heure avant.
-  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass. Pour le reste, au plus une notification par match.');
+  // Seule la ligne calme d’une heure avant, que le téléphone pose lui-même : aucune notification du serveur n’est
+  // promise (elles n’arrivent pas sur Android dans la version de test), et le mot n’est nulle part dans la soirée.
+  expect(normaliser(await page.locator('.soiree__notifs').innerText())).toBe('Une heure avant le coup d’envoi, ton écran verrouillé te rappelle ta place, sans son, avec un bouton vers ton pass.');
   const soiree = normaliser(await page.locator('.soiree').innerText());
-  expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone/i);
+  expect(soiree).not.toMatch(/[!%]|avis|vérifiés|disponible sur|iPhone|notification/i);
 });
 
 test('les écrans de la soirée ne se chargent qu’en approchant, sans rien faire bouger', async ({ page }) => {
@@ -522,9 +581,17 @@ test('sur ordinateur, l’écran à côté des moments suit la lecture : celui d
 
 // « Maintiens pour essayer » : le geste de l’appli, sur la page. Il se tient au clavier (Espace) comme au doigt ; lâché
 // avant 1,4 s, il se vide ; rien n’est envoyé.
+// L’horloge de la page est arrêtée (page.clock) : seul runFor fait passer le temps du geste. En temps réel, le temps
+// tenu était celui que la machine mettait entre keydown et keyup : sur une machine très chargée, les 300 ms (ou les huit
+// répétitions de 100 ms, plus bas) duraient plus de 1,4 s, la touche était vraiment tenue jusqu’au bout, et le verre se
+// remplissait, à juste titre, avant le lâcher.
+const HORLOGE_DU_GESTE = Date.UTC(2026, 9, 29, 18, 0);
+const TENIR_MS = 1400;
+
 test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » ; lâché trop tôt, il se vide ; rien ne part', async ({ page }) => {
   const envois = [];
   page.on('request', (r) => { if (r.method() !== 'GET') envois.push(r.url()); });
+  await arreterLHorloge(page, HORLOGE_DU_GESTE);
   await page.goto('/');
   const bouton = page.locator('#essai-bouton');
   const note = page.locator('#essai-note');
@@ -534,19 +601,26 @@ test('« Maintiens pour essayer » : tenu jusqu’au bout, « Place gardée. » 
   await expect(note).toHaveAttribute('role', 'status');
   await bouton.focus();
   await page.keyboard.down(' ');
-  await page.waitForTimeout(300);
+  await page.clock.runFor(300);
   await page.keyboard.up(' ');
   await expect(note).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
   // Lâché, il ne se remplit pas plus tard.
-  await page.waitForTimeout(1600);
+  await page.clock.runFor(1600);
   await expect(bouton).not.toHaveClass(/est-plein/);
   await expect(bouton).toHaveText('Maintiens pour essayer');
+  // Tenu : pas plein à 1 ms près, plein à 1,4 s.
   await page.keyboard.down(' ');
-  await expect(bouton).toHaveText('Place gardée.', { timeout: 3000 });
+  await page.clock.runFor(TENIR_MS - 1);
+  await expect(bouton).not.toHaveClass(/est-plein/);
+  await expect(bouton).toHaveText('Maintiens pour essayer');
+  await page.clock.runFor(1);
+  await expect(bouton).toHaveText('Place gardée.');
   await page.keyboard.up(' ');
   await expect(note).toHaveText('C’était un essai : rien n’est réservé.');
-  expect(await bouton.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe('rgb(255, 177, 61)');
-  await expect(bouton).toHaveText('Maintiens pour essayer', { timeout: 6000 });
+  // Le fond passe à l’ambre par une transition CSS, en temps réel : l’assertion attend sa fin.
+  await expect(bouton).toHaveCSS('background-color', 'rgb(255, 177, 61)');
+  await page.clock.runFor(3500);
+  await expect(bouton).toHaveText('Maintiens pour essayer');
   expect(envois).toEqual([]);
 });
 
@@ -569,18 +643,19 @@ test('« Maintiens pour essayer » avec un lecteur d’écran : un clic sans poi
 // avant 1,4 s, le verre se vide, comme au doigt.
 for (const touche of [' ', 'Enter']) {
   test(`« Maintiens pour essayer » : ${touche === ' ' ? 'Espace' : 'Entrée'} tenue avec ses répétitions, lâchée trop tôt, ne remplit rien`, async ({ page }) => {
+    await arreterLHorloge(page, HORLOGE_DU_GESTE);
     await page.goto('/');
     const bouton = page.locator('#essai-bouton');
     await bouton.scrollIntoViewIfNeeded();
     await bouton.focus();
     await page.keyboard.down(touche);
     for (let i = 0; i < 8; i += 1) {
-      await page.waitForTimeout(100);
+      await page.clock.runFor(100);
       await page.keyboard.down(touche);
     }
     await page.keyboard.up(touche);
     await expect(page.locator('#essai-note')).toHaveText('Lâché trop tôt : le verre se vide. Tiens jusqu’au bout.');
-    await page.waitForTimeout(1600);
+    await page.clock.runFor(1600);
     await expect(bouton).not.toHaveClass(/est-plein/);
     await expect(bouton).toHaveText('Maintiens pour essayer');
   });

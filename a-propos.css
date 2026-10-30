@@ -52,7 +52,8 @@
 }
 .apropos__qui { color: var(--texte-doux); font-weight: 600; }
 .apropos__quoi { font-weight: 700; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.18em; }
-.apropos__quoi::after { content: "\2009→"; content: "\2009→" / ""; display: inline-block; text-decoration: none; }
+/* Un chevron dessiné (la police allégée n’a pas de flèche), de la couleur du texte. */
+.apropos__quoi::after { content: ""; display: inline-block; width: 0.42em; height: 0.42em; margin-left: 0.35em; border-top: 2px solid currentColor; border-right: 2px solid currentColor; vertical-align: 0.12em; transform: rotate(45deg); }
 .apropos__entrees a:hover .apropos__quoi { color: var(--texte-doux); }
 @media (min-width: 760px) { .apropos__entrees a { flex-direction: column; justify-content: flex-start; } }
 

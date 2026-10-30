@@ -48,7 +48,7 @@
 
 .regarder-titre {
   margin: 0 0 14px;
-  max-width: 22ch;
+  max-width: 11.748em; /* 22ch en Bricolage (« 0 » de 0,534em) : la même boîte quelle que soit la police affichée */
   text-wrap: balance;
   font-weight: 800;
   font-stretch: 88%;

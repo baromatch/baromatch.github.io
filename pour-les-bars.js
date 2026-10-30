@@ -545,7 +545,10 @@
     });
     titrerResume();
     resume.hidden = false;
-    resume.focus();
+    // Par son haut : avec le texte agrandi, le résumé est plus haut que l’écran, et le focus seul le montrerait par
+    // son milieu (son titre au-dessus de l’écran).
+    if (resume.scrollIntoView) resume.scrollIntoView({ block: "start" });
+    resume.focus({ preventScroll: true });
   }
 
   function cacherResume() {
@@ -734,22 +737,34 @@
     // « Envoi… » est aussi écrit, caché, dans la zone de statut : un lecteur d’écran entend l’attente.
     if (vue.occupe && !message) statut.appendChild(paragraphe("visuellement-cache", TEXTES.envoi));
 
-    garderLeFocus(focusAvant, vue, action);
+    // Un refus ou un échec (la page périmée, hors ligne, l’étape de l’e-mail, une information refusée, trop d’envois) se
+    // montre par son haut : avec le texte agrandi, le focus seul le laissait commencer au-dessus de l’écran. La zone
+    // défile d’abord, puis le focus va où il doit, sans faire défiler à son tour.
+    var montrer = !note && message && MONTRER_LE_MESSAGE[etat];
+    if (montrer && message.zone.scrollIntoView) message.zone.scrollIntoView({ block: "start" });
+    garderLeFocus(focusAvant, vue, action, montrer);
   }
+
+  var MONTRER_LE_MESSAGE = { "attente-reseau": true, courriel: true, invalide: true, limite: true, expire: true };
 
   // Le focus ne tombe jamais sur la page : s’il était sur le bouton d’envoi, dans le chemin e-mail ou sur l’action
   // d’un message, et que cet élément s’efface, il passe à ce qui le remplace (le lien qui ouvre la messagerie quand il
   // mène, sinon l’action du message, sinon le bouton d’envoi). Sans focus (un navigateur qui ne le donne pas au
   // bouton cliqué), il y passe aussi quand le bouton d’envoi s’efface. Un focus ailleurs (un champ, Entrée tapée
   // dedans) reste où il est.
-  function garderLeFocus(avant, vue, action) {
+  function garderLeFocus(avant, vue, action, montrer) {
     if (etat === "envoye") return;
+    var options = montrer ? { preventScroll: true } : undefined;
     var surLaPage = !avant || avant === document.body;
+    // Le chemin e-mail devient le geste principal (après un 429, la messagerie ouverte) : le focus qui était sur le
+    // bouton d’envoi, ou sur la page, va au lien qui ouvre la messagerie. Le bouton, passé en second, reste plus bas,
+    // souvent sous l’écran.
+    if (vue.courriel === "principal" && (surLaPage || avant === bouton)) return courrielLien.focus(options);
     var ici = !surLaPage && (avant === bouton || courriel.contains(avant) || statut.contains(avant) || alerte.contains(avant));
     if (surLaPage ? vue.bouton : !ici) return;
     if (!surLaPage && document.contains(avant) && avant.getClientRects().length > 0) return;
     var remplacant = (vue.courriel === "principal" ? courrielLien : null) || action || (vue.bouton ? bouton : premierChamp.champ);
-    remplacant.focus();
+    remplacant.focus(options);
   }
 
   // ---------- Envoyer ----------
@@ -899,7 +914,10 @@
     verifies.forEach(effacerErreur);
     envoyeeEmail.textContent = demande.email;
     aller("envoye");
-    envoyee.focus();
+    // Par son haut : avec le texte agrandi, le merci est plus haut que l’écran, et le focus seul n’en montrerait que le
+    // bas (« C’est envoyé. » au-dessus de l’écran).
+    envoyee.focus({ preventScroll: true });
+    if (envoyee.scrollIntoView) envoyee.scrollIntoView({ block: "start" });
   }
 
   // ---------- Les gestes ----------

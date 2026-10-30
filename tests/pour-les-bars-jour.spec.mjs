@@ -308,6 +308,9 @@ test.describe('le jour posé', () => {
   });
 });
 
+// Des éléments qui prennent le focus sur le clair : un de chaque sorte (le bouton, les liens, les champs, la case, les questions).
+const FOCUS_DU_CLAIR = ['.ouverture-bars .capsule', '.lien-fleche', '.entete__lien', '#demande-bar', '#demande-message', '#demande-accord', '.questions summary', '.conditions__liste a', '.formulaire__ailleurs a'];
+
 test.describe('le bord des champs, le focus', () => {
   // WCAG 1.4.11 : le bord d’un champ se voit à 3:1 au moins contre ce qui l’entoure (la carte) et contre son fond.
   test('le bord de chaque champ, et du texte à copier, se voit à 3:1 au moins contre la carte et contre son propre fond', async ({ page }) => {
@@ -354,9 +357,8 @@ test.describe('le bord des champs, le focus', () => {
       const fond = lu.fonds.reverse().reduce((dessous, dessus) => poser(lireCouleur(dessus), dessous), { r: 255, v: 255, b: 255, a: 1 });
       return { ...lu, fond: `rgb(${Math.round(fond.r)}, ${Math.round(fond.v)}, ${Math.round(fond.b)})` };
     };
-    const CLAIR = ['.ouverture-bars .capsule', '.lien-fleche', '.entete__lien', '#demande-bar', '#demande-message', '#demande-accord', '.questions summary', '.conditions__liste a', '.formulaire__ailleurs a'];
     const SOMBRE = ['#salle-jouer', '#salle-places .pas__bouton--plus', '#salle-curseur', '.bars .bouton-nuit', '.pied__liens a'];
-    for (const selecteur of CLAIR) {
+    for (const selecteur of FOCUS_DU_CLAIR) {
       const lu = await lire(selecteur);
       expect(lu.visible, `${selecteur} : :focus-visible`).toBe(true);
       expect([lu.style, lu.largeur, lu.couleur], selecteur).toEqual(['solid', 2, NUIT]);
@@ -380,6 +382,30 @@ test.describe('le bord des champs, le focus', () => {
     await expect(page.locator('#demande-resume')).toBeFocused();
     const contour = await page.locator('#demande-resume').evaluate((e) => ({ visible: e.matches(':focus-visible'), couleur: getComputedStyle(e).outlineColor, style: getComputedStyle(e).outlineStyle }));
     expect(contour).toEqual({ visible: true, couleur: NUIT, style: 'solid' });
+  });
+
+  // Chaque contour de focus du clair suit --focus, la variable de styles.css (comme l’accueil) : le bleu nuit du jour vient de
+  // là, et nulle part ailleurs. Une couleur témoin posée sur --focus (style de <html>, plus fort que la classe « jour »)
+  // doit se retrouver sur chacun, puis sur le résumé des erreurs : un contour peint en dur (l’ambre, ou --texte) ne la prend
+  // pas. Le résumé se lit après un envoi refusé, qui marque aussi la case en erreur (son contour est alors celui de l’erreur).
+  test('chaque contour de focus du clair suit la variable --focus, le résumé des erreurs compris', async ({ page }) => {
+    await ouvrir(page, 1280);
+    const TEMOIN = 'rgb(1, 2, 3)';
+    const lireLesContours = (selecteurs) => page.evaluate(({ liste, temoin }) => {
+      document.documentElement.style.setProperty('--focus', temoin);
+      return liste.map((selecteur) => {
+        const e = document.querySelector(selecteur);
+        e.focus();
+        return `${selecteur} : ${e.matches(':focus-visible') ? getComputedStyle(e).outlineColor : 'sans :focus-visible'}`;
+      });
+    }, { liste: selecteurs, temoin: TEMOIN });
+    expect(await lireLesContours(FOCUS_DU_CLAIR)).toEqual(FOCUS_DU_CLAIR.map((selecteur) => `${selecteur} : ${TEMOIN}`));
+    await page.fill('#demande-email', 'camille@');
+    await page.clock.fastForward(3000);
+    // Entrée dans un champ : l’envoi au clavier, donc un focus qui se voit.
+    await page.press('#demande-email', 'Enter');
+    await expect(page.locator('#demande-resume')).toBeFocused();
+    expect(await lireLesContours(['#demande-resume'])).toEqual([`#demande-resume : ${TEMOIN}`]);
   });
 });
 

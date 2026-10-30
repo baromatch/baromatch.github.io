@@ -256,7 +256,8 @@
 .resume { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 16px; }
 .resume[hidden] { display: none; }
 .resume:focus { outline: none; }
-.resume:focus-visible { outline: 2px solid var(--ambre); outline-offset: 3px; }
+/* Le contour du focus du résumé : celui de tout le site (--focus, styles.css), l’ambre sur la nuit, le bleu nuit sur le clair. */
+.resume:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .resume__liste { margin: 6px 0 0; padding: 0 0 0 1.1em; color: var(--texte-doux); font-size: 0.9375rem; }
 .resume__liste li { margin: 4px 0; }
 
@@ -348,8 +349,6 @@
 .jour :is(.lien-fleche, .lien-fan, .formulaire__ailleurs a, .formulaire__confidentialite a, .resume a, .lien-bouton, .questions summary):hover { color: var(--texte-doux); }
 .jour .capsule--verre:hover { background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
 
-/* Le formulaire : le focus du résumé se voit en bleu nuit sur la carte blanche (en ambre sur la nuit). */
-.jour .resume:focus-visible { outline-color: var(--texte); }
 /* Les messages et le résumé : une boîte crème sur la carte blanche, un bord d’erreur plein. */
 .jour .message, .jour .resume { background: var(--fond); }
 .jour .message--erreur, .jour .resume { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--erreur) 55%, transparent); }

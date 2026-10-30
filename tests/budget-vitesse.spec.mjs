@@ -39,6 +39,14 @@ const KO = 1024;
 // 29 octobre 2026, après relecture : styles.css gagne le contour du focus du jour, la semaine sans :has(), le point des
 // jours qui ont des bars et les longs jours (de 61,4 à 63,7 Ko) : le CSS de l’accueil et des pages fixes monte de 62 à
 // 65 Ko ; main.js retire la semaine toute passée (de 17,1 à 17,8 Ko) : le JS de l’accueil, de 17 à 18 Ko.
+// 30 octobre 2026 : « Pour les bars » passe au jour. pour-les-bars.css va de 24,3 à 28,6 Ko, styles.css est à 64,4 Ko
+// (l’accueil au jour, et l’étiquette des écrans et la page courante de l’en-tête du jour) ; aucun seuil ne bouge.
+// Mesuré ce jour-là (Ko) : accueil 6 requêtes, 177 transférés, JS 17,8, CSS 64,4, images 19 ; CGU 4, 147, 0, 64,4, 0 ;
+// pour les bars 7, 185, 64, 92,9 (styles.css et pour-les-bars.css), 0 (ses captures se chargent au défilement) ;
+// « Ce soir » 6, 150, 2, 80,9, 0 ; l’affiche de la semaine 6, 154, 0, 97,2, 0.
+// 30 octobre 2026, après la relecture : le seuil de « Pour les bars » serre au plus juste. Mesuré (Ko) : 7 requêtes,
+// 186 transférés, JS 65,3 (pour-les-bars.js 59,9, l’amorce 5,4), CSS 94,1 (styles.css 65,5, pour-les-bars.css 28,7),
+// images 0 (ses captures se chargent au défilement) : seuils 8, 190, 67, 96, 4 (de 13, 260, 68, 97, 72).
 // 30 octobre 2026 : la police allégée (105 Ko au lieu de 121 : le crénage et les chiffres tabulaires seulement, les
 // signes rares à part). Chaque seuil de transfert baisse de 15 Ko ; mesuré : accueil 157, CGU 128, le guide 127, pour
 // les bars 165, les pages générées 130 à 133, les affiches 135. Le CSS gagne 3,8 Ko (les @font-face et la police de
@@ -53,11 +61,17 @@ const KO = 1024;
 // l’accueil et les pages fixes de 59 à 73, les pages générées de 75 à 89, les affiches de 91 à 105, pour les bars de 86
 // à 100. main.js : 18,3 Ko (16,2 avant l’accueil), le JS de l’accueil de 16 à 18 Ko. Le transfert de l’accueil garde
 // les 5 Ko du bloc de la semaine (165 à 170), celui des pages fixes les 3 Ko de leur CSS (140 à 143).
+// 30 octobre 2026, la police allégée et « Pour les bars » au jour ensemble : le seuil de la page serre au plus juste.
+// Mesuré (Ko) : 7 requêtes, 172 transférés, JS 65,7 (pour-les-bars.js 60,3, l’amorce 5,4), CSS 101,3 (styles.css 72,5,
+// pour-les-bars.css 28,7), images 0 (ses captures se chargent au défilement) : seuils 8, 176, 67, 103, 4.
+// styles.css garde aussi les trois règles du jour de « Pour les bars » (l’étiquette des écrans, la page courante de
+// l’en-tête) : 72,5 Ko ; le CSS des affiches mesure 105,4 Ko (105,6 avant leur commentaire raccourci) : leur seuil
+// passe de 105 à 106.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
-  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 245, js: 68, css: 100, images: 72 } },
+  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 176, js: 67, css: 103, images: 4 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
   { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
   { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
@@ -67,8 +81,8 @@ const PAGES = [
   { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
   { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
   { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 105, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 105, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 106, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };

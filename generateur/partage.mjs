@@ -204,9 +204,10 @@ const MARGE = 48;
 const CARTE = { x: MARGE, y: MARGE, largeur: LARGEUR - 2 * MARGE, hauteur: HAUTEUR - 2 * MARGE, rayon: 44 };
 const PLACE = CARTE.largeur - 2 * 64;
 // Les insignes d’un match : 160 px (la taille de référence de l’appli), sur la nuit, à 64 px des bords de la carte ;
-// le texte garde 32 px de plus de chaque côté.
-const INSIGNE = { taille: TAILLES.partage, bord: 64, ecart: 32 };
-const PLACE_ENTRE_LES_INSIGNES = PLACE - 2 * (INSIGNE.taille + INSIGNE.ecart);
+// le texte garde 32 px de plus de chaque côté. Un texte qui ne tiendrait pas entre eux, même à sa plus petite taille
+// (« Samedi 31 octobre · heure à confirmer ») : des insignes plus petits, 128 puis 96 px, plutôt qu’un texte coupé.
+const INSIGNE = { tailles: [TAILLES.partage, 128, 96], bord: 64, ecart: 32 };
+const placeEntreLesInsignes = (taille) => PLACE - 2 * (taille + INSIGNE.ecart);
 
 // Un texte trop long pour sa place, coupé à la fin d’un mot et terminé par « … ».
 const raccourcir = (police, texte, taille, espacement, place) => {
@@ -275,12 +276,21 @@ export const svgDeLaCarte = (lignesBrutes, { verre }) => {
     ligne: propre(lignesBrutes.ligne, policeTexte),
     ambre: propre(lignesBrutes.ambre, policeTexte),
   };
-  // Avec les insignes d’un match, le texte tient entre eux.
-  const place = lignesBrutes.insignes ? PLACE_ENTRE_LES_INSIGNES : PLACE;
-  const surtitre = lignes.surtitre ? ajuster(policeTexte, lignes.surtitre, { max: 34, min: 26, espacement: 0.04, place }) : null;
-  const titre = ajusterLeTitre(policeTitre, lignes.titre, place);
-  const ligne = lignes.ligne ? ajuster(policeTexte, lignes.ligne, { max: 50, min: 34, place }) : null;
-  const ambre = lignes.ambre ? ajuster(policeTexte, lignes.ambre, { max: 50, min: 34, place }) : null;
+  // Chaque ligne à la plus grande taille qui tient dans « place » (coupée, terminée par « … », si même la plus petite ne
+  // tient pas) ; entier : aucune ligne n’est coupée.
+  const ajusterTout = (place) => {
+    const mise = {
+      surtitre: lignes.surtitre ? ajuster(policeTexte, lignes.surtitre, { max: 34, min: 26, espacement: 0.04, place }) : null,
+      titre: ajusterLeTitre(policeTitre, lignes.titre, place),
+      ligne: lignes.ligne ? ajuster(policeTexte, lignes.ligne, { max: 50, min: 34, place }) : null,
+      ambre: lignes.ambre ? ajuster(policeTexte, lignes.ambre, { max: 50, min: 34, place }) : null,
+    };
+    const entier = ['surtitre', 'ligne', 'ambre'].every((cle) => !mise[cle] || mise[cle].lignes[0] === lignes[cle]) && mise.titre.lignes.join(' ') === lignes.titre;
+    return { ...mise, entier };
+  };
+  // Avec les insignes d’un match, le texte tient entre eux : les plus grands insignes où il tient entier.
+  const tailleDesInsignes = lignesBrutes.insignes ? (INSIGNE.tailles.find((taille) => ajusterTout(placeEntreLesInsignes(taille)).entier) ?? INSIGNE.tailles.at(-1)) : 0;
+  const { surtitre, titre, ligne, ambre } = ajusterTout(lignesBrutes.insignes ? placeEntreLesInsignes(tailleDesInsignes) : PLACE);
 
   // La pile, centrée dans la carte sous la marque : chaque bloc a sa hauteur (les lettres capitales) et son écart.
   const interligneDuTitre = titre.taille * 0.94;
@@ -310,10 +320,10 @@ export const svgDeLaCarte = (lignesBrutes, { verre }) => {
   // <svg>, posé à sa place (le dessin de l’appli, sans rien d’autre).
   const insignes = lignesBrutes.insignes ? [
     [lignesBrutes.insignes.domicile, CARTE.x + INSIGNE.bord],
-    [lignesBrutes.insignes.exterieur, CARTE.x + CARTE.largeur - INSIGNE.bord - INSIGNE.taille],
-  ].map(([club, x]) => insigne(club, { taille: INSIGNE.taille, fond: 'night', saison: lignesBrutes.insignes.saison })
+    [lignesBrutes.insignes.exterieur, CARTE.x + CARTE.largeur - INSIGNE.bord - tailleDesInsignes],
+  ].map(([club, x]) => insigne(club, { taille: tailleDesInsignes, fond: 'night', saison: lignesBrutes.insignes.saison })
     .replace(/^<svg class="insigne" width="(\d+)" height="(\d+)" viewBox="([^"]+)" aria-hidden="true" focusable="false">/,
-      (_, largeur, hauteur, boite) => `<svg x="${x}" y="${(haut + bas) / 2 - INSIGNE.taille / 2}" width="${largeur}" height="${hauteur}" viewBox="${boite}">`)) : [];
+      (_, largeur, hauteur, boite) => `<svg x="${x}" y="${(haut + bas) / 2 - tailleDesInsignes / 2}" width="${largeur}" height="${hauteur}" viewBox="${boite}">`)) : [];
 
   const marque = 'Baromatch';
   const tailleMarque = 34;

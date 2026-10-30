@@ -360,6 +360,32 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     }
   });
 
+  test('chaque image de partage, du scénario et de la semaine des planches : son texte dessiné en entier ; celle d’un match dit ce que dit son texte alternatif', async () => {
+    const scenario = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario() });
+    const decoder = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+    const plat = (t) => t.replace(/\u00A0/g, ' ').toLocaleLowerCase('fr-FR');
+    let matchs = 0;
+    for (const s of [site, scenario]) {
+      const cartes = s.pages.filter((p) => p.carte);
+      expect(cartes.length).toBeGreaterThan(5);
+      for (const p of cartes) {
+        const svg = svgDeLaCarte(p.carte, { verre: s.cadre.verre });
+        const dessine = [...svg.matchAll(/<text [^>]*>([^<]*)<\/text>/g)].map(([, t]) => decoder(t)).filter((t) => t !== 'Baromatch');
+        const lignes = ['surtitre', 'titre', 'ligne', 'ambre'].map((cle) => p.carte[cle]).filter(Boolean);
+        // Le titre peut tenir sur deux lignes : le texte dessiné, bout à bout, est celui des lignes de la carte.
+        expect(dessine.join(' '), p.chemin).toBe(lignes.join(' '));
+        if (!p.carte.insignes) continue;
+        matchs += 1;
+        for (const l of lignes) expect(plat(p.carte.alt), `${p.chemin} : « ${l} »`).toContain(plat(l));
+      }
+    }
+    expect(matchs).toBeGreaterThan(8);
+    // « Samedi 31 octobre · heure à confirmer » ne tient pas entre deux insignes de 160 px : ils sont plus petits.
+    const olAngers = scenario.pages.find((p) => p.chemin === '/matchs/ol-angers-2026-10-31/');
+    expect(olAngers.carte.ligne).toBe('Samedi 31 octobre · heure à confirmer');
+    expect(svgDeLaCarte(olAngers.carte, { verre: scenario.cadre.verre })).toMatch(/<svg x="112" y="\d+(?:\.\d+)?" width="128" height="128" viewBox="0 0 200 200">/);
+  });
+
   test('l’image de partage d’un match : les deux insignes de l’appli à 160 px, sur la nuit, la saison écrite', () => {
     const page = site.pages.find((p) => p.chemin === '/matchs/le-havre-psg-2026-10-30/');
     expect(page.carte.insignes).toEqual({ domicile: { slug: 'le-havre-ac', cle: 'le-havre', nom: 'Le Havre AC' }, exterieur: { slug: 'paris-saint-germain', cle: 'psg', nom: 'Paris Saint-Germain' }, saison: '26/27' });

@@ -365,5 +365,3 @@
 .jour .panier__envoyer[aria-disabled="true"]:hover { background: var(--fond-releve); }
 .jour .courriel--second .capsule:hover,
 .jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover { background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
-/* Le contour du petit verre (celui de l’envoi et du merci aussi) est en bleu nuit sur le clair : sa règle est dans le style de la page, le
-   petit verre du surtitre est dans le premier écran. */

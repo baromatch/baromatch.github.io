@@ -43,11 +43,14 @@ const KO = 1024;
 // Mesuré ce jour-là (Ko) : accueil 6 requêtes, 177 transférés, JS 17,8, CSS 64,4, images 19 ; CGU 4, 147, 0, 64,4, 0 ;
 // pour les bars 7, 185, 64, 92,9 (styles.css et pour-les-bars.css), 0 (ses captures se chargent au défilement) ;
 // « Ce soir » 6, 150, 2, 80,9, 0 ; l’affiche de la semaine 6, 154, 0, 97,2, 0.
+// 30 octobre 2026, après la relecture : le seuil de « Pour les bars » serre au plus juste. Mesuré (Ko) : 7 requêtes,
+// 186 transférés, JS 65,3 (pour-les-bars.js 59,9, l’amorce 5,4), CSS 94,1 (styles.css 65,5, pour-les-bars.css 28,7),
+// images 0 (ses captures se chargent au défilement) : seuils 8, 190, 67, 96, 4 (de 13, 260, 68, 97, 72).
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 185, js: 18, css: 65, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 158, js: 0, css: 65, images: 0 } },
-  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 260, js: 68, css: 97, images: 72 } },
+  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 190, js: 67, css: 96, images: 4 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
   { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },
   { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 83, images: 4 } },

@@ -1349,8 +1349,7 @@ a:hover { color: var(--goutte); }
 .semaine { margin-top: 48px; padding: 48px 0 56px; background: var(--fond-releve, var(--nuit-releve)); box-shadow: 0 0 0 100vmax var(--fond-releve, var(--nuit-releve)); clip-path: inset(0 -100vmax); }
 .ouverture > .semaine { grid-column: 1 / -1; }
 @media (min-width: 720px) { .semaine { padding: 64px 0 80px; } }
-/* Sur ordinateur, le film est affiché au-dessus des matchs mais vient au clavier après eux : l’ordre est celui du HTML,
-   choisi pour le téléphone (les matchs sous l’inscription, puis le film). */
+/* Sur ordinateur, le film, affiché au-dessus, vient au clavier après les matchs : l’ordre du HTML, celui du téléphone. */
 @media (min-width: 960px) { .ouverture > .semaine { grid-row: 6; margin-top: 72px; } }
 .semaine .titre-section { max-width: none; }
 .semaine__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
@@ -1369,8 +1368,7 @@ a:hover { color: var(--goutte); }
 .semaine__date small { color: var(--texte-discret); font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .semaine__date input:checked + span { border-color: var(--texte); background: var(--texte); color: var(--fond, var(--nuit)); }
 .semaine__date input:checked + span small { color: inherit; }
-/* Un jour qui a des matchs avec des bars : un point devant son nombre de matchs, de la couleur de son texte (l’ambre est
-   pour l’action), à sa taille (il grandit avec lui). Le point de « 1 bar à Paris » de même. */
+/* Un jour avec des bars : un point de la couleur du texte (l’ambre est pour l’action), à sa taille ; « 1 bar » aussi. */
 .semaine__point { display: inline-block; width: 0.6em; height: 0.6em; margin: 0 0.45em 0.1em 0; border-radius: 50%; background: currentColor; vertical-align: middle; }
 .semaine__date input:focus-visible + span { outline: 2px solid var(--texte); outline-offset: 2px; }
 .semaine__date[hidden], .semaine__jours[hidden], .semaine__jours > .semaine__jour[hidden] { display: none; }
@@ -1423,7 +1421,7 @@ a:hover { color: var(--goutte); }
 .carte-match__agenda::before { content: ""; flex: none; width: 14px; height: 13px; border: 1.5px solid currentColor; border-top-width: 4px; border-radius: 3px; }
 .carte-match__bars { display: inline-flex; align-items: center; gap: 8px; padding: 10px 0; font-weight: 650; }
 .carte-match__bars::before { content: ""; flex: none; width: 0.65em; height: 0.65em; border-radius: 50%; background: currentColor; }
-/* En couleurs forcées, un fond serait repeint (le point disparaîtrait) : la couleur du texte du système. */
+/* En couleurs forcées, leur fond serait repeint. */
 @media (forced-colors: active) { .semaine__point, .carte-match__bars::before { forced-color-adjust: none; background: CanvasText; } }
 .carte-match__voir, .semaine__voir { display: inline-flex; align-items: center; min-height: 44px; margin: 6px 0 10px; padding: 0 18px; border-radius: 999px; background: var(--ambre); color: var(--nuit); font-weight: 700; text-decoration: none; }
 :where(.jour) :is(.carte-match__voir, .semaine__voir) { color: var(--nuit); }

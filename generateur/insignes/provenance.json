@@ -1,0 +1,20 @@
+{
+ "_lisezMoi": "Copie du générateur d’insignes de l’appli Baromatch : les fichiers du dessin, transpilés en JavaScript sans commentaires, la table des clubs réduite à ce que le dessin lit, et les bandes des drapeaux (les données seules). Produite par generateur/outils/insignes/exporter.mjs, jamais modifiée à la main : quand l’appli change ses insignes (une version plus récente que celle-ci), on relance l’exportation. La copie redonne les empreintes que l’appli tient pour chaque insigne (tests/donnees/insignes/empreintes.json, vérifiées par tests/insignes.spec.mjs). © Baromatch, tous droits réservés.",
+ "versionDeLAppli": "0.1.0",
+ "typescript": "5.9.3",
+ "empreinteDesSources": "2590953e97dcb553d1552bd50f345468211f1b024dc0eb617ed65c8580cde12d",
+ "fichiers": {
+  "back.mjs": "8479bd490c7507590855e9da73a44e85e1e5553de98b786b5da0056f1858b3b4",
+  "badge.mjs": "183bcbc0cfdace3a726f0105e0f9ecc4c2c001f9d7cedce19a77831ee3317180",
+  "coaster.mjs": "92230bd27fe1217077c3001a3952e8bb506719fc4a90f5e674f70a7c05ef72b0",
+  "colour.mjs": "f8b6e3a865c09fd2087c1d0ebef3ba912811af9a759c163311a650a2b577e297",
+  "drapeaux.json": "71fd5373beea92852c5728b6101be5377d2099e8527806cce0618bfcdeb21203",
+  "glyphs.generated.mjs": "13f2ddd29a7b13b15043a48176ad251cb737bb6f35cb1d1724eb7171efc5d321",
+  "index.mjs": "95c238faf64c76778176a118ddcb74e2d7501d21efb892bf37c5627c7328e825",
+  "match.mjs": "7081ac68806c8c0e1c08a4863cd0ead756425497b5cafa171bf693cd59adc135",
+  "patterns.mjs": "88e66b67313a57124d58e1fe26885bba180c1699bd133da3826762995a6ffda1",
+  "specs.mjs": "6ed9b90d14cd259cd9f1aa7d9b5fc96c1d24926db7a3bff8a63aaebf881eb9c4",
+  "svg.mjs": "a03a2a468fc362e746e1560b4db54e8fe0ee68f12c89c5f4a5143860089b163e",
+  "type.mjs": "dc09de5ed69d05eac11b4577df2ee539d54638578d85dd84653315c271f24bb4"
+ }
+}

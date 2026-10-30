@@ -206,9 +206,13 @@ test.describe('les données', () => {
     const havre = donnees.matchs.filter((m) => [m.domicile.cle, m.exterieur.cle].includes('le-havre'));
     expect(havre.map((m) => [m.domicile.court, m.domicile.nom])).toEqual([['Le Havre', 'Le Havre AC'], ['Le Havre', 'Le Havre AC']]);
 
+    // Le nom du club dans l’appli, celui de son insigne : pour un club de clubs.json, le premier de ses noms (Havre AC
+    // a l’insigne du Havre) ; sinon celui des données ; aucun sans données.
     const index = indexerLesClubs(contenu.clubs);
-    expect(clubDe(index, { slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' })).toEqual({ cle: 'psg', court: 'PSG', nom: 'Paris Saint-Germain' });
-    expect(clubDe(index, { slug: 'fk-bod-glimt', canonicalName: 'FK Bodø/Glimt' })).toEqual({ cle: 'bodo-glimt', court: 'Bodø/Glimt', nom: 'FK Bodø/Glimt' });
+    expect(clubDe(index, { slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' })).toEqual({ cle: 'psg', court: 'PSG', nom: 'Paris Saint-Germain', slug: 'paris-saint-germain' });
+    expect(clubDe(index, { slug: 'havre-ac', canonicalName: 'Havre AC' })).toEqual({ cle: 'le-havre', court: 'Le Havre', nom: 'Le Havre AC', slug: 'le-havre-ac' });
+    expect(clubDe(index, { slug: 'fk-bod-glimt', canonicalName: 'FK Bodø/Glimt' })).toEqual({ cle: 'bodo-glimt', court: 'Bodø/Glimt', nom: 'FK Bodø/Glimt', slug: 'fk-bod-glimt' });
+    expect(clubDe(index, null, 'Como 1907')).toEqual({ cle: 'como-1907', court: 'Como 1907', nom: 'Como 1907' });
     expect(clubDe(index, { slug: 'sk-sturm-graz', canonicalName: 'SK Sturm Graz' }).court).toBe('Sturm Graz');
     expect(clubDe(index, null, 'Como 1907').court).toBe('Como 1907');
     // Chaque club de la copie de ce soir a un nom court sans sigle (sauf le Paris FC, dont c’est le nom).

@@ -5,7 +5,8 @@
 // - le poids transféré : celui de GitHub Pages, qui compresse le texte (HTML, CSS, JS, SVG) en gzip ; la police et les
 //   images passent telles quelles ;
 // - le nombre de requêtes, et le poids (non compressé) du JavaScript, du CSS et des images ;
-// - une seule police (Bricolage Grotesque, un seul fichier) ;
+// - une seule police : le cœur de Bricolage Grotesque, préchargé (ses deux autres fichiers, les signes rares et le
+//   latin étendu, ne viennent que pour un caractère que ces pages n’écrivent pas) ;
 // - rien d’un autre site pendant le chargement, et aucun script qui bloque l’affichage (chaque script de fichier est
 //   defer ou async).
 // Deux fois : la mesure d’audience arrêtée (le code de marque.json vide), puis active (un code d’essai). Active, chaque
@@ -32,22 +33,29 @@ const KO = 1024;
 // La police (121 Ko) fait l’essentiel de chaque page.
 // 26 octobre 2026 : le CSS des deux affiches passe de 86 à 87 Ko. styles.css gagne le mot du fondateur (À propos,
 // Presse) ; avec « Pour les bars » dans l’en-tête et l’accueil revu, elles arrivent à 86,8 Ko, compté 87.
+// 30 octobre 2026 : la police allégée (105 Ko au lieu de 121 : le crénage et les chiffres tabulaires seulement, les
+// signes rares à part). Chaque seuil de transfert baisse de 15 Ko ; mesuré : accueil 157, CGU 128, le guide 127, pour
+// les bars 165, les pages générées 130 à 133, les affiches 135. Le CSS gagne 3,8 Ko (les @font-face et la police de
+// secours) : ses seuils restent.
+// 30 octobre 2026, après relecture : la police de secours ne dessine plus que les caractères des trois fichiers (8 fois
+// la même unicode-range, 365 octets ; 0,2 Ko compressé) : styles.css passe de 55,8 à 57,7 Ko. Les seuils de CSS montent
+// d’autant : l’accueil et les pages fixes de 58 à 59 Ko, les pages générées de 72 à 75, les affiches de 87 à 91.
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 180, js: 16, css: 58, images: 24 } },
-  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 155, js: 0, css: 58, images: 0 } },
-  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 155, js: 0, css: 58, images: 0 } },
-  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 260, js: 68, css: 86, images: 72 } },
-  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 72, images: 4 } },
-  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 160, js: 4, css: 72, images: 6 } },
-  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 160, js: 4, css: 72, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 87, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 165, js: 4, css: 87, images: 4 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 165, js: 16, css: 59, images: 24 } },
+  { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 140, js: 0, css: 59, images: 0 } },
+  { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 140, js: 0, css: 59, images: 0 } },
+  { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 13, transfere: 245, js: 68, css: 86, images: 72 } },
+  { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 75, images: 4 } },
+  { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 75, images: 4 } },
+  { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 75, images: 4 } },
+  { nom: 'page d’une compétition', chemin: '/matchs/competition/ligue-1/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 75, images: 4 } },
+  { nom: 'page de ville', chemin: '/regarder-le-match/paris/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 75, images: 4 } },
+  { nom: 'page de bar', chemin: '/bar/le-zinc-des-amis-paris-11/', genere: true, budget: { requetes: 9, transfere: 145, js: 4, css: 75, images: 6 } },
+  { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 75, images: 4 } },
+  { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 75, images: 4 } },
+  { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 75, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 91, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 91, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };
@@ -56,7 +64,8 @@ const MESURES = [
   { nom: 'la mesure d’audience arrêtée', marque: { ...MARQUE, mesure: { ...MARQUE.mesure, code: '' } }, plus: {} },
   { nom: 'la mesure d’audience active', marque: { ...MARQUE, mesure: { ...MARQUE.mesure, outil: 'goatcounter', code: 'essai' } }, plus: AVEC_LA_MESURE },
 ];
-const POLICES_MAX = 1;
+// La seule police de ces pages : le cœur, celui que chaque page précharge.
+const POLICES = ['/fonts/bricolage-grotesque.woff2'];
 const TEXTE = /^(?:text\/|application\/(?:javascript|json|ld\+json|xml)|image\/svg\+xml)/;
 
 const portLibre = () => new Promise((resoudre) => {
@@ -126,8 +135,8 @@ for (const [rang, { nom, marque, plus }] of MESURES.entries()) {
       // /mesure.js, seulement quand la mesure est active (hors de baromatch.fr, il ne compte rien et n’envoie rien).
       const actif = Boolean(marque.mesure.code);
       expect(ressources.filter((r) => new URL(r.adresse).pathname === '/mesure.js')).toHaveLength(actif ? 1 : 0);
-      // Une seule police, et rien d’un autre site : ni script, ni style, ni police, ni envoi de la mesure d’audience.
-      expect(ressources.filter((r) => r.type === 'font').map((r) => new URL(r.adresse).pathname)).toHaveLength(POLICES_MAX);
+      // Une seule police, le cœur, et rien d’un autre site : ni script, ni style, ni police, ni envoi de la mesure d’audience.
+      expect(ressources.filter((r) => r.type === 'font').map((r) => new URL(r.adresse).pathname)).toEqual(POLICES);
       expect(ressources.filter((r) => new URL(r.adresse).origin !== origine).map((r) => r.adresse)).toEqual([]);
       expect(scriptsBloquants).toEqual([]);
     });

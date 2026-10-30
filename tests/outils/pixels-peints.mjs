@@ -86,7 +86,11 @@ const lireLesLignes = (nuit) => {
     const element = texte.parentElement;
     if (!element || element.closest(`${nuit}, script, style, svg, noscript, [hidden]`)) continue;
     if (!element.checkVisibility({ visibilityProperty: true, opacityProperty: true })) continue;
-    const [r, v, b, a = 1] = getComputedStyle(element).color.match(/[\d.]+/g).map(Number);
+    // « color(srgb r v b / a) » (de 0 à 1) pour une couleur de color-mix(), « rgb(…) » sinon.
+    const css = getComputedStyle(element).color;
+    const k = css.startsWith('color(srgb ') ? 255 : 1;
+    const [r, v, b] = css.match(/[\d.]+/g).map(Number).slice(0, 3).map((c) => c * k);
+    const a = Number(css.match(/[\d.]+/g)[3] ?? 1);
     let opacite = 1;
     for (let e = element; e; e = e.parentElement) opacite *= Number(getComputedStyle(e).opacity);
     const plage = document.createRange();

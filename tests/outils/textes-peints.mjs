@@ -11,7 +11,12 @@
 export const TOUJOURS_HORS_JEU = '.visuellement-cache, .lien-evitement';
 
 export const mesurerLesTextes = (page, nuit) => page.evaluate((horsJeu) => {
-  const lire = (css) => { const [r, v, b, a = 1] = css.match(/[\d.]+/g).map(Number); return { r, v, b, a }; };
+  // « rgb(…) », « rgba(…) », ou « color(srgb r v b / a) », que le navigateur écrit pour une couleur de color-mix() (de 0 à 1).
+  const lire = (css) => {
+    const [r, v, b, a = 1] = css.match(/[\d.]+/g).map(Number);
+    const k = css.startsWith('color(srgb ') ? 255 : 1;
+    return { r: r * k, v: v * k, b: b * k, a };
+  };
   const poser = (dessus, dessous) => ({ r: dessus.r * dessus.a + dessous.r * (1 - dessus.a), v: dessus.v * dessus.a + dessous.v * (1 - dessus.a), b: dessus.b * dessus.a + dessous.b * (1 - dessus.a), a: 1 });
   const lum = ({ r, v, b }) => [r, v, b].map((c) => c / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)).reduce((s, c, i) => s + c * [0.2126, 0.7152, 0.0722][i], 0);
   const rapport = (x, y) => { const [c, s] = [lum(x), lum(y)].sort((m, n) => n - m); return (c + 0.05) / (s + 0.05); };

@@ -115,6 +115,21 @@ const lireLaLumiere = (page) => page.evaluate(() => {
 });
 
 test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
+  // Une couleur faite par color-mix() (le survol de l’envoi en verre, par exemple) : le navigateur l’écrit « color(srgb r v b) »,
+  // de 0 à 1, pas « rgb(…) ». Lue comme rgb, elle devenait presque noire (#010101), et un texte bleu nuit dessus tombait à
+  // 1,06:1 : selon que la souris restait ou non sur le bouton après l’envoi, le test échouait au hasard.
+  test('témoin : une couleur de color-mix(), que le navigateur écrit « color(srgb …) », se lit juste', async ({ page }) => {
+    await page.setContent('<p style="margin: 0; background: color-mix(in srgb, #F3EEE5 82%, #0A0B10); color: #0A0B10">Envoyer ma demande</p>');
+    const fond = await page.locator('p').evaluate((p) => getComputedStyle(p).backgroundColor);
+    expect(fond).toMatch(/^color\(srgb /);
+    const lu = lireCouleur(fond);
+    for (const [canal, attendu] of [['r', 201.06], ['v', 197.14], ['b', 190.66]]) expect(lu[canal], canal).toBeCloseTo(attendu, 0);
+    expect(lu.a).toBe(1);
+    const mesures = await mesurerLesTextes(page, '.rien');
+    expect(mesures.map((m) => [m.fond, m.texte])).toEqual([['#C9C5BF', '#0A0B10']]);
+    expect(textesTropFaibles(mesures)).toEqual([]);
+  });
+
   for (const largeur of LARGEURS) {
     for (const etat of ETATS) {
       test(`à ${largeur} px, ${etat.nom} : chaque texte à 4,5:1 au moins`, async ({ page }, infos) => {

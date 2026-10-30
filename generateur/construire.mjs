@@ -6,11 +6,14 @@
 // Par défaut : les listes publiques de l’appli, la racine du dépôt, l’heure de la machine.
 // Le passage lit les données, fabrique et contrôle toutes les pages en mémoire (site.mjs), refuse de supprimer d’un
 // coup plus de la moitié des pages déjà publiées, puis écrit seulement ce qui a changé, dans la liste blanche
-// (etat.mjs) : matchs/, regarder-le-match/, bar/, ce-soir/, en/, agenda/ et sitemap.xml. --changees écrit, une par
-// ligne, les adresses indexables dont le contenu a changé, et celles qui ne sont plus indexables (pour IndexNow).
+// (etat.mjs) : matchs/, regarder-le-match/, bar/, ce-soir/, en/, agenda/ et sitemap.xml. Hors d’elle, une seule chose :
+// le bloc « Les matchs de la semaine » de l’accueil, entre ses deux repères, et rien d’autre de index.html (accueil.mjs).
+// --changees écrit, une par ligne, les adresses indexables dont le contenu a changé, et celles qui ne sont plus
+// indexables (pour IndexNow).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { blocDeLaSemaine, controlerLaSemaine, ecrireLAccueil, preparerLAccueil } from './accueil.mjs';
 import { fabriquerLesAgendas } from './agenda.mjs';
 import { badgeDuBar } from './badge.mjs';
 import { chargerLeRendu } from './images/rendu.mjs';
@@ -135,11 +138,29 @@ export const construire = async ({
   const refuses = [...fichiers.map((f) => f.chemin), ...supprimees].filter((chemin) => !estPermis(fichierDuChemin(chemin)));
   if (refuses.length) throw new Error(`Chemins refusés (hors de la liste blanche du générateur), rien n’est écrit : ${refuses.join(', ')}`);
 
+  // L’accueil : son bloc des matchs de la semaine, des mêmes données. Un bloc qui ne se fait pas (des textes sans le
+  // sien), un bloc refusé par son contrôle, ou un accueil sans ses repères, laisse l’accueil comme il est (le journal le
+  // dit) : les pages des matchs s’écrivent quand même.
+  let bloc = null;
+  let accueil = null;
+  try {
+    bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
+    const erreursDuBloc = controlerLaSemaine(bloc);
+    if (erreursDuBloc.length) {
+      avertissements.push(`accueil : le bloc des matchs de la semaine est refusé (${erreursDuBloc.join(' ; ')}) : l’accueil reste comme il est`);
+    } else {
+      accueil = preparerLAccueil({ racine, sortie, bloc });
+    }
+  } catch (erreur) {
+    avertissements.push(`accueil : ${erreur.message} : l’accueil reste comme il est`);
+  }
+
   // Tout est prêt et contrôlé : seulement maintenant, l’écriture.
   const ecrits = fichiers.filter((f) => f.contenu !== null && ecrireUnFichier(sortie, fichierDuChemin(f.chemin), f.contenu)).map((f) => f.chemin);
   for (const chemin of supprimees) effacerUnFichier(sortie, fichierDuChemin(chemin));
   ecrireUnFichier(sortie, FICHIER_ETAT, texteDeLEtat(etat));
   ecrireUnFichier(sortie, PLAN, plan);
+  if (accueil) ecrireLAccueil(sortie, accueil);
 
   // Pour IndexNow : les adresses indexables dont le contenu a changé, et celles qui l’étaient au passage précédent et
   // ne le sont plus (passées en noindex, ou disparues), pour que les moteurs les relisent.
@@ -154,7 +175,7 @@ export const construire = async ({
     if (p.indexable) compte[p.type].indexables += 1;
   }
   for (const avertissement of avertissements) journal(`avertissement : ${avertissement}`);
-  return { etat, plan, fichiers, ecrits, supprimees, changees, compte, avertissements, donnees: site.donnees };
+  return { etat, plan, fichiers, ecrits, supprimees, changees, compte, avertissements, donnees: site.donnees, accueil: { bloc, ecrit: Boolean(accueil) } };
 };
 
 // ---------- La ligne de commande ----------
@@ -186,7 +207,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     });
     const resume = Object.entries(resultat.compte).map(([type, { pages, indexables }]) => `${type} : ${pages} (${indexables} indexables)`).join(' · ');
     console.log(`Pages : ${resume}`);
-    console.log(`${resultat.ecrits.length} fichiers écrits ou changés, ${resultat.supprimees.length} supprimés, ${resultat.changees.length} adresses indexables changées.`);
+    console.log(`${resultat.ecrits.length} fichiers écrits ou changés, ${resultat.supprimees.length} supprimés, ${resultat.changees.length} adresses indexables changées${resultat.accueil.ecrit ? ', le bloc de l’accueil réécrit' : ''}.`);
     if (typeof options.changees === 'string') writeFileSync(options.changees, resultat.changees.map((a) => `${a}\n`).join(''));
   } catch (erreur) {
     console.error(erreur.message);

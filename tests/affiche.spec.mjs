@@ -379,8 +379,8 @@ test('l’Action installe l’encodeur avec le rendu des images, et enregistre l
   const action = readFileSync(path.join(racine, '.github', 'workflows', 'pages-des-matchs.yml'), 'utf8');
   expect(action).toContain('working-directory: generateur/images\n        run: npm ci --ignore-scripts --no-audit --no-fund');
   expect(action).toContain('--images=exiger');
-  expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml; do');
-  expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$'");
+  expect(action).toContain('for chemin in matchs regarder-le-match bar ce-soir en agenda sitemap.xml index.html; do');
+  expect(action).toContain("grep -vqE '^(matchs|regarder-le-match|bar|ce-soir|en|agenda)/|^sitemap\\.xml$|^index\\.html$'");
 });
 
 test('la semaine (/matchs/) mène à l’affiche de ses matchs, par un lien seul, juste avant « Toutes les villes »', async () => {

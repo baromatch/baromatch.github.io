@@ -42,7 +42,12 @@ for (const page of [...PAGES.filter((p) => !p.chemin.startsWith('/t/')), ...GENE
     expect(existsSync(fichierDe(page.chemin)), `${page.chemin} : aucun fichier ${fichierDe(page.chemin)}`).toBe(true);
     await onglet.goto(page.chemin);
     const { liens, srcsets } = await onglet.evaluate(() => ({
+      // Sauf le bloc des matchs de la semaine de l’accueil (#semaine) : le générateur l’écrit au même passage que les pages
+      // des matchs qu’il cite, et le test d’un passage (accueil-semaine.spec.mjs) suit ses liens dans le site qu’il
+      // construit. Ici, le bloc enregistré peut dater d’un autre passage que les pages des matchs du dépôt (une fusion de
+      // main) : un match fini depuis n’a plus son fichier d’agenda.
       liens: [...document.querySelectorAll('a[href], link[rel="canonical"], link[rel="icon"], link[rel="apple-touch-icon"], link[rel="stylesheet"], link[rel="preload"], script[src], img[src], source[src], video[poster]')]
+        .filter((e) => !e.closest('#semaine'))
         .map((e) => e.getAttribute('href') ?? e.getAttribute('src') ?? e.getAttribute('poster')),
       srcsets: [...document.querySelectorAll('img[srcset], source[srcset]')].map((e) => e.getAttribute('srcset')),
     }));

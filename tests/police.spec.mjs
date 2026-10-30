@@ -84,6 +84,16 @@ test('aucun caractère perdu : tout ce que l’ancienne police dessinait l’est
 // (::before, ::after, ::marker), textes d’exemple et valeurs des champs ; cachés compris (un panneau qui s’ouvre).
 const lireLesCaracteres = (onglet) => onglet.evaluate(() => {
   const vus = new Set();
+  // Le bloc des matchs de la semaine de l’accueil, entre ses deux repères : le générateur l’écrit avec les données du
+  // jour (des noms de clubs), comme les pages des matchs publiées. Son texte n’est pas lu ici ; ses textes fixes
+  // (generateur/contenu/textes.json) le sont par le test des textes du générateur, et ses contenus CSS (la flèche des
+  // cartes) ici même.
+  const reperes = [];
+  const commentaires = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+  for (let n = commentaires.nextNode(); n; n = commentaires.nextNode()) if (/^ semaine:(?:debut|fin) $/.test(n.data)) reperes.push(n);
+  const [debut, fin] = reperes;
+  const dansLeBloc = (e) => Boolean(debut && fin && (debut.compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING)
+    && (fin.compareDocumentPosition(e) & Node.DOCUMENT_POSITION_PRECEDING));
   const garder = (element, texte, pseudo) => {
     const famille = getComputedStyle(element, pseudo).fontFamily.split(',')[0].replace(/["']/g, '').trim();
     if (famille === 'Bricolage Grotesque') for (const c of texte) vus.add(c);
@@ -92,7 +102,7 @@ const lireLesCaracteres = (onglet) => onglet.evaluate(() => {
     if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(element.tagName)) continue;
     let texte = '';
     for (const noeud of element.childNodes) if (noeud.nodeType === Node.TEXT_NODE) texte += noeud.nodeValue;
-    if (texte.trim()) garder(element, texte);
+    if (texte.trim() && !dansLeBloc(element)) garder(element, texte);
     for (const pseudo of ['::before', '::after', '::marker']) {
       const contenu = getComputedStyle(element, pseudo).content;
       const litteral = (contenu.match(/"(?:[^"\\]|\\.)*"/g) ?? []).map((m) => m.slice(1, -1)).join('');
@@ -337,6 +347,10 @@ test('les textes que les scripts du site et le générateur écrivent plus tard 
   }
   const contenus = readdirSync(path.join(racine, 'generateur', 'contenu')).filter((f) => f.endsWith('.json'));
   expect(contenus).toContain('clubs.json');
+  // Les textes fixes du bloc des matchs de la semaine de l’accueil (que le test des pages écrites à la main ne lit pas)
+  // en sont : textes.json, section « accueil ».
+  expect(contenus).toContain('textes.json');
+  expect(textesDuJson(JSON.parse(readFileSync(path.join(racine, 'generateur', 'contenu', 'textes.json'), 'utf8')).accueil).length).toBeGreaterThan(15);
   for (const fichier of contenus) {
     const json = JSON.parse(readFileSync(path.join(racine, 'generateur', 'contenu', fichier), 'utf8'));
     for (const texte of textesDuJson(json)) for (const c of texte) relever(releve, c, `generateur/contenu/${fichier}`);

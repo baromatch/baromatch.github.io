@@ -81,17 +81,21 @@
 label.affiche-ligne__texte { cursor: pointer; }
 .affiche-heure { grid-area: heure; white-space: nowrap; font-size: 1.5rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
 .affiche-heure--a-confirmer { align-self: center; white-space: normal; font-size: 0.8125rem; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
-/* Les insignes devant le nom, ou au-dessus (toujours sous 560 px) ; l’heure au-dessus d’une ligne trop étroite. */
-.affiche-match { grid-area: match; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
-.affiche-match__nom { min-width: 0; overflow-wrap: anywhere; }
-@media (max-width: 559.98px) { .affiche-match { flex-direction: column; align-items: flex-start; } }
+/* La paire à côté du nom, en haut ; au-dessus (hors du flux) sous 560 px ou dans une ligne étroite. L’heure et la
+   compétition suivent la ligne de base du nom ; plus étroite encore, l’heure passe au-dessus. */
+.affiche-match { grid-area: match; position: relative; display: flex; align-items: flex-start; gap: 10px; min-width: 0; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
+.affiche-match__nom { align-self: baseline; min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 559.98px) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
 .affiche-ligne { container-type: inline-size; }
+@container (max-width: calc(13.25rem + 136px)) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
 @container (max-width: calc(4.25rem + 126px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
 .affiche-competition { grid-area: competition; color: var(--encre-douce); font-size: 0.875rem; font-weight: 600; }
-/* La compétition : 40 % au plus (texte agrandi). */
+/* Trois colonnes (la compétition à droite, 40 % au plus) dès 720 px, si la ligne en a la place (26 rem). */
 @media (min-width: 720px) {
-  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(40%); grid-template-areas: "heure match competition"; }
-  .affiche-competition { text-align: right; }
+  @container (min-width: 26rem) {
+    .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(40%); grid-template-areas: "heure match competition"; }
+    .affiche-competition { text-align: right; }
+  }
 }
 /* Ce qui sera imprimé : la ligne cochée surlignée ; dès qu’une case est cochée, les autres pâlissent. */
 .affiche-ligne:has(.affiche-case:checked) .affiche-ligne__texte { background: var(--surligne); }
@@ -183,7 +187,7 @@ label.affiche-ligne__texte { cursor: pointer; }
   .affiche-heure { font-size: calc(24pt * var(--echelle)); line-height: 1.05; }
   .affiche-heure--a-confirmer { font-size: calc(10pt * var(--echelle)); }
   /* La paire à côté du nom, en haut, à l’échelle (8 mm en A4). */
-  .affiche-match { flex-wrap: nowrap; align-items: flex-start; gap: calc(2.5mm * var(--echelle)); font-size: calc(20pt * var(--echelle)); line-height: 1.1; }
+  .affiche-match { gap: calc(2.5mm * var(--echelle)); font-size: calc(20pt * var(--echelle)); line-height: 1.1; }
   .affiche svg.insigne, .affiche svg.insignes { width: auto; height: calc(8mm * var(--echelle)); }
   .affiche-competition { font-size: calc(11pt * var(--echelle)); text-align: right; }
   .affiche-pied { flex-wrap: nowrap; gap: calc(8mm * var(--echelle)); margin-top: auto; padding-top: calc(3mm * var(--echelle)); break-inside: avoid; }
@@ -211,9 +215,8 @@ label.affiche-ligne__texte { cursor: pointer; }
 }
 
 /* ---------- La feuille à laisser au patron (/matchs/affiche/pour-le-patron/) ----------
-   Le même papier : un surtitre, le titre, quatre lignes, « Où on en est », puis le pied (l’appel, le contact, « Laissée
-   par » et sa ligne au stylo, la date et le verre ; le QR code à droite). La copie (la seconde feuille de l’A4) ne se
-   montre jamais à l’écran. */
+   Le même papier : surtitre, titre, quatre lignes, « Où on en est », puis le pied (appel, contact, « Laissée par » au
+   stylo, date, verre ; QR code à droite). Sa copie (seconde feuille de l’A4) ne se montre jamais à l’écran. */
 
 .affiche--copie { display: none; }
 .affiche-patron__surtitre { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
@@ -229,16 +232,13 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-laissee__trait { flex: 1; min-width: 6rem; height: 1.5em; border-bottom: 1px solid var(--encre-douce); }
 .affiche--patron .affiche-qr__code { width: 144px; height: 144px; }
 
-/* À l’impression : A4 (le choix par défaut), la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la ligne de
-   coupe au milieu : 268 mm sur les 273 de la zone imprimable (marges de 12 mm), 5 mm de jeu. Une page plus courte
-   (papier Letter, d’autres marges, une impression depuis un téléphone) : la copie passe entière sur la page suivante,
-   jamais coupée en deux (break-inside). A5, la feuille seule, la page entière. Un navigateur sans :has() imprime une
-   seule feuille, sur la moitié haute. */
+/* Imprimée en A4 (par défaut) : la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la coupe au milieu (268 mm
+   sur 273 imprimables). Une page plus courte (Letter, un téléphone) : la copie passe entière à la page suivante. A5 : la
+   feuille seule. Sans :has(), une seule feuille, en haut. */
 @media print {
   .affiche--patron { min-height: 0; height: 127mm; break-inside: avoid; }
   .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; margin-top: 14mm; }
-  /* La ligne de coupe, 7 mm sous la première feuille : entre les deux feuilles, ou sous la première quand la copie
-     passe sur la page suivante (jamais seule au bas d’une page). */
+  /* La coupe, 7 mm sous la première feuille (jamais seule au bas d’une page). */
   .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie) { position: relative; }
   .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie)::after { content: ""; position: absolute; right: 0; bottom: -7mm; left: 0; border-top: 0.3mm dashed #000000; }
   .regarder:has(#patron-a5:checked) .affiche--patron { height: auto; min-height: 184mm; }

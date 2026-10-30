@@ -503,6 +503,17 @@ test.describe('dans le navigateur', () => {
       nom += n.data;
     }
     const ligne = bloc.closest('.affiche-ligne__texte');
+    // La ligne de base d’un texte : le bas d’un repère vide posé en ligne à son début.
+    const base = (element) => {
+      const repere = document.createElement('span');
+      repere.style.cssText = 'display: inline-block; width: 0; height: 0';
+      element.prepend(repere);
+      const y = repere.getBoundingClientRect().bottom;
+      repere.remove();
+      return y;
+    };
+    const nomSeul = bloc.querySelector('.affiche-match__nom');
+    const heure = ligne?.querySelector('.affiche-heure');
     // La largeur du nom sur une seule ligne.
     const essai = document.createElement('span');
     essai.style.whiteSpace = 'nowrap';
@@ -511,6 +522,13 @@ test.describe('dans le navigateur', () => {
     const surUneLigne = essai.getBoundingClientRect().width;
     essai.remove();
     return {
+      // L’écart entre la ligne de base du nom et celles de l’heure et de la compétition (quand elle est sur la même rangée).
+      ecartHeure: nomSeul && heure ? base(heure) - base(nomSeul) : 0,
+      aConfirmer: Boolean(heure?.classList.contains('affiche-heure--a-confirmer')),
+      ecartCompetition: nomSeul && ligne ? base(ligne.querySelector('.affiche-competition')) - base(nomSeul) : 0,
+      troisColonnes: ligne ? getComputedStyle(ligne).gridTemplateAreas.startsWith('"heure match competition"') : false,
+      // L’heure et le nom sur la même rangée (une ligne trop étroite met l’heure au-dessus).
+      memeRangee: ligne ? getComputedStyle(ligne).gridTemplateAreas.startsWith('"heure match') : false,
       surUneLigne,
       nom: nom.trim(),
       prochain: bloc.matches('.affiche-prochain__match'),
@@ -528,12 +546,13 @@ test.describe('dans le navigateur', () => {
   }));
 
   // Le texte à 100 et à 200 % (WCAG 1.4.4 et 1.4.10) : la page ne défile pas de côté ; chaque match tient dans sa ligne,
-  // sans passer sur la compétition ; chaque insigne garde sa taille. Au téléphone (sous 560 px), une seule disposition :
-  // la paire toujours au-dessus du nom ; au-delà, à côté de lui ou au-dessus quand la place manque. Le grand prochain
-  // match d’un bar a sa paire de 58 px au-dessus de son nom.
+  // sans passer sur la compétition ; chaque insigne garde sa taille, même de 720 à 800 px (trois colonnes seulement si
+  // la ligne en a la place). Au téléphone (sous 560 px), une seule disposition : la paire toujours au-dessus du nom ;
+  // au-delà, à côté de lui ou au-dessus quand la place manque. L’heure (sauf « à confirmer », centrée) et la compétition
+  // sur la même rangée suivent la ligne de base du nom. Le grand prochain match d’un bar a sa paire de 58 px au-dessus.
   for (const [chemin, nom] of [[OUVERTE, 'l’affiche de la semaine'], [AFFICHE_DU_ZINC, 'l’affiche d’un bar']]) {
-    test(`${nom}, texte à 100 et 200 % : à 320, 360, 412 et 1280 px, rien ne déborde, les insignes gardent leur taille, au-dessus du nom au téléphone`, async ({ page: onglet }) => {
-      for (const largeur of [320, 360, 412, 1280]) {
+    test(`${nom}, texte à 100 et 200 % : à 320, 360, 412, 720, 760, 800 et 1280 px, rien ne déborde, les insignes gardent leur taille, au-dessus du nom au téléphone ; l’heure sur la ligne de base du nom`, async ({ page: onglet }) => {
+      for (const largeur of [320, 360, 412, 720, 760, 800, 1280]) {
         await onglet.setViewportSize({ width: largeur, height: 800 });
         await onglet.goto(`${serveur.adresse}${chemin}`);
         for (const pourcent of [100, 200]) {
@@ -550,6 +569,8 @@ test.describe('dans le navigateur', () => {
             for (const d of m.dessins) if (Math.abs(d.largeur - d.attribut) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.largeur} px au lieu de ${d.attribut}`);
             if ((largeur < 560 || m.prochain) && m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
             if (m.prochain && m.dessins.some((d) => d.hauteur !== 58)) ecarts.push(`${m.nom} : la paire du prochain match n’a pas 58 px`);
+            if (m.memeRangee && !m.aConfirmer && Math.abs(m.ecartHeure) > 0.5) ecarts.push(`${m.nom} : l’heure à ${m.ecartHeure.toFixed(1)} px de la ligne de base du nom`);
+            if (m.troisColonnes && Math.abs(m.ecartCompetition) > 0.5) ecarts.push(`${m.nom} : la compétition à ${m.ecartCompetition.toFixed(1)} px de la ligne de base du nom`);
           }
           expect(ecarts, cas).toEqual([]);
           if (chemin === AFFICHE_DU_ZINC) expect(matchs.filter((m) => m.prochain).map((m) => m.nom), cas).toEqual(['PSG – Barça']);
@@ -561,7 +582,7 @@ test.describe('dans le navigateur', () => {
   // L’impression, émulée à la largeur imprimable du papier (A4 : 210 mm moins deux marges de 12 ; A3 : 297 mm moins
   // deux marges, et tout 1,414 fois plus grand) : chaque paire à côté de son nom, sur la même ligne, le nom d’un seul
   // tenant ; la paire d’une ligne à 8 mm de haut en A4, celle du prochain match d’un bar à 15 mm, au-dessus de son nom.
-  test('à l’impression, en A4 et en A3 : chaque paire à côté de son nom, sur la même ligne, et à l’échelle du papier', async ({ page: onglet }) => {
+  test('à l’impression, en A4 et en A3 : chaque paire en haut, à côté de son nom, à l’échelle du papier ; l’heure et la compétition sur la ligne de base du nom', async ({ page: onglet }) => {
     const MM = 96 / 25.4;
     for (const chemin of [OUVERTE, AFFICHE_DU_ZINC]) {
       for (const [format, largeur, echelle] of [['A4', 186, 1], ['A3', 273, 1.414]]) {
@@ -586,6 +607,10 @@ test.describe('dans le navigateur', () => {
           if (m.paire.droite > m.texte.gauche + 0.5) ecarts.push(`${m.nom} : le nom n’est pas à côté de la paire`);
           if (m.texte.milieu < m.paire.haut || m.texte.milieu > m.paire.bas) ecarts.push(`${m.nom} : la paire et le nom ne sont pas sur la même ligne`);
           if (m.texte.gauche - m.bloc.gauche + m.surUneLigne <= m.bloc.droite - m.bloc.gauche && m.texte.lignes !== 1) ecarts.push(`${m.nom} : sur ${m.texte.lignes} lignes, alors qu’il tient sur une`);
+          // L’heure (sauf « à confirmer ») et la compétition sur la ligne de base du nom, la paire restant en haut.
+          if (!m.aConfirmer && Math.abs(m.ecartHeure) > 0.5) ecarts.push(`${m.nom} : l’heure à ${m.ecartHeure.toFixed(1)} px de la ligne de base du nom`);
+          if (Math.abs(m.ecartCompetition) > 0.5) ecarts.push(`${m.nom} : la compétition à ${m.ecartCompetition.toFixed(1)} px de la ligne de base du nom`);
+          if (Math.abs(m.paire.haut - m.bloc.haut) > 0.5) ecarts.push(`${m.nom} : la paire n’est pas en haut`);
         }
         expect(ecarts, cas).toEqual([]);
         if (chemin === OUVERTE) expect(matchs.filter((m) => m.texte.lignes === 1).length, cas).toBeGreaterThan(10);

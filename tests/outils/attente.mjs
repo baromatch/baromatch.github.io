@@ -54,8 +54,15 @@ export const chargerLesImages = async (onglet) => {
 // 18 px au lieu de 44. Seule, la même page s’ouvre entière à chaque fois (400 ouvertures, aucune requête perdue). Une
 // page incomplète est donc rechargée, une fois, et le rapport du test le note (la feuille, l’erreur du navigateur) ;
 // incomplète encore, l’ouverture échoue en les nommant. Ce que le test mesure reste la page telle que le site la sert.
+// (Une feuille en échec peut garder un objet feuille, illisible : lire ses règles lève alors une SecurityError.)
 const feuillesManquantes = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('link[rel="stylesheet"]')]
-  .filter((lien) => !lien.sheet || lien.sheet.cssRules.length === 0)
+  .filter((lien) => {
+    try {
+      return !lien.sheet || lien.sheet.cssRules.length === 0;
+    } catch {
+      return true;
+    }
+  })
   .map((lien) => new URL(lien.href).pathname));
 
 export const ouvrirEntiere = async (onglet, adresse) => {

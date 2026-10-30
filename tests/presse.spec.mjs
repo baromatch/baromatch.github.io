@@ -44,7 +44,7 @@ test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d
   expect(points).toEqual(['Pas un site de paris sportifs.', 'Pas un diffuseur.', 'Pas un vendeur d’alcool.', 'Ni écusson, ni logo.', 'Aucun bar ne paie pour passer devant un autre.']);
   const liste = normaliser(await page.locator('#n-est-pas + ul').textContent());
   expect(liste).toContain('Et jamais d’alcool à gagner.');
-  expect(liste).toContain('Pas d’écusson de club, ni de logo de compétition ou de chaîne : les clubs et les compétitions sont écrits en toutes lettres.');
+  expect(liste).toContain('Pas d’écusson de club : chaque club a son insigne Baromatch, celui de l’appli (ses couleurs, le motif de son maillot, un code de trois lettres), et son nom écrit en toutes lettres. Aucun logo de compétition ni de chaîne.');
   expect(liste).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom.');
   await expect(page.locator('main')).not.toContainText('Ce que Baromatch refuse');
   // Vrai aussi le jour où l’appli proposera des pronostics entre amis : ni pari, ni cote, ni argent, jamais.

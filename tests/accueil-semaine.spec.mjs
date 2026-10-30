@@ -6,7 +6,7 @@
 // et « Demain » ne mentent pas un autre jour ; et le contraste de chaque petit texte, mesuré tel qu’il est peint, sur
 // les fonds clairs de l’accueil (4,5:1 au moins, partout).
 import { test, expect } from '@playwright/test';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -281,6 +281,15 @@ test.describe('l’accueil : le générateur n’écrit que le bloc', () => {
       const hors = (html) => html.slice(0, html.indexOf(REPERES.debut)) + html.slice(html.indexOf(REPERES.fin));
       expect(hors(ecrit)).toBe(hors(ACCUEIL));
       expect(ecrit).toContain(premier.accueil.bloc);
+      // Chaque lien du bloc mène à un fichier que ce même passage a écrit, et chaque ancre à un id de la page visée.
+      const liensDuBloc = [...premier.accueil.bloc.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1]);
+      expect(liensDuBloc.length).toBeGreaterThan(10);
+      for (const lien of liensDuBloc) {
+        const [chemin, ancre] = lien.split('#');
+        const fichier = path.join(dossier, chemin.endsWith('/') ? `${chemin}index.html` : chemin);
+        expect(existsSync(fichier), lien).toBe(true);
+        if (ancre && fichier.endsWith('.html')) expect(readFileSync(fichier, 'utf8'), lien).toContain(`id="${ancre}"`);
+      }
       // Le scénario a des bars publiés : leurs matchs ont « Voir les bars ».
       expect(premier.accueil.bloc).toContain('carte-match--bars');
       expect(premier.accueil.bloc).toContain('data-aujourdhui="2026-10-23"');
@@ -551,24 +560,62 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     for (const t of await semaine.locator('.semaine__titre-jour').all()) expect((await t.boundingBox()).height).toBeGreaterThan(16);
   });
 
-  test('le jour même, sans la police, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {
-    // Seuls les décalages de la page elle-même : sans la police. Arrivée après le premier rendu (une machine chargée),
-    // elle remplace celle de secours (font-display: swap) et ce changement compte comme un décalage (0,005 sur
-    // ordinateur), qui existe déjà en ligne et dépend du hasard de la machine. Ce test ne le mesure pas : une police de
-    // secours aux mêmes mesures arrive dans une autre PR, avec le test qui servira la police en retard.
-    await page.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
-    for (const largeur of [390, 1280]) {
-      await page.addInitScript(() => {
-        window.decalages = 0;
-        new PerformanceObserver((liste) => { for (const e of liste.getEntries()) if (!e.hadRecentInput) window.decalages += e.value; })
-          .observe({ type: 'layout-shift', buffered: true });
+  // La police arrivée tard (une connexion lente, une machine chargée) : la page s’affiche d’abord dans la police de
+  // secours, aux mesures de Bricolage Grotesque (styles.css), puis la police la remplace. Mesuré comme
+  // tests/police.spec.mjs : les polices retenues jusqu’au premier affichage, puis libérées ; les décalages de mise en
+  // page relevés deux images après leur arrivée. Mesuré le 30 octobre 2026, six fois chacun, toujours le même :
+  // 0,0123 à 390 px, 0,00002 à 1280 px. Les seuils, au plus juste.
+  const SEUILS_DE_DECALAGE = { 390: 0.015, 1280: 0.001 };
+  for (const largeur of [390, 1280]) {
+    test(`le jour même, à ${largeur} px, la police arrivée après le premier affichage : la page bouge de moins de ${SEUILS_DE_DECALAGE[largeur]} (décalage de mise en page)`, async ({ browser }) => {
+      const contexte = await browser.newContext({ viewport: { width: largeur, height: 844 }, reducedMotion: 'reduce', locale: 'fr-FR', timezoneId: 'Europe/Paris' });
+      await contexte.addInitScript(() => {
+        window.decalages = [];
+        const garder = (entrees) => { for (const e of entrees) if (!e.hadRecentInput) window.decalages.push(e.value); };
+        window.observateurDesDecalages = new PerformanceObserver((liste) => garder(liste.getEntries()));
+        window.observateurDesDecalages.observe({ type: 'layout-shift', buffered: true });
+        window.relever = () => garder(window.observateurDesDecalages.takeRecords());
       });
-      await ouvrir(page, { largeur });
-      await page.waitForLoadState('networkidle');
-      await page.evaluate(() => document.fonts.ready);
-      expect(await page.evaluate(() => window.decalages), `${largeur} px`).toBe(0);
-    }
-  });
+      // Le jour du scénario, par la date seule (Date décalée) : l’horloge de Playwright remplacerait aussi les mesures de
+      // performance, dont les décalages.
+      await contexte.addInitScript((cible) => {
+        const Vraie = Date;
+        const ecart = cible - Vraie.now();
+        globalThis.Date = class extends Vraie {
+          constructor(...valeurs) { super(...(valeurs.length ? valeurs : [Vraie.now() + ecart])); }
+          static now() { return Vraie.now() + ecart; }
+        };
+      }, MAINTENANT_DU_SCENARIO + 2 * H);
+      const page = await contexte.newPage();
+      let ouvrirLaPorte;
+      const porte = new Promise((resoudre) => { ouvrirLaPorte = resoudre; });
+      const retenues = [];
+      await page.route('**/fonts/*.woff2', (route) => {
+        const envoi = porte.then(() => route.continue());
+        retenues.push(envoi);
+        return envoi;
+      });
+      try {
+        await page.goto(`${site.serveur.adresse}/`, { waitUntil: 'domcontentloaded' });
+        await page.waitForFunction(() => performance.getEntriesByName('first-contentful-paint').length > 0);
+        expect(retenues.length).toBeGreaterThan(0);
+        // Le jour du scénario : « Aujourd’hui » est vendredi 23, ses cartes sont là.
+        await expect(page.getByRole('radio', { name: /Aujourd’hui/ })).toBeChecked();
+        await expect(page.locator('#semaine .carte-match:visible')).not.toHaveCount(0);
+        expect(await page.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'))).toBe(false);
+        ouvrirLaPorte();
+        await page.waitForFunction(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
+        await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+        const total = await page.evaluate(() => { window.relever(); return window.decalages.reduce((somme, v) => somme + v, 0); });
+        test.info().annotations.push({ type: 'décalage', description: `${total}` });
+        expect(total).toBeLessThan(SEUILS_DE_DECALAGE[largeur]);
+      } finally {
+        ouvrirLaPorte();
+        await Promise.all(retenues);
+        await contexte.close();
+      }
+    });
+  }
 });
 
 test.describe('le prochain match dans un bar, dans le navigateur (le scénario du lundi 26 octobre)', () => {

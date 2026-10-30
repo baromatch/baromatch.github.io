@@ -9,7 +9,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { AxeBuilder } from '@axe-core/playwright';
 import { MARQUE } from './outils/marque.mjs';
 import { PIED } from './outils/pied.mjs';
-import { ralentirLaPolice } from './outils/attente.mjs';
+import { laPoliceEstLa, ralentirLaPolice } from './outils/attente.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 import { estPermis } from '../generateur/etat.mjs';
 import { mesureDuSite, politiqueAvecLaMesure } from '../generateur/mesure.mjs';
@@ -375,7 +375,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     test(`à ${largeur} × ${hauteur}, comme ${appareil} : « Gratuit pendant le lancement, sans engagement. » et le bouton « Proposer mon bar » dans le premier écran`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: hauteur });
       await page.goto(PAGE);
-      await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
+      await page.waitForFunction(laPoliceEstLa);
       await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
       await expect(page.locator('.ouverture-bars__prix')).toBeInViewport({ ratio: 1 });
       await expect(page.locator('.ouverture-bars .actions .capsule')).toBeInViewport({ ratio: 1 });
@@ -402,7 +402,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     test(`à ${largeur} px, le titre tient sur ${lignes.length} lignes : « ${lignes.join(' / ')} »`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto(PAGE);
-      await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
+      await page.waitForFunction(laPoliceEstLa);
       // Chaque mot rejoint la ligne du mot d’avant s’il a le même haut, sinon il en commence une.
       const titre = await page.locator('h1').evaluate((h1) => {
         const rangees = [];
@@ -1134,7 +1134,7 @@ test.describe('le premier écran d’abord', () => {
       await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
       await demande;
       // La police est là (document.fonts.ready, lui, attend aussi la feuille retenue).
-      await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
+      await page.waitForFunction(laPoliceEstLa);
       const avant = await boitesALEcran(page);
       expect(avant.length).toBeGreaterThan(20);
       const scene = () => page.locator('.salle__sol').evaluate((sol) => getComputedStyle(sol).visibility);
@@ -1159,7 +1159,7 @@ test.describe('le premier écran d’abord', () => {
       const demande = page.waitForRequest('**/pour-les-bars.css');
       await page.goto(`${PAGE}#proposer`, { waitUntil: 'domcontentloaded' });
       await demande;
-      await page.waitForFunction(() => [...document.fonts].every((police) => police.status === 'loaded'));
+      await page.waitForFunction(laPoliceEstLa);
       await page.evaluate(() => new Promise((resoudre) => { requestAnimationFrame(() => requestAnimationFrame(resoudre)); }));
       const avant = await boitesALEcran(page);
       expect(avant.join('\n')).toContain('carte-formulaire');

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 import { MOT_DU_FONDATEUR, motPourMot, SIGNATURE_DU_FONDATEUR } from './outils/fondateur.mjs';
-import { PIED } from './outils/pied.mjs';
+import { liensDuPied, PIED } from './outils/pied.mjs';
 import { contenuDuScenario, MAINTENANT_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 
@@ -149,16 +149,11 @@ test('comment on choisit les bars : les matchs, les places tenues par le bar, et
 });
 
 // Le pied de page des pages générées (matchs, villes, bars) : le même que celui des pages fixes, les deux pages de
-// confiance comprises. Le générateur écrit son pied lui-même (generateur/gabarits.mjs) : il ne le lit pas dans l’accueil.
+// confiance comprises. Le générateur l’écrit de la même source que les pages fixes (generateur/cadre.mjs).
 test('les pages générées ont le pied de page commun, avec « À propos » et « Comment on choisit les bars »', async () => {
   const { pages } = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario() });
   expect(pages.length).toBeGreaterThan(0);
-  const decoder = (texte) => texte.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/[\s\u00a0]+/g, ' ').trim();
-  for (const p of pages.filter((q) => q.chemin.endsWith('/'))) {
-    const pied = p.contenu.match(/<ul class="pied__liens">([\s\S]*?)<\/ul>/)?.[1] ?? '';
-    const liens = [...pied.matchAll(/<a href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map(([, href, texte]) => [href, decoder(texte)]);
-    expect(liens, p.chemin).toEqual(PIED);
-  }
+  for (const p of pages.filter((q) => q.chemin.endsWith('/'))) expect(liensDuPied(p.contenu), p.chemin).toEqual(PIED);
 });
 
 // La FAQ des fans sur l’accueil : chaque question visible est dans la FAQ balisée (une seule FAQPage), mot pour mot et

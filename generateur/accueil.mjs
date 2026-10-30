@@ -14,6 +14,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { aSonFichier } from './agenda.mjs';
+import { disque } from './cadre.mjs';
 import { texteVisible } from './controle.mjs';
 import { DUREE_MATCH_MS, JOUR_MS, MOTS_INTERDITS } from './donnees.mjs';
 import { quand } from './gabarits.mjs';
@@ -25,25 +26,14 @@ import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 export const ACCUEIL = 'index.html';
 export const REPERES = { debut: '<!-- semaine:debut -->', fin: '<!-- semaine:fin -->' };
 
-const COULEUR = /^#[0-9A-F]{6}$/i;
 // Au-delà de ce nombre de matchs, un jour finit par un lien vers lui dans la semaine (/matchs/) : styles.css n’en montre
 // que 4 au téléphone, 6 à partir de 720 px (les autres cartes restent dans la page).
 const CARTES_AU_TELEPHONE = 4;
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const jourCourt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short', day: 'numeric' });
 
-// Un club, un disque : sa première couleur de midi dans le sens des aiguilles d’une montre, sur la part que
-// couleurs.json lui donne (la moitié par défaut), la seconde dessous. Un club sans couleurs connues : un disque neutre.
-// Des attributs de SVG, pas de style en ligne (la politique de sécurité de l’accueil n’en permet aucun).
-export const disque = (couleurs) => {
-  const [premiere, seconde = premiere, part = 0.5] = Array.isArray(couleurs) ? couleurs : [];
-  if (!COULEUR.test(premiere ?? '') || !COULEUR.test(seconde) || !(part >= 0.5 && part <= 0.85)) {
-    return '<svg class="disque disque--neutre" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1"/></svg>';
-  }
-  const angle = 2 * Math.PI * part;
-  const point = `${(1 + Math.sin(angle)).toFixed(3)} ${(1 - Math.cos(angle)).toFixed(3)}`;
-  return `<svg class="disque" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1" fill="${seconde}"/><path d="M1 1V0A1 1 0 ${part > 0.5 ? 1 : 0} 1 ${point}z" fill="${premiere}"/></svg>`;
-};
+// Un club, un disque à ses deux couleurs (jamais un écusson) : le même que dans le pied de page de chaque page (cadre.mjs).
+export { disque };
 
 // Une carte : l’heure et la compétition, les deux clubs (le lien vers la page du match), puis ce qu’on peut faire.
 const carte = (m, { textes, couleurs, maintenant, sansAucunBar }) => {

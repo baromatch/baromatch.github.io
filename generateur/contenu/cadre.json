@@ -1,0 +1,40 @@
+{
+  "_lisezMoi": "Les mots de l’en-tête et du pied de page, les mêmes sur toutes les pages du site. Après une retouche ici (ou dans marque.json, ou dans les listes des clubs, des compétitions et des villes), lance « npm run cadre » : les pages écrites à la main sont réécrites entre leurs repères, et le générateur reprend ces mots au passage suivant. « etat » : la ligne du pied de page selon l’état de l’appli dans marque.json (« ouverte » : false ou true) ; vide, la ligne n’est pas écrite. Aucun « ! », tutoiement, phrases courtes.",
+  "menu": {
+    "nom": "Navigation principale",
+    "ceSoir": "Ce soir",
+    "semaine": "La semaine",
+    "bars": "Pour les bars",
+    "aPropos": "À propos"
+  },
+  "action": "Préviens-moi",
+  "pied": {
+    "etat": {
+      "fermee": "Pas encore ouvert · Bientôt à Paris",
+      "ouverte": ""
+    },
+    "attente": "Préviens-moi quand Baromatch arrive",
+    "proposer": "Proposer mon bar",
+    "contact": "Presse et partenariats",
+    "plan": "Plan du site",
+    "matchs": "Les matchs",
+    "agenda": "Ton club dans ton agenda",
+    "clubs": "Clubs",
+    "competitions": "Compétitions",
+    "villes": "Villes",
+    "toutesLesVilles": "Toutes les villes",
+    "baromatch": "Baromatch",
+    "presse": "Presse et partenariats",
+    "choisir": "Comment on choisit les bars",
+    "guide": "Comment trouver un bar qui diffuse le match",
+    "testeurs": "Testeurs Android",
+    "boutique": "Boutique",
+    "legal": "Informations légales",
+    "mentions": "Mentions légales",
+    "cgu": "Règles de l’appli (CGU)",
+    "confidentialite": "Confidentialité",
+    "supprimer": "Supprimer mon compte",
+    "droits": "© 2026 Baromatch",
+    "langue": "The rest of baromatch.fr is in French."
+  }
+}

@@ -3,8 +3,7 @@
 // lisible par un robot qui n’exécute rien ; seul le bloc « Partager » (partage.mjs) charge un fichier du site,
 // partage.js, qui l’enrichit sans rien changer au reste, et la mesure d’audience, quand marque.json l’active, charge
 // /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { actionDeLaPage, entete, lireLeCadre, pageDuGenerateurAvecLAction, pied } from './cadre.mjs';
 import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
@@ -18,16 +17,9 @@ export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img
 export const politiqueDesPages = (mesure) => politiqueAvecLaMesure(CSP, mesure);
 const IMAGE_ALT = 'Le verre de lumière de Baromatch et la phrase : Ton match. Ton bar. Ce soir.';
 
-// L’en-tête et la marque du pied de page, repris tels quels de l’accueil : une retouche de l’accueil passe ici au
-// passage suivant. Le verre (le dessin de la marque) sert aussi au badge.
-export const lireLeCadre = (racine) => {
-  const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
-  const entete = accueil.match(/<header class="entete page">[\s\S]*?<\/header>/)?.[0];
-  const piedMarque = accueil.match(/<div class="pied__marque">[\s\S]*?<\/div>/)?.[0];
-  const verre = piedMarque?.match(/<svg viewBox="0 0 200 200"[\s\S]*?<\/svg>/)?.[0];
-  if (!entete || !piedMarque || !verre) throw new Error('index.html : l’en-tête ou la marque du pied de page est introuvable, rien n’est écrit');
-  return { entete, piedMarque, verre };
-};
+// Le cadre (l’en-tête et le pied de page de toutes les pages, cadre.mjs) : le même que celui des pages écrites à la main.
+// Le verre (le dessin de la marque) sert aussi au badge et aux images de partage.
+export { lireLeCadre };
 
 // ---------- Tête, en-tête, pied ----------
 
@@ -73,36 +65,6 @@ ${partage ? `${SCRIPT_DU_PARTAGE}\n` : ''}${mesure.active ? `${baliseDeLaMesure(
 <a class="lien-evitement" href="#contenu">${langue === 'en' ? 'Skip to content' : 'Aller au contenu'}</a>
 `;
 
-// Le pied de page commun, dans l’ordre de toutes les pages (tests/outils/pied.mjs) ; « Presse » dès que la page existe.
-// Sur une page en anglais, le même pied, dit en français (lang="fr" : ses pages le sont), sous une phrase en anglais.
-const pied = ({ cadre, marque, chemin, avecPresse, langue = 'fr' }) => {
-  const x = marque.profils?.x;
-  const liens = [
-    ['/pour-les-bars.html', 'Pour les bars'],
-    ['/matchs/', 'Où regarder le match'],
-    ['/boutique.html', 'Boutique'],
-    ...(avecPresse ? [['/presse.html', 'Presse']] : []),
-    ['/a-propos.html', 'À propos'],
-    ['/comment-on-choisit-les-bars.html', 'Comment on choisit les bars'],
-    ['/mentions-legales.html', 'Mentions légales'],
-    ['/cgu.html', 'Règles de l’appli (CGU)'],
-    ['/confidentialite.html', 'Confidentialité'],
-    ['/supprimer-mon-compte.html', 'Supprimer mon compte'],
-  ];
-  const elements = liens.map(([href, texte]) => `    <li><a href="${href}"${href === chemin ? ' aria-current="page"' : ''}>${texte}</a></li>`);
-  if (x) elements.push(`    <li><a href="${e(x)}" rel="me noopener">X : @${e(x.replace(/\/+$/, '').split('/').pop())}</a></li>`);
-  elements.push(`    <li><a href="mailto:${e(marque.contact)}">${e(marque.contact)}</a></li>`);
-  return `<footer class="pied page"${langue === 'en' ? ' lang="fr"' : ''}>
-  ${cadre.piedMarque}
-${langue === 'en' ? '  <p class="pied__langue" lang="en">The rest of baromatch.fr is in French.</p>\n' : ''}  <ul class="pied__liens">
-${elements.join('\n')}
-  </ul>
-</footer>
-</body>
-</html>
-`;
-};
-
 // La typographie française, sur toute la page (titre, description, texte, données structurées) : texte.mjs.
 export { insecables };
 
@@ -112,13 +74,22 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
   ? corps.replace(/<header class="regarder-tete">[\s\S]*?<\/header>/, (enTete) => `${enTete}\n${blocPartager({ titre, chemin }, textesDuPartage)}`)
   : corps);
 
-// Une page en anglais (langue « en ») garde l’en-tête du site, en français : il le dit (lang="fr").
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${langue === 'en' ? cadre.entete.replace('<header class="entete page">', '<header class="entete page" lang="fr">') : cadre.entete}
+// L’en-tête et le pied de page : ceux de cadre.mjs, avec « Préviens-moi » (ambre, ou en contour si le corps a déjà son
+// bouton ambre), sauf sur les affiches. Une page en anglais garde l’en-tête et le pied du site, en français : ils le
+// disent (lang="fr").
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => {
+  const contenu = avecLePartage(corps, { partage, titre, chemin, textesDuPartage });
+  const action = pageDuGenerateurAvecLAction(chemin) ? actionDeLaPage(contenu) : null;
+  return insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, langue })}
 
 <main id="contenu" class="regarder page">
-${avecLePartage(corps, { partage, titre, chemin, textesDuPartage })}
+${contenu}
 </main>
-${pied({ cadre, marque, chemin, avecPresse, langue })}`);
+${pied(cadre, { marque, chemin, avecPresse, langue })}
+</body>
+</html>
+`);
+};
 
 // ---------- Morceaux communs ----------
 

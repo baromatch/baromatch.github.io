@@ -395,4 +395,4 @@
 .regarder-carte .regarder-carte__suite { margin-top: 10px; color: var(--texte-doux); font-size: 0.9375rem; }
 .regarder-carte__suite a { display: inline-block; padding: 11px 0; font-weight: 650; }
 /* Sur une page en anglais, le pied de page (en français) le dit d’abord, sur sa propre ligne. */
-.pied__langue { flex-basis: 100%; margin: 0; color: var(--texte-doux); }
+.pied .pied__langue { margin-bottom: 24px; }

@@ -35,6 +35,18 @@
   --verre-reflet: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   --ombre-scene: 0 24px 60px rgba(0, 0, 0, 0.45);
   --sortie-douce: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* La navigation (cadre.mjs), la nuit ; :root.jour la passe au jour. Son bord se voit à 3:1 sur la page. */
+  --menu-fond: #151722;
+  --menu-releve: rgba(255, 255, 255, 0.06);
+  --menu-bord: rgba(255, 255, 255, 0.36);
+  --menu-survol: rgba(255, 255, 255, 0.1);
+  --menu-courant: #F7F7F9;
+  --menu-envers: #0A0B10;
+  --menu-ombre: 0 12px 32px rgba(0, 0, 0, 0.5);
+  /* La zone basse de l’iPhone, que le bandeau du bas laisse libre (les tests la règlent à 34 px) ; --bandeau : la place
+     que le bandeau prend en bas de l’écran, quand il y est. */
+  --zone-basse: env(safe-area-inset-bottom, 0px);
+  --bandeau: 0px;
   --page: 1120px;
   --gouttiere: 16px;
   color-scheme: dark;
@@ -113,38 +125,102 @@ a:hover { color: var(--goutte); }
   padding: 0 var(--gouttiere);
 }
 
-/* ---------- En-tête ---------- */
+/* ---------- En-tête : la navigation « les matchs d’abord » (cadre.mjs) ---------- */
 
+/* Le logo, « Préviens-moi » sur les pages qui le portent, et quatre entrées. Par défaut (moins de 22 em de large, texte
+   agrandi, téléphone couché), les entrées font une rangée sous le logo, dans la page ; au téléphone debout, un bandeau
+   fixe en bas de l’écran ; à l’ordinateur, une ligne calme, pas collante. Les requêtes en em suivent la taille du texte
+   choisie dans le navigateur. Aucun script. */
 .entete {
   display: flex;
-  /* Quand le texte est agrandi (200 % dans les réglages du navigateur), le menu passe sous le logo au lieu de déborder. */
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  /* 14 px entre les rangs : la zone du logo déborde de 13 px (sa marge négative), sans toucher le rang suivant. */
+  gap: 14px 16px;
   padding-top: 20px;
   padding-bottom: 20px;
 }
 
-/* Le logo et les liens se touchent du doigt sur 44 px de haut (notre minimum ; WCAG 2.5.8 n’en demande que 24) ;
-   la marge négative garde l’en-tête à la même hauteur : seule la zone qui répond au toucher s’agrandit. Le logo ne
-   rétrécit jamais : 120 px au moins, le minimum de la marque. */
+/* Le logo se touche sur 44 px de haut (notre minimum ; WCAG 2.5.8 n’en demande que 24) ; la marge négative garde
+   l’en-tête à la même hauteur. Il ne rétrécit jamais : 120 px au moins, le minimum de la marque. */
 .entete__logo { display: block; flex: none; width: 132px; padding: 13px 0; margin: -13px 0; }
+@media (max-width: 400px) { .entete__logo { width: 120px; } }
 @media (min-width: 720px) { .entete__logo { width: 156px; } }
 .entete__logo svg { width: 100%; height: auto; }
 
-.entete__lien {
+.menu { flex: 1 0 100%; order: 2; min-width: 0; }
+.menu__liste, .menu__matchs { display: flex; flex-wrap: wrap; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.menu__liste { padding: 4px; border: 1px solid var(--menu-bord); border-radius: 26px; background: var(--menu-fond); }
+.menu__liste > li { display: flex; flex: 1 1 8rem; min-width: 0; }
+.menu__liste > .menu__groupe { flex: 2 1 16rem; }
+/* « Ce soir » et « La semaine », la paire des matchs, sur un fond à part : elles passent avant tout. */
+.menu__matchs { flex: 1; min-width: 0; border-radius: 22px; background: var(--menu-releve); }
+.menu__matchs > li { display: flex; flex: 1 1 7rem; min-width: 0; }
+.menu__lien {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 8px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border-radius: 22px;
   color: var(--texte);
-  font-weight: 600;
   font-size: 0.9375rem;
+  font-stretch: 92%;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
   text-decoration: none;
-  padding: 10px 2px;
-  /* 45 px de haut avec le bord, quelle que soit la taille du texte : quand le texte grandit, la ligne seule dépasse
-     44 px et la marge se réduit (les deux liens empilés sous le logo prennent moins de place). */
-  padding-block: max(2px, calc((45px - 1lh - 1px) / 2));
-  border-bottom: 1px solid rgba(255, 177, 61, 0.55);
 }
-.entete__lien:hover { color: var(--ambre); }
+.menu__lien:active { background: var(--menu-survol); color: var(--texte); }
+/* Le survol seulement à la souris : au doigt, il resterait collé après le toucher. */
+@media (hover: hover) { .menu__lien:hover { background: var(--menu-survol); color: var(--texte); } }
+/* La page où tu es : la pilule pleine (bleu nuit au jour) et ta place en ambre, un point. */
+.menu__lien[aria-current="page"],
+.menu__lien[aria-current="page"]:hover { background: var(--menu-courant); color: var(--menu-envers); }
+.menu__lien[aria-current="page"]::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ambre); }
+
+/* « Préviens-moi » : ambre ; en contour (le bord à 3:1) sur une page qui a déjà son bouton ambre (cadre.mjs). */
+.entete__attente {
+  display: inline-flex;
+  flex: none;
+  order: 1;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 44px;
+  margin-inline-start: auto;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--ambre);
+  color: var(--nuit);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+.entete__attente:hover { background: #FFC163; color: var(--nuit); }
+.entete__attente--contour { border-color: var(--champ-bord); background: transparent; color: var(--texte); }
+.entete__attente--contour:hover { border-color: var(--texte); background: var(--menu-survol); color: var(--texte); }
+
+/* L’ordinateur (60 em) : une seule ligne. La paire des matchs contre le logo, à plat (un filet à 3:1, sans ombre) ;
+   « Pour les bars » et « À propos » à droite. Les rangs restent permis : si la place manque, la ligne se plie. */
+@media (min-width: 60em) {
+  .entete { column-gap: 32px; padding-top: 16px; padding-bottom: 16px; }
+  .menu { flex: 1 1 auto; order: 0; }
+  .menu__liste { align-items: center; gap: 4px; padding: 0; border: 0; border-radius: 0; background: none; }
+  .menu__liste > li, .menu__liste > .menu__groupe, .menu__matchs > li { flex: none; }
+  .menu__liste > li:nth-child(2) { margin-inline-start: auto; }
+  .menu__matchs { flex-wrap: nowrap; padding: 3px; border: 1px solid var(--menu-bord); border-radius: 999px; background: var(--menu-fond); }
+  .menu__lien { flex: none; flex-wrap: nowrap; min-height: 44px; padding: 0 20px; border-radius: 999px; font-size: 1rem; font-stretch: 100%; white-space: nowrap; }
+  .menu__liste > li:not(.menu__groupe) .menu__lien { padding: 0 16px; }
+  .entete__attente { order: 0; margin-inline-start: 8px; font-size: 1rem; }
+}
 
 /* ---------- Ouverture (hero) ---------- */
 
@@ -670,34 +746,75 @@ a:hover { color: var(--goutte); }
 .bars a:not(.bouton-nuit):hover { color: rgba(10, 11, 16, 0.7); }
 .bars :focus-visible { outline-color: var(--nuit); }
 
-/* ---------- Pied de page ---------- */
+/* ---------- Pied de page : la nuit, rangé comme une feuille de match (cadre.mjs) ---------- */
 
-.pied {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px 32px;
-  padding-top: 36px;
-  padding-bottom: 44px;
-  font-size: 0.9375rem;
-  color: var(--texte-discret);
+/* Les liens en clair ; l’ambre aux deux actions (« Préviens-moi quand Baromatch arrive », « Proposer mon bar »), au
+   survol et au focus. Chaque lien se touche sur 44 px de haut (WCAG 2.5.8 en demande 24). */
+.pied { padding-top: 48px; padding-bottom: 40px; border-top: 1px solid var(--trait); color: var(--texte-doux); font-size: 0.9375rem; }
+.pied ul { margin: 0; padding: 0; list-style: none; }
+.pied p { margin: 0; }
+.pied a { color: var(--texte-doux); text-decoration: none; overflow-wrap: anywhere; }
+.pied a:hover { color: var(--ambre); text-decoration: underline; text-underline-offset: 0.2em; }
+.pied a[aria-current="page"] { color: var(--texte); }
+.pied .pied__action { color: var(--ambre); font-weight: 700; text-decoration: underline; text-decoration-color: rgba(255, 177, 61, 0.5); text-underline-offset: 0.25em; }
+.pied .pied__action:hover { color: var(--goutte); text-decoration-color: var(--ambre); }
+.pied__contact a, .pied__plan a, .pied__legal a { display: inline-flex; align-items: center; min-height: 44px; }
+.pied__tete { display: grid; gap: 24px 48px; }
+.pied__marque { display: flex; align-items: center; gap: 12px; color: var(--texte); font-size: 1.375rem; font-weight: 800; font-stretch: 92%; }
+.pied__marque svg { width: 36px; height: 36px; }
+.pied__slogan { margin-top: 10px; color: var(--texte); font-weight: 650; }
+.pied__contact { display: grid; align-content: start; justify-items: start; }
+.pied__plan { display: grid; gap: 32px; margin-top: 36px; padding-top: 32px; border-top: 1px solid var(--trait); }
+.pied h2 { margin: 0 0 4px; color: var(--texte); font-size: 1rem; font-weight: 700; line-height: 1.3; }
+/* Deux colonnes de liens au téléphone, une quand la place manque ou que le texte est agrandi (la largeur est en rem). */
+.pied__plan ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); column-gap: 16px; }
+.pied__plan li { min-width: 0; }
+/* Les clubs : un disque à leurs deux couleurs devant le nom, jamais un écusson ; une pilule sans bord. */
+.pied__plan .pied__clubs { grid-template-columns: repeat(auto-fill, minmax(min(100%, 7.5rem), 1fr)); gap: 8px; margin-top: 6px; }
+.pied .pied__club { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px 0 11px; border-radius: 999px; background: var(--verre); color: var(--texte); font-weight: 600; }
+.pied .pied__club:hover { background: var(--verre-fort); color: var(--ambre); }
+.pied .disque { width: 22px; height: 22px; outline-color: rgba(255, 255, 255, 0.36); }
+.pied .disque--neutre circle { fill: #6B6E7A; }
+.pied__legal { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 32px; margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--trait); }
+.pied__legal ul { display: flex; flex-wrap: wrap; column-gap: 24px; }
+.pied__legal p { padding: 10px 0; color: var(--texte-discret); font-size: 0.875rem; }
+@media (min-width: 40em) { .pied__plan { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 48em) { .pied__tete { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); } }
+@media (min-width: 64em) { .pied__plan { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr) minmax(0, 1.1fr) minmax(0, 0.8fr) minmax(0, 1.3fr); } }
+
+/* Le bandeau du bas, au téléphone debout (22 em de large au moins : 352 px à texte normal ; 30 em de haut). Il ne cache
+   jamais rien : le pied de page garde sa place au bout de la page (--bandeau : un rang tout juste au texte normal, de la
+   place pour plusieurs rangs dès que le texte grandit), le focus et les ancres s’arrêtent au-dessus (scroll-padding),
+   il s’efface quand un champ texte a le focus (le clavier est là ; pas pour les puces), et il laisse la barre de
+   sélection de la boutique seule en bas. 10 px au-dessus du bord, plus la zone basse de l’iPhone ; rien en hauteur
+   d’écran (vh). */
+@media screen and (min-width: 22em) and (max-width: 59.99em) and (min-height: 30em) {
+  :root { --bandeau: clamp(58px, 58px + (1rem - 16px) * 1000, max(118px, 6rem)); }
+  html { scroll-padding-bottom: calc(var(--bandeau) + var(--zone-basse) + 18px); }
+  .menu { position: fixed; z-index: 30; left: 10px; right: 10px; bottom: calc(10px + var(--zone-basse)); max-width: 28rem; margin-inline: auto; }
+  .menu__liste { box-shadow: var(--menu-ombre); }
+  .menu__liste > li, .menu__matchs > li { flex: 1 1 auto; }
+  .menu__liste > .menu__groupe { flex: 1.7 1 auto; }
+  /* Les quatre mots tiennent sur un rang dès 352 px, un cran plus étroits (86 %) que le texte courant. */
+  .menu__lien { gap: 6px; padding-inline: 5px; font-size: 0.875rem; font-stretch: 86%; }
+  .menu__lien[aria-current="page"] { padding-bottom: 12px; }
+  .menu__lien[aria-current="page"]::before { position: absolute; bottom: 6px; left: 50%; margin-left: -3.5px; }
+  .pied { padding-bottom: calc(40px + var(--bandeau) + var(--zone-basse) + 10px); }
+  body.avec-barre .menu,
+  body:has(:is(input:not([type="radio"], [type="checkbox"], [type="range"], [type="submit"], [type="button"], [type="reset"], [type="image"], [type="file"], [type="color"]), textarea):focus) .menu { visibility: hidden; }
+}
+@media screen and (min-width: 36em) and (max-width: 59.99em) and (min-height: 30em) {
+  .menu { max-width: 32rem; }
+  .menu__lien { padding-inline: 10px; font-size: 1rem; font-stretch: 100%; }
 }
 
-.pied__marque { display: flex; align-items: center; gap: 12px; }
-.pied__marque svg { width: 30px; height: 30px; }
-
-.pied__liens {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 24px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+/* Le contraste élevé de Windows : la page où l’on est cernée, les pilules des clubs aussi, et le logo dans la couleur du
+   texte (sinon noir sur noir). */
+@media (forced-colors: active) {
+  .menu__lien[aria-current="page"] { outline: 3px solid Highlight; outline-offset: -3px; }
+  .pied .pied__club { border: 1px solid CanvasText; }
+  .entete__logo path[fill="#F7F7F9"] { fill: CanvasText; }
 }
-/* Chaque lien se touche sur 44 px de haut (il en faisait 18, sous les 24 px de WCAG 2.5.8). */
-.pied__liens a { display: inline-flex; align-items: center; min-height: 44px; color: var(--texte-doux); text-decoration: none; overflow-wrap: anywhere; }
-.pied__liens a:hover { color: var(--ambre); text-decoration: underline; }
 
 /* ---------- Pages de texte (mentions, confidentialité, 404) ---------- */
 
@@ -904,38 +1021,6 @@ a:hover { color: var(--goutte); }
 .film__texte summary:hover { color: var(--ambre); }
 .film__texte ol { margin: 4px 0 8px; padding-left: 1.4em; color: var(--texte-doux); font-size: 0.9375rem; }
 .film__texte li { margin: 6px 0; }
-
-/* ---------- Navigation de l'en-tête ---------- */
-
-.entete__nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; }
-.entete__lien[aria-current="page"] { color: var(--ambre); }
-@media (max-width: 400px) {
-  .entete__logo { width: 120px; }
-  .entete__nav { column-gap: 14px; }
-}
-/* « Pour les bars » est l’entrée des patrons : il reste visible jusqu’à 320 px, avec le logo à 120 px. Les écarts et le
-   texte des liens se resserrent (120 + 4 + 65 + 4 + 92 px tiennent dans les 288 px d’un écran de 320) ; les liens
-   gardent 44 px de haut. */
-@media (max-width: 359px) {
-  .entete { column-gap: 4px; }
-  .entete__nav { column-gap: 4px; }
-  .entete__lien { font-size: 0.875rem; }
-}
-/* Dès qu’il y a la place (401 px), « Pour les bars » devient une capsule de verre : un patron la voit sans chercher, et
-   l’ambre reste aux appels de la page. En dessous, le lien souligné, comme « Boutique ». */
-@media (min-width: 401px) {
-  .entete__lien--bars {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    padding: 0 16px;
-    border: 1px solid var(--verre-bord-fort);
-    border-radius: 999px;
-    background: var(--verre-fort);
-    box-shadow: var(--verre-reflet);
-  }
-  .entete__lien--bars:hover { background: rgba(255, 255, 255, 0.15); }
-}
 
 /* ---------- Baromatch en bref, sur l'accueil ---------- */
 
@@ -1272,6 +1357,13 @@ a:hover { color: var(--goutte); }
   --ombre-carte: 0 1px 2px rgba(10, 11, 16, 0.05), 0 10px 28px rgba(10, 11, 16, 0.06);
   /* L’ambre sur le crème ne fait que 1,7:1 : sur le clair, le contour du focus est bleu nuit (WCAG 1.4.11, 3:1). */
   --focus: #0A0B10;
+  --menu-fond: #FFFFFF;
+  --menu-releve: #F3EEE5;
+  --menu-bord: rgba(10, 11, 16, 0.5);
+  --menu-survol: rgba(10, 11, 16, 0.07);
+  --menu-courant: #0A0B10;
+  --menu-envers: #FAF7F1;
+  --menu-ombre: 0 12px 32px rgba(10, 11, 16, 0.2), 0 1px 3px rgba(10, 11, 16, 0.12);
   color-scheme: light;
 }
 .jour body { background: var(--fond); }
@@ -1311,8 +1403,8 @@ a:hover { color: var(--goutte); }
 .jour .verre .bm-goutte-chute { fill: var(--ambre); }
 .jour .verre .bm-onde { stroke: var(--ambre); }
 .jour .verre__halo { opacity: 0.6; }
-.jour .entete__lien:hover, .jour .questions-fans summary:hover, .jour .film__texte summary:hover, .jour .attente__corriger:hover { color: var(--texte-doux); }
-.jour .entete__lien--bars:hover, .jour .vitrine-accueil__bouton--verre:hover { background: var(--fond-releve); }
+.jour .questions-fans summary:hover, .jour .film__texte summary:hover, .jour .attente__corriger:hover { color: var(--texte-doux); }
+.jour .vitrine-accueil__bouton--verre:hover { background: var(--fond-releve); }
 /* Le bouton nuit sur le clair (« Proposer mon bar ») : survolé, il prend la goutte de la nuit, pas celle du jour
    (#7A4300 ne fait que 2,45:1 sur la nuit). Sans poids de plus : un bouton nuit d’une autre couleur garde la sienne. */
 :where(.jour) .bouton-nuit:hover { color: #FFF3DA; }

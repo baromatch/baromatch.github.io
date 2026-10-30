@@ -194,17 +194,24 @@ test.describe('ce que la page dit', () => {
 
   test('l’en-tête et le pied de page du site, « Pour les bars » marqué comme la page en cours', async ({ page }) => {
     await page.goto(PAGE);
-    const liens = await page.$$eval('.entete__nav a', (a) => a.map((l) => [l.className, l.getAttribute('href'), l.textContent, l.getAttribute('aria-current')]));
+    // Le menu des quatre entrées, « Pour les bars » marqué ; pas de « Préviens-moi » : l’action de la page est
+    // « Proposer mon bar ».
+    const liens = await page.$$eval('.entete a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent.trim(), l.getAttribute('aria-current')]));
     expect(liens).toEqual([
-      ['entete__lien', '/boutique.html', 'Boutique', null],
-      ['entete__lien entete__lien--bars', '/pour-les-bars.html', 'Pour les bars', 'page'],
+      ['/', '', null],
+      ['/ce-soir/', 'Ce soir', null],
+      ['/matchs/', 'La semaine', null],
+      ['/pour-les-bars.html', 'Pour les bars', 'page'],
+      ['/a-propos.html', 'À propos', null],
     ]);
     // Le pied de page est celui des autres pages (tests/pages-de-texte.spec.mjs le vérifie mot pour mot) : les CGU
-    // nommées, et « Supprimer mon compte » après « Confidentialité ».
-    const pied = await page.$$eval('.pied__liens a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent]));
-    expect(pied[0]).toEqual(['/pour-les-bars.html', 'Pour les bars']);
-    expect(pied.map(([href]) => href)).toEqual(PIED.map(([href]) => href));
+    // nommées, et « Supprimer mon compte » après « Confidentialité ». « Proposer mon bar » y mène au formulaire.
+    const pied = await page.$$eval('.pied a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent.replace(/\s+/g, ' ').trim()]));
+    expect(pied).toEqual(PIED);
+    expect(pied).toContainEqual(['/pour-les-bars.html#proposer', 'Proposer mon bar']);
+    await expect(page.locator('#proposer')).toHaveCount(1);
   });
+
 
   test('les données structurées : le fil d’Ariane et la FAQ, qui répète mot pour mot chaque question de la page, rien d’autre', async ({ page }) => {
     await page.goto(PAGE);

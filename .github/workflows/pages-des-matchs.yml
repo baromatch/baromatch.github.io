@@ -6,8 +6,8 @@
 # Le générateur (generateur/construire.mjs, Node seul ; seuls le rendu des images de partage et l’encodeur des QR codes
 # s’installent, dans generateur/images) les écrit d’après les listes publiques de l’appli ; cette Action le lance
 # toutes les 3 heures, juste après minuit à Paris (pour que « Ce soir » passe au nouveau jour), à la main (onglet
-# Actions, « Run workflow »), et à chaque envoi sur main qui touche au générateur, à marque.json ou à l’accueil (dont
-# les pages reprennent l’en-tête et le pied de page).
+# Actions, « Run workflow »), et à chaque envoi sur main qui touche au générateur (dont le cadre de toutes les pages,
+# l’en-tête et le pied de page : generateur/cadre.mjs), à marque.json ou à l’accueil (son bloc des matchs de la semaine).
 # Si les données ne répondent pas, répondent une erreur ou ne donnent aucun match, le générateur s’arrête sans rien
 # écrire : les pages en ligne restent comme elles sont. Il refuse aussi de supprimer d’un coup plus de la moitié des
 # pages, ou de perdre d’un coup les bars ou les soirées (liste vide) ou plus de la moitié des bars ou des matchs à

@@ -596,7 +596,7 @@ test.describe('le jour : le survol, le focus et le pied de page de l’accueil',
   test('le pied de page de l’accueil a les couleurs de celui des autres pages', async ({ page }) => {
     const couleurs = async (adresse) => {
       await page.goto(adresse);
-      return page.evaluate(() => ['.pied', '.pied__marque span', '.pied__liens a'].map((s) => `${s} : ${getComputedStyle(document.querySelector(s)).color}`));
+      return page.evaluate(() => ['.pied', '.pied__marque span', '.pied__plan li a', '.pied__action', '.pied__club'].map((s) => `${s} : ${getComputedStyle(document.querySelector(s)).color}`));
     };
     expect(await couleurs('/')).toEqual(await couleurs('/cgu.html'));
   });

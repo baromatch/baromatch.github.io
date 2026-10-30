@@ -411,17 +411,23 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     });
   }
 
-  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console', async ({ page }) => {
+  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console, pour le seul patron', async ({ page }) => {
     await page.goto(PAGE);
     const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });
     await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte. Il marche sur Android pour l’instant');
-    await expect(carte).toContainText('sans Android, la page Scan de la Console valide aussi un pass, depuis un navigateur.');
+    // La page Scan de la Console n’est ouverte qu’au compte du patron (un compte de la porte n’y a pas accès), et sa
+    // caméra ne marche pas partout : le code tapé est le chemin sûr. La page ne la promet pas à « ton équipe ».
+    await expect(carte).toContainText('Il marche sur Android pour l’instant. Sans Android, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron : tu tapes le code à 6 chiffres du fan.');
+    const tout = normaliser(await page.locator('main').textContent());
+    for (const phrase of tout.split(/(?<=[.;?])\s/).filter((p) => p.includes('page Scan'))) expect(phrase, phrase).toContain('ton compte de patron');
+    expect(tout).not.toContain('valide aussi un pass, depuis un navigateur');
     // L’étape 3 renvoie à la réponse pour l’installation, sans répéter le détail.
     const etape = page.locator('.marche__etape').nth(2);
     await expect(etape).toContainText('On t’explique comment installer l’appli de la porte.');
     const besoin = (await questions(page)).find((q) => q.question === 'De quoi j’ai besoin ?');
     expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone Android : pour l’instant, elle n’existe que sur Android\./);
     expect(besoin.reponse).toContain('On t’explique comment installer l’appli quand on te répond.');
+    expect(besoin.reponse).toContain('Sans Android, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron, en tapant le code du fan.');
     // Rien sur une version iPhone à venir, ni de date : rien n’est annoncé.
     expect(normaliser(await page.locator('main').textContent())).not.toMatch(/iPhone[^.]*(bientôt|prochainement|arrive|bientot)/i);
   });
@@ -449,7 +455,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(reponse('Comment je démarre').replace('sous 48 h', '')).not.toMatch(/\d+\s*(jours?|semaines?|heures?|h\b)/);
     // Tant que la question n’est pas tranchée avec un avocat (loi Evin), la réponse ne dit pas « Oui » : elle dit ce
     // qu’est l’offre du soir, et la mention sanitaire sous une offre qui parle d’alcool. Pareil dans la FAQ balisée.
-    const boisson = 'L’offre du soir est la tienne : c’est toi qui la décides et qui la sers. Tu écris un titre et un prix (0 € si c’est gratuit) : les fans la voient sur la page de ton bar. Sous une offre qui parle d’alcool, l’appli affiche « L’abus d’alcool est dangereux pour la santé, à consommer avec modération. »';
+    const boisson = 'L’offre du soir est la tienne : c’est toi qui la décides et qui la sers. Tu écris un titre et un prix : les fans la voient sur la fiche de ton bar, dans l’appli. Sous une offre qui parle d’alcool, l’appli affiche « L’abus d’alcool est dangereux pour la santé, à consommer avec modération. »';
     expect(reponse('Je peux mettre')).toBe(boisson);
     expect(reponse('Je peux mettre')).not.toMatch(/^\s*Oui\b/i);
     const balisee = await page.evaluate(() => JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent)['@graph']
@@ -457,6 +463,47 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(balisee.replace(/\s+/g, ' ')).toBe(boisson);
     // L’ancienne réponse « On ne peut pas encore te donner de délai. », franche mais vide, est remplacée par l’ordre des choses.
     expect(lues.map((q) => q.reponse).join(' ')).not.toContain('On ne peut pas encore te donner de délai');
+  });
+
+  // La liste d’attente dit ce que fait le serveur : un bar marqué complet ne donne une place rendue à personne, et
+  // « rouvrir » ne prévient personne ; une place rendue avant le coup d’envoi prévient les premiers de la liste (plusieurs
+  // quand plusieurs places se libèrent), et elle n’est gardée pour aucun d’eux. Les mêmes mots que l’accueil.
+  test('la liste d’attente, vraie : les premiers prévenus, la place pas mise de côté ; marqué complet, une place rendue ne repart pas', async ({ page }) => {
+    await page.goto(PAGE);
+    const moment = page.locator('.moment', { has: page.locator('.atout__titre', { hasText: 'Un retard se prévient' }) });
+    await expect(moment.locator('li', { hasText: 'liste d’attente' })).toHaveText('Toutes tes places en ligne sont prises ? Les fans rejoignent la liste d’attente. Une place rendue avant le coup d’envoi : les premiers de la liste sont prévenus dans l’appli. Elle n’est pas mise de côté : le premier qui la prend la garde.');
+    const plein = (await questions(page)).find((q) => q.question === 'Et quand mon bar est plein ?');
+    expect(plein.reponse).toBe('Tu le marques complet : plus personne ne réserve, et une place rendue ne repart pas. Les fans peuvent rejoindre la liste d’attente, et tu vois combien attendent. Quand tu rouvres, tes places reviennent en ligne pour tous.');
+    const tout = normaliser(await page.locator('main').textContent());
+    for (const promesse of ['le premier de la liste le voit', 'la prend s’il veut', 'tu rouvres des places d’un geste']) expect(tout).not.toContain(promesse);
+  });
+
+  // Trois phrases au plus près de ce que fait l’appli : les pseudos d’une soirée n’arrivent au bar que 3 h avant le coup
+  // d’envoi (avant, des chiffres) ; « Je suis en retard » ne prolonge une place que si le bar la garde 15 minutes après
+  // le coup d’envoi (à 0 ou 30 minutes, le bar est prévenu, la place n’attend pas plus : la règle « gardée jusqu’à » de
+  // l’appli) ; l’affiche QR se pose là où les clients ne la touchent pas.
+  test('ce que le bar sait avant le coup d’envoi, le retard aux trois réglages, l’affiche QR hors de portée des clients', async ({ page }) => {
+    await page.goto(PAGE);
+    await expect(page.locator('.ouverture-bars__texte')).toHaveText('Sur l’appli Baromatch, les fans qui cherchent où voir le match trouvent ton bar et gardent leur place. Avant le coup d’envoi, tu sais combien ont réservé, et dès 3 h avant, qui.');
+    await expect(page.locator('.moment li', { hasText: 'Je suis en retard' })).toHaveText('« Je suis en retard » : le fan prévient qu’il arrive dans 10, 20 ou 30 minutes, et tu le vois dans la Console. Si tu gardes les places 15 minutes après le coup d’envoi, la sienne peut attendre jusqu’à 30 minutes après, pas plus. Si tu les gardes jusqu’au coup d’envoi, ou 30 minutes après, tu es prévenu du retard, mais la place n’attend pas plus.');
+    await expect(page.locator('.moment li', { hasText: 'Personne à la porte' })).toContainText('le QR de ton bar, affiché sur un écran au comptoir que tes clients ne touchent pas (L’affiche QR, dans la Console).');
+  });
+
+  // Rien ne pousse à boire : une gratuité ne se lit jamais près d’une offre ou d’une boisson (le générateur du site ne
+  // publie ni « Boisson gratuite » ni une offre à 0 €), ni sur la page, ni dans la FAQ balisée.
+  test('aucun bloc de la page ni de la FAQ balisée ne met « 0 € » ou « gratuit » avec une offre ou une boisson', async ({ page }) => {
+    await page.goto(PAGE);
+    // Chaque bloc : un paragraphe, un point de liste, une question avec sa réponse, la carte « Ton offre du soir », et
+    // chaque question de la FAQ balisée avec sa réponse.
+    const blocs = await page.evaluate(() => [
+      ...[...document.querySelectorAll('main p, main li, main details, main .atout--offre')].map((e) => e.textContent),
+      ...JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent)['@graph']
+        .flatMap((n) => n.mainEntity ?? []).map((q) => `${q.name} ${q.acceptedAnswer.text}`),
+    ]);
+    const lus = blocs.map(normaliser);
+    const fautifs = lus.filter((b) => /\boffres?\b|boissons?/i.test(b) && /\b0\s?€|gratuit|offert/i.test(b));
+    expect(fautifs).toEqual([]);
+    expect(lus.filter((b) => /boissons?/i.test(b)).length).toBeGreaterThan(1);
   });
 
   // Les conditions des premiers bars : sous le bouton, dans les pastilles, dans les deux questions et dans la FAQ

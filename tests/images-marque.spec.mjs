@@ -1,5 +1,5 @@
 // Les images de la marque que le site publie : les logos de la page presse (SVG copiés tels quels des fichiers
-// officiels, PNG rendus par tests/outils/images-marque.mjs), les captures de l’appli en WebP et l’image de story des
+// officiels, PNG rendus par tests/outils/images-marque.mjs), les écrans de l’appli en WebP et l’image de story des
 // bars. Chaque SVG est public et téléchargé : il ne dit rien d’interne (ni commentaire, ni nom de fichier de travail,
 // ni trace d’un logiciel de dessin). L’image de story ne promet rien tant que l’appli n’est pas ouverte au public.
 import { test, expect } from '@playwright/test';
@@ -12,7 +12,8 @@ const duDepot = (...morceaux) => path.join(racine, ...morceaux);
 const MARQUE = JSON.parse(readFileSync(duDepot('marque.json'), 'utf8'));
 
 const LOGOS = ['baromatch-logo-fond-sombre', 'baromatch-logo-fond-clair'];
-const CAPTURES = ['capture-ton-club', 'capture-trouve-ton-bar', 'capture-garde-ta-place', 'capture-souvenir'];
+// Les écrans de l’appli que la page Presse montre et donne à télécharger : ceux de l’accueil (img/appli/).
+const ECRANS_PRESSE = ['ce-soir', 'carte-recherche', 'bar', 'ta-soiree', 'tu-y-es'];
 
 // Largeur, hauteur et type de couleur (6 : avec transparence) d’un PNG, lus dans son en-tête.
 const enTetePng = (fichier) => {
@@ -79,16 +80,19 @@ test.describe('les logos de la page presse', () => {
   });
 });
 
-test('les captures de l’appli : des WebP légers, de largeur raisonnable', () => {
-  for (const nom of CAPTURES) {
-    const fichier = duDepot('presse', `${nom}.webp`);
-    const { largeur, hauteur } = tailleWebp(fichier);
-    expect(largeur, nom).toBe(480);
-    expect(hauteur, nom).toBeGreaterThan(largeur);
-    expect(statSync(fichier).size, nom).toBeLessThan(60 * 1024);
+// Les anciennes captures (un bar inventé à une vraie adresse, de vrais clubs à une date passée, « 1 place par compte »)
+// ne sont plus publiées : la page Presse donne les écrans d’aujourd’hui, en 300 px pour la page et 600 px à télécharger.
+test('les écrans de l’appli de la page Presse : des WebP légers, en 300 et 600 px ; plus aucune ancienne capture', () => {
+  for (const nom of ECRANS_PRESSE) {
+    for (const largeurAttendue of [300, 600]) {
+      const fichier = duDepot('img', 'appli', `${nom}-${largeurAttendue}.webp`);
+      const { largeur, hauteur } = tailleWebp(fichier);
+      expect(largeur, nom).toBe(largeurAttendue);
+      expect(hauteur, nom).toBe(Math.round(largeurAttendue * 649 / 300));
+      expect(statSync(fichier).size, nom).toBeLessThan(60 * 1024);
+    }
   }
-  expect(readdirSync(duDepot('presse')).filter((nom) => nom.startsWith('capture-')).sort())
-    .toEqual(CAPTURES.map((nom) => `${nom}.webp`).sort());
+  expect(readdirSync(duDepot('presse')).filter((nom) => nom.startsWith('capture-'))).toEqual([]);
 });
 
 test.describe('l’image de story des bars', () => {

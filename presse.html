@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" class="jour">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,21 +7,22 @@
      données structurées ne s’exécutent pas). Une retouche d’un script ou d’un style en ligne change son empreinte :
      tests/politique-de-securite.spec.mjs donne la nouvelle. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'">
-<title>Baromatch pour la presse : logos, images et contact</title>
-<meta name="description" content="Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : ce qu’elle est, ce qu’elle n’est pas, logos, images et contact.">
+<title>Presse et partenariats : le kit de Baromatch</title>
+<meta name="description" content="Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, film, texte à copier et contact.">
 <meta name="robots" content="max-image-preview:large">
 <link rel="canonical" href="https://baromatch.fr/presse.html">
-<meta name="theme-color" content="#0A0B10">
+<meta name="theme-color" content="#FAF7F1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/presse.css">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
-<meta property="og:title" content="Baromatch pour la presse : logos, images et contact">
-<meta property="og:description" content="Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : ce qu’elle est, ce qu’elle n’est pas, logos, images et contact.">
+<meta property="og:title" content="Presse et partenariats : le kit de Baromatch">
+<meta property="og:description" content="Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, film, texte à copier et contact.">
 <meta property="og:url" content="https://baromatch.fr/presse.html">
 <meta property="og:image" content="https://baromatch.fr/img/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -33,9 +34,9 @@
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@graph": [
  {"@type": "AboutPage", "@id": "https://baromatch.fr/presse.html#page", "url": "https://baromatch.fr/presse.html",
-  "name": "Baromatch pour la presse : logos, images et contact",
-  "description": "Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : ce qu’elle est, ce qu’elle n’est pas, logos, images et contact.",
-  "inLanguage": "fr-FR", "isPartOf": {"@id": "https://baromatch.fr/#site"}, "about": {"@id": "https://baromatch.fr/#organisation"},
+  "name": "Presse et partenariats : le kit de Baromatch",
+  "description": "Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, film, texte à copier et contact.",
+  "inLanguage": "fr-FR", "dateModified": "2026-10-30", "isPartOf": {"@id": "https://baromatch.fr/#site"}, "about": {"@id": "https://baromatch.fr/#organisation"},
   "breadcrumb": {"@id": "https://baromatch.fr/presse.html#fil"}},
  {"@type": "Organization", "@id": "https://baromatch.fr/#organisation", "name": "Baromatch", "url": "https://baromatch.fr/",
    "slogan": "Ton match. Ton bar. Ce soir.",
@@ -44,7 +45,7 @@
    "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "contact@baromatch.fr", "availableLanguage": "fr"}},
  {"@type": "BreadcrumbList", "@id": "https://baromatch.fr/presse.html#fil", "itemListElement": [
   {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://baromatch.fr/"},
-  {"@type": "ListItem", "position": 2, "name": "Presse", "item": "https://baromatch.fr/presse.html"}]}
+  {"@type": "ListItem", "position": 2, "name": "Presse et partenariats", "item": "https://baromatch.fr/presse.html"}]}
 ]}
 </script>
 </head>
@@ -55,74 +56,217 @@
   <nav class="entete__nav" aria-label="Navigation principale"><a class="entete__lien" href="/boutique.html">Boutique</a><a class="entete__lien entete__lien--bars" href="/pour-les-bars.html">Pour les bars</a></nav>
 </header>
 
-<main id="contenu" class="document presse page">
-  <h1>Presse</h1>
-  <p class="document__date">Mise à jour le 29 octobre 2026</p>
-  <p class="presse__chapeau">Ce qu’est Baromatch en quelques lignes, ses logos, des images de l’appli, et une adresse pour nous écrire.</p>
+<main id="contenu" class="presse">
+  <section class="presse__ouverture page" aria-labelledby="titre">
+    <div class="presse__ouverture-texte">
+      <p class="surtitre">Presse et partenariats</p>
+      <h1 class="presse__titre" id="titre">Tout pour parler de Baromatch</h1>
+      <p class="presse__chapo">Le logo, les couleurs, la police, des écrans de l’appli, le film et un texte à copier tel quel.</p>
+      <p>Les logos, les captures et l’affiche de cette page peuvent être utilisés pour parler de Baromatch, sans les modifier.</p>
+      <ul class="presse__actions">
+        <li><a class="capsule" href="mailto:contact@baromatch.fr?subject=Presse%20%E2%80%93%20Baromatch">Écrire pour la presse</a></li>
+        <li><a class="presse__bouton" href="mailto:contact@baromatch.fr?subject=Partenariat%20%E2%80%93%20Baromatch">Écrire pour un partenariat</a></li>
+      </ul>
+      <p class="presse__bar">Tu tiens un bar&nbsp;? <a href="/pour-les-bars.html#proposer">Proposer mon bar</a></p>
+    </div>
+    <img class="presse__icone" src="/presse/baromatch-icone.svg" width="1024" height="1024" alt="">
+    <nav class="presse__sommaire" aria-label="Sur cette page">
+      <ul>
+        <li><a href="#logos">Logo</a></li>
+        <li><a href="#ecrans">Écrans</a></li>
+        <li><a href="#film">Film</a></li>
+        <li><a href="#texte">Texte</a></li>
+        <li><a href="#contact">Écrire</a></li>
+      </ul>
+    </nav>
+  </section>
 
-  <h2 id="en-bref">Baromatch en bref</h2>
-  <p class="presse__slogan">Ton match. Ton bar. Ce soir.</p>
-  <p>Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.</p>
-  <p>Baromatch est une appli gratuite pour les fans de foot&nbsp;: choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. En test sur Android, à Paris.</p>
-  <dl class="presse__faits">
-    <div><dt>Aujourd’hui</dt><dd>En test sur Android, à Paris. L’appli n’est pas encore ouverte au public, ni sur iPhone.</dd></div>
-    <div><dt>Pour les fans</dt><dd>Gratuit. Ce qu’ils prennent au bar, ils le paient au bar.</dd></div>
-    <div><dt>Pour les bars</dt><dd>Baromatch cherche ses premiers bars à Paris. Chaque bar choisit ses matchs et combien de places il ouvre. <a href="/pour-les-bars.html">Baromatch pour les bars</a></dd></div>
-    <div><dt>Fondateur</dt><dd>Skander Kamoun</dd></div>
-  </dl>
+  <section class="presse__bloc page" aria-labelledby="logos">
+    <h2 class="presse__titre-section" id="logos">Le logo</h2>
+    <p class="presse__intro">Le verre de lumière et le nom, en SVG (net à toutes les tailles) et en PNG (2400&nbsp;px de large, fond transparent). Garde-les tels quels&nbsp;: mêmes couleurs, mêmes proportions, sans effet ajouté.</p>
+    <ul class="presse__logos">
+      <li class="presse__logo">
+        <div class="presse__apercu presse__apercu--clair"><img src="/presse/baromatch-logo-fond-clair.svg" width="1122" height="220" alt="Le logo Baromatch pour fond clair&nbsp;: le verre de lumière et le nom en noir"></div>
+        <p class="presse__legende">Pour fond clair</p>
+        <p class="presse__fichiers"><a href="/presse/baromatch-logo-fond-clair.svg" download>SVG<span class="visuellement-cache">, logo pour fond clair</span></a><a href="/presse/baromatch-logo-fond-clair.png" download>PNG<span class="visuellement-cache">, logo pour fond clair</span></a></p>
+      </li>
+      <li class="presse__logo">
+        <div class="presse__apercu presse__apercu--sombre"><img src="/presse/baromatch-logo-fond-sombre.svg" width="1122" height="220" alt="Le logo Baromatch pour fond sombre&nbsp;: le verre de lumière et le nom en blanc"></div>
+        <p class="presse__legende">Pour fond sombre</p>
+        <p class="presse__fichiers"><a href="/presse/baromatch-logo-fond-sombre.svg" download>SVG<span class="visuellement-cache">, logo pour fond sombre</span></a><a href="/presse/baromatch-logo-fond-sombre.png" download>PNG<span class="visuellement-cache">, logo pour fond sombre</span></a></p>
+      </li>
+      <li class="presse__logo">
+        <div class="presse__apercu presse__apercu--icone"><img src="/presse/baromatch-icone.svg" width="1024" height="1024" alt="L’icône de l’appli Baromatch&nbsp;: le verre de lumière sur la nuit"></div>
+        <p class="presse__legende">L’icône de l’appli</p>
+        <p class="presse__fichiers"><a href="/presse/baromatch-icone.svg" download>SVG<span class="visuellement-cache">, icône de l’appli</span></a><a href="/presse/baromatch-icone.png" download>PNG<span class="visuellement-cache">, icône de l’appli</span></a></p>
+      </li>
+    </ul>
+  </section>
 
-  <h2 id="mot-du-fondateur">Le mot du fondateur</h2>
-  <figure class="citation">
-    <blockquote>
-      <p>Baromatch est né d’une question simple&nbsp;: où voir le match ce soir, et est-ce qu’il reste de la place&nbsp;? Je m’appelle Skander, je suis fan de foot et je construis Baromatch à Paris. Le bar garde la main sur ses places, le fan sait avant de partir s’il y a de la place pour lui. On commence à Paris, bar par bar, avec ceux qui veulent le lancer avec nous.</p>
-    </blockquote>
-    <figcaption>Skander, fondateur de Baromatch</figcaption>
-  </figure>
+  <div class="presse__nuit nuit page">
+    <section class="presse__bloc" aria-labelledby="ecrans">
+      <h2 class="presse__titre-section" id="ecrans">Les écrans de l’appli</h2>
+      <p class="presse__intro">Cinq captures de l’appli, à télécharger. Sur ces écrans, les bars, les clubs et les pseudos sont inventés.</p>
+      <ul class="presse__ecrans">
+        <li class="presse__ecran">
+          <figure>
+            <div class="presse__cadre"><span class="exemple">Écran de démonstration</span>
+              <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ce-soir-300.webp" srcset="/img/appli/ce-soir-300.webp 300w, /img/appli/ce-soir-600.webp 600w" sizes="(min-width: 1000px) 196px, (min-width: 600px) 30vw, 44vw" width="300" height="649" loading="lazy" decoding="async" alt="L’écran Ce soir de l’appli&nbsp;: Alvène – Orvèle à 21:00, en Coupe des Faubourgs, puis Près de toi&nbsp;: La Lucarne Lunaire à 6 min à pied, encore 7 places, et Le Onze Étoilé à 9 min, encore 12 places."></div></div>
+            </div>
+            <figcaption><strong>Ce soir</strong> <span>Le match de ce soir, et les bars qui le diffusent.</span> <a href="/img/appli/ce-soir-600.webp" download>Télécharger<span class="visuellement-cache"> l’écran Ce soir</span> <span class="presse__poids">(WebP, 600&nbsp;px)</span></a></figcaption>
+          </figure>
+        </li>
+        <li class="presse__ecran">
+          <figure>
+            <div class="presse__cadre"><span class="exemple">Écran de démonstration</span>
+              <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/carte-recherche-300.webp" srcset="/img/appli/carte-recherche-300.webp 300w, /img/appli/carte-recherche-600.webp 600w" sizes="(min-width: 1000px) 196px, (min-width: 600px) 30vw, 44vw" width="300" height="649" loading="lazy" decoding="async" alt="La recherche de l’appli, avec «&nbsp;11e&nbsp;»&nbsp;: des bars du 11e, comme La Lucarne Lunaire rue des Crampons, à 6 min à pied, encore 7 places, puis le quartier et des adresses."></div></div>
+            </div>
+            <figcaption><strong>La recherche</strong> <span>Un club, un bar, un quartier ou une adresse.</span> <a href="/img/appli/carte-recherche-600.webp" download>Télécharger<span class="visuellement-cache"> l’écran de la recherche</span> <span class="presse__poids">(WebP, 600&nbsp;px)</span></a></figcaption>
+          </figure>
+        </li>
+        <li class="presse__ecran">
+          <figure>
+            <div class="presse__cadre"><span class="exemple">Écran de démonstration</span>
+              <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/bar-300.webp" srcset="/img/appli/bar-300.webp 300w, /img/appli/bar-600.webp 600w" sizes="(min-width: 1000px) 196px, (min-width: 600px) 30vw, 44vw" width="300" height="649" loading="lazy" decoding="async" alt="La page d’un bar dans l’appli&nbsp;: La Lucarne Lunaire, 14 rue des Crampons, à 6 min à pied. Coin des supporters d’Orvèle, grand écran, 5 écrans, son du match, debout, les deux camps. 4 places prises, et le bouton «&nbsp;Prendre ma place&nbsp;»."></div></div>
+            </div>
+            <figcaption><strong>La page d’un bar</strong> <span>Ses places, et le bouton pour garder la tienne.</span> <a href="/img/appli/bar-600.webp" download>Télécharger<span class="visuellement-cache"> l’écran de la page d’un bar</span> <span class="presse__poids">(WebP, 600&nbsp;px)</span></a></figcaption>
+          </figure>
+        </li>
+        <li class="presse__ecran">
+          <figure>
+            <div class="presse__cadre"><span class="exemple">Écran de démonstration</span>
+              <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ta-soiree-300.webp" srcset="/img/appli/ta-soiree-300.webp 300w, /img/appli/ta-soiree-600.webp 600w" sizes="(min-width: 1000px) 196px, (min-width: 600px) 30vw, 44vw" width="300" height="649" loading="lazy" decoding="async" alt="Ta soirée dans l’appli&nbsp;: Alvène – Orvèle à 21:00, à La Lucarne Lunaire, pour 1 personne, le QR code du pass et son code, et le bouton «&nbsp;Y aller · 6 min à pied&nbsp;»."></div></div>
+            </div>
+            <figcaption><strong>Ta soirée</strong> <span>Le pass&nbsp;: un QR code et un code à 6&nbsp;chiffres.</span> <a href="/img/appli/ta-soiree-600.webp" download>Télécharger<span class="visuellement-cache"> l’écran Ta soirée</span> <span class="presse__poids">(WebP, 600&nbsp;px)</span></a></figcaption>
+          </figure>
+        </li>
+        <li class="presse__ecran">
+          <figure>
+            <div class="presse__cadre"><span class="exemple">Écran de démonstration</span>
+              <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/tu-y-es-300.webp" srcset="/img/appli/tu-y-es-300.webp 300w, /img/appli/tu-y-es-600.webp 600w" sizes="(min-width: 1000px) 196px, (min-width: 600px) 30vw, 44vw" width="300" height="649" loading="lazy" decoding="async" alt="Tu y es&nbsp;: arrivée validée à 20:37 à La Lucarne Lunaire, coup d’envoi dans 23 minutes. Sous-bock n°08 collé."></div></div>
+            </div>
+            <figcaption><strong>Tu y es</strong> <span>L’arrivée validée, et le sous-bock collé dans l’album.</span> <a href="/img/appli/tu-y-es-600.webp" download>Télécharger<span class="visuellement-cache"> l’écran Tu y es</span> <span class="presse__poids">(WebP, 600&nbsp;px)</span></a></figcaption>
+          </figure>
+        </li>
+      </ul>
+    </section>
 
-  <h2 id="n-est-pas">Ce que Baromatch n’est pas</h2>
-  <ul>
-    <li><strong>Pas un site de paris sportifs.</strong> Le nom peut y faire penser, mais on ne parie pas sur Baromatch&nbsp;: ni mise, ni cote, ni argent en jeu.</li>
-    <li><strong>Pas un diffuseur.</strong> Baromatch ne montre pas les matchs&nbsp;: ce sont les bars qui les diffusent.</li>
-    <li><strong>Pas un vendeur d’alcool.</strong> Baromatch ne vend rien à boire&nbsp;: ce qu’on prend au bar, on le paie au bar.</li>
-  </ul>
+    <section class="presse__bloc presse__film" aria-labelledby="film">
+      <div class="presse__film-texte">
+        <h2 class="presse__titre-section" id="film">Le film</h2>
+        <p>Le film de présentation de Baromatch&nbsp;: 15&nbsp;secondes, sans le son, en portrait. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
+        <ul class="presse__liens-film">
+          <li><a href="/baromatch-film.mp4">Voir le film (MP4)</a></li>
+          <li><a href="/#film-texte">Ce que montre le film, en texte</a></li>
+          <li><a href="/baromatch-film.webp" download>Télécharger l’affiche<span class="visuellement-cache"> du film</span> <span class="presse__poids">(WebP)</span></a></li>
+        </ul>
+      </div>
+      <a class="presse__affiche" href="/baromatch-film.mp4"><img src="/baromatch-film.webp" width="540" height="960" loading="lazy" decoding="async" alt="Voir le film de Baromatch&nbsp;: son affiche, «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;», au-dessus d’un quartier où des bars s’allument"></a>
+    </section>
+  </div>
 
-  <h2 id="logos">Les logos</h2>
-  <p>Les logos, les captures et l’affiche de cette page peuvent être utilisés pour parler de Baromatch, sans les modifier.</p>
-  <p>Le verre de lumière et le nom, en SVG (net à toutes les tailles) et en PNG (2400&nbsp;px de large, fond transparent). Garde-les tels quels&nbsp;: mêmes couleurs, mêmes proportions, sans effet ajouté.</p>
-  <ul class="presse__logos">
-    <li class="presse__logo">
-      <div class="presse__apercu"><img src="/presse/baromatch-logo-fond-sombre.svg" width="1122" height="220" alt="Le logo Baromatch pour fond sombre : le verre de lumière et le nom en blanc"></div>
-      <p class="presse__legende">Pour fond sombre</p>
-      <p class="presse__fichiers"><a href="/presse/baromatch-logo-fond-sombre.svg" download>SVG<span class="visuellement-cache">, logo pour fond sombre</span></a><a href="/presse/baromatch-logo-fond-sombre.png" download>PNG<span class="visuellement-cache">, logo pour fond sombre</span></a></p>
-    </li>
-    <li class="presse__logo">
-      <div class="presse__apercu presse__apercu--clair"><img src="/presse/baromatch-logo-fond-clair.svg" width="1122" height="220" alt="Le logo Baromatch pour fond clair : le verre de lumière et le nom en noir"></div>
-      <p class="presse__legende">Pour fond clair</p>
-      <p class="presse__fichiers"><a href="/presse/baromatch-logo-fond-clair.svg" download>SVG<span class="visuellement-cache">, logo pour fond clair</span></a><a href="/presse/baromatch-logo-fond-clair.png" download>PNG<span class="visuellement-cache">, logo pour fond clair</span></a></p>
-    </li>
-    <li class="presse__logo">
-      <div class="presse__apercu"><img class="presse__icone" src="/presse/baromatch-icone.svg" width="1024" height="1024" alt="L’icône de l’appli Baromatch : le verre de lumière sur la nuit"></div>
-      <p class="presse__legende">L’icône de l’appli</p>
-      <p class="presse__fichiers"><a href="/presse/baromatch-icone.svg" download>SVG<span class="visuellement-cache">, icône de l’appli</span></a><a href="/presse/baromatch-icone.png" download>PNG<span class="visuellement-cache">, icône de l’appli</span></a></p>
-    </li>
-  </ul>
+  <section class="presse__bloc page" aria-labelledby="couleurs">
+    <h2 class="presse__titre-section" id="couleurs">Les couleurs et la police</h2>
+    <div class="presse__marque">
+      <ul class="presse__teintes">
+        <li>
+          <span class="presse__disque presse__disque--ambre" aria-hidden="true"></span>
+          <p class="presse__teinte-nom">Ambre</p>
+          <p><code>#FFB13D</code> · RVB <code>255 177 61</code></p>
+          <p class="presse__role">La couleur de l’action.</p>
+        </li>
+        <li>
+          <span class="presse__disque presse__disque--nuit" aria-hidden="true"></span>
+          <p class="presse__teinte-nom">Nuit</p>
+          <p><code>#0A0B10</code> · RVB <code>10 11 16</code></p>
+          <p class="presse__role">Le fond de l’appli.</p>
+        </li>
+      </ul>
+      <div class="presse__police">
+        <p class="presse__teinte-nom">Bricolage Grotesque</p>
+        <p class="presse__role">Une seule police, dans l’appli comme sur ce site. Les chiffres sont à chasse fixe, pour que les heures s’alignent&nbsp;: 18:42, 20:37, 21:00.</p>
+        <p class="presse__role">Une police libre, sous licence SIL Open Font. <a href="/fonts/LICENSE-OFL.txt">Lire la licence</a></p>
+      </div>
+    </div>
+  </section>
 
-  <h2 id="images">L’appli en images</h2>
-  <p>Des écrans de l’appli en test, avec des données d’exemple&nbsp;: le bar et le pseudo sont inventés.</p>
-  <ul class="presse__captures">
-    <li><figure><img src="/presse/capture-ton-club.webp" width="480" height="1039" loading="lazy" alt="L’écran d’accueil de l’appli : Ton match. Ton bar. Ce soir., puis le choix de son club"><figcaption>Tu choisis ton club&nbsp;: l’appli prend ses couleurs les soirs où il joue.</figcaption></figure></li>
-    <li><figure><img src="/presse/capture-trouve-ton-bar.webp" width="480" height="1039" loading="lazy" alt="La carte des bars qui diffusent un match, avec les places qui restent dans chacun"><figcaption>Les bars qui diffusent ton match, et les places qui restent dans chacun.</figcaption></figure></li>
-    <li><figure><img src="/presse/capture-garde-ta-place.webp" width="480" height="1039" loading="lazy" alt="L’écran pour garder sa place : l’heure d’arrivée et le bouton à maintenir"><figcaption>Tu gardes ta place&nbsp;: tu tiens appuyé, le verre se remplit.</figcaption></figure></li>
-    <li><figure><img src="/presse/capture-souvenir.webp" width="480" height="853" loading="lazy" alt="Un sous-bock : J’y étais., le match, le bar et la date de la soirée"><figcaption>La soirée gardée en souvenir&nbsp;: un sous-bock dans ton album.</figcaption></figure></li>
-  </ul>
+  <section class="presse__bloc page" aria-labelledby="texte">
+    <h2 class="presse__titre-section" id="texte">Le texte à copier</h2>
+    <p class="presse__intro">Prends-le tel quel.</p>
+    <dl class="presse__copie">
+      <div><dt>La phrase</dt><dd class="presse__phrase">Ton match. Ton bar. Ce soir.</dd></div>
+      <div><dt>En une ligne</dt><dd>Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.</dd></div>
+      <div><dt>En un paragraphe</dt><dd class="presse__paragraphe">Baromatch est une appli gratuite pour les fans de foot&nbsp;: choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. En test sur Android, à Paris.</dd></div>
+    </dl>
+    <h3 class="presse__sous-titre" id="en-bref">Baromatch en bref</h3>
+    <dl class="presse__faits">
+      <div><dt>Aujourd’hui</dt><dd>En test sur Android, à Paris. L’appli n’est pas encore ouverte au public, ni sur iPhone.</dd></div>
+      <div><dt>Pour les fans</dt><dd>Gratuit. Ce qu’ils prennent au bar, ils le paient au bar.</dd></div>
+      <div><dt>Pour les bars</dt><dd>Baromatch cherche ses premiers bars à Paris. Chaque bar choisit ses matchs et combien de places il ouvre. <a href="/pour-les-bars.html">Baromatch pour les bars</a></dd></div>
+      <div><dt>Pour qui</dt><dd>Les fans de foot de 18&nbsp;ans et plus, et les bars qui diffusent les matchs.</dd></div>
+      <div><dt>Qui publie</dt><dd>Baromatch est édité par Skander Kamoun, son fondateur, à titre personnel pour le moment. La société qui exploitera l’appli est en cours de création&nbsp;: ses informations seront dans les <a href="/mentions-legales.html">mentions légales</a> dès son immatriculation.</dd></div>
+    </dl>
+  </section>
 
-  <h2 id="film">Le film</h2>
-  <p>Le film de présentation de Baromatch&nbsp;: 15&nbsp;secondes, sans le son, en portrait. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
-  <a class="presse__film" href="/baromatch-film.mp4"><img src="/baromatch-film.webp" width="540" height="960" loading="lazy" alt="Voir le film de Baromatch&nbsp;: son affiche, «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;», au-dessus d’un quartier où des bars s’allument"></a>
-  <p class="presse__fichiers"><a href="/baromatch-film.mp4">Le film (MP4)</a><a href="/#film-texte">Ce que montre le film, en texte</a></p>
+  <section class="presse__bloc page" aria-labelledby="n-est-pas">
+    <h2 class="presse__titre-section" id="n-est-pas">Ce que Baromatch n’est pas</h2>
+    <ul class="presse__liste">
+      <li><strong>Pas un site de paris sportifs.</strong> Le nom peut y faire penser, mais on ne parie pas sur Baromatch&nbsp;: ni mise, ni cote, ni argent en jeu.</li>
+      <li><strong>Pas un diffuseur.</strong> Baromatch ne montre pas les matchs&nbsp;: ce sont les bars qui les diffusent.</li>
+      <li><strong>Pas un vendeur d’alcool.</strong> Baromatch ne vend rien à boire&nbsp;: ce qu’on prend au bar, on le paie au bar.</li>
+    </ul>
+  </section>
 
-  <h2 id="contact">Contact presse</h2>
-  <p>Une question, une interview, des images en plus grand&nbsp;: écris à <a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a>, c’est le fondateur qui répond. Baromatch est aussi sur X&nbsp;: <a href="https://x.com/baromatchapp" rel="me noopener">@baromatchapp</a>.</p>
+  <section class="presse__bloc presse__releve page" aria-labelledby="mot-du-fondateur">
+    <h2 class="presse__titre-section" id="mot-du-fondateur">Le mot du fondateur</h2>
+    <figure class="presse__citation">
+      <blockquote>
+        <p>Baromatch est né d’une question simple&nbsp;: où voir le match ce soir, et est-ce qu’il reste de la place&nbsp;? Je m’appelle Skander, je suis fan de foot et je construis Baromatch à Paris. Le bar garde la main sur ses places, le fan sait avant de partir s’il y a de la place pour lui. On commence à Paris, bar par bar, avec ceux qui veulent le lancer avec nous.</p>
+      </blockquote>
+      <figcaption>Skander, fondateur de Baromatch</figcaption>
+    </figure>
+  </section>
+
+  <section class="presse__bloc page" aria-labelledby="partenariats">
+    <h2 class="presse__titre-section" id="partenariats">Partenariats</h2>
+    <p class="presse__intro">Pour un investisseur, un club ou une ville&nbsp;: où en est Baromatch, et ce qu’il refuse.</p>
+    <div class="presse__deux">
+      <div class="presse__carte">
+        <h3 class="presse__sous-titre">Baromatch aujourd’hui</h3>
+        <ul class="presse__liste">
+          <li>Baromatch cherche ses premiers bars à Paris. Pour eux, c’est gratuit pendant le lancement, sans engagement.</li>
+          <li>Les fans ne réservent pas encore&nbsp;: on prépare l’ouverture avec les premiers bars.</li>
+          <li>Paris d’abord. Pas encore de date pour d’autres villes.</li>
+        </ul>
+      </div>
+      <div class="presse__carte">
+        <h3 class="presse__sous-titre">Ce que Baromatch refuse</h3>
+        <ul class="presse__liste">
+          <li>Les faux bars, les faux avis et les chiffres inventés.</li>
+          <li>Les écussons et les logos&nbsp;: les clubs et les compétitions sont écrits en toutes lettres.</li>
+          <li>Qu’un bar paie pour passer devant un autre.</li>
+        </ul>
+        <p class="presse__suite">Le détail&nbsp;: <a href="/comment-on-choisit-les-bars.html">comment on choisit les bars</a>, et <a href="/a-propos.html">pourquoi Baromatch existe</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="presse__bloc presse__releve page" aria-labelledby="contact">
+    <h2 class="presse__titre-section" id="contact">Écrire à Baromatch</h2>
+    <p class="presse__intro">Une question, une interview, des images en plus grand&nbsp;: écris à <a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a>, c’est le fondateur qui répond. Baromatch est aussi sur X&nbsp;: <a href="https://x.com/baromatchapp" rel="me noopener">@baromatchapp</a>.</p>
+    <ul class="presse__ecrire">
+      <li>
+        <p>Pour un article, une interview, des images</p>
+        <a class="presse__bouton" href="mailto:contact@baromatch.fr?subject=Presse%20%E2%80%93%20Baromatch">Écrire pour la presse</a>
+      </li>
+      <li>
+        <p>Pour un investisseur, un club ou une ville</p>
+        <a class="presse__bouton" href="mailto:contact@baromatch.fr?subject=Partenariat%20%E2%80%93%20Baromatch">Écrire pour un partenariat</a>
+      </li>
+    </ul>
+    <p class="presse__secours">Ta messagerie ne s’ouvre pas&nbsp;? Écris à contact@<wbr>baromatch.fr avec l’objet «&nbsp;Presse – Baromatch&nbsp;» ou «&nbsp;Partenariat – Baromatch&nbsp;».</p>
+    <p class="document__date">Mise à jour le 30 octobre 2026</p>
+  </section>
 </main>
 <footer class="pied page">
   <div class="pied__marque"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="pd-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="pd-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="pd-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#pd-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#pd-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#pd-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg><span>© 2026 Baromatch</span></div>

@@ -945,6 +945,14 @@ a:hover { color: var(--goutte); }
   border-top: 1px solid var(--trait);
 }
 @media (min-width: 720px) { .en-bref { padding-top: 120px; padding-bottom: 128px; } }
+/* « Baromatch en bref » : les faits de l’accueil (À propos et Presse ont leur feuille, a-propos.css et presse.css). */
+.faits { margin: 24px 0 0; border-top: 1px solid var(--trait); }
+.faits > div { display: grid; gap: 2px 24px; padding: 14px 0; border-bottom: 1px solid var(--trait); }
+@media (min-width: 720px) { .faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
+.faits dt { font-weight: 700; }
+.faits dd { margin: 0; color: var(--texte-doux); }
+/* Le lien seul d’une ligne (le contact) se touche sur 44 px. */
+.faits dd > a:only-child { display: inline-flex; align-items: center; min-height: 44px; }
 .en-bref .faits { max-width: 46rem; margin-top: 28px; }
 .en-bref__suite { margin: 24px 0 0; }
 .en-bref__suite a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
@@ -1182,68 +1190,6 @@ a:hover { color: var(--goutte); }
 .tablee__bouton { margin-top: 20px; }
 /* Un lien mort ou une panne : seulement le bouton, sous la phrase d’état. */
 .tablee__appli:has(> [hidden]) { margin-top: 12px; padding-top: 0; border-top: 0; text-align: center; }
-
-/* ---------- Page presse ---------- */
-
-.document.presse { max-width: 54rem; }
-.document .presse__chapeau { margin: 0; color: var(--texte); font-size: 1.1875rem; }
-.document .presse__slogan {
-  margin: 0 0 8px;
-  color: var(--texte);
-  font-weight: 800;
-  font-stretch: 88%;
-  font-variation-settings: "opsz" 72;
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  line-height: 1.1;
-}
-
-/* « Baromatch en bref » : les mêmes faits sur l’accueil, À propos et Presse. */
-.presse__faits, .faits { margin: 24px 0 0; border-top: 1px solid var(--trait); }
-.presse__faits > div, .faits > div { display: grid; gap: 2px 24px; padding: 14px 0; border-bottom: 1px solid var(--trait); }
-@media (min-width: 720px) { .presse__faits > div, .faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
-.presse__faits dt, .faits dt { font-weight: 700; }
-.presse__faits dd, .faits dd { margin: 0; color: var(--texte-doux); }
-/* Le lien seul d’une ligne (le contact) se touche sur 44 px. */
-.faits dd > a:only-child { display: inline-flex; align-items: center; min-height: 44px; }
-
-.document .presse__logos, .document .presse__captures { display: grid; gap: 20px; margin: 24px 0 0; padding: 0; list-style: none; }
-.document .presse__logos > li, .document .presse__captures > li { margin: 0; }
-@media (min-width: 720px) { .document .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.presse__logo, .citation { padding: 16px; border: 1px solid var(--verre-bord); border-radius: 20px; background: var(--verre); box-shadow: var(--verre-reflet); }
-/* Le mot du fondateur (À propos, Presse) : ses mots tels quels, signés, dans le même verre. */
-.citation { margin: 20px 0 0; }
-.citation blockquote { margin: 0; }
-.document .citation p { margin: 0; color: var(--texte); }
-.citation figcaption { margin-top: 12px; color: var(--texte-doux); font-size: 0.9375rem; font-weight: 700; }
-.presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: 20px; border-radius: 12px; background: var(--nuit); }
-.presse__apercu--clair { background: #F7F7F9; }
-.presse__apercu img { width: 100%; height: auto; }
-.presse__apercu img.presse__icone { width: auto; height: 100%; border-radius: 22%; }
-.document .presse__legende { margin: 12px 0 0; color: var(--texte); font-weight: 700; }
-
-.document .presse__fichiers { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 10px 0 0; }
-.presse__fichiers a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  max-width: 100%;
-  padding: 0 18px;
-  border: 1px solid var(--verre-bord-fort);
-  border-radius: 999px;
-  color: var(--texte);
-  font-weight: 600;
-  text-decoration: none;
-}
-.presse__fichiers a:hover { border-color: var(--ambre); color: var(--ambre); }
-
-.document .presse__captures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 720px) { .document .presse__captures { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.presse__captures figure { margin: 0; }
-.presse__captures img { width: 100%; height: auto; border: 1px solid var(--verre-bord); border-radius: 18px; }
-.presse__captures figcaption { margin-top: 10px; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.4; }
-
-.presse__film { display: block; width: min(100%, 18rem); margin-top: 16px; overflow: hidden; border: 1px solid var(--verre-bord); border-radius: 18px; }
-.presse__film img { width: 100%; height: auto; }
 
 /* ---------- Le jour : une page en clair (l’accueil, pour commencer) ---------- */
 

@@ -1,0 +1,226 @@
+/* Presse et partenariats, « le kit sur la page » : la page est le kit. Le jour (styles.css, « Le jour » : ses fonds, le
+   bleu nuit pour le texte), avec un seul bouton ambre, « Écrire pour la presse » ; toute autre action a un contour à
+   3,6:1. La nuit revient pour les écrans de l’appli et le film (la section « nuit » et le téléphone de verre de
+   styles.css), sans lien ambre : ses liens sont en blanc doux, soulignés. Les deux couleurs se montrent en petits
+   disques sur une carte blanche, pas en surfaces. Rien ne bouge : ni animation, ni script.
+   Chaque grand texte se règle en rem et en vw, et chaque grille d’écrans en em : avec le texte à 200 % sur 320 px, son
+   plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Chargée seulement par presse.html. */
+
+.presse { --presse-air: clamp(48px, 6.5vw, 88px); }
+.presse p, .presse ul, .presse dl, .presse figure { margin: 0; }
+
+/* ---------- L’ouverture : ce que c’est, ce qu’on peut en faire, à qui écrire ---------- */
+
+.presse__ouverture {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "icone" "texte" "sommaire";
+  gap: 24px;
+  padding-top: clamp(24px, 5vw, 64px);
+  padding-bottom: var(--presse-air);
+}
+.presse__ouverture-texte { grid-area: texte; min-width: 0; }
+.presse__icone { grid-area: icone; width: 76px; height: auto; border-radius: 18px; box-shadow: 0 14px 36px rgba(10, 11, 16, 0.22); }
+.presse__sommaire { grid-area: sommaire; }
+@media (min-width: 900px) {
+  .presse__ouverture { grid-template-columns: minmax(0, 1fr) 260px; grid-template-areas: "texte icone" "sommaire icone"; column-gap: 72px; align-items: center; }
+  .presse__icone { width: 260px; justify-self: end; border-radius: 58px; box-shadow: 0 24px 60px rgba(10, 11, 16, 0.26); }
+}
+
+.presse__titre {
+  max-width: 14ch;
+  margin: 0;
+  font-size: clamp(2rem, 1rem + 4.4vw, 4.25rem);
+  font-weight: 750;
+  font-stretch: 90%;
+  font-variation-settings: "opsz" 72;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.presse__ouverture-texte > p { max-width: 38rem; color: var(--texte-doux); text-wrap: pretty; }
+.presse__ouverture-texte > .surtitre { color: var(--texte-discret); }
+.presse__ouverture-texte > .presse__chapo { margin-top: 20px; color: var(--texte); font-size: 1.1875rem; }
+.presse__chapo + p { margin-top: 10px; }
+@media (min-width: 720px) { .presse__ouverture-texte > .presse__chapo { font-size: 1.3125rem; } }
+
+.presse .presse__actions { display: flex; flex-wrap: wrap; gap: 10px 12px; margin-top: 28px; padding: 0; list-style: none; }
+.presse__actions li { max-width: 100%; }
+.presse .capsule, .presse__bouton { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; }
+.presse__bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border: 1.5px solid var(--champ-bord);
+  border-radius: 999px;
+  background: var(--carte);
+  color: var(--texte);
+  font-weight: 700;
+  text-decoration: none;
+}
+.presse__bouton:hover { background: var(--fond-releve); color: var(--texte); }
+.presse__ouverture-texte > .presse__bar { margin-top: 12px; }
+.presse__bar a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; }
+
+/* Sur cette page : cinq entrées, des capsules à 44 px, cernées à 3,6:1. */
+.presse__sommaire ul { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
+.presse__sommaire a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--champ-bord);
+  border-radius: 999px;
+  background: var(--carte);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+.presse__sommaire a:hover { background: var(--fond-releve); }
+.presse [id] { scroll-margin-top: 16px; }
+
+/* ---------- Une section du kit ---------- */
+
+.presse__bloc { padding-top: var(--presse-air); padding-bottom: var(--presse-air); }
+.presse__titre-section {
+  max-width: 20ch;
+  margin: 0;
+  font-size: clamp(1.75rem, 1rem + 2.4vw, 2.75rem);
+  font-weight: 750;
+  font-stretch: 90%;
+  font-variation-settings: "opsz" 72;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.presse .presse__intro { max-width: 40rem; margin-top: 12px; color: var(--texte-doux); text-wrap: pretty; }
+.presse .presse__sous-titre { margin: 40px 0 0; font-size: 1.25rem; font-weight: 750; line-height: 1.25; }
+.presse__carte .presse__sous-titre { margin-top: 0; }
+
+/* Un fond relevé sur toute la largeur de l’écran (le mot du fondateur, « Écrire à Baromatch »). */
+.presse__releve { background: var(--fond-releve); box-shadow: 0 0 0 100vmax var(--fond-releve); clip-path: inset(0 -100vmax); }
+
+/* ---------- Le logo ---------- */
+
+.presse .presse__logos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 32px; padding: 0; list-style: none; }
+@media (min-width: 760px) { .presse .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.presse__logo { display: grid; align-content: start; gap: 12px; padding: 16px 16px 20px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
+/* Au téléphone, un aperçu plus bas (5:2) : les trois cartes tiennent en moins de deux écrans. */
+.presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 5 / 2; padding: 16px 20px; border-radius: 12px; }
+@media (min-width: 760px) { .presse__apercu { aspect-ratio: 16 / 9; padding: 20px; } }
+.presse__apercu img { width: min(100%, 300px); height: auto; }
+.presse__apercu--clair { background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); }
+.presse__apercu--sombre { background: var(--nuit); }
+.presse__apercu--icone { background: var(--fond-releve); }
+.presse__apercu--icone img { width: auto; height: 100%; border-radius: 22%; }
+.presse__legende { font-weight: 700; }
+.presse .presse__fichiers { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.presse__fichiers a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid var(--champ-bord);
+  border-radius: 999px;
+  background: var(--carte);
+  font-weight: 650;
+  text-decoration: none;
+}
+.presse__fichiers a:hover { background: var(--fond-releve); }
+
+/* ---------- La nuit : les écrans et le film ---------- */
+
+/* Ses liens en blanc doux, soulignés (l’ambre est pour l’action, pas pour un lien). */
+.presse__nuit a { color: var(--texte-doux); }
+.presse__nuit a:hover { color: var(--texte); }
+.presse__nuit > .presse__bloc + .presse__bloc { padding-top: 0; }
+.presse__poids { white-space: nowrap; }
+
+/* Les écrans : des colonnes d’au moins 9 em (deux au téléphone, cinq sur ordinateur). Avec le texte à 200 %, une
+   colonne fait deux fois plus large : un écran par ligne, et l’étiquette tient sur deux lignes, sans couper un mot.
+   L’étiquette se pose au-dessus de l’écran : la colonne est trop étroite pour qu’elle chevauche son bord. */
+.presse .presse__ecrans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr)); gap: 40px 16px; margin-top: 36px; padding: 0; list-style: none; }
+@media (min-width: 1000px) { .presse .presse__ecrans { gap: 40px 24px; } }
+.presse__ecran figure { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
+.presse__cadre { width: min(100%, 13rem); }
+.presse__cadre .exemple { position: static; margin: 0 0 10px; }
+.presse__cadre .telephone { max-width: none; padding: 5px; border-radius: 28px; }
+.presse__cadre .telephone__ecran { border-radius: 23px; }
+.presse__ecran figcaption { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.4; }
+.presse__ecran figcaption strong { color: var(--texte); font-size: 1.0625rem; font-weight: 700; }
+.presse__ecran figcaption a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; justify-self: start; min-height: 44px; font-weight: 650; }
+
+.presse__film { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: center; }
+@media (min-width: 800px) { .presse__film { grid-template-columns: minmax(0, 1fr) 260px; gap: 72px; } }
+.presse__film-texte > p { max-width: 36rem; margin-top: 12px; color: var(--texte-doux); text-wrap: pretty; }
+.presse .presse__liens-film { display: grid; justify-items: start; gap: 2px; margin-top: 20px; padding: 0; list-style: none; }
+.presse__liens-film a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; min-height: 44px; font-weight: 650; }
+.presse__affiche { display: block; width: min(100%, 240px); padding: 5px; border-radius: 28px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
+.presse__affiche img { width: 100%; height: auto; border-radius: 23px; }
+@media (min-width: 800px) { .presse__affiche { width: 260px; } }
+
+/* ---------- Les couleurs et la police : une carte, deux disques ---------- */
+
+.presse__marque { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; margin-top: 28px; padding: 28px; border: 1px solid var(--trait); border-radius: 22px; background: var(--carte); box-shadow: var(--ombre-carte); }
+@media (min-width: 860px) { .presse__marque { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; } }
+.presse .presse__teintes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 0; list-style: none; }
+@media (min-width: 560px) { .presse .presse__teintes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.presse__teintes li { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-content: start; column-gap: 16px; }
+.presse__disque { grid-row: span 3; width: 72px; height: 72px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(10, 11, 16, 0.14); }
+.presse__disque--ambre { background: var(--ambre); }
+.presse__disque--nuit { background: var(--nuit); }
+.presse__teinte-nom { font-size: 1.125rem; font-weight: 750; }
+.presse .presse__role { color: var(--texte-doux); text-wrap: pretty; }
+.presse__police .presse__role { margin-top: 6px; }
+.presse code { font: inherit; font-weight: 700; white-space: nowrap; -webkit-user-select: all; user-select: all; }
+
+/* ---------- Le texte à copier, et Baromatch en bref ---------- */
+
+.presse .presse__copie { display: grid; gap: 20px; margin-top: 28px; padding: 28px; border: 1px solid var(--trait); border-radius: 22px; background: var(--carte); box-shadow: var(--ombre-carte); }
+@media (min-width: 720px) { .presse .presse__copie { padding: 36px 44px; } }
+.presse__copie div { display: grid; gap: 6px; }
+.presse__copie dt { color: var(--texte-discret); font-size: 0.875rem; font-weight: 700; letter-spacing: 0.02em; }
+.presse__copie dd { max-width: 44rem; margin: 0; font-size: 1.1875rem; line-height: 1.45; text-wrap: pretty; -webkit-user-select: all; user-select: all; }
+.presse__copie .presse__phrase { font-size: clamp(1.5rem, 1rem + 2vw, 2.25rem); font-weight: 750; font-stretch: 90%; line-height: 1.15; letter-spacing: -0.02em; }
+.presse__copie .presse__paragraphe { padding-left: 18px; border-left: 3px solid var(--texte); font-size: clamp(1.1875rem, 1rem + 0.6vw, 1.4375rem); }
+
+.presse .presse__faits { margin-top: 16px; border-top: 1px solid var(--trait); }
+.presse__faits > div { display: grid; gap: 2px 24px; padding: 14px 0; border-bottom: 1px solid var(--trait); }
+@media (min-width: 720px) { .presse__faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
+.presse__faits dt { font-weight: 700; }
+.presse__faits dd { margin: 0; color: var(--texte-doux); text-wrap: pretty; }
+.presse__faits dd a { font-weight: 650; }
+
+/* ---------- Ce que Baromatch n’est pas, Partenariats ---------- */
+
+.presse .presse__liste { display: grid; gap: 12px; max-width: 44rem; margin-top: 24px; padding: 0; list-style: none; }
+.presse__carte .presse__liste { margin-top: 14px; }
+.presse__liste li { position: relative; padding-left: 22px; color: var(--texte-doux); text-wrap: pretty; }
+.presse__liste li::before { content: ""; position: absolute; top: 0.7em; left: 2px; width: 7px; height: 7px; border-radius: 50%; background: var(--texte); }
+.presse__liste strong { color: var(--texte); font-weight: 700; }
+
+.presse__deux { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 28px; }
+@media (min-width: 800px) { .presse__deux { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
+.presse__carte { min-width: 0; padding: 24px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
+.presse .presse__suite { margin-top: 18px; color: var(--texte-doux); }
+
+/* ---------- Le mot du fondateur ---------- */
+
+.presse .presse__citation { max-width: 46rem; margin-top: 28px; }
+.presse__citation blockquote { margin: 0; }
+.presse__citation p { font-size: clamp(1.25rem, 1rem + 1.3vw, 1.875rem); font-weight: 540; font-stretch: 94%; font-variation-settings: "opsz" 36; line-height: 1.38; letter-spacing: -0.01em; text-wrap: pretty; }
+.presse__citation figcaption { margin-top: 18px; color: var(--texte-doux); font-weight: 700; }
+
+/* ---------- Écrire à Baromatch ---------- */
+
+.presse .presse__ecrire { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px 20px; max-width: 46rem; margin-top: 28px; padding: 0; list-style: none; }
+@media (min-width: 640px) { .presse .presse__ecrire { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.presse__ecrire li { display: grid; align-content: start; gap: 8px; }
+.presse__ecrire p { color: var(--texte-discret); font-size: 0.9375rem; }
+.presse .presse__secours { max-width: 44rem; margin-top: 22px; color: var(--texte-doux); font-size: 0.9375rem; }
+.presse .document__date { margin-top: 22px; }
+
+@media (forced-colors: active) {
+  .presse__bouton, .presse__fichiers a, .presse__sommaire a, .presse__disque { border: 1px solid CanvasText; }
+}

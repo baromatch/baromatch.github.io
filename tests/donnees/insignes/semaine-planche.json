@@ -1,0 +1,12 @@
+{
+ "_lisezMoi": "Une semaine inventée pour les tests et les planches des insignes : de vrais noms de clubs (ceux de l’appli), des matchs inventés, aucun bar. Le Havre – PSG, Lille – Lens, France – Italie (deux sélections), Real Madrid – PSG (un club étranger), Monaco – Pafos FC (un club que l’appli ne connaît pas : son insigne neutre). La semaine s’ouvre le jeudi 29 octobre 2026.",
+ "matches": [
+  { "id": "p-havre-psg", "startAt": "2026-10-30T19:00:00.000Z", "league": "Ligue 1", "homeTeam": "Le Havre AC", "awayTeam": "Paris Saint-Germain", "homeClub": { "slug": "le-havre-ac", "canonicalName": "Le Havre AC" }, "awayClub": { "slug": "paris-saint-germain", "canonicalName": "Paris Saint-Germain" } },
+  { "id": "p-lille-lens", "startAt": "2026-10-31T16:00:00.000Z", "league": "Ligue 1", "homeTeam": "LOSC Lille", "awayTeam": "RC Lens", "homeClub": { "slug": "losc-lille", "canonicalName": "LOSC Lille" }, "awayClub": { "slug": "rc-lens", "canonicalName": "RC Lens" } },
+  { "id": "p-france-italie", "startAt": "2026-11-01T19:45:00.000Z", "league": "Match amical", "homeTeam": "France", "awayTeam": "Italie", "homeClub": { "slug": "nt-fr", "canonicalName": "France" }, "awayClub": { "slug": "nt-it", "canonicalName": "Italie" } },
+  { "id": "p-real-psg", "startAt": "2026-11-03T20:00:00.000Z", "league": "UEFA Champions League", "homeTeam": "Real Madrid C.F.", "awayTeam": "Paris Saint-Germain", "homeClub": { "slug": "real-madrid-c-f", "canonicalName": "Real Madrid C.F." }, "awayClub": { "slug": "paris-saint-germain", "canonicalName": "Paris Saint-Germain" } },
+  { "id": "p-monaco-pafos", "startAt": "2026-11-04T17:45:00.000Z", "league": "UEFA Champions League", "homeTeam": "AS Monaco", "awayTeam": "Pafos FC", "homeClub": { "slug": "as-monaco", "canonicalName": "AS Monaco" }, "awayClub": { "slug": "pafos-fc", "canonicalName": "Pafos FC" } }
+ ],
+ "bars": [],
+ "matchNights": []
+}

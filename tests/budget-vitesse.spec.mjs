@@ -82,11 +82,14 @@ const KO = 1024;
 // dans ces 1 250 px, en 600 px (leur colonne en demande 301 à 412 px × 1,75 : le WebP de 300 px serait agrandi).
 // Mesuré (Ko) : 10 requêtes, 213 transférés, CSS 85, images 92 (le logo, l’icône et deux écrans) ; seuils 11, 218,
 // 0, 86, 96 (de 9, 147, 0, 85, 26).
+// Après la relecture finale : a-propos.css gagne ses requêtes de conteneur (les colonnes suivent la taille du texte),
+// l’étiquette des écrans seuls sur leur ligne et ses couleurs forcées : de 11,7 à 12,8 Ko. CSS d’À propos mesuré 83 Ko :
+// seuil de 82 à 84. Presse reste sous le sien (85,6 Ko pour 86).
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 19, css: 73, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
-  { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 82, images: 42 } },
+  { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 84, images: 42 } },
   { nom: 'Presse et partenariats', chemin: '/presse.html', budget: { requetes: 11, transfere: 218, js: 0, css: 86, images: 96 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 176, js: 67, css: 103, images: 4 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 89, images: 4 } },

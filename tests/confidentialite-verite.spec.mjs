@@ -98,19 +98,25 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   expect(texte).not.toContain('recherche d’adresse');
   const messages = normaliser(await page.locator('#messages-match').innerText());
   expect(messages).toContain('quand les notifications de notre serveur arriveront sur ton téléphone, Baromatch pourra t’envoyer de temps en temps un message sur un match : un match qui approche, ou la mi-temps.');
-  expect(messages).toContain('Seulement si tu as gardé « Offres des bars » allumé dans Réglages (il l’est au départ)');
+  expect(messages).toContain('Seulement si tu as allumé « Messages de Baromatch » dans Réglages (il est coupé au départ) : c’est ton accord, et notre serveur garde la date où tu l’as donné.');
   expect(messages).toContain('Et seulement si une de tes arrivées a été validée dans un bar ces 7 derniers jours');
   expect(messages).toContain('Par match, au plus une de ces notifications : ton club qui joue, une soirée qui ouvre, ou ce message. Aucune pour un match où tu as déjà ta place.');
-  expect(messages).toContain('aucune offre de bar ne part en notification');
-  expect(messages).toContain('coupe « Offres des bars » dans Réglages, ou les notifications de Baromatch dans les réglages de ton téléphone');
+  expect(messages).not.toContain('Offres des bars');
+  expect(messages).toContain('Pour ne plus les recevoir, coupe « Messages de Baromatch » dans Réglages : ton accord est retiré.');
+  // Couper les notifications du téléphone les cache, sans retirer l’accord gardé avec le compte.
+  expect(messages).toContain('Couper les notifications de Baromatch dans les réglages de ton téléphone les cache aussi, sans retirer ton accord.');
   // Aujourd’hui, rien ne part encore du serveur : la page le dit toujours, juste avant.
   await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
   // Sa base est écrite, et le résumé « en clair » des intérêts légitimes, auquel renvoie le droit de s’opposer, la compte.
   const base = page.locator('#pourquoi + p + ul > li', { hasText: 'T’envoyer de temps en temps un message sur un match' });
   await expect(base).toHaveCount(1);
-  await expect(base).toContainText('notre intérêt légitime, quand les notifications de notre serveur arriveront sur ton téléphone');
+  // Un accord, coupé au départ, plus notre intérêt légitime.
+  await expect(base).toContainText('ton accord, donné en allumant « Messages de Baromatch » dans Réglages (il est coupé au départ), quand les notifications de notre serveur arriveront sur ton téléphone');
+  await expect(base).not.toContainText('intérêt légitime');
   await expect(base).toContainText('ou qu’il arrive à la mi-temps');
-  await expect(page.locator('#pourquoi ~ p', { hasText: 'Nos intérêts légitimes, en clair' })).toContainText('te prévenir qu’un match approche ou arrive à la mi-temps');
+  await expect(page.locator('#pourquoi ~ p', { hasText: 'Nos intérêts légitimes, en clair' })).not.toContainText('mi-temps');
+  expect(await texteDe(page, '/confidentialite.html')).toContain('« Messages de Baromatch », coupé tant que tu ne l’allumes pas ;');
+  expect(await texteDe(page, '/confidentialite.html')).not.toContain('Offres des bars');
   await expect(page.locator('#pourquoi + p + ul a[href="#messages-match"]')).toHaveCount(1);
 });
 

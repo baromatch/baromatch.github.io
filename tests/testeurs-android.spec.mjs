@@ -146,7 +146,7 @@ test('Confidentialité : ce qu’on garde des testeurs, pourquoi, sur quelle bas
   // Ce que dit le formulaire est ce que garde la page : les mêmes champs.
   await expect(page.locator('#prestataires + ul')).toContainText('Formspree reçoit les inscriptions du site (liste d’attente, test Android, boutique)');
   await expect(page.locator('#prestataires + ul')).toContainText('Google reçoit l’adresse Gmail des testeurs Android, pour les ajouter au test fermé de l’appli sur Google Play');
-  expect(await texteDe(page)).toContain('Retirer ton accord à tout moment, quand un usage repose sur lui (le match de ton club, la liste d’attente, le test Android, la boutique).');
+  expect(await texteDe(page)).toContain('Retirer ton accord à tout moment, quand un usage repose sur lui (le match de ton club, les messages de Baromatch, la liste d’attente, le test Android, la boutique).');
 });
 
 test('la page dit la même durée que Confidentialité, et y mène', async ({ page }) => {

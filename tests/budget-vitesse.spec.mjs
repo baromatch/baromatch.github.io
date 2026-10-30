@@ -133,11 +133,15 @@ test.beforeAll(async () => {
     sites.at(-1).serveur = await demarrerServeur(await portLibre(), -1, { dossier });
   }
 });
+// Un même processus de test peut repasser par ce fichier (tests en parallèle : un second lot de ses tests, après un autre
+// fichier) : beforeAll repart alors d’une liste vide, sinon sites[rang] serait encore un serveur arrêté par afterAll
+// (« net::ERR_CONNECTION_REFUSED », vu une fois sous charge).
 test.afterAll(async () => {
   for (const { dossier, serveur } of sites) {
     await serveur?.arreter();
     rmSync(dossier, { recursive: true, force: true });
   }
+  sites.length = 0;
 });
 
 for (const [rang, { nom, marque, plus }] of MESURES.entries()) {

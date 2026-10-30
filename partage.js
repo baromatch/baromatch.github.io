@@ -6,6 +6,9 @@
 (() => {
   const bloc = document.querySelector('.partage');
   if (!bloc) return;
+  // Les boutons ont leur place dès la première image (regarder.css) : ce script ne fait que les montrer. L’adresse en
+  // lien, elle, n’a de place que s’il la montre.
+  bloc.dataset.pret = '';
   const { titre, adresse, copie, echec } = bloc.dataset;
   const natif = bloc.querySelector('.partage__natif');
   const whatsapp = bloc.querySelector('.partage__whatsapp');

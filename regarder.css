@@ -342,6 +342,13 @@
 /* L’adresse de la page, en lien : sans JavaScript, ou quand la copie est refusée, elle se copie à la main. */
 .partage__lien { display: inline-block; padding: 11px 0; color: var(--texte-doux); font-size: 0.9375rem; overflow-wrap: anywhere; }
 .partage [hidden] { display: none; }
+/* Quand partage.js arrive, rien ne bouge : ses boutons ont leur place dès la première image, l’adresse non. */
+.partage__place { display: inline-grid; }
+.partage__place > * { grid-area: 1 / 1; place-self: start; }
+@media (scripting: enabled) {
+  .partage__place > [hidden], .partage__copier[hidden] { display: inline-flex; visibility: hidden; }
+  .partage:not([data-pret]) .partage__lien { display: none; }
+}
 .partage__statut { flex-basis: 100%; margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
 .partage__statut:empty { display: none; }
 

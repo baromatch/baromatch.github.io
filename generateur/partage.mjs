@@ -341,14 +341,17 @@ export const imageDeLaCarte = (cheminDeLaPage, carte, { verre, signature = '' })
 // Le bloc « Partager », sous la tête de la page. Sans JavaScript : « Envoyer sur WhatsApp » (le titre et l’adresse de la
 // page, rien d’autre) et l’adresse elle-même, en lien. Avec (partage.js) : le bouton « Partager » du téléphone quand il
 // existe ; sinon WhatsApp et « Copier le lien », dont la réponse est lue (aria-live). L’adresse partagée est l’adresse
-// canonique, telle quelle : aucun paramètre de suivi.
+// canonique, telle quelle : aucun paramètre de suivi. « Partager » et WhatsApp partagent une place (partage__place) :
+// l’un ou l’autre s’y montre sans que rien ne bouge (regarder.css).
 export const blocPartager = ({ titre, chemin }, textes = TEXTES) => {
   const adresse = adresseDe(chemin);
   const whatsapp = `https://wa.me/?text=${encodeURIComponent(`${titre} ${adresse}`)}`;
   const t = textes.bouton;
   return `<div class="partage" role="group" aria-label="${e(t.titre)}" data-titre="${e(titre)}" data-adresse="${e(adresse)}" data-copie="${e(t.copie)}" data-echec="${e(t.echec)}">
-  <button class="partage__bouton partage__natif" type="button" hidden>${e(t.partager)}</button>
-  <a class="partage__bouton partage__whatsapp" href="${e(whatsapp)}" rel="noopener">${e(t.whatsapp)}</a>
+  <span class="partage__place">
+    <button class="partage__bouton partage__natif" type="button" hidden>${e(t.partager)}</button>
+    <a class="partage__bouton partage__whatsapp" href="${e(whatsapp)}" rel="noopener">${e(t.whatsapp)}</a>
+  </span>
   <button class="partage__bouton partage__copier" type="button" hidden>${e(t.copier)}</button>
   <a class="partage__lien" href="${e(adresse)}">${e(adresse.replace(/^https:\/\//, ''))}</a>
   <p class="partage__statut" role="status" aria-live="polite"></p>

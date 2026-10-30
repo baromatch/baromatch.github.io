@@ -372,13 +372,19 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   // lancement, sans engagement. » se lit sans défiler (sous la ligne d’état, elle commençait à 702 px), et le bouton
   // « Proposer mon bar » est entier dans le premier écran (le prix remonté l’avait poussé de 13 px sous le bas de l’iPhone).
   for (const [appareil, largeur, hauteur] of [['un iPhone', 393, 659], ['un Pixel 7', 412, 839]]) {
-    test(`à ${largeur} × ${hauteur}, comme ${appareil} : « Gratuit pendant le lancement, sans engagement. » et le bouton « Proposer mon bar » dans le premier écran`, async ({ page }) => {
+    test(`à ${largeur} × ${hauteur}, comme ${appareil} : « Gratuit pendant le lancement, sans engagement. » en gras et le bouton « Proposer mon bar » dans le premier écran`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: hauteur });
       await page.goto(PAGE);
       await page.waitForFunction(laPoliceEstLa);
       await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
       await expect(page.locator('.ouverture-bars__prix')).toBeInViewport({ ratio: 1 });
       await expect(page.locator('.ouverture-bars .actions .capsule')).toBeInViewport({ ratio: 1 });
+      // Le prix se voit : la couleur du texte (le bleu nuit du jour, jamais l’ambre), en gras, à la taille du texte courant.
+      const prix = await page.locator('.ouverture-bars__prix').evaluate((p) => {
+        const style = getComputedStyle(p);
+        return { couleur: style.color, gras: Number(style.fontWeight) >= 600, taille: style.fontSize === getComputedStyle(document.body).fontSize };
+      });
+      expect(prix).toEqual({ couleur: 'rgb(10, 11, 16)', gras: true, taille: true });
     });
   }
 

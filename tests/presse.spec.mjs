@@ -23,17 +23,30 @@ test('Baromatch en bref : le slogan, la phrase et la description de marque.json,
   await page.goto(PAGE);
   const texte = normaliser(await page.locator('main').textContent());
   for (const cle of ['slogan', 'uneLigne', 'description']) expect(texte, cle).toContain(normaliser(MARQUE[cle]));
-  // Vrai aujourd’hui : en test, Android, Paris, pas encore ouvert, gratuit pour les fans.
+  // Vrai aujourd’hui : en test, Android, Paris, pas encore ouvert ; l’appli ne coûte rien au fan (la boutique, elle,
+  // vend des pièces : jamais « tu ne paies rien à Baromatch »).
   if (!MARQUE.appli.ouverte) expect(texte).toContain('L’appli n’est pas encore ouverte au public, ni sur iPhone.');
   const fait = async (nom) => normaliser(await page.locator('.presse__faits > div').filter({ has: page.locator('dt', { hasText: nom }) }).locator('dd').textContent());
-  expect(await fait('Pour les fans')).toMatch(/^Gratuit\./);
+  expect(await fait('Pour les fans')).toBe('L’appli ne te coûte rien. Ce que tu prends au bar, tu le paies au bar.');
   expect(await fait('Aujourd’hui')).toMatch(/^En test sur Android, à Paris\./);
+  // Qui publie : le nom, puis les mentions légales pour le reste.
+  expect(await fait('Qui publie')).toBe('Skander Kamoun, fondateur. Détails dans les mentions légales.');
+  expect(texte).not.toMatch(/Tu ne paies rien|Gratuit\. Ce qu’ils/);
+  // Le chapô : la description de marque.json, puis ce qu’on trouve sur la page.
+  expect(normaliser(await page.locator('.presse__chapo').textContent())).toBe(`${normaliser(MARQUE.description)} Ici : le logo, les écrans, le film et un texte à copier.`);
 });
 
-test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d’alcool', async ({ page }) => {
+// Une seule liste : ce que Baromatch n’est pas, et ce qu’il refuse (les écussons et les logos de compétition ou de
+// chaîne, un bar qui paierait pour passer devant), rien qui ne soit déjà vrai ailleurs sur le site.
+test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d’alcool, ni écusson, ni bar qui paie', async ({ page }) => {
   await page.goto(PAGE);
   const points = (await page.locator('#n-est-pas + ul > li > strong').allTextContents()).map(normaliser);
-  expect(points).toEqual(['Pas un site de paris sportifs.', 'Pas un diffuseur.', 'Pas un vendeur d’alcool.']);
+  expect(points).toEqual(['Pas un site de paris sportifs.', 'Pas un diffuseur.', 'Pas un vendeur d’alcool.', 'Ni écusson, ni logo.', 'Aucun bar ne paie pour passer devant un autre.']);
+  const liste = normaliser(await page.locator('#n-est-pas + ul').textContent());
+  expect(liste).toContain('Et jamais d’alcool à gagner.');
+  expect(liste).toContain('Pas d’écusson de club, ni de logo de compétition ou de chaîne : les clubs et les compétitions sont écrits en toutes lettres.');
+  expect(liste).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom.');
+  await expect(page.locator('main')).not.toContainText('Ce que Baromatch refuse');
   // Vrai aussi le jour où l’appli proposera des pronostics entre amis : ni pari, ni cote, ni argent, jamais.
   const paris = normaliser(await page.locator('#n-est-pas + ul > li').first().textContent());
   expect(paris).toContain('on ne parie pas sur Baromatch : ni mise, ni cote, ni argent en jeu.');
@@ -42,11 +55,12 @@ test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d
 
 // Ses mots à lui, écrits le 26 octobre 2026 : publiés tels quels, avec la typographie du site (l’apostrophe ’, une
 // espace insécable avant « : » et « ? »), signés. Le kit d’abord (le logo, les écrans, le film, les couleurs, le texte à
-// copier), puis ce que Baromatch n’est pas, et ses mots juste après, là où un journaliste les cite.
+// copier), puis ce que Baromatch n’est pas, et ses mots juste après, là où un journaliste les cite. Les partenariats
+// remontent avant les couleurs : une phrase et son bouton.
 test('le mot du fondateur : ses mots, mot pour mot, signés, juste après « Ce que Baromatch n’est pas »', async ({ page }) => {
   await page.goto(PAGE);
   const titres = (await page.locator('main h2').allTextContents()).map(normaliser);
-  expect(titres).toEqual(['Le logo', 'Les écrans de l’appli', 'Le film', 'Les couleurs et la police', 'Le texte à copier', 'Ce que Baromatch n’est pas', 'Le mot du fondateur', 'Partenariats', 'Écrire à Baromatch']);
+  expect(titres).toEqual(['Le logo', 'Les écrans de l’appli', 'Le film', 'Partenariats', 'Les couleurs et la police', 'Le texte à copier', 'Ce que Baromatch n’est pas', 'Le mot du fondateur', 'Écrire à Baromatch']);
   const mot = page.locator('#mot-du-fondateur + figure');
   const cite = await mot.locator('blockquote').textContent();
   expect(motPourMot(cite)).toBe(MOT_DU_FONDATEUR);
@@ -119,9 +133,28 @@ test('les écrans et le film : cinq écrans d’aujourd’hui chargés tard, cha
   expect(await page.locator('#film ~ *').evaluateAll((e) => e.map((x) => x.textContent).join(' '))).not.toMatch(/">|<\/a>|alt=/);
 });
 
-test('le contact presse : l’adresse de marque.json', async ({ page }) => {
+// Écrire : les deux boutons vont à l’adresse de marque.json, sans phrase qui la redise ; la phrase de secours la donne
+// en toutes lettres. Sous les écrans, un autre format ou une plus grande taille se demande à la même adresse.
+test('le contact presse : l’adresse de marque.json, et un autre format des écrans sur demande', async ({ page }) => {
   await page.goto(PAGE);
-  await expect(page.locator('#contact + p a[href^="mailto:"]')).toHaveAttribute('href', `mailto:${MARQUE.contact}`);
+  await expect(page.locator('#contact + ul.presse__ecrire')).toHaveCount(1);
+  for (const lien of await page.locator('#contact ~ .presse__ecrire a').all()) expect(await lien.getAttribute('href')).toMatch(new RegExp(`^mailto:${MARQUE.contact}\\?subject=`));
+  await expect(page.locator('#contact ~ .presse__secours .presse__adresse')).toHaveText(MARQUE.contact);
+  const autre = page.locator('#ecrans ~ .presse__autre-format');
+  expect(normaliser(await autre.textContent())).toBe('Besoin d’un autre format ou d’une plus grande taille ? Écris-nous.');
+  await expect(autre.locator('a')).toHaveAttribute('href', `mailto:${MARQUE.contact}?subject=Presse%20%E2%80%93%20Baromatch`);
+});
+
+// Le logo et l’icône, avec les tailles des fichiers qu’on télécharge, lues dans leurs PNG.
+test('les tailles dites du logo et de l’icône sont celles de leurs fichiers', async ({ page }) => {
+  const tailleDuPng = (nom) => { const o = readFileSync(path.join(racine, 'presse', nom)); return [o.readUInt32BE(16), o.readUInt32BE(20), o[25]]; };
+  expect(tailleDuPng('baromatch-logo-fond-clair.png').slice(0, 1)).toEqual([2400]);
+  expect(tailleDuPng('baromatch-logo-fond-sombre.png').slice(0, 1)).toEqual([2400]);
+  // Le logo a de la transparence (type 6) ; l’icône est sur la nuit, carrée, sans transparence.
+  expect(tailleDuPng('baromatch-logo-fond-clair.png')[2]).toBe(6);
+  expect(tailleDuPng('baromatch-icone.png')).toEqual([1024, 1024, 2]);
+  await page.goto(PAGE);
+  expect(normaliser(await page.locator('#logos + p').textContent())).toBe('Le logo en SVG (net à toutes les tailles) et en PNG (2400 px de large, fond transparent). L’icône de l’appli en SVG et en PNG (1024 px, sur la nuit). Garde-les tels quels : mêmes couleurs, mêmes proportions, sans effet ajouté.');
 });
 
 test('données structurées : une page « à propos » de l’Organization de l’accueil, et son fil d’Ariane', async ({ page }) => {
@@ -205,8 +238,12 @@ test('l’ouverture : écrire pour la presse ou pour un partenariat, une ligne p
   // Sur cette page : cinq entrées, chacune vers un titre de la page.
   const sommaire = page.getByRole('navigation', { name: 'Sur cette page' });
   const entrees = await sommaire.locator('a').evaluateAll((a) => a.map((l) => [l.textContent.trim(), l.getAttribute('href')]));
-  expect(entrees).toEqual([['Logo', '#logos'], ['Écrans', '#ecrans'], ['Film', '#film'], ['Texte', '#texte'], ['Écrire', '#contact']]);
+  expect(entrees).toEqual([['Logo', '#logos'], ['Écrans', '#ecrans'], ['Film', '#film'], ['Partenariats', '#partenariats'], ['Couleurs', '#couleurs'], ['Texte', '#texte'], ['Écrire', '#contact']]);
   for (const [, ancre] of entrees) await expect(page.locator(`h2${ancre}`)).toHaveCount(1);
+  // Dans l’ordre réel de la page.
+  const ordre = await page.locator('main h2').evaluateAll((h) => h.map((e) => `#${e.id}`));
+  const rangs = entrees.map(([, ancre]) => ordre.indexOf(ancre));
+  expect(rangs).toEqual([...rangs].sort((x, y) => x - y));
 });
 
 // Les deux couleurs, dites comme on les copie : le code, ses valeurs RVB (calculées du code ici), le disque peint de la
@@ -245,18 +282,15 @@ test('le texte à copier : la phrase, la ligne et le paragraphe de marque.json, 
   for (const regle of feuille.split('}').filter((r) => /user-select: all/.test(r))) expect(regle).toContain('-webkit-user-select: all;');
 });
 
-// Pour un partenaire : où en est Baromatch, avec les phrases déjà publiées (« Pour les bars », l’accueil), et ce qu’il
-// refuse, qui mène au détail. Puis à qui écrire : deux boutons en contour, chacun avec son objet, et la phrase de
-// secours qui nomme ces deux objets quand la messagerie ne s’ouvre pas.
-test('partenariats et contact : l’état du projet, ce qu’il refuse, deux objets déjà écrits et la phrase de secours', async ({ page }) => {
+// Partenariats : une phrase et son bouton, en contour. Puis à qui écrire : deux boutons en contour, chacun avec son
+// objet, et la phrase de secours qui nomme ces deux objets quand la messagerie ne s’ouvre pas.
+test('partenariats et contact : une phrase et son bouton, deux objets déjà écrits et la phrase de secours', async ({ page }) => {
   await page.goto(PAGE);
-  const partenariats = normaliser(await page.locator('section[aria-labelledby="partenariats"]').textContent());
-  expect(partenariats).toContain('Pour un investisseur, un club ou une ville');
-  expect(partenariats).toContain('Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
-  expect(partenariats).toContain('gratuit pendant le lancement, sans engagement.');
-  expect(partenariats).toContain('Qu’un bar paie pour passer devant un autre.');
-  const detail = await page.locator('section[aria-labelledby="partenariats"] .presse__suite a').evaluateAll((a) => a.map((l) => l.getAttribute('href')));
-  expect(detail).toEqual(['/comment-on-choisit-les-bars.html', '/a-propos.html']);
+  const partenariats = page.locator('section[aria-labelledby="partenariats"]');
+  expect(normaliser(await partenariats.textContent())).toBe('Partenariats Investisseur, club ou ville : écris-nous. Écrire pour un partenariat');
+  await expect(partenariats.locator('a')).toHaveAttribute('href', `mailto:${MARQUE.contact}?subject=Partenariat%20%E2%80%93%20Baromatch`);
+  await expect(partenariats.locator('a')).toHaveClass('presse__bouton');
+  await expect(page.locator('main')).not.toContainText('Baromatch aujourd’hui');
   const contact = page.locator('section[aria-labelledby="contact"]');
   const boutons = await contact.locator('.presse__ecrire li').evaluateAll((li) => li.map((l) => [l.querySelector('p').textContent.trim(), l.querySelector('a').className, l.querySelector('a').getAttribute('href')]));
   expect(boutons).toEqual([
@@ -264,8 +298,26 @@ test('partenariats et contact : l’état du projet, ce qu’il refuse, deux obj
     ['Pour un investisseur, un club ou une ville', 'presse__bouton', `mailto:${MARQUE.contact}?subject=Partenariat%20%E2%80%93%20Baromatch`],
   ]);
   expect(normaliser(await contact.locator('.presse__secours').textContent())).toBe(`Ta messagerie ne s’ouvre pas ? Écris à ${MARQUE.contact} avec l’objet « Presse – Baromatch » ou « Partenariat – Baromatch ».`);
-  expect(normaliser(await contact.locator('#contact + p').textContent())).toContain('c’est le fondateur qui répond.');
   // Une seule famille d’objets sur la page : « Presse – Baromatch » et « Partenariat – Baromatch ».
   const objets = await page.$$eval('main a[href^="mailto:"]', (a) => [...new Set(a.map((l) => new URL(l.href).searchParams.get('subject')).filter(Boolean))]);
   expect(objets.sort()).toEqual(['Partenariat – Baromatch', 'Presse – Baromatch']);
+});
+
+// « Ce que montre le film, en texte » mène au texte du film sur l’accueil : il s’ouvre en arrivant (main.js), au lieu
+// d’un résumé fermé. Sans JavaScript, le résumé reste visible et s’ouvre au toucher.
+test.describe('le film en texte, depuis la page Presse', () => {
+  test.use({ javaScriptEnabled: true });
+  test('le lien ouvre le texte du film sur l’accueil, et le texte se lit', async ({ page }) => {
+    await page.goto(PAGE);
+    await page.locator('#film ~ .presse__liens-film a[href="/#film-texte"]').click();
+    await expect(page).toHaveURL(/\/#film-texte$/);
+    await expect(page.locator('#film-texte')).toHaveAttribute('open', '');
+    await expect(page.locator('#film-texte ol li').first()).toBeVisible();
+  });
+  test('sur l’accueil, un lien vers #film-texte l’ouvre aussi en cours de route', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#film-texte')).not.toHaveAttribute('open', '');
+    await page.evaluate(() => { location.hash = 'film-texte'; });
+    await expect(page.locator('#film-texte')).toHaveAttribute('open', '');
+  });
 });

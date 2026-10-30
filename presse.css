@@ -61,9 +61,18 @@
 }
 .presse__bouton:hover { background: var(--fond-releve); color: var(--texte); }
 .presse__ouverture-texte > .presse__bar { margin-top: 12px; }
-.presse__bar a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; }
 
-/* Sur cette page : cinq entrées, des capsules à 44 px, cernées à 3,6:1. */
+/* Sur un petit téléphone (iPhone SE, 320 × 568), l’icône s’efface et le texte se resserre : « Écrire pour la presse »
+   tient dans le premier écran. */
+@media (max-width: 359px) {
+  .presse__icone { display: none; }
+  .presse__ouverture { grid-template-areas: "texte" "sommaire"; padding-top: 16px; }
+  .presse__titre { font-size: 1.875rem; }
+  .presse__ouverture-texte > .presse__chapo { margin-top: 12px; font-size: 1rem; line-height: 1.5; }
+  .presse__ouverture-texte > .presse__chapo + p { font-size: 0.9375rem; }
+  .presse .presse__actions { margin-top: 14px; }
+}
+/* Sur cette page : sept entrées, des capsules à 44 px, cernées à 3,6:1. */
 .presse__sommaire ul { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
 .presse__sommaire a {
   display: inline-flex;
@@ -96,7 +105,6 @@
 }
 .presse .presse__intro { max-width: 40rem; margin-top: 12px; color: var(--texte-doux); text-wrap: pretty; }
 .presse .presse__sous-titre { margin: 40px 0 0; font-size: 1.25rem; font-weight: 750; line-height: 1.25; }
-.presse__carte .presse__sous-titre { margin-top: 0; }
 
 /* Un fond relevé sur toute la largeur de l’écran (le mot du fondateur, « Écrire à Baromatch »). */
 .presse__releve { background: var(--fond-releve); box-shadow: 0 0 0 100vmax var(--fond-releve); clip-path: inset(0 -100vmax); }
@@ -136,11 +144,12 @@
 .presse__nuit a:hover { color: var(--texte); }
 .presse__nuit > .presse__bloc + .presse__bloc { padding-top: 0; }
 .presse__poids { white-space: nowrap; }
+.presse .presse__autre-format { max-width: 40rem; margin-top: 32px; color: var(--texte-doux); }
 
-/* Les écrans : des colonnes d’au moins 9 em (deux au téléphone, cinq sur ordinateur). Avec le texte à 200 %, une
+/* Les écrans : des colonnes d’au moins 8 em (deux au téléphone, cinq sur ordinateur). Avec le texte à 200 %, une
    colonne fait deux fois plus large : un écran par ligne, et l’étiquette tient sur deux lignes, sans couper un mot.
    L’étiquette se pose au-dessus de l’écran : la colonne est trop étroite pour qu’elle chevauche son bord. */
-.presse .presse__ecrans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr)); gap: 40px 16px; margin-top: 36px; padding: 0; list-style: none; }
+.presse .presse__ecrans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8em), 1fr)); gap: 40px 16px; margin-top: 36px; padding: 0; list-style: none; }
 @media (min-width: 1000px) { .presse .presse__ecrans { gap: 40px 24px; } }
 .presse__ecran figure { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
 .presse__cadre { width: min(100%, 13rem); }
@@ -167,12 +176,18 @@
 .presse .presse__teintes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 0; list-style: none; }
 @media (min-width: 560px) { .presse .presse__teintes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__teintes li { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-content: start; column-gap: 16px; }
+/* Sous 30 em (480 px), le disque passe au-dessus de son texte : à 200 %, le texte garde toute la largeur. */
+@media (max-width: 30em) {
+  .presse__teintes li { grid-template-columns: minmax(0, 1fr); row-gap: 2px; }
+  .presse__teintes .presse__disque { grid-row: auto; margin-bottom: 10px; }
+}
 .presse__disque { grid-row: span 4; width: 72px; height: 72px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(10, 11, 16, 0.14); }
 .presse__disque--ambre { background: var(--ambre); }
 .presse__disque--nuit { background: var(--nuit); }
 .presse__teinte-nom { font-size: 1.125rem; font-weight: 750; }
 .presse .presse__role { color: var(--texte-doux); text-wrap: pretty; }
 .presse__police .presse__role { margin-top: 6px; }
+.presse__police a, .presse__autre-format a, .presse__bar a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .presse code { font: inherit; font-weight: 700; white-space: nowrap; -webkit-user-select: all; user-select: all; }
 
 /* ---------- Le texte à copier, et Baromatch en bref ---------- */
@@ -192,17 +207,17 @@
 .presse__faits dd { margin: 0; color: var(--texte-doux); text-wrap: pretty; }
 .presse__faits dd a { font-weight: 650; }
 
-/* ---------- Ce que Baromatch n’est pas, Partenariats ---------- */
+/* ---------- Partenariats : une phrase et son bouton ---------- */
+
+.presse .presse__partenariat { margin-top: 20px; }
+
+/* ---------- Ce que Baromatch n’est pas, et ce qu’il refuse ---------- */
 
 .presse .presse__liste { display: grid; gap: 12px; max-width: 44rem; margin-top: 24px; padding: 0; list-style: none; }
-.presse__carte .presse__liste { margin-top: 14px; }
 .presse__liste li { position: relative; padding-left: 22px; color: var(--texte-doux); text-wrap: pretty; }
 .presse__liste li::before { content: ""; position: absolute; top: 0.7em; left: 2px; width: 7px; height: 7px; border-radius: 50%; background: var(--texte); }
 .presse__liste strong { color: var(--texte); font-weight: 700; }
 
-.presse__deux { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 28px; }
-@media (min-width: 800px) { .presse__deux { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
-.presse__carte { min-width: 0; padding: 24px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
 .presse .presse__suite { margin-top: 18px; color: var(--texte-doux); }
 
 /* ---------- Le mot du fondateur ---------- */
@@ -218,6 +233,10 @@
 @media (min-width: 640px) { .presse .presse__ecrire { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__ecrire li { display: grid; align-content: start; gap: 8px; }
 .presse__ecrire p { color: var(--texte-discret); font-size: 0.9375rem; }
+/* L’adresse, d’un seul tenant (Chromium coupe à un <wbr> même sans retour à la ligne permis : un bloc en ligne la
+   garde entière, et ne la coupe que si elle est plus large que sa colonne) ; sous 360 px, elle se coupe au <wbr>. */
+.presse__adresse { display: inline-block; max-width: 100%; white-space: nowrap; }
+@media (max-width: 359px) { .presse__adresse { display: inline; white-space: normal; } }
 .presse .presse__secours { max-width: 44rem; margin-top: 22px; color: var(--texte-doux); font-size: 0.9375rem; }
 .presse .document__date { margin-top: 22px; }
 

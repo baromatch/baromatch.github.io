@@ -72,8 +72,10 @@ const KO = 1024;
 // de leur mesure avec la police allégée (Ko) : À propos 5 requêtes, 135 transférés, CSS 81, aucune image au premier
 // écran ; Presse 8, 142, CSS 84, images 22 (l’icône et les trois logos en SVG). styles.css perd les règles de
 // l’ancienne page Presse (de 72,5 à 69,8 Ko) : aucun autre seuil ne bouge.
+// 30 octobre 2026, après relecture d’À propos et Presse : main.js ouvre le texte du film quand on arrive par
+// /#film-texte (le lien de la page Presse) : de 18,3 à 18,7 Ko, le JS de l’accueil de 18 à 19 Ko.
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 19, css: 73, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 6, transfere: 140, js: 0, css: 82, images: 2 } },

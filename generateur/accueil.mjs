@@ -6,8 +6,9 @@
 // les deux clubs (un disque à leurs couleurs, jamais un écusson), et une action qui existe. Un match qu’un bar publié
 // diffuse passe en tête de son jour, et sa carte dit combien de bars, avec « Voir les bars » ; les autres, plus
 // discrètes, proposent l’agenda du match, et disent « Pas encore de bar » dès qu’un bar est publié ailleurs : tant
-// qu’aucun ne l’est, la phrase sous le titre le dit une fois pour toutes (comme la semaine, /matchs/). Les données
-// sont celles des pages des matchs (les mêmes matchs que la semaine), rien d’autre.
+// qu’aucun ne l’est, la phrase sous le titre le dit une fois pour toutes (comme la semaine, /matchs/). Si le jour
+// choisi n’a aucun match qu’un bar diffuse et qu’un autre jour en a, une ligne sous la phrase nomme le prochain. Les
+// données sont celles des pages des matchs (les mêmes matchs que la semaine), rien d’autre.
 // Les mots « Aujourd’hui » et « Demain » valent pour le jour du passage (data-aujourdhui) : chacun porte sa date sans
 // eux (data-date), que main.js remet, avec les jours passés retirés, si la page est lue un autre jour (un passage
 // manqué).

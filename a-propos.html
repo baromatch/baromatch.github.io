@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" class="jour">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,12 +11,13 @@
 <meta name="description" content="Pourquoi Baromatch existe, ce que fait l’appli, où elle en est, Paris d’abord, les règles qu’on s’impose et qui la publie.">
 <meta name="robots" content="max-image-preview:large">
 <link rel="canonical" href="https://baromatch.fr/a-propos.html">
-<meta name="theme-color" content="#0A0B10">
+<meta name="theme-color" content="#FAF7F1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/a-propos.css">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
@@ -35,7 +36,7 @@
  {"@type": "AboutPage", "@id": "https://baromatch.fr/a-propos.html#page", "url": "https://baromatch.fr/a-propos.html",
   "name": "À propos de Baromatch : pourquoi l’appli existe",
   "description": "Pourquoi Baromatch existe, ce que fait l’appli, où elle en est, Paris d’abord, les règles qu’on s’impose et qui la publie.",
-  "inLanguage": "fr-FR", "dateModified": "2026-10-26", "isPartOf": {"@id": "https://baromatch.fr/#site"}, "about": {"@id": "https://baromatch.fr/#organisation"},
+  "inLanguage": "fr-FR", "dateModified": "2026-10-30", "isPartOf": {"@id": "https://baromatch.fr/#site"}, "about": {"@id": "https://baromatch.fr/#organisation"},
   "breadcrumb": {"@id": "https://baromatch.fr/a-propos.html#fil"}},
  {"@type": "Organization", "@id": "https://baromatch.fr/#organisation", "name": "Baromatch", "url": "https://baromatch.fr/",
    "slogan": "Ton match. Ton bar. Ce soir.",
@@ -55,67 +56,179 @@
   <nav class="entete__nav" aria-label="Navigation principale"><a class="entete__lien" href="/boutique.html">Boutique</a><a class="entete__lien entete__lien--bars" href="/pour-les-bars.html">Pour les bars</a></nav>
 </header>
 
-<main id="contenu" class="document page">
-  <h1>À propos de Baromatch</h1>
-  <p class="document__date">Mise à jour le 26 octobre 2026</p>
-  <p class="document__chapeau">Baromatch est une appli gratuite pour les fans de foot&nbsp;: choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. En test sur Android, à Paris.</p>
+<main id="contenu" class="apropos">
+  <section class="apropos__ouverture page" aria-labelledby="titre">
+    <h1 class="apropos__titre" id="titre"><span class="surtitre">À propos de Baromatch</span> Savoir où voir le match avant de sortir, et s’il reste une place.</h1>
+    <p class="apropos__chapo">Baromatch est une appli gratuite pour les fans de foot&nbsp;: choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. En test sur Android, à Paris.</p>
+    <ul class="apropos__entrees" aria-label="Par où commencer">
+      <li><a href="/pour-les-bars.html#proposer"><span class="apropos__qui">Tu tiens un bar<span class="visuellement-cache">&nbsp;:</span></span> <span class="apropos__quoi">Proposer mon bar</span></a></li>
+      <li><a href="/#attente"><span class="apropos__qui">Tu es fan<span class="visuellement-cache">&nbsp;:</span></span> <span class="apropos__quoi">Me prévenir</span></a></li>
+      <li><a href="/presse.html"><span class="apropos__qui">Presse ou partenaire<span class="visuellement-cache">&nbsp;:</span></span> <span class="apropos__quoi">Logos, écrans et contact</span></a></li>
+    </ul>
+  </section>
 
-  <h2 id="en-bref">En bref</h2>
-  <dl class="faits">
-    <div><dt>Ce que c’est</dt><dd>Une appli gratuite pour les fans de foot&nbsp;: choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir.</dd></div>
-    <div><dt>Où</dt><dd>À Paris, pour commencer. Pas encore de date pour d’autres villes.</dd></div>
-    <div><dt>Quand</dt><dd>Pour l’instant, l’appli est en test sur Android. Elle n’est pas encore ouverte au public, ni en téléchargement public sur Google Play, et il n’y a pas encore de version iPhone.</dd></div>
-    <div><dt>Pour qui</dt><dd>Les fans de foot de 18&nbsp;ans et plus, et les bars qui diffusent les matchs.</dd></div>
-    <div><dt>Contact</dt><dd><a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a></dd></div>
-  </dl>
+  <section class="apropos__rubrique page" aria-labelledby="pourquoi">
+    <h2 class="apropos__rail" id="pourquoi">Pourquoi Baromatch existe</h2>
+    <div class="apropos__corps">
+      <p class="apropos__enonce">Un soir de match, la même question revient&nbsp;: on le regarde où&nbsp;?</p>
+      <p class="apropos__lead">Il faut un bar qui le diffuse, et de la place pour toute la bande. Souvent, on ne le sait qu’en poussant la porte.</p>
+      <div class="apropos__trois">
+        <div>
+          <h3 class="apropos__petit-titre">Pour toi</h3>
+          <p>Baromatch te le dit avant que tu sortes&nbsp;: les bars qui passent ton match, les places qu’il leur reste, et une place qui t’attend.</p>
+        </div>
+        <div>
+          <h3 class="apropos__petit-titre">Pour le bar</h3>
+          <p>C’est savoir à l’avance combien de fans viennent. Une place gardée pour quelqu’un qui ne vient pas est libérée à l’heure que le bar a choisie.</p>
+        </div>
+        <div>
+          <h3 class="apropos__petit-titre">Pour s’en souvenir</h3>
+          <p>Et comme un soir de match se raconte longtemps, chaque soirée validée devient un sous-bock dans ton album&nbsp;: le match, le bar, la date.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <h2 id="pourquoi">Pourquoi Baromatch existe</h2>
-  <p>Un soir de match, la même question revient&nbsp;: on le regarde où&nbsp;? Il faut un bar qui le diffuse, et de la place pour toute la bande. Souvent, on ne le sait qu’en poussant la porte.</p>
-  <p>Baromatch te le dit avant que tu sortes&nbsp;: les bars qui passent ton match, les places qu’il leur reste, et une place qui t’attend.</p>
-  <p>Pour le bar, c’est savoir à l’avance combien de fans viennent. Une place gardée pour quelqu’un qui ne vient pas est libérée à l’heure que le bar a choisie.</p>
-  <p>Et comme un soir de match se raconte longtemps, chaque soirée validée devient un sous-bock dans ton album&nbsp;: le match, le bar, la date.</p>
+  <section class="apropos__rubrique apropos__releve page" aria-labelledby="mot-du-fondateur">
+    <h2 class="apropos__rail" id="mot-du-fondateur">Le mot du fondateur</h2>
+    <figure class="apropos__citation">
+      <blockquote>
+        <p>Baromatch est né d’une question simple&nbsp;: où voir le match ce soir, et est-ce qu’il reste de la place&nbsp;? Je m’appelle Skander, je suis fan de foot et je construis Baromatch à Paris. Le bar garde la main sur ses places, le fan sait avant de partir s’il y a de la place pour lui. On commence à Paris, bar par bar, avec ceux qui veulent le lancer avec nous.</p>
+      </blockquote>
+      <figcaption>Skander, fondateur de Baromatch</figcaption>
+    </figure>
+  </section>
 
-  <h2 id="mot-du-fondateur">Le mot du fondateur</h2>
-  <figure class="citation">
-    <blockquote>
-      <p>Baromatch est né d’une question simple&nbsp;: où voir le match ce soir, et est-ce qu’il reste de la place&nbsp;? Je m’appelle Skander, je suis fan de foot et je construis Baromatch à Paris. Le bar garde la main sur ses places, le fan sait avant de partir s’il y a de la place pour lui. On commence à Paris, bar par bar, avec ceux qui veulent le lancer avec nous.</p>
-    </blockquote>
-    <figcaption>Skander, fondateur de Baromatch</figcaption>
-  </figure>
+  <section class="apropos__appli nuit page" aria-labelledby="ce-que-fait-l-appli">
+    <h2 class="apropos__rail" id="ce-que-fait-l-appli">Ce que fait l’appli</h2>
+    <ul class="apropos__ecrans">
+      <li class="apropos__ecran">
+        <figure>
+          <div class="apropos__cadre"><span class="exemple">Écran de démonstration</span>
+            <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ce-soir-300.webp" srcset="/img/appli/ce-soir-300.webp 300w, /img/appli/ce-soir-600.webp 600w" sizes="(min-width: 960px) 272px, (min-width: 700px) 30vw, 176px" width="300" height="649" loading="lazy" decoding="async" alt="L’écran Ce soir de l’appli&nbsp;: Alvène – Orvèle à 21:00, en Coupe des Faubourgs, puis Près de toi&nbsp;: La Lucarne Lunaire à 6 min à pied, encore 7 places, et Le Onze Étoilé à 9 min, encore 12 places."></div></div>
+          </div>
+          <figcaption>
+            <p><strong>Tu choisis ton match,</strong> avec l’heure du coup d’envoi, à l’heure de Paris. <strong>Tu trouves ton bar&nbsp;:</strong> ceux qui le diffusent près de toi, et les places qui leur restent.</p>
+            <p class="apropos__cote-bar"><strong>Côté bar&nbsp;:</strong> chaque bar choisit ses matchs et combien de places il ouvre.</p>
+          </figcaption>
+        </figure>
+      </li>
+      <li class="apropos__ecran">
+        <figure>
+          <div class="apropos__cadre"><span class="exemple">Écran de démonstration</span>
+            <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/ta-soiree-300.webp" srcset="/img/appli/ta-soiree-300.webp 300w, /img/appli/ta-soiree-600.webp 600w" sizes="(min-width: 960px) 272px, (min-width: 700px) 30vw, 176px" width="300" height="649" loading="lazy" decoding="async" alt="Ta soirée dans l’appli&nbsp;: Alvène – Orvèle à 21:00, à La Lucarne Lunaire, pour 1 personne, le QR code du pass et son code, et le bouton «&nbsp;Y aller · 6 min à pied&nbsp;»."></div></div>
+          </div>
+          <figcaption>
+            <p><strong>Tu gardes ta place,</strong> gratuitement, pour toi seul ou pour la bande, jusqu’à 8&nbsp;personnes. <strong>Tu arrives et tu montres ton pass&nbsp;:</strong> l’équipe du bar le scanne, ou tu scannes le QR du bar.</p>
+            <p class="apropos__cote-bar"><strong>Côté bar&nbsp;:</strong> à la porte, le pseudo et le nombre de personnes.</p>
+          </figcaption>
+        </figure>
+      </li>
+      <li class="apropos__ecran">
+        <figure>
+          <div class="apropos__cadre"><span class="exemple">Écran de démonstration</span>
+            <div class="telephone"><div class="telephone__ecran"><img src="/img/appli/tu-y-es-300.webp" srcset="/img/appli/tu-y-es-300.webp 300w, /img/appli/tu-y-es-600.webp 600w" sizes="(min-width: 960px) 272px, (min-width: 700px) 30vw, 176px" width="300" height="649" loading="lazy" decoding="async" alt="Tu y es&nbsp;: arrivée validée à 20:37 à La Lucarne Lunaire, coup d’envoi dans 23 minutes. Sous-bock n°08 collé."></div></div>
+          </div>
+          <figcaption>
+            <p><strong>Tu gardes la soirée,</strong> en sous-bock dans ton album.</p>
+            <p class="apropos__cote-bar"><strong>Côté bar&nbsp;:</strong> après, l’Historique fait les comptes&nbsp;: réservations, arrivées, absents.</p>
+          </figcaption>
+        </figure>
+      </li>
+    </ul>
+    <p class="apropos__note">Sur ces écrans, les bars, les clubs et les pseudos sont inventés. Les fans ne réservent pas encore&nbsp;: on prépare l’ouverture avec les premiers bars.</p>
+  </section>
 
-  <h2 id="ce-que-fait-l-appli">Ce que fait l’appli</h2>
-  <ul>
-    <li><strong>Tu choisis ton match,</strong> avec l’heure du coup d’envoi, à l’heure de Paris.</li>
-    <li><strong>Tu trouves ton bar&nbsp;:</strong> ceux qui le diffusent près de toi, et les places qui leur restent.</li>
-    <li><strong>Tu gardes ta place,</strong> gratuitement, pour toi seul ou pour la bande, jusqu’à 8&nbsp;personnes.</li>
-    <li><strong>Tu arrives et tu montres ton pass&nbsp;:</strong> l’équipe du bar le scanne, ou tu scannes le QR du bar.</li>
-    <li><strong>Tu gardes la soirée,</strong> en sous-bock dans ton album.</li>
-  </ul>
+  <section class="apropos__rubrique page" aria-labelledby="regles">
+    <h2 class="apropos__rail" id="regles">Ce qu’on refuse</h2>
+    <div class="apropos__corps">
+      <ul class="apropos__refus">
+        <li>
+          <h3 class="apropos__refus-titre">Aucun bar ne paie pour passer devant un autre.</h3>
+          <p>Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Rien d’autre ne change cet ordre&nbsp;: ni une note, ni un avis, ni de l’argent.</p>
+        </li>
+        <li>
+          <h3 class="apropos__refus-titre">Aucun bar sans son accord.</h3>
+          <p>Un bar n’apparaît sur ce site qu’avec son accord écrit. Il peut partir quand il veut.</p>
+        </li>
+        <li>
+          <h3 class="apropos__refus-titre">Rien qui pousse à boire.</h3>
+          <p>Baromatch ne vend pas d’alcool, n’en fait pas la promotion et n’en donne jamais en récompense.</p>
+        </li>
+        <li>
+          <h3 class="apropos__refus-titre">Pas de faux avis. Pas de faux bar.</h3>
+          <p>Pas de chiffre sorti de nulle part. Ce site n’affiche ni note ni avis, et Baromatch n’en écrit pas à la place des fans.</p>
+        </li>
+        <li>
+          <h3 class="apropos__refus-titre">Sans l’appli, on entre comme d’habitude.</h3>
+          <p>Les places de l’appli sont celles que le bar met de côté pour Baromatch. Le reste de la salle est pour ceux qui passent la porte sans avoir réservé.</p>
+        </li>
+      </ul>
+      <h3 class="apropos__petit-titre apropos__aussi-titre">Et aussi</h3>
+      <ul class="apropos__aussi">
+        <li><strong>Gratuit pour les fans.</strong> Tu ne paies rien à Baromatch. Ce que tu prends au bar, tu le paies au bar.</li>
+        <li><strong>Pas de paris.</strong> Ni mise, ni cote, ni argent en jeu.</li>
+        <li><strong>Ni écusson, ni logo.</strong> Les clubs et les compétitions sont écrits en toutes lettres.</li>
+        <li><strong>18&nbsp;ans et plus.</strong> Les soirées se passent dans des bars.</li>
+      </ul>
+      <p class="apropos__suite">Le détail, et ce qu’on refuse de montrer&nbsp;: <a href="/comment-on-choisit-les-bars.html">comment on choisit les bars</a>. Les règles de l’appli sont dans les <a href="/cgu.html">CGU</a>, et ce qu’on fait de tes données dans la page <a href="/confidentialite.html">Confidentialité</a>.</p>
+    </div>
+  </section>
 
-  <h2 id="aujourd-hui">Où en est Baromatch</h2>
-  <p>Pour l’instant, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, ni sur iPhone.</p>
-  <p>Tu as un téléphone Android&nbsp;? <a href="/testeurs-android.html">Deviens testeur</a>. Pour être prévenu à l’ouverture, laisse ton adresse sur <a href="/#attente">l’accueil</a>.</p>
+  <section class="apropos__rubrique page" aria-labelledby="paris">
+    <h2 class="apropos__rail" id="paris">Où va Baromatch</h2>
+    <div class="apropos__corps">
+      <p class="apropos__enonce">Paris d’abord.</p>
+      <p class="apropos__lead">Baromatch commence à Paris&nbsp;: les bars de l’appli sont à Paris, et c’est là qu’on cherche les premiers. Chaque bar arrive après un échange avec nous, par e-mail ou par téléphone. Il n’y a pas d’inscription en ligne.</p>
+      <div class="apropos__deux">
+        <div class="apropos__note-carte">
+          <h3 class="apropos__petit-titre" id="aujourd-hui">Aujourd’hui</h3>
+          <p>Pour l’instant, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, ni sur iPhone.</p>
+          <p>Tu as un téléphone Android&nbsp;? <a href="/testeurs-android.html">Deviens testeur</a>.</p>
+        </div>
+        <div class="apropos__note-carte">
+          <h3 class="apropos__petit-titre">Ailleurs qu’à Paris</h3>
+          <p>Pas de date pour d’autres villes. Tu tiens un bar ailleurs&nbsp;? <a href="/pour-les-bars.html">Écris-nous quand même</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <h2 id="paris">Paris d’abord</h2>
-  <p>Baromatch commence à Paris&nbsp;: les bars de l’appli sont à Paris, et c’est là qu’on cherche les premiers. Chaque bar arrive après un échange avec nous, par e-mail ou par téléphone. Il n’y a pas d’inscription en ligne.</p>
-  <p>Pas de date pour d’autres villes. Tu tiens un bar ailleurs&nbsp;? <a href="/pour-les-bars.html">Écris-nous quand même</a>.</p>
+  <section class="apropos__rubrique apropos__releve page" aria-labelledby="contact">
+    <h2 class="apropos__rail" id="contact">Et maintenant</h2>
+    <div class="apropos__corps">
+      <p class="apropos__enonce">Par où commencer&nbsp;?</p>
+      <ul class="apropos__cartes">
+        <li class="apropos__carte">
+          <h3 class="apropos__petit-titre">Tu tiens un bar</h3>
+          <p>Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres. Gratuit pendant le lancement, sans engagement.</p>
+          <p class="apropos__action"><a class="capsule" href="/pour-les-bars.html#proposer">Proposer mon bar</a></p>
+          <p class="apropos__rassure">Une personne lit chaque demande et te répond sous 48&nbsp;h. Tu préfères l’e-mail&nbsp;? <a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a></p>
+        </li>
+        <li class="apropos__carte">
+          <h3 class="apropos__petit-titre">Tu es fan</h3>
+          <p>L’appli n’est pas encore ouverte. Laisse ton adresse&nbsp;: on te prévient le jour où elle ouvre.</p>
+          <p class="apropos__action"><a class="apropos__bouton" href="/#attente">Me prévenir</a></p>
+          <p class="apropos__rassure">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. Un téléphone Android&nbsp;? <a href="/testeurs-android.html">Deviens testeur</a></p>
+        </li>
+        <li class="apropos__carte">
+          <h3 class="apropos__petit-titre">Presse, partenaire, club ou ville</h3>
+          <p>Une question, une interview, des images en plus grand&nbsp;: écris-nous, c’est le fondateur qui répond.</p>
+          <p class="apropos__action"><a class="apropos__bouton" href="mailto:contact@baromatch.fr?subject=Partenariat%20ou%20presse%20%E2%80%93%20Baromatch">Écrire à Baromatch</a></p>
+          <p class="apropos__rassure">Les logos, les écrans et le film&nbsp;: <a href="/presse.html">la page Presse</a></p>
+        </li>
+      </ul>
+    </div>
+  </section>
 
-  <h2 id="regles">Les règles qu’on s’impose</h2>
-  <ul>
-    <li><strong>Gratuit pour les fans.</strong> Tu ne paies rien à Baromatch. Ce que tu prends au bar, tu le paies au bar.</li>
-    <li><strong>Rien d’inventé.</strong> Pas de faux bar, pas de faux avis, pas de chiffre sorti de nulle part. Un bar n’apparaît sur ce site qu’avec son accord écrit.</li>
-    <li><strong>Rien qui pousse à boire.</strong> Baromatch ne vend pas d’alcool, n’en fait pas la promotion et n’en donne jamais en récompense.</li>
-    <li><strong>Pas de paris.</strong> Ni mise, ni cote, ni argent en jeu.</li>
-    <li><strong>Ni écusson, ni logo.</strong> Les clubs et les compétitions sont écrits en toutes lettres.</li>
-    <li><strong>18&nbsp;ans et plus.</strong> Les soirées se passent dans des bars.</li>
-  </ul>
-  <p>Le détail, et ce qu’on refuse de montrer&nbsp;: <a href="/comment-on-choisit-les-bars.html">comment on choisit les bars</a>. Les règles de l’appli sont dans les <a href="/cgu.html">CGU</a>, et ce qu’on fait de tes données dans la page <a href="/confidentialite.html">Confidentialité</a>.</p>
-
-  <h2 id="qui">Qui publie Baromatch</h2>
-  <p>Baromatch est édité par Skander Kamoun, son fondateur, à titre personnel pour le moment. La société qui exploitera l’appli est en cours de création&nbsp;: ses informations seront dans les <a href="/mentions-legales.html">mentions légales</a> dès son immatriculation.</p>
-
-  <h2 id="contact">Nous écrire</h2>
-  <p>Une question, un bar à proposer, une erreur à signaler&nbsp;: <a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a>. Baromatch est aussi sur X&nbsp;: <a href="https://x.com/baromatchapp" rel="me noopener">@baromatchapp</a>. Pour la presse, les logos et les images sont sur la <a href="/presse.html">page presse</a>.</p>
+  <section class="apropos__rubrique page" aria-labelledby="qui">
+    <h2 class="apropos__rail" id="qui">Qui publie Baromatch</h2>
+    <div class="apropos__corps apropos__qui-publie">
+      <p>Baromatch est édité par Skander Kamoun, son fondateur, à titre personnel pour le moment. La société qui exploitera l’appli est en cours de création&nbsp;: ses informations seront dans les <a href="/mentions-legales.html">mentions légales</a> dès son immatriculation.</p>
+      <p>Une question, une erreur à signaler&nbsp;: <a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a>. Baromatch est aussi sur X&nbsp;: <a href="https://x.com/baromatchapp" rel="me noopener">@baromatchapp</a>.</p>
+      <p class="document__date">Mise à jour le 30 octobre 2026</p>
+    </div>
+  </section>
 </main>
 <footer class="pied page">
   <div class="pied__marque"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><linearGradient id="pd-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="pd-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="pd-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#pd-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#pd-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#pd-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg><span>© 2026 Baromatch</span></div>

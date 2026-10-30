@@ -1,13 +1,7 @@
-/* Baromatch — les affiches à imprimer : l’affiche des matchs de la semaine (/matchs/affiche/), l’affiche de chaque
-   bar publié (/bar/<bar>/affiche/) et la feuille à laisser au patron (/matchs/affiche/pour-le-patron/), écrites par le
-   générateur (generateur/affiche.mjs, generateur/feuille-du-patron.mjs). Elles reprennent styles.css et regarder.css ;
-   ici, la feuille et son impression.
-   À l’écran : le jour du site, et l’affiche en aperçu sur une feuille blanche (son ombre courte, un trait autour).
-   À l’impression : seulement la feuille, papier blanc, encre noire, une seule touche d’ambre (le verre de la marque).
-   Une affiche pleine nuit viderait la cartouche d’un bar. Seules les lignes cochées s’impriment ; si rien n’est coché,
-   toutes. Un navigateur sans :has() imprime tous les matchs : rien ne casse. La taille du papier n’est pas fixée
-   (@page size bloquerait le choix A4 / A3 dans la fenêtre d’impression) : le bouton A3 agrandit tout (--echelle).
-   Aucun script, aucune animation. Les chiffres sont tabulaires. */
+/* Baromatch — les affiches à imprimer (generateur/affiche.mjs, feuille-du-patron.mjs) : celle de la semaine, celle
+   de chaque bar, la feuille du patron. À l’écran, le jour et la feuille blanche ; imprimée, la feuille seule, encre
+   noire, une touche d’ambre (le verre). Seules les lignes cochées s’impriment, toutes si rien n’est coché (ou sans
+   :has()). Sans @page size (il bloquerait A4 / A3) : A3 agrandit tout (--echelle). Aucun script, aucune animation. */
 
 /* ---------- Le choix du papier ---------- */
 
@@ -25,8 +19,7 @@
   font-weight: 650;
   cursor: pointer;
 }
-/* Le choix et les cases cochées à la couleur du texte (l’encre sur la feuille) : l’ambre, sur le clair, ne ferait que
-   1,9:1 (WCAG 1.4.11). */
+/* Le choix et les cases à la couleur du texte : l’ambre, sur le clair, ferait 1,9:1. */
 .affiche-format__choix:hover { background: var(--fond-releve, var(--verre-fort)); }
 .affiche-format__choix:has(:checked) { border-color: var(--texte); }
 .affiche-format input { width: 20px; height: 20px; margin: 0; accent-color: var(--texte); }
@@ -211,9 +204,7 @@ label.affiche-ligne__texte { cursor: pointer; }
 }
 
 /* ---------- La feuille à laisser au patron (/matchs/affiche/pour-le-patron/) ----------
-   Le même papier : un surtitre, le titre, quatre lignes, « Où on en est », puis le pied (l’appel, le contact, « Laissée
-   par » et sa ligne au stylo, la date et le verre ; le QR code à droite). La copie (la seconde feuille de l’A4) ne se
-   montre jamais à l’écran. */
+   Le même papier ; sa copie (la seconde feuille de l’A4) ne se montre jamais à l’écran. */
 
 .affiche--copie { display: none; }
 .affiche-patron__surtitre { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
@@ -229,11 +220,8 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-laissee__trait { flex: 1; min-width: 6rem; height: 1.5em; border-bottom: 1px solid var(--encre-douce); }
 .affiche--patron .affiche-qr__code { width: 144px; height: 144px; }
 
-/* À l’impression : A4 (le choix par défaut), la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la ligne de
-   coupe au milieu : 268 mm sur les 273 de la zone imprimable (marges de 12 mm), 5 mm de jeu. Une page plus courte
-   (papier Letter, d’autres marges, une impression depuis un téléphone) : la copie passe entière sur la page suivante,
-   jamais coupée en deux (break-inside). A5, la feuille seule, la page entière. Un navigateur sans :has() imprime une
-   seule feuille, sur la moitié haute. */
+/* Imprimée en A4 : la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la coupe au milieu (268 mm sur 273). Une
+   page plus courte : la copie passe entière à la suivante. A5 : la feuille seule. Sans :has() : une feuille, en haut. */
 @media print {
   .affiche--patron { min-height: 0; height: 127mm; break-inside: avoid; }
   .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; margin-top: 14mm; }

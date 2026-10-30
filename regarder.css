@@ -1,7 +1,6 @@
-/* Baromatch — les pages « Où regarder le match » (matchs, villes, bars), écrites par le générateur.
-   Elles reprennent styles.css (le jour, le verre, la police, l’en-tête et le pied de page) ; ici, seulement leur
-   mise en page. L’ambre reste à l’appel à l’action. Au jour, une valeur de nuit prend la sienne par
-   var(--fond-releve, …), qui n’existe qu’au jour. Aucune animation. Les chiffres sont tabulaires. */
+/* Baromatch — les pages « Où regarder le match », écrites par le générateur. Elles reprennent styles.css (le jour, le
+   verre, la police, l’en-tête, le pied) ; ici, leur mise en page. L’ambre reste à l’appel à l’action. Une valeur de
+   nuit prend celle du jour par var(--fond-releve, …), qui n’existe qu’au jour. Aucune animation. */
 
 .regarder {
   padding-top: 8px;
@@ -400,8 +399,7 @@
 
 /* ---------- Le jour ---------- */
 
-/* Les liens soulignés de leur couleur, survolés en bleu doux, comme sur l’accueil ; la pilule de la liste d’attente,
-   au focus, garde un bord bleu nuit (l’ambre : 1,7:1). */
+/* Les liens soulignés de leur couleur, survolés comme sur l’accueil ; la pilule au focus en bleu nuit (l’ambre : 1,7:1). */
 .jour :is(.regarder-carte__nom, .regarder-soir__match) a { text-decoration-color: currentColor; }
 .jour :is(.regarder-carte__nom, .regarder-soir__match) a:hover { color: var(--texte-doux); }
 .jour .regarder-fil a:hover { color: var(--texte); }

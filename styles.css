@@ -1388,7 +1388,8 @@ a:hover { color: var(--goutte); }
 @media (min-width: 720px) { .semaine { padding: 64px 0 80px; } }
 /* Ordinateur : le film, au-dessus, vient au clavier après les matchs, dans l’ordre du téléphone. */
 @media (min-width: 960px) { .ouverture > .semaine { grid-row: 6; margin-top: 72px; } }
-.semaine .titre-section { max-width: none; }
+/* Une boîte en em, pas à la largeur du texte : la même avec la police de secours (tests/police.spec.mjs). */
+.semaine .titre-section { max-width: none; flex: 0 1 10em; }
 .semaine__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
 .semaine__toute { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
 .semaine__chapo { max-width: 44rem; margin: 12px 0 0; color: var(--texte-doux); text-wrap: pretty; }

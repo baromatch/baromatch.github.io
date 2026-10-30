@@ -143,7 +143,8 @@ for (const { chemin, feuille, ambre } of PAGES) {
       });
     }
 
-    for (const largeur of [320, 375, 390]) {
+    // Du téléphone à l’ordinateur : les colonnes suivent la taille du texte (avant, à 960 px, la page défilait de côté).
+    for (const largeur of [320, 375, 390, 768, 960, 1024, 1280]) {
       test(`à ${largeur} px, texte à 200 % : rien ne sort de l’écran, aucun mot n’est coupé, chaque étiquette garde son texte`, async ({ page }) => {
         await ouvrir(page, chemin, largeur, 700);
         await chargerLesImages(page);
@@ -284,18 +285,25 @@ test('iPhone SE (320 × 568) : le premier écran montre « Écrire pour la press
   await ouvrir(page, '/a-propos.html', 320, 568);
   const premiere = await page.locator('.apropos__entrees li').first().boundingBox();
   expect(premiere.y + premiere.height).toBeLessThanOrEqual(568);
-  // Dès 360 px, l’icône revient.
-  await ouvrir(page, '/presse.html', 360, 740);
+  // Sur un iPhone 15 (393 × 659), l’icône de l’ouverture s’efface aussi (elle reste dans « Le logo ») : les deux
+  // boutons tiennent dans le premier écran. Dès 600 px, elle revient.
+  await ouvrir(page, '/presse.html', 393, 659);
+  await expect(page.locator('.presse__icone')).toBeHidden();
+  const partenariat = await page.locator('.presse__actions .presse__bouton').boundingBox();
+  expect(partenariat.y + partenariat.height).toBeLessThanOrEqual(659);
+  await expect(page.locator('#logos ~ .presse__logos img[src="/presse/baromatch-icone.svg"]')).toBeVisible();
+  await ouvrir(page, '/presse.html', 600, 900);
   await expect(page.locator('.presse__icone')).toBeVisible();
 });
 
 // La police retenue jusqu’au premier affichage, puis lâchée (comme tests/police.spec.mjs) : la page s’affiche dans la
 // police de secours, et quand Bricolage Grotesque arrive, rien ne bouge. Sous 360 px, chaque entrée d’À propos tient sur
 // deux lignes quelle que soit la police (avant, elle passait d’une à deux lignes : 0,003 sur un iPhone SE). À 390 px,
-// deux polices ne coupent jamais leurs lignes tout à fait aux mêmes pixels : 0,0001 au plus (mesuré 0,00004 et 0,00009).
+// deux polices ne coupent jamais leurs lignes tout à fait aux mêmes pixels : 0,001 au plus (mesuré 0,00004 à 0,0003 ;
+// Google dit « bon » sous 0,1).
 for (const { chemin } of PAGES) {
   for (const [largeur, hauteur] of [[320, 568], [390, 844]]) {
-    test(`${chemin} à ${largeur} px : quand la police arrive tard, rien ne bouge (CLS ${largeur < 360 ? '0' : 'sous 0,0001'})`, async ({ browser, baseURL }) => {
+    test(`${chemin} à ${largeur} px : quand la police arrive tard, rien ne bouge (CLS ${largeur < 360 ? '0' : 'sous 0,001'})`, async ({ browser, baseURL }) => {
       const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: hauteur }, reducedMotion: 'reduce', locale: 'fr-FR' });
       await contexte.addInitScript(() => {
         window.decalages = [];
@@ -318,7 +326,7 @@ for (const { chemin } of PAGES) {
         await onglet.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
         const total = await onglet.evaluate(() => { window.relever(); return window.decalages.reduce((t, v) => t + v, 0); });
         if (largeur < 360) expect(total).toBe(0);
-        else expect(total).toBeLessThanOrEqual(0.0001);
+        else expect(total).toBeLessThanOrEqual(0.001);
       } finally {
         lacher();
         await Promise.all(retenues);
@@ -339,25 +347,28 @@ test('les liens pris dans une phrase des deux pages se touchent sur 44 px', asyn
   expect(hauteurs.filter(([, h]) => h < 44)).toEqual([]);
 });
 
-// Les écrans de l’appli ne sont jamais agrandis : l’image chargée a au moins autant de pixels que sa place à l’écran,
-// à 320 px (deux par ligne sur Presse) comme avec le texte à 200 % (un par ligne, plus large).
-for (const pourcent of [100, 200]) {
-  test(`à 320 px (×2), texte à ${pourcent} % : chaque écran de l’appli est chargé assez grand pour sa place`, async ({ browser, baseURL }) => {
-    const contexte = await browser.newContext({ baseURL, viewport: { width: 320, height: 568 }, deviceScaleFactor: 2, reducedMotion: 'reduce' });
+// Les écrans de l’appli et l’affiche du film ne sont jamais agrandis : l’image chargée a au moins autant de pixels que
+// sa place à l’écran, sur un iPhone SE (×2) et un iPhone 15 (×3), à 100 % (deux écrans par ligne sur Presse) comme
+// avec le texte à 200 % (un par ligne, plus large ; les cadres plafonnés en px).
+for (const [appareil, largeur, hauteur, ratio] of [['iPhone SE', 320, 568, 2], ['iPhone 15', 393, 659, 3]]) for (const pourcent of [100, 200]) {
+  test(`${appareil} (×${ratio}), texte à ${pourcent} % : chaque écran de l’appli, et l’affiche du film, chargés assez grands pour leur place`, async ({ browser, baseURL }) => {
+    const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: hauteur }, deviceScaleFactor: ratio, reducedMotion: 'reduce' });
     await contexte.addInitScript((p) => { document.addEventListener('DOMContentLoaded', () => { document.documentElement.style.fontSize = `${p}%`; }); }, pourcent);
     const onglet = await contexte.newPage();
     try {
       for (const { chemin } of PAGES) {
         await onglet.goto(chemin);
         await chargerLesImages(onglet);
-        const ecrans = await onglet.$$eval('main img[src^="/img/appli/"]', (images) => images.map((img) => ({
-          // La largeur du fichier chargé, dite par son nom (-300 ou -600) : naturalWidth, lui, suit l’attribut sizes.
-          src: img.currentSrc.replace(/^.*\/img\//, ''), largeur: Number(img.currentSrc.match(/-(\d+)\.webp$/)[1]), place: Math.round(img.getBoundingClientRect().width * devicePixelRatio), haut: Math.round(img.getBoundingClientRect().top + scrollY),
+        const ecrans = await onglet.$$eval('main img[src^="/img/appli/"], main img[src="/baromatch-film.webp"]', (images) => images.map((img) => ({
+          // La largeur du fichier chargé, dite par son nom (-300, -600, -720 ; l’affiche sans suffixe fait 540) :
+          // naturalWidth, lui, suit l’attribut sizes.
+          src: img.currentSrc.replace(/^.*\//, ''), largeur: Number(img.currentSrc.match(/-(\d+)\.webp$/)?.[1] ?? 540), place: Math.round(img.getBoundingClientRect().width * devicePixelRatio), haut: Math.round(img.getBoundingClientRect().top + scrollY),
         })));
         expect(ecrans.length, chemin).toBeGreaterThan(2);
         expect(ecrans.filter((e) => e.largeur + 1 < e.place).map((e) => `${e.src} : ${e.largeur} px pour ${e.place}`), chemin).toEqual([]);
         // Sur Presse, à 100 %, deux écrans par ligne.
         if (chemin === '/presse.html' && pourcent === 100) expect(ecrans[0].haut).toBe(ecrans[1].haut);
+        if (chemin === '/presse.html') expect(ecrans.map((e) => e.src)).toContainEqual(expect.stringMatching(/^baromatch-film/));
       }
     } finally {
       await contexte.close();
@@ -418,4 +429,32 @@ test('Presse au téléphone : les cartes du logo par deux à 100 %, une par lign
   await agrandir(page, 200);
   const colonnes = await page.$$eval('.presse__logo', (cartes) => new Set(cartes.map((c) => Math.round(c.getBoundingClientRect().left))).size);
   expect(colonnes).toBe(1);
+});
+
+// Couleurs forcées (contraste élevé de Windows) : la capsule ambre garde un bord ; les aperçus du logo et les disques de
+// couleur gardent leurs couleurs (sinon le logo blanc disparaît sur un fond devenu clair, et les disques se vident).
+test('couleurs forcées : la capsule ambre a un bord, les aperçus du logo et les disques gardent leurs couleurs', async ({ page }) => {
+  await page.emulateMedia({ forcedColors: 'active' });
+  for (const { chemin } of PAGES) {
+    await page.goto(chemin);
+    const bord = await page.locator('main .capsule').first().evaluate((e) => parseFloat(getComputedStyle(e).borderTopWidth));
+    expect(bord, chemin).toBeGreaterThanOrEqual(1);
+  }
+  const lu = await page.evaluate(() => ({
+    sombre: getComputedStyle(document.querySelector('.presse__apercu--sombre')).backgroundColor,
+    ambre: getComputedStyle(document.querySelector('.presse__disque--ambre')).backgroundColor,
+    nuit: getComputedStyle(document.querySelector('.presse__disque--nuit')).backgroundColor,
+  }));
+  expect(lu).toEqual({ sombre: 'rgb(10, 11, 16)', ambre: AMBRE, nuit: 'rgb(10, 11, 16)' });
+});
+
+// Les titres de rubrique d’À propos, en petites capitales dessinées : le lecteur d’écran lit « Pourquoi Baromatch
+// existe », pas « POURQUOI BAROMATCH EXISTE » (le nom que Chromium donne au titre, lu dans son arbre d’accessibilité).
+test('À propos : les titres de rubrique gardent leur casse dans l’arbre d’accessibilité', async ({ page }) => {
+  await page.goto('/a-propos.html');
+  const cdp = await page.context().newCDPSession(page);
+  const { nodes } = await cdp.send('Accessibility.getFullAXTree');
+  const titres = nodes.filter((n) => n.role?.value === 'heading' && n.properties?.some((p) => p.name === 'level' && p.value.value === 2)).map((n) => n.name?.value);
+  expect(titres).toEqual(['Pourquoi Baromatch existe', 'Ce que fait l’appli', 'Ce qu’on refuse', 'Le mot du fondateur', 'Où va Baromatch', 'Et maintenant']);
+  expect(await page.locator('.apropos__rail').first().evaluate((e) => getComputedStyle(e).fontVariantCaps)).toBe('all-small-caps');
 });

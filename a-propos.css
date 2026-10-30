@@ -4,9 +4,12 @@
    section « nuit » et le téléphone de verre de styles.css), puis au pied de page. Un seul bouton ambre, « Proposer mon
    bar » ; les autres actions ont un contour à 3,6:1. Rien ne bouge : la page n’a ni animation ni script.
    Chaque grand texte se règle en rem et en vw : avec le texte à 200 % sur 320 px, son plus long mot tient sur sa ligne
-   (tests/pages-du-jour.spec.mjs le mesure). Chargée seulement par a-propos.html. */
+   (tests/pages-du-jour.spec.mjs le mesure). Les colonnes suivent la taille du texte, pas la largeur de l’écran : la
+   page est un conteneur (« apropos »), et chaque grille passe en colonnes à une largeur dite en em (le seuil d’avant
+   divisé par 18 px, le texte du corps dès 720 px) ; à 100 %, rien ne change dès 1 024 px ; à 200 %, une colonne.
+   Chargée seulement par a-propos.html. */
 
-.apropos { --apropos-air: clamp(44px, 9vw, 128px); }
+.apropos { --apropos-air: clamp(44px, 9vw, 128px); container: apropos / inline-size; }
 
 /* ---------- L’ouverture : la phrase, puis une entrée pour chacun ---------- */
 
@@ -32,7 +35,7 @@
    visiteur est, puis ce qui l’attend derrière le lien. */
 .apropos__entrees { display: grid; grid-template-columns: minmax(0, 1fr); margin: clamp(32px, 5vw, 56px) 0 0; padding: 0; list-style: none; border-top: 1.5px solid var(--texte); }
 .apropos__entrees li { border-bottom: 1px solid var(--champ-bord); }
-@media (min-width: 760px) { .apropos__entrees { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; } }
+@container apropos (min-width: 42em) { .apropos__entrees { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; } }
 .apropos__entrees a {
   display: flex;
   flex-wrap: wrap;
@@ -49,7 +52,7 @@
 /* Un chevron dessiné (la police allégée n’a pas de flèche), de la couleur du texte. */
 .apropos__quoi::after { content: ""; display: inline-block; width: 0.42em; height: 0.42em; margin-left: 0.35em; border-top: 2px solid currentColor; border-right: 2px solid currentColor; vertical-align: 0.12em; transform: rotate(45deg); }
 .apropos__entrees a:hover .apropos__quoi { color: var(--texte-doux); }
-@media (min-width: 760px) { .apropos__entrees a { flex-direction: column; justify-content: flex-start; } }
+@container apropos (min-width: 42em) { .apropos__entrees a { flex-direction: column; justify-content: flex-start; } }
 /* Sous 360 px, chaque entrée tient sur deux lignes quelle que soit la police : celle de secours (plus étroite) et
    Bricolage Grotesque, arrivée après, ne la font plus passer d’une à deux lignes (le décalage mesuré sur un iPhone SE).
    L’ouverture se resserre : la première entrée se voit dans le premier écran (320 × 568). */
@@ -64,7 +67,7 @@
 /* ---------- Une rubrique : un rail qui la nomme, un corps qui la dit ---------- */
 
 .apropos__rubrique { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding-top: var(--apropos-air); padding-bottom: var(--apropos-air); }
-@media (min-width: 960px) { .apropos__rubrique { grid-template-columns: 12rem minmax(0, 1fr); column-gap: 56px; } }
+@container apropos (min-width: 53em) { .apropos__rubrique { grid-template-columns: 12rem minmax(0, 1fr); column-gap: 56px; } }
 .apropos__rail {
   margin: 0;
   align-self: start;
@@ -73,10 +76,10 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   line-height: 1.5;
-  text-transform: uppercase;
+  font-variant-caps: all-small-caps;
   font-variation-settings: "opsz" 14;
 }
-@media (min-width: 960px) { .apropos__rubrique > .apropos__rail { padding-top: 0.9rem; } }
+@container apropos (min-width: 53em) { .apropos__rubrique > .apropos__rail { padding-top: 0.9rem; } }
 .apropos__corps { min-width: 0; }
 .apropos__corps p, .apropos__corps ul { margin: 0; }
 
@@ -100,7 +103,7 @@
 .apropos__trois { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; margin-top: clamp(40px, 6vw, 80px); }
 .apropos__trois > div { padding-top: 18px; border-top: 1.5px solid var(--texte); }
 .apropos__trois p { color: var(--texte-doux); text-wrap: pretty; }
-@media (min-width: 800px) { .apropos__trois { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@container apropos (min-width: 44em) { .apropos__trois { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* Un fond relevé, sur toute la largeur de l’écran (le mot du fondateur, « Et maintenant »). */
 .apropos__releve { background: var(--fond-releve); box-shadow: 0 0 0 100vmax var(--fond-releve); clip-path: inset(0 -100vmax); }
@@ -127,27 +130,32 @@
 .apropos__ecrans { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; margin: 0; padding: 0; list-style: none; }
 .apropos__ecran { container-type: inline-size; }
 .apropos__ecran figure { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; margin: 0; }
-.apropos__cadre { position: relative; width: min(100%, 11rem); }
+.apropos__cadre { position: relative; width: min(100%, 11rem, 212px); }
 .apropos__cadre .telephone { max-width: none; }
+/* Au-dessus de l’écran quand il est seul sur sa ligne (un petit téléphone, le texte à 200 %) : l’étiquette passe à la
+   ligne dans la largeur du cadre, sans couper un mot ni sortir de l’écran. */
+.apropos__cadre .exemple { position: static; margin: 0 0 10px; }
 .apropos__ecran figcaption { color: var(--texte-doux); font-size: 1rem; line-height: 1.5; text-wrap: pretty; }
 .apropos__ecran figcaption p { margin: 0; }
 .apropos__ecran figcaption strong { color: var(--texte); font-weight: 700; }
 .apropos__ecran .apropos__cote-bar { margin-top: 10px; font-size: 0.9375rem; }
 .apropos__note { max-width: 40rem; margin: 0; color: var(--texte-discret); font-size: 0.9375rem; }
 
-/* Au téléphone, la page reste courte : chaque écran fait 152 px de large, sa légende à côté ; sous 340 px de place (un
-   écran de 360 px, ou le texte à 200 %), la légende passe dessous. L’étiquette se centre sur l’écran, qu’elle déborde
-   un peu, sans toucher la légende. */
-@media (max-width: 699px) {
-  @container (min-width: 20em) {
+/* Tant que la page est étroite (moins de 41 em : un téléphone, ou le texte à 200 %), la page reste courte : au
+   téléphone, chaque écran fait 152 px de large, sa légende à côté (de 20 em à 500 px de place) ; sous 20 em, ou avec le
+   texte agrandi, elle passe dessous. L’étiquette se centre sur l’écran, qu’elle déborde un peu, sans toucher la légende. Au-delà, trois colonnes.
+   Le cadre ne dépasse jamais 212 px : l’écran (200 px) n’est jamais plus large que le WebP de 600 px servi, même à ×3. */
+@container apropos (max-width: 40.99em) {
+  @container (min-width: 20em) and (max-width: 500px) {
     .apropos__ecran figure { grid-template-columns: 9.5rem minmax(0, 1fr); align-items: start; gap: 22px; }
     .apropos__cadre { width: 100%; }
-    .apropos__cadre .exemple { left: 50%; transform: translateX(-50%); white-space: nowrap; }
+    .apropos__cadre .exemple { position: absolute; left: 50%; margin: 0; transform: translateX(-50%); white-space: nowrap; }
   }
 }
-@media (min-width: 700px) {
+@container apropos (min-width: 41em) {
   .apropos__ecrans { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; align-items: start; }
   .apropos__cadre { width: min(100%, 17rem); }
+  .apropos__cadre .exemple { position: absolute; margin: 0; }
 }
 
 /* ---------- Ce qu’on refuse : des phrases calmes, en grand ---------- */
@@ -166,7 +174,7 @@
   text-wrap: balance;
 }
 .apropos__refus li p { max-width: 30rem; color: var(--texte-doux); text-wrap: pretty; }
-@media (min-width: 800px) {
+@container apropos (min-width: 44em) {
   .apropos__refus li { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; align-items: start; }
   .apropos__refus li p { padding-top: 0.4rem; }
 }
@@ -175,7 +183,7 @@
 /* ---------- Où va Baromatch ---------- */
 
 .apropos__deux { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: clamp(36px, 5vw, 64px); }
-@media (min-width: 800px) { .apropos__deux { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; } }
+@container apropos (min-width: 44em) { .apropos__deux { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; } }
 .apropos__note-carte, .apropos__carte { min-width: 0; padding: 24px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
 .apropos__note-carte p, .apropos__carte p { color: var(--texte-doux); text-wrap: pretty; }
 .apropos__corps .apropos__note-carte p + p { margin-top: 10px; }
@@ -184,7 +192,7 @@
 
 .apropos__corps .apropos__cartes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: clamp(28px, 4vw, 48px); padding: 0; list-style: none; }
 .apropos__carte { display: flex; flex-direction: column; }
-@media (min-width: 800px) {
+@container apropos (min-width: 44em) {
   .apropos__corps .apropos__cartes { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); gap: 0 20px; }
   .apropos__carte { display: grid; grid-row: span 4; grid-template-rows: subgrid; align-content: start; }
 }
@@ -209,10 +217,10 @@
 /* ---------- Qui publie Baromatch : deux lignes sous la citation ---------- */
 
 .apropos__qui-publie { display: grid; gap: 6px; max-width: 42rem; padding-top: 18px; border-top: 1px solid rgba(10, 11, 16, 0.22); }
-@media (min-width: 960px) { .apropos__rubrique > .apropos__qui-publie { grid-column: 2; } }
+@container apropos (min-width: 53em) { .apropos__rubrique > .apropos__qui-publie { grid-column: 2; } }
 .apropos__qui-publie p { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; text-wrap: pretty; }
 .apropos__qui-publie .document__date { margin: 0; }
 
 @media (forced-colors: active) {
-  .apropos__bouton, .apropos__carte, .apropos__note-carte { border: 1px solid CanvasText; }
+  .apropos__bouton, .apropos__carte, .apropos__note-carte, .apropos .capsule { border: 1px solid CanvasText; }
 }

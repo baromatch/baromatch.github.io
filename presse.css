@@ -4,9 +4,12 @@
    téléphone de verre de styles.css), sans lien ambre : ses liens sont en blanc doux, soulignés. Les deux couleurs se
    montrent en petits disques sur une carte blanche, pas en surfaces. Rien ne bouge : ni animation, ni script.
    Chaque grand texte se règle en rem et en vw, et chaque grille d’écrans en em : avec le texte à 200 % sur 320 px, son
-   plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Chargée seulement par presse.html. */
+   plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Les colonnes suivent la taille du texte,
+   pas la largeur de l’écran : la page est un conteneur (« presse »), et chaque grille passe en colonnes à une largeur
+   dite en em (le seuil d’avant divisé par 18 px, ou 17 sous 720 px) ; à 100 %, rien ne change dès 1 024 px. Chargée
+   seulement par presse.html. */
 
-.presse { --presse-air: clamp(40px, 6.5vw, 88px); }
+.presse { --presse-air: clamp(40px, 6.5vw, 88px); container: presse / inline-size; }
 .presse p, .presse ul, .presse dl, .presse figure { margin: 0; }
 
 /* ---------- L’ouverture : ce que c’est, ce qu’on peut en faire, à qui écrire ---------- */
@@ -22,7 +25,7 @@
 .presse__ouverture-texte { grid-area: texte; min-width: 0; }
 .presse__icone { grid-area: icone; width: 76px; height: auto; border-radius: 18px; box-shadow: 0 14px 36px rgba(10, 11, 16, 0.22); }
 .presse__sommaire { grid-area: sommaire; }
-@media (min-width: 900px) {
+@container presse (min-width: 50em) {
   .presse__ouverture { grid-template-columns: minmax(0, 1fr) 260px; grid-template-areas: "texte icone" "sommaire icone"; column-gap: 72px; align-items: center; }
   .presse__icone { width: 260px; justify-self: end; border-radius: 58px; box-shadow: 0 24px 60px rgba(10, 11, 16, 0.26); }
 }
@@ -62,11 +65,15 @@
 .presse__bouton:hover { background: var(--fond-releve); color: var(--texte); }
 .presse__ouverture-texte > .presse__bar { margin-top: 12px; }
 
-/* Sur un petit téléphone (iPhone SE, 320 × 568), l’icône s’efface et le texte se resserre : « Écrire pour la presse »
-   tient dans le premier écran. */
-@media (max-width: 359px) {
+/* Au téléphone (sous 600 px), l’icône de l’ouverture s’efface (elle reste dans « Le logo ») : les deux boutons
+   tiennent dans le premier écran d’un iPhone 15. Sur un petit téléphone (iPhone SE, 320 × 568), le texte se resserre
+   aussi : « Écrire pour la presse » tient dans le premier écran. */
+@media (max-width: 599px) {
   .presse__icone { display: none; }
-  .presse__ouverture { grid-template-areas: "texte" "sommaire"; padding-top: 16px; }
+  .presse__ouverture { grid-template-areas: "texte" "sommaire"; }
+}
+@media (max-width: 359px) {
+  .presse__ouverture { padding-top: 16px; }
   .presse__titre { font-size: 1.875rem; }
   .presse__ouverture-texte > .presse__chapo { margin-top: 12px; font-size: 1rem; line-height: 1.5; }
   .presse__ouverture-texte > .presse__chapo + p { font-size: 0.9375rem; }
@@ -113,11 +120,11 @@
 
 /* Deux cartes par ligne au téléphone (des colonnes de 9 em : une seule avec le texte à 200 %), trois sur ordinateur. */
 .presse .presse__logos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr)); gap: 12px; margin-top: 28px; padding: 0; list-style: none; }
-@media (min-width: 760px) { .presse .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } }
+@container presse (min-width: 42em) { .presse .presse__logos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } }
 .presse__logo { display: grid; align-content: start; gap: 10px; padding: 12px 12px 16px; border: 1px solid var(--trait); border-radius: 20px; background: var(--carte); box-shadow: var(--ombre-carte); }
 /* Au téléphone, un aperçu plus bas (5:2) : les trois cartes tiennent en moins de deux écrans. */
 .presse__apercu { display: flex; align-items: center; justify-content: center; aspect-ratio: 5 / 2; padding: 16px 20px; border-radius: 12px; }
-@media (min-width: 760px) { .presse__apercu { aspect-ratio: 16 / 9; padding: 20px; } }
+@container presse (min-width: 42em) { .presse__apercu { aspect-ratio: 16 / 9; padding: 20px; } }
 .presse__apercu img { width: min(100%, 300px); height: auto; }
 .presse__apercu--clair { background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); }
 .presse__apercu--sombre { background: var(--nuit); }
@@ -151,9 +158,10 @@
    colonne fait deux fois plus large : un écran par ligne, et l’étiquette tient sur deux lignes, sans couper un mot.
    L’étiquette se pose au-dessus de l’écran : la colonne est trop étroite pour qu’elle chevauche son bord. */
 .presse .presse__ecrans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8em), 1fr)); gap: 40px 16px; margin-top: 36px; padding: 0; list-style: none; }
-@media (min-width: 1000px) { .presse .presse__ecrans { gap: 40px 24px; } }
+@container presse (min-width: 55em) { .presse .presse__ecrans { gap: 40px 24px; } }
 .presse__ecran figure { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
-.presse__cadre { width: min(100%, 13rem); }
+/* Le cadre ne dépasse jamais 206 px : l’écran (196 px) n’est jamais plus large que le WebP de 600 px servi, même à ×3. */
+.presse__cadre { width: min(100%, 13rem, 206px); }
 .presse__cadre .exemple { position: static; margin: 0 0 10px; }
 .presse__cadre .telephone { max-width: none; padding: 5px; border-radius: 28px; }
 .presse__cadre .telephone__ecran { border-radius: 23px; }
@@ -162,23 +170,23 @@
 .presse__ecran figcaption a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; justify-self: start; min-height: 44px; font-weight: 650; }
 
 .presse__film { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: center; }
-@media (min-width: 800px) { .presse__film { grid-template-columns: minmax(0, 1fr) 260px; gap: 72px; } }
+@container presse (min-width: 44em) { .presse__film { grid-template-columns: minmax(0, 1fr) 260px; gap: 72px; } }
 .presse__film-texte > p { max-width: 36rem; margin-top: 12px; color: var(--texte-doux); text-wrap: pretty; }
 .presse .presse__liens-film { display: grid; justify-items: start; gap: 2px; margin-top: 20px; padding: 0; list-style: none; }
 .presse__liens-film a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 0.25em; min-height: 44px; font-weight: 650; }
 .presse__affiche { display: block; width: min(100%, 240px); padding: 5px; border-radius: 28px; background: #15171F; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), var(--ombre-scene); }
 .presse__affiche img { width: 100%; height: auto; border-radius: 23px; }
-@media (min-width: 800px) { .presse__affiche { width: 260px; } }
+@container presse (min-width: 44em) { .presse__affiche { width: 260px; } }
 
 /* ---------- Les couleurs et la police : une carte, deux disques ---------- */
 
 .presse__marque { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; margin-top: 28px; padding: 28px; border: 1px solid var(--trait); border-radius: 22px; background: var(--carte); box-shadow: var(--ombre-carte); }
-@media (min-width: 860px) { .presse__marque { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; } }
+@container presse (min-width: 48em) { .presse__marque { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; } }
 .presse .presse__teintes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 0; list-style: none; }
-@media (min-width: 560px) { .presse .presse__teintes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container presse (min-width: 33em) { .presse .presse__teintes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__teintes li { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-content: start; column-gap: 16px; }
-/* Sous 30 em (480 px), le disque passe au-dessus de son texte : à 200 %, le texte garde toute la largeur. */
-@media (max-width: 30em) {
+/* Sous 30 em de page (510 px à 100 %), le disque passe au-dessus de son texte : à 200 %, le texte garde toute la largeur. */
+@container presse (max-width: 30em) {
   .presse__teintes li { grid-template-columns: minmax(0, 1fr); row-gap: 2px; }
   .presse__teintes .presse__disque { grid-row: auto; margin-bottom: 10px; }
 }
@@ -203,7 +211,7 @@
 
 .presse .presse__faits { margin-top: 16px; border-top: 1px solid var(--trait); }
 .presse__faits > div { display: grid; gap: 2px 24px; padding: 14px 0; border-bottom: 1px solid var(--trait); }
-@media (min-width: 720px) { .presse__faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
+@container presse (min-width: 40em) { .presse__faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
 .presse__faits dt { font-weight: 700; }
 .presse__faits dd { margin: 0; color: var(--texte-doux); text-wrap: pretty; }
 .presse__faits dd a { font-weight: 650; }
@@ -231,7 +239,7 @@
 /* ---------- Écrire à Baromatch ---------- */
 
 .presse .presse__ecrire { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px 20px; max-width: 46rem; margin-top: 28px; padding: 0; list-style: none; }
-@media (min-width: 640px) { .presse .presse__ecrire { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container presse (min-width: 37em) { .presse .presse__ecrire { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__ecrire li { display: grid; align-content: start; gap: 8px; }
 .presse__ecrire p { color: var(--texte-discret); font-size: 0.9375rem; }
 /* L’adresse, d’un seul tenant (Chromium coupe à un <wbr> même sans retour à la ligne permis : un bloc en ligne la
@@ -242,5 +250,6 @@
 .presse .document__date { margin-top: 22px; }
 
 @media (forced-colors: active) {
-  .presse__bouton, .presse__fichiers a, .presse__sommaire a, .presse__disque { border: 1px solid CanvasText; }
+  .presse__bouton, .presse__fichiers a, .presse__sommaire a, .presse__disque, .presse .capsule { border: 1px solid CanvasText; }
+  .presse__apercu, .presse__disque { forced-color-adjust: none; }
 }

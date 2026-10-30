@@ -549,11 +549,11 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     for (const t of await semaine.locator('.semaine__titre-jour').all()) expect((await t.boundingBox()).height).toBeGreaterThan(16);
   });
 
-  test('le jour même, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {
+  test('le jour même, sans la police, rien ne bouge au chargement (CLS 0), au téléphone comme sur ordinateur', async ({ page }) => {
     // Seuls les décalages de la page elle-même : sans la police. Arrivée après le premier rendu (une machine chargée),
-    // elle remplace celle de secours (font-display: swap) et ce changement compte comme un décalage, qui existe déjà en
-    // ligne et dépend du hasard de la machine. Il aura sa propre correction (les mesures de la police de secours) et son
-    // propre test.
+    // elle remplace celle de secours (font-display: swap) et ce changement compte comme un décalage (0,005 sur
+    // ordinateur), qui existe déjà en ligne et dépend du hasard de la machine. Ce test ne le mesure pas : une police de
+    // secours aux mêmes mesures arrive dans une autre PR, avec le test qui servira la police en retard.
     await page.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
     for (const largeur of [390, 1280]) {
       await page.addInitScript(() => {

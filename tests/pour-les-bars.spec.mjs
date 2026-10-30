@@ -334,20 +334,20 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     reponse: d.querySelector('p').textContent.replace(/\s+/g, ' ').trim(),
   })));
 
-  test('le premier écran, à 360 × 740 : où en est Baromatch sous la phrase d’ouverture, le prix près du bouton, les pastilles, et le lien du fan égaré en haut', async ({ page }) => {
+  test('le premier écran, à 360 × 740 : le prix juste sous la phrase d’ouverture, puis où en est Baromatch, le bouton, les pastilles, et le lien du fan égaré en haut', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto(PAGE);
     const ouverture = page.locator('.ouverture-bars');
-    // La ligne d’état, juste sous la phrase d’ouverture : tant que l’appli n’est pas ouverte (marque.json), elle dit
-    // que les fans ne réservent pas encore, avant la plateforme. Le jour où l’appli ouvre, ce test échoue tant que la
+    // Le prix d’abord, juste sous la phrase d’ouverture (gratuit, sans engagement : l’argument d’un premier contact, lu
+    // dans le premier écran d’un iPhone), puis la ligne d’état : tant que l’appli n’est pas ouverte (marque.json), elle
+    // dit que les fans ne réservent pas encore, avant la plateforme. Le jour où l’appli ouvre, ce test échoue tant que la
     // ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
-    const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__etat');
+    const prix = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix');
+    const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix + .ouverture-bars__etat');
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
     await expect(etat).toHaveText('Où on en est : Baromatch est en test sur Android, à Paris (pas encore sur iPhone). Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
-    // Sous le bouton, les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du
-    // gratuit des clients.
-    const bouton = ouverture.locator('.actions .capsule[href="#proposer"]');
-    const prix = ouverture.locator('.actions + .ouverture-bars__prix');
+    // Les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du gratuit des clients.
+    const bouton = ouverture.locator('.ouverture-bars__etat + .actions .capsule[href="#proposer"]');
     await expect(prix).toHaveText(CONDITIONS_COURTES);
     await expect(ouverture.locator('.boutique-promesses li')).toHaveText([
       'On cherche les premiers bars, à Paris',
@@ -366,6 +366,16 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect((await fan.boundingBox()).y + 24).toBeLessThan((await page.locator('h1').boundingBox()).y + 1);
     // Et l’ancienne pastille « Premiers bars à Paris », qui se lisait comme « il y a déjà des bars », est partie.
     await expect(ouverture).not.toContainText('Premiers bars à Paris');
+  });
+
+  // Sur un iPhone (393 × 659 de page, sous la barre du navigateur), « Gratuit pendant le lancement, sans engagement. » se
+  // lit sans défiler : sous la ligne d’état, elle commençait à 702 px.
+  test('à 393 × 659, comme un iPhone : « Gratuit pendant le lancement, sans engagement. » dans le premier écran', async ({ page }) => {
+    await page.setViewportSize({ width: 393, height: 659 });
+    await page.goto(PAGE);
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
+    await expect(page.locator('.ouverture-bars__prix')).toBeInViewport({ ratio: 1 });
   });
 
   test('le lien du fan tient sur la ligne de « Pour les bars » à 360 px, sans pousser le titre', async ({ page }) => {

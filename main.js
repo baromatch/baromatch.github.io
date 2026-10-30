@@ -381,10 +381,10 @@ document.addEventListener("click", function (evenement) {
 
 /* Les matchs de la semaine : le générateur les écrit pour le jour de son passage (data-aujourdhui). Lus un autre jour
    (un passage manqué), « Aujourd’hui » et « Demain » redeviennent des dates (data-date), et les jours passés s’effacent,
-   avec leurs matchs (et la ligne du prochain match dans un bar, son jour passé) ; si le jour choisi en était, le
-   premier jour restant qui a des matchs est choisi, comme le fait le générateur (sinon le premier restant). Si tous les
-   jours sont passés (le générateur arrêté une semaine), la barre et ses cartes s’en vont : restent le titre, la phrase
-   et « Toute la semaine ». Le jour de Paris se lit en parties. */
+   avec leurs matchs, et la ligne du prochain match dans un bar dès son jour (sa carte est alors là) ; si le jour choisi
+   en était, le premier jour restant qui a des matchs est choisi, comme le fait le générateur (sinon le premier
+   restant). Si tous les jours sont passés (le générateur arrêté une semaine), la barre et ses cartes s’en vont :
+   restent le titre, la phrase et « Toute la semaine ». Le jour de Paris se lit en parties. */
 (function () {
   var semaine = document.querySelector("[data-aujourdhui]");
   if (!semaine) return;
@@ -394,7 +394,7 @@ document.addEventListener("click", function (evenement) {
   var jour = parties.year + "-" + parties.month + "-" + parties.day;
   if (jour === semaine.getAttribute("data-aujourdhui")) return;
   var prochain = document.querySelector(".semaine__prochain[data-jour]");
-  if (prochain && prochain.getAttribute("data-jour") < jour) prochain.hidden = true;
+  if (prochain && prochain.getAttribute("data-jour") <= jour) prochain.hidden = true;
   semaine.querySelectorAll("[data-date]").forEach(function (date) { date.textContent = date.getAttribute("data-date"); });
   var restants = [];
   semaine.querySelectorAll('input[name="semaine-jour"]').forEach(function (choix) {

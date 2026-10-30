@@ -604,13 +604,18 @@ test.describe('le prochain match dans un bar, dans le navigateur (le scénario d
     });
   }
 
-  test('lue un autre jour : la ligne reste jusqu’au jour de son match (vendredi 30), et s’efface le lendemain', async ({ page }) => {
-    for (const [jour, visible] of [['2026-10-30', true], ['2026-10-31', false]]) {
+  test('lue un autre jour : la ligne reste jusqu’à la veille de son match, et s’efface le jour même (sa carte est alors la première du jour choisi)', async ({ page }) => {
+    for (const [jour, visible] of [['2026-10-29', true], ['2026-10-30', false], ['2026-10-31', false]]) {
       await page.clock.setFixedTime(new Date(`${jour}T10:00:00Z`));
       await page.goto(`${site.serveur.adresse}/`);
       if (visible) await expect(page.locator('.semaine__prochain'), jour).toBeVisible();
       else await expect(page.locator('.semaine__prochain'), jour).toBeHidden();
     }
+    // Le jour même : vendredi 30 est choisi, et la carte du match avec son bar vient en premier.
+    await page.clock.setFixedTime(new Date('2026-10-30T10:00:00Z'));
+    await page.goto(`${site.serveur.adresse}/`);
+    await expect(page.getByRole('radio', { name: /ven\. 30/ })).toBeChecked();
+    await expect(page.locator('#semaine .carte-match:visible').first()).toHaveClass(/carte-match--bars/);
   });
 });
 

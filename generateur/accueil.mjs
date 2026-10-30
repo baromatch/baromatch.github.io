@@ -33,9 +33,6 @@ const CARTES_AU_TELEPHONE = 4;
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const jourCourt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short', day: 'numeric' });
 
-// Un club, un disque à ses deux couleurs (jamais un écusson) : le même que dans le pied de page de chaque page (cadre.mjs).
-export { disque };
-
 const nomDe = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
 // « 2 bars à Paris », ou le nombre seul quand ses bars sont dans plusieurs villes : sur la carte, et sur la ligne du
 // prochain match dans un bar.

@@ -3,7 +3,7 @@
 // lisible par un robot qui n’exécute rien ; seul le bloc « Partager » (partage.mjs) charge un fichier du site,
 // partage.js, qui l’enrichit sans rien changer au reste, et la mesure d’audience, quand marque.json l’active, charge
 // /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
-import { actionDeLaPage, entete, lireLeCadre, pageDuGenerateurAvecLAction, pied } from './cadre.mjs';
+import { actionDeLaPage, entete, pageDuGenerateurAvecLAction, pied } from './cadre.mjs';
 import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
@@ -16,10 +16,6 @@ export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img
 // GoatCounter dans connect-src quand elle est active.
 export const politiqueDesPages = (mesure) => politiqueAvecLaMesure(CSP, mesure);
 const IMAGE_ALT = 'Le verre de lumière de Baromatch et la phrase : Ton match. Ton bar. Ce soir.';
-
-// Le cadre (l’en-tête et le pied de page de toutes les pages, cadre.mjs) : le même que celui des pages écrites à la main.
-// Le verre (le dessin de la marque) sert aussi au badge et aux images de partage.
-export { lireLeCadre };
 
 // ---------- Tête, en-tête, pied ----------
 

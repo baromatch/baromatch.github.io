@@ -17,7 +17,7 @@ import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { construire } from '../generateur/construire.mjs';
 import { estPermis } from '../generateur/etat.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
-import { lireLeCadre } from '../generateur/gabarits.mjs';
+import { lireLeCadre } from '../generateur/cadre.mjs';
 import { controlerLaPage } from '../generateur/controle.mjs';
 import { mesureDuSite } from '../generateur/mesure.mjs';
 import { lesPolices, SCRIPT_DU_PARTAGE, svgDeLaCarte } from '../generateur/partage.mjs';
@@ -124,7 +124,7 @@ test.describe('les images de partage', () => {
       else expect(p.carte.ambre, p.chemin).toMatch(new RegExp(`^${cartes} bars? le diffusen?t? à `));
     }
     // Le texte de chaque image, tel qu’il est dessiné : jamais « 0 bar », ni score, ni « ! ».
-    const { verre } = lireLeCadre(racine);
+    const { verre } = lireLeCadre();
     for (const p of resultat.fichiers.filter((f) => f.carte)) {
       const svg = svgDeLaCarte(p.carte, { verre });
       const dessine = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' · ');
@@ -286,7 +286,7 @@ test.describe('d’un passage à l’autre', () => {
     const charger = () => chargerLeRendu({ polices: Object.values(lesPolices()) });
     const [premier, second] = [await charger(), await charger()];
     expect(premier.rendu.signature).toBe(second.rendu.signature);
-    const { verre } = lireLeCadre(racine);
+    const { verre } = lireLeCadre();
     const vues = [];
     // Le scénario le matin, le soir, la nuit et le lendemain ; la copie des listes publiques, un samedi.
     for (const [source, maintenant, avec] of [
@@ -319,7 +319,7 @@ test.describe('d’un passage à l’autre', () => {
 
   test('une image n’est réécrite que si son texte change : le matin, le soir, la nuit et le lendemain', async () => {
     const sortie = dossierVide();
-    const { verre } = lireLeCadre(racine);
+    const { verre } = lireLeCadre();
     // Le texte dessiné de chaque image d’un passage, par son adresse.
     const textes = (resultat) => new Map(resultat.fichiers.filter((f) => f.carte).map((f) => [`${f.chemin}partage.png`, texteDessine(svgDeLaCarte(f.carte, { verre }))]));
     const ecrites = (resultat) => resultat.ecrits.filter((c) => c.endsWith('partage.png')).sort();

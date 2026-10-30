@@ -33,8 +33,8 @@ export const disque = (couleurs) => {
   return `<svg class="disque" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1" fill="${seconde}"/><path d="M1 1V0A1 1 0 ${part > 0.5 ? 1 : 0} 1 ${point}z" fill="${premiere}"/></svg>`;
 };
 
-// Ce que le cadre lit, une fois : ses mots, ses deux dessins, et les listes du pied. racine : gardée pour les appels
-// d’avant ; le cadre est celui du générateur, quel que soit le site qu’il écrit.
+// Ce que le cadre lit, une fois : ses mots, ses deux dessins, et les listes du pied. Le cadre est celui du générateur
+// (ses fichiers de contenu), quel que soit le site qu’il écrit.
 export const lireLeCadre = () => {
   const suivre = lireJson('suivre.json');
   const noms = lireJson('clubs.json');

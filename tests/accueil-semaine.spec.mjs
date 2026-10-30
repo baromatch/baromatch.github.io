@@ -11,8 +11,9 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
-  accueilAvecLaSemaine, blocDeLaSemaine, controlerLaSemaine, disque, ecrireLAccueil, preparerLAccueil, REPERES,
+  accueilAvecLaSemaine, blocDeLaSemaine, controlerLaSemaine, ecrireLAccueil, preparerLAccueil, REPERES,
 } from '../generateur/accueil.mjs';
+import { disque } from '../generateur/cadre.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { echapper, insecables } from '../generateur/texte.mjs';
 import { racine } from './outils/environnement.mjs';

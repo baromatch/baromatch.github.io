@@ -18,7 +18,8 @@ import { construireEnMemoire } from '../generateur/site.mjs';
 import { fabriquerLesPages, SEUILS } from '../generateur/pages.mjs';
 import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
 import { controlerLaPage, texteVisible } from '../generateur/controle.mjs';
-import { insecables, lireLeCadre, offre as offreAffichee } from '../generateur/gabarits.mjs';
+import { lireLeCadre } from '../generateur/cadre.mjs';
+import { insecables, offre as offreAffichee } from '../generateur/gabarits.mjs';
 import { echapper } from '../generateur/texte.mjs';
 import { auBar } from '../generateur/jsonld.mjs';
 import { construire, verifierLesListes } from '../generateur/construire.mjs';
@@ -465,7 +466,7 @@ test.describe('les pages', () => {
     for (const m of donnees.matchs) m.soirees.reverse();
     for (const b of donnees.bars) b.soirees.reverse();
     donnees.bars.reverse();
-    const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre(racine) });
+    const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre() });
     const nomsDe = (chemin) => [...pages.find((p) => p.chemin === chemin).contenu.matchAll(/<h[345] class="regarder-carte__nom"><a href="\/bar\/[^"]+">([^<]+)<\/a>/g)].map((m) => m[1]);
     // Lyon avant Paris ; à Paris, le 10e avant le 11e (la page de la ville) ; à Lyon 2e, « Au Bon Coin » avant « La Cave des Gones ».
     expect(nomsDe('/matchs/psg-ol-2026-10-25/')).toEqual(['Au Bon Coin', 'La Cave des Gones', 'Le Zinc des Amis']);
@@ -482,7 +483,7 @@ test.describe('les pages', () => {
     const donnees = preparer(brut, { maintenant: VENDREDI, ...contenu, publies: [...PUBLIES_DU_SCENARIO, 'b-lucarne'] });
     for (const b of donnees.bars) b.soirees.reverse();
     donnees.bars.reverse();
-    const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre(racine) });
+    const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre() });
     const paris = pages.find((p) => p.chemin === '/regarder-le-match/paris/').contenu;
     const soirees = paris.split('id="titre-soirees"')[1].split('</section>')[0];
     const lignes = [...soirees.matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]+")?>([^<]+)<\/(?:a|span)> <span class="regarder-matchs__infos"><time[^>]*>[^<]*<\/time> · <a href="\/bar\/[^"]+">([^<]+)<\/a>, ([^<]+)<\/span><\/li>/g)].map((m) => `${m[1]} · ${m[2]}, ${m[3]}`);

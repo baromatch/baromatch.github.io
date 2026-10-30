@@ -322,9 +322,9 @@
 
 /* ---------- Partager la page (match, ville, bar) ---------- */
 
-/* Sous la tête de la page : des capsules de verre, discrètes (l’ambre reste à l’appel à l’action), de 44 px au moins.
-   Aucune animation : rien à couper quand le mouvement est réduit. */
-.partage { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 20px; }
+/* Sous la tête de la page, deux rangées de 44 px avec ou sans partage.js : des capsules de verre discrètes (l’ambre
+   reste à l’appel à l’action), sans animation. */
+.partage { display: grid; justify-items: start; gap: 8px; margin-top: 20px; }
 .partage__bouton {
   display: inline-flex;
   align-items: center;
@@ -343,10 +343,10 @@
   cursor: pointer;
 }
 .partage__bouton:hover { background: rgba(255, 255, 255, 0.14); color: var(--texte); }
-/* L’adresse de la page, en lien : sans JavaScript, ou quand la copie est refusée, elle se copie à la main. */
-.partage__lien { display: inline-block; padding: 11px 0; color: var(--texte-doux); font-size: 0.9375rem; overflow-wrap: anywhere; }
+/* L’adresse de la page, sur une ligne : sans JavaScript, ou si la copie est refusée, elle se copie à la main. */
+.partage__lien { display: block; max-width: 100%; min-height: 44px; padding: 11px 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.375; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .partage [hidden] { display: none; }
-.partage__statut { flex-basis: 100%; margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
+.partage__statut { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
 .partage__statut:empty { display: none; }
 
 /* ---------- Ton club dans ton agenda (agenda/, et la tête d’une page de match) ---------- */

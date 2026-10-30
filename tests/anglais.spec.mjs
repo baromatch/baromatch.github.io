@@ -91,7 +91,7 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
 
   test('chaque page : lang="en", sa tête (adresse canonique, aperçus en anglais), le fil en anglais, le pied du site en français', () => {
     for (const p of anglaises(site)) {
-      expect(p.contenu.startsWith('<!doctype html>\n<html lang="en">'), p.chemin).toBe(true);
+      expect(p.contenu.startsWith('<!doctype html>\n<html lang="en" class="jour">\n'), p.chemin).toBe(true);
       expect(p.contenu).toContain(`<link rel="canonical" href="${ORIGINE}${p.chemin}">`);
       expect(meta(p.contenu, 'og:locale'), p.chemin).toEqual(['en_GB']);
       expect(meta(p.contenu, 'og:url'), p.chemin).toEqual([`${ORIGINE}${p.chemin}`]);
@@ -342,7 +342,10 @@ test.describe('le contrôle et l’écriture', () => {
     // La même phrase sur une page en français n’est pas jugée par cette liste-là.
     const fr = pageDe(site, '/matchs/psg-ol-2026-10-25/');
     expect(avec((h) => h.replace('</main>', '<p>Drinks</p></main>'), fr)).not.toMatch(/boisson/);
-    expect(avec((h) => h.replace('<html lang="en">', '<html lang="fr">'))).toMatch(/<html lang="en"> attendu en tête/);
+    expect(avec((h) => h.replace('<html lang="en" class="jour">', '<html lang="fr" class="jour">'))).toMatch(/<html lang="en" class="jour"> attendu en tête/);
+    // Une page sans le jour (la classe jour de sa balise html) : refusée aussi, en anglais comme en français.
+    expect(avec((h) => h.replace('<html lang="en" class="jour">', '<html lang="en">'))).toMatch(/<html lang="en" class="jour"> attendu en tête/);
+    expect(avec((h) => h.replace('<html lang="fr" class="jour">', '<html lang="fr">'), fr)).toMatch(/<html lang="fr" class="jour"> attendu en tête/);
     // hreflang sur une page en noindex : refusé, en anglais comme en français.
     const lie = avecLesLangues(en.contenu, { autre: { chemin: fr.chemin, langue: 'fr', texte: 'Version française' }, alternatives: [{ hreflang: 'fr', chemin: fr.chemin }, { hreflang: 'en', chemin: en.chemin }] });
     expect(controlerLaPage({ ...en, contenu: lie }).join()).toMatch(/hreflang sur une page en noindex/);

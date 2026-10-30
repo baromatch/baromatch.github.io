@@ -62,11 +62,13 @@ test('les faits qui évitent les erreurs : ce que Baromatch est, ce qu’il n’
   expect(texte).not.toMatch(/pronostic/i);
   expect(texte).toContain('Baromatch n’est pas un diffuseur');
   expect(texte).toContain('Baromatch ne vend pas d’alcool.');
-  // Les clubs : nommés en texte, et sur l’accueil, chacun avec un disque à ses couleurs (les cartes des matchs de la
-  // semaine), gris pour un club dont les couleurs ne sont pas connues (generateur/accueil.mjs, disque--neutre) ; jamais
-  // un écusson ni un logo.
+  // Les clubs : nommés en texte, et sur l’accueil, chacun avec son insigne, celui de l’appli (les cartes des matchs de
+  // la semaine, generateur/insigne.mjs) ; une sélection, son drapeau ; un club inconnu de l’appli, un insigne neutre ;
+  // jamais un écusson ni un logo, ni l’ancien disque.
   expect(texte).not.toContain('en texte seulement');
-  expect(texte).toContain('chaque club a aussi un disque à ses couleurs, gris si elles ne sont pas connues.');
+  expect(texte).toContain('chaque club a aussi son insigne Baromatch, celui de l’appli : ses couleurs, le motif de son maillot et trois lettres de sa ville ou de son quartier.');
+  expect(texte).toContain('Une sélection nationale a les bandes de son drapeau ; un club que l’appli ne connaît pas encore, un insigne neutre avec les premières lettres de son nom.');
+  expect(texte).not.toMatch(/disque/);
   expect(texte).toContain('Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.');
   expect(texte).toContain('L’appli est gratuite pour les fans.');
   expect(texte).toContain('en test sur Android, à Paris');

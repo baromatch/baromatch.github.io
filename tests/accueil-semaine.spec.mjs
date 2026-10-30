@@ -15,6 +15,7 @@ import {
 } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { racine } from './outils/environnement.mjs';
+import { auJourDeLAccueil } from './outils/horloge.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, MAINTENANT_DU_SCENARIO } from './outils/site-genere.mjs';
 
@@ -494,6 +495,9 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
             await construireLeSiteDExemple(site.dossier, { rendu: null, qr: null });
             site.serveur = await demarrerServeur(await portLibre(), -1, { dossier: site.dossier });
             await page.clock.setFixedTime(new Date(MAINTENANT_DU_SCENARIO + 2 * H));
+          } else {
+            // Le jour du bloc enregistré : lu une semaine plus tard, la barre et ses cartes ne seraient plus mesurées.
+            await auJourDeLAccueil(page);
           }
           await page.setViewportSize({ width: largeur, height: 900 });
           await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -574,6 +578,8 @@ test.describe('le jour : le survol, le focus et le pied de page de l’accueil',
 
   for (const largeur of [390, 1280]) {
     test(`au clavier, à ${largeur} px : chaque contour de focus posé sur un fond clair s’en détache à 3:1 au moins`, async ({ page }) => {
+      // Le jour du bloc enregistré : la barre des jours et les cartes du jour choisi passent au clavier.
+      await auJourDeLAccueil(page);
       await page.setViewportSize({ width: largeur, height: 900 });
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto('/');

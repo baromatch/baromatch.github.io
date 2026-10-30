@@ -3,7 +3,7 @@
 // et le bouton de la liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… pas encore ouverte »).
 // La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque.
 import { test, expect } from '@playwright/test';
-import { arreterLHorloge } from './outils/horloge.mjs';
+import { arreterLHorloge, auJourDeLAccueil } from './outils/horloge.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
@@ -197,6 +197,8 @@ const deuxImages = (page) => page.evaluate(() => new Promise((suite) => requestA
 for (const largeur of [360, 1280]) {
   test(`à ${largeur} px : le bouton du film l’arrête au clavier, juste après les matchs de la semaine, et la pause tient en revenant au film`, async ({ page }) => {
     await simulerUnLecteur(page);
+    // Le jour du bloc enregistré : une semaine après, la barre des jours et ses cartes s’effacent (main.js).
+    await auJourDeLAccueil(page);
     await page.setViewportSize({ width: largeur, height: 800 });
     await page.goto('/');
     const lecture = page.locator('#film-lecture');

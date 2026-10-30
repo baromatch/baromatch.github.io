@@ -11,6 +11,12 @@ export const attendreLaPageFinie = async (onglet) => {
   });
 };
 
+// La police est arrivée : le cœur de Bricolage Grotesque est chargé, et plus aucune police n’est en chemin. Pas
+// « chaque police chargée » : les deux autres fichiers de Bricolage Grotesque et la police de secours (styles.css) restent
+// « unloaded » tant que la page n’en a pas besoin. À passer à waitForFunction.
+export const laPoliceEstLa = () => [...document.fonts].some((police) => police.family === 'Bricolage Grotesque' && police.status === 'loaded')
+  && [...document.fonts].every((police) => police.status !== 'loading');
+
 // « Pour les bars » lente, comme sur une machine chargée : sa police (demandée dès la tête, en préchargement)
 // retenue 1,5 s. Le premier affichage vient alors avant « load » (la police s’affiche en remplacement, font-display:
 // swap), et l’amorce demande la feuille et le script pendant que la page charge encore ; une feuille ou un script que le

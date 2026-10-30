@@ -155,17 +155,19 @@ test.describe('le bloc, du générateur', () => {
   test('des bars publiés, aucun le jour choisi : sous la phrase, une ligne nomme le prochain match dans un bar (sa date, son heure, ses bars) avec « Voir les bars » ; sans bar publié, ou quand le jour choisi a le sien, aucune', () => {
     const avec = bloc({ bars: [{ id: 'b1' }] });
     // Jeudi 29 n’a que Fiorentina – Atalanta, sans bar : la ligne nomme OL – Angers, samedi.
-    expect(avec).toContain(`<p class="semaine__chapo">${textes.accueil.avecBars}</p>\n<p class="semaine__prochain" data-jour="2026-10-31">Le prochain match dans un bar\u00a0: OL – Angers, <time datetime="2026-10-31T20:45:00+01:00">samedi 31 octobre · 20:45</time>, 2 bars à Paris. <a class="semaine__voir" href="/matchs/ol-angers-2026-10-31/#titre-bars">Voir les bars<span class="visuellement-cache">\u00a0: OL – Angers</span></a></p>`);
+    expect(avec).toContain(`<p class="semaine__chapo">${textes.accueil.avecBars}</p>\n<p class="semaine__prochain" data-jour="2026-10-31">Le prochain match dans un bar\u00a0: OL – Angers, <time datetime="2026-10-31T20:45:00+01:00">samedi 31 octobre\u00a0· 20:45</time>, 2 bars à Paris. <a class="semaine__voir" href="/matchs/ol-angers-2026-10-31/#titre-bars">Voir les bars<span class="visuellement-cache">\u00a0: OL – Angers</span></a></p>`);
     expect(avec.match(/semaine__prochain/g)).toHaveLength(1);
     expect(controlerLaSemaine(avec)).toEqual([]);
     // Demain, il est dit par sa date, jamais « demain » : la ligne reste vraie lue un autre jour. 1 bar, au singulier
     // (la règle des cartes) ; des bars dans plusieurs villes, le nombre seul.
     const demain = [...MATCHS, unMatch({ slug: 'brest-lens-2026-10-30', debut: '2026-10-30T19:00:00Z', domicile: club('brest', 'Brest'), exterieur: club('lens', 'Lens'), soirees: [soiree('Paris')] })];
     const ligne = bloc({ matchs: demain, bars: [{ id: 'b1' }] }).match(/<p class="semaine__prochain"[^]*?<\/p>/)[0];
-    expect(ligne).toContain('data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Brest – Lens, <time datetime="2026-10-30T20:00:00+01:00">vendredi 30 octobre · 20:00</time>, 1 bar à Paris.');
+    expect(ligne).toContain('data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Brest – Lens, <time datetime="2026-10-30T20:00:00+01:00">vendredi 30 octobre\u00a0· 20:00</time>, 1 bar à Paris.');
     expect(ligne).not.toMatch(/demain|aujourd/i);
+    // « · » ne commence jamais une ligne : une espace insécable le tient à la date.
+    expect(ligne).not.toMatch(/ ·/);
     const ailleurs = MATCHS.map((m) => (m.slug === 'ol-angers-2026-10-31' ? { ...m, soirees: [soiree('Paris'), soiree('Lyon'), soiree('Lyon')] } : m));
-    expect(bloc({ matchs: ailleurs, bars: [{ id: 'b1' }] })).toContain('samedi 31 octobre · 20:45</time>, 3 bars. <a class="semaine__voir"');
+    expect(bloc({ matchs: ailleurs, bars: [{ id: 'b1' }] })).toContain('samedi 31 octobre\u00a0· 20:45</time>, 3 bars. <a class="semaine__voir"');
     // Sans bar publié : aucune ligne. Le jour choisi a déjà son match dans un bar : aucune. Seul un match reporté a des
     // bars : aucune.
     expect(bloc()).not.toContain('semaine__prochain');
@@ -181,7 +183,7 @@ test.describe('le bloc, du générateur', () => {
       return blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
     };
     const lundi = Date.parse('2026-10-26T08:00:00Z');
-    expect(await blocDuScenario(lundi)).toContain('<p class="semaine__prochain" data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Le Havre – PSG, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre · 19:00</time>, 1 bar à Paris. <a class="semaine__voir" href="/matchs/le-havre-psg-2026-10-30/#titre-bars">');
+    expect(await blocDuScenario(lundi)).toContain('<p class="semaine__prochain" data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Le Havre – PSG, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre\u00a0· 19:00</time>, 1 bar à Paris. <a class="semaine__voir" href="/matchs/le-havre-psg-2026-10-30/#titre-bars">');
     expect(await blocDuScenario(lundi, [])).not.toContain('semaine__prochain');
     expect(await blocDuScenario(MAINTENANT_DU_SCENARIO)).not.toContain('semaine__prochain');
   });

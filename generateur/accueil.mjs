@@ -96,9 +96,10 @@ export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) 
     ? `\n<p class="semaine__liens"><a href="#attente">${e(t.sansBarLien)}</a><a href="/pour-les-bars.html#proposer">${e(t.sansBarProposer)}</a></p>` : ''}`;
   // Des bars publiés, mais aucun match qu’un bar diffuse le jour choisi : une ligne sous la phrase nomme le prochain,
   // par sa date (jamais « demain » : lue un autre jour, elle reste vraie ; main.js l’efface une fois ce jour passé),
-  // son heure et ses bars, avec « Voir les bars ». Sans elle, son match restait derrière un jour à deviner.
+  // son heure et ses bars, avec « Voir les bars ». Sans elle, son match restait derrière un jour à deviner. Une espace
+  // insécable avant « · » : la ligne ne se coupe jamais sur « · 20:45 » (à 320 px, texte à 200 %).
   const prochain = (sansAucunBar || semaine.find((j) => j.jour === choisi)?.matchs.some(avecBars)) ? null : semaine.flatMap((j) => j.matchs).find(avecBars);
-  const ligneDuProchain = prochain ? `\n<p class="semaine__prochain" data-jour="${jourDeParis(prochain.debut)}">${remplir(e(t.prochainDansUnBar), { match: e(nomDe(prochain)), quand: quand(prochain), bars: e(lesBars(prochain)) })} <a class="semaine__voir" href="${cheminDuMatch(prochain)}#titre-bars">${e(t.voirLesBars)}<span class="visuellement-cache"> : ${e(nomDe(prochain))}</span></a></p>` : '';
+  const ligneDuProchain = prochain ? `\n<p class="semaine__prochain" data-jour="${jourDeParis(prochain.debut)}">${remplir(e(t.prochainDansUnBar), { match: e(nomDe(prochain)), quand: quand(prochain).replace(' · ', '\u00a0· '), bars: e(lesBars(prochain)) })} <a class="semaine__voir" href="${cheminDuMatch(prochain)}#titre-bars">${e(t.voirLesBars)}<span class="visuellement-cache"> : ${e(nomDe(prochain))}</span></a></p>` : '';
 
   const nomDuJour = ({ jour, i }) => (i === 0 ? t.aujourdhui : i === 1 ? t.demain : jourCourt.format(new Date(`${jour}T12:00:00Z`)));
   // La puce d’un jour dit combien de matchs ; s’il y en a qu’un bar diffuse, un point devant (de la couleur du texte :

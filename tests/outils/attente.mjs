@@ -1,3 +1,5 @@
+import { test } from '@playwright/test';
+
 // Attendre qu’une page soit finie avant de mesurer ce qui est sous le premier écran.
 // Sur « Pour les bars », pour-les-bars-amorce.js ne demande le formulaire et pour-les-bars.css qu’après le premier
 // affichage, donc après la fin du goto() : sans cette attente, un test lit le formulaire encore invisible et la page
@@ -43,4 +45,33 @@ export const chargerLesImages = async (onglet) => {
   });
   await onglet.waitForFunction(() => [...document.images].filter((image) => image.getClientRects().length > 0)
     .every((image) => image.complete));
+};
+
+// Ouvrir une page et ne la mesurer qu’entière : chacune de ses feuilles de style (<link rel="stylesheet">) chargée et
+// lue. Sous une forte charge (la suite entière, deux contrôles à la fois sur une machine de 4 cœurs), une requête de
+// /styles.css s’est perdue en route une fois sur neuf passages : le navigateur abandonne la feuille, et ouvre quand même
+// la page, sans elle (« load » n’attend pas une feuille en échec) ; le test des villes mesurait alors des puces de
+// 18 px au lieu de 44. Seule, la même page s’ouvre entière à chaque fois (400 ouvertures, aucune requête perdue). Une
+// page incomplète est donc rechargée, une fois, et le rapport du test le note (la feuille, l’erreur du navigateur) ;
+// incomplète encore, l’ouverture échoue en les nommant. Ce que le test mesure reste la page telle que le site la sert.
+const feuillesManquantes = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('link[rel="stylesheet"]')]
+  .filter((lien) => !lien.sheet || lien.sheet.cssRules.length === 0)
+  .map((lien) => new URL(lien.href).pathname));
+
+export const ouvrirEntiere = async (onglet, adresse) => {
+  const perdues = [];
+  const noter = (requete) => perdues.push(`${new URL(requete.url()).pathname} (${requete.failure()?.errorText ?? 'échec'})`);
+  onglet.on('requestfailed', noter);
+  try {
+    await onglet.goto(adresse);
+    let manquantes = await feuillesManquantes(onglet);
+    if (!manquantes.length) return;
+    test.info().annotations.push({ type: 'page rechargée', description: `${manquantes.join(', ')} manquait ; requêtes perdues : ${perdues.join(', ') || 'aucune'}` });
+    perdues.length = 0;
+    await onglet.reload();
+    manquantes = await feuillesManquantes(onglet);
+    if (manquantes.length) throw new Error(`Page incomplète deux fois de suite : ${manquantes.join(', ')} ne s’est pas chargée (requêtes perdues : ${perdues.join(', ') || 'aucune'})`);
+  } finally {
+    onglet.off('requestfailed', noter);
+  }
 };

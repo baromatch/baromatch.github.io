@@ -77,13 +77,13 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // listes publiques (20 cartes sur ses sept jours, 40 insignes, et non 25), 164 Ko transférés sans les insignes, 182 avec
 // (les insignes de l’appli ajoutent environ 18 à 21 Ko compressés, surtout les tracés de leurs lettres) ; seuil 185.
 // Lighthouse au téléphone reste à 99-100 sur l’accueil réel.
-// 30 octobre 2026, après relecture des insignes : les affiches gagnent leurs insignes à l’impression et la paire du
+// 30 octobre 2026, les insignes à l’impression : les affiches gagnent leurs insignes imprimés et la paire du
 // prochain match d’un bar (affiche.css de 16 915 à 17 474 octets, ses commentaires raccourcis) : leur CSS mesure
 // 107,22 Ko (109 797 octets), seuil de 106 à 107. Les pages générées mesurent 90,36 Ko (92 524 octets), l’accueil et les
 // pages fixes 73,20 Ko (74 954 octets) : leurs seuils restent.
-// 30 octobre 2026, après relecture des insignes : la semaine pleine est celle de l’accueil réel de ce jour
-// (tests/donnees/semaine-pleine.json : 25 matchs, 50 insignes, relus dans l’état enregistré du site). Mesurée : 186,09 Ko
-// transférés (190 559 octets ; 186,00 avant les corrections) : seuil 187.
+// 30 octobre 2026, la semaine pleine : celle de l’accueil réel de ce jour (tests/donnees/semaine-pleine.json : 25 matchs,
+// 50 insignes, relus dans l’état enregistré du site), à la place de la copie des listes publiques (20 cartes). Mesurée :
+// 186,09 Ko transférés (190 559 octets) : seuil 187.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 18, css: 73, images: 24 } },

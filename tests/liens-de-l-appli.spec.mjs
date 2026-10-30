@@ -41,3 +41,44 @@ test('servi tel quel : 200, en JSON, sans redirection', async ({ request }) => {
   expect(reponse.headers()['content-type']).toMatch(/^application\/json/);
   expect(await reponse.json()).toEqual(lire());
 });
+
+// ---------- L’iPhone ----------
+// /.well-known/apple-app-site-association (sans extension : c’est le nom qu’Apple lit) dit à l’iPhone que les mêmes
+// liens https://baromatch.fr/t/… s’ouvrent dans l’appli fr.baromatch.app du compte de développeur Apple qu’il nomme
+// par son identifiant (le Team ID). Un identifiant faux ou un texte « à remplir » ne casse rien d’autre, mais l’iPhone
+// ouvre alors le lien dans le navigateur : ce test refuse tout ce qui n’a pas la forme d’un vrai Team ID, et la doc
+// (DOC) le nomme, avec l’endroit et la date où il a été lu.
+const FICHIER_IPHONE = path.join(racine, '.well-known', 'apple-app-site-association');
+// Le Team ID (10 capitales ou chiffres), un point, puis l’appli : un texte à remplir à sa place n’en a pas la forme.
+const IDENTIFIANT = /^[A-Z0-9]{10}\.fr\.baromatch\.app$/;
+
+const lireIphone = () => JSON.parse(readFileSync(FICHIER_IPHONE, 'utf8'));
+
+test('iPhone : une seule entrée, pour fr.baromatch.app et un vrai Team ID, que la doc nomme', () => {
+  const association = lireIphone();
+  expect(Object.keys(association)).toEqual(['applinks']);
+  const { details } = association.applinks;
+  expect(details).toHaveLength(1);
+  const { appIDs } = details[0];
+  expect(appIDs, 'un seul identifiant : un vrai Team ID, puis fr.baromatch.app').toEqual([expect.stringMatching(IDENTIFIANT)]);
+  // L’identifiant entier, Team ID compris : c’est ce que la doc dit de lire chez Apple pour vérifier.
+  const [appId] = appIDs;
+  expect(readFileSync(DOC, 'utf8'), `${appId} : la doc ne dit pas d’où vient ce Team ID`).toContain(appId);
+});
+
+test('iPhone : seuls les liens de tablée, /t/…, s’ouvrent dans l’appli', () => {
+  const { components } = lireIphone().applinks.details[0];
+  // Comme sur Android : rien d’autre du site ne s’ouvre dans l’appli, et ce chemin-là n’est pas exclu.
+  expect(components.map((composant) => composant['/'])).toEqual(['/t/*']);
+  expect(components.filter((composant) => composant.exclude)).toEqual([]);
+});
+
+test('iPhone : servi tel quel, 200, sans redirection, le fichier exact', async ({ request }) => {
+  expect(existsSync(path.join(racine, '.nojekyll'))).toBe(true);
+  const reponse = await request.get('/.well-known/apple-app-site-association', { maxRedirects: 0 });
+  expect(reponse.status()).toBe(200);
+  // Pas de type exigé ici, contrairement à assetlinks.json : un fichier sans extension part en
+  // application/octet-stream, du serveur local comme de GitHub Pages, et le CDN d’Apple, qui lit le fichier pour les
+  // iPhone, l’accepte ainsi.
+  expect(await reponse.text()).toBe(readFileSync(FICHIER_IPHONE, 'utf8'));
+});

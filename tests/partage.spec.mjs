@@ -11,6 +11,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { CAS_DU_PARTAGE, montresAttendus, partageArriveTard, SANS_LE_SCRIPT } from './outils/partage-tard.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, PUBLIES_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
@@ -583,63 +584,37 @@ test.describe('le bloc « Partager »', () => {
     expect(await onglet.evaluate(() => window.__copies)).toEqual([canonique(MATCH)]);
   });
 
-  test('la copie refusée : l’adresse revient en lien, et la page dit comment la copier', async ({ page: onglet }) => {
+  test('la copie refusée : l’adresse revient en lien, sous « Copier le lien » sans le recouvrir, et la page dit comment la copier', async ({ page: onglet }) => {
     await sansLeBoutonDuTelephone(onglet, { copieRefusee: true });
     const { copier, lien, statut } = await ouvrir(onglet);
     await copier.click();
     await expect(statut).toHaveText('Copie impossible : appuie longtemps sur le lien pour le copier.'.replace(' :', ' :'));
     await expect(lien).toBeVisible();
+    await expect(copier).toBeVisible();
+    const [boiteDuBouton, boiteDuLien] = [await copier.boundingBox(), await lien.boundingBox()];
+    expect(boiteDuLien.y).toBeGreaterThanOrEqual(boiteDuBouton.y + boiteDuBouton.height);
   });
 
-  // Le bloc a la même hauteur avant et après partage.js (deux rangées : le partage, puis la copie ou le lien) : quand le
-  // script arrive après le premier affichage, rien ne bouge en dessous. partage.js retardé d’une seconde, la page se
-  // peint, puis la somme des décalages (layout-shift, hors réponse à un geste) doit être nulle : avec le bouton du
-  // téléphone, sans lui, sans presse-papiers, et sans l’un ni l’autre.
-  const CAS = [
-    { nom: 'le bouton du téléphone et le presse-papiers', partager: true, copier: true },
-    { nom: 'le bouton du téléphone sans presse-papiers', partager: true, copier: false },
-    { nom: 'sans le bouton du téléphone', partager: false, copier: true },
-    { nom: 'sans le bouton du téléphone ni presse-papiers', partager: false, copier: false },
-  ];
-  const decalagesQuandPartageArriveTard = async (browser, { chemin = MATCH, largeur, cas }) => {
-    const contexte = await browser.newContext({ viewport: { width: largeur, height: 800 } });
-    const onglet = await contexte.newPage();
-    await onglet.addInitScript(({ partager, copier }) => {
-      if (partager) Object.defineProperty(Navigator.prototype, 'share', { configurable: true, value: async () => {} });
-      else delete Navigator.prototype.share;
-      Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => (copier ? { writeText: async () => {} } : undefined) });
-      window.__decalages = 0;
-      new PerformanceObserver((liste) => {
-        for (const entree of liste.getEntries()) if (!entree.hadRecentInput) window.__decalages += entree.value;
-      }).observe({ type: 'layout-shift', buffered: true });
-    }, cas);
-    await onglet.route('**/partage.js', async (route) => {
-      await new Promise((resoudre) => { setTimeout(resoudre, 1000); });
-      await route.continue();
-    });
-    await onglet.goto(`${serveur.adresse}${chemin}`, { waitUntil: 'load' });
-    await onglet.evaluate(() => new Promise((resoudre) => { requestAnimationFrame(() => requestAnimationFrame(resoudre)); }));
-    await onglet.waitForTimeout(300);
-    // Le script a bien tourné : le bon bouton est là, et la bonne seconde rangée.
-    await expect(onglet.locator(cas.partager ? '.partage__natif' : '.partage__whatsapp')).toBeVisible();
-    await expect(onglet.locator(cas.copier ? '.partage__copier' : '.partage__lien')).toBeVisible();
-    const decalages = await onglet.evaluate(() => window.__decalages);
-    await contexte.close();
-    return decalages;
-  };
-  for (const cas of CAS) {
-    test(`le bloc ne fait rien bouger quand partage.js arrive tard : ${cas.nom}, à 320, 390, 412 et 1280 px`, async ({ browser }) => {
-      for (const largeur of [320, 390, 412, 1280]) {
-        expect(await decalagesQuandPartageArriveTard(browser, { largeur, cas }), `${largeur} px`).toBe(0);
-      }
-    });
-  }
-  test('les autres pages qui ont ce bloc (une ville, un bar, « Ce soir », en anglais) : rien ne bouge non plus', async ({ browser }) => {
-    for (const chemin of ['/regarder-le-match/paris/', '/bar/le-zinc-des-amis-paris-11/', '/ce-soir/', '/en/matches/psg-ol-2026-10-25/', '/en/']) {
-      expect(await decalagesQuandPartageArriveTard(browser, { chemin, largeur: 390, cas: CAS[0] }), `${chemin}, 390 px`).toBe(0);
-      expect(await decalagesQuandPartageArriveTard(browser, { chemin, largeur: 1280, cas: CAS[3] }), `${chemin}, 1280 px`).toBe(0);
+  // Le bloc a la même taille avant et après partage.js : deux rangées (le partage, puis la copie ou le lien), chacune
+  // avec ses deux possibles, l’un caché mais à sa place. Quand le script arrive après le premier affichage, rien ne bouge
+  // (aucun décalage hors réponse à un geste, ni la hauteur du bloc, ni ce qui le suit), à toute taille de texte ; avant
+  // lui, WhatsApp et l’adresse ; après lui, les bons boutons, et seulement eux. Les quatre cas (le bouton du téléphone,
+  // le presse-papiers, l’un, l’autre, aucun ; tests/outils/partage-tard.mjs), à 320, 390, 412 et 1280 px, le texte à
+  // 100, 125, 150 et 200 %, sur chaque sorte de page qui a ce bloc : un match, une ville, un bar, « Ce soir », un match
+  // et Paris en anglais.
+  const PAGES_DU_BLOC = [MATCH, '/regarder-le-match/paris/', '/bar/le-zinc-des-amis-paris-11/', '/ce-soir/', '/en/matches/psg-ol-2026-10-25/', '/en/'];
+  for (const chemin of PAGES_DU_BLOC) {
+    for (const cas of CAS_DU_PARTAGE) {
+      test(`${chemin}, partage.js en retard, ${cas.nom} : rien ne bouge à 320, 390, 412 et 1280 px, le texte de 100 à 200 %, et les bons boutons se montrent`, async ({ browser }) => {
+        const attendu = { decalages: 0, bouge: { hauteur: 0, dessous: 0 }, avant: SANS_LE_SCRIPT, apres: montresAttendus(cas) };
+        for (const largeur of [320, 390, 412, 1280]) {
+          for (const texte of [100, 125, 150, 200]) {
+            expect(await partageArriveTard(browser, `${serveur.adresse}${chemin}`, { largeur, texte, cas }), `${largeur} px, texte à ${texte} %`).toEqual(attendu);
+          }
+        }
+      });
     }
-  });
+  }
 
   test('des cibles de 44 px, sans animation, à 360 px comme au bureau', async ({ browser }) => {
     for (const largeur of [360, 1280]) {

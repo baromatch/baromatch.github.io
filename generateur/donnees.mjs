@@ -94,24 +94,27 @@ export const indexerLesClubs = (clubs) => {
   const index = new Map();
   for (const [cle, club] of Object.entries(clubs)) {
     if (cle.startsWith('_')) continue;
-    for (const nomDansLAppli of club.slugs) index.set(nomDansLAppli, { cle, court: club.court, nom: club.nom });
+    for (const nomDansLAppli of club.slugs) index.set(nomDansLAppli, { cle, court: club.court, nom: club.nom, slug: club.slugs[0] });
   }
   return index;
 };
 
-// Un club des données → { cle, court, nom } : la clé sert à l’adresse et aux doublons, « court » s’affiche partout,
-// « nom » est le nom complet. Un nom sans lettre latine (« Шахтар Донецьк ») ne donne aucune adresse : la clé est
-// celle que l’appli donne au club, sinon une clé stable faite du nom (« club-1a2b3c4d »), qui reconnaît le club d’un
-// match à l’autre sans le confondre avec un autre ; le match prend alors son identifiant pour adresse (sansAdresse).
+// Un club des données → { cle, court, nom, slug } : la clé sert à l’adresse et aux doublons, « court » s’affiche
+// partout, « nom » est le nom complet, « slug » le nom du club dans l’appli, celui de son insigne (insigne.mjs) : pour un
+// club de clubs.json, le premier de ses noms (deux noms d’un même club, un seul insigne) ; sinon celui des données. Un
+// nom sans lettre latine (« Шахтар Донецьк ») ne donne aucune adresse : la clé est celle que l’appli donne au club,
+// sinon une clé stable faite du nom (« club-1a2b3c4d »), qui reconnaît le club d’un match à l’autre sans le confondre
+// avec un autre ; le match prend alors son identifiant pour adresse (sansAdresse).
 export const clubDe = (index, clubBrut, nomEquipe) => {
   const nomDansLAppli = clubBrut?.slug || slug(nomEquipe);
   const connu = index.get(nomDansLAppli);
   const nom = connu?.nom ?? clubBrut?.canonicalName ?? nomEquipe ?? '';
-  if (connu) return { cle: connu.cle, court: connu.court, nom };
+  if (connu) return { cle: connu.cle, court: connu.court, nom, slug: connu.slug };
   const court = sansSigles(nom);
+  const insigne = clubBrut?.slug ? { slug: clubBrut.slug } : {};
   const cle = slug(court) || slug(clubBrut?.slug);
-  if (cle) return { cle, court, nom };
-  return { cle: `club-${createHash('sha256').update(nom).digest('hex').slice(0, 8)}`, court, nom, sansAdresse: true };
+  if (cle) return { cle, court, nom, ...insigne };
+  return { cle: `club-${createHash('sha256').update(nom).digest('hex').slice(0, 8)}`, court, nom, ...insigne, sansAdresse: true };
 };
 
 // ---------- Les matchs ----------

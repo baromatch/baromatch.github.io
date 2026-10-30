@@ -8,6 +8,7 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { sansInsignes } from './outils/insignes.mjs';
 import { contenuDuScenario, PUBLIES_DU_SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { lireLaSource } from '../generateur/sources.mjs';
@@ -206,9 +207,13 @@ test.describe('les données', () => {
     const havre = donnees.matchs.filter((m) => [m.domicile.cle, m.exterieur.cle].includes('le-havre'));
     expect(havre.map((m) => [m.domicile.court, m.domicile.nom])).toEqual([['Le Havre', 'Le Havre AC'], ['Le Havre', 'Le Havre AC']]);
 
+    // Le nom du club dans l’appli, celui de son insigne : pour un club de clubs.json, le premier de ses noms (Havre AC
+    // a l’insigne du Havre) ; sinon celui des données ; aucun sans données.
     const index = indexerLesClubs(contenu.clubs);
-    expect(clubDe(index, { slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' })).toEqual({ cle: 'psg', court: 'PSG', nom: 'Paris Saint-Germain' });
-    expect(clubDe(index, { slug: 'fk-bod-glimt', canonicalName: 'FK Bodø/Glimt' })).toEqual({ cle: 'bodo-glimt', court: 'Bodø/Glimt', nom: 'FK Bodø/Glimt' });
+    expect(clubDe(index, { slug: 'paris-saint-germain', canonicalName: 'Paris Saint-Germain' })).toEqual({ cle: 'psg', court: 'PSG', nom: 'Paris Saint-Germain', slug: 'paris-saint-germain' });
+    expect(clubDe(index, { slug: 'havre-ac', canonicalName: 'Havre AC' })).toEqual({ cle: 'le-havre', court: 'Le Havre', nom: 'Le Havre AC', slug: 'le-havre-ac' });
+    expect(clubDe(index, { slug: 'fk-bod-glimt', canonicalName: 'FK Bodø/Glimt' })).toEqual({ cle: 'bodo-glimt', court: 'Bodø/Glimt', nom: 'FK Bodø/Glimt', slug: 'fk-bod-glimt' });
+    expect(clubDe(index, null, 'Como 1907')).toEqual({ cle: 'como-1907', court: 'Como 1907', nom: 'Como 1907' });
     expect(clubDe(index, { slug: 'sk-sturm-graz', canonicalName: 'SK Sturm Graz' }).court).toBe('Sturm Graz');
     expect(clubDe(index, null, 'Como 1907').court).toBe('Como 1907');
     // Chaque club de la copie de ce soir a un nom court sans sigle (sauf le Paris FC, dont c’est le nom).
@@ -242,7 +247,7 @@ test.describe('les données', () => {
     expect(site.refusees.map((p) => p.chemin)).toEqual([]);
     const page = site.pages.find((p) => p.chemin === '/matchs/match-cmshakhtar01-2026-10-26/');
     expect(page.contenu).toContain('<p class="regarder-affiche">Шахтар Донецьк – Динамо Київ</p>');
-    expect(page.contenu).toContain('<a class="regarder-matchs__match" href="/matchs/match-cmpsg03-2026-10-29/">Шахтар Донецьк – PSG</a>');
+    expect(sansInsignes(page.contenu)).toContain('<a class="regarder-matchs__match" href="/matchs/match-cmpsg03-2026-10-29/">Шахтар Донецьк – PSG</a>');
   });
 
   test('l’heure de Paris, des deux côtés du changement d’heure du 25 octobre', async () => {
@@ -485,7 +490,7 @@ test.describe('les pages', () => {
     const { pages } = fabriquerLesPages({ donnees, contenu, cadre: lireLeCadre(racine) });
     const paris = pages.find((p) => p.chemin === '/regarder-le-match/paris/').contenu;
     const soirees = paris.split('id="titre-soirees"')[1].split('</section>')[0];
-    const lignes = [...soirees.matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]+")?>([^<]+)<\/(?:a|span)> <span class="regarder-matchs__infos"><time[^>]*>[^<]*<\/time> · <a href="\/bar\/[^"]+">([^<]+)<\/a>, ([^<]+)<\/span><\/li>/g)].map((m) => `${m[1]} · ${m[2]}, ${m[3]}`);
+    const lignes = [...sansInsignes(soirees).matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]+")?>([^<]+)<\/(?:a|span)> <span class="regarder-matchs__infos"><time[^>]*>[^<]*<\/time> · <a href="\/bar\/[^"]+">([^<]+)<\/a>, ([^<]+)<\/span><\/li>/g)].map((m) => `${m[1]} · ${m[2]}, ${m[3]}`);
     expect(lignes).toEqual([
       'PSG – Barça · Le Comptoir du Canal, Paris 10e',
       'PSG – Barça · À la Lucarne, Paris 11e',
@@ -687,12 +692,12 @@ test.describe('les pages', () => {
     expect(p.indexable).toBe(true);
     const ceSoir = p.contenu.split('id="titre-ce-soir">')[1].split('</section>')[0];
     expect(ceSoir).toMatch(/^Aujourd’hui, vendredi 23 octobre<\/h2>/);
-    expect(ceSoir).toContain('<a class="regarder-matchs__match" href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
+    expect(sansInsignes(ceSoir)).toContain('<a class="regarder-matchs__match" href="/matchs/brest-nice-2026-10-23/">Brest – Nice</a>');
     expect(ceSoir).toContain('1 bar à Lyon');
     expect(p.contenu).toContain('<h2 id="jour-2026-10-25">Dimanche 25 octobre</h2>');
     // Sous le titre du jour, la ligne ne répète pas la date : l’heure seule, la date complète dans datetime.
-    expect(p.contenu).toMatch(/PSG – OL<\/a> <span class="regarder-matchs__infos"><time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
-    expect(p.contenu).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
+    expect(sansInsignes(p.contenu)).toMatch(/PSG – OL<\/a> <span class="regarder-matchs__infos"><time datetime="2026-10-25T20:45:00\+01:00">20:45<\/time> · Ligue 1 · <span class="regarder-compte"><a href="\/regarder-le-match\/lyon\/">1 bar à Lyon<\/a>, <a href="\/regarder-le-match\/paris\/">1 bar à Paris<\/a><\/span>/);
+    expect(sansInsignes(p.contenu)).toMatch(/Lille – Lens<\/a>[^\n]*Pas encore de bar/);
     // Sept jours : le jeudi 29 en est le dernier, le vendredi 30 n’y est pas.
     expect(p.contenu).not.toContain('jour-2026-10-30');
     // Le titre de la page dit ce que dit son h1 (la semaine, pas « ce soir », qui a sa page), entre 15 et 60 caractères.
@@ -873,7 +878,8 @@ test.describe('les pages', () => {
     brut.matches = brut.matches.map((m) => (m.id === 'm-psg-ol' ? { ...m, status: 'POSTPONED' } : m.id === 'm-lehavre-psg' ? { ...m, status: 'CANCELLED' } : m));
     const enMemoire = (instant, anciens) => construireEnMemoire({ brut: structuredClone(brut), maintenant: Date.parse(instant), racine, contenu, anciens });
     const autre = await enMemoire('2026-10-23T08:00:00Z');
-    const page = (chemin) => autre.pages.find((p) => p.chemin === chemin).contenu;
+    // Chaque page sans ses insignes (décoratifs) : ses lignes se lisent par le nom de leur match.
+    const page = (chemin) => sansInsignes(autre.pages.find((p) => p.chemin === chemin).contenu);
     const ligneDe = (html, debut) => html.split('\n').find((l) => l.includes(debut));
     const reporte = '<strong>Match reporté</strong>';
     const annule = '<strong>Match annulé</strong>';

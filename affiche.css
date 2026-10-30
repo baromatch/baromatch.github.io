@@ -1,13 +1,8 @@
-/* Baromatch — les affiches à imprimer : l’affiche des matchs de la semaine (/matchs/affiche/), l’affiche de chaque
-   bar publié (/bar/<bar>/affiche/) et la feuille à laisser au patron (/matchs/affiche/pour-le-patron/), écrites par le
-   générateur (generateur/affiche.mjs, generateur/feuille-du-patron.mjs). Elles reprennent styles.css et regarder.css ;
-   ici, la feuille et son impression.
-   À l’écran : la nuit du site, et l’affiche en aperçu sur une feuille blanche.
-   À l’impression : seulement la feuille, papier blanc, encre noire, une seule touche d’ambre (le verre de la marque).
-   Une affiche pleine nuit viderait la cartouche d’un bar. Seules les lignes cochées s’impriment ; si rien n’est coché,
-   toutes. Un navigateur sans :has() imprime tous les matchs : rien ne casse. La taille du papier n’est pas fixée
-   (@page size bloquerait le choix A4 / A3 dans la fenêtre d’impression) : le bouton A3 agrandit tout (--echelle).
-   Aucun script, aucune animation. Les chiffres sont tabulaires. */
+/* Baromatch — les affiches à imprimer (de la semaine, de chaque bar publié, la feuille du patron ; generateur/affiche.mjs,
+   generateur/feuille-du-patron.mjs), par-dessus styles.css et regarder.css. À l’écran, la feuille en aperçu ; imprimée,
+   la feuille seule, encre noire sur blanc (une pleine nuit viderait la cartouche), une touche d’ambre. Seules les lignes
+   cochées s’impriment (rien de coché, ou sans :has() : toutes). Le papier n’est pas fixé (@page size bloquerait A4 / A3) :
+   le bouton A3 agrandit tout (--echelle). Ni script, ni animation ; chiffres tabulaires. */
 
 /* ---------- Le choix du papier ---------- */
 
@@ -86,10 +81,16 @@
 label.affiche-ligne__texte { cursor: pointer; }
 .affiche-heure { grid-area: heure; white-space: nowrap; font-size: 1.5rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
 .affiche-heure--a-confirmer { align-self: center; white-space: normal; font-size: 0.8125rem; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
-.affiche-match { grid-area: match; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
+/* Les insignes devant le nom, ou au-dessus (toujours sous 560 px) ; l’heure au-dessus d’une ligne trop étroite. */
+.affiche-match { grid-area: match; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
+.affiche-match__nom { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 559.98px) { .affiche-match { flex-direction: column; align-items: flex-start; } }
+.affiche-ligne { container-type: inline-size; }
+@container (max-width: calc(4.25rem + 126px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
 .affiche-competition { grid-area: competition; color: var(--encre-douce); font-size: 0.875rem; font-weight: 600; }
+/* La compétition : 40 % au plus (texte agrandi). */
 @media (min-width: 720px) {
-  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) auto; grid-template-areas: "heure match competition"; }
+  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(40%); grid-template-areas: "heure match competition"; }
   .affiche-competition { text-align: right; }
 }
 /* Ce qui sera imprimé : la ligne cochée surlignée ; dès qu’une case est cochée, les autres pâlissent. */
@@ -105,8 +106,7 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-blanc li { height: 44px; border-bottom: 1px solid var(--trait-papier); }
 .affiche-prepare { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--encre-douce); font-size: 0.8125rem; line-height: 1.35; }
 .affiche-verre { flex: none; width: 30px; height: 30px; }
-/* L’adresse sous le code passe à la ligne : la figure ne dépasse jamais la feuille, même avec une longue adresse, et
-   ne devient jamais plus étroite que le code lui-même. */
+/* L’adresse passe à la ligne : la figure ne dépasse jamais la feuille, et n’est jamais plus étroite que le code. */
 .affiche-qr { flex: 0 1 auto; min-width: min-content; max-width: 100%; margin: 0; text-align: center; }
 /* Le QR code garde sa marge blanche (dans son dessin) ; sur l’écran, assez grand pour être scanné sur l’aperçu. */
 .affiche-qr__code { width: 132px; height: 132px; }
@@ -124,6 +124,7 @@ label.affiche-ligne__texte { cursor: pointer; }
   line-height: 1;
   letter-spacing: -0.02em;
 }
+.affiche-prochain__match > .insignes { margin-bottom: 10px; }
 .affiche-prochain__quand { display: block; margin-top: 8px; font-size: 1.375rem; font-weight: 750; }
 .affiche-prochain__quand .affiche-heure { font-size: inherit; }
 .affiche-prochain .affiche-competition { display: block; margin-top: 2px; font-size: 1rem; }
@@ -143,8 +144,7 @@ label.affiche-ligne__texte { cursor: pointer; }
   body > :not(main), main > :not(.affiche-zone), .affiche-zone > :not(.affiche), .affiche-case, .affiche-stylo { display: none !important; }
   main.page { max-width: none; margin: 0; padding: 0; }
   .affiche-zone { margin: 0; }
-  /* La feuille remplit la page (un peu moins que sa hauteur, marges comprises, en A4 comme en A3) : le pied et son QR
-     code tombent en bas. */
+  /* La feuille remplit la page, en A4 comme en A3 (marges comprises) : le pied et son QR code tombent en bas. */
   .affiche {
     --encre: #000000;
     --encre-douce: #3A3A3A;
@@ -172,8 +172,9 @@ label.affiche-ligne__texte { cursor: pointer; }
   .affiche-dates { margin-top: calc(2mm * var(--echelle)); font-size: calc(14pt * var(--echelle)); }
   .affiche-jour { grid-template-columns: calc(34mm * var(--echelle)) minmax(0, 1fr); gap: 0 calc(4mm * var(--echelle)); padding: calc(1mm * var(--echelle)) 0; break-inside: avoid; }
   .affiche-jour__nom { padding-top: calc(1.6mm * var(--echelle)); font-size: calc(14pt * var(--echelle)); white-space: nowrap; }
+  /* La compétition sur deux lignes, plutôt que le nom. */
   .affiche-ligne__texte {
-    grid-template-columns: calc(27mm * var(--echelle)) minmax(0, 1fr) auto;
+    grid-template-columns: calc(27mm * var(--echelle)) minmax(0, 1fr) fit-content(calc(32mm * var(--echelle)));
     grid-template-areas: "heure match competition";
     column-gap: calc(3mm * var(--echelle));
     min-height: 0;
@@ -181,7 +182,9 @@ label.affiche-ligne__texte { cursor: pointer; }
   }
   .affiche-heure { font-size: calc(24pt * var(--echelle)); line-height: 1.05; }
   .affiche-heure--a-confirmer { font-size: calc(10pt * var(--echelle)); }
-  .affiche-match { font-size: calc(20pt * var(--echelle)); line-height: 1.1; }
+  /* La paire à côté du nom, en haut, à l’échelle (8 mm en A4). */
+  .affiche-match { flex-wrap: nowrap; align-items: flex-start; gap: calc(2.5mm * var(--echelle)); font-size: calc(20pt * var(--echelle)); line-height: 1.1; }
+  .affiche svg.insigne, .affiche svg.insignes { width: auto; height: calc(8mm * var(--echelle)); }
   .affiche-competition { font-size: calc(11pt * var(--echelle)); text-align: right; }
   .affiche-pied { flex-wrap: nowrap; gap: calc(8mm * var(--echelle)); margin-top: auto; padding-top: calc(3mm * var(--echelle)); break-inside: avoid; }
   .affiche-blanc { margin-bottom: calc(4mm * var(--echelle)); }
@@ -196,6 +199,7 @@ label.affiche-ligne__texte { cursor: pointer; }
   .affiche--bar .affiche-titre { font-size: calc(40pt * var(--echelle)); }
   .affiche-prochain { margin-top: calc(10mm * var(--echelle)); }
   .affiche-prochain__match { font-size: calc(76pt * var(--echelle)); }
+  .affiche .affiche-prochain__match svg { height: calc(15mm * var(--echelle)); }
   .affiche-prochain__quand { margin-top: calc(4mm * var(--echelle)); font-size: calc(28pt * var(--echelle)); }
   .affiche-prochain .affiche-competition { margin-top: calc(1mm * var(--echelle)); font-size: calc(14pt * var(--echelle)); text-align: left; }
   .affiche--bar .affiche-tete { padding-bottom: calc(8mm * var(--echelle)); }

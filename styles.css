@@ -1328,6 +1328,8 @@ a:hover { color: var(--goutte); }
   .jour .film { width: clamp(220px, calc((100vh - 360px) * 0.5625), 18rem); }
 }
 .jour .ouverture__statut { color: var(--texte); }
+/* Sous 360 px, le texte agrandi : un titre tient son plus long mot. */
+@media (max-width: 359px) { .jour .titre-section { font-size: 2rem; } }
 .jour .attente__champ { background: var(--carte); }
 @media (min-width: 560px) {
   .jour .attente__ligne { background: var(--carte); box-shadow: var(--ombre-carte); }

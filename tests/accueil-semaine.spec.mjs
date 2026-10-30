@@ -848,8 +848,9 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
 test.describe('le contraste de chaque ligne de texte sur le clair, mesuré au pixel', () => {
   for (const largeur of [390, 1280]) {
     test(`l’accueil tel qu’il est, à ${largeur} px : derrière chaque ligne de texte, chaque pixel tient 4,5:1 au moins (ombres et lumière comprises)`, async ({ page }, infos) => {
-      // Une vingtaine de photos de la page, du haut en bas : plus longtemps que les 30 s d’un test ordinaire.
-      test.setTimeout(180_000);
+      // Une vingtaine de photos de la page, du haut en bas : plus longtemps que les 30 s d’un test ordinaire. Sous une
+      // forte charge (un passage de 9,6 min au lieu de 4,8), 180 s ne suffisaient pas.
+      test.setTimeout(360_000);
       await auJourDeLAccueil(page);
       await page.setViewportSize({ width: largeur, height: 900 });
       await page.emulateMedia({ reducedMotion: 'reduce' });

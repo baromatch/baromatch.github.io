@@ -703,7 +703,11 @@ test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
       slug: `club-${i}-autre-${i}-${jour}`, debut: `${jour}T${String(12 + i).padStart(2, '0')}:00:00Z`, domicile: club(`club-${i}`, `Club ${i}`), exterieur: club(`autre-${i}`, `Autre ${i}`),
     })));
   const AVEC_UN_BAR = UNE_SEMAINE.map((m) => (m.slug === 'club-0-autre-0-2026-10-30' ? { ...m, soirees: [soiree('Paris')] } : m));
-  for (const [nom, matchs, bars] of [['sans bar', UNE_SEMAINE, []], ['avec un bar (demain)', AVEC_UN_BAR, [{ id: 'b1' }]]]) {
+  // Des bars chaque jour : un point sur chaque puce. Dans le texte, il élargissait chaque puce (7 rangées, 644 px).
+  const UN_BAR_CHAQUE_JOUR = UNE_SEMAINE.map((m) => (m.slug.startsWith('club-0-') ? { ...m, soirees: [soiree('Paris')] } : m));
+  for (const [nom, matchs, bars, points] of [
+    ['sans bar', UNE_SEMAINE, [], 0], ['avec un bar (demain)', AVEC_UN_BAR, [{ id: 'b1' }], 1], ['un point sur chaque jour', UN_BAR_CHAQUE_JOUR, [{ id: 'b1' }], 7],
+  ]) {
     test(`à 320 × 568, ${nom} : la barre des jours tient dans l’écran, sans mot coupé ni texte hors de sa puce`, async ({ page }) => {
       await ouvrirLEssai(page, bloc({ matchs, bars }), { largeur: 320, hauteur: 568 });
       const barre = await page.locator('.semaine__dates').boundingBox();
@@ -711,7 +715,25 @@ test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
       expect(await motsCoupes(page, '.semaine__date b, .semaine__date small')).toEqual([]);
       const debordes = await page.locator('.semaine__date > span').evaluateAll((puces) => puces.filter((p) => p.scrollWidth > p.clientWidth || [...p.children].some((e) => e.getBoundingClientRect().right > p.getBoundingClientRect().right + 0.5)).map((p) => p.textContent));
       expect(debordes).toEqual([]);
-      if (bars.length) await expect(page.locator('.semaine__point')).toHaveCount(1);
+      await expect(page.locator('.semaine__point')).toHaveCount(points);
+      // Le point est dans le coin de sa puce, sans rien couvrir de son texte.
+      const couverts = await page.locator('.semaine__point').evaluateAll((liste) => liste.flatMap((point) => {
+        const p = point.getBoundingClientRect();
+        const puce = point.closest('label').querySelector('span').getBoundingClientRect();
+        // Les lignes de texte de la puce (ses nœuds de texte seulement, sans le point).
+        const textes = [];
+        const marcheur = document.createTreeWalker(point.closest('label'), NodeFilter.SHOW_TEXT);
+        for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+          if (!n.data.trim() || n.parentElement.closest('.visuellement-cache')) continue;
+          const plage = document.createRange();
+          plage.selectNodeContents(n);
+          textes.push(...plage.getClientRects());
+        }
+        const dedans = p.left < puce.right && p.right > puce.left && p.top < puce.bottom && p.bottom > puce.top;
+        const couvre = textes.some((t) => p.left < t.right && p.right > t.left && p.top < t.bottom && p.bottom > t.top);
+        return dedans && !couvre ? [] : [point.closest('label').textContent];
+      }));
+      expect(couverts).toEqual([]);
     });
   }
 });

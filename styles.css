@@ -1328,7 +1328,7 @@ a:hover { color: var(--goutte); }
   .jour .film { width: clamp(220px, calc((100vh - 360px) * 0.5625), 18rem); }
 }
 .jour .ouverture__statut { color: var(--texte); }
-/* Sous 360 px, le texte agrandi : un titre tient son plus long mot. */
+/* Sous 360 px, à 200 %, un titre tient son plus long mot. */
 @media (max-width: 359px) { .jour .titre-section { font-size: 2rem; } }
 .jour .attente__champ { background: var(--carte); }
 @media (min-width: 560px) {
@@ -1337,7 +1337,7 @@ a:hover { color: var(--goutte); }
 }
 .jour .attente__ville span { background: var(--carte); }
 .jour .attente__ville input:checked + span { border-color: var(--texte); background: rgba(255, 177, 61, 0.24); }
-/* Une ombre courte : plus large, elle grisait la note du film, dessous (4,25:1). */
+/* Une ombre courte : elle grisait la note du film (4,25:1). */
 .jour .film__cadre { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.26), 0 24px 60px -24px rgba(10, 11, 16, 0.22); }
 
 /* La bande des bars : une carte blanche, l’ambre reste au bouton. */
@@ -1351,7 +1351,7 @@ a:hover { color: var(--goutte); }
 .semaine { margin-top: 48px; padding: 48px 0 56px; background: var(--fond-releve, var(--nuit-releve)); box-shadow: 0 0 0 100vmax var(--fond-releve, var(--nuit-releve)); clip-path: inset(0 -100vmax); }
 .ouverture > .semaine { grid-column: 1 / -1; }
 @media (min-width: 720px) { .semaine { padding: 64px 0 80px; } }
-/* Sur ordinateur, le film, affiché au-dessus, vient au clavier après les matchs : l’ordre du HTML, celui du téléphone. */
+/* Sur ordinateur, le film (au-dessus) vient au clavier après les matchs : l’ordre du HTML, celui du téléphone. */
 @media (min-width: 960px) { .ouverture > .semaine { grid-row: 6; margin-top: 72px; } }
 .semaine .titre-section { max-width: none; }
 .semaine__tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
@@ -1370,8 +1370,9 @@ a:hover { color: var(--goutte); }
 .semaine__date small { color: var(--texte-discret); font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .semaine__date input:checked + span { border-color: var(--texte); background: var(--texte); color: var(--fond, var(--nuit)); }
 .semaine__date input:checked + span small { color: inherit; }
-/* Un jour avec des bars : un point de la couleur du texte (l’ambre est pour l’action), à sa taille ; « 1 bar » aussi. */
-.semaine__point { display: inline-block; width: 0.6em; height: 0.6em; margin: 0 0.45em 0.1em 0; border-radius: 50%; background: currentColor; vertical-align: middle; }
+/* Des bars ce jour-là : un point couleur du texte (l’ambre est pour l’action), en em, au coin de la puce ; « 1 bar » aussi. */
+.semaine__point { position: absolute; top: -0.2em; right: -0.2em; width: 0.6em; height: 0.6em; border-radius: 50%; background: currentColor; }
+.semaine__date input:checked + span .semaine__point { box-shadow: 0 0 0 2px var(--texte); }
 .semaine__date input:focus-visible + span { outline: 2px solid var(--texte); outline-offset: 2px; }
 .semaine__date[hidden], .semaine__jours[hidden], .semaine__jours > .semaine__jour[hidden] { display: none; }
 @media (forced-colors: active) { .semaine__date input:checked + span { border: 3px solid Highlight; } }
@@ -1410,7 +1411,7 @@ a:hover { color: var(--goutte); }
 .carte-match__haut { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; margin: 0; }
 .carte-match__heure { font-size: 1.375rem; font-weight: 750; font-stretch: 92%; font-variant-numeric: tabular-nums; line-height: 1.2; }
 .carte-match__compet { color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; text-align: right; }
-/* Les clubs mènent à la page du match : une flèche, et toute la carte (ses autres liens devant). */
+/* Les clubs mènent au match : une flèche, et toute la carte (ses autres liens devant). */
 .carte-match__clubs { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; color: var(--texte); font-size: 1.0625rem; font-weight: 650; text-decoration: none; }
 .carte-match__clubs::before { content: ""; position: absolute; inset: 0; }
 .carte-match__clubs::after { content: "›"; content: "›" / ""; grid-area: 1 / 2 / 3; align-self: center; color: var(--texte-discret); font-size: 1.5rem; line-height: 1; }

@@ -196,7 +196,9 @@
 .presse__teinte-nom { font-size: 1.125rem; font-weight: 750; }
 .presse .presse__role { color: var(--texte-doux); text-wrap: pretty; }
 .presse__police .presse__role { margin-top: 6px; }
-.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 650; }
+/* En ligne, 44 px au toucher (comme dans a-propos.css). */
+.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a { padding-block: max(0px, 22px - .55em); font-weight: 650; }
+:is(.presse__police, .presse__autre-format, .presse__bar, .presse__faits, .presse__suite) a:focus-visible { padding-block: 0; }
 .presse code { font: inherit; font-weight: 700; white-space: nowrap; -webkit-user-select: all; user-select: all; }
 
 /* ---------- Le texte à copier, et Baromatch en bref ---------- */
@@ -214,7 +216,6 @@
 @container presse (min-width: 45rem) { .presse__faits > div { grid-template-columns: 10rem minmax(0, 1fr); } }
 .presse__faits dt { font-weight: 700; }
 .presse__faits dd { margin: 0; color: var(--texte-doux); text-wrap: pretty; }
-.presse__faits dd a { font-weight: 650; }
 
 /* ---------- Partenariats : une phrase et son bouton ---------- */
 

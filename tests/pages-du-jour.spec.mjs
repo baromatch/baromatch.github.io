@@ -343,7 +343,8 @@ for (const { chemin } of PAGES) {
   }
 }
 
-// Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés) : 44 px de haut eux aussi.
+// Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés) : 44 px de haut eux aussi, par un
+// padding qui ne touche pas à la ligne (ils restent en ligne : tests/liens-en-ligne.spec.mjs).
 test('les liens pris dans une phrase des deux pages se touchent sur 44 px', async ({ page }) => {
   const hauteurs = [];
   for (const [chemin, selecteur] of [['/a-propos.html', '.apropos__rassure a, .apropos__note-carte a, .apropos__qui-publie a, .apropos__suite a'], ['/presse.html', '.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a']]) {

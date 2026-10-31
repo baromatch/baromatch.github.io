@@ -10,6 +10,7 @@
 // ligne au lieu de déborder. La police est attendue avant chaque mesure ; avec la police de secours (Bricolage pas
 // encore arrivée), le rang du téléphone tient aussi sur une ligne, dans sa place.
 import { test, expect } from '@playwright/test';
+import { lireCouleur, rapport } from './outils/contraste.mjs';
 import { couperLAPI } from './outils/invitation.mjs';
 import { PAGES } from './outils/pages.mjs';
 

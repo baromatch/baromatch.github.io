@@ -29,7 +29,8 @@
      (data-attente), dès que la page est lue, et il apparaît là avec son script, sans rien pousser et sans attendre ce
      fichier. Sans JavaScript, ou si le formulaire ne vient pas, il reste caché et le chemin e-mail (.sans-js,
      #demande-secours) est en haut de la carte ;
-   - les questions, qu’on voit au-dessus de la carte en arrivant par #proposer. */
+   - les questions, qu’on voit au-dessus de la carte en arrivant par #proposer ;
+   - le jour (<html class="jour">) : ce que ce fichier peint en dur pour la nuit, repris en clair dans son dernier bloc. */
 
 
 /* La lumière du match : une boîte fixe derrière la page (sa place est dans le style de la page), et ici ses halos, des
@@ -130,6 +131,8 @@
 .moment__liste li { position: relative; padding-left: 22px; color: var(--texte-doux); }
 .moment__liste li::before { content: ""; position: absolute; left: 2px; top: 0.62em; width: 8px; height: 8px; border-radius: 50%; background: var(--texte-discret); }
 .moment__liste strong { color: var(--texte); font-weight: 700; }
+/* Au bout de chaque moment, le même chemin vers le formulaire : un lien, pas un bouton (l’ambre reste aux trois boutons). */
+.moment__suite { margin: 18px 0 0; }
 .moment__visuel { width: 100%; max-width: 360px; margin: 12px auto 0; }
 .moment__visuel--duo { max-width: 520px; }
 .moment__visuel--console { max-width: 640px; }
@@ -181,7 +184,8 @@
    grille, les marges, le piège à robots et le bord des champs sont dans le style de la page : le formulaire y prend
    sa place, invisible, et son script l’affiche sans attendre ce fichier. Sur la carte de verre, le fond de nuit du
    champ ne se distingue pas (1,16:1) : son bord seul le dessine, à 3:1 au moins (WCAG 1.4.11 ; 0,18 de la boutique
-   donnait 1,78:1 ici), d’où le 0,34 du style de la page. */
+   donnait 1,78:1 ici), d’où le 0,34 du style de la page. Sur le jour, le bord est --champ-bord (du bleu nuit à 50 %),
+   3,7:1 sur la carte blanche : sa règle est dans le style de la page aussi. */
 .formulaire .panier__champ[aria-invalid="true"] { border-color: var(--erreur); box-shadow: 0 0 0 1px var(--erreur); }
 .panier__accord input[aria-invalid="true"] { outline: 2px solid var(--erreur); outline-offset: 2px; }
 .champ__erreur {
@@ -250,11 +254,13 @@
 .resume__titre { font-variant-numeric: tabular-nums; }
 .message__texte { margin: 4px 0 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.45; }
 .message__actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
-.message__actions .capsule { flex: 1 1 auto; min-height: 48px; padding: 0 20px; white-space: nowrap; }
+/* Le texte d’une action passe à la ligne plutôt que de sortir de l’écran (« Recharger la page », à 200 % sur 320 px). */
+.message__actions .capsule { flex: 1 1 auto; max-width: 100%; min-height: 48px; padding: 8px 20px; white-space: normal; text-align: center; }
 .resume { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 16px; }
 .resume[hidden] { display: none; }
 .resume:focus { outline: none; }
-.resume:focus-visible { outline: 2px solid var(--ambre); outline-offset: 3px; }
+/* Le contour du focus du résumé : celui de tout le site (--focus, styles.css), l’ambre sur la nuit, le bleu nuit sur le clair. */
+.resume:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .resume__liste { margin: 6px 0 0; padding: 0 0 0 1.1em; color: var(--texte-doux); font-size: 0.9375rem; }
 .resume__liste li { margin: 4px 0; }
 
@@ -315,3 +321,47 @@
 @media (prefers-reduced-motion: reduce) {
   .jauge-envoi { animation: none; }
 }
+
+/* ---------- Le jour : « Pour les bars » en clair ---------- */
+
+/* <html class="jour"> (styles.css, section « Le jour ») : le fond est crème, le texte bleu nuit, l’ambre n’est plus qu’aux
+   boutons « Proposer mon bar ». Les jetons suivent d’eux-mêmes ; ce bloc reprend ce que cette feuille peint en dur pour
+   la nuit. Ce qui reste de nuit, sur toute la page : la carte « Ta salle, ce soir » (classe « nuit », dans le style de
+   la page), les écrans de démonstration dans leurs cadres (la Console, les téléphones : leur fond est celui de la nuit,
+   leur étiquette est une pastille de nuit) et le pied de page. Les règles de ce bloc passent par .jour : elles pèsent
+   plus que celles de la nuit, plus haut, qui restent telles quelles. Le premier écran et #proposer ont les leurs dans
+   le style de la page (ce qu’ils peignent avant l’arrivée de cette feuille). */
+
+/* La lumière du match, en lavis : ses halos (teal, indigo, ambre) gardent leur allumage et leur montée avec la page,
+   mais sur du crème chacun teinte de 7 % au plus (0,6 × 0,8 × 0,14), et de 17 % si les trois se superposaient, ce qu’ils
+   ne font pas : un petit texte gris garde plus de 4,5:1 dessous, même ainsi (tests/pour-les-bars-jour.spec.mjs le calcule). */
+.jour .lumiere { opacity: 0.14; }
+
+/* Les cartes sont blanches sur le crème : un filet et l’ombre douce de l’accueil (--ombre-carte), à la place du reflet de verre,
+   qui est blanc sur du blanc. */
+.jour :is(.conditions__liste li, .marche__etape, .regard__carte, .atout--offre) { box-shadow: inset 0 0 0 1px var(--verre-bord), var(--ombre-carte); }
+.jour .atout__mention { background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); }
+/* Le numéro d’une étape : un disque de nuit, son chiffre clair (il suivait --texte, du bleu nuit sur du bleu nuit). */
+.jour .marche__numero span { color: #F7F7F9; box-shadow: none; }
+
+/* Les liens dans le texte : le même souligné, en bleu nuit. */
+.jour :is(.conditions__liste a, .marche .chapo a, .questions a) { text-decoration-color: rgba(10, 11, 16, 0.4); }
+.jour :is(.conditions__liste a, .marche .chapo a, .questions a):hover { text-decoration-color: currentColor; }
+
+/* Les survols : jamais d’ambre ni de blanc translucide sur le clair (l’ambre : 1,7:1 sur le crème) ; le texte passe au bleu nuit un peu plus doux. */
+.jour :is(.lien-fleche, .lien-fan, .formulaire__ailleurs a, .formulaire__confidentialite a, .resume a, .lien-bouton, .questions summary):hover { color: var(--texte-doux); }
+.jour .capsule--verre:hover { background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
+
+/* Les messages et le résumé : une boîte crème sur la carte blanche, un bord d’erreur plein. */
+.jour .message, .jour .resume { background: var(--fond); }
+.jour .message--erreur, .jour .resume { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--erreur) 55%, transparent); }
+/* L’étape e-mail : le texte à copier est un champ, il a le bord des champs ; le bouton en verre et le bouton d’envoi
+   en attente sont crème sur la carte blanche (du blanc sur du blanc ne se voit pas). */
+.jour .courriel__texte { border-color: var(--champ-bord); background: var(--fond); }
+.jour .capsule--verre,
+.jour .courriel--second .capsule,
+.jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer,
+.jour .panier__envoyer[aria-disabled="true"],
+.jour .panier__envoyer[aria-disabled="true"]:hover { background: var(--fond-releve); }
+.jour .courriel--second .capsule:hover,
+.jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover { background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }

@@ -11,6 +11,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { sansInsignes } from './outils/insignes.mjs';
 import { erreursDuCalendrier, lireLeCalendrier } from './outils/icalendar.mjs';
 import { contenuDuScenario, SCENARIO } from './outils/site-genere.mjs';
 import { blocDuMatch } from '../generateur/agenda.mjs';
@@ -429,9 +430,14 @@ test('la page agenda/ : trois lignes d’explication, les clubs, chaque téléph
   expect(page).toContain('<p>Les matchs de ton club au programme de Baromatch : Ligue 1 et Ligue des champions.</p>');
   expect(page).toContain('<p>Ils arrivent quelques semaines à l’avance : pour l’instant, jusqu’au vendredi 20 novembre.</p>');
   expect(page).toContain('<p>Pas de Coupe de France ni de match amical pour l’instant.</p>');
-  // Les clubs en simples mots : ni « officiel », ni écusson, ni image.
+  // Les clubs en mots, chacun avec son insigne Baromatch (celui de l’appli, 30 px, décoratif, juste avant son nom) :
+  // ni « officiel », ni écusson, ni image, ni aucun autre dessin.
   const principal = page.match(/<main[\s\S]*<\/main>/)[0];
-  expect(principal).not.toMatch(/officiel|écusson|logo|<img|<svg/i);
+  const cartes = [...principal.matchAll(/<h3 class="regarder-carte__nom">([\s\S]*?)<\/h3>/g)].map(([, dedans]) => dedans);
+  expect(cartes.length).toBeGreaterThan(0);
+  for (const dedans of cartes) expect(dedans).toMatch(/^<svg class="insigne" width="30" height="30" viewBox="0 0 (?:200 200|30 30)" aria-hidden="true" focusable="false">(?:(?!<svg|<\/svg>)[\s\S])*<\/svg>[^<]+$/);
+  expect(sansInsignes(principal)).not.toMatch(/officiel|écusson|logo|<img|<svg/i);
+  expect(principal).not.toMatch(/officiel|écusson|logo|<img|<image|<text|href="[^"]*\.(?:png|svg|webp)"/i);
 
   // Une Coupe de France dans les listes : la page et l’agenda le disent, et ne disent plus qu’elle manque.
   const avecCoupe = dossierVide();

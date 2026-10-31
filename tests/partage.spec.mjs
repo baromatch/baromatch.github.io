@@ -101,8 +101,10 @@ test.describe('les images de partage', () => {
   test('le vrai nombre de vrais bars : « 1 bar le diffuse », « 2 bars le diffusent » ; sans bar, ni nombre ni promesse', () => {
     const carteDe = (chemin) => resultat.fichiers.find((f) => f.chemin === chemin).carte;
     // Un match sans vrai bar : le match, son jour et son heure, rien de plus.
+    // Et les insignes des deux clubs (insigne.mjs), de part et d’autre du texte, à la saison du passage.
     expect(carteDe('/matchs/lille-lens-2026-10-26/')).toEqual({
       surtitre: 'Ligue 1', titre: 'Lille – Lens', ligne: 'Lundi 26 octobre · 20:00', ambre: '', alt: 'Lille – Lens, Ligue 1, lundi 26 octobre · 20:00.',
+      insignes: { domicile: { slug: 'losc-lille', cle: 'lille', nom: 'LOSC Lille' }, exterieur: { slug: 'rc-lens', cle: 'lens', nom: 'RC Lens' }, saison: '26/27' },
     });
     expect(carteDe('/matchs/brest-nice-2026-10-23/')).toMatchObject({ titre: 'Brest – Nice', ambre: '1 bar le diffuse à Lyon' });
     expect(carteDe('/matchs/psg-ol-2026-10-25/')).toMatchObject({ titre: 'PSG – OL', ligne: 'Dimanche 25 octobre · 20:45', ambre: '2 bars le diffusent à Lyon et Paris' });
@@ -533,13 +535,13 @@ test.describe('le bloc « Partager »', () => {
     });
   }
 
-  test('avec le bouton du téléphone : « Partager » seul, au clavier, avec le titre et l’adresse canonique', async ({ page: onglet }) => {
+  test('avec le bouton du téléphone : « Partager », au clavier, avec le titre et l’adresse canonique ; dessous, « Copier le lien »', async ({ page: onglet }) => {
     await avecLeBoutonDuTelephone(onglet);
     const { natif, whatsapp, copier, lien } = await ouvrir(onglet);
     await expect(natif).toBeVisible();
     await expect(natif).toHaveText('Partager');
     await expect(whatsapp).toBeHidden();
-    await expect(copier).toBeHidden();
+    await expect(copier).toBeVisible();
     await expect(lien).toBeHidden();
     await natif.focus();
     await onglet.keyboard.press('Enter');
@@ -587,6 +589,56 @@ test.describe('le bloc « Partager »', () => {
     await copier.click();
     await expect(statut).toHaveText('Copie impossible : appuie longtemps sur le lien pour le copier.'.replace(' :', ' :'));
     await expect(lien).toBeVisible();
+  });
+
+  // Le bloc a la même hauteur avant et après partage.js (deux rangées : le partage, puis la copie ou le lien) : quand le
+  // script arrive après le premier affichage, rien ne bouge en dessous. partage.js retardé d’une seconde, la page se
+  // peint, puis la somme des décalages (layout-shift, hors réponse à un geste) doit être nulle : avec le bouton du
+  // téléphone, sans lui, sans presse-papiers, et sans l’un ni l’autre.
+  const CAS = [
+    { nom: 'le bouton du téléphone et le presse-papiers', partager: true, copier: true },
+    { nom: 'le bouton du téléphone sans presse-papiers', partager: true, copier: false },
+    { nom: 'sans le bouton du téléphone', partager: false, copier: true },
+    { nom: 'sans le bouton du téléphone ni presse-papiers', partager: false, copier: false },
+  ];
+  const decalagesQuandPartageArriveTard = async (browser, { chemin = MATCH, largeur, cas }) => {
+    const contexte = await browser.newContext({ viewport: { width: largeur, height: 800 } });
+    const onglet = await contexte.newPage();
+    await onglet.addInitScript(({ partager, copier }) => {
+      if (partager) Object.defineProperty(Navigator.prototype, 'share', { configurable: true, value: async () => {} });
+      else delete Navigator.prototype.share;
+      Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => (copier ? { writeText: async () => {} } : undefined) });
+      window.__decalages = 0;
+      new PerformanceObserver((liste) => {
+        for (const entree of liste.getEntries()) if (!entree.hadRecentInput) window.__decalages += entree.value;
+      }).observe({ type: 'layout-shift', buffered: true });
+    }, cas);
+    await onglet.route('**/partage.js', async (route) => {
+      await new Promise((resoudre) => { setTimeout(resoudre, 1000); });
+      await route.continue();
+    });
+    await onglet.goto(`${serveur.adresse}${chemin}`, { waitUntil: 'load' });
+    await onglet.evaluate(() => new Promise((resoudre) => { requestAnimationFrame(() => requestAnimationFrame(resoudre)); }));
+    await onglet.waitForTimeout(300);
+    // Le script a bien tourné : le bon bouton est là, et la bonne seconde rangée.
+    await expect(onglet.locator(cas.partager ? '.partage__natif' : '.partage__whatsapp')).toBeVisible();
+    await expect(onglet.locator(cas.copier ? '.partage__copier' : '.partage__lien')).toBeVisible();
+    const decalages = await onglet.evaluate(() => window.__decalages);
+    await contexte.close();
+    return decalages;
+  };
+  for (const cas of CAS) {
+    test(`le bloc ne fait rien bouger quand partage.js arrive tard : ${cas.nom}, à 320, 390, 412 et 1280 px`, async ({ browser }) => {
+      for (const largeur of [320, 390, 412, 1280]) {
+        expect(await decalagesQuandPartageArriveTard(browser, { largeur, cas }), `${largeur} px`).toBe(0);
+      }
+    });
+  }
+  test('les autres pages qui ont ce bloc (une ville, un bar, « Ce soir », en anglais) : rien ne bouge non plus', async ({ browser }) => {
+    for (const chemin of ['/regarder-le-match/paris/', '/bar/le-zinc-des-amis-paris-11/', '/ce-soir/', '/en/matches/psg-ol-2026-10-25/', '/en/']) {
+      expect(await decalagesQuandPartageArriveTard(browser, { chemin, largeur: 390, cas: CAS[0] }), `${chemin}, 390 px`).toBe(0);
+      expect(await decalagesQuandPartageArriveTard(browser, { chemin, largeur: 1280, cas: CAS[3] }), `${chemin}, 1280 px`).toBe(0);
+    }
   });
 
   test('des cibles de 44 px, sans animation, à 360 px comme au bureau', async ({ browser }) => {

@@ -10,6 +10,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import { sansInsignes } from './outils/insignes.mjs';
 import { CAPTURE, MAINTENANT_DE_LA_CAPTURE, MAINTENANT_DU_SCENARIO, SCENARIO, contenuDuScenario } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { texteVisible } from '../generateur/controle.mjs';
@@ -53,7 +54,7 @@ test('un club avec des matchs à venir et de vrais bars : indexable, ses matchs 
   expect(psg.titre).toBe('Où regarder les matchs du PSG dans un bar — Baromatch');
   expect(psg.contenu).toContain('<h1 class="regarder-titre">Où regarder les matchs du PSG dans un bar</h1>');
   expect(psg.description).toBe('4 matchs du PSG au programme, à l’heure de Paris, et 3 bars qui en diffusent sur Baromatch. Le prochain : PSG – Barça, samedi 24 octobre à 21:00.');
-  expect(psg.contenu).toContain('<a class="regarder-matchs__match" href="/matchs/psg-ol-2026-10-25/">PSG – OL</a>');
+  expect(sansInsignes(psg.contenu)).toContain('<a class="regarder-matchs__match" href="/matchs/psg-ol-2026-10-25/">PSG – OL</a>');
   expect(psg.contenu).toContain(fine('Le prochain : Paris Saint-Germain – FC Barcelona, samedi 24 octobre à 21:00, Ligue des champions, à domicile.'));
   // Les vrais bars publiés seulement, et jamais leur offre (loi Evin) : leur nom, leur adresse, leur prochain match.
   expect(psg.contenu).toContain('<a href="/bar/le-zinc-des-amis-paris-11/">Le Zinc des Amis</a>');

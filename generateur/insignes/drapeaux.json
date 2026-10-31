@@ -1,0 +1,635 @@
+{
+ "al": {
+  "direction": "vertical",
+  "bands": [
+   "#E41E20",
+   "#000000",
+   "#E41E20"
+  ]
+ },
+ "ad": {
+  "direction": "vertical",
+  "bands": [
+   "#0018A8",
+   "#FEDF00",
+   "#D50032"
+  ]
+ },
+ "am": {
+  "direction": "horizontal",
+  "bands": [
+   "#D90012",
+   "#0033A0",
+   "#F2A800"
+  ]
+ },
+ "at": {
+  "direction": "horizontal",
+  "bands": [
+   "#ED2939",
+   "#FFFFFF",
+   "#ED2939"
+  ]
+ },
+ "az": {
+  "direction": "horizontal",
+  "bands": [
+   "#00B5E2",
+   "#EF3340",
+   "#509E2F"
+  ]
+ },
+ "by": {
+  "direction": "horizontal",
+  "bands": [
+   "#C8313E",
+   "#4AA657"
+  ]
+ },
+ "be": {
+  "direction": "vertical",
+  "bands": [
+   "#000000",
+   "#FDDA24",
+   "#EF3340"
+  ]
+ },
+ "ba": {
+  "direction": "vertical",
+  "bands": [
+   "#002395",
+   "#FECB00"
+  ]
+ },
+ "bg": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#00966E",
+   "#D62612"
+  ]
+ },
+ "hr": {
+  "direction": "horizontal",
+  "bands": [
+   "#FF0000",
+   "#FFFFFF",
+   "#171796"
+  ]
+ },
+ "cy": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#D57800",
+   "#4E5B31"
+  ]
+ },
+ "cz": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#D7141A",
+   "#11457E"
+  ]
+ },
+ "dk": {
+  "direction": "vertical",
+  "bands": [
+   "#C8102E",
+   "#FFFFFF",
+   "#C8102E"
+  ]
+ },
+ "gb-eng": {
+  "direction": "vertical",
+  "bands": [
+   "#FFFFFF",
+   "#CE1124",
+   "#FFFFFF"
+  ]
+ },
+ "ee": {
+  "direction": "horizontal",
+  "bands": [
+   "#0072CE",
+   "#000000",
+   "#FFFFFF"
+  ]
+ },
+ "fo": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#0065BD",
+   "#ED2939"
+  ]
+ },
+ "fi": {
+  "direction": "vertical",
+  "bands": [
+   "#FFFFFF",
+   "#002F6C",
+   "#FFFFFF"
+  ]
+ },
+ "fr": {
+  "direction": "vertical",
+  "bands": [
+   "#0055A4",
+   "#FFFFFF",
+   "#EF4135"
+  ]
+ },
+ "ge": {
+  "direction": "vertical",
+  "bands": [
+   "#FFFFFF",
+   "#FF0000",
+   "#FFFFFF"
+  ]
+ },
+ "de": {
+  "direction": "horizontal",
+  "bands": [
+   "#000000",
+   "#DD0000",
+   "#FFCE00"
+  ]
+ },
+ "gi": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#DA000C"
+  ]
+ },
+ "gr": {
+  "direction": "horizontal",
+  "bands": [
+   "#0D5EAF",
+   "#FFFFFF",
+   "#0D5EAF",
+   "#FFFFFF"
+  ]
+ },
+ "hu": {
+  "direction": "horizontal",
+  "bands": [
+   "#CE2939",
+   "#FFFFFF",
+   "#477050"
+  ]
+ },
+ "is": {
+  "direction": "vertical",
+  "bands": [
+   "#02529C",
+   "#FFFFFF",
+   "#DC1E35"
+  ]
+ },
+ "il": {
+  "direction": "horizontal",
+  "bands": [
+   "#0038B8",
+   "#FFFFFF",
+   "#0038B8"
+  ]
+ },
+ "it": {
+  "direction": "vertical",
+  "bands": [
+   "#009246",
+   "#FFFFFF",
+   "#CE2B37"
+  ]
+ },
+ "kz": {
+  "direction": "horizontal",
+  "bands": [
+   "#00AFCA",
+   "#FEC50C",
+   "#00AFCA"
+  ]
+ },
+ "xk": {
+  "direction": "horizontal",
+  "bands": [
+   "#244AA5",
+   "#D0A650"
+  ]
+ },
+ "lv": {
+  "direction": "horizontal",
+  "bands": [
+   "#9E3039",
+   "#FFFFFF",
+   "#9E3039"
+  ]
+ },
+ "li": {
+  "direction": "horizontal",
+  "bands": [
+   "#002B7F",
+   "#CE1126"
+  ]
+ },
+ "lt": {
+  "direction": "horizontal",
+  "bands": [
+   "#FDB913",
+   "#006A44",
+   "#C1272D"
+  ]
+ },
+ "lu": {
+  "direction": "horizontal",
+  "bands": [
+   "#ED2939",
+   "#FFFFFF",
+   "#00A1DE"
+  ]
+ },
+ "mt": {
+  "direction": "vertical",
+  "bands": [
+   "#FFFFFF",
+   "#CF142B"
+  ]
+ },
+ "md": {
+  "direction": "vertical",
+  "bands": [
+   "#0046AE",
+   "#FFD200",
+   "#CC092F"
+  ]
+ },
+ "me": {
+  "direction": "horizontal",
+  "bands": [
+   "#D3AE3B",
+   "#C40308",
+   "#D3AE3B"
+  ]
+ },
+ "nl": {
+  "direction": "horizontal",
+  "bands": [
+   "#AE1C28",
+   "#FFFFFF",
+   "#21468B"
+  ]
+ },
+ "mk": {
+  "direction": "horizontal",
+  "bands": [
+   "#D20000",
+   "#FFE600",
+   "#D20000"
+  ]
+ },
+ "gb-nir": {
+  "direction": "vertical",
+  "bands": [
+   "#FFFFFF",
+   "#CE1126",
+   "#FFFFFF"
+  ]
+ },
+ "no": {
+  "direction": "vertical",
+  "bands": [
+   "#BA0C2F",
+   "#FFFFFF",
+   "#00205B"
+  ]
+ },
+ "pl": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#DC143C"
+  ]
+ },
+ "pt": {
+  "direction": "vertical",
+  "bands": [
+   "#006600",
+   "#FF0000"
+  ]
+ },
+ "ie": {
+  "direction": "vertical",
+  "bands": [
+   "#169B62",
+   "#FFFFFF",
+   "#FF883E"
+  ]
+ },
+ "ro": {
+  "direction": "vertical",
+  "bands": [
+   "#002B7F",
+   "#FCD116",
+   "#CE1126"
+  ]
+ },
+ "sm": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#5EB6E4"
+  ]
+ },
+ "gb-sct": {
+  "direction": "vertical",
+  "bands": [
+   "#0065BF",
+   "#FFFFFF",
+   "#0065BF"
+  ]
+ },
+ "rs": {
+  "direction": "horizontal",
+  "bands": [
+   "#C6363C",
+   "#0C4076",
+   "#FFFFFF"
+  ]
+ },
+ "sk": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#0B4EA2",
+   "#EE1C25"
+  ]
+ },
+ "si": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#005DA4",
+   "#ED1C24"
+  ]
+ },
+ "es": {
+  "direction": "horizontal",
+  "bands": [
+   "#AA151B",
+   "#F1BF00",
+   "#AA151B"
+  ]
+ },
+ "se": {
+  "direction": "vertical",
+  "bands": [
+   "#006AA7",
+   "#FECC02",
+   "#006AA7"
+  ]
+ },
+ "ch": {
+  "direction": "vertical",
+  "bands": [
+   "#DA291C",
+   "#FFFFFF",
+   "#DA291C"
+  ]
+ },
+ "tr": {
+  "direction": "vertical",
+  "bands": [
+   "#E30A17",
+   "#FFFFFF"
+  ]
+ },
+ "ua": {
+  "direction": "horizontal",
+  "bands": [
+   "#0057B7",
+   "#FFD700"
+  ]
+ },
+ "gb-wls": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#D30731",
+   "#00AB39"
+  ]
+ },
+ "ru": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#0039A6",
+   "#D52B1E"
+  ]
+ },
+ "ar": {
+  "direction": "horizontal",
+  "bands": [
+   "#74ACDF",
+   "#FFFFFF",
+   "#74ACDF"
+  ]
+ },
+ "br": {
+  "direction": "horizontal",
+  "bands": [
+   "#009C3B",
+   "#FFDF00",
+   "#002776"
+  ]
+ },
+ "uy": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#0038A8",
+   "#FFFFFF",
+   "#0038A8"
+  ]
+ },
+ "co": {
+  "direction": "horizontal",
+  "bands": [
+   "#FCD116",
+   "#003893",
+   "#CE1126"
+  ]
+ },
+ "cl": {
+  "direction": "horizontal",
+  "bands": [
+   "#0039A6",
+   "#FFFFFF",
+   "#D52B1E"
+  ]
+ },
+ "pe": {
+  "direction": "vertical",
+  "bands": [
+   "#D91023",
+   "#FFFFFF",
+   "#D91023"
+  ]
+ },
+ "us": {
+  "direction": "horizontal",
+  "bands": [
+   "#3C3B6E",
+   "#B22234",
+   "#FFFFFF",
+   "#B22234"
+  ]
+ },
+ "mx": {
+  "direction": "vertical",
+  "bands": [
+   "#006847",
+   "#FFFFFF",
+   "#CE1126"
+  ]
+ },
+ "ca": {
+  "direction": "vertical",
+  "bands": [
+   "#FF0000",
+   "#FFFFFF",
+   "#FF0000"
+  ]
+ },
+ "ma": {
+  "direction": "vertical",
+  "bands": [
+   "#C1272D",
+   "#006233",
+   "#C1272D"
+  ]
+ },
+ "sn": {
+  "direction": "vertical",
+  "bands": [
+   "#00853F",
+   "#FDEF42",
+   "#E31B23"
+  ]
+ },
+ "dz": {
+  "direction": "vertical",
+  "bands": [
+   "#006233",
+   "#D21034",
+   "#FFFFFF"
+  ]
+ },
+ "tn": {
+  "direction": "vertical",
+  "bands": [
+   "#E70013",
+   "#FFFFFF",
+   "#E70013"
+  ]
+ },
+ "ci": {
+  "direction": "vertical",
+  "bands": [
+   "#F77F00",
+   "#FFFFFF",
+   "#009E60"
+  ]
+ },
+ "cm": {
+  "direction": "vertical",
+  "bands": [
+   "#007A5E",
+   "#CE1126",
+   "#FCD116"
+  ]
+ },
+ "eg": {
+  "direction": "horizontal",
+  "bands": [
+   "#CE1126",
+   "#FFFFFF",
+   "#000000"
+  ]
+ },
+ "ng": {
+  "direction": "vertical",
+  "bands": [
+   "#008751",
+   "#FFFFFF",
+   "#008751"
+  ]
+ },
+ "gh": {
+  "direction": "horizontal",
+  "bands": [
+   "#CE1126",
+   "#FCD116",
+   "#006B3F"
+  ]
+ },
+ "ml": {
+  "direction": "vertical",
+  "bands": [
+   "#14B53A",
+   "#FCD116",
+   "#CE1126"
+  ]
+ },
+ "gn": {
+  "direction": "vertical",
+  "bands": [
+   "#CE1126",
+   "#FCD116",
+   "#009460"
+  ]
+ },
+ "cd": {
+  "direction": "horizontal",
+  "bands": [
+   "#007FFF",
+   "#F7D618",
+   "#CE1021",
+   "#007FFF"
+  ]
+ },
+ "jp": {
+  "direction": "vertical",
+  "bands": [
+   "#FFFFFF",
+   "#BC002D",
+   "#FFFFFF"
+  ]
+ },
+ "kr": {
+  "direction": "horizontal",
+  "bands": [
+   "#FFFFFF",
+   "#CD2E3A",
+   "#0047A0"
+  ]
+ },
+ "id": {
+  "direction": "horizontal",
+  "bands": [
+   "#FF0000",
+   "#FFFFFF"
+  ]
+ },
+ "au": {
+  "direction": "horizontal",
+  "bands": [
+   "#012169",
+   "#E4002B",
+   "#FFFFFF",
+   "#012169"
+  ]
+ }
+}

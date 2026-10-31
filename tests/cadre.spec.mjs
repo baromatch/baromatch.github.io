@@ -12,16 +12,18 @@
 // - les contrastes, mesurés tels qu’ils sont peints, la nuit et au jour : 4,5:1 pour le texte, 3:1 pour le focus et les
 //   bords.
 import { test, expect } from '@playwright/test';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
   actionDeLaPage, cibleDeLAction, ecrireLeCadre, entete, lireLeCadre, pageAvecLeCadre, PAGES_DU_CADRE, pageDuGenerateurAvecLAction, pied,
 } from '../generateur/cadre.mjs';
+import { insigne } from '../generateur/insigne.mjs';
 import { pagesEcritesALaMain } from '../generateur/mesure.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
+import { echapper } from '../generateur/texte.mjs';
 import { attendreLaPageFinie } from './outils/attente.mjs';
 import { lireCouleur, poser, rapport } from './outils/contraste.mjs';
 import { racine } from './outils/environnement.mjs';
@@ -286,6 +288,68 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
       });
     }
   }
+});
+
+// ---------- Les clubs du pied ----------
+
+// Chaque club du pied : l’insigne de l’appli (generateur/insigne.mjs) à 24 px, sur la nuit du pied (il est de nuit sur
+// chaque page, même au jour), décoratif, fait de formes, devant le nom écrit ; plus aucun disque. Ses identifiants
+// prennent « pied- » devant : une page qui dessine aussi le club (Monaco, dont l’insigne a une découpe à 24 px comme à
+// 30 px) garde un pied identique à celui des autres pages, et chaque identifiant n’y sert qu’une fois.
+test.describe('les clubs du pied de page', () => {
+  test('l’insigne de l’appli à 24 px, sur la nuit, devant le nom ; ses identifiants à part', () => {
+    const cadre = lireLeCadre();
+    expect(cadre.clubs.length).toBeGreaterThan(5);
+    const html = pied(cadre, { marque: MARQUE });
+    const liens = [...html.matchAll(/<a class="pied__club" href="\/matchs\/club\/([^/]+)\/">([\s\S]*?)<\/a>/g)];
+    expect(liens.map(([, cle]) => cle)).toEqual(cadre.clubs.map((c) => c.cle));
+    for (const [i, [, cle, dedans]] of liens.entries()) {
+      const { nom } = cadre.clubs[i];
+      // Le dessin de l’appli, à l’identifiant près.
+      expect(dedans.replace(/( id="|url\(#)pied-/g, '$1'), cle).toBe(`${insigne({ cle, nom }, { taille: 24, fond: 'night' })}${echapper(nom)}`);
+      expect(dedans, cle).toMatch(/^<svg class="insigne" width="24" height="24" viewBox="0 0 200 200" aria-hidden="true" focusable="false">(?:(?!<svg)[\s\S])*<\/svg>[^<]+$/);
+      expect(dedans, cle).not.toMatch(/<image|href=|<text|<title|style=/);
+      for (const [, id] of dedans.matchAll(/ id="([^"]+)"/g)) expect(id, cle).toMatch(/^pied-ib-f-/);
+      for (const [, cible] of dedans.matchAll(/url\(#([^)]+)\)/g)) expect(cible, cle).toMatch(/^pied-ib-f-/);
+    }
+    // Au moins un club du pied a une découpe (Monaco), donc des identifiants à renommer.
+    expect(html).toMatch(/ id="pied-ib-f-/);
+    // Sur la nuit : ni le filet d’encre à 60 %, ni le bord d’encre que l’insigne prend sur un fond clair.
+    expect(html).not.toMatch(/stroke="rgba\(20,21,31,0\.6\)"|stroke-opacity="0\.85"/);
+    expect(html).not.toMatch(/class="disque|viewBox="0 0 2 2"/);
+    // Chaque page écrite à la main porte ces insignes, un par club.
+    for (const p of PAGES_DU_CADRE) expect(lire(p.fichier).match(PIED)[0].match(/<svg class="insigne" width="24"/g), p.fichier).toHaveLength(cadre.clubs.length);
+  });
+
+  test('une page qui dessine aussi Monaco : son pied est celui des autres pages, chaque identifiant n’y sert qu’une fois', async () => {
+    const dossier = mkdtempSync(path.join(tmpdir(), 'cadre-monaco-'));
+    let site;
+    try {
+      const fichier = path.join(dossier, 'scenario.json');
+      const club = (slug, canonicalName) => ({ slug, canonicalName });
+      writeFileSync(fichier, JSON.stringify({
+        matches: [
+          { id: 'c-monaco-lens', startAt: '2026-10-30T19:00:00.000Z', league: 'Ligue 1', homeTeam: 'AS Monaco', awayTeam: 'RC Lens', homeClub: club('as-monaco', 'AS Monaco'), awayClub: club('rc-lens', 'RC Lens') },
+          { id: 'c-nice-monaco', startAt: '2026-11-01T16:00:00.000Z', league: 'Ligue 1', homeTeam: 'OGC Nice', awayTeam: 'AS Monaco', homeClub: club('ogc-nice', 'OGC Nice'), awayClub: club('as-monaco', 'AS Monaco') },
+        ],
+        bars: [],
+        matchNights: [],
+      }));
+      site = await construireEnMemoire({ source: `scenario:${fichier}`, maintenant: Date.parse('2026-10-29T09:00:00Z'), racine });
+    } finally {
+      rmSync(dossier, { recursive: true, force: true });
+    }
+    const cadre = lireLeCadre();
+    const pages = pagesHtml(site.pages).filter((p) => p.contenu.includes(' id="ib-f-as-monaco-small-sn0-field"'));
+    expect(pages.map((p) => p.chemin)).toEqual(expect.arrayContaining(['/matchs/club/monaco/', '/matchs/', '/matchs/club/nice/']));
+    for (const p of pages) {
+      expect(p.contenu.match(PIED)[0], p.chemin).toBe(pied(cadre, { marque: MARQUE, chemin: p.chemin, langue: p.langue ?? 'fr' }));
+      const ids = [...p.contenu.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
+      expect(ids.length - new Set(ids).size, p.chemin).toBe(0);
+      for (const [, cible] of p.contenu.matchAll(/url\(#([^)]+)\)/g)) expect(ids, p.chemin).toContain(cible);
+      expect(ids, p.chemin).toContain('pied-ib-f-as-monaco-small-sn0-field');
+    }
+  });
 });
 
 // ---------- Le contact du pied ----------

@@ -1,6 +1,6 @@
 // Le pied de page commun à toutes les pages, dans cet ordre : chaque lien [adresse, texte]. En haut, les deux actions
 // (les seuls liens ambre), « Presse et partenariats » (la page Presse) et son adresse, X ; puis le plan du site : les
-// matchs, les clubs (un disque à leurs couleurs devant le nom), les compétitions, les villes, Baromatch ; en bas, les
+// matchs, les clubs (leur insigne de l’appli devant le nom), les compétitions, les villes, Baromatch ; en bas, les
 // pages légales. Les tests le comparent mot pour mot, sur les pages fixes comme sur les pages générées.
 export const PIED = [
   ['/#attente', 'Préviens-moi quand Baromatch arrive'],

@@ -3,8 +3,8 @@
 // (<!-- entete:debut --> … <!-- entete:fin -->, <!-- pied:debut --> … <!-- pied:fin -->), que « npm run cadre » (ce
 // fichier, lancé seul) réécrit. tests/cadre.spec.mjs refuse une page dont l’en-tête ou le pied diffère de cette source.
 // Les mots : contenu/cadre.json ; le logo et le verre du pied : contenu/logo.svg et contenu/verre.svg ; les clubs, les
-// compétitions et les villes du pied : les listes du générateur (suivre.json, clubs.json, couleurs.json, villes.json),
-// celles dont les pages existent toujours ; l’état de l’appli : marque.json.
+// compétitions et les villes du pied : les listes du générateur (suivre.json, clubs.json, villes.json), celles dont les
+// pages existent toujours, chaque club avec son insigne de l’appli (insigne.mjs) ; l’état de l’appli : marque.json.
 // L’en-tête : le logo, quatre entrées (« Ce soir » et « La semaine » en paire, « Pour les bars », « À propos »), sans
 // chiffre ni script, la page où l’on est marquée (aria-current), puis « Préviens-moi » sur les pages qui le portent :
 // ambre si la page n’a pas déjà son bouton ambre, en contour sinon (actionDeLaPage).
@@ -12,6 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DOSSIER_GENERATEUR, RACINE } from './contenu.mjs';
+import { insigne } from './insigne.mjs';
 import { pagesEcritesALaMain } from './mesure.mjs';
 import { echapper as e } from './texte.mjs';
 
@@ -19,31 +20,25 @@ const lire = (fichier) => readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 
 const lireJson = (fichier) => JSON.parse(lire(fichier));
 const sansNotes = (objet) => Object.entries(objet).filter(([cle]) => !cle.startsWith('_'));
 
-// Un club, un disque : sa première couleur de midi dans le sens des aiguilles d’une montre, sur la part que
-// couleurs.json lui donne (la moitié par défaut), la seconde dessous. Un club sans couleurs connues : un disque neutre.
-// Des attributs de SVG, pas de style en ligne (la politique de sécurité des pages n’en permet aucun).
-const COULEUR = /^#[0-9A-F]{6}$/i;
-export const disque = (couleurs) => {
-  const [premiere, seconde = premiere, part = 0.5] = Array.isArray(couleurs) ? couleurs : [];
-  if (!COULEUR.test(premiere ?? '') || !COULEUR.test(seconde) || !(part >= 0.5 && part <= 0.85)) {
-    return '<svg class="disque disque--neutre" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1"/></svg>';
-  }
-  const angle = 2 * Math.PI * part;
-  const point = `${(1 + Math.sin(angle)).toFixed(3)} ${(1 - Math.cos(angle)).toFixed(3)}`;
-  return `<svg class="disque" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1" fill="${seconde}"/><path d="M1 1V0A1 1 0 ${part > 0.5 ? 1 : 0} 1 ${point}z" fill="${premiere}"/></svg>`;
-};
+// Un club du pied : son insigne de l’appli (insigne.mjs), à 24 px, sur la nuit du pied (le pied est de nuit sur
+// chaque page, même au jour), décoratif : son nom est écrit à côté. Les identifiants de son dessin (la découpe de
+// quelques clubs) prennent « pied- » devant : une page qui dessine le même club à une taille voisine (une liste, à
+// 30 px) a les siens, et le pied reste le même sur chaque page (identifiantsUniques n’a rien à y renommer).
+export const TAILLE_DES_INSIGNES_DU_PIED = 24;
+export const insigneDuPied = (club) => insigne(club, { taille: TAILLE_DES_INSIGNES_DU_PIED, fond: 'night' })
+  .replace(/ id="([^"]+)"/g, ' id="pied-$1"')
+  .replace(/url\(#([^)]+)\)/g, 'url(#pied-$1)');
 
 // Ce que le cadre lit, une fois : ses mots, ses deux dessins, et les listes du pied. Le cadre est celui du générateur
 // (ses fichiers de contenu), quel que soit le site qu’il écrit.
 export const lireLeCadre = () => {
   const suivre = lireJson('suivre.json');
   const noms = lireJson('clubs.json');
-  const couleurs = lireJson('couleurs.json');
   return {
     textes: lireJson('cadre.json'),
     logo: lire('logo.svg').trim(),
     verre: lire('verre.svg').trim(),
-    clubs: sansNotes(suivre.clubs).map(([cle]) => ({ cle, nom: noms[cle]?.court ?? cle, couleurs: couleurs[cle] })),
+    clubs: sansNotes(suivre.clubs).map(([cle]) => ({ cle, nom: noms[cle]?.court ?? cle })),
     competitions: sansNotes(suivre.competitions).map(([nom, c]) => ({ cle: c.cle, nom })),
     villes: sansNotes(lireJson('villes.json')).map(([cle, v]) => ({ cle, nom: v.nom })),
   };
@@ -97,8 +92,8 @@ export const cibleDeLAction = (contenu) => (/<form\b[^>]*\bid="attente"/.test(co
 // Le pied de page, de nuit. marque : marque.json (le contact, X, le slogan, l’état de l’appli). avecPresse : la page
 // Presse existe. Sur une page en anglais, le même pied, dit en français (lang="fr"), sous une phrase en anglais.
 // Écrit serré (une balise par ligne, sans retrait, sans classe que styles.css ne lit pas) : il est sur chaque page, et
-// une page de plus de 73 000 octets perd un aller-retour sur un téléphone lent (tests/pour-les-bars.spec.mjs). L’adresse
-// passe à la ligne après « @ » (<wbr>), quand le texte est agrandi.
+// une page de plus de 43 800 octets compressés perd un aller-retour sur un téléphone lent (tests/pour-les-bars.spec.mjs).
+// L’adresse passe à la ligne après « @ » (<wbr>), quand le texte est agrandi.
 export const pied = (cadre, { marque, chemin = '', avecPresse = true, langue = 'fr' } = {}) => {
   const t = cadre.textes.pied;
   const m = cadre.textes.menu;
@@ -106,7 +101,7 @@ export const pied = (cadre, { marque, chemin = '', avecPresse = true, langue = '
   const colonne = (titre, contenu) => `<div>\n<h2>${e(titre)}</h2>\n${contenu}\n</div>`;
   const etat = t.etat[marque.appli?.ouverte ? 'ouverte' : 'fermee'];
   const x = marque.profils?.x;
-  const clubs = `<ul class="pied__clubs">\n${cadre.clubs.map((c) => `<li>${lien(`/matchs/club/${c.cle}/`, `${disque(c.couleurs).replace(' focusable="false"', '')}${e(c.nom)}`, chemin, 'pied__club')}</li>`).join('\n')}\n</ul>`;
+  const clubs = `<ul class="pied__clubs">\n${cadre.clubs.map((c) => `<li>${lien(`/matchs/club/${c.cle}/`, `${insigneDuPied(c)}${e(c.nom)}`, chemin, 'pied__club')}</li>`).join('\n')}\n</ul>`;
   return `<footer class="pied page"${langue === 'en' ? ' lang="fr"' : ''}>${langue === 'en' ? `
 <p class="pied__langue" lang="en">${e(t.langue)}</p>` : ''}
 <div class="pied__tete">

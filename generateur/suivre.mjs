@@ -18,7 +18,7 @@ import path from 'node:path';
 import { cheminDuCalendrier, clubsDeLigue1, lienVersLAgenda, webcalDe } from './agenda.mjs';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS } from './donnees.mjs';
-import { appel, enAttenteDesBars, fil, ligneDeListe, ligneDeMatch, page, quand, statutDuMatch, tuTiensUnBar } from './gabarits.mjs';
+import { appel, enAttenteDesBars, fil, insignesDeLEnTete, ligneDeListe, ligneDeMatch, page, quand, statutDuMatch, tuTiensUnBar } from './gabarits.mjs';
 import { heureDeParis, jourEnLettres } from './heure.mjs';
 import { adresseDe, cheminDeLaVille, cheminDuBar, cheminDuMatch, filDAriane, listeDesBars, pageWeb } from './jsonld.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
@@ -197,7 +197,7 @@ ${guide}  <p>${e(t.chaine)}</p>
       ],
       corps: `${fil(etapes)}
 <header class="regarder-tete">
-  <p class="regarder-surtitre">${e(t.surtitreClub)}</p>
+${insignesDeLEnTete({ cle, nom: nomComplet })}  <p class="regarder-surtitre">${e(t.surtitreClub)}</p>
   <h1 class="regarder-titre">${e(h1)}</h1>
   <p class="regarder-chapeau">${e(chapeau(t.chapeauClub, joues, soirees))}</p>
 ${prochain ? `  <p class="regarder-quand">${e(remplir(t.prochain, { match: `${prochain.domicile.nom} – ${prochain.exterieur.nom}`, quand: quandCourt(prochain), competition: prochain.competition, lieu: prochain.domicile.cle === cle ? t.domicile : t.exterieur }))}</p>\n` : ''}</header>

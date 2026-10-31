@@ -9,6 +9,7 @@ import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
 import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, cheminDeLaVille, debutDe, IMAGE } from './jsonld.mjs';
 import { baliseDeLaMesure, lireLaMesure, politiqueAvecLaMesure } from './mesure.mjs';
 import { blocPartager, SCRIPT_DU_PARTAGE } from './partage.mjs';
+import { identifiantsUniques, insigne, paireDInsignes, TAILLES } from './insigne.mjs';
 
 // form-action : la liste d’attente des pages de ville part vers Formspree, sans JavaScript (attente.mjs).
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action https://formspree.io";
@@ -72,11 +73,12 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
 
 // L’en-tête et le pied de page : ceux de cadre.mjs, avec « Préviens-moi » (ambre, ou en contour si le corps a déjà son
 // bouton ambre ; vers la liste d’attente de la page quand elle en a une), sauf sur les affiches. Une page en anglais
-// garde l’en-tête et le pied du site, en français : ils le disent (lang="fr").
+// garde l’en-tête et le pied du site, en français : ils le disent (lang="fr"). Les identifiants des insignes de la page
+// (le corps et le pied) sont uniques (identifiantsUniques).
 export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => {
   const contenu = avecLePartage(corps, { partage, titre, chemin, textesDuPartage });
   const action = pageDuGenerateurAvecLAction(chemin) ? actionDeLaPage(contenu) : null;
-  return insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, cible: cibleDeLAction(contenu), langue })}
+  return identifiantsUniques(insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, cible: cibleDeLAction(contenu), langue })}
 
 <main id="contenu" class="regarder page">
 ${contenu}
@@ -84,10 +86,18 @@ ${contenu}
 ${pied(cadre, { marque, chemin, avecPresse, langue })}
 </body>
 </html>
-`);
+`));
 };
 
 // ---------- Morceaux communs ----------
+
+// Les insignes des clubs (insigne.mjs), sur le fond de nuit des pages générées : la paire d’un match dans une liste
+// (30 px, comme la liste « Les matchs » de l’appli) ; les deux insignes de l’en-tête d’un match, ou celui d’un club
+// (58 px, comme son écran « Ce soir »).
+export const FOND_DES_PAGES = 'night';
+export const insignesDuMatch = (match, { fond = FOND_DES_PAGES } = {}) => paireDInsignes(match.domicile, match.exterieur, { fond });
+export const insignesDeLEnTete = (...clubs) => `  <div class="regarder-insignes">${clubs.map((club) => insigne(club, { taille: TAILLES.entete, fond: FOND_DES_PAGES })).join('')}</div>
+`;
 
 export const fil = (etapes) => `<nav class="regarder-fil" aria-label="Fil d’Ariane">
   <ol>
@@ -209,8 +219,13 @@ export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = ''
 export const statutDuMatch = (match, textes) => (match.statut ? ` · <strong>${e(textes.match[match.statut])}</strong>` : '');
 
 // Une ligne d’une liste de matchs (ou de villes) : sa tête, seule sur sa ligne (un lien de 44 px vers sa page, ou son
-// nom), et dessous ses détails, en tête de ligne (une capitale, aucun « · » devant). tete : du HTML déjà échappé.
-export const ligneDeListe = (tete, adresse, infos) => `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${tete}</a>` : `<span class="regarder-matchs__match">${tete}</span>`}${infos ? ` <span class="regarder-matchs__infos">${infos}</span>` : ''}</li>`;
+// nom), et dessous ses détails, en tête de ligne (une capitale, aucun « · » devant). tete : du HTML déjà échappé ;
+// insignes : ceux du match, devant son nom (insignesDuMatch), qui a alors son propre élément (il passe sous la paire
+// quand il ne tient pas à côté, sans couper de mot).
+export const ligneDeListe = (tete, adresse, infos, insignes = '') => {
+  const dedans = insignes ? `${insignes}<span class="regarder-matchs__nom">${tete}</span>` : tete;
+  return `<li>${adresse ? `<a class="regarder-matchs__match" href="${adresse}">${dedans}</a>` : `<span class="regarder-matchs__match">${dedans}</span>`}${infos ? ` <span class="regarder-matchs__infos">${infos}</span>` : ''}</li>`;
+};
 
 // Une ligne de match : son nom court (vers sa page s’il en a une) ; dessous, le jour et l’heure (ou l’heure seule, sous
 // un titre qui donne déjà le jour), la compétition, et la suite (« · » puis les bars, ou le statut du match).
@@ -218,6 +233,7 @@ export const ligneDeMatch = (match, { avecPage, suite = '', heureSeule = false }
   `${e(match.domicile.court)} – ${e(match.exterieur.court)}`,
   avecPage ? cheminDuMatch(match) : null,
   `${quand(match, { heureSeule, majuscule: true })} · ${e(match.competition)}${suite}`,
+  insignesDuMatch(match),
 );
 
 export { accorder, capitale, e, jourEnLettres, heureDeParis, ancreDeLaSoiree, cheminDeLaVille, cheminDuBar, cheminDuMatch };

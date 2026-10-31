@@ -144,7 +144,7 @@ export const construire = async ({
   let bloc = null;
   let accueil = null;
   try {
-    bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
+    bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant });
     const erreursDuBloc = controlerLaSemaine(bloc);
     if (erreursDuBloc.length) {
       avertissements.push(`accueil : le bloc des matchs de la semaine est refusé (${erreursDuBloc.join(' ; ')}) : l’accueil reste comme il est`);

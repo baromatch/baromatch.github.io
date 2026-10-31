@@ -11,9 +11,10 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
-  accueilAvecLaSemaine, blocDeLaSemaine, controlerLaSemaine, disque, ecrireLAccueil, preparerLAccueil, REPERES,
+  accueilAvecLaSemaine, blocDeLaSemaine, controlerLaSemaine, ecrireLAccueil, preparerLAccueil, REPERES,
 } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
+import { paireDInsignes } from '../generateur/insigne.mjs';
 import { echapper, insecables } from '../generateur/texte.mjs';
 import { racine } from './outils/environnement.mjs';
 import { auJourDeLAccueil } from './outils/horloge.mjs';
@@ -27,7 +28,7 @@ import { decrireLesPlusFaibles, lignesTropFaibles, mesurerAuPixel } from './outi
 import { lireCouleur, poser, rapport } from './outils/contraste.mjs';
 
 const CONTENU = chargerLeContenu(racine);
-const { textes, couleurs } = CONTENU;
+const { textes } = CONTENU;
 const ACCUEIL = readFileSync(path.join(racine, 'index.html'), 'utf8');
 const H = 3_600_000;
 
@@ -50,7 +51,7 @@ const MATCHS = [
   unMatch({ slug: 'psg-ol-2026-10-28', debut: '2026-10-28T19:45:00Z', domicile: club('psg', 'PSG'), exterieur: club('ol', 'OL') }),
   unMatch({ slug: 'lens-om-2026-11-08', debut: '2026-11-08T19:45:00Z', domicile: club('lens', 'Lens'), exterieur: club('om', 'OM') }),
 ];
-const bloc = ({ matchs = MATCHS, bars = [], maintenant = JEUDI } = {}) => blocDeLaSemaine({ donnees: { matchs, bars }, textes, couleurs, maintenant });
+const bloc = ({ matchs = MATCHS, bars = [], maintenant = JEUDI } = {}) => blocDeLaSemaine({ donnees: { matchs, bars }, textes, maintenant });
 const texteDe = (html) => html.replace(/<[^>]+>/g, ' ').replace(/[ \n]+/g, ' ').trim();
 const jourDe = (html, jour) => html.split(`<div class="semaine__jour" data-jour="${jour}">`)[1].split('</div>')[0];
 const cartesDe = (html, jour) => jourDe(html, jour).split('<li class="').slice(1);
@@ -180,7 +181,7 @@ test.describe('le bloc, du générateur', () => {
   test('le scénario (des bars inventés) : la ligne du prochain match dans un bar le 26 octobre (lundi sans bar, vendredi avec), aucune le 23 (le jour choisi a le sien), ni sans bar publié', async () => {
     const blocDuScenario = async (maintenant, publies = PUBLIES_DU_SCENARIO) => {
       const site = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant, racine, contenu: { ...contenuDuScenario(), publies } });
-      return blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, couleurs: site.contenu.couleurs, maintenant });
+      return blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant });
     };
     const lundi = Date.parse('2026-10-26T08:00:00Z');
     expect(await blocDuScenario(lundi)).toContain('<p class="semaine__prochain" data-jour="2026-10-30">Le prochain match dans un bar\u00a0: Le Havre – PSG, <time datetime="2026-10-30T19:00:00+01:00">vendredi 30 octobre\u00a0· 19:00</time>, 1 bar à Paris. <a class="semaine__voir" href="/matchs/le-havre-psg-2026-10-30/#titre-bars">');
@@ -204,21 +205,26 @@ test.describe('le bloc, du générateur', () => {
     expect(controlerLaSemaine(html)).toEqual([]);
   });
 
-  test('deux disques aux couleurs des clubs, jamais un écusson ; un club sans couleurs connues reste neutre', () => {
-    expect(disque(['#004170', '#DA291C', 0.75])).toBe('<svg class="disque" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1" fill="#DA291C"/><path d="M1 1V0A1 1 0 1 1 0.000 1.000z" fill="#004170"/></svg>');
-    expect(disque(['#FFFFFF', '#111111'])).toContain('<path d="M1 1V0A1 1 0 0 1 1.000 2.000z" fill="#FFFFFF"/>');
-    const neutre = '<svg class="disque disque--neutre" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1"/></svg>';
-    for (const douteuses of [undefined, [], ['rouge', '#FFFFFF'], ['#FFF', '#000000'], ['#004170', '#DA291C', 0.95], ['#004170', '"/><script>']]) {
-      expect(disque(douteuses), JSON.stringify(douteuses)).toBe(neutre);
+  test('deux insignes, ceux de l’appli, jamais un écusson ; un club que l’appli ne connaît pas a son insigne neutre', () => {
+    // Chaque carte : la paire de l’appli (un seul dessin de 64 × 30, décoratif), dans le lien vers le match, devant les
+    // deux noms (tests/insignes.spec.mjs la compare, trait pour trait, à celle de l’appli).
+    const html = bloc({ bars: [{ id: 'b1' }] });
+    const cartes = html.split('<li class="carte-match').slice(1);
+    expect(cartes).toHaveLength(MATCHS.length - 2);
+    for (const carte of cartes) {
+      const lien = carte.split('<a class="carte-match__clubs"')[1].split('</a>')[0];
+      expect(lien.match(/<svg /g)).toHaveLength(1);
+      expect(lien).toMatch(/^ href="[^"]+"><svg class="insignes" width="64" height="30" viewBox="0 0 426\.6666666666667 200" aria-hidden="true" focusable="false">/);
+      expect(lien).toMatch(/<\/svg><span class="carte-match__club">[^<]+<\/span><span class="visuellement-cache"> – <\/span><span class="carte-match__club">[^<]+<\/span>$/);
     }
-    const inconnu = jourDe(bloc(), '2026-11-02');
-    expect(inconnu.match(/disque--neutre/g)).toHaveLength(2);
-    // Chaque couleur de couleurs.json est une vraie couleur, à une part permise ; chaque club de clubs.json qui en a une.
-    for (const [cle, valeur] of Object.entries(couleurs).filter(([c]) => !c.startsWith('_'))) {
-      expect(disque(valeur), cle).not.toContain('disque--neutre');
-    }
-    // Aucune image, aucun nom de fichier : le disque est dessiné.
-    expect(bloc({ bars: [{ id: 'b1' }] })).not.toMatch(/<img|\.(?:png|svg|webp)"/);
+    // Le 2 novembre : deux clubs que l’appli ne connaît pas, chacun son insigne neutre (le carton d’encre et les
+    // premières lettres de son nom ; aucune pour un nom sans lettre latine), exactement comme l’appli le dessine.
+    const inconnu = jourDe(html, '2026-11-02');
+    expect(inconnu).toContain(paireDInsignes({ nom: 'Sturm Graz' }, { nom: 'Шахтар' }, { fond: 'light', maintenant: JEUDI }));
+    expect(inconnu.match(/<circle cx="100" cy="100" r="96" fill="#1B1D27"\/>/g)).toHaveLength(2);
+    // Aucune image, aucun lien, aucun texte ni titre dans un dessin : l’insigne est fait de formes, ses lettres de tracés.
+    expect(html).not.toMatch(/<img|\.(?:png|svg|webp)"/);
+    for (const dessin of html.match(/<svg[\s\S]*?<\/svg>/g)) expect(dessin).not.toMatch(/<image|href=|<text|<title|style=/);
   });
 
   test('le bloc passe son contrôle : ni style en ligne, ni script, ni « ! », ni mot interdit, et un seul titre h2', () => {
@@ -788,6 +794,77 @@ test.describe('le texte agrandi à 200 %, sur un petit téléphone', () => {
         return dedans && !couvre ? [] : [point.closest('label').textContent];
       }));
       expect(couverts).toEqual([]);
+    });
+  }
+});
+
+// ---------- Les noms des clubs dans leur carte, le texte à 100 et à 200 % ----------
+
+// Chaque nom de club des cartes visibles, mesuré sur son texte (une plage) : son bord droit, le début de la colonne de la
+// flèche, le bord intérieur de la carte ; et la paire d’insignes, à côté des noms (à gauche) ou au-dessus.
+const lireLesNoms = (page) => page.evaluate(() => [...document.querySelectorAll('#semaine .carte-match')].filter((c) => c.checkVisibility()).flatMap((carte) => {
+  const lien = carte.querySelector('.carte-match__clubs');
+  const style = getComputedStyle(carte);
+  const bord = carte.getBoundingClientRect().right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+  const pistes = getComputedStyle(lien).gridTemplateColumns.split(' ').map(parseFloat);
+  const fleche = lien.getBoundingClientRect().right - pistes.at(-1);
+  const paire = lien.querySelector('.insignes').getBoundingClientRect();
+  return [...carte.querySelectorAll('.carte-match__club')].map((club) => {
+    const plage = document.createRange();
+    plage.selectNodeContents(club);
+    const lignes = [...plage.getClientRects()].filter((r) => r.width > 0);
+    const gauche = Math.min(...lignes.map((r) => r.left));
+    const droite = Math.max(...lignes.map((r) => r.right));
+    return { nom: club.textContent, surLaFleche: Math.round(droite - fleche), horsDeLaCarte: Math.round(droite - bord), aCote: paire.right <= gauche, dessus: paire.bottom <= Math.min(...lignes.map((r) => r.top)) };
+  });
+}));
+// Chaque jour de la barre, l’un après l’autre : les noms de ses cartes visibles.
+const lireChaqueJour = async (page) => {
+  const jours = page.locator('#semaine .semaine__date');
+  const lus = [];
+  for (let i = 0; i < await jours.count(); i += 1) {
+    await jours.nth(i).click();
+    lus.push(...await lireLesNoms(page));
+  }
+  return lus;
+};
+// Des noms longs, d’un seul mot pour la plupart (ceux qui sortaient de leur carte à 320 et 360 px, texte à 200 %).
+const NOMS_LONGS = [['leverkusen', 'Leverkusen'], ['strasbourg', 'Strasbourg'], ['newcastle', 'Newcastle'], ['bodo-glimt', 'Bodø/Glimt'], ['olympiacos', 'Olympiacos'],
+  ['nordsjaelland', 'Nordsjælland'], ['guadalajara', 'Guadalajara'], ['galatasaray', 'Galatasaray'], ['fenerbahce', 'Fenerbahçe'], ['hearts', 'Heart of Midlothian']];
+const MATCHS_AUX_NOMS_LONGS = Array.from({ length: NOMS_LONGS.length / 2 }, (_, i) => {
+  const [[a, nomA], [b, nomB]] = NOMS_LONGS.slice(i * 2, i * 2 + 2);
+  return unMatch({ slug: `${a}-${b}-2026-10-${29 + (i % 2)}`, debut: `2026-10-${29 + (i % 2)}T${17 + i}:00:00Z`, domicile: club(a, nomA), exterieur: club(b, nomB), competition: 'Ligue Europa' });
+});
+
+test.describe('les noms des clubs d’une carte, à 100 et 200 %', () => {
+  for (const largeur of [320, 360, 390, 412]) {
+    test(`à ${largeur} px : chaque nom tient dans sa colonne, avant la flèche, et dans sa carte ; à 100 %, la paire reste à côté des noms`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.setViewportSize({ width: largeur, height: 800 });
+      const essai = accueilAvecLaSemaine(ACCUEIL, bloc({ matchs: MATCHS_AUX_NOMS_LONGS }));
+      const lu = {};
+      // L’accueil tel qu’il est (sa semaine), puis l’accueil avec une semaine aux noms longs.
+      for (const [quoi, ouvrir] of [
+        ['l’accueil', async () => { await auJourDeLAccueil(page); await page.goto('/'); }],
+        ['les noms longs', async () => {
+          await page.clock.setFixedTime(new Date(JEUDI));
+          await page.route((adresse) => adresse.pathname === '/', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: essai }));
+          await page.goto('/');
+        }],
+      ]) {
+        await ouvrir();
+        await page.evaluate(() => document.fonts.ready);
+        for (const pourcent of [100, 200]) {
+          await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          lu[`${quoi}, ${pourcent} %`] = await lireChaqueJour(page);
+        }
+      }
+      expect(lu['les noms longs, 200 %'].map((n) => n.nom)).toEqual(expect.arrayContaining(['Nordsjælland', 'Olympiacos', 'Bodø/Glimt']));
+      for (const [cas, noms] of Object.entries(lu)) {
+        expect(noms.filter((n) => n.surLaFleche > 0 || n.horsDeLaCarte > 0).map((n) => `${n.nom} : +${n.surLaFleche} px sur la flèche, +${n.horsDeLaCarte} px hors de la carte`), cas).toEqual([]);
+        // À 100 % (où tout tient), la carte reste comme elle est : la paire à gauche des noms.
+        if (cas.endsWith('100 %')) expect(noms.filter((n) => !n.aCote).map((n) => n.nom), cas).toEqual([]);
+      }
     });
   }
 });

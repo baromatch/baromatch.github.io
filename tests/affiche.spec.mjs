@@ -17,11 +17,13 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import jsQR from 'jsqr';
 import { racine } from './outils/environnement.mjs';
+import { sansInsignes } from './outils/insignes.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, MAINTENANT_DU_SCENARIO, PUBLIES_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { construire } from '../generateur/construire.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
+import { paireDInsignes } from '../generateur/insigne.mjs';
 import { controlerLaPage, texteVisible } from '../generateur/controle.mjs';
 import { MOTS_INTERDITS } from '../generateur/donnees.mjs';
 import { estPermis, fichierDuChemin } from '../generateur/etat.mjs';
@@ -88,10 +90,10 @@ const pageDe = (site, chemin) => {
 };
 const robotsDe = (p) => p.contenu.match(/<meta name="robots" content="([^"]*)">/)[1];
 // Les lignes de l’affiche : « 2026-10-23T20:45:00+02:00 Brest – Nice ».
-const lignesDe = (html) => [...html.matchAll(/<li class="affiche-ligne">[\s\S]*?<time class="affiche-heure[^"]*" datetime="([^"]+)">[^<]*<\/time> <span class="affiche-match">([^<]+)<\/span>/g)].map((m) => `${m[1]} ${m[2]}`);
+const lignesDe = (html) => [...sansInsignes(html).matchAll(/<li class="affiche-ligne">[\s\S]*?<time class="affiche-heure[^"]*" datetime="([^"]+)">[^<]*<\/time> <span class="affiche-match">([^<]+)<\/span>/g)].map((m) => `${m[1]} ${m[2]}`);
 // Les lignes des jours de /matchs/ (le bloc du jour et les jours suivants, sans « La semaine d’après », qui mène aux
 // pages des matchs plus lointains), dans le même format.
-const lignesDeLaSemaine = (html) => [...html.split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]*")?>([^<]+?)<\/(?:a|span)> <span class="regarder-matchs__infos"><time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
+const lignesDeLaSemaine = (html) => [...sansInsignes(html).split('aria-labelledby="titre-ensuite"')[0].matchAll(/<li><(?:a|span) class="regarder-matchs__match"(?: href="[^"]*")?>([^<]+?)<\/(?:a|span)> <span class="regarder-matchs__infos"><time datetime="([^"]+)">/g)].map((m) => `${m[2]} ${m[1]}`);
 // Les modules d’un QR code dessiné par svgDuQr, relus dans son SVG (marge comprise).
 const matriceDuSvg = (svg) => {
   const cote = Number(svg.match(/viewBox="0 0 (\d+) \1"/)[1]);
@@ -252,7 +254,7 @@ test('les lignes sont les matchs des sept jours de /matchs/, dans l’ordre, san
   expect(affiche).toContain('<p class="affiche-dates">Du vendredi 23 au jeudi 29 octobre</p>');
   expect(affiche).toContain('<h4 class="affiche-jour__nom" id="jour-2026-10-25"><time datetime="2026-10-25">Dimanche 25</time></h4>');
   // Une heure provisoire n’est pas écrite.
-  expect(affiche).toContain('<time class="affiche-heure affiche-heure--a-confirmer" datetime="2026-10-28">Heure à confirmer</time> <span class="affiche-match">Paris FC – Angers</span>');
+  expect(sansInsignes(affiche)).toContain('<time class="affiche-heure affiche-heure--a-confirmer" datetime="2026-10-28">Heure à confirmer</time> <span class="affiche-match">Paris FC – Angers</span>');
   // Le passé (le match d’hier) et l’au-delà des sept jours (vendredi 30) n’y sont pas.
   expect(affiche).not.toMatch(/OM – Lens|Le Havre – PSG/);
   // Le pied : la phrase de préparation et le QR code vers l’accueil, sans aucun paramètre de suivi.
@@ -306,7 +308,10 @@ test('l’affiche d’un bar publié : noindex, sa prochaine soirée, ses soiré
   expect(p.contenu).toContain('<p class="affiche-bar">Le Zinc des Amis</p>');
   // Pas ce soir : « Ici, on diffuse le match. », puis le match, son jour et son heure en entier.
   expect(p.contenu).toContain('<h3 class="affiche-titre">Ici, on diffuse le match.</h3>');
-  expect(p.contenu).toContain('<span class="affiche-prochain__match">PSG – Barça</span> <span class="affiche-prochain__quand">Samedi 24 octobre · <time class="affiche-heure" datetime="2026-10-24T21:00:00+02:00">21:00</time></span>');
+  expect(sansInsignes(p.contenu)).toContain('<span class="affiche-prochain__match">PSG – Barça</span> <span class="affiche-prochain__quand">Samedi 24 octobre · <time class="affiche-heure" datetime="2026-10-24T21:00:00+02:00">21:00</time></span>');
+  // Le prochain match a sa paire d’insignes, comme l’en-tête d’une page de match : 58 px, sur le papier (fond clair).
+  const psgBarca = site.donnees.matchs.find((m) => m.slug === 'psg-barca-2026-10-24');
+  expect(p.contenu).toContain(`<span class="affiche-prochain__match">${paireDInsignes(psgBarca.domicile, psgBarca.exterieur, { taille: 58, fond: 'light' })}PSG – Barça</span>`);
   expect(lignesDe(p.contenu)).toEqual(['2026-10-25T20:45:00+01:00 PSG – OL']);
   // L’appli n’est pas ouverte : aucune place promise.
   expect(p.contenu).toContain('Nos soirées de match sont sur Baromatch.');
@@ -480,6 +485,113 @@ test.describe('dans le navigateur', () => {
     // L’affiche d’un bar n’a pas de lignes vides : pas d’indice non plus.
     await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
     await expect(onglet.locator('.affiche-stylo')).toHaveCount(0);
+  });
+
+  // Chaque match de la feuille (les lignes, et le grand prochain match d’un bar) : sa boîte, sa paire d’insignes, chacun
+  // de ses dessins (la largeur que son attribut lui donne, et celle qu’il a), son nom (le texte seul : ses lignes, ses
+  // bords), la boîte de sa ligne et celle de sa compétition.
+  const lireLesMatchs = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('.affiche-match, .affiche-prochain__match')].filter((b) => b.getClientRects().length).map((bloc) => {
+    const boite = (e) => { const r = e.getBoundingClientRect(); return { gauche: r.left, droite: r.right, haut: r.top, bas: r.bottom, hauteur: r.height }; };
+    const textes = [];
+    let nom = '';
+    const marcheur = document.createTreeWalker(bloc, NodeFilter.SHOW_TEXT);
+    for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+      if (n.parentElement.closest('svg') || !n.data.trim()) continue;
+      const plage = document.createRange();
+      plage.selectNodeContents(n);
+      textes.push(...[...plage.getClientRects()].filter((r) => r.width > 0));
+      nom += n.data;
+    }
+    const ligne = bloc.closest('.affiche-ligne__texte');
+    // La largeur du nom sur une seule ligne.
+    const essai = document.createElement('span');
+    essai.style.whiteSpace = 'nowrap';
+    essai.textContent = nom.trim();
+    bloc.append(essai);
+    const surUneLigne = essai.getBoundingClientRect().width;
+    essai.remove();
+    return {
+      surUneLigne,
+      nom: nom.trim(),
+      prochain: bloc.matches('.affiche-prochain__match'),
+      bloc: boite(bloc),
+      ligne: ligne ? boite(ligne) : null,
+      competition: ligne ? boite(ligne.querySelector('.affiche-competition')) : null,
+      paire: boite(bloc.querySelector('.insignes')),
+      dessins: [...bloc.querySelectorAll('svg')].map((d) => ({ attribut: Number(d.getAttribute('width')), largeur: d.getBoundingClientRect().width, hauteur: d.getBoundingClientRect().height })),
+      // milieu : celui de sa première ligne.
+      texte: {
+        lignes: new Set(textes.map((r) => Math.round(r.top))).size, gauche: Math.min(...textes.map((r) => r.left)), droite: Math.max(...textes.map((r) => r.right)),
+        haut: Math.min(...textes.map((r) => r.top)), bas: Math.max(...textes.map((r) => r.bottom)), milieu: (Math.min(...textes.map((r) => r.top)) + Math.min(...textes.map((r) => r.bottom))) / 2,
+      },
+    };
+  }));
+
+  // Le texte à 100 et à 200 % (WCAG 1.4.4 et 1.4.10) : la page ne défile pas de côté ; chaque match tient dans sa ligne,
+  // sans passer sur la compétition ; chaque insigne garde sa taille. Au téléphone (sous 560 px), une seule disposition :
+  // la paire toujours au-dessus du nom ; au-delà, à côté de lui ou au-dessus quand la place manque. Le grand prochain
+  // match d’un bar a sa paire de 58 px au-dessus de son nom.
+  for (const [chemin, nom] of [[OUVERTE, 'l’affiche de la semaine'], [AFFICHE_DU_ZINC, 'l’affiche d’un bar']]) {
+    test(`${nom}, texte à 100 et 200 % : à 320, 360, 412 et 1280 px, rien ne déborde, les insignes gardent leur taille, au-dessus du nom au téléphone`, async ({ page: onglet }) => {
+      for (const largeur of [320, 360, 412, 1280]) {
+        await onglet.setViewportSize({ width: largeur, height: 800 });
+        await onglet.goto(`${serveur.adresse}${chemin}`);
+        for (const pourcent of [100, 200]) {
+          await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          const cas = `${largeur} px, ${pourcent} %`;
+          const matchs = await lireLesMatchs(onglet);
+          expect(matchs.filter((m) => !m.prochain).length, cas).toBeGreaterThan(0);
+          expect(await onglet.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${cas} : la page défile de côté`).toBe(0);
+          const ecarts = [];
+          for (const m of matchs) {
+            if (m.ligne && (m.bloc.droite > m.ligne.droite + 0.5 || m.bloc.gauche < m.ligne.gauche - 0.5 || m.texte.droite > m.ligne.droite + 0.5)) ecarts.push(`${m.nom} : sort de sa ligne`);
+            const c = m.competition;
+            if (c && m.bloc.gauche < c.droite - 0.5 && c.gauche < m.bloc.droite - 0.5 && m.bloc.haut < c.bas - 0.5 && c.haut < m.bloc.bas - 0.5) ecarts.push(`${m.nom} : passe sur la compétition`);
+            for (const d of m.dessins) if (Math.abs(d.largeur - d.attribut) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.largeur} px au lieu de ${d.attribut}`);
+            if ((largeur < 560 || m.prochain) && m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
+            if (m.prochain && m.dessins.some((d) => d.hauteur !== 58)) ecarts.push(`${m.nom} : la paire du prochain match n’a pas 58 px`);
+          }
+          expect(ecarts, cas).toEqual([]);
+          if (chemin === AFFICHE_DU_ZINC) expect(matchs.filter((m) => m.prochain).map((m) => m.nom), cas).toEqual(['PSG – Barça']);
+        }
+      }
+    });
+  }
+
+  // L’impression, émulée à la largeur imprimable du papier (A4 : 210 mm moins deux marges de 12 ; A3 : 297 mm moins
+  // deux marges, et tout 1,414 fois plus grand) : chaque paire à côté de son nom, sur la même ligne, le nom d’un seul
+  // tenant ; la paire d’une ligne à 8 mm de haut en A4, celle du prochain match d’un bar à 15 mm, au-dessus de son nom.
+  test('à l’impression, en A4 et en A3 : chaque paire à côté de son nom, sur la même ligne, et à l’échelle du papier', async ({ page: onglet }) => {
+    const MM = 96 / 25.4;
+    for (const chemin of [OUVERTE, AFFICHE_DU_ZINC]) {
+      for (const [format, largeur, echelle] of [['A4', 186, 1], ['A3', 273, 1.414]]) {
+        await onglet.emulateMedia({ media: 'screen' });
+        await onglet.setViewportSize({ width: Math.round(largeur * MM), height: 1200 });
+        await onglet.goto(`${serveur.adresse}${chemin}`);
+        if (format === 'A3') await onglet.locator('#affiche-a3').check();
+        await onglet.emulateMedia({ media: 'print' });
+        const cas = `${chemin}, ${format}`;
+        const matchs = await lireLesMatchs(onglet);
+        expect(matchs.filter((m) => !m.prochain).length, cas).toBeGreaterThan(chemin === OUVERTE ? 10 : 0);
+        const ecarts = [];
+        for (const m of matchs) {
+          const attendue = (m.prochain ? 15 : 8) * MM * echelle;
+          for (const d of m.dessins) if (Math.abs(d.hauteur - attendue) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.hauteur.toFixed(1)} px de haut au lieu de ${attendue.toFixed(1)}`);
+          if (m.prochain) {
+            if (m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
+            continue;
+          }
+          // À côté de la paire, sa première ligne à hauteur de la paire ; d’un seul tenant quand il tient à côté d’elle (un
+          // nom plus long passe à la ligne à côté d’elle, jamais dessous).
+          if (m.paire.droite > m.texte.gauche + 0.5) ecarts.push(`${m.nom} : le nom n’est pas à côté de la paire`);
+          if (m.texte.milieu < m.paire.haut || m.texte.milieu > m.paire.bas) ecarts.push(`${m.nom} : la paire et le nom ne sont pas sur la même ligne`);
+          if (m.texte.gauche - m.bloc.gauche + m.surUneLigne <= m.bloc.droite - m.bloc.gauche && m.texte.lignes !== 1) ecarts.push(`${m.nom} : sur ${m.texte.lignes} lignes, alors qu’il tient sur une`);
+        }
+        expect(ecarts, cas).toEqual([]);
+        if (chemin === OUVERTE) expect(matchs.filter((m) => m.texte.lignes === 1).length, cas).toBeGreaterThan(10);
+      }
+    }
+    await onglet.emulateMedia({ media: 'screen' });
   });
 
   test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi', async ({ page: onglet }) => {

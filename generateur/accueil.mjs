@@ -3,7 +3,7 @@
 // avant d’écrire, que tout ce qui est hors des repères est resté identique, octet pour octet.
 // Le bloc : une barre des sept jours de Paris (« Aujourd’hui », « Demain », « sam. 31 »…), des boutons radio qui
 // marchent sans script (styles.css montre le jour choisi), puis une carte par match du jour : l’heure, la compétition,
-// les deux clubs (un disque à leurs couleurs, jamais un écusson), et une action qui existe. Un match qu’un bar publié
+// les deux clubs (leurs insignes, comme dans l’appli, jamais un écusson), et une action qui existe. Un match qu’un bar publié
 // diffuse passe en tête de son jour, et sa carte dit combien de bars, avec « Voir les bars » ; les autres, plus
 // discrètes, proposent l’agenda du match, et disent « Pas encore de bar » dès qu’un bar est publié ailleurs : tant
 // qu’aucun ne l’est, la phrase sous le titre le dit une fois pour toutes (comme la semaine, /matchs/). Si le jour
@@ -19,6 +19,7 @@ import { texteVisible } from './controle.mjs';
 import { DUREE_MATCH_MS, JOUR_MS, MOTS_INTERDITS } from './donnees.mjs';
 import { quand } from './gabarits.mjs';
 import { jourDeParis, jourEnLettres } from './heure.mjs';
+import { identifiantsUniques, paireDInsignes } from './insigne.mjs';
 import { cheminDuMatch } from './jsonld.mjs';
 import { SEMAINE_JOURS } from './pages.mjs';
 import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
@@ -26,25 +27,11 @@ import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 export const ACCUEIL = 'index.html';
 export const REPERES = { debut: '<!-- semaine:debut -->', fin: '<!-- semaine:fin -->' };
 
-const COULEUR = /^#[0-9A-F]{6}$/i;
 // Au-delà de ce nombre de matchs, un jour finit par un lien vers lui dans la semaine (/matchs/) : styles.css n’en montre
 // que 4 au téléphone, 6 à partir de 720 px (les autres cartes restent dans la page).
 const CARTES_AU_TELEPHONE = 4;
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const jourCourt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short', day: 'numeric' });
-
-// Un club, un disque : sa première couleur de midi dans le sens des aiguilles d’une montre, sur la part que
-// couleurs.json lui donne (la moitié par défaut), la seconde dessous. Un club sans couleurs connues : un disque neutre.
-// Des attributs de SVG, pas de style en ligne (la politique de sécurité de l’accueil n’en permet aucun).
-export const disque = (couleurs) => {
-  const [premiere, seconde = premiere, part = 0.5] = Array.isArray(couleurs) ? couleurs : [];
-  if (!COULEUR.test(premiere ?? '') || !COULEUR.test(seconde) || !(part >= 0.5 && part <= 0.85)) {
-    return '<svg class="disque disque--neutre" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1"/></svg>';
-  }
-  const angle = 2 * Math.PI * part;
-  const point = `${(1 + Math.sin(angle)).toFixed(3)} ${(1 - Math.cos(angle)).toFixed(3)}`;
-  return `<svg class="disque" viewBox="0 0 2 2" aria-hidden="true" focusable="false"><circle cx="1" cy="1" r="1" fill="${seconde}"/><path d="M1 1V0A1 1 0 ${part > 0.5 ? 1 : 0} 1 ${point}z" fill="${premiere}"/></svg>`;
-};
 
 const nomDe = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
 // « 2 bars à Paris », ou le nombre seul quand ses bars sont dans plusieurs villes : sur la carte, et sur la ligne du
@@ -54,8 +41,12 @@ const lesBars = (m) => {
   return `${accorder(m.soirees.length, 'bar')}${villes.length === 1 ? ` à ${villes[0]}` : ''}`;
 };
 
-// Une carte : l’heure et la compétition, les deux clubs (le lien vers la page du match), puis ce qu’on peut faire.
-const carte = (m, { textes, couleurs, maintenant, sansAucunBar }) => {
+// Les insignes des cartes : la paire de la liste « Les matchs » de l’appli (30 px), sur le fond clair des cartes.
+const FOND_DES_CARTES = 'light';
+
+// Une carte : l’heure et la compétition, les deux clubs (le lien vers la page du match : leurs insignes, puis leurs
+// noms), puis ce qu’on peut faire.
+const carte = (m, { textes, maintenant, sansAucunBar }) => {
   const t = textes.accueil;
   const chemin = cheminDuMatch(m);
   const nom = nomDe(m);
@@ -68,15 +59,16 @@ const carte = (m, { textes, couleurs, maintenant, sansAucunBar }) => {
   } else {
     bas = `${sansAucunBar ? '' : `<span class="carte-match__etat">${e(t.pasDeBar)}</span>`}${aSonFichier(m, maintenant) ? `<a class="carte-match__agenda" href="${chemin}match.ics" type="text/calendar">${e(t.agenda)}${pour}</a>` : ''}`;
   }
-  const club = (c) => `<span class="carte-match__club">${disque(couleurs[c.cle])}${e(c.court)}</span>`;
+  const club = (c) => `<span class="carte-match__club">${e(c.court)}</span>`;
+  const insignes = paireDInsignes(m.domicile, m.exterieur, { fond: FOND_DES_CARTES, maintenant });
   return `<li class="carte-match${m.soirees.length && !m.statut ? ' carte-match--bars' : ''}">
 <p class="carte-match__haut"><span class="carte-match__heure">${quand(m, { heureSeule: true })}</span><span class="carte-match__compet">${e(m.competition)}</span></p>
-<a class="carte-match__clubs" href="${chemin}">${club(m.domicile)}<span class="visuellement-cache"> – </span>${club(m.exterieur)}</a>
+<a class="carte-match__clubs" href="${chemin}">${insignes}${club(m.domicile)}<span class="visuellement-cache"> – </span>${club(m.exterieur)}</a>
 ${bas ? `<p class="carte-match__bas">${bas}</p>\n` : ''}</li>`;
 };
 
 // Le bloc entier, pour l’instant « maintenant » : le titre, la phrase vraie, la barre des jours et leurs cartes.
-export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) => {
+export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
   const t = textes.accueil;
   const aujourdhui = jourDeParis(maintenant);
   // Les sept jours de Paris, comptés sur les dates (comme la semaine, pages.mjs : un jour de changement d’heure dure 23
@@ -122,10 +114,11 @@ export const blocDeLaSemaine = ({ donnees, textes, couleurs = {}, maintenant }) 
   };
   const panneaux = semaine.map((j) => `<div class="semaine__jour" data-jour="${j.jour}">
 <h3 class="semaine__titre-jour"${j.i < 2 ? ` data-date="${e(enLettres(j.jour))}">${e(`${nomDuJour(j)}, ${jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`))}`)}` : `>${e(enLettres(j.jour))}`}</h3>
-${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m, { textes, couleurs, maintenant, sansAucunBar })).join('\n')}\n</ul>${tous(j)}` : `<p class="semaine__rien">${e(t.rienCeJour)}</p>`}
+${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m, { textes, maintenant, sansAucunBar })).join('\n')}\n</ul>${tous(j)}` : `<p class="semaine__rien">${e(t.rienCeJour)}</p>`}
 </div>`).join('\n');
   const rien = semaine.every((j) => !j.matchs.length);
-  return insecables(`<div class="semaine__tete">
+  // Les identifiants des insignes, uniques dans le bloc (le reste de l’accueil n’en dessine pas).
+  return identifiantsUniques(insecables(`<div class="semaine__tete">
 <h2 class="titre-section" id="titre-semaine">${e(t.titre)}</h2>
 <a class="semaine__toute" href="/matchs/">${e(t.toute)}</a>
 </div>
@@ -136,7 +129,7 @@ ${rien ? `<p class="semaine__rien">${e(t.rienCetteSemaine)}</p>` : `<div class="
 ${dates}
 </fieldset>
 ${panneaux}
-</div>`}`);
+</div>`}`));
 };
 
 // Ce que le bloc ne fait jamais : un style en ligne ou un script (la politique de sécurité de l’accueil les refuse),

@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "6cajm8YnQazkY_vOxzTiJg",
-   "change": "2026-10-30",
+   "empreinte": "rcZUHfbgio4IYsueo9-wew",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
@@ -67,8 +67,8 @@
   "/agenda/lens.ics": {
    "type": "calendrier",
    "cle": "lens",
-   "empreinte": "UyftDHkaRDBbBCWMQ60fYQ",
-   "change": "2026-10-25",
+   "empreinte": "wAsVA4EBe4mgd81t1LSSLA",
+   "change": "2026-10-31",
    "indexable": false,
    "memoire": {
     "court": "Lens",
@@ -78,8 +78,8 @@
   "/agenda/lille.ics": {
    "type": "calendrier",
    "cle": "lille",
-   "empreinte": "ehfX5lj3FyDsW7zk_Xh_9A",
-   "change": "2026-10-25",
+   "empreinte": "nx8U5zKqTiEoCp6l1Xl3Ng",
+   "change": "2026-10-31",
    "indexable": false,
    "memoire": {
     "court": "Lille",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "cSn2U0_ckavf63knehvOpQ",
-   "change": "2026-10-30",
+   "empreinte": "q8VAXtUXZslBThNsUlk9HQ",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "CB_CqBBh2qxOE_f7hF5DdQ",
-   "change": "2026-10-30",
+   "empreinte": "Iu_9TDghQRcrZq71unPJtQ",
+   "change": "2026-10-31",
    "indexable": false
   },
   "/en/": {
@@ -269,8 +269,8 @@
    "type": "match-en",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "6fljx57nP0hwYahZzVahdw",
-   "change": "2026-10-30",
+   "empreinte": "NEgXFoDLVPmMJS8hGBi0ng",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -350,8 +350,8 @@
    "type": "match-en",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "7z8o4p1a8kGFmSoAlESuYw",
-   "change": "2026-10-30",
+   "empreinte": "hsz0_VeT42GalHbNVgJezw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -492,31 +492,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "D_aSfqpi6ZDtdo6pPQXc_w",
-   "change": "2026-10-30",
+   "empreinte": "TnVDBYAr5HjMrMw_wDGEHA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "aY3Xa_2StVuTGz6ExoZmiQ",
-   "change": "2026-10-30",
+   "empreinte": "eDnlhONMvxPMuj244vWWHw",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "SKwYmavR8Zzy-hZpLKYtCw",
-   "change": "2026-10-30",
+   "empreinte": "ABq4iNmJvTrXzmCxpnSvMA",
+   "change": "2026-10-31",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "vyz__-F8cP95TvKpmoMGCA",
-   "change": "2026-10-30",
+   "empreinte": "4qbU3KJWeQXPNlbxI3aEDg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -1058,8 +1058,8 @@
    "type": "match",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "4NnAG-xZEc86qMityPRU8g",
-   "change": "2026-10-30",
+   "empreinte": "C9kN1XQAlkYCMqv676vPWg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1161,16 +1161,16 @@
   "/matchs/club/lens/": {
    "type": "club",
    "cle": "lens",
-   "empreinte": "cogP441U4NTBvMdCqvyolg",
-   "change": "2026-10-30",
+   "empreinte": "POBfjrHB37jiJvOrhUgCzQ",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
   "/matchs/club/lille/": {
    "type": "club",
    "cle": "lille",
-   "empreinte": "Vd17KtACN3psLxzMMzurSg",
-   "change": "2026-10-30",
+   "empreinte": "2j_Am0Q-79YfoXD3ACJLZw",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
@@ -1241,8 +1241,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "q9iD17dZIK8dF6AWCaVWyg",
-   "change": "2026-10-30",
+   "empreinte": "A4kt1Bp2b8cLQcIUny5pgQ",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
@@ -1884,8 +1884,8 @@
    "type": "match",
    "cle": "lens-paris-fc-2026-10-24",
    "date": "2026-10-24T18:45:00.000Z",
-   "empreinte": "yAwEE-3IbcGycVGUfA18_g",
-   "change": "2026-10-30",
+   "empreinte": "YTAX_DSYp3Kywx6XnrGjYg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2046,8 +2046,8 @@
    "type": "match",
    "cle": "lille-brest-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "Tt3DuoSMS8ETK7wg82CnqQ",
-   "change": "2026-10-30",
+   "empreinte": "cz55xZ__UFAygkdWoNSo5A",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2076,8 +2076,8 @@
    "type": "match",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "tm-tKJqpoo1CfND-mBRimQ",
-   "change": "2026-10-30",
+   "empreinte": "Z28ApUqjr_pRWU6nx4UJyw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2106,8 +2106,8 @@
    "type": "match",
    "cle": "lille-lens-2026-10-30",
    "date": "2026-10-30T20:05:00.000Z",
-   "empreinte": "fkSZ0Af0a5aLkr6kPQ02_w",
-   "change": "2026-10-30",
+   "empreinte": "RTzokOITPZkRjU-efx2wcw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2131,13 +2131,6 @@
      "slug": "rc-lens"
     }
    }
-  },
-  "/matchs/lille-lens-2026-10-30/partage.png": {
-   "type": "partage",
-   "cle": "lille-lens-2026-10-30",
-   "empreinte": "gdkD6j-n7ZUlO5Y8snxzZw",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/liverpool-arsenal-2026-11-01/": {
    "type": "match",
@@ -2409,8 +2402,8 @@
    "type": "match",
    "cle": "monaco-lille-2026-10-25",
    "date": "2026-10-25T14:00:00.000Z",
-   "empreinte": "ZAZnRJoeOfAqVc3td3Y3FA",
-   "change": "2026-10-30",
+   "empreinte": "N-hWlzOy_y9kkwTok2szVw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3416,8 +3409,8 @@
    "type": "match",
    "cle": "troyes-lens-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "czyDpxkNNzQIQihdCQL9Ww",
-   "change": "2026-10-30",
+   "empreinte": "ei7vEUqYQsYYRMnJXFJ0gg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3569,28 +3562,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5jqs001lryqj10w6b44j@baromatch.fr": {
-   "ids": [
-    "cmv6e5jqs001lryqj10w6b44j"
-   ],
-   "slug": "lille-lens-2026-10-30",
-   "debut": "2026-10-30T20:05:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "lille",
-    "court": "Lille",
-    "nom": "LOSC Lille"
-   },
-   "exterieur": {
-    "cle": "lens",
-    "court": "Lens",
-    "nom": "RC Lens"
-   },
-   "empreinte": "uAawgi75efmIFuhh6K-WjQ",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmv6e5jre001nryqjhxfxhvya@baromatch.fr": {
    "ids": [
     "cmv6e5jre001nryqjhxfxhvya"

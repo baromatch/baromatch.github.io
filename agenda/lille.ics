@@ -11,20 +11,6 @@ X-WR-CALDESC:Lille : les matchs au programme de Baromatch (Ligue 1 et Ligu
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5jqs001lryqj10w6b44j@baromatch.fr
-DTSTAMP:20261020T104807Z
-SEQUENCE:0
-DTSTART:20261030T200500Z
-DTEND:20261030T220500Z
-SUMMARY:Lille – Lens
-DESCRIPTION:Ligue 1 · LOSC Lille – RC Lens\nCoup d’envoi vendredi 30 o
- ctobre à 21:05\, heure de Paris.\nLa page du match : https://baromatch.f
- r/matchs/lille-lens-2026-10-30/
-URL:https://baromatch.fr/matchs/lille-lens-2026-10-30/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmv6e5k2p002jryqjyhm5jlup@baromatch.fr
 DTSTAMP:20261020T213523Z
 SEQUENCE:1

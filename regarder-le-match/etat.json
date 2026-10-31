@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "naNwsEcxubgxgWOXnSf_ow",
-   "change": "2026-10-30",
+   "empreinte": "aRWIYL-rHrtnh2YYhu8kNQ",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
@@ -45,8 +45,8 @@
   "/agenda/le-havre.ics": {
    "type": "calendrier",
    "cle": "le-havre",
-   "empreinte": "jQO8Gr5qJXxlfQsO0Iezjw",
-   "change": "2026-10-25",
+   "empreinte": "Noa8mNoU_4EIxNBmO8gi1w",
+   "change": "2026-10-30",
    "indexable": false,
    "memoire": {
     "court": "Le Havre",
@@ -67,8 +67,8 @@
   "/agenda/lens.ics": {
    "type": "calendrier",
    "cle": "lens",
-   "empreinte": "UyftDHkaRDBbBCWMQ60fYQ",
-   "change": "2026-10-25",
+   "empreinte": "wAsVA4EBe4mgd81t1LSSLA",
+   "change": "2026-10-31",
    "indexable": false,
    "memoire": {
     "court": "Lens",
@@ -78,8 +78,8 @@
   "/agenda/lille.ics": {
    "type": "calendrier",
    "cle": "lille",
-   "empreinte": "ehfX5lj3FyDsW7zk_Xh_9A",
-   "change": "2026-10-25",
+   "empreinte": "nx8U5zKqTiEoCp6l1Xl3Ng",
+   "change": "2026-10-31",
    "indexable": false,
    "memoire": {
     "court": "Lille",
@@ -111,8 +111,8 @@
   "/agenda/nice.ics": {
    "type": "calendrier",
    "cle": "nice",
-   "empreinte": "aZ_TSiOBqHJ3nLWaq8LmNA",
-   "change": "2026-10-25",
+   "empreinte": "3hBS2tJWzwXi0ky7hk37rg",
+   "change": "2026-10-31",
    "indexable": false,
    "memoire": {
     "court": "Nice",
@@ -155,8 +155,8 @@
   "/agenda/psg.ics": {
    "type": "calendrier",
    "cle": "psg",
-   "empreinte": "PdORSskEuwO3kPWbFRe_YQ",
-   "change": "2026-10-26",
+   "empreinte": "sLPyTyKyiWHOXh0vxs8x8Q",
+   "change": "2026-10-30",
    "indexable": false,
    "memoire": {
     "court": "PSG",
@@ -166,8 +166,8 @@
   "/agenda/rennes.ics": {
    "type": "calendrier",
    "cle": "rennes",
-   "empreinte": "3ELxMvqJu2TtPaP31Tt-xw",
-   "change": "2026-10-25",
+   "empreinte": "qF9xwc0DJv7hozsPaF8y1Q",
+   "change": "2026-10-31",
    "indexable": false,
    "memoire": {
     "court": "Rennes",
@@ -210,23 +210,23 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "8Y4z3I1AeeENRQycLd2yLQ",
-   "change": "2026-10-30",
+   "empreinte": "OR7IKN7jDtbXbUd7PEdvkQ",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "CB_CqBBh2qxOE_f7hF5DdQ",
-   "change": "2026-10-30",
+   "empreinte": "Iu_9TDghQRcrZq71unPJtQ",
+   "change": "2026-10-31",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "iyh-t80v5HAwtGBLljXJxg",
-   "change": "2026-10-30",
+   "empreinte": "tfDQy5lnhwR1gKEvsEKq8Q",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -269,8 +269,8 @@
    "type": "match-en",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "6fljx57nP0hwYahZzVahdw",
-   "change": "2026-10-30",
+   "empreinte": "NEgXFoDLVPmMJS8hGBi0ng",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -278,8 +278,8 @@
    "type": "match-en",
    "cle": "chelsea-man-united-2026-10-31",
    "date": "2026-10-31T12:30:00.000Z",
-   "empreinte": "LRBC5ekKwX2xgB7CvyRcBA",
-   "change": "2026-10-30",
+   "empreinte": "WQ7rfX3JfhFveoNHO2IxYA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -287,8 +287,8 @@
    "type": "match-en",
    "cle": "chelsea-tottenham-2026-10-24",
    "date": "2026-10-24T16:30:00.000Z",
-   "empreinte": "6edfgIQlNgBA0qGpnsPSQg",
-   "change": "2026-10-30",
+   "empreinte": "Po4hkLIx8Eg-hRgwYFSCgg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -296,8 +296,8 @@
    "type": "match-en",
    "cle": "everton-chelsea-2026-10-17",
    "date": "2026-10-17T11:30:00.000Z",
-   "empreinte": "JXo9MVZn9fPNWqc5nGnePg",
-   "change": "2026-10-30",
+   "empreinte": "DwdUnaEMpoSD7ZTAQlI3VQ",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -314,8 +314,8 @@
    "type": "match-en",
    "cle": "juventus-rennes-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "Nm2BZefbDiOOP5NyRMhOPw",
-   "change": "2026-10-30",
+   "empreinte": "D1pLr-PAJuiYu-Ox2un6NA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -323,7 +323,7 @@
    "type": "match-en",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "OFyPZdu4B8oET0_LRLNwug",
+   "empreinte": "p8BkicbwvhMRM83f_3_Eaw",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -350,8 +350,8 @@
    "type": "match-en",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "7z8o4p1a8kGFmSoAlESuYw",
-   "change": "2026-10-30",
+   "empreinte": "hsz0_VeT42GalHbNVgJezw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -413,7 +413,7 @@
    "type": "match-en",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "in3DSkFtv8B0C97yh4cTSw",
+   "empreinte": "JXuLsi7gAmcbI_pQ7IEBDA",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -422,7 +422,7 @@
    "type": "match-en",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "sSiAXfBu1sqhD75jKVH-KQ",
+   "empreinte": "YEkm0AGVQBaWX26KRyXpwA",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -458,7 +458,7 @@
    "type": "match-en",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "HAO7Ygr96McTF7aEelLNmw",
+   "empreinte": "Od6zGDmVp5NNUPqnKq3GZQ",
    "change": "2026-10-30",
    "indexable": false,
    "bars": []
@@ -484,39 +484,39 @@
   "/en/premier-league/": {
    "type": "guide-en",
    "cle": "premier-league",
-   "empreinte": "9lItRPdETGu6bcYphga9lA",
-   "change": "2026-10-30",
+   "empreinte": "ox5DnoJktS7DvIWba6zlmA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "ITDSjFg4cTLUxBjc3OjtGw",
-   "change": "2026-10-30",
+   "empreinte": "yx8n7inX3kKtpv_GYxK-wg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "rE9335axadVn8NruuXZlPg",
-   "change": "2026-10-30",
+   "empreinte": "KtfmY52P8cDdQwYJAnya_g",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "SKwYmavR8Zzy-hZpLKYtCw",
-   "change": "2026-10-30",
+   "empreinte": "ABq4iNmJvTrXzmCxpnSvMA",
+   "change": "2026-10-31",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "vyz__-F8cP95TvKpmoMGCA",
-   "change": "2026-10-30",
+   "empreinte": "4qbU3KJWeQXPNlbxI3aEDg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": []
   },
@@ -836,8 +836,8 @@
    "type": "match",
    "cle": "bayern-dortmund-2026-10-31",
    "date": "2026-10-31T17:30:00.000Z",
-   "empreinte": "e_MdCWEjSvWRt7zG2KCWqg",
-   "change": "2026-10-30",
+   "empreinte": "7qjLRasuJJoGW6rPMX3v5Q",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -861,13 +861,6 @@
      "slug": "borussia-dortmund"
     }
    }
-  },
-  "/matchs/bayern-dortmund-2026-10-31/match.ics": {
-   "type": "evenement",
-   "cle": "bayern-dortmund-2026-10-31",
-   "empreinte": "0vG6ACxj6-qG_jA5zh-Pgw",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/bayern-dortmund-2026-10-31/partage.png": {
    "type": "partage",
@@ -984,8 +977,8 @@
    "type": "match",
    "cle": "brest-nice-2026-10-23",
    "date": "2026-10-23T18:45:00.000Z",
-   "empreinte": "qEuSA8R3Y8rDL9GNUB75xg",
-   "change": "2026-10-30",
+   "empreinte": "irX8e9TtD_xshEGOOyfCAA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1058,8 +1051,8 @@
    "type": "match",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "4NnAG-xZEc86qMityPRU8g",
-   "change": "2026-10-30",
+   "empreinte": "C9kN1XQAlkYCMqv676vPWg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1088,8 +1081,8 @@
    "type": "match",
    "cle": "chelsea-man-united-2026-10-31",
    "date": "2026-10-31T12:30:00.000Z",
-   "empreinte": "p0ochEdMPyBUrpzEcswk8Q",
-   "change": "2026-10-30",
+   "empreinte": "KtGRxh-gX7OjJwSSDUvt5w",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1114,26 +1107,12 @@
     }
    }
   },
-  "/matchs/chelsea-man-united-2026-10-31/match.ics": {
-   "type": "evenement",
-   "cle": "chelsea-man-united-2026-10-31",
-   "empreinte": "0m5hKEgCEtkmXpL_kZb8ew",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/chelsea-man-united-2026-10-31/partage.png": {
-   "type": "partage",
-   "cle": "chelsea-man-united-2026-10-31",
-   "empreinte": "Z5dkmmvkmcjr80TT5JEDkg",
-   "change": "2026-10-30",
-   "indexable": false
-  },
   "/matchs/chelsea-tottenham-2026-10-24/": {
    "type": "match",
    "cle": "chelsea-tottenham-2026-10-24",
    "date": "2026-10-24T16:30:00.000Z",
-   "empreinte": "6klsESBQf-Hv2o-zUKyoeQ",
-   "change": "2026-10-30",
+   "empreinte": "N29J3TKtVMbXZyTcAoFBqg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1161,16 +1140,16 @@
   "/matchs/club/lens/": {
    "type": "club",
    "cle": "lens",
-   "empreinte": "cogP441U4NTBvMdCqvyolg",
-   "change": "2026-10-30",
+   "empreinte": "POBfjrHB37jiJvOrhUgCzQ",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
   "/matchs/club/lille/": {
    "type": "club",
    "cle": "lille",
-   "empreinte": "Vd17KtACN3psLxzMMzurSg",
-   "change": "2026-10-30",
+   "empreinte": "2j_Am0Q-79YfoXD3ACJLZw",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
@@ -1185,9 +1164,9 @@
   "/matchs/club/nice/": {
    "type": "club",
    "cle": "nice",
-   "empreinte": "yXtElrU3wQIOkhuGztgHIw",
-   "change": "2026-10-30",
-   "indexable": true,
+   "empreinte": "Wh8ZbIY1_Dmf2XDey-0Mcw",
+   "change": "2026-10-31",
+   "indexable": false,
    "bars": []
   },
   "/matchs/club/ol/": {
@@ -1209,7 +1188,7 @@
   "/matchs/club/psg/": {
    "type": "club",
    "cle": "psg",
-   "empreinte": "om6bLwTKaqLmc8xl18__gw",
+   "empreinte": "gIiRPnKtYxvCZh5n7XcTGQ",
    "change": "2026-10-30",
    "indexable": true,
    "bars": []
@@ -1217,32 +1196,32 @@
   "/matchs/club/rennes/": {
    "type": "club",
    "cle": "rennes",
-   "empreinte": "Tie-GkXPGfCyZ9ICU1l8EQ",
-   "change": "2026-10-30",
+   "empreinte": "WtbEA7sI1M9y7oqjvyf28Q",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
   "/matchs/competition/bundesliga/": {
    "type": "competition",
    "cle": "bundesliga",
-   "empreinte": "EFHDrvJ1db0g5j7hWaxzbA",
-   "change": "2026-10-30",
-   "indexable": true,
+   "empreinte": "r2x7eIewOTY8cKxbjuRKhQ",
+   "change": "2026-10-31",
+   "indexable": false,
    "bars": []
   },
   "/matchs/competition/liga/": {
    "type": "competition",
    "cle": "liga",
-   "empreinte": "4f7C2xtDoNGEgx1XADFNvg",
-   "change": "2026-10-30",
-   "indexable": true,
+   "empreinte": "10y_SwpkEbkHnPrSHrpaFg",
+   "change": "2026-10-31",
+   "indexable": false,
    "bars": []
   },
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "JMadq_sYnJAUTcTs21_Evg",
-   "change": "2026-10-30",
+   "empreinte": "PUCyjlB5ZQn2R9MGWORQbA",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
@@ -1273,8 +1252,8 @@
   "/matchs/competition/premier-league/": {
    "type": "competition",
    "cle": "premier-league",
-   "empreinte": "2MM3x6vKd_L6fSp6owC7ow",
-   "change": "2026-10-30",
+   "empreinte": "Mrha3miGOhhRvOcnKAyToA",
+   "change": "2026-10-31",
    "indexable": true,
    "bars": []
   },
@@ -1320,8 +1299,8 @@
    "type": "match",
    "cle": "espanyol-atletico-2026-10-17",
    "date": "2026-10-17T12:00:00.000Z",
-   "empreinte": "s3k5syA_Wl3JsyYC_8h4qQ",
-   "change": "2026-10-30",
+   "empreinte": "mYzqMFpDsSyh5By6HNytrA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1350,8 +1329,8 @@
    "type": "match",
    "cle": "everton-chelsea-2026-10-17",
    "date": "2026-10-17T11:30:00.000Z",
-   "empreinte": "9LNVNoIgdsDtT5JTIsLM0g",
-   "change": "2026-10-30",
+   "empreinte": "4pr9G7k5Hk9zJF0DVCLBhA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1588,8 +1567,8 @@
    "type": "match",
    "cle": "juventus-rennes-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "6WHUBigtVtcjPbnmSVEK_g",
-   "change": "2026-10-30",
+   "empreinte": "ooq94Zk1D6M_ZhMa4aVdUw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1618,7 +1597,7 @@
    "type": "match",
    "cle": "le-havre-auxerre-2026-10-18",
    "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "EsIP-nHZodt3dCaaPfgeSQ",
+   "empreinte": "toVzRMtQ4NuId-GvAKiVBA",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -1692,7 +1671,7 @@
    "type": "match",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "t1kFTl-CDwq-V_i6rPrZ0Q",
+   "empreinte": "DR3gp2giqCUDG-TPkRZStg",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -1717,20 +1696,6 @@
      "slug": "paris-saint-germain"
     }
    }
-  },
-  "/matchs/le-havre-psg-2026-10-30/match.ics": {
-   "type": "evenement",
-   "cle": "le-havre-psg-2026-10-30",
-   "empreinte": "fb6-R0QEBr_nsZirzfBM2A",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/le-havre-psg-2026-10-30/partage.png": {
-   "type": "partage",
-   "cle": "le-havre-psg-2026-10-30",
-   "empreinte": "MVpZRh0HNvooabJuDqkvfg",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/le-mans-monaco-2026-11-08/": {
    "type": "match",
@@ -1898,8 +1863,8 @@
    "type": "match",
    "cle": "lens-paris-fc-2026-10-24",
    "date": "2026-10-24T18:45:00.000Z",
-   "empreinte": "yAwEE-3IbcGycVGUfA18_g",
-   "change": "2026-10-30",
+   "empreinte": "YTAX_DSYp3Kywx6XnrGjYg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1928,8 +1893,8 @@
    "type": "match",
    "cle": "levante-atletico-2026-10-31",
    "date": "2026-10-31T13:00:00.000Z",
-   "empreinte": "YYPizYF5eaI12qz1_I4bzw",
-   "change": "2026-10-30",
+   "empreinte": "SPoscFgswexBZE_x0i3z5A",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1953,20 +1918,6 @@
      "slug": "atletico-de-madrid"
     }
    }
-  },
-  "/matchs/levante-atletico-2026-10-31/match.ics": {
-   "type": "evenement",
-   "cle": "levante-atletico-2026-10-31",
-   "empreinte": "492iZ2h6eLLHILjjD1u6uQ",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/levante-atletico-2026-10-31/partage.png": {
-   "type": "partage",
-   "cle": "levante-atletico-2026-10-31",
-   "empreinte": "dFOiY1cGT3TOM32pNgm8RQ",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/leverkusen-om-2026-11-05/": {
    "type": "match",
@@ -2016,8 +1967,8 @@
    "type": "match",
    "cle": "leverkusen-stuttgart-2026-10-31",
    "date": "2026-10-31T14:30:00.000Z",
-   "empreinte": "XtvnVZCK5KMUsJBtifpTng",
-   "change": "2026-10-30",
+   "empreinte": "TNQ8jkSolg0ud824Yu3VFg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2042,26 +1993,12 @@
     }
    }
   },
-  "/matchs/leverkusen-stuttgart-2026-10-31/match.ics": {
-   "type": "evenement",
-   "cle": "leverkusen-stuttgart-2026-10-31",
-   "empreinte": "JjW53TSU-Ar6N1xP6w80qg",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/leverkusen-stuttgart-2026-10-31/partage.png": {
-   "type": "partage",
-   "cle": "leverkusen-stuttgart-2026-10-31",
-   "empreinte": "uRay7k9aPOPV8Fc3D2b47Q",
-   "change": "2026-10-30",
-   "indexable": false
-  },
   "/matchs/lille-brest-2026-10-17/": {
    "type": "match",
    "cle": "lille-brest-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "Tt3DuoSMS8ETK7wg82CnqQ",
-   "change": "2026-10-30",
+   "empreinte": "cz55xZ__UFAygkdWoNSo5A",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2090,8 +2027,8 @@
    "type": "match",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "tm-tKJqpoo1CfND-mBRimQ",
-   "change": "2026-10-30",
+   "empreinte": "Z28ApUqjr_pRWU6nx4UJyw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2120,8 +2057,8 @@
    "type": "match",
    "cle": "lille-lens-2026-10-30",
    "date": "2026-10-30T20:05:00.000Z",
-   "empreinte": "sf-D_y56Sc8qWaqv2cfIIQ",
-   "change": "2026-10-30",
+   "empreinte": "RTzokOITPZkRjU-efx2wcw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2145,20 +2082,6 @@
      "slug": "rc-lens"
     }
    }
-  },
-  "/matchs/lille-lens-2026-10-30/match.ics": {
-   "type": "evenement",
-   "cle": "lille-lens-2026-10-30",
-   "empreinte": "jTdVIsrquIlAKZYklC76uQ",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/lille-lens-2026-10-30/partage.png": {
-   "type": "partage",
-   "cle": "lille-lens-2026-10-30",
-   "empreinte": "gdkD6j-n7ZUlO5Y8snxzZw",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/liverpool-arsenal-2026-11-01/": {
    "type": "match",
@@ -2430,8 +2353,8 @@
    "type": "match",
    "cle": "monaco-lille-2026-10-25",
    "date": "2026-10-25T14:00:00.000Z",
-   "empreinte": "ZAZnRJoeOfAqVc3td3Y3FA",
-   "change": "2026-10-30",
+   "empreinte": "N-hWlzOy_y9kkwTok2szVw",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2652,8 +2575,8 @@
    "type": "match",
    "cle": "nice-rennes-2026-10-31",
    "date": "2026-10-31T16:15:00.000Z",
-   "empreinte": "K3MKT9-GB0jXLyPM1AhC0w",
-   "change": "2026-10-30",
+   "empreinte": "BSKsLpnqeHZ0CYXTpgGOvg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2677,20 +2600,6 @@
      "slug": "stade-rennais-fc"
     }
    }
-  },
-  "/matchs/nice-rennes-2026-10-31/match.ics": {
-   "type": "evenement",
-   "cle": "nice-rennes-2026-10-31",
-   "empreinte": "tcnimfdxL45NUStjA8ULaw",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/nice-rennes-2026-10-31/partage.png": {
-   "type": "partage",
-   "cle": "nice-rennes-2026-10-31",
-   "empreinte": "7BDzOhJtMoUMa3rtH054lg",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/ol-angers-2026-10-31/": {
    "type": "match",
@@ -2740,8 +2649,8 @@
    "type": "match",
    "cle": "ol-nice-2026-10-18",
    "date": "2026-10-18T18:45:00.000Z",
-   "empreinte": "QdDK9I8t9oMG05-dyl7tcA",
-   "change": "2026-10-30",
+   "empreinte": "WOKxgzpA79-k7zkhJ0-H-g",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2770,7 +2679,7 @@
    "type": "match",
    "cle": "om-le-havre-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "bKGSU55FAeD_cLaNSdZU0Q",
+   "empreinte": "zLLeGUgH5aJhPWExAode6A",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -2888,8 +2797,8 @@
    "type": "match",
    "cle": "paris-fc-rennes-2026-10-18",
    "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "4Rg_sDa0d-rub2uCliARGg",
-   "change": "2026-10-30",
+   "empreinte": "X2dx1hpcyWDYtZNHsSI8vQ",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2918,7 +2827,7 @@
    "type": "match",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "CGujeotpkJ0OEsTMpQjv0A",
+   "empreinte": "u7Aci4NvFrnR64KP145V_Q",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -2949,7 +2858,7 @@
    "type": "match",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "Ov_efvoz-Gf8EQGryBiJhw",
+   "empreinte": "3_eocvXinCLt94sI_Gti9Q",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -3185,8 +3094,8 @@
    "type": "match",
    "cle": "rennes-strasbourg-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "KbnxuXOxrwXKDKAoa1RzRw",
-   "change": "2026-10-30",
+   "empreinte": "2RMPwu6IdumU4-lp_ZsaBA",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3259,7 +3168,7 @@
    "type": "match",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "iFjhI8ANTqtEp8TBnUUzvQ",
+   "empreinte": "20TZBVjHTi1fdT5Nu_0Aag",
    "change": "2026-10-30",
    "indexable": false,
    "bars": [],
@@ -3437,8 +3346,8 @@
    "type": "match",
    "cle": "troyes-lens-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "czyDpxkNNzQIQihdCQL9Ww",
-   "change": "2026-10-30",
+   "empreinte": "ei7vEUqYQsYYRMnJXFJ0gg",
+   "change": "2026-10-31",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3590,160 +3499,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5jq2001jryqjwmoopuma@baromatch.fr": {
-   "ids": [
-    "cmv6e5jq2001jryqjwmoopuma"
-   ],
-   "slug": "le-havre-psg-2026-10-30",
-   "debut": "2026-10-30T18:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "le-havre",
-    "court": "Le Havre",
-    "nom": "Le Havre AC"
-   },
-   "exterieur": {
-    "cle": "psg",
-    "court": "PSG",
-    "nom": "Paris Saint-Germain"
-   },
-   "empreinte": "aoJfeRCMt88aLu5Zg7dwrQ",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jqs001lryqj10w6b44j@baromatch.fr": {
-   "ids": [
-    "cmv6e5jqs001lryqj10w6b44j"
-   ],
-   "slug": "lille-lens-2026-10-30",
-   "debut": "2026-10-30T20:05:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "lille",
-    "court": "Lille",
-    "nom": "LOSC Lille"
-   },
-   "exterieur": {
-    "cle": "lens",
-    "court": "Lens",
-    "nom": "RC Lens"
-   },
-   "empreinte": "uAawgi75efmIFuhh6K-WjQ",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jre001nryqjhxfxhvya@baromatch.fr": {
-   "ids": [
-    "cmv6e5jre001nryqjhxfxhvya"
-   ],
-   "slug": "chelsea-man-united-2026-10-31",
-   "debut": "2026-10-31T12:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "chelsea",
-    "court": "Chelsea",
-    "nom": "Chelsea FC"
-   },
-   "exterieur": {
-    "cle": "man-united",
-    "court": "Man United",
-    "nom": "Manchester United"
-   },
-   "empreinte": "tqOhaZzPcdGHd0TQEVi7WA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5js3001pryqjp1pab0mv@baromatch.fr": {
-   "ids": [
-    "cmv6e5js3001pryqjp1pab0mv"
-   ],
-   "slug": "levante-atletico-2026-10-31",
-   "debut": "2026-10-31T13:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "LaLiga",
-   "domicile": {
-    "cle": "levante",
-    "court": "Levante",
-    "nom": "Levante UD"
-   },
-   "exterieur": {
-    "cle": "atletico",
-    "court": "Atlético",
-    "nom": "Atlético de Madrid"
-   },
-   "empreinte": "caIpyX7fakTJ7kTL-igS9w",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jsr001rryqjyirci7ve@baromatch.fr": {
-   "ids": [
-    "cmv6e5jsr001rryqjyirci7ve"
-   ],
-   "slug": "leverkusen-stuttgart-2026-10-31",
-   "debut": "2026-10-31T14:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Bundesliga",
-   "domicile": {
-    "cle": "leverkusen",
-    "court": "Leverkusen",
-    "nom": "Bayer 04 Leverkusen"
-   },
-   "exterieur": {
-    "cle": "stuttgart",
-    "court": "Stuttgart",
-    "nom": "VfB Stuttgart"
-   },
-   "empreinte": "ndtjww3ZI0Ojg98d-gL7Ag",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jtm001tryqjjh7k07oq@baromatch.fr": {
-   "ids": [
-    "cmv6e5jtm001tryqjjh7k07oq"
-   ],
-   "slug": "nice-rennes-2026-10-31",
-   "debut": "2026-10-31T16:15:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "nice",
-    "court": "Nice",
-    "nom": "OGC Nice"
-   },
-   "exterieur": {
-    "cle": "rennes",
-    "court": "Rennes",
-    "nom": "Stade Rennais FC"
-   },
-   "empreinte": "QEbjSEn8zqmIOPDlZNganw",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5jud001vryqjg1ftnofd@baromatch.fr": {
-   "ids": [
-    "cmv6e5jud001vryqjg1ftnofd"
-   ],
-   "slug": "bayern-dortmund-2026-10-31",
-   "debut": "2026-10-31T17:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Bundesliga",
-   "domicile": {
-    "cle": "bayern",
-    "court": "Bayern",
-    "nom": "FC Bayern München"
-   },
-   "exterieur": {
-    "cle": "dortmund",
-    "court": "Dortmund",
-    "nom": "Borussia Dortmund"
-   },
-   "empreinte": "L-toQjxvr-tqUJFlC862HA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmv6e5jv2001xryqji904wews@baromatch.fr": {
    "ids": [
     "cmv6e5jv2001xryqji904wews"

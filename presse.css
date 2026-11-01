@@ -44,7 +44,6 @@
 .presse__ouverture-texte > p { max-width: 32rem; max-width: min(32rem, calc(round(down, 100% - .9375rem, 1.3125rem) + .9375rem)); color: var(--texte-doux); text-wrap: pretty; }
 .presse__ouverture-texte > .surtitre { color: var(--texte-discret); }
 .presse__ouverture-texte > .presse__chapo { max-width: min(32rem, calc(round(down, 100% - 1rem, 1.46875rem) + 1rem)); margin-top: 20px; color: var(--texte); font-size: 1.1875rem; }
-.presse__chapo + p { margin-top: 10px; }
 @media (min-width: 720px) { .presse__ouverture-texte > .presse__chapo { font-size: 1.3125rem; } }
 
 /* Les deux boutons l’un sous l’autre, de la largeur du plus grand ; côte à côte dès 36 rem (16 px d’air au moins). */
@@ -66,6 +65,8 @@
 }
 .presse__bouton:hover { background: var(--fond-releve); color: var(--texte); }
 .presse__ouverture-texte > .presse__bar { margin-top: 12px; }
+/* Les droits du kit, sous les boutons : les deux boutons restent dans le premier écran d’un iPhone (SE compris). */
+.presse__ouverture-texte > .presse__bar + p { margin-top: 16px; }
 
 /* Sous 600 px, l’icône s’efface (elle reste dans « Le logo ») : les deux boutons tiennent dans le premier écran d’un
    iPhone 15 ; sous 360 px, le texte se resserre : « Écrire pour la presse » tient dans celui d’un iPhone SE. */
@@ -78,7 +79,9 @@
   .presse__ouverture { padding-top: 16px; }
   .presse__titre { font-size: 1.875rem; }
   .presse__ouverture-texte > .presse__chapo { margin-top: 12px; font-size: 1rem; line-height: 1.5; }
-  .presse__ouverture-texte > .presse__chapo + p { font-size: 0.9375rem; }
+  .presse__ouverture-texte > .presse__bar + p { font-size: 0.9375rem; }
+  /* La question et son lien l’un sous l’autre : le lien ne glisse pas de côté quand la police arrive (CLS 0 à 320 px). */
+  .presse__ouverture-texte > .presse__bar { display: grid; justify-items: start; }
   .presse .presse__actions { margin-top: 14px; }
 }
 /* Sur cette page : huit entrées, des capsules à 44 px, cernées à 3,6:1. */

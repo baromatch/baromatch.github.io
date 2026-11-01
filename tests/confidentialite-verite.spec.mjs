@@ -54,8 +54,10 @@ test('la page Confidentialité ne décrit comme destinataire ni Mapbox, ni Fireb
   await expect(page.locator('#prestataires + ul > li', { hasText: /^Sentry/ })).toContainText('une fois qu’on l’a allumé');
   // Les mails d’alerte, par Resend : des chiffres, jamais un fan.
   await expect(page.locator('#prestataires + ul > li', { hasText: /^Resend/ })).toContainText('ils ne disent que la sorte d’alerte et des chiffres, jamais un fan, un pseudo, une adresse mail, un code ni le nom d’un bar');
-  // Les notifications : tant que celles du serveur ne sont pas allumées, seuls les rappels programmés par le téléphone.
-  await expect(page.locator('#notifications + ul')).toContainText('tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone');
+  // Les notifications : celles du serveur sont allumées sur iPhone depuis le 1er novembre 2026 ; sur Android, pas encore,
+  // seuls les rappels programmés par le téléphone.
+  await expect(page.locator('#notifications + ul')).toContainText('sur iPhone, elles sont allumées depuis le 1er novembre 2026');
+  await expect(page.locator('#notifications + ul')).toContainText('Sur Android, pas encore : notre serveur n’en envoie aucune sur ton téléphone');
   // Les photos : fermées, et la page sera mise à jour avant.
   expect(texte).toContain('Les photos de profil ne sont pas ouvertes pour l’instant.');
   expect(texte).toContain('Avant de les ouvrir, on mettra cette page à jour');
@@ -82,8 +84,8 @@ test('la page Confidentialité : les durées que l’effacement automatique appl
 
 // La recherche de la carte (le besoin n° 40 de l’appli, 27 octobre 2026) : tout ce que le fan tape, dès 3 caractères,
 // part vers l’IGN, même un nom de bar ou de club ; la réponse reste 5 minutes, sans le compte. Et les messages de Baromatch
-// sur un match (le besoin n° 41) : à qui, combien, et comment les couper ; aucun ne part tant que les notifications du
-// serveur n’arrivent pas sur le téléphone.
+// sur un match (le besoin n° 41) : à qui, combien, et comment les couper ; sur Android, aucun ne part tant que les
+// notifications du serveur n’y arrivent pas.
 test('la page Confidentialité : tout texte de la recherche part vers l’IGN, et les messages de Baromatch sur un match', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const ligneRecherche = page.locator('#position + ul > li', { hasText: 'La recherche de la carte' });
@@ -97,7 +99,7 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   const texte = await texteDe(page, '/confidentialite.html');
   expect(texte).not.toContain('recherche d’adresse');
   const messages = normaliser(await page.locator('#messages-match').innerText());
-  expect(messages).toContain('quand les notifications de notre serveur arriveront sur ton téléphone, Baromatch pourra t’envoyer de temps en temps un message sur un match : un match qui approche, ou la mi-temps.');
+  expect(messages).toContain('sur iPhone, et sur Android quand les notifications de notre serveur y arriveront, Baromatch peut t’envoyer de temps en temps un message sur un match : un match qui approche, ou la mi-temps.');
   expect(messages).toContain('Seulement si tu as allumé « Messages de Baromatch » dans Réglages (il est coupé au départ) : c’est ton accord, et notre serveur garde la date où tu l’as donné.');
   expect(messages).toContain('Et seulement si une de tes arrivées a été validée dans un bar ces 7 derniers jours');
   expect(messages).toContain('Par match, au plus une de ces notifications : ton club qui joue, une soirée qui ouvre, ou ce message. Aucune pour un match où tu as déjà ta place.');
@@ -105,13 +107,13 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   expect(messages).toContain('Pour ne plus les recevoir, coupe « Messages de Baromatch » dans Réglages : ton accord est retiré.');
   // Couper les notifications du téléphone les cache, sans retirer l’accord gardé avec le compte.
   expect(messages).toContain('Couper les notifications de Baromatch dans les réglages de ton téléphone les cache aussi, sans retirer ton accord.');
-  // Tant que les notifications du serveur ne sont pas allumées, rien ne part : la page le dit toujours, juste avant.
-  await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone');
+  // Sur Android, tant que les notifications du serveur n’y sont pas allumées, rien ne part : la page le dit, juste avant.
+  await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('Sur Android, pas encore : notre serveur n’en envoie aucune sur ton téléphone');
   // Sa base est écrite, et le résumé « en clair » des intérêts légitimes, auquel renvoie le droit de s’opposer, la compte.
   const base = page.locator('#pourquoi + p + ul > li', { hasText: 'T’envoyer de temps en temps un message sur un match' });
   await expect(base).toHaveCount(1);
   // Un accord, coupé au départ, plus notre intérêt légitime.
-  await expect(base).toContainText('ton accord, donné en allumant « Messages de Baromatch » dans Réglages (il est coupé au départ), quand les notifications de notre serveur arriveront sur ton téléphone');
+  await expect(base).toContainText('ton accord, donné en allumant « Messages de Baromatch » dans Réglages (il est coupé au départ), sur iPhone, et sur Android quand les notifications de notre serveur y arriveront');
   await expect(base).not.toContainText('intérêt légitime');
   await expect(base).toContainText('ou qu’il arrive à la mi-temps');
   await expect(page.locator('#pourquoi ~ p', { hasText: 'Nos intérêts légitimes, en clair' })).not.toContainText('mi-temps');
@@ -120,15 +122,17 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   await expect(page.locator('#pourquoi + p + ul a[href="#messages-match"]')).toHaveCount(1);
 });
 
-// Les notifications des iPhone (30 octobre 2026) : une fois qu’on les allume, celles de notre serveur passent par Apple.
-// La page le dit avant : ce qu’Apple reçoit (jamais qui tu es), combien de temps, Apple dans les prestataires et dans
-// les durées ; rien chez Apple pour un téléphone Android, et la page ne nomme Apple nulle part ailleurs.
-test('la page Confidentialité : sur iPhone, les notifications de notre serveur passent par Apple, une fois allumées', async ({ page }) => {
+// Les notifications des iPhone, allumées le 1er novembre 2026 : celles de notre serveur passent par Apple. La page le dit :
+// ce qu’Apple reçoit (jamais qui tu es), combien de temps, Apple dans les prestataires et dans les durées ; rien chez
+// Apple pour un téléphone Android, où elles ne sont pas encore allumées, et la page ne nomme Apple nulle part ailleurs.
+test('la page Confidentialité : sur iPhone, les notifications de notre serveur sont allumées et passent par Apple ; sur Android, pas encore', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const serveur = normaliser(await page.locator('#notifications + ul > li').nth(1).innerText());
-  expect(serveur).toContain('Les notifications de notre serveur : tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone, et seules tes soirées sonnent, depuis ton téléphone.');
-  expect(serveur).toContain('Sur iPhone, une fois allumées, elles passent par le service de notifications d’Apple (voir ci-dessous).');
-  expect(serveur).toContain('Sur Android, avant qu’elles arrivent, cette page le dira.');
+  expect(serveur).toContain('Les notifications de notre serveur : sur iPhone, elles sont allumées depuis le 1er novembre 2026. Elles passent par le service de notifications d’Apple (voir ci-dessous).');
+  expect(serveur).toContain('Sur Android, pas encore : notre serveur n’en envoie aucune sur ton téléphone, et seules tes soirées sonnent, depuis ton téléphone. Avant qu’elles arrivent sur Android, cette page le dira.');
+  // Plus aucune phrase ne dit qu’elles attendent d’être allumées partout : sur iPhone, elles le sont.
+  const toute = await texteDe(page, '/confidentialite.html');
+  expect(toute).not.toMatch(/tant qu’on ne les a pas allumées|tant qu’on n’a pas allumé celles de notre serveur|une fois qu’on les a allumées|quand les notifications de notre serveur arriveront sur ton téléphone/);
   await expect(page.locator('#notifications + ul > li').nth(2)).toHaveAttribute('id', 'apple');
   await expect(page.locator('#notifications + ul > li').nth(1).locator('a[href="#apple"]')).toHaveCount(1);
   const apple = normaliser(await page.locator('#apple').innerText());
@@ -138,12 +142,12 @@ test('la page Confidentialité : sur iPhone, les notifications de notre serveur 
   expect(apple).toContain('Pour un téléphone Android, rien ne part chez Apple.');
   const prestataire = page.locator('#prestataires + ul > li', { hasText: /^Apple/ });
   await expect(prestataire).toHaveCount(1);
-  await expect(prestataire).toContainText('transmet à ton iPhone les notifications de notre serveur, une fois qu’on les a allumées');
+  await expect(prestataire).toContainText('transmet à ton iPhone les notifications de notre serveur, allumées depuis le 1er novembre 2026');
   await expect(prestataire).toContainText('Apple est une société américaine.');
   const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
   expect(durees).toContain('Les notifications de notre serveur chez Apple, pour un iPhone : le temps qu’elles arrivent, 12 heures au plus.');
   const choix = normaliser(await page.locator('#notifications + ul > li', { hasText: 'Tes choix, dans Réglages' }).innerText());
-  expect(choix).toContain('Aucune de ces notifications n’arrive sur ton téléphone tant qu’on n’a pas allumé celles de notre serveur.');
+  expect(choix).toContain('Sur Android, ces trois-là n’arrivent pas encore : les notifications de notre serveur n’y sont pas encore allumées.');
   expect(choix).not.toContain('pour l’instant');
   // Apple n’est nommé que là : la ligne des notifications du serveur, ce qu’Apple reçoit, ses prestataires, sa durée.
   const ailleurs = await page.locator('main').evaluate((main) => {

@@ -3,7 +3,8 @@
 // - Un seul bouton ambre par page (« Proposer mon bar », « Écrire pour la presse ») : aucune autre surface, aucun texte
 //   ni aucun bord ambre dans la page (le disque de couleur du kit, qui montre l’ambre, excepté).
 // - Chaque texte à 4,5:1 au moins sur son fond, chaque bord d’une action et chaque contour du focus à 3:1.
-// - Chaque action hors d’une phrase se touche sur 44 px de haut.
+// - Chaque action hors d’une phrase se touche sur 44 px de haut ; un lien pris dans une phrase, sur toute sa ligne, et
+//   toucher son texte n’ouvre jamais un autre lien.
 // - Avec le texte à 200 % sur 320, 375 et 390 px : rien ne sort de l’écran, aucun mot n’est coupé (passer à la ligne
 //   après un trait d’union n’en coupe pas), et l’étiquette « Écran de démonstration » garde son texte dans sa pilule.
 // - Chaque écran de l’appli porte « Écran de démonstration », et la page dit que ses bars, clubs et pseudos sont inventés.
@@ -438,17 +439,76 @@ for (const largeur of [528, 912]) {
   });
 }
 
-// Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés) : 44 px de haut eux aussi, par un
-// padding qui ne touche pas à la ligne (ils restent en ligne : tests/liens-en-ligne.spec.mjs).
-test('les liens pris dans une phrase des deux pages se touchent sur 44 px', async ({ page }) => {
-  const hauteurs = [];
-  for (const [chemin, selecteur] of [['/a-propos.html', '.apropos__rassure a, .apropos__note-carte a, .apropos__qui-publie a, .apropos__suite a'], ['/presse.html', '.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a']]) {
-    await ouvrir(page, chemin, 390);
-    hauteurs.push(...await page.$$eval(selecteur, (liens) => liens.map((a) => [a.textContent.trim(), Math.round(a.getBoundingClientRect().height)])));
+// Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés ; ils restent en ligne :
+// tests/liens-en-ligne.spec.mjs) : un padding agrandit leur zone à toucher jusqu’à la hauteur de leur ligne, jamais
+// au-delà (l’exception « en ligne » de WCAG 2.5.8, comme tests/cibles-tactiles.spec.mjs). Mesuré là où le doigt touche
+// (elementFromPoint), pas sur la boîte : sur 7 × 7 points de chaque morceau de texte d’un lien, c’est ce lien qui
+// répond ; au milieu de chaque morceau, il répond sur toute la hauteur de sa ligne, à 0,1 em près (le padding compte la
+// boîte du texte pour 1,25 em ; celle de Bricolage Grotesque fait de 1,20 à 1,24 em). Avant, ce padding portait la
+// boîte à 44 px sur des lignes de 26 px : la boîte d’un lien couvrait le bas du texte du lien de la ligne du dessus, et
+// toucher « comment on choisit les bars » ouvrait « pourquoi Baromatch existe » (Presse, de 320 à 576 px) ou les
+// « CGU » (À propos) ; le test d’alors lisait la hauteur de la boîte, et passait.
+const toucherLesLiens = () => {
+  const nom = (e) => e.textContent.replace(/\s+/g, ' ').trim();
+  const repond = (x, y) => document.elementFromPoint(x, y)?.closest('a') ?? null;
+  const fautes = [];
+  let liens = 0;
+  for (const a of document.querySelectorAll('main a[href]')) {
+    if (getComputedStyle(a).display !== 'inline' || !a.getClientRects().length || a.closest('.visuellement-cache')) continue;
+    let bloc = a.parentElement;
+    while (/^(inline|contents)/.test(getComputedStyle(bloc).display)) bloc = bloc.parentElement;
+    if (nom(bloc) === nom(a)) continue;
+    liens += 1;
+    const interligne = parseFloat(getComputedStyle(bloc).lineHeight);
+    const taille = parseFloat(getComputedStyle(a).fontSize);
+    // Le bord de la zone où ce lien répond, depuis un point où il répond, vers le haut (-1) ou le bas (1), au 1/64 px.
+    const bord = (x, depart, sens) => {
+      let dedans = depart;
+      let dehors = depart + sens;
+      while (Math.abs(dehors - depart) < interligne && repond(x, dehors) === a) { dedans = dehors; dehors += sens; }
+      for (let i = 0; i < 6; i += 1) { const m = (dedans + dehors) / 2; if (repond(x, m) === a) dedans = m; else dehors = m; }
+      return dedans;
+    };
+    a.scrollIntoView({ block: 'center' });
+    const morceaux = [];
+    const parcours = document.createTreeWalker(a, NodeFilter.SHOW_TEXT);
+    while (parcours.nextNode()) {
+      if (!parcours.currentNode.nodeValue.trim() || parcours.currentNode.parentElement.closest('.visuellement-cache')) continue;
+      const plage = document.createRange();
+      plage.selectNodeContents(parcours.currentNode);
+      morceaux.push(...[...plage.getClientRects()].filter((r) => r.width > 2));
+    }
+    for (const r of morceaux) {
+      const points = Array.from({ length: 49 }, (_, k) => [r.left + 1 + ((r.width - 2) * (k % 7)) / 6, r.top + 1 + ((r.height - 2) * Math.floor(k / 7)) / 6]);
+      // Un autre lien (au bord du dernier signe, le point qui suit le lien, rapproché par le crénage, répond pour la phrase).
+      const ailleurs = points.map(([x, y]) => repond(x, y)).find((c) => c && c !== a);
+      if (ailleurs) fautes.push(`toucher « ${nom(a)} » ouvre « ${nom(ailleurs)} »`);
+      const x = r.left + r.width / 2;
+      const milieu = (r.top + r.bottom) / 2;
+      const hauteur = bord(x, milieu, 1) - bord(x, milieu, -1);
+      if (hauteur < interligne - 0.1 * taille) fautes.push(`« ${nom(a)} » se touche sur ${hauteur.toFixed(1)} px, sa ligne en fait ${interligne.toFixed(1)}`);
+    }
   }
-  expect(hauteurs.length).toBe(14);
-  expect(hauteurs.filter(([, h]) => h < 44)).toEqual([]);
-});
+  return { liens, fautes: [...new Set(fautes)] };
+};
+const LARGEURS_DES_LIENS = [[320, 480, 8], [496, 960, 16], [976, 1440, 16]];
+for (const { chemin } of PAGES) for (const [debut, fin, pas] of LARGEURS_DES_LIENS) {
+  test(`${chemin}, de ${debut} à ${fin} px, texte à 100, 150 et 200 % : toucher le texte d’un lien pris dans une phrase ouvre ce lien, jamais un autre, sur toute la hauteur de sa ligne`, async ({ page }) => {
+    test.setTimeout(120_000);
+    await ouvrir(page, chemin, debut);
+    const fautes = [];
+    for (let largeur = debut; largeur <= fin; largeur += pas) {
+      await page.setViewportSize({ width: largeur, height: 900 });
+      for (const pourcent of [100, 150, 200]) {
+        await agrandir(page, pourcent);
+        const lu = await page.evaluate(toucherLesLiens);
+        expect(lu.liens, `${largeur} px, ${pourcent} %`).toBe(7);
+        fautes.push(...lu.fautes.map((f) => `${largeur} px, ${pourcent} % : ${f}`));
+      }
+    }
+    expect(fautes).toEqual([]);
+  });
+}
 
 // Les écrans de l’appli et l’affiche du film ne sont jamais agrandis : l’image chargée a au moins autant de pixels que
 // sa place à l’écran, sur un iPhone SE (×2) et un iPhone 15 (×3), à 100 % (deux écrans par ligne sur Presse) comme
@@ -575,8 +635,8 @@ test('Presse à 320 px, texte à 200 % : chaque disque de couleur est au-dessus 
   expect(teintes).toEqual([true, true]);
 });
 
-// Le nombre de lignes d’un texte : ses morceaux de texte, regroupés quand ils se chevauchent en hauteur (un lien de
-// 44 px dans la ligne ne compte pas pour une ligne de plus).
+// Le nombre de lignes d’un texte : ses morceaux de texte, regroupés quand ils se chevauchent en hauteur (le texte d’un
+// lien et celui de sa phrase, sur la même ligne, comptent pour une).
 const lignesDe = (page, selecteur) => page.$$eval(selecteur, (elements) => elements.map((e) => {
   const rects = [];
   const parcours = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);

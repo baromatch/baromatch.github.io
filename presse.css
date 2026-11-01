@@ -201,8 +201,8 @@
 .presse__teinte-nom { font-size: 1.125rem; font-weight: 750; }
 .presse .presse__role { color: var(--texte-doux); text-wrap: pretty; }
 .presse__police .presse__role { margin-top: 6px; }
-/* En ligne, 44 px au toucher (comme dans a-propos.css). */
-.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a { padding-block: max(0px, 22px - .55em); font-weight: 650; }
+/* En ligne, agrandis au toucher sur toute leur ligne, sans déborder (comme dans a-propos.css). */
+.presse__police a, .presse__autre-format a, .presse__bar a, .presse__faits a, .presse__suite a { padding-block: max(0px, (1lh - 1.25em) / 2); font-weight: 650; }
 :is(.presse__police, .presse__autre-format, .presse__bar, .presse__faits, .presse__suite) a:focus-visible { padding-block: 0; }
 .presse code { font: inherit; font-weight: 700; white-space: nowrap; -webkit-user-select: all; user-select: all; }
 

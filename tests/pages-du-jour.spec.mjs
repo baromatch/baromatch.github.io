@@ -374,49 +374,62 @@ for (const { chemin } of PAGES) {
 
 // Le chapô de Presse, plus long, se coupait autrement selon la police : à 576 px, quatre lignes dans la police de
 // secours et cinq dans Bricolage Grotesque ; à son arrivée, tout le premier écran descendait d’une ligne (CLS 0,018).
-// Le chapô et la phrase des droits, qui le suit, ont 32 rem au plus (512 px à 100 %), une largeur où les deux polices
-// coupent pareil (le chapô : cinq lignes de 433 à 540 px en 19 px, de 479 à 597 px en 21 px ; la phrase : deux lignes
-// dès 448 px). De 480 à 1 440 px (à 200 %, dès 1 088 px, où leur largeur ne bouge plus), ils ont autant de lignes avec
-// l’une qu’avec l’autre ; à 576 px, rien ne bouge (les capsules du sommaire glissent de côté : 0,0005 au plus, comme à
-// 390 px).
+// Puis, sous 480 px et à 808 px, le chapô, la phrase des droits ou le sommaire changeaient encore de lignes (CLS 0,015
+// à 0,018 de 337 à 464 px, 0,178 à 476 px, 0,026 à 808 px ; 0,04 à 416 et 464 px avec le texte à 200 %). Désormais,
+// rien dans l’ouverture ne dépend de la police (presse.css) : le titre a une largeur en em, le chapô et les phrases des
+// largeurs calées sur des pas en rem, choisis là où Bricolage Grotesque, Arial et Roboto coupent pareil (mesuré avec
+// chacune de 320 à 1 440 px, à 100 et 200 %, avec aussi la phrase des droits de la PR à venir), et chaque capsule du
+// sommaire une largeur où son mot tient dans les trois polices. À 576 px, rien ne bouge (les capsules glissent de
+// côté : 0,0005 au plus, comme à 390 px).
 test('/presse.html à 576 px : quand la police arrive tard, le premier écran ne bouge pas (CLS sous 0,0005)', async ({ browser, baseURL }) => {
   expect(await decalageQuandLaPoliceArrive(browser, baseURL, '/presse.html', 576, 900)).toBeLessThanOrEqual(0.0005);
 });
 
-test('Presse, de 480 à 1 440 px : le chapô et la phrase des droits ont autant de lignes dans la police de secours que dans Bricolage Grotesque', async ({ browser, baseURL }) => {
-  test.setTimeout(120_000);
-  const ouvrirAvec = async (police) => {
-    const contexte = await browser.newContext({ baseURL, viewport: { width: 480, height: 900 }, reducedMotion: 'reduce' });
+// Une page ouverte deux fois : dans la police de secours (Bricolage Grotesque refusée) et dans Bricolage Grotesque.
+const deuxPolices = async (browser, baseURL, chemin, largeur) => {
+  const ouvrirAvec = async (secours) => {
+    const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: 900 }, reducedMotion: 'reduce' });
     const onglet = await contexte.newPage();
-    if (police === 'secours') await onglet.route('**/fonts/*.woff2', (route) => route.abort());
-    await onglet.goto('/presse.html');
+    if (secours) await onglet.route('**/fonts/*.woff2', (route) => route.abort());
+    await onglet.goto(chemin);
     await onglet.evaluate(() => document.fonts.ready);
+    const chargee = await onglet.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
+    expect(chargee, secours ? 'la police de secours' : 'Bricolage Grotesque').toBe(!secours);
     return { contexte, onglet };
   };
-  const secours = await ouvrirAvec('secours');
-  const bricolage = await ouvrirAvec('bricolage');
-  const lire = (onglet) => onglet.$$eval('.presse__chapo, .presse__chapo + p', (paragraphes) => paragraphes.map((p) => Math.round(p.getBoundingClientRect().height / parseFloat(getComputedStyle(p).lineHeight))));
-  const ecarts = [];
-  let mesures = 0;
-  try {
-    expect(await secours.onglet.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'))).toBe(false);
-    expect(await bricolage.onglet.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'))).toBe(true);
-    for (const [pourcent, debut] of [[100, 480], [200, 1088]]) {
-      for (const { onglet } of [secours, bricolage]) await agrandir(onglet, pourcent);
-      for (let largeur = debut; largeur <= 1440; largeur += 8) {
-        for (const { onglet } of [secours, bricolage]) await onglet.setViewportSize({ width: largeur, height: 900 });
-        const [avant, apres] = [await lire(secours.onglet), await lire(bricolage.onglet)];
-        mesures += 1;
-        if (avant.join() !== apres.join()) ecarts.push(`${largeur} px, ${pourcent} % : ${avant.join(' et ')} lignes dans la police de secours, ${apres.join(' et ')} dans Bricolage Grotesque`);
+  const polices = [await ouvrirAvec(true), await ouvrirAvec(false)];
+  return { onglets: polices.map((p) => p.onglet), fermer: () => Promise.all(polices.map((p) => p.contexte.close())) };
+};
+
+// Presse, de 320 à 1 440 px, toutes les 1 px (avant : de 480 px, toutes les 8 px, qui ne voyaient rien sous 480 px), texte
+// à 100 et 200 % : le titre, le chapô et la phrase des droits ont la même hauteur dans les deux polices, et le sommaire
+// autant de rangées ; à 100 %, les deux boutons et la ligne des bars aussi (à 200 %, ils sont sous le premier écran).
+// Avant : 214 écarts. Un texte de l’ouverture qui change peut tomber sur une largeur où les polices coupent autrement :
+// ce test le dit, et le pas de presse.css se recale (une largeur où les trois polices coupent pareil).
+const OUVERTURE_DE_PRESSE = ['.presse__titre', '.presse__chapo', '.presse__chapo + p', '.presse__actions', '.presse__bar'];
+for (const pourcent of [100, 200]) {
+  test(`Presse, de 320 à 1 440 px, texte à ${pourcent} % : l’ouverture garde ses lignes et le sommaire ses rangées quand la police arrive`, async ({ browser, baseURL }) => {
+    test.setTimeout(300_000);
+    const { onglets, fermer } = await deuxPolices(browser, baseURL, '/presse.html', 320);
+    const blocs = pourcent === 100 ? OUVERTURE_DE_PRESSE : OUVERTURE_DE_PRESSE.slice(0, 3);
+    const lire = (onglet) => onglet.evaluate((selecteurs) => [...selecteurs.map((s) => document.querySelector(s).getBoundingClientRect().height),
+      new Set([...document.querySelectorAll('.presse__sommaire li')].map((li) => Math.round(li.getBoundingClientRect().top))).size], blocs);
+    const ecarts = [];
+    try {
+      for (const onglet of onglets) await agrandir(onglet, pourcent);
+      for (let largeur = 320; largeur <= 1440; largeur += 1) {
+        for (const onglet of onglets) await onglet.setViewportSize({ width: largeur, height: 900 });
+        const [secours, bricolage] = [await lire(onglets[0]), await lire(onglets[1])];
+        [...blocs, 'rangées du sommaire'].forEach((nom, i) => {
+          if (Math.abs(secours[i] - bricolage[i]) > 0.5) ecarts.push(`${largeur} px, ${nom} : ${Math.round(secours[i])} dans la police de secours, ${Math.round(bricolage[i])} dans Bricolage Grotesque`);
+        });
       }
+    } finally {
+      await fermer();
     }
-  } finally {
-    await secours.contexte.close();
-    await bricolage.contexte.close();
-  }
-  expect(mesures).toBeGreaterThan(160);
-  expect(ecarts).toEqual([]);
-});
+    expect(ecarts).toEqual([]);
+  });
+}
 
 // Les deux boutons de l’ouverture de Presse, « Écrire pour la presse » et « Écrire pour un partenariat » : côte à côte
 // seulement avec 16 px d’air au moins dans leur rangée, sinon l’un sous l’autre, de la même largeur, alignés à gauche.
@@ -647,22 +660,6 @@ for (const { chemin } of PAGES) {
     expect(fautes).toEqual([]);
   });
 }
-
-// Une page ouverte deux fois : dans la police de secours (Bricolage Grotesque refusée) et dans Bricolage Grotesque.
-const deuxPolices = async (browser, baseURL, chemin, largeur) => {
-  const ouvrirAvec = async (secours) => {
-    const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: 900 }, reducedMotion: 'reduce' });
-    const onglet = await contexte.newPage();
-    if (secours) await onglet.route('**/fonts/*.woff2', (route) => route.abort());
-    await onglet.goto(chemin);
-    await onglet.evaluate(() => document.fonts.ready);
-    const chargee = await onglet.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
-    expect(chargee, secours ? 'la police de secours' : 'Bricolage Grotesque').toBe(!secours);
-    return { contexte, onglet };
-  };
-  const polices = [await ouvrirAvec(true), await ouvrirAvec(false)];
-  return { onglets: polices.map((p) => p.onglet), fermer: () => Promise.all(polices.map((p) => p.contexte.close())) };
-};
 
 // L’étiquette « Écran de démonstration » d’À propos est dans le flux : sur trois colonnes, elle est centrée sur le bord du
 // cadre et peut le déborder de 8 px de chaque côté, comme au téléphone. Avant, posée dans le coin (24 px de chaque

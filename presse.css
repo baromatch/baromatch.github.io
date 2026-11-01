@@ -1,13 +1,9 @@
-/* Presse et partenariats, « le kit sur la page » : la page est le kit. Le jour (styles.css, « Le jour » : ses fonds, le
-   bleu nuit pour le texte), avec un seul bouton ambre, « Écrire pour la presse » ; toute autre action a un contour à
-   3,5:1 au moins (3,6:1 sur le crème). La nuit revient pour les écrans de l’appli et le film (la section « nuit » et le
-   téléphone de verre de styles.css), sans lien ambre : ses liens sont en blanc doux, soulignés. Les deux couleurs se
-   montrent en petits disques sur une carte blanche, pas en surfaces. Rien ne bouge : ni animation, ni script.
-   Chaque grand texte se règle en rem et en vw, et chaque grille d’écrans en em : avec le texte à 200 % sur 320 px, son
-   plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Les colonnes suivent la taille du texte,
-   pas la largeur de l’écran : la page est un conteneur (« presse ») large comme le texte, et chaque grille passe en
-   colonnes à une largeur dite en rem (le seuil d’avant en px divisé par 16 : un rem suit la racine) ; à 100 %, les
-   seuils d’avant au pixel près, à 200 %, leur double. Chargée seulement par presse.html. */
+/* Presse et partenariats, « le kit sur la page » : la page est le kit. Le jour (styles.css), un seul bouton ambre,
+   « Écrire pour la presse » ; toute autre action a un contour à 3,5:1 au moins. La nuit revient pour les écrans et le
+   film, sans lien ambre. Les deux couleurs se montrent en disques, pas en surfaces. Ni animation, ni script.
+   Les grands textes en rem et en vw, les grilles d’écrans en em : à 200 % sur 320 px, le plus long mot tient sur sa
+   ligne. Les colonnes suivent la taille du texte : la page est un conteneur (« presse ») large comme le texte, ses
+   seuils en rem (ceux d’avant en px divisés par 16). Chargée seulement par presse.html (tests/pages-du-jour.spec.mjs). */
 
 .presse { --presse-air: clamp(40px, 6.5vw, 88px); container: presse / inline-size; max-width: calc(var(--page) + 2 * var(--gouttiere)); margin-inline: auto; }
 .presse p, .presse ul, .presse dl, .presse figure { margin: 0; }
@@ -31,7 +27,8 @@
 }
 
 .presse__titre {
-  max-width: 14ch;
+  max-width: 7.62em;
+  max-width: min(7.62em, calc(round(down, 100% - .25em, .5em) + .25em));
   margin: 0;
   font-size: clamp(2rem, 1rem + 4.4vw, 4.25rem);
   font-weight: 750;
@@ -41,15 +38,16 @@
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
-/* 32 rem au plus : les deux polices y coupent le chapô et la phrase pareil, rien ne bouge quand la police arrive. */
-.presse__ouverture-texte > p { max-width: 32rem; color: var(--texte-doux); text-wrap: pretty; }
+/* La police arrive tard : l’ouverture ne bouge pas. Le titre en em (pas en ch, la largeur du « 0 ») ; le chapô et les
+   phrases calés sur des pas en rem où Bricolage et ses secours (Arial, Roboto) coupent pareil, à 100 et 200 % ; les
+   capsules du sommaire assez larges dans les trois polices. */
+.presse__ouverture-texte > p { max-width: 32rem; max-width: min(32rem, calc(round(down, 100% - .9375rem, 1.3125rem) + .9375rem)); color: var(--texte-doux); text-wrap: pretty; }
 .presse__ouverture-texte > .surtitre { color: var(--texte-discret); }
-.presse__ouverture-texte > .presse__chapo { margin-top: 20px; color: var(--texte); font-size: 1.1875rem; }
+.presse__ouverture-texte > .presse__chapo { max-width: min(32rem, calc(round(down, 100% - 1rem, 1.46875rem) + 1rem)); margin-top: 20px; color: var(--texte); font-size: 1.1875rem; }
 .presse__chapo + p { margin-top: 10px; }
 @media (min-width: 720px) { .presse__ouverture-texte > .presse__chapo { font-size: 1.3125rem; } }
 
-/* Les deux boutons : l’un sous l’autre, de la largeur du plus grand ; côte à côte dès 36 rem, avec 16 px d’air au moins
-   quelle que soit la police (avant, à la ligne comme des mots, la police de secours les faisait changer de rangée). */
+/* Les deux boutons l’un sous l’autre, de la largeur du plus grand ; côte à côte dès 36 rem (16 px d’air au moins). */
 .presse .presse__actions { display: grid; grid-template-columns: fit-content(100%); gap: 10px 12px; margin-top: 28px; padding: 0; list-style: none; }
 .presse__actions li { display: grid; min-width: 0; }
 @container (min-width: 36rem) { .presse .presse__actions { grid-template-columns: repeat(2, max-content); } }
@@ -69,9 +67,8 @@
 .presse__bouton:hover { background: var(--fond-releve); color: var(--texte); }
 .presse__ouverture-texte > .presse__bar { margin-top: 12px; }
 
-/* Au téléphone (sous 600 px), l’icône de l’ouverture s’efface (elle reste dans « Le logo ») et l’ouverture se resserre :
-   les deux boutons tiennent dans le premier écran d’un iPhone 15, 16 px au-dessus de son bas. Sur un petit téléphone
-   (iPhone SE, 320 × 568), le texte se resserre aussi : « Écrire pour la presse » tient dans le premier écran. */
+/* Sous 600 px, l’icône s’efface (elle reste dans « Le logo ») : les deux boutons tiennent dans le premier écran d’un
+   iPhone 15 ; sous 360 px, le texte se resserre : « Écrire pour la presse » tient dans celui d’un iPhone SE. */
 @media (max-width: 599px) {
   .presse__icone { display: none; }
   .presse__ouverture { grid-template-areas: "texte" "sommaire"; padding-top: 16px; }
@@ -84,11 +81,17 @@
   .presse__ouverture-texte > .presse__chapo + p { font-size: 0.9375rem; }
   .presse .presse__actions { margin-top: 14px; }
 }
-/* Sur cette page : sept entrées, des capsules à 44 px, cernées à 3,6:1. */
+/* Sur cette page : huit entrées, des capsules à 44 px, cernées à 3,6:1. */
 .presse__sommaire ul { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
+.presse__sommaire li { display: flex; min-width: min(5.8rem, 100%); }
+.presse__sommaire li:nth-child(4) { min-width: min(8.4rem, 100%); }
+.presse__sommaire li:nth-child(5) { min-width: min(6.8rem, 100%); }
+.presse__sommaire li:nth-child(7) { min-width: min(10.6rem, 100%); }
 .presse__sommaire a {
+  flex: 1;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: 0 18px;
   border: 1px solid var(--champ-bord);
@@ -159,13 +162,12 @@
 .presse__poids { white-space: nowrap; }
 .presse .presse__autre-format { max-width: 40rem; margin-top: 32px; color: var(--texte-doux); }
 
-/* Les écrans : des colonnes d’au moins 8 em (deux au téléphone, cinq sur ordinateur). Avec le texte à 200 %, une
-   colonne fait deux fois plus large : un écran par ligne, et l’étiquette tient sur deux lignes, sans couper un mot.
-   L’étiquette se pose au-dessus de l’écran : la colonne est trop étroite pour qu’elle chevauche son bord. */
+/* Les écrans : des colonnes d’au moins 8 em (deux au téléphone, cinq sur ordinateur, une à 200 %). L’étiquette se
+   pose au-dessus de l’écran. */
 .presse .presse__ecrans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8em), 1fr)); gap: 40px 16px; margin-top: 36px; padding: 0; list-style: none; }
 @container presse (min-width: 62.5rem) { .presse .presse__ecrans { gap: 40px 24px; } }
 .presse__ecran figure { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
-/* Le cadre ne dépasse jamais 206 px : l’écran (196 px) n’est jamais plus large que le WebP de 600 px servi, même à ×3. */
+/* 206 px au plus : l’écran n’est jamais plus large que son WebP de 600 px, même à ×3. */
 .presse__cadre { width: min(100%, 13rem, 206px); }
 .presse__cadre .exemple { position: static; margin: 0 0 10px; }
 .presse__cadre .telephone { max-width: none; padding: 5px; border-radius: 28px; }
@@ -248,8 +250,7 @@
 @container presse (min-width: 40rem) { .presse .presse__ecrire { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .presse__ecrire li { display: grid; align-content: start; gap: 8px; }
 .presse__ecrire p { color: var(--texte-discret); font-size: 0.9375rem; }
-/* L’adresse, d’un seul tenant (Chromium coupe à un <wbr> même sans retour à la ligne permis : un bloc en ligne la
-   garde entière, et ne la coupe que si elle est plus large que sa colonne) ; sous 360 px, elle se coupe au <wbr>. */
+/* L’adresse d’un seul tenant (un bloc en ligne : Chromium coupe à un <wbr> même en nowrap) ; sous 360 px, au <wbr>. */
 .presse__adresse { display: inline-block; max-width: 100%; white-space: nowrap; }
 @media (max-width: 359px) { .presse__adresse { display: inline; white-space: normal; } }
 .presse .presse__secours { max-width: 44rem; margin-top: 22px; color: var(--texte-doux); font-size: 0.9375rem; }

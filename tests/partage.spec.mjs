@@ -655,6 +655,82 @@ test.describe('le bloc « Partager »', () => {
     });
   }
 
+  // Le bloc au texte agrandi, de 320 à 1280 px (tous les 10 px), le texte à 100, 125, 150 et 200 % (le réglage du
+  // navigateur, comme tests/texte-agrandi.spec.mjs), la police arrivée. Ses états sont posés comme partage.js les pose
+  // (l’attribut hidden de chaque possible ; partage.js retenu) : avant lui ou sans JavaScript, chacun de ses quatre
+  // choix, et la copie refusée (l’adresse revenue sous « Copier le lien »). Dans chacun : la page ne défile pas de côté,
+  // le bloc reste dans sa colonne et chaque possible montré dans le bloc, chaque bouton garde 44 × 44 px au moins et
+  // tout son texte (l’adresse, sur une ligne, peut finir par « … »), rien ne se recouvre. Et chaque choix de partage.js
+  // garde la hauteur du bloc et le haut de ce qui le suit : rien ne bouge quand il arrive, à toute largeur et à toute
+  // taille de texte (les vrais décalages, partage.js arrivé tard, sont comptés plus haut).
+  const ETATS_DU_BLOC = [
+    { nom: 'avant partage.js', montres: SANS_LE_SCRIPT },
+    ...CAS_DU_PARTAGE.map((cas) => ({ nom: cas.nom, montres: montresAttendus(cas), choix: true })),
+    { nom: 'la copie refusée, avec le bouton du téléphone', montres: { natif: true, whatsapp: false, copier: true, lien: true } },
+    { nom: 'la copie refusée, sans le bouton du téléphone', montres: { natif: false, whatsapp: true, copier: true, lien: true } },
+  ];
+  const mesurerLeBlocAgrandi = (onglet, etats) => onglet.evaluate((liste) => {
+    const bloc = document.querySelector('.partage');
+    const possibles = ['natif', 'whatsapp', 'copier', 'lien'].map((nom) => [nom, bloc.querySelector(`.partage__${nom}`)]);
+    const arrondi = (n) => Math.round(n * 100) / 100;
+    const problemes = [];
+    let mesures = 0;
+    for (const texte of [100, 125, 150, 200]) {
+      document.documentElement.style.fontSize = `${texte}%`;
+      let avant = null;
+      for (const etat of liste) {
+        for (const [nom, e] of possibles) e.hidden = !etat.montres[nom];
+        const dire = (probleme) => problemes.push(`texte à ${texte} %, ${etat.nom} : ${probleme}`);
+        const ecran = document.documentElement.clientWidth;
+        const colonne = bloc.parentElement.getBoundingClientRect();
+        const b = bloc.getBoundingClientRect();
+        if (document.documentElement.scrollWidth > ecran) dire(`la page défile de côté (${document.documentElement.scrollWidth} px pour ${ecran})`);
+        if (b.left < colonne.left - 0.5 || b.right > Math.min(colonne.right, ecran) + 0.5) dire(`le bloc sort de sa colonne (${arrondi(b.left)} à ${arrondi(b.right)} px, la colonne de ${arrondi(colonne.left)} à ${arrondi(colonne.right)} px)`);
+        const vus = possibles.filter(([, e]) => e.checkVisibility({ visibilityProperty: true, opacityProperty: true }));
+        const montres = Object.fromEntries(possibles.map(([nom, e]) => [nom, vus.some(([, v]) => v === e)]));
+        if (JSON.stringify(montres) !== JSON.stringify(etat.montres)) dire(`se montrent ${JSON.stringify(montres)}`);
+        for (const [nom, e] of vus) {
+          const r = e.getBoundingClientRect();
+          if (r.left < b.left - 0.5 || r.right > b.right + 0.5) dire(`${nom} sort du bloc (${arrondi(r.left)} à ${arrondi(r.right)} px)`);
+          if (r.width < 44 || r.height < 44) dire(`${nom} mesure ${arrondi(r.width)} × ${arrondi(r.height)} px`);
+          if (nom !== 'lien' && (e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1)) dire(`le texte de ${nom} sort de sa capsule (${e.scrollWidth} × ${e.scrollHeight} px dans ${e.clientWidth} × ${e.clientHeight})`);
+        }
+        for (const [i, [nom, e]] of vus.entries()) {
+          for (const [autre, f] of vus.slice(i + 1)) {
+            const [r, s] = [e.getBoundingClientRect(), f.getBoundingClientRect()];
+            if (Math.min(r.right, s.right) - Math.max(r.left, s.left) > 0.5 && Math.min(r.bottom, s.bottom) - Math.max(r.top, s.top) > 0.5) dire(`${nom} et ${autre} se recouvrent`);
+          }
+        }
+        const place = { hauteur: arrondi(b.height), dessous: arrondi((bloc.nextElementSibling?.getBoundingClientRect().top ?? b.bottom) + window.scrollY) };
+        if (!avant) avant = place;
+        else if (etat.choix && JSON.stringify(place) !== JSON.stringify(avant)) dire(`le bloc bouge : ${JSON.stringify(avant)} avant partage.js, ${JSON.stringify(place)} après`);
+        mesures += 1;
+      }
+    }
+    document.documentElement.style.fontSize = '';
+    for (const [nom, e] of possibles) e.hidden = !liste[0].montres[nom];
+    return { problemes, mesures };
+  }, etats);
+  for (const chemin of PAGES_DU_BLOC) {
+    test(`${chemin}, le texte de 100 à 200 %, de 320 à 1280 px : le bloc reste dans sa colonne, ses boutons gardent 44 px et leur texte, et rien ne bouge quand partage.js choisit`, async ({ page: onglet }) => {
+      await onglet.route('**/partage.js', (route) => route.abort());
+      await onglet.setViewportSize({ width: 320, height: 800 });
+      await onglet.goto(`${serveur.adresse}${chemin}`);
+      await onglet.evaluate(() => document.fonts.ready);
+      expect(await lireCeQuiSeMontre(onglet)).toEqual(SANS_LE_SCRIPT);
+      const problemes = [];
+      let mesures = 0;
+      for (let largeur = 320; largeur <= 1280; largeur += 10) {
+        await onglet.setViewportSize({ width: largeur, height: 800 });
+        const lu = await mesurerLeBlocAgrandi(onglet, ETATS_DU_BLOC);
+        problemes.push(...lu.problemes.map((p) => `${largeur} px, ${p}`));
+        mesures += lu.mesures;
+      }
+      expect(mesures).toBe(97 * 4 * ETATS_DU_BLOC.length);
+      expect({ problemes: problemes.length, premiers: problemes.slice(0, 20) }).toEqual({ problemes: 0, premiers: [] });
+    });
+  }
+
   test('des cibles de 44 px, sans animation, à 360 px comme au bureau', async ({ browser }) => {
     for (const largeur of [360, 1280]) {
       const contexte = await browser.newContext({ javaScriptEnabled: false, viewport: { width: largeur, height: 800 }, reducedMotion: 'reduce' });

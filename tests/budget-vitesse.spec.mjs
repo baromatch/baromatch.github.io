@@ -98,6 +98,8 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // affiche.css 17 104), et les pilules au texte agrandi (styles.css de 74 954 à 75 022 octets, affiche.css 17 185).
 // Mesuré : les pages générées 91,72 Ko (93 920 octets) ; les affiches 108,50 Ko (111 105 octets) : leur seuil de CSS
 // monte de 108 à 109, au plus juste.
+// Puis le bord des boutons en couleurs forcées (regarder.css 19 074 octets). Mesuré : les pages générées 91,89 Ko
+// (94 096 octets), les affiches 108,67 Ko (111 281 octets) : seuils inchangés.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 18, css: 73, images: 24 } },

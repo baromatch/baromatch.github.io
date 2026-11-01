@@ -6,7 +6,8 @@
 // Mesuré tel qu’il est peint : chaque texte à 4,5:1 (tests/outils/textes-peints.mjs ; au pixel près, texte à 200 %, avec
 // tests/outils/pixels-peints.mjs), chaque contour de focus et chaque bord de champ à 3:1, chaque survol lisible et
 // visible ; le premier affichage déjà au jour ; le texte à 200 % à 320 px qui reste dans l’écran ; de 320 à 1280 px,
-// texte à 100 et 200 %, des cibles de 44 × 44 px et aucun mot coupé en plein mot ; et CLS 0 sans la police.
+// texte à 100 et 200 %, des cibles de 44 × 44 px et aucun mot coupé en plein mot ; les boutons qui gardent leur forme
+// en couleurs forcées ; et CLS 0 sans la police.
 import { test, expect } from '@playwright/test';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -565,4 +566,26 @@ test('la feuille du patron, à 390 px, texte à 200 % : le rond de chaque choix 
   const ronds = await onglet.locator('.affiche-format input').evaluateAll((liste) => liste.map((r) => [r.getBoundingClientRect().width, r.getBoundingClientRect().height]));
   expect(ronds.length).toBe(2);
   expect(ronds).toEqual([[20, 20], [20, 20]]);
+});
+
+// En couleurs forcées (Windows, contraste élevé), le fond d’un bouton disparaît : l’appel ambre et « Me prévenir » gardent
+// un bord, donc leur forme de bouton, comme « Proposer mon bar » (tests/pages-generees.spec.mjs).
+test.describe('en couleurs forcées', () => {
+  for (const largeur of [390, 1280]) {
+    test(`à ${largeur} px : l’appel des fans et « Me prévenir » gardent un bord`, async ({ page: onglet }) => {
+      await onglet.emulateMedia({ forcedColors: 'active' });
+      const bords = [];
+      // L’appel des fans d’un match ; « Me prévenir », la liste d’attente d’une ville sans bar.
+      for (const [type, selecteur] of [[TYPES.find((t) => t.nom === 'un match avec un bar inventé'), 'main .capsule'], [TYPES.find((t) => t.site === 'sansBar' && t.chemin === '/regarder-le-match/paris/'), 'main .attente__bouton']]) {
+        await onglet.setViewportSize({ width: largeur, height: 900 });
+        await onglet.goto(adresseDe(type));
+        await expect(onglet.locator(selecteur)).toHaveCount(1);
+        bords.push(await onglet.locator(selecteur).evaluate((b) => {
+          const s = getComputedStyle(b);
+          return `${b.textContent.trim().slice(0, 24)} : ${s.borderTopStyle} ${parseFloat(s.borderTopWidth) >= 1 ? 'visible' : s.borderTopWidth}`;
+        }));
+      }
+      expect(bords.filter((b) => !/ : solid visible$/.test(b))).toEqual([]);
+    });
+  }
 });

@@ -416,3 +416,5 @@
 .jour .regarder-fil a:hover { color: var(--texte); }
 .jour .regarder-agenda__clubs a:hover { background: var(--fond-releve); }
 .jour .regarder-attente .attente__ligne:focus-within { border-color: var(--texte); }
+/* Couleurs forcées : le fond d’un bouton disparaît, son bord reste. */
+@media (forced-colors: active) { .regarder :is(.capsule, .attente__bouton) { border: 1px solid; } }

@@ -102,6 +102,9 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // Après la relecture finale : a-propos.css gagne ses requêtes de conteneur (les colonnes suivent la taille du texte),
 // l’étiquette des écrans seuls sur leur ligne et ses couleurs forcées : de 11,7 à 12,8 Ko. CSS d’À propos mesuré 83 Ko :
 // seuil de 82 à 84. Presse reste sous le sien (85,6 Ko pour 86).
+// 1er novembre 2026, dernière vérification d’À propos et Presse : presse.css gagne la largeur du chapô (rien ne bouge
+// quand la police arrive). Le CSS de Presse mesurait 86,48 Ko (arrondi à 86, à 20 octets du seuil), 86,59 avec elle :
+// seuil de 86 à 87.
 // Les deux ensemble : l’accueil et sa semaine pleine gardent les seuils des insignes, avec le JS de main.js à 19 Ko.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 19, css: 73, images: 24 } },
@@ -109,7 +112,7 @@ const PAGES = [
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 84, images: 42 } },
-  { nom: 'Presse et partenariats', chemin: '/presse.html', budget: { requetes: 11, transfere: 218, js: 0, css: 86, images: 96 } },
+  { nom: 'Presse et partenariats', chemin: '/presse.html', budget: { requetes: 11, transfere: 218, js: 0, css: 87, images: 96 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 176, js: 67, css: 103, images: 4 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
   { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },

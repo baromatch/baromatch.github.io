@@ -308,40 +308,89 @@ test('iPhone SE (320 × 568) : le premier écran montre « Écrire pour la press
 // les deux polices n’ont pas tout à fait la même largeur : dans une rangée de capsules ou de liens (le sommaire de
 // Presse, « Proposer mon bar », « Me prévenir »), chacun glisse de quelques pixels de côté ; aucune ligne ne se coupe
 // autrement. 0,0005 au plus (mesuré 0,00004 et 0,00024 ; Google dit « bon » sous 0,1).
+const decalageQuandLaPoliceArrive = async (browser, baseURL, chemin, largeur, hauteur) => {
+  const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: hauteur }, reducedMotion: 'reduce', locale: 'fr-FR' });
+  await contexte.addInitScript(() => {
+    window.decalages = [];
+    const garder = (entrees) => { for (const e of entrees) if (!e.hadRecentInput) window.decalages.push(e.value); };
+    window.observateurDesDecalages = new PerformanceObserver((liste) => garder(liste.getEntries()));
+    window.observateurDesDecalages.observe({ type: 'layout-shift', buffered: true });
+    window.relever = () => garder(window.observateurDesDecalages.takeRecords());
+  });
+  const onglet = await contexte.newPage();
+  let lacher;
+  const porte = new Promise((resoudre) => { lacher = resoudre; });
+  const retenues = [];
+  await onglet.route('**/fonts/*.woff2', (route) => { const envoi = porte.then(() => route.continue()); retenues.push(envoi); return envoi; });
+  try {
+    await onglet.goto(chemin, { waitUntil: 'domcontentloaded' });
+    await onglet.waitForFunction(() => performance.getEntriesByName('first-contentful-paint').length > 0);
+    expect(retenues.length).toBeGreaterThan(0);
+    lacher();
+    await onglet.waitForFunction(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
+    await onglet.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+    return await onglet.evaluate(() => { window.relever(); return window.decalages.reduce((t, v) => t + v, 0); });
+  } finally {
+    lacher();
+    await Promise.all(retenues);
+    await contexte.close();
+  }
+};
 for (const { chemin } of PAGES) {
   for (const [largeur, hauteur] of [[320, 568], [390, 844]]) {
     test(`${chemin} à ${largeur} px : quand la police arrive tard, rien ne bouge (CLS ${largeur < 360 ? '0' : 'sous 0,0005'})`, async ({ browser, baseURL }) => {
-      const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: hauteur }, reducedMotion: 'reduce', locale: 'fr-FR' });
-      await contexte.addInitScript(() => {
-        window.decalages = [];
-        const garder = (entrees) => { for (const e of entrees) if (!e.hadRecentInput) window.decalages.push(e.value); };
-        window.observateurDesDecalages = new PerformanceObserver((liste) => garder(liste.getEntries()));
-        window.observateurDesDecalages.observe({ type: 'layout-shift', buffered: true });
-        window.relever = () => garder(window.observateurDesDecalages.takeRecords());
-      });
-      const onglet = await contexte.newPage();
-      let lacher;
-      const porte = new Promise((resoudre) => { lacher = resoudre; });
-      const retenues = [];
-      await onglet.route('**/fonts/*.woff2', (route) => { const envoi = porte.then(() => route.continue()); retenues.push(envoi); return envoi; });
-      try {
-        await onglet.goto(chemin, { waitUntil: 'domcontentloaded' });
-        await onglet.waitForFunction(() => performance.getEntriesByName('first-contentful-paint').length > 0);
-        expect(retenues.length).toBeGreaterThan(0);
-        lacher();
-        await onglet.waitForFunction(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
-        await onglet.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
-        const total = await onglet.evaluate(() => { window.relever(); return window.decalages.reduce((t, v) => t + v, 0); });
-        if (largeur < 360) expect(total).toBe(0);
-        else expect(total).toBeLessThanOrEqual(0.0005);
-      } finally {
-        lacher();
-        await Promise.all(retenues);
-        await contexte.close();
-      }
+      const total = await decalageQuandLaPoliceArrive(browser, baseURL, chemin, largeur, hauteur);
+      if (largeur < 360) expect(total).toBe(0);
+      else expect(total).toBeLessThanOrEqual(0.0005);
     });
   }
 }
+
+// Le chapô de Presse, plus long, se coupait autrement selon la police : à 576 px, quatre lignes dans la police de
+// secours et cinq dans Bricolage Grotesque ; à son arrivée, tout le premier écran descendait d’une ligne (CLS 0,018).
+// Le chapô et la phrase des droits, qui le suit, ont 32 rem au plus (512 px à 100 %), une largeur où les deux polices
+// coupent pareil (le chapô : cinq lignes de 433 à 540 px en 19 px, de 479 à 597 px en 21 px ; la phrase : deux lignes
+// dès 448 px). De 480 à 1 440 px (à 200 %, dès 1 088 px, où leur largeur ne bouge plus), ils ont autant de lignes avec
+// l’une qu’avec l’autre ; à 576 px, rien ne bouge (les capsules du sommaire glissent de côté : 0,0005 au plus, comme à
+// 390 px).
+test('/presse.html à 576 px : quand la police arrive tard, le premier écran ne bouge pas (CLS sous 0,0005)', async ({ browser, baseURL }) => {
+  expect(await decalageQuandLaPoliceArrive(browser, baseURL, '/presse.html', 576, 900)).toBeLessThanOrEqual(0.0005);
+});
+
+test('Presse, de 480 à 1 440 px : le chapô et la phrase des droits ont autant de lignes dans la police de secours que dans Bricolage Grotesque', async ({ browser, baseURL }) => {
+  test.setTimeout(120_000);
+  const ouvrirAvec = async (police) => {
+    const contexte = await browser.newContext({ baseURL, viewport: { width: 480, height: 900 }, reducedMotion: 'reduce' });
+    const onglet = await contexte.newPage();
+    if (police === 'secours') await onglet.route('**/fonts/*.woff2', (route) => route.abort());
+    await onglet.goto('/presse.html');
+    await onglet.evaluate(() => document.fonts.ready);
+    return { contexte, onglet };
+  };
+  const secours = await ouvrirAvec('secours');
+  const bricolage = await ouvrirAvec('bricolage');
+  const lire = (onglet) => onglet.$$eval('.presse__chapo, .presse__chapo + p', (paragraphes) => paragraphes.map((p) => Math.round(p.getBoundingClientRect().height / parseFloat(getComputedStyle(p).lineHeight))));
+  const ecarts = [];
+  let mesures = 0;
+  try {
+    expect(await secours.onglet.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'))).toBe(false);
+    expect(await bricolage.onglet.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'))).toBe(true);
+    for (const [pourcent, debut] of [[100, 480], [200, 1088]]) {
+      for (const { onglet } of [secours, bricolage]) await agrandir(onglet, pourcent);
+      for (let largeur = debut; largeur <= 1440; largeur += 8) {
+        for (const { onglet } of [secours, bricolage]) await onglet.setViewportSize({ width: largeur, height: 900 });
+        const [avant, apres] = [await lire(secours.onglet), await lire(bricolage.onglet)];
+        mesures += 1;
+        if (avant.join() !== apres.join()) ecarts.push(`${largeur} px, ${pourcent} % : ${avant.join(' et ')} lignes dans la police de secours, ${apres.join(' et ')} dans Bricolage Grotesque`);
+      }
+    }
+  } finally {
+    await secours.contexte.close();
+    await bricolage.contexte.close();
+  }
+  expect(mesures).toBeGreaterThan(160);
+  expect(ecarts).toEqual([]);
+});
 
 // Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés) : 44 px de haut eux aussi, par un
 // padding qui ne touche pas à la ligne (ils restent en ligne : tests/liens-en-ligne.spec.mjs).

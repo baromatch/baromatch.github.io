@@ -41,7 +41,8 @@
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
-.presse__ouverture-texte > p { max-width: 38rem; color: var(--texte-doux); text-wrap: pretty; }
+/* 32 rem au plus : les deux polices y coupent le chapô et la phrase pareil, rien ne bouge quand la police arrive. */
+.presse__ouverture-texte > p { max-width: 32rem; color: var(--texte-doux); text-wrap: pretty; }
 .presse__ouverture-texte > .surtitre { color: var(--texte-discret); }
 .presse__ouverture-texte > .presse__chapo { margin-top: 20px; color: var(--texte); font-size: 1.1875rem; }
 .presse__chapo + p { margin-top: 10px; }

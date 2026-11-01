@@ -392,6 +392,52 @@ test('Presse, de 480 à 1 440 px : le chapô et la phrase des droits ont autant 
   expect(ecarts).toEqual([]);
 });
 
+// Les deux boutons de l’ouverture de Presse, « Écrire pour la presse » et « Écrire pour un partenariat » : côte à côte
+// seulement avec 16 px d’air au moins dans leur rangée, sinon l’un sous l’autre, de la même largeur, alignés à gauche.
+// Avant, ils passaient à la ligne comme des mots : juste au-dessus du seuil, ils tenaient côte à côte à 0,5 px près
+// (532 et 916 px) ; juste en dessous, la police de secours, un peu plus large, les mettait l’un sous l’autre, et à son
+// arrivée le premier écran sautait (CLS 0,109 à 528 px, 0,121 à 912 px) ; l’un sous l’autre, ils n’avaient pas la même
+// largeur. Mesuré au téléphone (360, 375, 390, 393, 412, 430 px), puis de 480 à 1 440 px toutes les 4 px, à 100 et 200 %.
+// Sur un iPhone 12 à 15 (390 × 664 et 393 × 659 de page, sous la barre de Safari), le second finit 16 px au moins
+// au-dessus du bas du premier écran (avant : 3,5 px sur l’iPhone 15).
+const lireLesBoutons = (page) => page.evaluate(() => {
+  const liste = document.querySelector('.presse__actions').getBoundingClientRect();
+  const [a, b] = [...document.querySelectorAll('.presse__actions a')].map((x) => x.getBoundingClientRect());
+  return { coteACote: Math.abs(a.top - b.top) < 1, air: liste.right - b.right, gauches: [a.left, b.left], largeurs: [a.width, b.width], ecart: b.top - a.bottom, basDuSecond: b.bottom };
+});
+const fautesDesBoutons = (lu) => {
+  if (lu.coteACote) return lu.air < 16 ? [`côte à côte avec ${lu.air.toFixed(1)} px d’air`] : [];
+  const fautes = [];
+  if (Math.abs(lu.gauches[0] - lu.gauches[1]) > 0.5) fautes.push('l’un sous l’autre, pas alignés');
+  if (Math.abs(lu.largeurs[0] - lu.largeurs[1]) > 0.5) fautes.push(`l’un sous l’autre, de largeurs ${lu.largeurs.map(Math.round).join(' et ')} px`);
+  if (lu.ecart < 8) fautes.push(`l’un sous l’autre, à ${lu.ecart.toFixed(1)} px`);
+  return fautes;
+};
+test('Presse : les deux boutons de l’ouverture côte à côte avec 16 px d’air, ou l’un sous l’autre de la même largeur ; sur un iPhone, 16 px sous le second', async ({ page }) => {
+  test.setTimeout(120_000);
+  const fautes = [];
+  for (const [largeur, hauteur] of [[360, 740], [375, 667], [390, 664], [393, 659], [412, 839], [430, 739]]) {
+    await ouvrir(page, '/presse.html', largeur, hauteur);
+    const lu = await lireLesBoutons(page);
+    fautes.push(...fautesDesBoutons(lu).map((f) => `${largeur} px : ${f}`));
+    if ([390, 393].includes(largeur) && hauteur - lu.basDuSecond < 16) fautes.push(`${largeur} × ${hauteur} : ${(hauteur - lu.basDuSecond).toFixed(1)} px sous le second bouton`);
+  }
+  for (const pourcent of [100, 200]) {
+    await agrandir(page, pourcent);
+    for (let largeur = 480; largeur <= 1440; largeur += 4) {
+      await page.setViewportSize({ width: largeur, height: 900 });
+      fautes.push(...fautesDesBoutons(await lireLesBoutons(page)).map((f) => `${largeur} px, ${pourcent} % : ${f}`));
+    }
+  }
+  expect(fautes).toEqual([]);
+});
+
+for (const largeur of [528, 912]) {
+  test(`/presse.html à ${largeur} px : quand la police arrive tard, les deux boutons ne changent pas de rangée (CLS sous 0,0005)`, async ({ browser, baseURL }) => {
+    expect(await decalageQuandLaPoliceArrive(browser, baseURL, '/presse.html', largeur, 900)).toBeLessThanOrEqual(0.0005);
+  });
+}
+
 // Les liens pris dans une phrase, dans ces pages (pas l’en-tête ni le pied, partagés) : 44 px de haut eux aussi, par un
 // padding qui ne touche pas à la ligne (ils restent en ligne : tests/liens-en-ligne.spec.mjs).
 test('les liens pris dans une phrase des deux pages se touchent sur 44 px', async ({ page }) => {

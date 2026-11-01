@@ -22,7 +22,7 @@
   padding-top: clamp(24px, 5vw, 64px);
   padding-bottom: var(--presse-air);
 }
-.presse__ouverture-texte { grid-area: texte; min-width: 0; }
+.presse__ouverture-texte { grid-area: texte; min-width: 0; container-type: inline-size; }
 .presse__icone { grid-area: icone; width: 76px; height: auto; border-radius: 18px; box-shadow: 0 14px 36px rgba(10, 11, 16, 0.22); }
 .presse__sommaire { grid-area: sommaire; }
 @container presse (min-width: 56.25rem) {
@@ -48,8 +48,11 @@
 .presse__chapo + p { margin-top: 10px; }
 @media (min-width: 720px) { .presse__ouverture-texte > .presse__chapo { font-size: 1.3125rem; } }
 
-.presse .presse__actions { display: flex; flex-wrap: wrap; gap: 10px 12px; margin-top: 28px; padding: 0; list-style: none; }
-.presse__actions li { max-width: 100%; }
+/* Les deux boutons : l’un sous l’autre, de la largeur du plus grand ; côte à côte dès 36 rem, avec 16 px d’air au moins
+   quelle que soit la police (avant, à la ligne comme des mots, la police de secours les faisait changer de rangée). */
+.presse .presse__actions { display: grid; grid-template-columns: fit-content(100%); gap: 10px 12px; margin-top: 28px; padding: 0; list-style: none; }
+.presse__actions li { display: grid; min-width: 0; }
+@container (min-width: 36rem) { .presse .presse__actions { grid-template-columns: repeat(2, max-content); } }
 .presse .capsule, .presse__bouton { max-width: 100%; padding: 12px 24px; line-height: 1.25; text-align: center; }
 .presse__bouton {
   display: inline-flex;
@@ -66,12 +69,13 @@
 .presse__bouton:hover { background: var(--fond-releve); color: var(--texte); }
 .presse__ouverture-texte > .presse__bar { margin-top: 12px; }
 
-/* Au téléphone (sous 600 px), l’icône de l’ouverture s’efface (elle reste dans « Le logo ») : les deux boutons
-   tiennent dans le premier écran d’un iPhone 15. Sur un petit téléphone (iPhone SE, 320 × 568), le texte se resserre
-   aussi : « Écrire pour la presse » tient dans le premier écran. */
+/* Au téléphone (sous 600 px), l’icône de l’ouverture s’efface (elle reste dans « Le logo ») et l’ouverture se resserre :
+   les deux boutons tiennent dans le premier écran d’un iPhone 15, 16 px au-dessus de son bas. Sur un petit téléphone
+   (iPhone SE, 320 × 568), le texte se resserre aussi : « Écrire pour la presse » tient dans le premier écran. */
 @media (max-width: 599px) {
   .presse__icone { display: none; }
-  .presse__ouverture { grid-template-areas: "texte" "sommaire"; }
+  .presse__ouverture { grid-template-areas: "texte" "sommaire"; padding-top: 16px; }
+  .presse .presse__actions { margin-top: 20px; }
 }
 @media (max-width: 359px) {
   .presse__ouverture { padding-top: 16px; }

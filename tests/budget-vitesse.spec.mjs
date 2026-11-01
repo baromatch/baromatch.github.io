@@ -104,7 +104,7 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // seuil de 82 à 84. Presse reste sous le sien (85,6 Ko pour 86).
 // 1er novembre 2026, dernière vérification d’À propos et Presse : presse.css gagne la largeur du chapô (rien ne bouge
 // quand la police arrive). Le CSS de Presse mesurait 86,48 Ko (arrondi à 86, à 20 octets du seuil), 86,59 avec elle :
-// seuil de 86 à 87.
+// seuil de 86 à 87. Puis la rangée des deux boutons de l’ouverture (une grille, une requête de conteneur) : 87,14 Ko.
 // Les deux ensemble : l’accueil et sa semaine pleine gardent les seuils des insignes, avec le JS de main.js à 19 Ko.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 19, css: 73, images: 24 } },

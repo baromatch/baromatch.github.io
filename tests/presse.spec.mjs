@@ -120,11 +120,12 @@ test('les écrans et le film : cinq écrans d’aujourd’hui chargés tard, cha
     expect(ecran.srcset).toBe(`/img/appli/${nom}-300.webp 300w, /img/appli/${nom}-600.webp 600w`);
     expect(ecran.paresseuse, nom).toBe(true);
     expect(ecran.etiquette, nom).toBe('Écran de démonstration');
-    expect(ecran.telecharger[0], nom).toBe(`/img/appli/${nom}-600.webp`);
+    // Le fichier téléchargé porte lui-même « Écran de démonstration » (le test suivant le vérifie dans l’image).
+    expect(ecran.telecharger[0], nom).toBe(`/presse/ecran-${nom}-demonstration.png`);
     expect(ecran.telecharger[1], nom).toBe(true);
-    expect(ecran.telecharger[2], nom).toMatch(/^Télécharger l’écran .+ \(WebP, 600 px\)$/);
+    expect(ecran.telecharger[2], nom).toMatch(/^Télécharger l’écran .+ \(PNG, 600 px\)$/);
   }
-  expect(normaliser(await page.locator('#ecrans + p').textContent())).toContain('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.');
+  expect(normaliser(await page.locator('#ecrans + p').textContent())).toContain('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés : chaque fichier le dit, sous l’écran.');
   const source = readFileSync(path.join(racine, 'presse.html'), 'utf8');
   expect(source).not.toMatch(/capture-|Oberkampf|1 place par compte/);
   expect(readdirSync(path.join(racine, 'presse')).filter((nom) => nom.startsWith('capture-'))).toEqual([]);
@@ -133,6 +134,58 @@ test('les écrans et le film : cinq écrans d’aujourd’hui chargés tard, cha
   // La phrase du film, entière, et rien d’un attribut perdu dans le texte.
   await expect(page.locator('#film + p')).toHaveText('Le film de présentation de Baromatch : 15 secondes, sans le son, en portrait. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.');
   expect(await page.locator('#film ~ *').evaluateAll((e) => e.map((x) => x.textContent).join(' '))).not.toMatch(/">|<\/a>|alt=/);
+});
+
+// Un écran téléchargé quitte la page qui dit qu’il est inventé : le fichier le dit lui-même. Chaque PNG est l’écran de
+// 600 px de l’accueil, pixel pour pixel, puis, dessous et jamais dessus, une bande de nuit écrite en clair (« Écran de
+// démonstration », et ce qui est inventé). La recette : generateur/outils/ecrans-presse.mjs, à relancer quand une capture
+// change ; ce test tombe si un fichier n’est plus l’écran du jour ou n’a plus sa bande.
+test.describe('les écrans à télécharger', () => {
+  test.use({ javaScriptEnabled: true });
+  test('chaque fichier est l’écran du jour, avec sous lui la bande « Écran de démonstration »', async ({ page }) => {
+    const { ECRANS_DE_LA_PRESSE, LARGEUR, HAUTEUR_DE_L_ECRAN, HAUTEUR_DE_LA_BANDE, ETIQUETTE, PRECISION, fichierDeLaPresse } = await import('../generateur/outils/ecrans-presse.mjs');
+    expect(ECRANS_DE_LA_PRESSE).toEqual(['ce-soir', 'carte-recherche', 'bar', 'ta-soiree', 'tu-y-es']);
+    expect([ETIQUETTE, PRECISION]).toEqual(['Écran de démonstration', 'Les bars, les clubs, les pseudos et les chiffres sont inventés.']);
+    await page.goto(PAGE);
+    for (const ecran of ECRANS_DE_LA_PRESSE) {
+      // Un PNG de 600 px de large, l’écran plus la bande.
+      const octets = readFileSync(path.join(racine, fichierDeLaPresse(ecran)));
+      expect(octets.subarray(1, 4).toString(), ecran).toBe('PNG');
+      expect([octets.readUInt32BE(16), octets.readUInt32BE(20)], ecran).toEqual([LARGEUR, HAUTEUR_DE_L_ECRAN + HAUTEUR_DE_LA_BANDE]);
+      const lu = await page.evaluate(async ({ png, webp, hauteur, bande }) => {
+        const pixels = async (src, y, h) => {
+          const image = new Image();
+          image.src = src;
+          await image.decode();
+          const toile = document.createElement('canvas');
+          toile.width = image.naturalWidth;
+          toile.height = h;
+          const contexte = toile.getContext('2d', { willReadFrequently: true });
+          contexte.drawImage(image, 0, -y);
+          return contexte.getImageData(0, 0, toile.width, h).data;
+        };
+        // L’écran : le haut du PNG est l’écran de 600 px, au plus 3 niveaux d’écart sur chaque point d’une grille.
+        const [a, b] = [await pixels(png, 0, hauteur), await pixels(webp, 0, hauteur)];
+        let ecart = 0;
+        for (let y = 5; y < hauteur; y += 37) for (let x = 5; x < 600; x += 23) {
+          const i = (y * 600 + x) * 4;
+          ecart = Math.max(ecart, Math.abs(a[i] - b[i]), Math.abs(a[i + 1] - b[i + 1]), Math.abs(a[i + 2] - b[i + 2]));
+        }
+        // La bande : de la nuit, et du texte clair dessus (ses deux lignes).
+        const d = await pixels(png, hauteur, bande);
+        let clairs = 0;
+        let nuit = 0;
+        for (let i = 600 * 4 * 4; i < d.length; i += 4) {
+          if (d[i] > 200 && d[i + 1] > 200 && d[i + 2] > 190) clairs += 1;
+          if (d[i] < 20 && d[i + 1] < 20 && d[i + 2] < 25) nuit += 1;
+        }
+        return { ecart, clairs, nuit, total: d.length / 4 - 600 * 4 };
+      }, { png: `/${fichierDeLaPresse(ecran)}`, webp: `/img/appli/${ecran}-600.webp`, hauteur: HAUTEUR_DE_L_ECRAN, bande: HAUTEUR_DE_LA_BANDE });
+      expect(lu.ecart, `${ecran} : l’écran du fichier n’est plus celui de l’accueil`).toBeLessThanOrEqual(3);
+      expect(lu.nuit / lu.total, `${ecran} : la bande n’est pas de nuit`).toBeGreaterThan(0.75);
+      expect(lu.clairs, `${ecran} : la bande n’a pas son texte`).toBeGreaterThan(2000);
+    }
+  });
 });
 
 // Écrire : les deux boutons vont à l’adresse de marque.json, sans phrase qui la redise ; la phrase de secours la donne

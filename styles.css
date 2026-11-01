@@ -877,8 +877,12 @@ a:hover { color: var(--goutte); }
   .menu__liste > .menu__groupe { flex: 1.7 1 auto; }
   .menu__lien { gap: 6px; padding-inline: 5px; }
 }
-/* Plus étroit (moins de 360 px, une page zoomée) : deux rangs de deux, pas une colonne de quatre pilules. */
+/* Plus étroit (moins de 360 px, une page zoomée) : deux rangs de deux, pas une colonne de quatre pilules, et l’en-tête
+   serré comme au téléphone (36 px de gagnés) : l’appel du premier écran d’un iPhone SE reste dans l’écran. */
 @media screen and (max-width: 22.49em) {
+  .entete { row-gap: 6px; padding-top: 12px; padding-bottom: 0; }
+  .entete__logo { padding: 12px 0 9px; margin: -12px 0 -9px; }
+  .entete__attente { margin-top: 3px; }
   .menu__liste > li, .menu__matchs > li { flex: 1 1 calc(50% - 1px); }
   .menu__liste > .menu__groupe { flex-basis: 100%; }
 }

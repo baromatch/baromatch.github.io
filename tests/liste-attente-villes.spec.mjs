@@ -82,7 +82,8 @@ const verifierLesPuces = async (onglet, navigations) => {
   await onglet.waitForFunction(() => document.readyState === 'complete');
   await onglet.evaluate(async () => {
     await document.fonts.ready;
-    await Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {})));
+    // Seulement celles qui finissent avec le temps (pas le menu qui suit le défilement).
+    await Promise.all(document.getAnimations().filter((a) => a.timeline === document.timeline && a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {})));
     await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
   });
   const lu = await lireLesPuces(onglet);

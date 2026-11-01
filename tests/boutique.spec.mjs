@@ -40,11 +40,12 @@ test('les mots disent une sélection et une demande d’être prévenu, pas une 
   await expect(page.locator('.boutique-texte')).toContainText('Choisis tes pièces dès maintenant : on t’écrit à l’ouverture, sans rien payer.');
   await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /[Rr]éserv/);
 
-  // L’accueil ne présente plus la boutique (décision du propriétaire, 28 octobre) : on y arrive par le menu ou le pied de
-  // page.
+  // L’accueil ne présente plus la boutique (décision du propriétaire, 28 octobre), et elle a quitté le menu du haut
+  // (29 octobre) : on y arrive par le pied de page de chaque page.
   await page.goto('/');
   await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
-  await expect(page.locator('.entete__nav a[href="/boutique.html"]')).toHaveText('Boutique');
+  await expect(page.locator('.entete a[href*="boutique"]')).toHaveCount(0);
+  await expect(page.locator('.pied a[href="/boutique.html"]')).toHaveText('Boutique');
 });
 
 test('les questions : la date et la livraison sans ambiguïté', async ({ page }) => {

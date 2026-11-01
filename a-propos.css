@@ -54,10 +54,11 @@
    L’ouverture se resserre : la première entrée se voit dans le premier écran (320 × 568). */
 @media (max-width: 359px) {
   .apropos__entrees a { flex-direction: column; justify-content: flex-start; }
-  .apropos__ouverture { padding-top: 20px; }
-  .apropos__titre { font-size: 2rem; }
-  .apropos__chapo { margin-top: 16px; font-size: 1.0625rem; line-height: 1.5; }
-  .apropos__entrees { margin-top: 20px; }
+  .apropos__ouverture { padding-top: 12px; }
+  .apropos__ouverture .surtitre { margin-bottom: 10px; }
+  .apropos__titre { font-size: 1.875rem; }
+  .apropos__chapo { margin-top: 16px; font-size: 1.0625rem; line-height: 1.4; }
+  .apropos__entrees { margin-top: 14px; }
 }
 
 /* ---------- Une rubrique : un rail qui la nomme, un corps qui la dit ---------- */

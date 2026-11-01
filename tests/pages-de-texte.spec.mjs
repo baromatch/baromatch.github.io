@@ -14,7 +14,7 @@ for (const page of PAGES) {
   test(`${page.nom} : le pied de page mène à « Supprimer mon compte » et nomme les CGU`, async ({ page: onglet }) => {
     await couperLAPI(onglet);
     await onglet.goto(page.chemin);
-    const liens = await onglet.$$eval('.pied__liens a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent.replace(/\s+/g, ' ').trim()]));
+    const liens = await onglet.$$eval('.pied a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent.replace(/\s+/g, ' ').trim()]));
     expect(liens).toEqual(PIED);
   });
 }

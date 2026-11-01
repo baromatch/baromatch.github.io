@@ -6,6 +6,7 @@ import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import { AxeBuilder } from '@axe-core/playwright';
 import { MARQUE } from './outils/marque.mjs';
 import { PIED } from './outils/pied.mjs';
@@ -194,17 +195,24 @@ test.describe('ce que la page dit', () => {
 
   test('l’en-tête et le pied de page du site, « Pour les bars » marqué comme la page en cours', async ({ page }) => {
     await page.goto(PAGE);
-    const liens = await page.$$eval('.entete__nav a', (a) => a.map((l) => [l.className, l.getAttribute('href'), l.textContent, l.getAttribute('aria-current')]));
+    // Le menu des quatre entrées, « Pour les bars » marqué ; pas de « Préviens-moi » : l’action de la page est
+    // « Proposer mon bar ».
+    const liens = await page.$$eval('.entete a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent.trim(), l.getAttribute('aria-current')]));
     expect(liens).toEqual([
-      ['entete__lien', '/boutique.html', 'Boutique', null],
-      ['entete__lien entete__lien--bars', '/pour-les-bars.html', 'Pour les bars', 'page'],
+      ['/', '', null],
+      ['/ce-soir/', 'Ce soir', null],
+      ['/matchs/', 'La semaine', null],
+      ['/pour-les-bars.html', 'Pour les bars', 'page'],
+      ['/a-propos.html', 'À propos', null],
     ]);
     // Le pied de page est celui des autres pages (tests/pages-de-texte.spec.mjs le vérifie mot pour mot) : les CGU
-    // nommées, et « Supprimer mon compte » après « Confidentialité ».
-    const pied = await page.$$eval('.pied__liens a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent]));
-    expect(pied[0]).toEqual(['/pour-les-bars.html', 'Pour les bars']);
-    expect(pied.map(([href]) => href)).toEqual(PIED.map(([href]) => href));
+    // nommées, et « Supprimer mon compte » après « Confidentialité ». « Proposer mon bar » y mène au formulaire.
+    const pied = await page.$$eval('.pied a', (a) => a.map((l) => [l.getAttribute('href'), l.textContent.replace(/\s+/g, ' ').trim()]));
+    expect(pied).toEqual(PIED);
+    expect(pied).toContainEqual(['/pour-les-bars.html#proposer', 'Proposer mon bar']);
+    await expect(page.locator('#proposer')).toHaveCount(1);
   });
+
 
   test('les données structurées : le fil d’Ariane et la FAQ, qui répète mot pour mot chaque question de la page, rien d’autre', async ({ page }) => {
     await page.goto(PAGE);
@@ -368,10 +376,11 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await expect(ouverture).not.toContainText('Premiers bars à Paris');
   });
 
-  // Sur un iPhone (393 × 659 de page, sous la barre du navigateur) et un Pixel 7 (412 × 839), « Gratuit pendant le
-  // lancement, sans engagement. » se lit sans défiler (sous la ligne d’état, elle commençait à 702 px), et le bouton
-  // « Proposer mon bar » est entier dans le premier écran (le prix remonté l’avait poussé de 13 px sous le bas de l’iPhone).
-  for (const [appareil, largeur, hauteur] of [['un iPhone', 393, 659], ['un Pixel 7', 412, 839]]) {
+  // Sur un iPhone (393 × 659 de page, sous la barre du navigateur), un Pixel 7 (412 × 839) et un Android de 360 px
+  // (360 × 640, sous les barres de Chrome), « Gratuit pendant le lancement, sans engagement. » se lit sans défiler (sous
+  // la ligne d’état, elle commençait à 702 px), et le bouton « Proposer mon bar » est entier dans le premier écran (le
+  // prix remonté l’avait poussé de 13 px sous le bas de l’iPhone ; le menu sous le logo, de 6 px sous celui d’Android).
+  for (const [appareil, largeur, hauteur] of [['un iPhone', 393, 659], ['un Pixel 7', 412, 839], ['un Android de 360 px', 360, 640]]) {
     test(`à ${largeur} × ${hauteur}, comme ${appareil} : « Gratuit pendant le lancement, sans engagement. » en gras et le bouton « Proposer mon bar » dans le premier écran`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: hauteur });
       await page.goto(PAGE);
@@ -949,18 +958,21 @@ test.describe('le premier écran d’abord', () => {
     };
   });
 
-  test('dans la tête, une seule feuille bloque (styles.css) ; pour-les-bars.css n’y est que pour qui n’a pas JavaScript, et le HTML tient en 73 000 octets', () => {
+  test('dans la tête, une seule feuille bloque (styles.css) ; pour-les-bars.css n’y est que pour qui n’a pas JavaScript, et le HTML compressé arrive en deux allers-retours', () => {
     const tete = SOURCE.slice(0, SOURCE.indexOf('</head>'));
     const sansNoscript = tete.replace(/<noscript>[\s\S]*?<\/noscript>/g, '');
     expect([...sansNoscript.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*>/g)].map(([lien]) => lien)).toEqual(['<link rel="stylesheet" href="/styles.css">']);
     expect([...tete.matchAll(/<noscript>([\s\S]*?)<\/noscript>/g)].map(([, contenu]) => contenu)).toEqual(['<link rel="stylesheet" href="/pour-les-bars.css">']);
     expect(SOURCE.slice(SOURCE.indexOf('</head>')).match(/<link\b/g)).toBeNull();
-    // Le HTML est la première chose qu’attend le téléphone. Lighthouse, en local, le lit non compressé (GitHub Pages le
-    // sert compressé en gzip) : au-delà d’environ 74 000 octets, la 4G lente simulée lui ajoute un aller-retour avant
-    // de demander quoi que ce soit (+150 ms sur le premier affichage comme sur le LCP, un point de moins).
-    expect(Buffer.byteLength(SOURCE), 'pour-les-bars.html : 73 000 octets au plus. Pour ajouter du texte, faire de la '
+    // Le HTML est la première chose qu’attend le téléphone. GitHub Pages le sert compressé en gzip, et Lighthouse se
+    // mesure ainsi depuis le 30 octobre 2026 (avant, le serveur local le servait tel quel, et la règle était de 73 000
+    // octets bruts). La 4G lente simulée lui laisse 14 600 octets au premier aller-retour, puis 29 200 : au-delà de
+    // 43 800 octets compressés, un aller-retour de plus avant de demander quoi que ce soit (+150 ms sur le premier
+    // affichage comme sur le LCP, un point de moins). Mesuré le 31 octobre 2026 : 22,2 Ko compressés (87,7 Ko bruts,
+    // avec le pied de page rangé et les insignes de ses clubs) ; 18,6 Ko compressés (72,7 Ko bruts) avant la navigation.
+    expect(gzipSync(Buffer.from(SOURCE)).length, 'pour-les-bars.html, compressé : 40 000 octets au plus. Pour ajouter du texte, faire de la '
       + 'place dans la page : un commentaire HTML, un SVG répété (un <symbol> dans les définitions cachées et des <use>), '
-      + 'une règle du style de la tête qui ne sert pas au premier écran (elle va dans pour-les-bars.css)').toBeLessThanOrEqual(73000);
+      + 'une règle du style de la tête qui ne sert pas au premier écran (elle va dans pour-les-bars.css)').toBeLessThanOrEqual(40000);
   });
 
   // Le formulaire au repos a toutes ses règles dans le style de la page (grille, marges, bord des champs à 3:1) : son

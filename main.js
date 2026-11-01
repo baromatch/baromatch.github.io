@@ -70,10 +70,20 @@
     retour.appendChild(texte);
   }
 
+  // Le retour se voit en entier, « Corriger l’adresse » compris : sur iPhone, le bouton touché ne garde pas le focus,
+  // et le bandeau du bas reste là (le défilement s’arrête au-dessus de lui, scroll-padding de styles.css).
+  function montrerLeRetour() {
+    var bas = corriger && !corriger.hidden ? corriger : retour;
+    if (bas.scrollIntoView) bas.scrollIntoView({ block: "nearest" });
+  }
+
+  // Une adresse à corriger : le message sous le champ se voit aussi une fois le clavier fermé (le champ perd le focus
+  // et le bandeau du bas revient).
   function signaler(message) {
     afficher(message, "erreur");
     champ.setAttribute("aria-invalid", "true");
     champ.focus();
+    montrerLeRetour();
   }
 
   function rouvrir() {
@@ -132,6 +142,7 @@
     var corps = encodeURIComponent("Mon adresse : " + courriel + (ville ? "\nMa ville : " + ville : ""));
     window.location.href = "mailto:" + CONTACT + "?subject=" + sujet + "&body=" + corps;
     afficher(TEXTES.messagerie, "ok");
+    montrerLeRetour();
   }
 
   // Une inscription réussie se dit aussi à la mesure d’audience (mesure.js, si elle est active) : seulement qu’elle a
@@ -141,6 +152,7 @@
     villeInscrite = ville;
     afficher(TEXTES.inscrite(courriel, ville), "ok");
     aller("inscrite");
+    montrerLeRetour();
     document.dispatchEvent(new CustomEvent("baromatch:compter", { detail: "liste-attente" }));
   }
 
@@ -167,8 +179,9 @@
     transmettre(urlEnvoi, donnees).then(function (issue) {
       if (issue === "ok") return inscrire(courriel, ville);
       rouvrir();
-      if (issue === "refusee") signaler(TEXTES.refusee);
-      else afficher(TEXTES.panne, "erreur");
+      if (issue === "refusee") return signaler(TEXTES.refusee);
+      afficher(TEXTES.panne, "erreur");
+      montrerLeRetour();
     });
   });
 

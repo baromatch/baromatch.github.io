@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
 import { sansInsignes } from './outils/insignes.mjs';
-import { PIED } from './outils/pied.mjs';
+import { liensDuPied, PIED } from './outils/pied.mjs';
 import { contenuDuScenario, PUBLIES_DU_SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { lireLaSource } from '../generateur/sources.mjs';
@@ -110,8 +110,8 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
       // Le pied de page du site, mot pour mot, dit en français (lang="fr"), sous une phrase en anglais.
       const pied = p.contenu.match(/<footer class="pied page" lang="fr">([\s\S]*?)<\/footer>/)?.[1] ?? '';
       expect(pied, p.chemin).toContain('<p class="pied__langue" lang="en">The rest of baromatch.fr is in French.</p>');
-      const liens = [...pied.matchAll(/<a href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map(([, href, texte]) => [href, texte.replace(/&amp;/g, '&').replace(/[\s ]+/g, ' ').trim()]);
-      expect(liens, p.chemin).toEqual(PIED);
+      expect(pied, p.chemin).toMatch(/^\n<p class="pied__langue" lang="en">/);
+      expect(liensDuPied(p.contenu), p.chemin).toEqual(PIED);
     }
   });
 

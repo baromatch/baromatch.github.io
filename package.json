@@ -8,6 +8,7 @@
     "lighthouse": "node tests/outils/lighthouse.mjs",
     "liens": "playwright test tests/liens.spec.mjs",
     "generer": "node generateur/construire.mjs",
+    "cadre": "node generateur/cadre.mjs",
     "generer:capture": "node generateur/construire.mjs --source=capture:tests/donnees/capture --maintenant=2026-10-15T19:44:29Z --sortie=apercu",
     "lighthouse:exemples": "node tests/outils/lighthouse-exemples.mjs",
     "lighthouse:budget": "node tests/outils/lighthouse-budget.mjs",

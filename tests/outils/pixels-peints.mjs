@@ -4,7 +4,7 @@
 //
 // mesurerAuPixel(page, nuit) : le texte de la page est caché (couleur transparente, soulignements et ombres de texte retirés), la
 // page est photographiée de haut en bas, un écran à la fois (ce qui est fixe ou collant se peint donc là où le visiteur le
-// voit), et derrière chaque ligne de texte (les rectangles que le navigateur donne pour ses caractères) chaque pixel est
+// voit ; une ligne qu’il couvre se mesure à une autre position), et derrière chaque ligne de texte (les rectangles que le navigateur donne pour ses caractères) chaque pixel est
 // comparé à la couleur du texte posée dessus. Le pire pixel de chaque ligne en est le contraste. `nuit` : les moments de nuit
 // de la page (un sélecteur CSS), que la mesure laisse de côté. Le texte caché l’est par une feuille construite (adoptedStyleSheets) :
 // la politique de sécurité de la page, qui n’admet pas de style en ligne, n’a pas à être contournée.
@@ -78,6 +78,11 @@ const TEXTE_CACHE = `*, *::before, *::after, *::placeholder, *::marker {
 // de place) : `cle` retrouve la même ligne à une autre position de défilement.
 const lireLesLignes = (nuit) => {
   const lignes = [];
+  // Ce qui est fixe et couvre la page (le bandeau du bas) : une ligne qu’il couvre ne se lit pas à cette position, elle
+  // se mesure à une autre (un décor fixe sans pointeur, derrière la page, ne couvre rien).
+  const couvrants = [...document.querySelectorAll('body *')]
+    .filter((e) => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).pointerEvents !== 'none' && e.checkVisibility())
+    .map((e) => ({ e, r: e.getBoundingClientRect() }));
   const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   let rang = 0;
   for (let texte = marcheur.nextNode(); texte; texte = marcheur.nextNode()) {
@@ -99,6 +104,7 @@ const lireLesLignes = (nuit) => {
       if (rect.width < 2 || rect.height < 2) return;
       // Une ligne coupée par le bord de l’écran se mesure à une autre position de défilement, où elle est entière.
       if (rect.top < 0 || rect.left < 0 || rect.bottom > window.innerHeight || rect.right > window.innerWidth) return;
+      if (couvrants.some(({ e, r }) => !e.contains(element) && rect.left < r.right && r.left < rect.right && rect.top < r.bottom && r.top < rect.bottom)) return;
       lignes.push({
         cle: `${rang}:${i}`,
         quoi: `${element.tagName.toLowerCase()}${element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : ''} « ${texte.textContent.trim().slice(0, 28)} »`,
@@ -168,13 +174,22 @@ export const mesurerAuPixel = async (page, nuit) => {
     await page.evaluate((haut) => window.scrollTo({ top: haut, behavior: 'instant' }), defilement);
     // Deux images, pour que ce qui suit le défilement (la lumière du match, ses halos) ait fini de se poser, et la fin des
     // transitions et des animations qui ne tournent pas sans fin (une couleur lue à mi-chemin du texte qui reparaît serait un gris).
+    // Celles qui suivent le défilement (le menu qui devient le bandeau du bas) ne finissent pas avec le temps : pas d’attente.
     await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
     await page.evaluate(() => Promise.all(document.getAnimations()
-      .filter((animation) => animation.effect?.getComputedTiming().endTime !== Infinity)
+      .filter((animation) => animation.timeline === document.timeline && animation.effect?.getComputedTiming().endTime !== Infinity)
       .map((animation) => animation.finished.catch(() => {}))));
     const vues = await page.evaluate(lireLesLignes, `${nuit}, ${TOUJOURS_HORS_JEU}`);
     await cacher(true);
-    const image = lirePng(await page.screenshot({ animations: 'disabled' }));
+    // La photo, les animations arrêtées comme le fait « animations: 'disabled' » (celles qui tournent sans fin ramenées à
+    // leur début ; les autres sont déjà finies) ; sauf celles qui suivent le défilement : le menu devenu le bandeau du bas
+    // reste là où le visiteur le voit (« disabled » le renverrait dans son rang, en haut de la page).
+    await page.evaluate(() => {
+      window.animationsArretees = document.getAnimations().filter((animation) => animation.timeline === document.timeline && animation.playState === 'running');
+      for (const animation of window.animationsArretees) animation.cancel();
+    });
+    const image = lirePng(await page.screenshot());
+    await page.evaluate(() => { for (const animation of window.animationsArretees) animation.play(); });
     await cacher(false);
     if (image.largeur !== largeur) throw new Error(`mesurerAuPixel : la capture fait ${image.largeur} px de large, la page ${largeur}`);
     for (const ligne of vues) {

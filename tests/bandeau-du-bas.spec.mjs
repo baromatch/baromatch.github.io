@@ -15,6 +15,8 @@
 //   - les retours des formulaires (l’inscription faite ou en panne, « Corriger l’adresse », l’envoi, la case oubliée)
 //     se voient au-dessus de lui, que le bouton touché garde le focus (Android) ou non (iPhone) ;
 //   - sur la boutique, il laisse la barre de sélection seule en bas, et reste dans son rang, au clavier ;
+// - arrivé par un lien vers un formulaire (#attente, #proposer), que le navigateur amène en haut de l’écran, texte à
+//   125 et 200 % dès le chargement : aucun champ ni bouton du formulaire n’est sous le bandeau (il reste dans son rang) ;
 //   - il est à 10 px du bord, plus --zone-basse : sans viewport-fit=cover, Chromium donne 0 à
 //     env(safe-area-inset-bottom) (Safari aussi, d’après sa documentation : à vérifier sur un vrai iPhone) ; la zone
 //     basse d’un iPhone à encoche est aussi simulée, à 34 px.
@@ -352,6 +354,50 @@ for (const cas of CAS) {
       expect((await lireLeBandeau(onglet)).fixe).toBe(true);
     });
   });
+}
+
+// ---------- L’arrivée par un lien vers un formulaire ----------
+
+// « Préviens-moi » (/#attente, ou #attente sur une page de ville) et « Proposer mon bar » (/pour-les-bars.html#proposer)
+// mènent à un formulaire, que le navigateur amène lui-même en haut de l’écran. Avec le texte agrandi dès le chargement
+// (un font-size sur <html>, le cas le plus dur), la page défile alors plus bas que le rang, qui deviendrait le bandeau
+// du bas, par-dessus le champ ou le bouton. Arrivé ainsi, le rang reste sous le logo : aucun champ ni bouton du
+// formulaire n’est sous un bandeau fixe.
+const ARRIVEES_PAR_UN_LIEN = [
+  { adresse: '/#attente', genere: false, boites: ['#attente-mail', '.attente__bouton'] },
+  { adresse: '/pour-les-bars.html#proposer', genere: false, boites: ['#demande-bar'] },
+  { adresse: '/regarder-le-match/paris/#attente', genere: true, boites: ['#attente-mail', '.attente__bouton'] },
+];
+for (const [largeur, hauteur] of [[360, 560], [375, 548], [390, 664], [430, 739]]) {
+  for (const texte of [125, 200]) {
+    for (const { adresse, genere, boites } of ARRIVEES_PAR_UN_LIEN) {
+      test(`arrivée par ${adresse} à ${largeur} × ${hauteur}, texte à ${texte} % : aucun champ ni bouton sous le bandeau`, async ({ page: onglet }) => {
+        await couperLAPI(onglet);
+        await onglet.setViewportSize({ width: largeur, height: hauteur });
+        // Le texte agrandi avant le premier affichage : c’est à cette taille que le navigateur suit le lien.
+        await onglet.addInitScript((t) => {
+          const poser = () => { if (document.documentElement) document.documentElement.style.fontSize = `${t}%`; };
+          poser();
+          new MutationObserver(poser).observe(document, { childList: true });
+        }, texte);
+        await onglet.goto(genere ? `${site.serveur.adresse}${adresse}` : adresse);
+        await attendreLaPageFinie(onglet);
+        await onglet.evaluate(() => document.fonts.ready);
+        await onglet.evaluate(OUTILS);
+        const bandeau = await lireLeBandeau(onglet);
+        const lu = await onglet.evaluate((liste) => ({
+          taille: getComputedStyle(document.documentElement).fontSize,
+          defile: scrollY,
+          boites: liste.map((s) => window.boiteDuBandeau(document.querySelector(s))),
+        }), boites);
+        expect(lu.taille, 'le texte agrandi dès le chargement').toBe(`${16 * texte / 100}px`);
+        expect(lu.defile, 'le navigateur a suivi le lien').toBeGreaterThan(0);
+        const sous = lu.boites.filter((b) => bandeau.fixe && bandeau.visible && b.bas > bandeau.haut + 0.5 && b.haut < bandeau.bas - 0.5)
+          .map((b) => dire(b, bandeau));
+        expect(sous, 'sous le bandeau du bas').toEqual([]);
+      });
+    }
+  }
 }
 
 // ---------- La zone basse, sans simulation ----------

@@ -4,8 +4,9 @@
 // sur chaque page écrite à la main et sur les pages des matchs d’un site d’exemple :
 // - à l’arrivée, sur les écrans d’iPhone et d’Android avec les barres du navigateur affichées (une hauteur réduite),
 //   rien n’est fixe : les entrées sont un rang sous le logo, visible, qui ne couvre rien ;
-// - une fois ce rang sorti de l’écran, le bandeau du bas, à 390 et 375 px de large, texte à 100 et 200 % (un font-size
-//   posé sur <html>, que les media queries ne voient pas : le bandeau grandit de rangs, le cas le plus dur) :
+// - une fois ce rang sorti de l’écran, le bandeau du bas, à 390 et 375 px de large (iPhone), 412 et 360 px (Android),
+//   texte à 100 et 200 % (un font-size posé sur <html>, que les media queries ne voient pas : le bandeau grandit de
+//   rangs, le cas le plus dur) :
 //   - la fin de la page remonte au-dessus de lui ;
 //   - « Proposer mon bar » et chaque bouton de formulaire, amenés en bas de l’écran (comme le fait une ancre) puis par
 //     le focus, s’arrêtent au-dessus de lui ;
@@ -34,11 +35,17 @@ import { construireLeSiteDExemple } from './outils/site-genere.mjs';
 // La zone basse d’un iPhone à encoche, simulée (sans viewport-fit=cover, Safari la garde hors de la page).
 const ZONE_BASSE = 34;
 const BORD = 10;
+// Deux iPhone (15 et SE), deux Android (Pixel 7, et le plus étroit, 360 px, où le bandeau commence) ; la zone basse
+// simulée partout (plus dur qu’Android, dont la barre des gestes est hors de la page).
 const CAS = [
   { largeur: 390, hauteur: 844, texte: 100 },
   { largeur: 390, hauteur: 844, texte: 200 },
   { largeur: 375, hauteur: 667, texte: 100 },
   { largeur: 375, hauteur: 667, texte: 200 },
+  { largeur: 412, hauteur: 780, texte: 100 },
+  { largeur: 412, hauteur: 780, texte: 200 },
+  { largeur: 360, hauteur: 640, texte: 100 },
+  { largeur: 360, hauteur: 640, texte: 200 },
 ];
 // L’arrivée, les barres du navigateur affichées : la hauteur qu’il reste à la page.
 const ECRANS_D_ARRIVEE = [

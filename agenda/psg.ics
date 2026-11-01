@@ -5,9 +5,9 @@ CALSCALE:GREGORIAN
 X-WR-CALNAME:PSG · Baromatch
 X-WR-CALDESC:PSG : les matchs au programme de Baromatch (Ligue 1 et Ligue 
  des champions)\, à l’heure de Paris\, pour l’instant jusqu’au diman
- che 8 novembre. Pas de Coupe de France ni de match amical pour l’instant
- . Un match reporté ou annulé reste sept jours\, marqué comme tel. https
- ://baromatch.fr/agenda/
+ che 29 novembre. Pas de Coupe de France ni de match amical pour l’instan
+ t. Un match reporté ou annulé reste sept jours\, marqué comme tel. http
+ s://baromatch.fr/agenda/
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
@@ -35,6 +35,42 @@ DESCRIPTION:Ligue 1 · Paris Saint-Germain – ESTAC Troyes\nCoup d’envoi
   samedi 7 novembre à 20:45\, heure de Paris.\nLa page du match : https:/
  /baromatch.fr/matchs/psg-troyes-2026-11-07/
 URL:https://baromatch.fr/matchs/psg-troyes-2026-11-07/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmvxramxm0008z71o33w3iy6d@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261121T161500Z
+DTEND:20261121T181500Z
+SUMMARY:Nice – PSG
+DESCRIPTION:Ligue 1 · OGC Nice – Paris Saint-Germain\nCoup d’envoi sam
+ edi 21 novembre à 17:15\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmvxran5x000yz71o4e47dsdo@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261125T200000Z
+DTEND:20261125T220000Z
+SUMMARY:PSG – Rome
+DESCRIPTION:Ligue des champions · Paris Saint-Germain – AS Roma\nCoup d
+ ’envoi mercredi 25 novembre à 21:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmvxranap001ez71oeiheug5e@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261128T194500Z
+DTEND:20261128T214500Z
+SUMMARY:PSG – Lorient
+DESCRIPTION:Ligue 1 · Paris Saint-Germain – FC Lorient\nCoup d’envoi s
+ amedi 28 novembre à 20:45\, heure de Paris.
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

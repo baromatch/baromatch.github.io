@@ -5,9 +5,9 @@ CALSCALE:GREGORIAN
 X-WR-CALNAME:Lille · Baromatch
 X-WR-CALDESC:Lille : les matchs au programme de Baromatch (Ligue 1 et Ligu
  e des champions)\, à l’heure de Paris\, pour l’instant jusqu’au dim
- anche 8 novembre. Pas de Coupe de France ni de match amical pour l’insta
- nt. Un match reporté ou annulé reste sept jours\, marqué comme tel. htt
- ps://baromatch.fr/agenda/
+ anche 29 novembre. Pas de Coupe de France ni de match amical pour l’inst
+ ant. Un match reporté ou annulé reste sept jours\, marqué comme tel. ht
+ tps://baromatch.fr/agenda/
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
@@ -35,6 +35,42 @@ DESCRIPTION:Ligue 1 · Stade Rennais FC – LOSC Lille\nCoup d’envoi dima
  nche 8 novembre à 15:00\, heure de Paris.\nLa page du match : https://ba
  romatch.fr/matchs/rennes-lille-2026-11-08/
 URL:https://baromatch.fr/matchs/rennes-lille-2026-11-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmvxramzf000cz71o8hckykfg@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261121T194500Z
+DTEND:20261121T214500Z
+SUMMARY:Lille – OL
+DESCRIPTION:Ligue 1 · LOSC Lille – Olympique Lyonnais\nCoup d’envoi sa
+ medi 21 novembre à 20:45\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmvxran5d000wz71ox8yz96xc@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261125T200000Z
+DTEND:20261125T220000Z
+SUMMARY:Lille – Bayern
+DESCRIPTION:Ligue des champions · LOSC Lille – FC Bayern München\nCoup 
+ d’envoi mercredi 25 novembre à 21:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmvxranba001gz71ockajun8y@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261128T194500Z
+DTEND:20261128T214500Z
+SUMMARY:Le Mans – Lille
+DESCRIPTION:Ligue 1 · Le Mans FC – LOSC Lille\nCoup d’envoi samedi 28 
+ novembre à 20:45\, heure de Paris.
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

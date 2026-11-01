@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrada30002fkaxczfjnsxs@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261107T200000Z
+DTEND:20261107T220000Z
+SUMMARY:Valencia – Real Madrid
+DESCRIPTION:LaLiga · Valencia CF – Real Madrid C.F.\nCoup d’envoi same
+ di 7 novembre à 21:00\, heure de Paris.\nLa page du match : https://baro
+ match.fr/matchs/valencia-real-madrid-2026-11-07/
+URL:https://baromatch.fr/matchs/valencia-real-madrid-2026-11-07/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

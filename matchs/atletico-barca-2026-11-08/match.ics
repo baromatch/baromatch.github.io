@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxradb80004fkax7q9nmdru@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261108T200000Z
+DTEND:20261108T220000Z
+SUMMARY:Atlético – Barça
+DESCRIPTION:LaLiga · Atlético de Madrid – FC Barcelona\nCoup d’envoi 
+ dimanche 8 novembre à 21:00\, heure de Paris.\nLa page du match : https:
+ //baromatch.fr/matchs/atletico-barca-2026-11-08/
+URL:https://baromatch.fr/matchs/atletico-barca-2026-11-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

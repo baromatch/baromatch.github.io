@@ -493,15 +493,14 @@ test.describe('les cibles de 44 × 44 px', () => {
 
 // Aucun mot coupé en plein mot : un mot passé à la ligne ne l’est qu’après son trait d’union (« Saint- / Germain »), ou
 // dans une adresse (un lien d’agenda, une adresse e-mail, qui n’ont pas d’autre place). Avant, à 320 px et 200 %,
-// « Aujourd’hui, » (la semaine), « Baromatch. » (la feuille du patron, l’affiche d’un bar) passaient à la ligne en plein mot.
-// Hors jeu ici : les lignes des matchs d’une affiche (.affiche-ligne), refaites, avec leur propre test « aucun nom coupé »,
-// par la branche des insignes (tests/affiche.spec.mjs) ; ce test les reprendra quand elle sera dans main.
+// « Aujourd’hui, » (la semaine), « Baromatch. » (la feuille du patron, l’affiche d’un bar) passaient à la ligne en plein mot ;
+// et les noms des lignes de l’affiche de la semaine (« Bres / t », « PS / G »), avant la suite des insignes.
 const motsCoupesEnPleinMot = (onglet) => onglet.evaluate(() => {
   const coupes = [];
   const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
     const parent = n.parentElement;
-    if (!parent || !n.data.trim() || parent.closest('script, style, [hidden], .lien-evitement, .attente__piege, .visuellement-cache, .affiche-ligne')) continue;
+    if (!parent || !n.data.trim() || parent.closest('script, style, [hidden], .lien-evitement, .attente__piege, .visuellement-cache')) continue;
     if (!parent.checkVisibility({ visibilityProperty: true, opacityProperty: true })) continue;
     for (const mot of n.data.matchAll(/\S+/g)) {
       if (/[@/]|\.[a-z]{2,}/.test(mot[0])) continue;

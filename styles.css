@@ -788,7 +788,8 @@ a:hover { color: var(--goutte); }
 /* ---------- Pied de page : la nuit, rangé comme une feuille de match (cadre.mjs) ---------- */
 
 /* Les liens en clair ; l’ambre aux deux actions (« Préviens-moi quand Baromatch arrive », « Proposer mon bar »), au
-   survol et au focus. Chaque lien se touche sur 44 px de haut (WCAG 2.5.8 en demande 24). */
+   survol et au focus. Chaque lien se touche sur 44 px de haut (WCAG 2.5.8 en demande 24) ; passé à la ligne ou le texte
+   agrandi, ses lignes serrées (1,3) et 0,2 em au-dessus et dessous : deux liens voisins ne se lisent pas comme un seul. */
 .pied { padding-top: 48px; padding-bottom: 40px; border-top: 1px solid var(--trait); color: var(--texte-doux); font-size: 0.9375rem; }
 .pied ul { margin: 0; padding: 0; list-style: none; }
 .pied p { margin: 0; }
@@ -798,7 +799,7 @@ a:hover { color: var(--goutte); }
 .pied a[aria-current="page"] { color: var(--texte); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.25em; }
 .pied .pied__action { color: var(--ambre); font-weight: 700; text-decoration: underline; text-decoration-color: rgba(255, 177, 61, 0.5); text-underline-offset: 0.25em; }
 .pied .pied__action:hover { color: var(--goutte); text-decoration-color: var(--ambre); }
-.pied__contact a, .pied__plan a, .pied__legal a { display: inline-flex; align-items: center; min-height: 44px; }
+.pied__contact a, .pied__plan a, .pied__legal a { display: inline-flex; align-items: center; min-height: 44px; padding-block: 0.2em; line-height: 1.3; }
 /* Dans la ligne « Presse et partenariats : contact@… », les deux liens soulignés se distinguent du texte. */
 .pied__contact p a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 /* Un lien de liste prend toute sa case : « Lyon » se touche sur toute la largeur de la colonne. */

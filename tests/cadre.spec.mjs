@@ -427,6 +427,46 @@ for (const largeur of [360, 390, 1280]) {
   });
 }
 
+// Deux liens voisins d’une liste du pied se lisent comme deux : quand un lien passe à la ligne (« Comment on choisit
+// les bars », puis « Comment trouver un bar qui diffuse le match », dans une colonne étroite), l’écart jusqu’au lien
+// suivant reste plus grand que l’interligne, de 4 px au moins. À l’ordinateur et au téléphone, texte à 100 et 200 %.
+for (const largeur of [320, 393, 1280]) {
+  test(`le pied à ${largeur} px, texte à 100 et 200 % : deux liens voisins ne se lisent pas comme un seul`, async ({ page }) => {
+    await page.setViewportSize({ width: largeur, height: 800 });
+    await page.goto('/cgu.html');
+    await page.evaluate(() => document.fonts.ready);
+    let paires = 0;
+    for (const pourcent of [100, 200]) {
+      const lu = await page.evaluate((p) => {
+        document.documentElement.style.fontSize = `${p}%`;
+        const collees = [];
+        let vues = 0;
+        for (const liste of document.querySelectorAll('.pied__contact ul, .pied__plan ul:not(.pied__clubs), .pied__legal ul')) {
+          const liens = [...liste.querySelectorAll('a')].map((a) => {
+            const plage = document.createRange();
+            plage.selectNodeContents(a);
+            const lignes = [...plage.getClientRects()].filter((r) => r.width > 0 && r.height > 0);
+            return { texte: a.textContent.trim(), haut: lignes[0], bas: lignes.at(-1), interligne: parseFloat(getComputedStyle(a).lineHeight) - lignes[0].height };
+          });
+          for (const a of liens) {
+            // Le lien juste en dessous, dans la même colonne.
+            const dessous = liens.filter((b) => b !== a && b.haut.top >= a.bas.bottom - 0.5 && b.haut.left < a.bas.right && a.bas.left < b.haut.right)
+              .sort((x, y) => x.haut.top - y.haut.top)[0];
+            if (!dessous) continue;
+            vues += 1;
+            const ecart = dessous.haut.top - a.bas.bottom;
+            if (ecart < a.interligne + 4) collees.push(`« ${a.texte} » puis « ${dessous.texte} » : ${ecart.toFixed(1)} px, l’interligne ${a.interligne.toFixed(1)} px`);
+          }
+        }
+        return { collees, vues };
+      }, pourcent);
+      paires += lu.vues;
+      expect(lu.collees, `${pourcent} % : liens voisins collés`).toEqual([]);
+    }
+    expect(paires, 'des liens voisins, l’un sous l’autre').toBeGreaterThan(5);
+  });
+}
+
 // ---------- L’ancien cadre ----------
 
 // Le jour de la fusion, les pages des matchs publiées par l’Action avec l’ancien générateur ont encore l’ancien en-tête

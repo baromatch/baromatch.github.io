@@ -135,9 +135,10 @@
 .apropos__ecran figure { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; margin: 0; }
 .apropos__cadre { position: relative; width: min(100%, 11rem, 212px); }
 .apropos__cadre .telephone { max-width: none; }
-/* Au-dessus de l’écran quand il est seul sur sa ligne (un petit téléphone, le texte à 200 %) : l’étiquette passe à la
-   ligne dans la largeur du cadre, sans couper un mot ni sortir de l’écran. */
-.apropos__cadre .exemple { position: static; margin: 0 0 10px; }
+/* L’étiquette est posée sur le bord haut du cadre, jamais sur l’écran : dans le flux, son bas sur le haut de l’écran
+   (le bord fait 6 px). Sur deux lignes (le texte agrandi), elle pousse l’écran au lieu d’en cacher le haut ; sur une
+   (24 px), ses marges laissent l’écran au haut du cadre. Centrée, dans la largeur du cadre. */
+.apropos__cadre .exemple { position: relative; top: auto; left: 50%; display: flex; width: max-content; max-width: 100%; margin: -18px 0 -6px; transform: translateX(-50%); text-align: center; }
 .apropos__ecran figcaption { color: var(--texte-doux); font-size: 1rem; line-height: 1.5; text-wrap: pretty; }
 .apropos__ecran figcaption p { margin: 0; }
 .apropos__ecran figcaption strong { color: var(--texte); font-weight: 700; }
@@ -147,20 +148,19 @@
 /* Tant que la page est étroite (sous 43,75 rem, 700 px à 100 %), la page reste courte : chaque écran fait 152 px de large,
    sa légende à côté, dès 21,25 rem de place (340 px à 100 %) ; en dessous, la légende passe dessous. La colonne de
    l’écran ne dépasse jamais 212 px (à 200 %) : l’écran (200 px) n’est jamais plus large que le WebP de 600 px servi,
-   même à ×3. L’étiquette se centre sur l’écran, qu’elle déborde un peu sans toucher la légende ; plus large que la
-   colonne (le texte agrandi), elle passe sur deux lignes. Au-delà, trois colonnes, le cadre à 272 px au plus (la place
-   que dit sizes ; à 200 %, sa colonne de 340 px agrandissait l’écran). */
+   même à ×3. L’étiquette déborde un peu le cadre sans toucher la légende. Au-delà, trois colonnes, le cadre à 272 px
+   au plus (la place que dit sizes ; à 200 %, sa colonne de 340 px agrandissait l’écran), l’étiquette dans son coin. */
 @container apropos (max-width: 43.74rem) {
   @container (min-width: 21.25rem) {
     .apropos__ecran figure { grid-template-columns: min(9.5rem, 212px) minmax(0, 1fr); align-items: start; gap: 22px; }
     .apropos__cadre { width: 100%; }
-    .apropos__cadre .exemple { position: absolute; left: 50%; width: max-content; max-width: calc(100% + 16px); margin: 0; transform: translateX(-50%); text-align: center; }
+    .apropos__cadre .exemple { max-width: calc(100% + 16px); }
   }
 }
 @container apropos (min-width: 43.75rem) {
   .apropos__ecrans { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; align-items: start; }
   .apropos__cadre { width: min(100%, 17rem, 272px); }
-  .apropos__cadre .exemple { position: absolute; margin: 0; }
+  .apropos__cadre .exemple { left: 24px; max-width: calc(100% - 48px); transform: none; }
 }
 
 /* ---------- Ce qu’on refuse : des phrases calmes, en grand ---------- */

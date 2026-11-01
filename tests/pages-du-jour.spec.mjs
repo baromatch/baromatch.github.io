@@ -428,6 +428,46 @@ for (const ratio of [1, 2]) for (const [debut, fin] of PLAGES_IMAGES) {
   });
 }
 
+// L’étiquette « Écran de démonstration » est posée sur le bord du cadre, jamais sur l’écran (la règle de la marque) :
+// sur À propos, son bas est dans le bord haut du téléphone (6 px, entre le haut du téléphone et celui de l’écran), sur une
+// ligne comme sur deux, et rien au-dessus d’elle ne la touche ; sur Presse, elle est au-dessus du téléphone. De 320 à
+// 1 440 px, texte à 100 et 200 %. Avant, sur À propos, elle était posée à cheval sur l’écran : 6 px de l’écran cachés
+// sur une ligne, 46 px sur deux (le texte à 200 %, dès 712 px).
+for (const { chemin } of PAGES) {
+  test(`${chemin}, de 320 à 1 440 px, texte à 100 et 200 % : chaque étiquette « Écran de démonstration » posée sur le bord du cadre, jamais sur l’écran`, async ({ page }) => {
+    await ouvrir(page, chemin, 320);
+    const fautes = [];
+    let mesurees = 0;
+    for (let largeur = 320; largeur <= 1440; largeur += 8) {
+      await page.setViewportSize({ width: largeur, height: 900 });
+      for (const pourcent of [100, 200]) {
+        await agrandir(page, pourcent);
+        const lu = await page.evaluate(() => [...document.querySelectorAll('main figure')].filter((f) => f.querySelector('.exemple')).map((figure) => {
+          const etiquette = figure.querySelector('.exemple').getBoundingClientRect();
+          const telephone = figure.querySelector('.telephone').getBoundingClientRect();
+          const ecran = figure.querySelector('.telephone__ecran').getBoundingClientRect();
+          // Ce qui est juste au-dessus : l’écran d’avant s’il est dans la même colonne, sinon le titre de la section.
+          const li = figure.closest('li');
+          const avant = [li.previousElementSibling, li.parentElement.previousElementSibling].find((e) => {
+            const r = e?.getBoundingClientRect();
+            return r && r.left < etiquette.right && r.right > etiquette.left;
+          })?.getBoundingClientRect();
+          return { nom: figure.querySelector('img').getAttribute('src').replace(/^.*\//, ''), bas: etiquette.bottom, haut: etiquette.top, telephone: telephone.top, ecran: ecran.top, avant: avant?.bottom ?? -Infinity };
+        }));
+        mesurees += lu.length;
+        for (const e of lu) {
+          const ici = `${largeur} px, ${pourcent} %, ${e.nom}`;
+          if (e.bas > e.ecran + 0.5) fautes.push(`${ici} : l’étiquette cache ${Math.round(e.bas - e.ecran)} px du haut de l’écran`);
+          if (chemin === '/a-propos.html' && e.bas < e.telephone - 0.5) fautes.push(`${ici} : l’étiquette flotte ${Math.round(e.telephone - e.bas)} px au-dessus du cadre`);
+          if (e.haut < e.avant - 0.5) fautes.push(`${ici} : l’étiquette touche ce qui est au-dessus d’elle`);
+        }
+      }
+    }
+    expect(mesurees).toBeGreaterThan(500);
+    expect(fautes).toEqual([]);
+  });
+}
+
 // La carte des couleurs à 320 px, texte à 200 % : le disque passe au-dessus de son texte, qui garde toute la largeur.
 test('Presse à 320 px, texte à 200 % : chaque disque de couleur est au-dessus de son nom', async ({ page }) => {
   await ouvrir(page, '/presse.html', 320, 700);

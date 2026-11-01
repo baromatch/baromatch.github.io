@@ -541,7 +541,9 @@ for (const { chemin } of PAGES) for (const [debut, fin, pas] of LARGEURS_DES_LIE
       for (const pourcent of [100, 150, 200]) {
         await agrandir(page, pourcent);
         const lu = await page.evaluate(toucherLesLiens);
-        expect(lu.liens, `${largeur} px, ${pourcent} %`).toBe(7);
+        // Sept liens pris dans une phrase ; sur Presse sous 360 px, « Proposer mon bar » passe sous sa question, seul sur sa
+        // ligne (presse.css, pour que rien ne bouge quand la police arrive) : il n’est plus pris dans une phrase.
+        expect(lu.liens, `${largeur} px, ${pourcent} %`).toBe(chemin === '/presse.html' && largeur < 360 ? 6 : 7);
         fautes.push(...lu.fautes.map((f) => `${largeur} px, ${pourcent} % : ${f}`));
       }
     }

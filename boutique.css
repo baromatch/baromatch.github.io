@@ -62,8 +62,7 @@
   color: var(--texte-discret);
   font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 .boutique-produit__nom { margin: -6px 0 0; font-size: 1.625rem; font-weight: 800; font-stretch: 88%; line-height: 1.05; }
 .boutique-produit__texte { margin: 0; color: var(--texte-doux); font-size: 1rem; }

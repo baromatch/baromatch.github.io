@@ -597,8 +597,10 @@ a:hover { color: var(--goutte); }
 /* Des mots qui ne se séparent pas en fin de ligne (« Mets-toi », une adresse e-mail dans une phrase). */
 .insecable { white-space: nowrap; }
 
-/* Le surtitre d’une section : il dit de quoi elle parle, en petites capitales, sans ambre (l’ambre est pour les actions). */
-.surtitre { margin: 0 0 14px; color: var(--texte-discret); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+/* Le surtitre d’une section : il dit de quoi elle parle, petit, gras et espacé, sans ambre (l’ambre est pour les
+   actions). Dans sa casse, à l’écran comme dans le HTML : mis en capitales par le style, Safari le ferait lire en
+   capitales, parfois lettre par lettre (tests/surtitres.spec.mjs). */
+.surtitre { margin: 0 0 14px; color: var(--texte-discret); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.08em; }
 
 .soiree__chapo { max-width: 34rem; margin: 20px 0 0; color: var(--texte-doux); }
 
@@ -1232,8 +1234,7 @@ a:hover { color: var(--goutte); }
   color: var(--ambre);
   font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .boutique-promesses { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; padding: 0; }

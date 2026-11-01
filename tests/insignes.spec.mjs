@@ -15,7 +15,7 @@ import { pathToFileURL } from 'node:url';
 import { blocDeLaSemaine, REPERES } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { clubDe, indexerLesClubs } from '../generateur/donnees.mjs';
-import { ecartsDeLaTable } from '../generateur/outils/insignes/exporter.mjs';
+import { chainesNouvelles, declarationsInconnues, ecartsDeLaTable, refusDesNouveautes, TETE_DE_LA_TABLE, USAGE } from '../generateur/outils/insignes/exporter.mjs';
 import { bandesDe, identifiantsUniques, insigne, paireDInsignes, TAILLES } from '../generateur/insigne.mjs';
 import { svgDeLaCarte } from '../generateur/partage.mjs';
 import * as badge from '../generateur/insignes/badge.mjs';
@@ -82,6 +82,69 @@ test.describe('la copie du générateur de l’appli', () => {
       expect(texte.slice(entete.length), fichier).not.toMatch(/^\s*\/\/|\/\*/m);
     }
     expect(readFileSync(path.join(COPIE, 'glyphs.generated.mjs'), 'utf8')).not.toContain('©');
+  });
+
+  test('la provenance met à part les contours des lettres, sous la licence de leur police', () => {
+    expect(PROVENANCE._lisezMoi).toMatch(/© Baromatch, tous droits réservés, sauf glyphs\.generated\.mjs : contours des lettres de Bricolage Grotesque, sous licence SIL OFL 1\.1 \(fonts\/LICENSE-OFL\.txt\)\.$/);
+  });
+
+  test('le module de la table n’a que ses déclarations connues ; une chaîne de texte nouvelle arrête l’export, jusqu’à ce qu’on l’accepte', () => {
+    // La table copiée : ses déclarations de tête (en début de ligne dans le code copié), exactement celles de la liste.
+    const table = readFileSync(path.join(COPIE, 'specs.mjs'), 'utf8');
+    const tete = [...table.matchAll(/^(?:export )?(?:const|let|var|function|class) ([A-Za-z_$][\w$]*)/gm)].map(([, nom]) => nom);
+    expect(tete.sort()).toEqual([...TETE_DE_LA_TABLE].sort());
+    expect(table).not.toMatch(/^import\b/m);
+    // Une déclaration hors de la liste est refusée.
+    expect(declarationsInconnues(TETE_DE_LA_TABLE)).toEqual([]);
+    expect(declarationsInconnues([...TETE_DE_LA_TABLE, 'NOTE_DE_RELECTURE', '(ExpressionStatement)'])).toEqual(['NOTE_DE_RELECTURE', '(ExpressionStatement)']);
+    // Les chaînes nouvelles par rapport à la copie commitée, chacune une fois, dans l’ordre ; aucune quand rien ne change.
+    expect(chainesNouvelles(['night', 'light'], ['light', 'à relire', 'night', 'à relire'])).toEqual(['à relire']);
+    expect(chainesNouvelles(['night', 'light'], ['light'])).toEqual([]);
+    // Les accepter demande une option explicite.
+    expect(USAGE).toMatch(/--accepter-chaines\s+\(facultatif\) accepte les chaînes de texte nouvelles des modules copiés, après les avoir relues/);
+  });
+
+  // Le refus montre tout ce qu’il faut relire : chaque chaîne nouvelle, en entier, écrite comme en JSON (ses espaces et
+  // ses retours à la ligne se voient), au-delà de 40 chaînes et de 120 signes.
+  test('l’export refusé montre toutes les chaînes de texte nouvelles, chacune en entier', () => {
+    const chaines = Array.from({ length: 45 }, (_, i) => `chaîne ${String(i + 1).padStart(2, '0')} : ${'a'.repeat(140)}\tfin\n`);
+    const refus = refusDesNouveautes({ chaines });
+    expect(refus).toMatch(/^45 chaîne\(s\) de texte nouvelle\(s\) dans les modules copiés/);
+    expect(refus).toContain('--accepter-chaines');
+    const montrees = chaines.filter((chaine) => refus.includes(`\n  ${JSON.stringify(chaine)}`));
+    expect(montrees.length, 'chaînes montrées en entier').toBe(45);
+    // Acceptées après relecture, ou rien de nouveau : aucun refus.
+    expect(refusDesNouveautes({ chaines }, { accepterChaines: true })).toBeNull();
+    expect(refusDesNouveautes({ chaines: [] })).toBeNull();
+  });
+
+  // Les noms aussi (variables, fonctions, paramètres, clés, propriétés) : un nom que la copie commitée n’a pas arrête
+  // l’export comme une chaîne nouvelle ; tous se montrent, jusqu’à ce qu’on les accepte (--accepter-noms), chaque option
+  // n’acceptant que ce qu’elle nomme.
+  test('un nom nouveau dans les modules copiés arrête l’export, jusqu’à ce qu’on l’accepte', () => {
+    expect(chainesNouvelles(['badgeSvg', 'size'], ['size', 'nomInconnu', 'badgeSvg', 'nomInconnu'])).toEqual(['nomInconnu']);
+    const noms = Array.from({ length: 45 }, (_, i) => `nomInconnu${i + 1}`);
+    const refus = refusDesNouveautes({ noms });
+    expect(refus).toMatch(/^45 nom\(s\) nouveau\(x\) dans les modules copiés/);
+    expect(refus).toContain('--accepter-noms');
+    expect(noms.filter((nom) => refus.split('\n').includes(`  ${nom}`))).toEqual(noms);
+    expect(refusDesNouveautes({ noms }, { accepterNoms: true })).toBeNull();
+    expect(refusDesNouveautes({ chaines: ['à relire'], noms }, { accepterChaines: true })).toMatch(/^45 nom\(s\)/);
+    expect(refusDesNouveautes({ chaines: ['à relire'], noms }, { accepterNoms: true })).toMatch(/^1 chaîne\(s\)/);
+    expect(refusDesNouveautes({ chaines: ['à relire'], noms }, { accepterChaines: true, accepterNoms: true })).toBeNull();
+    expect(USAGE).toMatch(/--accepter-noms\s+\(facultatif\) accepte les noms nouveaux \(variables, fonctions, clés\) des modules copiés, après les avoir relus/);
+  });
+
+  // Ce qui ne se voit pas à l’écran s’écrit en \u{…} dans le refus, dans les chaînes comme dans les noms : une espace
+  // sans chasse (U+200B : « nig », elle, « ht » se lirait « night »), une espace insécable, un caractère qui inverse le
+  // sens de l’écriture, un séparateur de ligne, un antiliant dans un nom. L’espace simple et les lettres accentuées
+  // restent tels quels, les retours à la ligne s’écrivent comme en JSON (\n).
+  test('l’export refusé écrit en \\u{…} chaque caractère qui ne se voit pas, dans les chaînes comme dans les noms', () => {
+    const refus = refusDesNouveautes({ chaines: ['nig\u200Bht', 'mot\u00A0insécable', 'droite\u202Egauche', 'retour à la ligne\n', 'fin\u2028'], noms: ['si\u200Cze', 'taille'] });
+    for (const montre of ['  "nig\\u{200B}ht"', '  "mot\\u{00A0}insécable"', '  "droite\\u{202E}gauche"', '  "retour à la ligne\\n"', '  "fin\\u{2028}"', '  si\\u{200C}ze', '  taille']) {
+      expect(refus.split('\n'), montre).toContain(montre);
+    }
+    expect(refus).not.toMatch(/[\u00A0\u200B\u200C\u202E\u2028]/);
   });
 
   test('un seul renommage, une règle générale écrite dans la provenance : aucun nom en capitales n’y finit par « _FROM »', () => {
@@ -185,6 +248,28 @@ test.describe('l’accueil', () => {
     // Puis les deux noms, écrits.
     expect(clubs.slice(clubs.lastIndexOf('</svg>'))).toContain('<span class="carte-match__club">Le Havre</span>');
     expect(clubs.slice(clubs.lastIndexOf('</svg>'))).toContain('<span class="carte-match__club">PSG</span>');
+  });
+});
+
+test.describe('le bloc de la semaine de l’accueil', () => {
+  test('un club et une sélection qui jouent deux fois (Monaco, la France) : chaque identifiant n’y sert qu’une fois, chaque renvoi vise le sien', () => {
+    const club = (cle, court, slug) => ({ cle, court, nom: court, slug });
+    const match = (slug, debut, domicile, exterieur) => ({ slug, ids: [slug], debut: Date.parse(debut), heureConfirmee: true, statut: null, competition: 'Ligue 1', domicile, exterieur, soirees: [] });
+    const monaco = club('monaco', 'Monaco', 'as-monaco');
+    const france = club('france', 'France', 'nt-fr');
+    const matchs = [
+      match('monaco-lens-2026-10-29', '2026-10-29T19:00:00Z', monaco, club('lens', 'Lens', 'rc-lens')),
+      match('nice-monaco-2026-10-30', '2026-10-30T19:00:00Z', club('nice', 'Nice', 'ogc-nice'), monaco),
+      match('france-italie-2026-10-31', '2026-10-31T19:45:00Z', france, club('italie', 'Italie', 'nt-it')),
+      match('espagne-france-2026-11-01', '2026-11-01T19:45:00Z', club('espagne', 'Espagne', 'nt-es'), france),
+    ];
+    const bloc = blocDeLaSemaine({ donnees: { matchs, bars: [] }, textes: chargerLeContenu(racine).textes, maintenant: JEUDI });
+    const ids = [...bloc.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
+    // Les insignes de Monaco (30 px) et le drapeau de la France ont leurs identifiants, dessinés deux fois chacun.
+    expect(ids.filter((id) => id.startsWith('ib-f-as-monaco-')).length).toBeGreaterThan(1);
+    expect(ids.filter((id) => id.startsWith('drapeau-fr-')).length).toBe(2);
+    expect(ids.length - new Set(ids).size).toBe(0);
+    for (const [, cible] of bloc.matchAll(/url\(#([^)]+)\)/g)) expect(ids).toContain(cible);
   });
 });
 

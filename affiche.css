@@ -42,6 +42,7 @@
   color: var(--encre);
   box-shadow: var(--ombre-scene);
   font-variant-numeric: tabular-nums;
+  container-type: inline-size;
 }
 @media screen { .jour .affiche { box-shadow: 0 0 0 1px var(--trait), var(--ombre-carte); } }
 .affiche :focus-visible { outline-color: var(--encre); }
@@ -60,9 +61,8 @@
 .affiche-dates { margin: 10px 0 0; font-size: 1.125rem; font-weight: 650; }
 .affiche-vide { margin: 20px 0; font-weight: 650; }
 
-/* Un jour : son nom à gauche (au-dessus sur un téléphone), ses matchs à droite. */
+/* Un jour : son nom au-dessus de ses matchs, ou à gauche (plus bas). */
 .affiche-jour { display: grid; gap: 0 16px; padding: 8px 0; border-bottom: 1px solid var(--trait-papier); }
-@media (min-width: 560px) { .affiche-jour { grid-template-columns: 8.5rem minmax(0, 1fr); } }
 .affiche-jour__nom { margin: 0; padding-top: 10px; font-size: 1rem; font-weight: 750; line-height: 1.3; }
 
 .affiche-lignes { margin: 0; padding: 0; list-style: none; }
@@ -84,17 +84,24 @@
 label.affiche-ligne__texte { cursor: pointer; }
 .affiche-heure { grid-area: heure; white-space: nowrap; font-size: 1.5rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
 .affiche-heure--a-confirmer { align-self: center; white-space: normal; font-size: 0.8125rem; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
-/* Les insignes devant le nom, ou au-dessus (toujours sous 560 px) ; l’heure au-dessus d’une ligne trop étroite. */
-.affiche-match { grid-area: match; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
-.affiche-match__nom { min-width: 0; overflow-wrap: anywhere; }
-@media (max-width: 559.98px) { .affiche-match { flex-direction: column; align-items: flex-start; } }
-.affiche-ligne { container-type: inline-size; }
-@container (max-width: calc(4.25rem + 126px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
+/* La paire à côté du nom, en haut ; l’heure et la compétition sur la ligne de base du nom. */
+.affiche-match { grid-area: match; position: relative; display: flex; align-items: flex-start; gap: 10px; min-width: 0; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
+.affiche-match__nom { align-self: baseline; min-width: 0; overflow-wrap: anywhere; }
+.affiche-ligne { container: ligne / inline-size; }
 .affiche-competition { grid-area: competition; color: var(--encre-douce); font-size: 0.875rem; font-weight: 600; }
-/* La compétition : 40 % au plus (texte agrandi). */
-@media (min-width: 720px) {
-  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(40%); grid-template-areas: "heure match competition"; }
-  .affiche-competition { text-align: right; }
+/* À l’écran, en rem (texte agrandi compris) : chaque disposition garde entier un mot de 11,55 rem (15 lettres
+   larges) à côté de l’heure (4,25 rem + 62 px), de la paire (74 px), de la compétition (10,25 rem) ; le jour
+   (8,5 rem + 16 px) à gauche s’il reste l’heure à côté du nom. Au téléphone, texte agrandi, la feuille peut être
+   plus étroite que ce mot. */
+@media screen {
+  @container (width >= calc(24.3rem + 78px)) { .affiche-jour { grid-template-columns: 8.5rem minmax(0, 1fr); } }
+  @container ligne (width < calc(15.8rem + 62px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
+  @container ligne (width < calc(15.8rem + 136px)) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
+  @container ligne (width >= calc(26.05rem + 148px)) {
+    .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(10.25rem); grid-template-areas: "heure match competition"; }
+    .affiche-competition { text-align: right; }
+  }
+  @media (max-width: 559.98px) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
 }
 /* Ce qui sera imprimé : la ligne cochée surlignée ; dès qu’une case est cochée, les autres pâlissent. */
 .affiche-ligne:has(.affiche-case:checked) .affiche-ligne__texte { background: var(--surligne); }
@@ -119,9 +126,12 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-bar { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
 .affiche--bar .affiche-tete { padding-bottom: 18px; }
 .affiche-prochain { margin: 18px 0 0; }
+/* 15 lettres larges tiennent dans la feuille. Jamais sous 1,5 rem, au-dessus de sa date (1,375) : au téléphone, texte
+   agrandi, un mot trop large passe alors à la ligne. */
 .affiche-prochain__match {
   display: block;
   font-size: clamp(2.25rem, 10vw, 3.75rem);
+  font-size: min(clamp(2.25rem, 10vw, 3.75rem), max(12cqi, 1.5rem));
   font-weight: 800;
   font-stretch: 88%;
   line-height: 1;
@@ -187,8 +197,14 @@ label.affiche-ligne__texte { cursor: pointer; }
   .affiche-heure { font-size: calc(24pt * var(--echelle)); line-height: 1.05; }
   .affiche-heure--a-confirmer { font-size: calc(10pt * var(--echelle)); }
   /* La paire à côté du nom, en haut, à l’échelle (8 mm en A4). */
-  .affiche-match { flex-wrap: nowrap; align-items: flex-start; gap: calc(2.5mm * var(--echelle)); font-size: calc(20pt * var(--echelle)); line-height: 1.1; }
+  .affiche-match { gap: calc(2.5mm * var(--echelle)); font-size: calc(20pt * var(--echelle)); line-height: 1.1; }
   .affiche svg.insigne, .affiche svg.insignes { width: auto; height: calc(8mm * var(--echelle)); }
+  /* Plus étroit que l’A4 (A5, une échelle de 104 % et plus) : le jour au-dessus de ses matchs, la paire au-dessus du nom. */
+  @media (max-width: 180mm) {
+    .affiche-jour { grid-template-columns: minmax(0, 1fr); }
+    .affiche-match { display: block; padding-top: calc(8mm * var(--echelle) + 1mm); }
+    .affiche-match > .insignes { position: absolute; top: 0; }
+  }
   .affiche-competition { font-size: calc(11pt * var(--echelle)); text-align: right; }
   .affiche-pied { flex-wrap: nowrap; gap: calc(8mm * var(--echelle)); margin-top: auto; padding-top: calc(3mm * var(--echelle)); break-inside: avoid; }
   .affiche-blanc { margin-bottom: calc(4mm * var(--echelle)); }
@@ -236,8 +252,7 @@ label.affiche-ligne__texte { cursor: pointer; }
 @media print {
   .affiche--patron { min-height: 0; height: 127mm; break-inside: avoid; }
   .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; margin-top: 14mm; }
-  /* La ligne de coupe, 7 mm sous la première feuille : entre les deux feuilles, ou sous la première quand la copie
-     passe sur la page suivante (jamais seule au bas d’une page). */
+  /* La coupe, 7 mm sous la première feuille (jamais seule au bas d’une page). */
   .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie) { position: relative; }
   .regarder:has(#patron-a4:checked) .affiche--patron:not(.affiche--copie)::after { content: ""; position: absolute; right: 0; bottom: -7mm; left: 0; border-top: 0.3mm dashed #000000; }
   .regarder:has(#patron-a5:checked) .affiche--patron { height: auto; min-height: 184mm; }

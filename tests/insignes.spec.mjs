@@ -118,6 +118,23 @@ test.describe('la copie du générateur de l’appli', () => {
     expect(refusDesNouveautes({ chaines: [] })).toBeNull();
   });
 
+  // Les noms aussi (variables, fonctions, paramètres, clés, propriétés) : un nom que la copie commitée n’a pas arrête
+  // l’export comme une chaîne nouvelle ; tous se montrent, jusqu’à ce qu’on les accepte (--accepter-noms), chaque option
+  // n’acceptant que ce qu’elle nomme.
+  test('un nom nouveau dans les modules copiés arrête l’export, jusqu’à ce qu’on l’accepte', () => {
+    expect(chainesNouvelles(['badgeSvg', 'size'], ['size', 'nomInconnu', 'badgeSvg', 'nomInconnu'])).toEqual(['nomInconnu']);
+    const noms = Array.from({ length: 45 }, (_, i) => `nomInconnu${i + 1}`);
+    const refus = refusDesNouveautes({ noms });
+    expect(refus).toMatch(/^45 nom\(s\) nouveau\(x\) dans les modules copiés/);
+    expect(refus).toContain('--accepter-noms');
+    expect(noms.filter((nom) => refus.split('\n').includes(`  ${nom}`))).toEqual(noms);
+    expect(refusDesNouveautes({ noms }, { accepterNoms: true })).toBeNull();
+    expect(refusDesNouveautes({ chaines: ['à relire'], noms }, { accepterChaines: true })).toMatch(/^45 nom\(s\)/);
+    expect(refusDesNouveautes({ chaines: ['à relire'], noms }, { accepterNoms: true })).toMatch(/^1 chaîne\(s\)/);
+    expect(refusDesNouveautes({ chaines: ['à relire'], noms }, { accepterChaines: true, accepterNoms: true })).toBeNull();
+    expect(USAGE).toMatch(/--accepter-noms\s+\(facultatif\) accepte les noms nouveaux \(variables, fonctions, clés\) des modules copiés, après les avoir relus/);
+  });
+
   test('un seul renommage, une règle générale écrite dans la provenance : aucun nom en capitales n’y finit par « _FROM »', () => {
     expect(PROVENANCE.renommage).toBe('Dans la copie, un nom écrit en capitales qui finit par « _FROM » finit par « _AT » ; rien d’autre n’est renommé.');
     for (const fichier of readdirSync(COPIE).filter((f) => f.endsWith('.mjs'))) {

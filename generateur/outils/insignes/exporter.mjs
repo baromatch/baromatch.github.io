@@ -20,7 +20,9 @@
 //  - n’avoir, dans le module de la table, que ses déclarations connues (TETE_DE_LA_TABLE) ;
 //  - n’avoir, dans aucun module copié, de chaîne de texte que la copie commitée (HEAD) n’a pas déjà : une chaîne nouvelle
 //    arrête l’export et s’affiche (toutes, chacune en entier), jusqu’à ce qu’une personne la relise et l’accepte
-//    (--accepter-chaines).
+//    (--accepter-chaines) ;
+//  - n’y avoir non plus aucun nom (variable, fonction, paramètre, clé, propriété) que la copie commitée n’a pas déjà : un
+//    nom nouveau arrête l’export de même, jusqu’à ce qu’on l’accepte (--accepter-noms).
 // Sinon rien n’est écrit, et la sortie dit pourquoi. Deux lancements sur les mêmes sources écrivent les mêmes octets.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -39,7 +41,7 @@ export const DONNEES_DES_TESTS = path.join(SITE, 'tests', 'donnees', 'insignes')
 // TypeScript, à une version fixée.
 export const VERSION_DE_TYPESCRIPT = '5.9.3';
 
-export const USAGE = `Usage : node generateur/outils/insignes/exporter.mjs --dessin <dossier> --drapeaux <fichier> --compile <fichier> --version <fichier> [--empreintes <fichier>] [--typescript <dossier>] [--accepter-chaines]
+export const USAGE = `Usage : node generateur/outils/insignes/exporter.mjs --dessin <dossier> --drapeaux <fichier> --compile <fichier> --version <fichier> [--empreintes <fichier>] [--typescript <dossier>] [--accepter-chaines] [--accepter-noms]
   --dessin      le dossier des sources du dessin des insignes (ceux de ses modules que le site importe sont copiés)
   --drapeaux    le fichier source des bandes des drapeaux (seules ses données sont copiées)
   --compile     le module d’entrée du paquet compilé qui contient ce même dessin
@@ -47,7 +49,8 @@ export const USAGE = `Usage : node generateur/outils/insignes/exporter.mjs --des
   --empreintes  (facultatif) le fichier des empreintes des insignes, vérifiées sans être copiées
   --typescript  (facultatif) un dossier qui contient déjà TypeScript ${VERSION_DE_TYPESCRIPT} (node_modules/typescript) ; sans lui,
                 cette version est installée une fois, à part, dans le dossier temporaire de la machine
-  --accepter-chaines  (facultatif) accepte les chaînes de texte nouvelles des modules copiés, après les avoir relues`;
+  --accepter-chaines  (facultatif) accepte les chaînes de texte nouvelles des modules copiés, après les avoir relues
+  --accepter-noms     (facultatif) accepte les noms nouveaux (variables, fonctions, clés) des modules copiés, après les avoir relus`;
 
 // L’en-tête de chaque fichier copié. Les contours des lettres sont une partie de la police Bricolage Grotesque, changée
 // de format : ce fichier reste sous sa licence (SIL OFL 1.1, dont le texte est à côté des polices du site), avec la
@@ -286,16 +289,29 @@ const chainesDe = (ts, code) => {
   visiter(ts.createSourceFile('module.mjs', code, ts.ScriptTarget.ES2020, true, ts.ScriptKind.JS));
   return trouvees;
 };
-// Les chaînes d’une copie qui ne sont pas dans une autre (la copie commitée), dans l’ordre.
+// Les noms d’un module (variables, fonctions, paramètres, clés et propriétés), lus par l’analyseur de TypeScript.
+const nomsDe = (ts, code) => {
+  const trouves = new Set();
+  const visiter = (noeud) => {
+    if (ts.isIdentifier(noeud) || ts.isPrivateIdentifier(noeud)) trouves.add(noeud.text);
+    ts.forEachChild(noeud, visiter);
+  };
+  visiter(ts.createSourceFile('module.mjs', code, ts.ScriptTarget.ES2020, true, ts.ScriptKind.JS));
+  return trouves;
+};
+// Les chaînes (ou les noms) d’une copie qui ne sont pas dans une autre (la copie commitée), dans l’ordre.
 export const chainesNouvelles = (commitees, copiees) => {
   const avant = new Set(commitees);
   return [...new Set(copiees)].filter((chaine) => !avant.has(chaine)).sort();
 };
 // Ce que la relecture doit voir avant que la copie soit écrite : chaque chaîne nouvelle, toutes, en entier, écrite comme
-// en JSON (ses espaces et ses retours à la ligne se voient) ; null quand il n’y a rien à relire, ou que tout est accepté.
-export const refusDesNouveautes = ({ chaines = [] }, { accepterChaines = false } = {}) => {
-  if (!chaines.length || accepterChaines) return null;
-  return `${chaines.length} chaîne(s) de texte nouvelle(s) dans les modules copiés, toutes, en entier (écrites comme en JSON) ; relis-les, puis relance avec --accepter-chaines :\n${chaines.map((c) => `  ${JSON.stringify(c)}`).join('\n')}`;
+// en JSON (ses espaces et ses retours à la ligne se voient), et chaque nom nouveau, tous ; chacun avec l’option qui
+// l’accepte. null quand il n’y a rien à relire, ou que tout est accepté.
+export const refusDesNouveautes = ({ chaines = [], noms = [] }, { accepterChaines = false, accepterNoms = false } = {}) => {
+  const parties = [];
+  if (chaines.length && !accepterChaines) parties.push(`${chaines.length} chaîne(s) de texte nouvelle(s) dans les modules copiés, toutes, en entier (écrites comme en JSON) ; relis-les, puis relance avec --accepter-chaines :\n${chaines.map((c) => `  ${JSON.stringify(c)}`).join('\n')}`);
+  if (noms.length && !accepterNoms) parties.push(`${noms.length} nom(s) nouveau(x) dans les modules copiés (variables, fonctions, clés), tous ; relis-les, puis relance avec --accepter-noms :\n${noms.map((n) => `  ${n}`).join('\n')}`);
+  return parties.length ? parties.join('\n') : null;
 };
 // Les modules de la copie commitée (HEAD) : { nom du fichier : son texte } ; rien sans git ou sans copie.
 const copieCommitee = () => {
@@ -429,7 +445,7 @@ const tableDesDrapeaux = (module) => Object.values(module).find((valeur) => vale
 
 // ---------- L’exportation ----------
 
-export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees = DONNEES_DES_TESTS, accepterChaines = false }) => {
+export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees = DONNEES_DES_TESTS, accepterChaines = false, accepterNoms = false }) => {
   const ts = chargerTypescript(typescript);
   const lu = lireLesSources(sources);
 
@@ -465,10 +481,12 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
     if (!copies.includes('specs')) refuser('le module de la table (specs) n’est pas copié');
     const inconnues = declarationsInconnues(declarationsDeTete(ts, transpiles.get('specs').code));
     if (inconnues.length) refuser(`specs : des déclarations de tête inconnues (${inconnues.join(', ')})`);
-    // Les chaînes de texte : aucune que la copie commitée n’ait déjà, sauf acceptée après relecture.
-    const commitees = Object.values(copieCommitee()).flatMap((texte) => [...chainesDe(ts, texte)]);
-    const nouvelles = chainesNouvelles(commitees, copies.flatMap((nom) => [...chainesDe(ts, transpiles.get(nom).code)]));
-    const refus = refusDesNouveautes({ chaines: nouvelles }, { accepterChaines });
+    // Les chaînes de texte et les noms : aucun que la copie commitée n’ait déjà, sauf accepté après relecture.
+    const commitee = Object.values(copieCommitee());
+    const codes = copies.map((nom) => transpiles.get(nom).code);
+    const lus = (lire, textes) => textes.flatMap((texte) => [...lire(ts, texte)]);
+    const nouveautes = { chaines: chainesNouvelles(lus(chainesDe, commitee), lus(chainesDe, codes)), noms: chainesNouvelles(lus(nomsDe, commitee), lus(nomsDe, codes)) };
+    const refus = refusDesNouveautes(nouveautes, { accepterChaines, accepterNoms });
     if (refus) refuser(refus);
 
     // Les drapeaux : les données seulement, dans l’ordre de leur table, lues dans le module transpilé à part (jamais
@@ -539,7 +557,7 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
     mkdirSync(sortie, { recursive: true });
     mkdirSync(donnees, { recursive: true });
     for (const { cible, texte } of ecrits) writeFileSync(cible, texte);
-    return { version: lu.version, fichiers: Object.keys(fichiers).length, empreintes, chainesAcceptees: nouvelles.length };
+    return { version: lu.version, fichiers: Object.keys(fichiers).length, empreintes, chainesAcceptees: nouveautes.chaines.length, nomsAcceptes: nouveautes.noms.length };
   } finally {
     rmSync(atelier, { recursive: true, force: true });
   }
@@ -550,8 +568,13 @@ const OPTIONS = ['dessin', 'drapeaux', 'compile', 'version', 'empreintes', 'type
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const options = {};
-  const accepterChaines = args.includes('--accepter-chaines');
-  if (accepterChaines) args.splice(args.indexOf('--accepter-chaines'), 1);
+  const drapeau = (nom) => {
+    if (!args.includes(nom)) return false;
+    args.splice(args.indexOf(nom), 1);
+    return true;
+  };
+  const accepterChaines = drapeau('--accepter-chaines');
+  const accepterNoms = drapeau('--accepter-noms');
   for (let i = 0; i < args.length; i += 2) {
     const cle = args[i].replace(/^--/, '');
     if (!args[i].startsWith('--') || !OPTIONS.includes(cle) || args[i + 1] === undefined) {
@@ -562,8 +585,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   }
   const { typescript, ...sources } = options;
   try {
-    const { version, fichiers, empreintes, chainesAcceptees } = await exporter({ sources, typescript, accepterChaines });
-    console.log(`Insignes de l’appli ${version} : ${fichiers} fichiers écrits dans generateur/insignes/, le même dessin que le paquet compilé${empreintes ? `, ${empreintes} empreintes redonnées` : ''}${chainesAcceptees ? `, ${chainesAcceptees} chaîne(s) nouvelle(s) acceptée(s)` : ''}.`);
+    const { version, fichiers, empreintes, chainesAcceptees, nomsAcceptes } = await exporter({ sources, typescript, accepterChaines, accepterNoms });
+    console.log(`Insignes de l’appli ${version} : ${fichiers} fichiers écrits dans generateur/insignes/, le même dessin que le paquet compilé${empreintes ? `, ${empreintes} empreintes redonnées` : ''}${chainesAcceptees ? `, ${chainesAcceptees} chaîne(s) nouvelle(s) acceptée(s)` : ''}${nomsAcceptes ? `, ${nomsAcceptes} nom(s) nouveau(x) accepté(s)` : ''}.`);
   } catch (erreur) {
     if (!(erreur instanceof Refus)) throw erreur;
     console.error(`Rien n’est écrit : ${erreur.message}`);

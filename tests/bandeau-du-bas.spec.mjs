@@ -306,6 +306,22 @@ for (const cas of CAS) {
         });
       }
 
+      // Une adresse vide ou incomplète : le message dit quoi corriger, sous le champ, et le champ prend le focus (le
+      // bandeau rentre dans son rang). Le message se voit tout de suite, puis encore une fois le clavier fermé (le champ
+      // perd le focus, le bandeau revient).
+      for (const [quoi, adresse, message] of [['vide', '', /Vérifie ton adresse/], ['incomplète', 'fan.inventee@exemple', /Il manque la fin/]]) {
+        test(`l’accueil, la liste d’attente, une adresse ${quoi} (${qui}) : le message se voit, le clavier ouvert puis fermé`, async ({ page: onglet }) => {
+          await ouvrir(onglet, '/', cas);
+          await onglet.locator('#attente-mail').fill(adresse);
+          await onglet.evaluate(() => document.activeElement?.blur());
+          await toucher(onglet, '.attente__bouton');
+          await expect(onglet.locator('#attente-retour')).toHaveText(message);
+          await verifierLesBoites(onglet, ['#attente-retour']);
+          await onglet.evaluate(() => document.activeElement?.blur());
+          await verifierLesBoites(onglet, ['#attente-retour']);
+        });
+      }
+
       test(`« Pour les bars », la case oubliée puis l’envoi (${qui}) : la case, son message et le bouton se voient`, async ({ page: onglet }) => {
         await ouvrir(onglet, '/pour-les-bars.html', cas);
         for (const [id, valeur] of [['demande-bar', 'Le Zinc inventé'], ['demande-ville', 'Paris'], ['demande-nom', 'Camille Exemple'], ['demande-email', 'patron.invente@example.org']]) {

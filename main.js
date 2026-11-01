@@ -70,21 +70,24 @@
     retour.appendChild(texte);
   }
 
-  function signaler(message) {
-    afficher(message, "erreur");
-    champ.setAttribute("aria-invalid", "true");
-    champ.focus();
-  }
-
-  function rouvrir() {
-    aller("repos");
-  }
-
   // Le retour se voit en entier, « Corriger l’adresse » compris : sur iPhone, le bouton touché ne garde pas le focus,
   // et le bandeau du bas reste là (le défilement s’arrête au-dessus de lui, scroll-padding de styles.css).
   function montrerLeRetour() {
     var bas = corriger && !corriger.hidden ? corriger : retour;
     if (bas.scrollIntoView) bas.scrollIntoView({ block: "nearest" });
+  }
+
+  // Une adresse à corriger : le message sous le champ se voit aussi une fois le clavier fermé (le champ perd le focus
+  // et le bandeau du bas revient).
+  function signaler(message) {
+    afficher(message, "erreur");
+    champ.setAttribute("aria-invalid", "true");
+    champ.focus();
+    montrerLeRetour();
+  }
+
+  function rouvrir() {
+    aller("repos");
   }
 
   // Formspree répond 422 quand il refuse un envoi, avec la liste de ce qu’il refuse (errors[].field, errors[].code).

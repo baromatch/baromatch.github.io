@@ -416,6 +416,48 @@ for (const [largeur, hauteur] of [[360, 560], [375, 548], [390, 664], [430, 739]
   }
 }
 
+// ---------- Sans animation liée au défilement ----------
+
+// Un navigateur sans animation liée au défilement (Firefox, Safari avant la version 26) ne lit pas les règles du bandeau
+// (@supports (animation-timeline: view())) : le rang reste sous le logo, rien ne devient fixe, et rien n’est réservé en
+// bas (ni la marge du pied, ni scroll-padding). Simulé en retirant ces règles de la feuille, comme il les ignore.
+for (const [largeur, hauteur] of [[390, 844], [360, 640]]) {
+  for (const chemin of ['/', '/a-propos.html', '/cgu.html', '/pour-les-bars.html', '/boutique.html']) {
+    test(`sans animation liée au défilement, ${chemin} à ${largeur} × ${hauteur} : le rang reste sous le logo, rien de fixe, rien de réservé en bas`, async ({ page: onglet }) => {
+      await couperLAPI(onglet);
+      await onglet.setViewportSize({ width: largeur, height: hauteur });
+      await onglet.goto(chemin);
+      await attendreLaPageFinie(onglet);
+      const retirees = await onglet.evaluate(() => {
+        const feuille = [...document.styleSheets].find((f) => (f.href ?? '').endsWith('/styles.css'));
+        let n = 0;
+        for (let i = feuille.cssRules.length - 1; i >= 0; i -= 1) {
+          const regle = feuille.cssRules[i];
+          if (regle instanceof CSSSupportsRule && regle.conditionText.includes('animation-timeline')) { feuille.deleteRule(i); n += 1; }
+        }
+        return n;
+      });
+      expect(retirees, 'les règles du bandeau, sous @supports').toBe(2);
+      for (const ou of ['l’arrivée', 'le rang sorti de l’écran', 'le bas de la page']) {
+        const lu = await onglet.evaluate(async (moment) => {
+          if (moment === 'le rang sorti de l’écran') window.scrollTo(0, document.querySelector('.menu').getBoundingClientRect().bottom + scrollY + 40);
+          if (moment === 'le bas de la page') window.scrollTo(0, document.documentElement.scrollHeight);
+          await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
+          const fixes = [...document.querySelectorAll('body *')].filter((e) => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).pointerEvents !== 'none' && e.checkVisibility({ visibilityProperty: true }));
+          return {
+            rang: getComputedStyle(document.querySelector('.menu__liste')).position,
+            fixes: fixes.map((e) => e.className || e.tagName),
+            pied: getComputedStyle(document.querySelector('.pied')).paddingBottom,
+            defilement: getComputedStyle(document.documentElement).scrollPaddingBottom,
+            deCote: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+          };
+        }, ou);
+        expect(lu, ou).toEqual({ rang: 'static', fixes: [], pied: '40px', defilement: 'auto', deCote: false });
+      }
+    });
+  }
+}
+
 // ---------- La zone basse, sans simulation ----------
 
 // Sans la valeur simulée : --zone-basse vaut ce que donne env(safe-area-inset-bottom) (écrit ainsi dans styles.css, le

@@ -279,15 +279,32 @@ test('le téléphone couché garde le rang sous le logo', async ({ page: onglet 
   expect(lu.position).toBe('static');
 });
 
-// L’ordre du clavier suit l’écran : le lien d’évitement, le logo, « Préviens-moi » (en haut, à côté du logo), puis les
-// quatre entrées.
-test('l’ordre du clavier : le logo, « Préviens-moi », puis les quatre entrées', async ({ page: onglet }) => {
-  await ouvrir(onglet, '/a-propos.html', 390, 844);
-  await onglet.locator('.lien-evitement').focus();
-  const ordre = [];
-  for (let i = 0; i < 6; i += 1) {
-    await onglet.keyboard.press('Tab');
-    ordre.push(await onglet.evaluate(() => document.activeElement.getAttribute('href')));
+// L’ordre du clavier suit l’écran, rang par rang, de gauche à droite. Au téléphone : le logo, « Préviens-moi » (en
+// haut, à côté du logo), puis les quatre entrées. À l’ordinateur (une seule ligne) : le logo, les quatre entrées, puis
+// « Préviens-moi », au bout de la ligne (reading-flow, dans Chromium ; Safari et Firefox gardent l’ordre du HTML, celui
+// du téléphone).
+const ordreDeLEcran = (liens) => {
+  const rangs = [];
+  for (const lien of [...liens].sort((a, b) => a.haut - b.haut)) {
+    const rang = rangs.find((r) => lien.haut < r.bas - 0.5 && r.haut < lien.bas - 0.5);
+    if (rang) { rang.liens.push(lien); rang.bas = Math.max(rang.bas, lien.bas); } else rangs.push({ haut: lien.haut, bas: lien.bas, liens: [lien] });
   }
-  expect(ordre).toEqual(['/', '/#attente', ...MENU.map(([href]) => href)]);
-});
+  return rangs.flatMap((r) => r.liens.sort((a, b) => a.gauche - b.gauche)).map((l) => l.nom);
+};
+for (const [largeur, attendu] of [
+  [390, ['/', '/#attente', ...MENU.map(([href]) => href)]],
+  [1024, ['/', ...MENU.map(([href]) => href), '/#attente']],
+  [1280, ['/', ...MENU.map(([href]) => href), '/#attente']],
+]) {
+  test(`l’ordre du clavier à ${largeur} px suit l’écran : ${attendu.join(', ')}`, async ({ page: onglet }) => {
+    await ouvrir(onglet, '/a-propos.html', largeur, 844);
+    expect(ordreDeLEcran((await lireLEntete(onglet)).liens), 'l’ordre de l’écran').toEqual(attendu);
+    await onglet.locator('.lien-evitement').focus();
+    const ordre = [];
+    for (let i = 0; i < 6; i += 1) {
+      await onglet.keyboard.press('Tab');
+      ordre.push(await onglet.evaluate(() => document.activeElement.getAttribute('href')));
+    }
+    expect(ordre, 'l’ordre du clavier').toEqual(attendu);
+  });
+}

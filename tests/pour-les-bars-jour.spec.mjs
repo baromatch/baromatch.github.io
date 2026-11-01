@@ -350,7 +350,9 @@ test.describe('le jour posé', () => {
 });
 
 // Des éléments qui prennent le focus sur le clair : un de chaque sorte (le bouton, les liens, les champs, la case, les questions).
-const FOCUS_DU_CLAIR = ['.ouverture-bars .capsule', '.lien-fleche', '.entete__lien', '#demande-bar', '#demande-message', '#demande-accord', '.questions summary', '.conditions__liste a', '.formulaire__ailleurs a'];
+// L’en-tête et le pied sont ceux de la navigation « les matchs d’abord » (generateur/cadre.mjs) : une entrée du menu, sur
+// le clair ; un lien du plan du site, dans le pied de nuit (plus bas).
+const FOCUS_DU_CLAIR = ['.ouverture-bars .capsule', '.lien-fleche', '.menu__lien', '#demande-bar', '#demande-message', '#demande-accord', '.questions summary', '.conditions__liste a', '.formulaire__ailleurs a'];
 
 test.describe('le bord des champs, le focus', () => {
   // WCAG 1.4.11 : le bord d’un champ se voit à 3:1 au moins contre ce qui l’entoure (la carte) et contre son fond.
@@ -398,7 +400,7 @@ test.describe('le bord des champs, le focus', () => {
       const fond = lu.fonds.reverse().reduce((dessous, dessus) => poser(lireCouleur(dessus), dessous), { r: 255, v: 255, b: 255, a: 1 });
       return { ...lu, fond: `rgb(${Math.round(fond.r)}, ${Math.round(fond.v)}, ${Math.round(fond.b)})` };
     };
-    const SOMBRE = ['#salle-jouer', '#salle-places .pas__bouton--plus', '#salle-curseur', '.bars .bouton-nuit', '.pied__liens a'];
+    const SOMBRE = ['#salle-jouer', '#salle-places .pas__bouton--plus', '#salle-curseur', '.bars .bouton-nuit', '.pied__plan a'];
     for (const selecteur of FOCUS_DU_CLAIR) {
       const lu = await lire(selecteur);
       expect(lu.visible, `${selecteur} : :focus-visible`).toBe(true);

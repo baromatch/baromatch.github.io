@@ -19,7 +19,8 @@
 //  - ne contenir aucun commentaire, et passer le contrôle des documents publics (tests/outils/fuites.mjs) ;
 //  - n’avoir, dans le module de la table, que ses déclarations connues (TETE_DE_LA_TABLE) ;
 //  - n’avoir, dans aucun module copié, de chaîne de texte que la copie commitée (HEAD) n’a pas déjà : une chaîne nouvelle
-//    arrête l’export et s’affiche, jusqu’à ce qu’une personne la relise et l’accepte (--accepter-chaines).
+//    arrête l’export et s’affiche (toutes, chacune en entier), jusqu’à ce qu’une personne la relise et l’accepte
+//    (--accepter-chaines).
 // Sinon rien n’est écrit, et la sortie dit pourquoi. Deux lancements sur les mêmes sources écrivent les mêmes octets.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -290,6 +291,12 @@ export const chainesNouvelles = (commitees, copiees) => {
   const avant = new Set(commitees);
   return [...new Set(copiees)].filter((chaine) => !avant.has(chaine)).sort();
 };
+// Ce que la relecture doit voir avant que la copie soit écrite : chaque chaîne nouvelle, toutes, en entier, écrite comme
+// en JSON (ses espaces et ses retours à la ligne se voient) ; null quand il n’y a rien à relire, ou que tout est accepté.
+export const refusDesNouveautes = ({ chaines = [] }, { accepterChaines = false } = {}) => {
+  if (!chaines.length || accepterChaines) return null;
+  return `${chaines.length} chaîne(s) de texte nouvelle(s) dans les modules copiés, toutes, en entier (écrites comme en JSON) ; relis-les, puis relance avec --accepter-chaines :\n${chaines.map((c) => `  ${JSON.stringify(c)}`).join('\n')}`;
+};
 // Les modules de la copie commitée (HEAD) : { nom du fichier : son texte } ; rien sans git ou sans copie.
 const copieCommitee = () => {
   const git = (...args) => execFileSync('git', ['-C', SITE, ...args], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
@@ -461,9 +468,8 @@ export const exporter = async ({ sources, typescript, sortie = SORTIE, donnees =
     // Les chaînes de texte : aucune que la copie commitée n’ait déjà, sauf acceptée après relecture.
     const commitees = Object.values(copieCommitee()).flatMap((texte) => [...chainesDe(ts, texte)]);
     const nouvelles = chainesNouvelles(commitees, copies.flatMap((nom) => [...chainesDe(ts, transpiles.get(nom).code)]));
-    if (nouvelles.length && !accepterChaines) {
-      refuser(`${nouvelles.length} chaîne(s) de texte nouvelle(s) dans les modules copiés ; relis-les, puis relance avec --accepter-chaines :\n${nouvelles.slice(0, 40).map((c) => `  « ${c.length > 120 ? `${c.slice(0, 120)}…` : c} »`).join('\n')}`);
-    }
+    const refus = refusDesNouveautes({ chaines: nouvelles }, { accepterChaines });
+    if (refus) refuser(refus);
 
     // Les drapeaux : les données seulement, dans l’ordre de leur table, lues dans le module transpilé à part (jamais
     // copié), puis comparées à leur table, ordre des clés compris.

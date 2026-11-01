@@ -15,7 +15,7 @@ import { pathToFileURL } from 'node:url';
 import { blocDeLaSemaine, REPERES } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { clubDe, indexerLesClubs } from '../generateur/donnees.mjs';
-import { chainesNouvelles, declarationsInconnues, ecartsDeLaTable, TETE_DE_LA_TABLE, USAGE } from '../generateur/outils/insignes/exporter.mjs';
+import { chainesNouvelles, declarationsInconnues, ecartsDeLaTable, refusDesNouveautes, TETE_DE_LA_TABLE, USAGE } from '../generateur/outils/insignes/exporter.mjs';
 import { bandesDe, identifiantsUniques, insigne, paireDInsignes, TAILLES } from '../generateur/insigne.mjs';
 import { svgDeLaCarte } from '../generateur/partage.mjs';
 import * as badge from '../generateur/insignes/badge.mjs';
@@ -102,6 +102,20 @@ test.describe('la copie du générateur de l’appli', () => {
     expect(chainesNouvelles(['night', 'light'], ['light'])).toEqual([]);
     // Les accepter demande une option explicite.
     expect(USAGE).toMatch(/--accepter-chaines\s+\(facultatif\) accepte les chaînes de texte nouvelles des modules copiés, après les avoir relues/);
+  });
+
+  // Le refus montre tout ce qu’il faut relire : chaque chaîne nouvelle, en entier, écrite comme en JSON (ses espaces et
+  // ses retours à la ligne se voient), au-delà de 40 chaînes et de 120 signes.
+  test('l’export refusé montre toutes les chaînes de texte nouvelles, chacune en entier', () => {
+    const chaines = Array.from({ length: 45 }, (_, i) => `chaîne ${String(i + 1).padStart(2, '0')} : ${'a'.repeat(140)}\tfin\n`);
+    const refus = refusDesNouveautes({ chaines });
+    expect(refus).toMatch(/^45 chaîne\(s\) de texte nouvelle\(s\) dans les modules copiés/);
+    expect(refus).toContain('--accepter-chaines');
+    const montrees = chaines.filter((chaine) => refus.includes(`\n  ${JSON.stringify(chaine)}`));
+    expect(montrees.length, 'chaînes montrées en entier').toBe(45);
+    // Acceptées après relecture, ou rien de nouveau : aucun refus.
+    expect(refusDesNouveautes({ chaines }, { accepterChaines: true })).toBeNull();
+    expect(refusDesNouveautes({ chaines: [] })).toBeNull();
   });
 
   test('un seul renommage, une règle générale écrite dans la provenance : aucun nom en capitales n’y finit par « _FROM »', () => {

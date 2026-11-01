@@ -831,8 +831,8 @@ a:hover { color: var(--goutte); }
 /* ---------- Transition : l’ancien en-tête et l’ancien pied ----------
    Les pages des matchs publiées avant cette navigation gardent leur ancien en-tête (.entete__nav) et leur ancien pied
    (.pied__liens) jusqu’au premier passage réussi de l’Action « Pages des matchs », qui les réécrit avec le cadre neuf.
-   Ces règles les mettent encore en forme, comme avant, leurs bords à 3:1 (--champ-bord). À retirer, avec ses tests
-   (tests/cadre.spec.mjs, « l’ancien cadre »), quand plus aucune page du dépôt ne les porte : le test le dira. */
+   Ces règles les mettent encore en forme, comme avant, leurs bords à 3:1 (--champ-bord). À retirer avec leurs tests
+   (tests/cadre.spec.mjs, « l’ancien cadre ») par une PR de nettoyage, après ce passage. */
 .entete__nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; margin-inline-start: auto; }
 .entete__lien { color: var(--texte); font-weight: 600; font-size: 0.9375rem; text-decoration: none; padding: 10px 2px; padding-block: max(2px, calc((45px - 1lh - 1px) / 2)); border-bottom: 1px solid rgba(255, 177, 61, 0.55); }
 .entete__lien:hover, .entete__lien[aria-current="page"] { color: var(--ambre); }

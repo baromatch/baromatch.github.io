@@ -436,9 +436,9 @@ for (const largeur of [360, 390, 1280]) {
 // au jour ; le pied en ligne, ses liens sans puce et de 44 px de haut ; rien ne déborde de côté. Deux de ces pages sont
 // gardées telles que l’Action les a publiées sur main le 31 octobre (tests/donnees/ancien-cadre/ : un match, et un match
 // en anglais, dont le pied a une phrase de plus) et servies à leur adresse : la preuve tient même quand le dépôt n’en a
-// plus. S’y ajoutent celles du dépôt qui les portent encore, une de chaque sorte. Quand plus aucune page du dépôt ne les
-// porte, le premier test le dit : le bloc « Transition » de styles.css, ces tests et tests/donnees/ancien-cadre/ se
-// retirent alors ensemble.
+// plus. S’y ajoutent celles du dépôt qui les portent encore, une de chaque sorte (plus aucune, une fois l’Action passée :
+// rien ne tombe pour autant, sur aucune PR). Le bloc « Transition » de styles.css, ces tests et tests/donnees/ancien-cadre/
+// se retirent ensemble, par une PR de nettoyage, après le premier passage réussi de l’Action.
 const GARDEES = [
   { chemin: '/matchs/angers-lorient-2026-10-25/', fichier: 'tests/donnees/ancien-cadre/match.html' },
   { chemin: '/en/matches/arsenal-everton-2026-10-24/', fichier: 'tests/donnees/ancien-cadre/match-en.html' },
@@ -460,11 +460,6 @@ const ANCIENNES = (() => {
 // Une page du dépôt de chaque sorte : un match, « Ce soir », une ville, une page en anglais.
 const ECHANTILLON = [/^\/matchs\/[a-z0-9-]+-\d{4}-\d{2}-\d{2}\/$/, /^\/ce-soir\/$/, /^\/regarder-le-match\/[a-z-]+\/$/, /^\/en\/[a-z-]+\/$/]
   .map((forme) => ANCIENNES.find((c) => forme.test(c))).filter(Boolean);
-
-test('l’ancien cadre : des pages du dépôt le portent encore (sinon, retire le bloc « Transition » de styles.css, ces tests et tests/donnees/ancien-cadre/)', () => {
-  expect(ANCIENNES.length, 'plus aucune page n’a l’ancien cadre : retire le bloc « Transition » de styles.css, ces tests et tests/donnees/ancien-cadre/').toBeGreaterThan(0);
-  expect(ECHANTILLON.length).toBeGreaterThan(0);
-});
 
 test('l’ancien cadre : les pages gardées sont celles de main, avec l’ancien en-tête et l’ancien pied', () => {
   for (const { chemin, fichier } of GARDEES) {

@@ -94,6 +94,10 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // 1er novembre 2026, la mesure du rendu des pages générées : un club (« OL ») ou une ville (« Lille ») se touche sur
 // 44 × 44 px (regarder.css, de 18 705 à 18 771 octets). Mesuré : les pages générées 91,53 Ko (93 725 octets) : leur
 // seuil de CSS monte de 91 à 92, au plus juste ; les affiches 108,12 Ko : seuil inchangé.
+// Puis, sans mot coupé à 320 px et 200 %, le titre du soir et l’appel des affiches (regarder.css 18 898 octets,
+// affiche.css 17 104), et les pilules au texte agrandi (styles.css de 74 954 à 75 022 octets, affiche.css 17 185).
+// Mesuré : les pages générées 91,72 Ko (93 920 octets) ; les affiches 108,50 Ko (111 105 octets) : leur seuil de CSS
+// monte de 108 à 109, au plus juste.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 18, css: 73, images: 24 } },
@@ -109,8 +113,8 @@ const PAGES = [
   { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 92, images: 4 } },
   { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 92, images: 4 } },
   { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 92, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 108, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 108, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 109, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 109, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };

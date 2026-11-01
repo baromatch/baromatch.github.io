@@ -3,10 +3,10 @@
 // compétition, une ville et la liste des villes, la page d’un bar et son code, les affiches, la feuille du patron, la
 // page neutre, les pages en anglais, et les pages telles qu’elles sont sans aucun bar publié (la copie enregistrée des
 // listes publiques). Le crème, le bleu nuit pour le texte, l’ambre seulement pour l’action ; le pied de page de nuit.
-// Mesuré tel qu’il est peint : chaque texte à 4,5:1 (tests/outils/textes-peints.mjs), chaque contour de focus et chaque
-// bord de champ à 3:1, chaque survol lisible et visible ; le premier affichage déjà au jour ; le texte à 200 % à 320 px
-// qui reste dans l’écran ; de 320 à 1280 px, texte à 100 et 200 %, des cibles de 44 × 44 px et aucun mot coupé en
-// plein mot ; et CLS 0 sans la police.
+// Mesuré tel qu’il est peint : chaque texte à 4,5:1 (tests/outils/textes-peints.mjs ; au pixel près, texte à 200 %, avec
+// tests/outils/pixels-peints.mjs), chaque contour de focus et chaque bord de champ à 3:1, chaque survol lisible et
+// visible ; le premier affichage déjà au jour ; le texte à 200 % à 320 px qui reste dans l’écran ; de 320 à 1280 px,
+// texte à 100 et 200 %, des cibles de 44 × 44 px et aucun mot coupé en plein mot ; et CLS 0 sans la police.
 import { test, expect } from '@playwright/test';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -15,6 +15,7 @@ import path from 'node:path';
 import { lireCouleur, luminance, poser, rapport } from './outils/contraste.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { racine } from './outils/environnement.mjs';
+import { decrireLesPlusFaibles, lignesTropFaibles, mesurerAuPixel } from './outils/pixels-peints.mjs';
 import { CAPTURE, MAINTENANT_DE_LA_CAPTURE, construireLeSiteDExemple } from './outils/site-genere.mjs';
 import { decrireLesCouples, mesurerLesTextes, textesTropFaibles } from './outils/textes-peints.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
@@ -535,4 +536,33 @@ test.describe('aucun mot coupé en plein mot', () => {
       expect(coupes).toEqual([]);
     });
   }
+});
+
+// Le texte à 200 %, mesuré tel qu’il est peint (tests/outils/pixels-peints.mjs : derrière chaque ligne de texte, chaque
+// pixel) : 4,5:1 au moins. La mesure des fonds empilés (plus haut) ne voit pas un bord arrondi qui passe sous un texte :
+// avant, les villes de la liste d’attente (« Marseille » à 3,1:1, « Paris » choisie à 1,5:1) et le choix du papier de la
+// feuille du patron (1,02:1), passés sur deux lignes, touchaient le bord de leur pilule.
+test.describe('le contraste peint, texte à 200 %', () => {
+  for (const type of TYPES) {
+    for (const largeur of [375, 390]) {
+      test(`${type.nom}, à ${largeur} px : derrière chaque ligne de texte, chaque pixel tient 4,5:1`, async ({ page: onglet }, infos) => {
+        test.setTimeout(120_000);
+        await ouvrir(onglet, type, largeur);
+        await agrandir(onglet, 200);
+        const mesures = await mesurerAuPixel(onglet, NUIT);
+        expect(mesures.length).toBeGreaterThan(type.textes ?? 15);
+        infos.annotations.push({ type: 'contraste peint', description: decrireLesPlusFaibles(mesures) });
+        expect(lignesTropFaibles(mesures)).toEqual([]);
+      });
+    }
+  }
+});
+
+// Le choix du papier, texte à 200 % : passé sur deux lignes, son rond garde 20 × 20 px (avant, serré à 14 px de large).
+test('la feuille du patron, à 390 px, texte à 200 % : le rond de chaque choix du papier garde 20 × 20 px', async ({ page: onglet }) => {
+  await ouvrir(onglet, TYPES.find((t) => t.chemin === '/matchs/affiche/pour-le-patron/'), 390);
+  await agrandir(onglet, 200);
+  const ronds = await onglet.locator('.affiche-format input').evaluateAll((liste) => liste.map((r) => [r.getBoundingClientRect().width, r.getBoundingClientRect().height]));
+  expect(ronds.length).toBe(2);
+  expect(ronds).toEqual([[20, 20], [20, 20]]);
 });

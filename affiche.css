@@ -12,17 +12,18 @@
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  padding: 0 18px;
+  padding: 8px 18px;
   border: 1px solid var(--champ-bord);
-  border-radius: 999px;
+  border-radius: 22px;
   background: var(--verre);
   font-weight: 650;
   cursor: pointer;
 }
-/* Le choix et les cases à la couleur du texte : l’ambre, sur le clair, ferait 1,9:1. */
+/* Sur deux lignes (texte agrandi), le bord ne touche pas le texte. Le choix et les cases à la couleur du texte :
+   l’ambre, sur le clair, ferait 1,9:1. */
 .affiche-format__choix:hover { background: var(--fond-releve, var(--verre-fort)); }
 .affiche-format__choix:has(:checked) { border-color: var(--texte); }
-.affiche-format input { width: 20px; height: 20px; margin: 0; accent-color: var(--texte); }
+.affiche-format input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--texte); }
 
 /* ---------- La feuille, à l’écran ---------- */
 

@@ -56,7 +56,7 @@
   .apropos__entrees a { flex-direction: column; justify-content: flex-start; }
   .apropos__ouverture { padding-top: 12px; }
   .apropos__ouverture .surtitre { margin-bottom: 10px; }
-  .apropos__titre { font-size: 2rem; }
+  .apropos__titre { font-size: 1.875rem; }
   .apropos__chapo { margin-top: 16px; font-size: 1.0625rem; line-height: 1.4; }
   .apropos__entrees { margin-top: 14px; }
 }

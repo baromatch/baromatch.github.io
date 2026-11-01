@@ -419,12 +419,20 @@ for (const largeur of [360, 390, 1280]) {
 
 // ---------- L’ancien cadre ----------
 
-// Les pages des matchs publiées (dans le dépôt) avant cette navigation ont encore l’ancien en-tête (.entete__nav) et
-// l’ancien pied (.pied__liens), jusqu’au premier passage de l’Action « Pages des matchs » qui les réécrit. Servies avec
-// la feuille de style neuve, elles restent en forme : les liens de l’en-tête à droite du logo (l’ordinateur) ou à côté
-// de lui (le téléphone), entiers, de 44 px de haut, lisibles, la nuit comme au jour ; le pied en ligne, ses liens sans
-// puce et de 44 px de haut ; rien ne déborde de côté. Quand plus aucune page du dépôt ne les porte, ce test le dit :
-// le bloc « Transition » de styles.css et ce test se retirent alors ensemble.
+// Le jour de la fusion, les pages des matchs publiées par l’Action avec l’ancien générateur ont encore l’ancien en-tête
+// (.entete__nav) et l’ancien pied (.pied__liens), jusqu’à son passage suivant, qui les réécrit avec le cadre neuf.
+// Servies avec la feuille de style neuve, elles restent en forme : les liens de l’en-tête à droite du logo (l’ordinateur)
+// ou à côté de lui (le téléphone), entiers, de 44 px de haut, lisibles, leurs bords à 3:1 (lus au pixel), la nuit comme
+// au jour ; le pied en ligne, ses liens sans puce et de 44 px de haut ; rien ne déborde de côté. Deux de ces pages sont
+// gardées telles que l’Action les a publiées sur main le 31 octobre (tests/donnees/ancien-cadre/ : un match, et un match
+// en anglais, dont le pied a une phrase de plus) et servies à leur adresse : la preuve tient même quand le dépôt n’en a
+// plus. S’y ajoutent celles du dépôt qui les portent encore, une de chaque sorte. Quand plus aucune page du dépôt ne les
+// porte, le premier test le dit : le bloc « Transition » de styles.css, ces tests et tests/donnees/ancien-cadre/ se
+// retirent alors ensemble.
+const GARDEES = [
+  { chemin: '/matchs/angers-lorient-2026-10-25/', fichier: 'tests/donnees/ancien-cadre/match.html' },
+  { chemin: '/en/matches/arsenal-everton-2026-10-24/', fichier: 'tests/donnees/ancien-cadre/match-en.html' },
+];
 const ANCIENNES = (() => {
   const trouvees = [];
   const parcourir = (dossier) => {
@@ -439,77 +447,101 @@ const ANCIENNES = (() => {
   }
   return trouvees.sort();
 })();
-// Une page de chaque sorte : un match, « Ce soir », une ville, une page en anglais (son pied a une phrase de plus).
+// Une page du dépôt de chaque sorte : un match, « Ce soir », une ville, une page en anglais.
 const ECHANTILLON = [/^\/matchs\/[a-z0-9-]+-\d{4}-\d{2}-\d{2}\/$/, /^\/ce-soir\/$/, /^\/regarder-le-match\/[a-z-]+\/$/, /^\/en\/[a-z-]+\/$/]
   .map((forme) => ANCIENNES.find((c) => forme.test(c))).filter(Boolean);
 
-test('l’ancien cadre : des pages du dépôt le portent encore (sinon, retire le bloc « Transition » de styles.css et ce test)', () => {
-  expect(ANCIENNES.length, 'plus aucune page n’a l’ancien cadre : retire le bloc « Transition » de styles.css et ce test').toBeGreaterThan(0);
+test('l’ancien cadre : des pages du dépôt le portent encore (sinon, retire le bloc « Transition » de styles.css, ces tests et tests/donnees/ancien-cadre/)', () => {
+  expect(ANCIENNES.length, 'plus aucune page n’a l’ancien cadre : retire le bloc « Transition » de styles.css, ces tests et tests/donnees/ancien-cadre/').toBeGreaterThan(0);
   expect(ECHANTILLON.length).toBeGreaterThan(0);
 });
 
-for (const chemin of ECHANTILLON) {
-  for (const [largeur, hauteur] of [[340, 740], [390, 844], [1280, 800]]) {
-    test(`l’ancien cadre de ${chemin} à ${largeur} px, avec la feuille de style neuve : en forme, la nuit comme au jour`, async ({ page }) => {
-      await couperLAPI(page);
-      await page.setViewportSize({ width: largeur, height: hauteur });
-      await page.goto(chemin);
-      await page.evaluate(() => document.fonts.ready);
-      const mesurer = () => page.evaluate(() => {
-        const boite = (e) => (({ left, right, top, bottom, width, height }) => ({ gauche: left, droite: right, haut: top, bas: bottom, largeur: width, hauteur: height }))(e.getBoundingClientRect());
-        const fonds = (e) => {
-          const couches = [];
-          for (let n = e; n; n = n.parentElement) {
-            const c = getComputedStyle(n).backgroundColor;
-            couches.push(c);
-            if (/^rgb\(/.test(c)) break;
-          }
-          return couches;
-        };
-        const entete = document.querySelector('header.entete');
-        const s = getComputedStyle(entete);
-        const nav = entete.querySelector('.entete__nav');
-        const pied = document.querySelector('footer.pied');
-        return {
-          pageDefile: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-          entete: { ...boite(entete), dedansDroite: entete.getBoundingClientRect().right - parseFloat(s.paddingRight) },
-          logo: boite(entete.querySelector('.entete__logo svg')),
-          nav: boite(nav),
-          liens: [...nav.querySelectorAll('a')].map((a) => ({ texte: a.textContent, ...boite(a), couleur: getComputedStyle(a).color, fonds: fonds(a) })),
-          pied: { affichage: getComputedStyle(pied).display },
-          liste: (({ listStyleType, paddingLeft, display }) => ({ listStyleType, paddingLeft, display }))(getComputedStyle(pied.querySelector('.pied__liens'))),
-          liensDuPied: [...pied.querySelectorAll('.pied__liens a')].map((a) => ({ texte: a.textContent, ...boite(a), couleur: getComputedStyle(a).color, fonds: fonds(a) })),
-          marque: getComputedStyle(pied.querySelector(':scope > .pied__marque')).fontSize === getComputedStyle(pied).fontSize,
-          verre: pied.querySelector(':scope > .pied__marque svg').getBoundingClientRect().width,
-        };
-      });
-      for (const moment of ['nuit', 'jour']) {
-        if (moment === 'jour') await page.evaluate(() => document.documentElement.classList.add('jour'));
-        const lu = await mesurer();
-        expect(lu.pageDefile, `${moment} : la page défile de côté`).toBe(false);
-        expect(lu.liens.map((l) => l.texte)).toEqual(['Boutique', 'Pour les bars']);
-        for (const l of [...lu.liens, ...lu.liensDuPied]) {
-          expect(l.hauteur, `${moment} : ${l.texte}, hauteur`).toBeGreaterThanOrEqual(44);
-          expect(l.gauche, `${moment} : ${l.texte}, à gauche`).toBeGreaterThanOrEqual(0);
-          expect(l.droite, `${moment} : ${l.texte}, à droite`).toBeLessThanOrEqual(largeur);
-          const fond = composer(l.fonds);
-          expect(rapport(poser(lireCouleur(l.couleur), fond), fond), `${moment} : ${l.texte}, contraste`).toBeGreaterThanOrEqual(4.5);
-        }
-        for (const l of lu.liens) {
-          const dessus = l.gauche < lu.logo.droite && lu.logo.gauche < l.droite && l.haut < lu.logo.bas && lu.logo.haut < l.bas;
-          expect(dessus, `${moment} : ${l.texte} sur le logo`).toBe(false);
-        }
-        // Les liens au bout de la ligne du logo, contre le bord droit de l’en-tête.
-        expect(lu.nav.droite).toBeCloseTo(lu.entete.dedansDroite, 0);
-        expect(lu.pied.affichage).toBe('flex');
-        expect(lu.liste).toEqual({ listStyleType: 'none', paddingLeft: '0px', display: 'flex' });
-        expect(lu.liensDuPied.length).toBeGreaterThanOrEqual(10);
-        expect(lu.marque, 'le nom du pied à la taille du pied').toBe(true);
-        expect(lu.verre).toBe(30);
-      }
-    });
+test('l’ancien cadre : les pages gardées sont celles de main, avec l’ancien en-tête et l’ancien pied', () => {
+  for (const { chemin, fichier } of GARDEES) {
+    const html = lire(fichier);
+    expect(html, fichier).toContain(`<link rel="canonical" href="https://baromatch.fr${chemin}">`);
+    expect(html.match(/<nav class="entete__nav"/g), fichier).toHaveLength(1);
+    expect(html.match(/<ul class="pied__liens">/g), fichier).toHaveLength(1);
+    expect(html, fichier).not.toContain('class="menu"');
+    expect(html, fichier).toMatch(/<link rel="stylesheet" href="\/styles\.css">/);
   }
-}
+});
+
+test.describe('l’ancien cadre, avec la feuille de style neuve', () => {
+  // Les bords se lisent au pixel : un écran d’iPhone (×3).
+  test.use({ deviceScaleFactor: 3 });
+  const pages = [...GARDEES.map((g) => ({ ...g, quoi: `${g.chemin} (gardée de main)` })), ...ECHANTILLON.map((chemin) => ({ chemin, quoi: chemin }))];
+  for (const { chemin, fichier, quoi } of pages) {
+    for (const [largeur, hauteur] of [[340, 740], [390, 844], [1280, 800]]) {
+      test(`${quoi} à ${largeur} px : en forme, la nuit comme au jour`, async ({ page }) => {
+        await couperLAPI(page);
+        if (fichier) await page.route(`**${chemin}`, (route) => route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: lire(fichier) }));
+        await page.setViewportSize({ width: largeur, height: hauteur });
+        await page.goto(chemin);
+        await page.evaluate(() => document.fonts.ready);
+        const mesurer = () => page.evaluate(() => {
+          const boite = (e) => (({ left, right, top, bottom, width, height }) => ({ gauche: left, droite: right, haut: top, bas: bottom, largeur: width, hauteur: height }))(e.getBoundingClientRect());
+          const fonds = (e) => {
+            const couches = [];
+            for (let n = e; n; n = n.parentElement) {
+              const c = getComputedStyle(n).backgroundColor;
+              couches.push(c);
+              if (/^rgb\(/.test(c)) break;
+            }
+            return couches;
+          };
+          const entete = document.querySelector('header.entete');
+          const s = getComputedStyle(entete);
+          const nav = entete.querySelector('.entete__nav');
+          const pied = document.querySelector('footer.pied');
+          return {
+            feuille: [...document.styleSheets].some((f) => (f.href ?? '').endsWith('/styles.css') && f.cssRules.length > 0),
+            pageDefile: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+            entete: { ...boite(entete), dedansDroite: entete.getBoundingClientRect().right - parseFloat(s.paddingRight) },
+            logo: boite(entete.querySelector('.entete__logo svg')),
+            nav: boite(nav),
+            liens: [...nav.querySelectorAll('a')].map((a) => ({ texte: a.textContent, ...boite(a), couleur: getComputedStyle(a).color, fonds: fonds(a) })),
+            pied: { affichage: getComputedStyle(pied).display },
+            liste: (({ listStyleType, paddingLeft, display }) => ({ listStyleType, paddingLeft, display }))(getComputedStyle(pied.querySelector('.pied__liens'))),
+            liensDuPied: [...pied.querySelectorAll('.pied__liens a')].map((a) => ({ texte: a.textContent, ...boite(a), couleur: getComputedStyle(a).color, fonds: fonds(a) })),
+            marque: getComputedStyle(pied.querySelector(':scope > .pied__marque')).fontSize === getComputedStyle(pied).fontSize,
+            verre: pied.querySelector(':scope > .pied__marque svg').getBoundingClientRect().width,
+          };
+        });
+        for (const moment of ['nuit', 'jour']) {
+          if (moment === 'jour') await page.evaluate(() => document.documentElement.classList.add('jour'));
+          const lu = await mesurer();
+          expect(lu.feuille, 'la feuille de style neuve est là').toBe(true);
+          expect(lu.pageDefile, `${moment} : la page défile de côté`).toBe(false);
+          expect(lu.liens.map((l) => l.texte)).toEqual(['Boutique', 'Pour les bars']);
+          for (const l of [...lu.liens, ...lu.liensDuPied]) {
+            expect(l.hauteur, `${moment} : ${l.texte}, hauteur`).toBeGreaterThanOrEqual(44);
+            expect(l.gauche, `${moment} : ${l.texte}, à gauche`).toBeGreaterThanOrEqual(0);
+            expect(l.droite, `${moment} : ${l.texte}, à droite`).toBeLessThanOrEqual(largeur);
+            const fond = composer(l.fonds);
+            expect(rapport(poser(lireCouleur(l.couleur), fond), fond), `${moment} : ${l.texte}, contraste`).toBeGreaterThanOrEqual(4.5);
+          }
+          for (const l of lu.liens) {
+            const dessus = l.gauche < lu.logo.droite && lu.logo.gauche < l.droite && l.haut < lu.logo.bas && lu.logo.haut < l.bas;
+            expect(dessus, `${moment} : ${l.texte} sur le logo`).toBe(false);
+          }
+          // Les liens au bout de la ligne du logo, contre le bord droit de l’en-tête.
+          expect(lu.nav.droite).toBeCloseTo(lu.entete.dedansDroite, 0);
+          // Leurs bords, lus au pixel contre la page : le souligné de « Boutique » (et de « Pour les bars » jusqu’à
+          // 400 px), la capsule de « Pour les bars » au-delà. Le dedans de la capsule a son reflet : seul le dehors compte.
+          const bords = await mesurerLesBords(page, '.entete__lien');
+          expect(bords.flatMap((b) => b.cotes).length).toBeGreaterThanOrEqual(2);
+          expect(bordsTropFaibles(bords, 3, `${moment} : `, { dedans: false })).toEqual([]);
+          expect(lu.pied.affichage).toBe('flex');
+          expect(lu.liste).toEqual({ listStyleType: 'none', paddingLeft: '0px', display: 'flex' });
+          expect(lu.liensDuPied.length).toBeGreaterThanOrEqual(10);
+          expect(lu.marque, 'le nom du pied à la taille du pied').toBe(true);
+          expect(lu.verre).toBe(30);
+        }
+      });
+    }
+  }
+});
 
 // ---------- La ligne d’état du pied ----------
 

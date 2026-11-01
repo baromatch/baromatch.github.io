@@ -77,18 +77,50 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // listes publiques (20 cartes sur ses sept jours, 40 insignes, et non 25), 164 Ko transférés sans les insignes, 182 avec
 // (les insignes de l’appli ajoutent environ 18 à 21 Ko compressés, surtout les tracés de leurs lettres) ; seuil 185.
 // Lighthouse au téléphone reste à 99-100 sur l’accueil réel.
-// 30 octobre 2026, après relecture des insignes : les affiches gagnent leurs insignes à l’impression et la paire du
+// 30 octobre 2026, les insignes à l’impression : les affiches gagnent leurs insignes imprimés et la paire du
 // prochain match d’un bar (affiche.css de 16 915 à 17 474 octets, ses commentaires raccourcis) : leur CSS mesure
 // 107,22 Ko (109 797 octets), seuil de 106 à 107. Les pages générées mesurent 90,36 Ko (92 524 octets), l’accueil et les
 // pages fixes 73,20 Ko (74 954 octets) : leurs seuils restent.
 // 30 octobre 2026, après relecture des insignes : la semaine pleine est celle de l’accueil réel de ce jour
 // (tests/donnees/semaine-pleine.json : 25 matchs, 50 insignes, relus dans l’état enregistré du site). Mesurée : 186,09 Ko
 // transférés (190 559 octets ; 186,00 avant les corrections) : seuil 187.
+// 30 octobre 2026, À propos et Presse et partenariats au jour, chacune avec sa feuille, chargée seulement par elle
+// (a-propos.css 11,0 Ko, presse.css 13,7 Ko), comme « Pour les bars » : elles ont leur propre budget, un peu au-dessus
+// de leur mesure avec la police allégée (Ko) : À propos 5 requêtes, 135 transférés, CSS 81, aucune image au premier
+// écran ; Presse 8, 142, CSS 84, images 22 (l’icône et les trois logos en SVG). styles.css perd les règles de
+// l’ancienne page Presse (de 72,5 à 69,8 Ko) : aucun autre seuil ne bouge.
+// 30 octobre 2026, après relecture d’À propos et Presse : main.js ouvre le texte du film quand on arrive par
+// /#film-texte (le lien de la page Presse) : de 18,3 à 18,7 Ko, le JS de l’accueil de 18 à 19 Ko.
+// Le même jour, À propos suit l’ordre du propriétaire : les écrans de l’appli viennent juste après « Pourquoi », à
+// moins de 1 250 px du premier écran, où Chromium charge déjà les images paresseuses. Chaque écran se demande à la
+// largeur de son cadre au téléphone (152 px : le WebP de 300 px, 10 à 16 Ko). Mesuré (Ko) : 7 requêtes, 165
+// transférés, CSS 81, images 31 (deux écrans) ; seuils 8, 176, 0, 82, 42 (les trois écrans).
+// Presse, plus courte au téléphone (les cartes du logo par deux) : ses deux premiers écrans de l’appli arrivent aussi
+// dans ces 1 250 px, en 600 px (leur colonne en demande 301 à 412 px × 1,75 : le WebP de 300 px serait agrandi).
+// Mesuré (Ko) : 10 requêtes, 213 transférés, CSS 85, images 92 (le logo, l’icône et deux écrans) ; seuils 11, 218,
+// 0, 86, 96 (de 9, 147, 0, 85, 26).
+// Après la relecture finale : a-propos.css gagne ses requêtes de conteneur (les colonnes suivent la taille du texte),
+// l’étiquette des écrans seuls sur leur ligne et ses couleurs forcées : de 11,7 à 12,8 Ko. CSS d’À propos mesuré 83 Ko :
+// seuil de 82 à 84. Presse reste sous le sien (85,6 Ko pour 86).
+// 1er novembre 2026, dernière vérification d’À propos et Presse : presse.css gagne la largeur du chapô (rien ne bouge
+// quand la police arrive). Le CSS de Presse mesurait 86,48 Ko (arrondi à 86, à 20 octets du seuil), 86,59 avec elle :
+// seuil de 86 à 87. Puis la rangée des deux boutons de l’ouverture (une grille, une requête de conteneur) : 87,14 Ko.
+// Le même jour, CSS d’À propos 84,20 Ko (à 310 octets du seuil). Puis la relecture d’À propos et Presse : les liens en
+// ligne, la page large comme son texte, l’étiquette des écrans, les chiffres de la police, l’ouverture de Presse qui ne
+// bouge plus quand la police arrive ; les commentaires des deux feuilles raccourcis pour tenir sans relever les seuils.
+// Mesuré : CSS d’À propos 83,55 Ko (seuil 84), de Presse 86,97 Ko (seuil 87).
+// Les deux ensemble : l’accueil et sa semaine pleine gardent les seuils des insignes, avec le JS de main.js à 19 Ko.
+// 1er novembre 2026, la suite des insignes : affiche.css passe de 17 273 à 18 144 octets (à l’écran, les noms des clubs
+// entiers, texte agrandi compris ; le grand prochain match d’un bar jamais plus petit que sa date ; imprimée plus
+// étroite que l’A4, la paire au-dessus du nom). Le CSS des affiches mesure 108,07 Ko (110 668 octets ; 107,49 Ko avant
+// ces corrections, à 9 octets de l’arrondi à 108) : seuil de 107 à 108.
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
-  { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 18, css: 73, images: 24 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 19, css: 73, images: 24 } },
+  { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 19, css: 73, images: 24 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 73, images: 0 } },
+  { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 84, images: 42 } },
+  { nom: 'Presse et partenariats', chemin: '/presse.html', budget: { requetes: 11, transfere: 218, js: 0, css: 87, images: 96 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 176, js: 67, css: 103, images: 4 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
   { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
@@ -99,8 +131,8 @@ const PAGES = [
   { nom: 'page en anglais (Paris)', chemin: '/en/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
   { nom: 'match en anglais', chemin: '/en/matches/psg-barca-2026-10-24/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
   { nom: '« Ton club dans ton agenda »', chemin: '/agenda/', genere: true, budget: { requetes: 8, transfere: 145, js: 4, css: 90, images: 4 } },
-  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 107, images: 4 } },
-  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 107, images: 4 } },
+  { nom: 'affiche de la semaine', chemin: '/matchs/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 108, images: 4 } },
+  { nom: 'affiche d’un bar', chemin: '/bar/le-zinc-des-amis-paris-11/affiche/', genere: true, budget: { requetes: 8, transfere: 150, js: 4, css: 108, images: 4 } },
 ];
 // /mesure.js : 6,7 Ko, 2,6 Ko compressé, une requête.
 const AVEC_LA_MESURE = { requetes: 1, transfere: 3, js: 7 };

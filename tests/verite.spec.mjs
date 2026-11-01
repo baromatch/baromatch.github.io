@@ -45,7 +45,7 @@ test('le film de l’accueil dit que ses bars, ses clubs, ses pseudos et ses chi
   expect(note).toContain('Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.');
   // La page de confiance le promet pour chaque capture de l’appli.
   await page.goto(CONFIANCE);
-  expect(normaliser(await page.locator('#accord + ul').textContent())).toContain('utilisent des bars et des pseudos inventés, et le disent');
+  expect(normaliser(await page.locator('#accord + ul').textContent())).toContain('utilisent des bars, des clubs, des pseudos et des chiffres inventés, et le disent');
 });
 
 test('une offre qui parle d’alcool : jamais affichée sur le site, la mention santé dans l’appli', async ({ page }) => {

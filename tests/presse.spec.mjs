@@ -1,8 +1,10 @@
-// La page presse : ce qu’est Baromatch dit avec les mots de marque.json, ce qu’il n’est pas (ni paris sportifs, ni
-// diffuseur, ni vente d’alcool), le mot du fondateur (ses mots, mot pour mot, rien d’écrit à sa place), les logos à
-// télécharger, les captures, le film et le contact. Aucun emplacement vide en ligne. Ses données structurées la relient
-// à l’Organization de l’accueil.
-// Le reste (référencement, liens, accessibilité, politique de sécurité, pied de page) vient de tests/outils/pages.mjs.
+// La page Presse et partenariats, « le kit sur la page » : les logos à télécharger, cinq écrans de l’appli d’aujourd’hui
+// (chacun marqué « Écran de démonstration »), le film à regarder, les deux couleurs et la police, le texte à copier avec
+// les mots de marque.json, ce que Baromatch n’est pas (ni paris sportifs, ni diffuseur, ni vente d’alcool), le mot du
+// fondateur (ses mots, mot pour mot, rien d’écrit à sa place), les partenariats et à qui écrire. Aucun emplacement vide
+// en ligne. Ses données structurées la relient à l’Organization de l’accueil.
+// Le reste (référencement, liens, accessibilité, politique de sécurité, pied de page) vient de tests/outils/pages.mjs ;
+// le jour (un seul bouton ambre, contraste, texte agrandi, rien qui bouge), de tests/pages-du-jour.spec.mjs.
 import { test, expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -21,17 +23,32 @@ test('Baromatch en bref : le slogan, la phrase et la description de marque.json,
   await page.goto(PAGE);
   const texte = normaliser(await page.locator('main').textContent());
   for (const cle of ['slogan', 'uneLigne', 'description']) expect(texte, cle).toContain(normaliser(MARQUE[cle]));
-  // Vrai aujourd’hui : en test, Android, Paris, pas encore ouvert, gratuit pour les fans.
+  // Vrai aujourd’hui : en test, Android, Paris, pas encore ouvert ; l’appli ne coûte rien au fan (la boutique, elle,
+  // vend des pièces : jamais « tu ne paies rien à Baromatch »).
   if (!MARQUE.appli.ouverte) expect(texte).toContain('L’appli n’est pas encore ouverte au public, ni sur iPhone.');
+  // « ni sur iPhone » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
+  if (texte.includes('ni sur iPhone')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « ni sur iPhone » (Presse, À propos), l’accueil et llms.txt').toBe('');
   const fait = async (nom) => normaliser(await page.locator('.presse__faits > div').filter({ has: page.locator('dt', { hasText: nom }) }).locator('dd').textContent());
-  expect(await fait('Pour les fans')).toMatch(/^Gratuit\./);
+  expect(await fait('Pour les fans')).toBe('L’appli ne te coûte rien. Ce que tu prends au bar, tu le paies au bar.');
   expect(await fait('Aujourd’hui')).toMatch(/^En test sur Android, à Paris\./);
+  // Qui publie : le nom, puis les mentions légales pour le reste.
+  expect(await fait('Qui publie')).toBe('Skander Kamoun, fondateur. Détails dans les mentions légales.');
+  expect(texte).not.toMatch(/Tu ne paies rien|Gratuit\. Ce qu’ils/);
+  // Le chapô : la description de marque.json, puis ce qu’on trouve sur la page.
+  expect(normaliser(await page.locator('.presse__chapo').textContent())).toBe(`${normaliser(MARQUE.description)} Ici : le logo, les écrans, le film à regarder et un texte à copier.`);
 });
 
-test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d’alcool', async ({ page }) => {
+// Une seule liste : ce que Baromatch n’est pas, et ce qu’il refuse (les écussons et les logos de compétition ou de
+// chaîne, un bar qui paierait pour passer devant), rien qui ne soit déjà vrai ailleurs sur le site.
+test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d’alcool, ni écusson, ni bar qui paie', async ({ page }) => {
   await page.goto(PAGE);
   const points = (await page.locator('#n-est-pas + ul > li > strong').allTextContents()).map(normaliser);
-  expect(points).toEqual(['Pas un site de paris sportifs.', 'Pas un diffuseur.', 'Pas un vendeur d’alcool.']);
+  expect(points).toEqual(['Pas un site de paris sportifs.', 'Pas un diffuseur.', 'Pas un vendeur d’alcool.', 'Ni écusson, ni logo.', 'Aucun bar ne paie pour passer devant un autre.']);
+  const liste = normaliser(await page.locator('#n-est-pas + ul').textContent());
+  expect(liste).toContain('Et jamais d’alcool à gagner.');
+  expect(liste).toContain('Pas d’écusson de club : chaque club a son insigne Baromatch, celui de l’appli (ses couleurs, le motif de son maillot, un code de trois lettres), et son nom écrit en toutes lettres. Aucun logo de compétition ni de chaîne.');
+  expect(liste).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom.');
+  await expect(page.locator('main')).not.toContainText('Ce que Baromatch refuse');
   // Vrai aussi le jour où l’appli proposera des pronostics entre amis : ni pari, ni cote, ni argent, jamais.
   const paris = normaliser(await page.locator('#n-est-pas + ul > li').first().textContent());
   expect(paris).toContain('on ne parie pas sur Baromatch : ni mise, ni cote, ni argent en jeu.');
@@ -39,11 +56,13 @@ test('ce que Baromatch n’est pas : ni paris sportifs, ni diffuseur, ni vente d
 });
 
 // Ses mots à lui, écrits le 26 octobre 2026 : publiés tels quels, avec la typographie du site (l’apostrophe ’, une
-// espace insécable avant « : » et « ? »), signés, et juste après « Baromatch en bref », là où un journaliste les cite.
-test('le mot du fondateur : ses mots, mot pour mot, signés, juste après « Baromatch en bref »', async ({ page }) => {
+// espace insécable avant « : » et « ? »), signés. Le kit d’abord (le logo, les écrans, le film, les couleurs, le texte à
+// copier), puis ce que Baromatch n’est pas, et ses mots juste après, là où un journaliste les cite. Les partenariats
+// remontent avant les couleurs : une phrase et son bouton.
+test('le mot du fondateur : ses mots, mot pour mot, signés, juste après « Ce que Baromatch n’est pas »', async ({ page }) => {
   await page.goto(PAGE);
   const titres = (await page.locator('main h2').allTextContents()).map(normaliser);
-  expect(titres.slice(0, 3)).toEqual(['Baromatch en bref', 'Le mot du fondateur', 'Ce que Baromatch n’est pas']);
+  expect(titres).toEqual(['Le logo', 'Les écrans de l’appli', 'Le film', 'Partenariats', 'Les couleurs et la police', 'Le texte à copier', 'Ce que Baromatch n’est pas', 'Le mot du fondateur', 'Écrire à Baromatch']);
   const mot = page.locator('#mot-du-fondateur + figure');
   const cite = await mot.locator('blockquote').textContent();
   expect(motPourMot(cite)).toBe(MOT_DU_FONDATEUR);
@@ -70,37 +89,127 @@ test('aucun emplacement vide, ni lu, ni dans la source, et la page reste indexab
   expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<loc>https://baromatch.fr/presse.html</loc>');
 });
 
-test('les logos : fond sombre, fond clair et icône, chacun en SVG et en PNG à télécharger', async ({ page }) => {
+test('les logos : fond clair, fond sombre et icône, chacun en SVG et en PNG à télécharger', async ({ page }) => {
   await page.goto(PAGE);
   const fichiers = await page.$$eval('.presse__logo .presse__fichiers a', (liens) => liens.map((a) => [a.getAttribute('href'), a.hasAttribute('download')]));
-  expect(fichiers).toEqual(['baromatch-logo-fond-sombre', 'baromatch-logo-fond-clair', 'baromatch-icone']
+  expect(fichiers).toEqual(['baromatch-logo-fond-clair', 'baromatch-logo-fond-sombre', 'baromatch-icone']
     .flatMap((nom) => [[`/presse/${nom}.svg`, true], [`/presse/${nom}.png`, true]]));
   // Chaque aperçu montre le SVG qu’on télécharge.
   const apercus = await page.$$eval('.presse__apercu img', (images) => images.map((img) => img.getAttribute('src')));
-  expect(apercus).toEqual(['/presse/baromatch-logo-fond-sombre.svg', '/presse/baromatch-logo-fond-clair.svg', '/presse/baromatch-icone.svg']);
+  expect(apercus).toEqual(['/presse/baromatch-logo-fond-clair.svg', '/presse/baromatch-logo-fond-sombre.svg', '/presse/baromatch-icone.svg']);
 });
 
-test('les captures et le film : des images légères chargées tard, le film à un clic', async ({ page }) => {
+// Les écrans d’aujourd’hui, ceux de l’accueil (des clubs, des bars et des rues inventés), chacun marqué « Écran de
+// démonstration » et téléchargeable en 600 px. Les anciennes captures (un bar inventé à une vraie adresse, de vrais
+// clubs à une date passée, « 1 place par compte ») ne sont plus ni sur la page, ni dans le site.
+test('les écrans et le film : cinq écrans d’aujourd’hui chargés tard, chacun marqué et à télécharger, le film à un clic', async ({ page }) => {
   await page.goto(PAGE);
-  const captures = await page.$$eval('.presse__captures img', (images) => images.map((img) => ({
-    src: img.getAttribute('src'), paresseuse: img.getAttribute('loading') === 'lazy', legende: img.closest('figure').querySelector('figcaption')?.textContent ?? '',
-  })));
-  expect(captures).toHaveLength(4);
-  for (const capture of captures) {
-    expect(capture.src).toMatch(/^\/presse\/capture-[a-z-]+\.webp$/);
-    expect(capture.paresseuse, capture.src).toBe(true);
-    expect(capture.legende.trim(), capture.src).not.toBe('');
+  const ecrans = await page.$$eval('#ecrans ~ .presse__ecrans figure', (figures) => figures.map((figure) => {
+    const img = figure.querySelector('img');
+    const lien = figure.querySelector('figcaption a');
+    return {
+      src: img.getAttribute('src'), srcset: img.getAttribute('srcset'), paresseuse: img.getAttribute('loading') === 'lazy',
+      etiquette: figure.querySelector('.exemple')?.textContent ?? '', nom: figure.querySelector('figcaption strong')?.textContent ?? '',
+      telecharger: lien && [lien.getAttribute('href'), lien.hasAttribute('download'), lien.textContent.replace(/\s+/g, ' ').trim()],
+    };
+  }));
+  expect(ecrans.map((e) => e.nom)).toEqual(['Ce soir', 'La recherche', 'La page d’un bar', 'Ta soirée', 'Tu y es']);
+  for (const [i, nom] of ['ce-soir', 'carte-recherche', 'bar', 'ta-soiree', 'tu-y-es'].entries()) {
+    const ecran = ecrans[i];
+    expect(ecran.src).toBe(`/img/appli/${nom}-300.webp`);
+    expect(ecran.srcset).toBe(`/img/appli/${nom}-300.webp 300w, /img/appli/${nom}-600.webp 600w`);
+    expect(ecran.paresseuse, nom).toBe(true);
+    expect(ecran.etiquette, nom).toBe('Écran de démonstration');
+    // Le fichier téléchargé porte lui-même « Écran de démonstration » (le test suivant le vérifie dans l’image).
+    expect(ecran.telecharger[0], nom).toBe(`/presse/ecran-${nom}-demonstration.png`);
+    expect(ecran.telecharger[1], nom).toBe(true);
+    expect(ecran.telecharger[2], nom).toMatch(/^Télécharger l’écran .+ \(PNG, 600 px\)$/);
   }
-  await expect(page.locator('a.presse__film')).toHaveAttribute('href', '/baromatch-film.mp4');
-  await expect(page.locator('a.presse__film img')).toHaveAttribute('src', '/baromatch-film.webp');
+  expect(normaliser(await page.locator('#ecrans + p').textContent())).toContain('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés. Chaque fichier le dit, sous l’écran.');
+  const source = readFileSync(path.join(racine, 'presse.html'), 'utf8');
+  expect(source).not.toMatch(/capture-|Oberkampf|1 place par compte/);
+  expect(readdirSync(path.join(racine, 'presse')).filter((nom) => nom.startsWith('capture-'))).toEqual([]);
+  await expect(page.locator('a.presse__affiche')).toHaveAttribute('href', '/baromatch-film.mp4');
+  await expect(page.locator('a.presse__affiche img')).toHaveAttribute('src', '/baromatch-film.webp');
   // La phrase du film, entière, et rien d’un attribut perdu dans le texte.
   await expect(page.locator('#film + p')).toHaveText('Le film de présentation de Baromatch : 15 secondes, sans le son, en portrait. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.');
   expect(await page.locator('#film ~ *').evaluateAll((e) => e.map((x) => x.textContent).join(' '))).not.toMatch(/">|<\/a>|alt=/);
 });
 
-test('le contact presse : l’adresse de marque.json', async ({ page }) => {
+// Un écran téléchargé quitte la page qui dit qu’il est inventé : le fichier le dit lui-même. Chaque PNG est l’écran de
+// 600 px de l’accueil, pixel pour pixel, puis, dessous et jamais dessus, une bande de nuit écrite en clair (« Écran de
+// démonstration », et ce qui est inventé). La recette : generateur/outils/ecrans-presse.mjs, à relancer quand une capture
+// change ; ce test tombe si un fichier n’est plus l’écran du jour ou n’a plus sa bande.
+test.describe('les écrans à télécharger', () => {
+  test.use({ javaScriptEnabled: true });
+  test('chaque fichier est l’écran du jour, avec sous lui la bande « Écran de démonstration »', async ({ page }) => {
+    const { ECRANS_DE_LA_PRESSE, LARGEUR, HAUTEUR_DE_L_ECRAN, HAUTEUR_DE_LA_BANDE, ETIQUETTE, PRECISION, fichierDeLaPresse } = await import('../generateur/outils/ecrans-presse.mjs');
+    expect(ECRANS_DE_LA_PRESSE).toEqual(['ce-soir', 'carte-recherche', 'bar', 'ta-soiree', 'tu-y-es']);
+    expect([ETIQUETTE, PRECISION]).toEqual(['Écran de démonstration', 'Les bars, les clubs, les pseudos et les chiffres sont inventés.']);
+    await page.goto(PAGE);
+    for (const ecran of ECRANS_DE_LA_PRESSE) {
+      // Un PNG de 600 px de large, l’écran plus la bande.
+      const octets = readFileSync(path.join(racine, fichierDeLaPresse(ecran)));
+      expect(octets.subarray(1, 4).toString(), ecran).toBe('PNG');
+      expect([octets.readUInt32BE(16), octets.readUInt32BE(20)], ecran).toEqual([LARGEUR, HAUTEUR_DE_L_ECRAN + HAUTEUR_DE_LA_BANDE]);
+      const lu = await page.evaluate(async ({ png, webp, hauteur, bande }) => {
+        const pixels = async (src, y, h) => {
+          const image = new Image();
+          image.src = src;
+          await image.decode();
+          const toile = document.createElement('canvas');
+          toile.width = image.naturalWidth;
+          toile.height = h;
+          const contexte = toile.getContext('2d', { willReadFrequently: true });
+          contexte.drawImage(image, 0, -y);
+          return contexte.getImageData(0, 0, toile.width, h).data;
+        };
+        // L’écran : le haut du PNG est l’écran de 600 px, au plus 3 niveaux d’écart sur chaque point d’une grille.
+        const [a, b] = [await pixels(png, 0, hauteur), await pixels(webp, 0, hauteur)];
+        let ecart = 0;
+        for (let y = 5; y < hauteur; y += 37) for (let x = 5; x < 600; x += 23) {
+          const i = (y * 600 + x) * 4;
+          ecart = Math.max(ecart, Math.abs(a[i] - b[i]), Math.abs(a[i + 1] - b[i + 1]), Math.abs(a[i + 2] - b[i + 2]));
+        }
+        // La bande : de la nuit, et du texte clair dessus (ses deux lignes).
+        const d = await pixels(png, hauteur, bande);
+        let clairs = 0;
+        let nuit = 0;
+        for (let i = 600 * 4 * 4; i < d.length; i += 4) {
+          if (d[i] > 200 && d[i + 1] > 200 && d[i + 2] > 190) clairs += 1;
+          if (d[i] < 20 && d[i + 1] < 20 && d[i + 2] < 25) nuit += 1;
+        }
+        return { ecart, clairs, nuit, total: d.length / 4 - 600 * 4 };
+      }, { png: `/${fichierDeLaPresse(ecran)}`, webp: `/img/appli/${ecran}-600.webp`, hauteur: HAUTEUR_DE_L_ECRAN, bande: HAUTEUR_DE_LA_BANDE });
+      expect(lu.ecart, `${ecran} : l’écran du fichier n’est plus celui de l’accueil`).toBeLessThanOrEqual(3);
+      expect(lu.nuit / lu.total, `${ecran} : la bande n’est pas de nuit`).toBeGreaterThan(0.75);
+      expect(lu.clairs, `${ecran} : la bande n’a pas son texte`).toBeGreaterThan(2000);
+    }
+  });
+});
+
+// Écrire : les deux boutons vont à l’adresse de marque.json, sans phrase qui la redise ; la phrase de secours la donne
+// en toutes lettres. Sous les écrans, un autre format ou une plus grande taille se demande à la même adresse.
+test('le contact presse : l’adresse de marque.json, et un autre format des écrans sur demande', async ({ page }) => {
   await page.goto(PAGE);
-  await expect(page.locator('#contact + p a[href^="mailto:"]')).toHaveAttribute('href', `mailto:${MARQUE.contact}`);
+  await expect(page.locator('#contact + ul.presse__ecrire')).toHaveCount(1);
+  for (const lien of await page.locator('#contact ~ .presse__ecrire a').all()) expect(await lien.getAttribute('href')).toMatch(new RegExp(`^mailto:${MARQUE.contact}\\?subject=`));
+  await expect(page.locator('#contact ~ .presse__secours .presse__adresse')).toHaveText(MARQUE.contact);
+  const autre = page.locator('#ecrans ~ .presse__autre-format');
+  expect(normaliser(await autre.textContent())).toBe('Besoin d’un autre format ou d’une plus grande taille ? Écris-nous.');
+  await expect(autre.locator('a')).toHaveAttribute('href', `mailto:${MARQUE.contact}?subject=Presse%20%E2%80%93%20Baromatch`);
+});
+
+// Le logo et l’icône, avec les tailles des fichiers qu’on télécharge, lues dans leurs PNG.
+test('les tailles dites du logo et de l’icône sont celles de leurs fichiers', async ({ page }) => {
+  const tailleDuPng = (nom) => { const o = readFileSync(path.join(racine, 'presse', nom)); return [o.readUInt32BE(16), o.readUInt32BE(20), o[25]]; };
+  expect(tailleDuPng('baromatch-logo-fond-clair.png').slice(0, 1)).toEqual([2400]);
+  expect(tailleDuPng('baromatch-logo-fond-sombre.png').slice(0, 1)).toEqual([2400]);
+  // Le logo a de la transparence (type 6) ; l’icône est sur la nuit, carrée, sans transparence.
+  expect(tailleDuPng('baromatch-logo-fond-clair.png')[2]).toBe(6);
+  expect(tailleDuPng('baromatch-icone.png')).toEqual([1024, 1024, 2]);
+  await page.goto(PAGE);
+  expect(normaliser(await page.locator('#logos + p').textContent())).toBe('Le logo en SVG (net à toutes les tailles) et en PNG (2400 px de large, fond transparent). L’icône de l’appli en SVG et en PNG (1024 px, sur la nuit). Garde-les tels quels : mêmes couleurs, mêmes proportions, sans effet ajouté.');
 });
 
 test('données structurées : une page « à propos » de l’Organization de l’accueil, et son fil d’Ariane', async ({ page }) => {
@@ -120,13 +229,31 @@ test('données structurées : une page « à propos » de l’Organization de l�
   expect(fiche.description).toBe(await page.locator('meta[name="description"]').getAttribute('content'));
   expect(fil.itemListElement.map((e) => [e.position, e.name, e.item])).toEqual([
     [1, 'Accueil', `${ORIGINE}/`],
-    [2, 'Presse', `${ORIGINE}${PAGE}`],
+    [2, 'Presse et partenariats', `${ORIGINE}${PAGE}`],
   ]);
+  // Datée comme la page, et comme le plan du site.
+  const affichee = normaliser(await page.locator('.document__date').textContent());
+  expect(affichee).toBe('Mise à jour le 1er novembre 2026');
+  expect(fiche.dateModified).toBe('2026-11-01');
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/presse.html</loc><lastmod>2026-11-01</lastmod></url>');
 });
 
 test('le film en texte, les droits des visuels, et une adresse qui passe à la ligne à 200 %', async ({ page }) => {
   await page.goto(PAGE);
-  await expect(page.locator('#film ~ .presse__fichiers a[href="/#film-texte"]')).toHaveText('Ce que montre le film, en texte');
+  await expect(page.locator('#film ~ .presse__liens-film a[href="/#film-texte"]')).toHaveText('Ce que montre le film, en texte');
+  // Le film reste à regarder, et la page le dit : un lien pour le voir, aucun pour le télécharger ; l’affiche, elle,
+  // se télécharge, et c’est elle que la description de la page nomme.
+  await expect(page.locator('#film ~ p.presse__film-droits')).toHaveText('Le film se regarde, il ne se reprend pas. Seule son affiche peut être utilisée.');
+  const description = 'Le kit de Baromatch, l’appli gratuite pour trouver un bar qui diffuse ton match à Paris : logos, écrans, affiche du film, texte à copier et contact.';
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);
+  expect(JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())['@graph'].find((n) => n['@type'] === 'AboutPage').description).toBe(description);
+  // L’affiche du film, en 540 et 720 px : jamais agrandie sur un téléphone à ×3 (tests/pages-du-jour.spec.mjs).
+  await expect(page.locator('a.presse__affiche img')).toHaveAttribute('srcset', '/baromatch-film.webp 540w, /baromatch-film-720.webp 720w');
+  // Le film reste à regarder : un lien pour le voir, aucun pour le télécharger ; l’affiche, elle, se télécharge.
+  await expect(page.locator('#film ~ .presse__liens-film a[href="/baromatch-film.mp4"]')).toHaveText('Voir le film (MP4)');
+  expect(await page.locator('a[download][href$=".mp4"]').count()).toBe(0);
+  await expect(page.locator('#film ~ .presse__liens-film a[download][href="/baromatch-film.webp"]')).toHaveCount(1);
   await expect(page.locator('main')).toContainText(PHRASE_DROITS);
   const adresses = await page.$$eval('a[href="mailto:contact@baromatch.fr"]', (liens) => liens.map((a) => a.innerHTML));
   expect(adresses.length).toBeGreaterThan(0);
@@ -157,4 +284,124 @@ test('les droits du kit presse : la phrase du propriétaire, citée mot pour mot
     return /\.(html|txt|md|json|xml|js|css)$/.test(e.name) ? [chemin] : [];
   });
   for (const fichier of publies('.')) expect(lire(fichier), fichier).not.toContain('libres d’utilisation');
+});
+
+// L’ouverture dit à qui écrire : un seul bouton ambre, pour la presse (le visiteur de cette page), puis le partenariat
+// en contour, et une ligne pour le patron de bar qui arrive ici. Les deux objets de message sont ceux de la page.
+test('l’ouverture : écrire pour la presse ou pour un partenariat, une ligne pour un bar, et le sommaire de la page', async ({ page }) => {
+  await page.goto(PAGE);
+  const ouverture = page.locator('.presse__ouverture');
+  const liens = await ouverture.locator('.presse__actions a, .presse__bar a').evaluateAll((a) => a.map((l) => [l.className, l.textContent.trim(), l.getAttribute('href')]));
+  expect(liens).toEqual([
+    ['capsule', 'Écrire pour la presse', `mailto:${MARQUE.contact}?subject=Presse%20%E2%80%93%20Baromatch`],
+    ['presse__bouton', 'Écrire pour un partenariat', `mailto:${MARQUE.contact}?subject=Partenariat%20%E2%80%93%20Baromatch`],
+    ['', 'Proposer mon bar', '/pour-les-bars.html#proposer'],
+  ]);
+  expect(normaliser(await ouverture.locator('.presse__bar').textContent())).toBe('Tu tiens un bar ? Proposer mon bar');
+  expect(normaliser(await ouverture.textContent())).toContain(PHRASE_DROITS);
+  // Sur cette page : cinq entrées, chacune vers un titre de la page.
+  const sommaire = page.getByRole('navigation', { name: 'Sur cette page' });
+  const entrees = await sommaire.locator('a').evaluateAll((a) => a.map((l) => [l.textContent.trim(), l.getAttribute('href')]));
+  expect(entrees).toEqual([['Logo', '#logos'], ['Écrans', '#ecrans'], ['Film', '#film'], ['Partenariats', '#partenariats'], ['Couleurs', '#couleurs'], ['Texte', '#texte'], ['Ce qu’il n’est pas', '#n-est-pas'], ['Écrire', '#contact']]);
+  for (const [, ancre] of entrees) await expect(page.locator(`h2${ancre}`)).toHaveCount(1);
+  // Dans l’ordre réel de la page.
+  const ordre = await page.locator('main h2').evaluateAll((h) => h.map((e) => `#${e.id}`));
+  const rangs = entrees.map(([, ancre]) => ordre.indexOf(ancre));
+  expect(rangs).toEqual([...rangs].sort((x, y) => x - y));
+});
+
+// Les deux couleurs, dites comme on les copie : le code, ses valeurs RVB (calculées du code ici), le disque peint de la
+// même couleur, et leur rôle. Une seule police, nommée, avec sa licence.
+test('les couleurs et la police : chaque code, ses valeurs RVB et son disque disent la même couleur', async ({ page }) => {
+  await page.goto(PAGE);
+  const teintes = await page.$$eval('.presse__teintes li', (liste) => liste.map((li) => ({
+    nom: li.querySelector('.presse__teinte-nom').textContent.trim(),
+    codes: [...li.querySelectorAll('code')].map((c) => c.textContent.trim()),
+    disque: getComputedStyle(li.querySelector('.presse__disque')).backgroundColor,
+    role: li.querySelector('.presse__role').textContent.trim(),
+  })));
+  expect(teintes.map(({ nom, role }) => [nom, role])).toEqual([['Ambre', 'La couleur de l’action.'], ['Nuit', 'Le fond de l’appli.']]);
+  for (const { nom, codes: [hex, rvb], disque } of teintes) {
+    const valeurs = hex.match(/^#([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})$/).slice(1).map((x) => parseInt(x, 16));
+    expect(rvb, nom).toBe(valeurs.join(' '));
+    expect(disque, nom).toBe(`rgb(${valeurs.join(', ')})`);
+  }
+  expect(teintes.map((t) => t.codes[0])).toEqual(['#FFB13D', '#0A0B10']);
+  await expect(page.locator('.presse__police .presse__teinte-nom')).toHaveText('Bricolage Grotesque');
+  await expect(page.locator('.presse__police a')).toHaveAttribute('href', '/fonts/LICENSE-OFL.txt');
+  expect(readFileSync(path.join(racine, 'fonts', 'LICENSE-OFL.txt'), 'utf8')).toMatch(/SIL OPEN FONT LICENSE/i);
+});
+
+// « Les chiffres sont à chasse fixe, pour que les heures s’alignent : 18:42, 20:37, 21:00. » : vrai sur la page même.
+// Chaque chiffre de la phrase a la même largeur (avant, la page les dessinait proportionnels : 5,5 px pour « 1 »,
+// 11,7 px pour « 0 »).
+test('la police : les chiffres de la phrase sur la chasse fixe ont tous la même largeur', async ({ page }) => {
+  await page.goto(PAGE);
+  await page.evaluate(() => document.fonts.ready);
+  const phrase = page.locator('.presse__police .presse__role').filter({ hasText: 'chasse fixe' });
+  await expect(phrase).toHaveCount(1);
+  const chiffres = await phrase.evaluate((p) => [...p.childNodes].filter((n) => n.nodeType === 3).flatMap((noeud) => [...noeud.nodeValue].flatMap((c, i) => {
+    if (!/\d/.test(c)) return [];
+    const plage = document.createRange();
+    plage.setStart(noeud, i);
+    plage.setEnd(noeud, i + 1);
+    return [[c, plage.getBoundingClientRect().width]];
+  })));
+  expect(chiffres.length).toBe(12);
+  const largeurs = chiffres.map(([, l]) => l);
+  expect(Math.max(...largeurs) - Math.min(...largeurs), chiffres.map(([c, l]) => `${c} ${l.toFixed(2)} px`).join(', ')).toBeLessThan(0.1);
+});
+
+// Le texte à copier se prend d’un geste (un toucher le sélectionne en entier), y compris sur iPhone, où Safari ne lit
+// que -webkit-user-select.
+test('le texte à copier : la phrase, la ligne et le paragraphe de marque.json, chacun sélectionné d’un geste', async ({ page }) => {
+  await page.goto(PAGE);
+  const copie = await page.$$eval('.presse__copie > div', (lignes) => lignes.map((div) => [div.querySelector('dt').textContent.trim(), div.querySelector('dd').textContent.replace(/[\s ]+/g, ' ').trim(), getComputedStyle(div.querySelector('dd')).userSelect]));
+  expect(copie).toEqual([
+    ['La phrase', MARQUE.slogan, 'all'],
+    ['En une ligne', normaliser(MARQUE.uneLigne), 'all'],
+    ['En un paragraphe', normaliser(MARQUE.description), 'all'],
+  ]);
+  const feuille = readFileSync(path.join(racine, 'presse.css'), 'utf8');
+  for (const regle of feuille.split('}').filter((r) => /user-select: all/.test(r))) expect(regle).toContain('-webkit-user-select: all;');
+});
+
+// Partenariats : une phrase et son bouton, en contour. Puis à qui écrire : deux boutons en contour, chacun avec son
+// objet, et la phrase de secours qui nomme ces deux objets quand la messagerie ne s’ouvre pas.
+test('partenariats et contact : une phrase et son bouton, deux objets déjà écrits et la phrase de secours', async ({ page }) => {
+  await page.goto(PAGE);
+  const partenariats = page.locator('section[aria-labelledby="partenariats"]');
+  expect(normaliser(await partenariats.textContent())).toBe('Partenariats Investisseur, club ou ville : écris-nous. Écrire pour un partenariat');
+  await expect(partenariats.locator('a')).toHaveAttribute('href', `mailto:${MARQUE.contact}?subject=Partenariat%20%E2%80%93%20Baromatch`);
+  await expect(partenariats.locator('a')).toHaveClass('presse__bouton');
+  await expect(page.locator('main')).not.toContainText('Baromatch aujourd’hui');
+  const contact = page.locator('section[aria-labelledby="contact"]');
+  const boutons = await contact.locator('.presse__ecrire li').evaluateAll((li) => li.map((l) => [l.querySelector('p').textContent.trim(), l.querySelector('a').className, l.querySelector('a').getAttribute('href')]));
+  expect(boutons).toEqual([
+    ['Pour un article, une interview, des images', 'presse__bouton', `mailto:${MARQUE.contact}?subject=Presse%20%E2%80%93%20Baromatch`],
+    ['Pour un investisseur, un club ou une ville', 'presse__bouton', `mailto:${MARQUE.contact}?subject=Partenariat%20%E2%80%93%20Baromatch`],
+  ]);
+  expect(normaliser(await contact.locator('.presse__secours').textContent())).toBe(`Ta messagerie ne s’ouvre pas ? Écris à ${MARQUE.contact} avec l’objet « Presse – Baromatch » ou « Partenariat – Baromatch ».`);
+  // Une seule famille d’objets sur la page : « Presse – Baromatch » et « Partenariat – Baromatch ».
+  const objets = await page.$$eval('main a[href^="mailto:"]', (a) => [...new Set(a.map((l) => new URL(l.href).searchParams.get('subject')).filter(Boolean))]);
+  expect(objets.sort()).toEqual(['Partenariat – Baromatch', 'Presse – Baromatch']);
+});
+
+// « Ce que montre le film, en texte » mène au texte du film sur l’accueil : il s’ouvre en arrivant (main.js), au lieu
+// d’un résumé fermé. Sans JavaScript, le résumé reste visible et s’ouvre au toucher.
+test.describe('le film en texte, depuis la page Presse', () => {
+  test.use({ javaScriptEnabled: true });
+  test('le lien ouvre le texte du film sur l’accueil, et le texte se lit', async ({ page }) => {
+    await page.goto(PAGE);
+    await page.locator('#film ~ .presse__liens-film a[href="/#film-texte"]').click();
+    await expect(page).toHaveURL(/\/#film-texte$/);
+    await expect(page.locator('#film-texte')).toHaveAttribute('open', '');
+    await expect(page.locator('#film-texte ol li').first()).toBeVisible();
+  });
+  test('sur l’accueil, un lien vers #film-texte l’ouvre aussi en cours de route', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#film-texte')).not.toHaveAttribute('open', '');
+    await page.evaluate(() => { location.hash = 'film-texte'; });
+    await expect(page.locator('#film-texte')).toHaveAttribute('open', '');
+  });
 });

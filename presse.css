@@ -5,11 +5,11 @@
    montrent en petits disques sur une carte blanche, pas en surfaces. Rien ne bouge : ni animation, ni script.
    Chaque grand texte se règle en rem et en vw, et chaque grille d’écrans en em : avec le texte à 200 % sur 320 px, son
    plus long mot tient sur sa ligne (tests/pages-du-jour.spec.mjs le mesure). Les colonnes suivent la taille du texte,
-   pas la largeur de l’écran : la page est un conteneur (« presse »), et chaque grille passe en colonnes à une largeur
-   dite en rem (le seuil d’avant en px divisé par 16 : un rem suit la racine) ; à 100 %, les seuils d’avant au pixel
-   près, à 200 %, leur double. Chargée seulement par presse.html. */
+   pas la largeur de l’écran : la page est un conteneur (« presse ») large comme le texte, et chaque grille passe en
+   colonnes à une largeur dite en rem (le seuil d’avant en px divisé par 16 : un rem suit la racine) ; à 100 %, les
+   seuils d’avant au pixel près, à 200 %, leur double. Chargée seulement par presse.html. */
 
-.presse { --presse-air: clamp(40px, 6.5vw, 88px); container: presse / inline-size; }
+.presse { --presse-air: clamp(40px, 6.5vw, 88px); container: presse / inline-size; max-width: calc(var(--page) + 2 * var(--gouttiere)); margin-inline: auto; }
 .presse p, .presse ul, .presse dl, .presse figure { margin: 0; }
 
 /* ---------- L’ouverture : ce que c’est, ce qu’on peut en faire, à qui écrire ---------- */

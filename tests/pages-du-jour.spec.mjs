@@ -5,8 +5,9 @@
 // - Chaque texte à 4,5:1 au moins sur son fond, chaque bord d’une action et chaque contour du focus à 3:1.
 // - Chaque action hors d’une phrase se touche sur 44 px de haut ; un lien pris dans une phrase, sur toute sa ligne, et
 //   toucher son texte n’ouvre jamais un autre lien.
-// - Avec le texte à 200 % sur 320, 375 et 390 px : rien ne sort de l’écran, aucun mot n’est coupé (passer à la ligne
-//   après un trait d’union n’en coupe pas), et l’étiquette « Écran de démonstration » garde son texte dans sa pilule.
+// - Avec le texte à 200 %, du téléphone à l’ordinateur, et de 125 à 200 % sur grand écran : rien ne sort de l’écran,
+//   aucun mot n’est coupé (passer à la ligne après un trait d’union n’en coupe pas), aucune ponctuation n’est seule en
+//   début de ligne, et l’étiquette « Écran de démonstration » garde son texte dans sa pilule.
 // - Chaque écran de l’appli porte « Écran de démonstration », et la page dit que ses bars, clubs et pseudos sont inventés.
 // - Rien ne bouge (ni animation, ni transition), avec ou sans « réduire les animations », et rien ne saute au chargement
 //   (CLS 0, mesuré sans la police, comme l’accueil).
@@ -144,43 +145,67 @@ for (const { chemin, feuille, ambre } of PAGES) {
       });
     }
 
-    // Du téléphone à l’ordinateur : les colonnes suivent la taille du texte (avant, à 960 px, la page défilait de côté).
-    for (const largeur of [320, 375, 390, 768, 960, 1024, 1280]) {
-      test(`à ${largeur} px, texte à 200 % : rien ne sort de l’écran, aucun mot n’est coupé, chaque étiquette garde son texte`, async ({ page }) => {
-        await ouvrir(page, chemin, largeur, 700);
+    // Du téléphone au grand écran : les colonnes suivent la place du texte, pas la largeur de l’écran (avant, à 960 px, la
+    // page défilait de côté ; dès 1 728 px avec le texte à 150 % (« Très grande » dans Chrome), les colonnes se réglaient
+    // sur l’écran entier : « Écrire à Baromatc/h », « engagemen/t. », « d’habitude » puis « . » seul). Chaque ligne
+    // commence après une espace ou un trait d’union : aucun mot coupé, aucune ponctuation seule en début de ligne, et
+    // jamais à une espace insécable (avant, à 320 px et 200 % : « Par où commencer » puis « ? » seul).
+    const TEXTE_AGRANDI = [[[320, 324, 328, 336, 344, 352, 360], [200]], ...[375, 390, 768, 960, 1024, 1280].map((l) => [[l], [200]]),
+      ...[1440, 1728, 1920, 2560].map((l) => [[l], [125, 150, 175, 200]])];
+    for (const [largeurs, pourcents] of TEXTE_AGRANDI) {
+      test(`à ${largeurs.join(', ')} px, texte à ${pourcents.join(', ')} % : rien ne sort de l’écran, aucun mot coupé ni ponctuation seule en début de ligne, chaque étiquette garde son texte`, async ({ page }) => {
+        await ouvrir(page, chemin, largeurs[0], 700);
         await chargerLesImages(page);
-        await agrandir(page, 200);
-        const lu = await page.evaluate(() => {
-          const ecran = document.documentElement.clientWidth;
-          const dehors = [...document.querySelectorAll('main *')].filter((e) => e.getClientRects().length && !e.closest('svg, .visuellement-cache'))
-            .filter((e) => { const r = e.getBoundingClientRect(); return r.left < -0.5 || r.right > ecran + 0.5; }).map(nomDe);
-          // Chaque mot (entre deux espaces ou deux traits d’union) : une seule ligne.
-          const coupes = [];
-          const parcours = document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT);
-          while (parcours.nextNode()) {
-            const noeud = parcours.currentNode;
-            if (!noeud.parentElement.getClientRects().length || noeud.parentElement.closest('.visuellement-cache')) continue;
-            for (const mot of noeud.nodeValue.matchAll(/[^\s  \-‑–]+/g)) {
-              const morceau = document.createRange();
-              morceau.setStart(noeud, mot.index);
-              morceau.setEnd(noeud, mot.index + mot[0].length);
-              const hauts = [...morceau.getClientRects()].filter((r) => r.width > 0).map((r) => r.top);
-              if (hauts.length > 1 && Math.max(...hauts) - Math.min(...hauts) > 2) coupes.push(mot[0]);
+        for (const largeur of largeurs) for (const pourcent of pourcents) {
+          const ici = `${largeur} px, ${pourcent} %`;
+          await page.setViewportSize({ width: largeur, height: 700 });
+          await agrandir(page, pourcent);
+          const lu = await page.evaluate(() => {
+            const ecran = document.documentElement.clientWidth;
+            const dehors = [...document.querySelectorAll('main *')].filter((e) => e.getClientRects().length && !e.closest('svg, .visuellement-cache'))
+              .filter((e) => { const r = e.getBoundingClientRect(); return r.left < -0.5 || r.right > ecran + 0.5; }).map(nomDe);
+            // Chaque signe visible, dans l’ordre, avec son bloc ; puis chaque début de ligne, et ce qui le précède.
+            const signes = [];
+            const parcours = document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT);
+            while (parcours.nextNode()) {
+              const noeud = parcours.currentNode;
+              if (!noeud.parentElement.getClientRects().length || noeud.parentElement.closest('.visuellement-cache')) continue;
+              let bloc = noeud.parentElement;
+              while (/^(inline|contents)/.test(getComputedStyle(bloc).display)) bloc = bloc.parentElement;
+              for (let i = 0; i < noeud.nodeValue.length; i += 1) {
+                if (/[ \t\n\r]/.test(noeud.nodeValue[i])) continue;
+                const plage = document.createRange();
+                plage.setStart(noeud, i);
+                plage.setEnd(noeud, i + 1);
+                const r = [...plage.getClientRects()].find((x) => x.width > 0);
+                if (r) signes.push({ noeud, i, bloc, milieu: (r.top + r.bottom) / 2, haut: r.height });
+              }
             }
-          }
-          const etiquettes = [...document.querySelectorAll('main .exemple')].filter((e) => e.checkVisibility()).map((e) => {
-            const boite = e.getBoundingClientRect();
-            const plage = document.createRange();
-            plage.selectNodeContents(e);
-            return [...plage.getClientRects()].filter((l) => l.top < boite.top - 0.5 || l.bottom > boite.bottom + 0.5 || l.left < boite.left - 0.5 || l.right > boite.right + 0.5).length;
+            const coupes = [];
+            for (let k = 1; k < signes.length; k += 1) {
+              const [avant, ici] = [signes[k - 1], signes[k]];
+              if (avant.bloc !== ici.bloc || ici.milieu - avant.milieu <= ici.haut / 2) continue;
+              const signe = ici.noeud.nodeValue[ici.i];
+              const extrait = `${avant.noeud.nodeValue.slice(Math.max(0, avant.i - 14), avant.i + 1)}|${ici.noeud.nodeValue.slice(ici.i, ici.i + 6)}`;
+              const espace = avant.noeud !== ici.noeud || /[ \t\n\r]/.test(avant.noeud.nodeValue.slice(avant.i + 1, ici.i));
+              if (',.;:!?»)…'.includes(signe)) coupes.push(`« ${signe} » seul en début de ligne : « ${extrait} »`);
+              else if (!espace && !/[-‑–—]/.test(avant.noeud.nodeValue[avant.i])) coupes.push(`mot coupé : « ${extrait} »`);
+            }
+            const etiquettes = [...document.querySelectorAll('main .exemple')].filter((e) => e.checkVisibility()).map((e) => {
+              const boite = e.getBoundingClientRect();
+              const plage = document.createRange();
+              plage.selectNodeContents(e);
+              return [...plage.getClientRects()].filter((l) => l.top < boite.top - 0.5 || l.bottom > boite.bottom + 0.5 || l.left < boite.left - 0.5 || l.right > boite.right + 0.5).length;
+            });
+            return { dehors, coupes, signes: signes.length, etiquettes, defile: document.documentElement.scrollWidth > ecran };
           });
-          return { dehors, coupes, etiquettes, defile: document.documentElement.scrollWidth > ecran };
-        });
-        expect(lu.dehors).toEqual([]);
-        expect(lu.defile, 'la page défile de côté').toBe(false);
-        expect(lu.coupes, 'des mots coupés').toEqual([]);
-        expect(lu.etiquettes.length).toBeGreaterThan(0);
-        expect(lu.etiquettes.filter((n) => n > 0), 'une étiquette dont le texte sort').toEqual([]);
+          expect(lu.dehors, ici).toEqual([]);
+          expect(lu.defile, `${ici} : la page défile de côté`).toBe(false);
+          expect(lu.signes, ici).toBeGreaterThan(2000);
+          expect(lu.coupes, `${ici} : des mots coupés`).toEqual([]);
+          expect(lu.etiquettes.length, ici).toBeGreaterThan(0);
+          expect(lu.etiquettes.filter((n) => n > 0), `${ici} : une étiquette dont le texte sort`).toEqual([]);
+        }
       });
     }
 
@@ -446,7 +471,7 @@ for (const largeur of [528, 912]) {
 // répond ; au milieu de chaque morceau, il répond sur toute la hauteur de sa ligne, à 0,1 em près (le padding compte la
 // boîte du texte pour 1,25 em ; celle de Bricolage Grotesque fait de 1,20 à 1,24 em). Avant, ce padding portait la
 // boîte à 44 px sur des lignes de 26 px : la boîte d’un lien couvrait le bas du texte du lien de la ligne du dessus, et
-// toucher « comment on choisit les bars » ouvrait « pourquoi Baromatch existe » (Presse, de 320 à 576 px) ou les
+// toucher « comment on choisit les bars » ouvrait « pourquoi Baromatch existe » (Presse, de 320 à 528 px) ou les
 // « CGU » (À propos) ; le test d’alors lisait la hauteur de la boîte, et passait.
 const toucherLesLiens = () => {
   const nom = (e) => e.textContent.replace(/\s+/g, ' ').trim();

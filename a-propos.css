@@ -5,12 +5,12 @@
    bar » ; les autres actions ont un contour à 3,6:1. Rien ne bouge : la page n’a ni animation ni script.
    Chaque grand texte se règle en rem et en vw : avec le texte à 200 % sur 320 px, son plus long mot tient sur sa ligne
    (tests/pages-du-jour.spec.mjs le mesure). Les colonnes suivent la taille du texte, pas la largeur de l’écran : la
-   page est un conteneur (« apropos »), et chaque grille passe en colonnes à une largeur dite en rem (le seuil d’avant en
-   px divisé par 16) : dans une requête de conteneur, un rem suit la racine ; à 100 %, les seuils d’avant au pixel près,
-   à 200 %, leur double.
+   page est un conteneur (« apropos ») large comme le texte, et chaque grille passe en colonnes à une largeur en rem (le
+   seuil d’avant en px divisé par 16) : dans une requête de conteneur, un rem suit la racine ; à 100 %, les seuils
+   d’avant au pixel près, à 200 %, leur double.
    Chargée seulement par a-propos.html. */
 
-.apropos { --apropos-air: clamp(44px, 9vw, 128px); container: apropos / inline-size; }
+.apropos { --apropos-air: clamp(44px, 9vw, 128px); container: apropos / inline-size; max-width: calc(var(--page) + 2 * var(--gouttiere)); margin-inline: auto; }
 
 /* ---------- L’ouverture : la phrase, puis une entrée pour chacun ---------- */
 
@@ -89,7 +89,7 @@
 /* Une phrase qu’on lit en grand, calmement. */
 .apropos__enonce {
   max-width: 20ch;
-  font-size: clamp(1.75rem, 1rem + 4vw, 3.5rem);
+  font-size: clamp(min(1.75rem, 9vw), 1rem + 4vw, 3.5rem);
   font-weight: 650;
   font-stretch: 92%;
   font-variation-settings: "opsz" 72;

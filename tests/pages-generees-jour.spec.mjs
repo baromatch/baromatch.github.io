@@ -5,7 +5,7 @@
 // listes publiques). Le crème, le bleu nuit pour le texte, l’ambre seulement pour l’action ; le pied de page de nuit.
 // Mesuré tel qu’il est peint : chaque texte à 4,5:1 (tests/outils/textes-peints.mjs), chaque contour de focus et chaque
 // bord de champ à 3:1, chaque survol lisible et visible ; le premier affichage déjà au jour ; le texte à 200 % à 320 px
-// qui reste dans l’écran ; et CLS 0 sans la police.
+// qui reste dans l’écran ; à 320 et 1280 px, texte à 100 et 200 %, des cibles de 44 × 44 px ; et CLS 0 sans la police.
 import { test, expect } from '@playwright/test';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -450,5 +450,39 @@ test.describe('CLS 0 sans la police', () => {
         }
       });
     }
+  }
+});
+
+// ---------- Le rendu mesuré à toutes les tailles : téléphones (320 à 430 px) et ordinateur, texte à 100 et 200 % ----------
+
+const agrandir = (onglet, pourcent) => onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+
+// Chaque cible : un lien, un bouton, un résumé dépliable, un champ, ou l’étiquette d’un choix (sa case, son rond, s’ils
+// en ont une, ne sont pas la cible). Hors jeu : un lien pris dans une phrase (son parent dit plus que lui, il reste en
+// ligne), le lien d’évitement, le piège à robots et le pied de page de nuit (le même partout, tests/cibles-tactiles).
+const lireLesCibles = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('a[href], button, summary, input:not([type="hidden"]), select, textarea, label:has(> input)')]
+  .filter((e) => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && !e.closest('.lien-evitement, .attente__piege, .pied'))
+  .filter((e) => !(e.matches('input[type="checkbox"], input[type="radio"]') && e.labels?.length))
+  .filter((e) => !(e.tagName === 'A' && getComputedStyle(e).display === 'inline'
+    && e.parentElement.textContent.replace(/\s+/g, ' ').trim() !== e.textContent.replace(/\s+/g, ' ').trim()))
+  .map((e) => { const r = e.getBoundingClientRect(); return { quoi: `${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]} « ${(e.textContent || e.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 30)} »`, largeur: r.width, hauteur: r.height }; }));
+
+// Chaque cible se touche du doigt sur 44 × 44 px au moins : un club de deux lettres (« OL ») ou une ville courte
+// (« Lille ») comme les autres. Avant, le lien d’un club faisait la largeur de son nom (21 px pour « OL »).
+test.describe('les cibles de 44 × 44 px', () => {
+  for (const type of TYPES) {
+    test(`${type.nom}, à 320 et 1280 px, texte à 100 et 200 % : chaque cible fait 44 × 44 px au moins`, async ({ page: onglet }) => {
+      const petites = [];
+      for (const largeur of [320, 1280]) {
+        await ouvrir(onglet, type, largeur);
+        for (const pourcent of [100, 200]) {
+          await agrandir(onglet, pourcent);
+          const cibles = await lireLesCibles(onglet);
+          expect(cibles.length).toBeGreaterThan(5);
+          petites.push(...cibles.filter((c) => c.largeur < 43.5 || c.hauteur < 43.5).map((c) => `${largeur} px, ${pourcent} % : ${c.quoi} ${Math.round(c.largeur * 10) / 10} × ${Math.round(c.hauteur * 10) / 10} px`));
+        }
+      }
+      expect([...new Set(petites)]).toEqual([]);
+    });
   }
 });

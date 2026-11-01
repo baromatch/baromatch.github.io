@@ -411,6 +411,29 @@ test('la page des bars mène à l’affiche de la semaine, une fois avant le for
 
 // ---------- Dans le navigateur ----------
 
+// Chaque match visible : son nom, et chacun de ses mots coupé (sur plus d’une ligne) ou sorti de sa colonne. Un nom à
+// trait d’union peut passer à la ligne après son trait (« Saint- », puis « Étienne »), comme en typographie : ses
+// parties sont des mots, chacun d’un seul tenant.
+const motsDesNoms = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('.affiche-match, .affiche-prochain__match')].filter((b) => b.getClientRects().length).map((bloc) => {
+  const colonne = bloc.getBoundingClientRect();
+  const ecarts = [];
+  let nom = '';
+  const marcheur = document.createTreeWalker(bloc, NodeFilter.SHOW_TEXT);
+  for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+    if (n.parentElement.closest('svg')) continue;
+    nom += n.data;
+    for (const mot of n.data.matchAll(/[^\s–-]+/g)) {
+      const plage = document.createRange();
+      plage.setStart(n, mot.index);
+      plage.setEnd(n, mot.index + mot[0].length);
+      const boites = [...plage.getClientRects()].filter((r) => r.width > 0);
+      if (new Set(boites.map((r) => Math.round(r.top))).size > 1) ecarts.push(`« ${mot[0]} » coupé`);
+      if (Math.min(...boites.map((r) => r.left)) < colonne.left - 0.5 || Math.max(...boites.map((r) => r.right)) > colonne.right + 0.5) ecarts.push(`« ${mot[0]} » sort de sa colonne`);
+    }
+  }
+  return { nom: nom.trim(), grand: bloc.matches('.affiche-prochain__match'), ecarts };
+}));
+
 const portLibre = () => new Promise((resoudre) => {
   const sonde = createServer();
   sonde.listen(0, '127.0.0.1', () => {
@@ -503,6 +526,17 @@ test.describe('dans le navigateur', () => {
       nom += n.data;
     }
     const ligne = bloc.closest('.affiche-ligne__texte');
+    // La ligne de base d’un texte : le bas d’un repère vide posé en ligne à son début.
+    const base = (element) => {
+      const repere = document.createElement('span');
+      repere.style.cssText = 'display: inline-block; width: 0; height: 0';
+      element.prepend(repere);
+      const y = repere.getBoundingClientRect().bottom;
+      repere.remove();
+      return y;
+    };
+    const nomSeul = bloc.querySelector('.affiche-match__nom');
+    const heure = ligne?.querySelector('.affiche-heure');
     // La largeur du nom sur une seule ligne.
     const essai = document.createElement('span');
     essai.style.whiteSpace = 'nowrap';
@@ -511,6 +545,13 @@ test.describe('dans le navigateur', () => {
     const surUneLigne = essai.getBoundingClientRect().width;
     essai.remove();
     return {
+      // L’écart entre la ligne de base du nom et celles de l’heure et de la compétition (quand elle est sur la même rangée).
+      ecartHeure: nomSeul && heure ? base(heure) - base(nomSeul) : 0,
+      aConfirmer: Boolean(heure?.classList.contains('affiche-heure--a-confirmer')),
+      ecartCompetition: nomSeul && ligne ? base(ligne.querySelector('.affiche-competition')) - base(nomSeul) : 0,
+      troisColonnes: ligne ? getComputedStyle(ligne).gridTemplateAreas.startsWith('"heure match competition"') : false,
+      // L’heure et le nom sur la même rangée (une ligne trop étroite met l’heure au-dessus).
+      memeRangee: ligne ? getComputedStyle(ligne).gridTemplateAreas.startsWith('"heure match') : false,
       surUneLigne,
       nom: nom.trim(),
       prochain: bloc.matches('.affiche-prochain__match'),
@@ -528,12 +569,13 @@ test.describe('dans le navigateur', () => {
   }));
 
   // Le texte à 100 et à 200 % (WCAG 1.4.4 et 1.4.10) : la page ne défile pas de côté ; chaque match tient dans sa ligne,
-  // sans passer sur la compétition ; chaque insigne garde sa taille. Au téléphone (sous 560 px), une seule disposition :
-  // la paire toujours au-dessus du nom ; au-delà, à côté de lui ou au-dessus quand la place manque. Le grand prochain
-  // match d’un bar a sa paire de 58 px au-dessus de son nom.
+  // sans passer sur la compétition ; chaque insigne garde sa taille, même de 720 à 800 px (trois colonnes seulement si
+  // la ligne en a la place). Au téléphone (sous 560 px), une seule disposition : la paire toujours au-dessus du nom ;
+  // au-delà, à côté de lui ou au-dessus quand la place manque. L’heure (sauf « à confirmer », centrée) et la compétition
+  // sur la même rangée suivent la ligne de base du nom. Le grand prochain match d’un bar a sa paire de 58 px au-dessus.
   for (const [chemin, nom] of [[OUVERTE, 'l’affiche de la semaine'], [AFFICHE_DU_ZINC, 'l’affiche d’un bar']]) {
-    test(`${nom}, texte à 100 et 200 % : à 320, 360, 412 et 1280 px, rien ne déborde, les insignes gardent leur taille, au-dessus du nom au téléphone`, async ({ page: onglet }) => {
-      for (const largeur of [320, 360, 412, 1280]) {
+    test(`${nom}, texte à 100 et 200 % : à 320, 360, 412, 720, 760, 800 et 1280 px, rien ne déborde, les insignes gardent leur taille, au-dessus du nom au téléphone ; l’heure sur la ligne de base du nom`, async ({ page: onglet }) => {
+      for (const largeur of [320, 360, 412, 720, 760, 800, 1280]) {
         await onglet.setViewportSize({ width: largeur, height: 800 });
         await onglet.goto(`${serveur.adresse}${chemin}`);
         for (const pourcent of [100, 200]) {
@@ -550,6 +592,8 @@ test.describe('dans le navigateur', () => {
             for (const d of m.dessins) if (Math.abs(d.largeur - d.attribut) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.largeur} px au lieu de ${d.attribut}`);
             if ((largeur < 560 || m.prochain) && m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
             if (m.prochain && m.dessins.some((d) => d.hauteur !== 58)) ecarts.push(`${m.nom} : la paire du prochain match n’a pas 58 px`);
+            if (m.memeRangee && !m.aConfirmer && Math.abs(m.ecartHeure) > 0.5) ecarts.push(`${m.nom} : l’heure à ${m.ecartHeure.toFixed(1)} px de la ligne de base du nom`);
+            if (m.troisColonnes && Math.abs(m.ecartCompetition) > 0.5) ecarts.push(`${m.nom} : la compétition à ${m.ecartCompetition.toFixed(1)} px de la ligne de base du nom`);
           }
           expect(ecarts, cas).toEqual([]);
           if (chemin === AFFICHE_DU_ZINC) expect(matchs.filter((m) => m.prochain).map((m) => m.nom), cas).toEqual(['PSG – Barça']);
@@ -558,54 +602,114 @@ test.describe('dans le navigateur', () => {
     });
   }
 
+  // Le grand prochain match d’un bar, le titre de son affiche : la feuille le plafonne (15 lettres larges y tiennent),
+  // mais il suit le réglage du texte (WCAG 1.4.4) et ne passe jamais sous sa date (« Samedi 24 octobre · 21:00 ») : au
+  // téléphone, texte agrandi, il gardait 29,8 px quand sa date passait à 44. Taille calculée, tous les 8 px, sans
+  // recharger (la feuille suit la fenêtre).
+  test('le grand prochain match d’un bar, texte de 100 à 200 %, de 320 à 1280 px : jamais plus petit que sa date', async ({ page: onglet }) => {
+    await onglet.setViewportSize({ width: 320, height: 800 });
+    await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
+    const ecarts = [];
+    for (let largeur = 320; largeur <= 1280; largeur += 8) {
+      await onglet.setViewportSize({ width: largeur, height: 800 });
+      for (const pourcent of [100, 125, 150, 175, 200]) {
+        const [nom, date] = await onglet.evaluate((p) => {
+          document.documentElement.style.fontSize = `${p}%`;
+          return ['.affiche-prochain__match', '.affiche-prochain__quand'].map((s) => parseFloat(getComputedStyle(document.querySelector(s)).fontSize));
+        }, pourcent);
+        if (nom < date) ecarts.push(`${largeur} px, ${pourcent} % : le nom à ${nom.toFixed(1)} px, sa date à ${date.toFixed(1)}`);
+      }
+    }
+    expect(ecarts).toEqual([]);
+  });
+
   // L’impression, émulée à la largeur imprimable du papier (A4 : 210 mm moins deux marges de 12 ; A3 : 297 mm moins
   // deux marges, et tout 1,414 fois plus grand) : chaque paire à côté de son nom, sur la même ligne, le nom d’un seul
   // tenant ; la paire d’une ligne à 8 mm de haut en A4, celle du prochain match d’un bar à 15 mm, au-dessus de son nom.
-  test('à l’impression, en A4 et en A3 : chaque paire à côté de son nom, sur la même ligne, et à l’échelle du papier', async ({ page: onglet }) => {
+  // Le texte agrandi à 200 % n’y change rien : la mise en page de l’écran n’entre pas dans l’impression.
+  test('à l’impression, en A4 et en A3, texte à 100 et à 200 % : chaque paire en haut, à côté de son nom, à l’échelle du papier ; l’heure et la compétition sur la ligne de base du nom', async ({ page: onglet }) => {
     const MM = 96 / 25.4;
     for (const chemin of [OUVERTE, AFFICHE_DU_ZINC]) {
       for (const [format, largeur, echelle] of [['A4', 186, 1], ['A3', 273, 1.414]]) {
-        await onglet.emulateMedia({ media: 'screen' });
-        await onglet.setViewportSize({ width: Math.round(largeur * MM), height: 1200 });
-        await onglet.goto(`${serveur.adresse}${chemin}`);
-        if (format === 'A3') await onglet.locator('#affiche-a3').check();
-        await onglet.emulateMedia({ media: 'print' });
-        const cas = `${chemin}, ${format}`;
-        const matchs = await lireLesMatchs(onglet);
-        expect(matchs.filter((m) => !m.prochain).length, cas).toBeGreaterThan(chemin === OUVERTE ? 10 : 0);
-        const ecarts = [];
-        for (const m of matchs) {
-          const attendue = (m.prochain ? 15 : 8) * MM * echelle;
-          for (const d of m.dessins) if (Math.abs(d.hauteur - attendue) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.hauteur.toFixed(1)} px de haut au lieu de ${attendue.toFixed(1)}`);
-          if (m.prochain) {
-            if (m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
-            continue;
+        for (const pourcent of [100, 200]) {
+          await onglet.emulateMedia({ media: 'screen' });
+          await onglet.setViewportSize({ width: Math.round(largeur * MM), height: 1200 });
+          await onglet.goto(`${serveur.adresse}${chemin}`);
+          if (format === 'A3') await onglet.locator('#affiche-a3').check();
+          await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          await onglet.emulateMedia({ media: 'print' });
+          const cas = `${chemin}, ${format}, texte à ${pourcent} %`;
+          const matchs = await lireLesMatchs(onglet);
+          expect(matchs.filter((m) => !m.prochain).length, cas).toBeGreaterThan(chemin === OUVERTE ? 10 : 0);
+          const ecarts = [];
+          for (const m of matchs) {
+            const attendue = (m.prochain ? 15 : 8) * MM * echelle;
+            for (const d of m.dessins) if (Math.abs(d.hauteur - attendue) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.hauteur.toFixed(1)} px de haut au lieu de ${attendue.toFixed(1)}`);
+            if (m.prochain) {
+              if (m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
+              continue;
+            }
+            // À côté de la paire, sa première ligne à hauteur de la paire ; d’un seul tenant quand il tient à côté d’elle (un
+            // nom plus long passe à la ligne à côté d’elle, jamais dessous).
+            if (m.paire.droite > m.texte.gauche + 0.5) ecarts.push(`${m.nom} : le nom n’est pas à côté de la paire`);
+            if (m.texte.milieu < m.paire.haut || m.texte.milieu > m.paire.bas) ecarts.push(`${m.nom} : la paire et le nom ne sont pas sur la même ligne`);
+            if (m.texte.gauche - m.bloc.gauche + m.surUneLigne <= m.bloc.droite - m.bloc.gauche && m.texte.lignes !== 1) ecarts.push(`${m.nom} : sur ${m.texte.lignes} lignes, alors qu’il tient sur une`);
+            // L’heure (sauf « à confirmer ») et la compétition sur la ligne de base du nom, la paire restant en haut.
+            if (!m.aConfirmer && Math.abs(m.ecartHeure) > 0.5) ecarts.push(`${m.nom} : l’heure à ${m.ecartHeure.toFixed(1)} px de la ligne de base du nom`);
+            if (Math.abs(m.ecartCompetition) > 0.5) ecarts.push(`${m.nom} : la compétition à ${m.ecartCompetition.toFixed(1)} px de la ligne de base du nom`);
+            if (Math.abs(m.paire.haut - m.bloc.haut) > 0.5) ecarts.push(`${m.nom} : la paire n’est pas en haut`);
           }
-          // À côté de la paire, sa première ligne à hauteur de la paire ; d’un seul tenant quand il tient à côté d’elle (un
-          // nom plus long passe à la ligne à côté d’elle, jamais dessous).
-          if (m.paire.droite > m.texte.gauche + 0.5) ecarts.push(`${m.nom} : le nom n’est pas à côté de la paire`);
-          if (m.texte.milieu < m.paire.haut || m.texte.milieu > m.paire.bas) ecarts.push(`${m.nom} : la paire et le nom ne sont pas sur la même ligne`);
-          if (m.texte.gauche - m.bloc.gauche + m.surUneLigne <= m.bloc.droite - m.bloc.gauche && m.texte.lignes !== 1) ecarts.push(`${m.nom} : sur ${m.texte.lignes} lignes, alors qu’il tient sur une`);
+          expect(ecarts, cas).toEqual([]);
+          if (chemin === OUVERTE) expect(matchs.filter((m) => m.texte.lignes === 1).length, cas).toBeGreaterThan(10);
         }
-        expect(ecarts, cas).toEqual([]);
-        if (chemin === OUVERTE) expect(matchs.filter((m) => m.texte.lignes === 1).length, cas).toBeGreaterThan(10);
       }
     }
     await onglet.emulateMedia({ media: 'screen' });
   });
 
-  test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi', async ({ page: onglet }) => {
+  // Imprimée plus étroite que l’A4 (une échelle de 110 % et plus dans la fenêtre d’impression, ou l’A5 : 124 mm
+  // imprimables), émulée de même : le jour au-dessus de ses matchs, la paire au-dessus du nom, et aucun nom de club coupé
+  // en plein mot (à 124 mm, « Arsenal » et « Chelsea » se coupaient lettre par lettre), texte à 100 et à 200 %.
+  test('imprimée plus étroite que l’A4 (échelle de 110 à 150 %, ou A5) : la paire au-dessus du nom, aucun nom de club coupé en plein mot', async ({ page: onglet }) => {
+    const MM = 96 / 25.4;
+    const ecarts = [];
+    for (const chemin of [OUVERTE, AFFICHE_DU_ZINC]) {
+      for (const [papier, largeur] of [['A4 à 110 %', 186 / 1.1], ['A4 à 125 %', 186 / 1.25], ['A4 à 135 %', 186 / 1.35], ['A5', 124]]) {
+        for (const pourcent of [100, 200]) {
+          await onglet.emulateMedia({ media: 'screen' });
+          await onglet.setViewportSize({ width: Math.round(largeur * MM), height: 1200 });
+          await onglet.goto(`${serveur.adresse}${chemin}`);
+          await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          await onglet.emulateMedia({ media: 'print' });
+          const cas = `${chemin}, ${papier}, texte à ${pourcent} %`;
+          const lignes = (await lireLesMatchs(onglet)).filter((m) => !m.prochain);
+          expect(lignes.length, cas).toBeGreaterThan(chemin === OUVERTE ? 10 : 0);
+          for (const m of lignes) if (m.paire.bas > m.texte.haut + 0.5) ecarts.push(`${cas}, ${m.nom} : la paire n’est pas au-dessus du nom`);
+          for (const m of await motsDesNoms(onglet)) ecarts.push(...m.ecarts.map((ecart) => `${cas}, ${m.nom} : ${ecart}`));
+        }
+      }
+    }
+    await onglet.emulateMedia({ media: 'screen' });
+    expect(ecarts).toEqual([]);
+  });
+
+  test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi ; texte à 100 et à 200 %', async ({ page: onglet }) => {
     const ailleurs = surveiller(onglet);
-    await onglet.goto(`${serveur.adresse}${OUVERTE}`);
-    const cases = onglet.locator('.affiche-case');
-    for (let i = 0; i < 14; i += 1) await cases.nth(i).check();
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A4' }))).toBe(1);
-    await onglet.locator('#affiche-a3').check();
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A3' }))).toBe(1);
-    await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A4' }))).toBe(1);
-    await onglet.locator('#affiche-a3').check();
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A3' }))).toBe(1);
+    for (const pourcent of [100, 200]) {
+      const texte = (p) => { document.documentElement.style.fontSize = `${p}%`; };
+      await onglet.goto(`${serveur.adresse}${OUVERTE}`);
+      await onglet.evaluate(texte, pourcent);
+      const cases = onglet.locator('.affiche-case');
+      for (let i = 0; i < 14; i += 1) await cases.nth(i).check();
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A4' })), `la semaine, A4, ${pourcent} %`).toBe(1);
+      await onglet.locator('#affiche-a3').check();
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A3' })), `la semaine, A3, ${pourcent} %`).toBe(1);
+      await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
+      await onglet.evaluate(texte, pourcent);
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A4' })), `un bar, A4, ${pourcent} %`).toBe(1);
+      await onglet.locator('#affiche-a3').check();
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A3' })), `un bar, A3, ${pourcent} %`).toBe(1);
+    }
     expect(ailleurs).toEqual([]);
   });
 
@@ -652,4 +756,71 @@ test.describe('dans le navigateur', () => {
       expect(jsQR(Uint8ClampedArray.from(pixels), largeur, hauteur)?.data, chemin).toBe(attendu);
     }
   });
+});
+
+// ---------- Les noms longs, dans le navigateur ----------
+
+// Aucun mot coupé sur l’aperçu des affiches : chaque mot d’un nom de club (un Range par mot) tient sur une seule ligne et
+// reste dans sa colonne. Tous les 2 px, sans recharger (la feuille suit la fenêtre) : texte à 100 % de 320 à 1280 px ;
+// à 150 et 200 % de 560 à 1280 px (là où « Juvent/us » et « Monac/o » se coupaient, de 720 à 760 px, et où un seuil
+// reculé de 4 px coupait de nouveau des noms, sur 4 px). Au téléphone avec le texte agrandi, la feuille est plus étroite
+// qu’un mot de 15 lettres larges, qui passe alors à la ligne (styles.css) : de 400 à 558 px, texte de 125 à 200 %, les
+// noms réels seulement (« Nordsjælland », 12 lettres, y reste entier ; sous 388 px à 200 %, il se coupe).
+// La semaine remplie, avec le nom le plus long que le générateur a publié (« Deportivo Alavés »), son mot le plus long
+// (« Nordsjælland »), un nom à trait d’union (« Saint-Étienne ») et un nom inventé de 15 lettres sans espace
+// (« Montwermalbourg ») face à la compétition la plus longue (« Trophée des champions ») ; sur l’affiche d’un bar, ses
+// lignes (le Zinc des Amis) et son grand prochain match (le Café des Sports).
+const NOM_INVENTE = 'Montwermalbourg';
+const NOMS_LONGS = [
+  ['m-ala-mwb', '2026-10-24T16:15:00Z', 'Trophée des Champions', 'Deportivo Alavés', NOM_INVENTE],
+  ['m-mwb-juv', '2026-10-26T18:00:00Z', 'UEFA Conference League', NOM_INVENTE, 'Juventus'],
+  ['m-mon-nor', '2026-10-28T20:00:00Z', 'UEFA Champions League', 'AS Monaco', 'FC Nordsjælland'],
+  ['m-ste-lor', '2026-10-25T12:00:00Z', 'Ligue 1', 'AS Saint-Étienne', 'FC Lorient'],
+];
+const SOIREES_DES_NOMS_LONGS = [['b-zinc', 'm-mon-bre'], ['b-zinc', 'm-mwb-juv'], ['b-zinc', 'm-mon-nor'], ['b-zinc', 'm-rma-juv'], ['b-rennes', 'm-ala-mwb'], ['b-rennes', 'm-mwb-juv']];
+const AFFICHE_DE_RENNES = '/bar/le-cafe-des-sports-rennes/affiche/';
+// Les balayages : [texte en %, de, à (px), les noms réels seulement].
+const BALAYAGES = [[100, 320, 1280, false], [150, 560, 1280, false], [200, 560, 1280, false], ...[125, 150, 175, 200].map((p) => [p, 400, 558, true])];
+
+test.describe('les noms longs, dans le navigateur', () => {
+  let site;
+  test.beforeAll(async () => {
+    const dossier = dossierVide();
+    const scenario = scenarioCharge();
+    for (const [id, startAt, league, homeTeam, awayTeam] of NOMS_LONGS) scenario.matches.push({ id, startAt, league, homeTeam, awayTeam });
+    for (const [bar, match] of SOIREES_DES_NOMS_LONGS) scenario.matchNights.push({ id: `n-${bar}-${match}`, status: 'OPEN', bar: { id: bar }, match: { id: match }, offer: null });
+    await construireLeSiteDExemple(dossier, { rendu: null });
+    await construire({ source: ecrireLeScenario(scenario), sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr, accepterLesSuppressions: true });
+    site = await demarrerServeur(await portLibre(), -1, { dossier });
+  });
+  test.afterAll(async () => { await site?.arreter(); });
+
+  const AFFICHES = [
+    ['l’affiche de la semaine', OUVERTE, { lignes: ['Deportivo Alavés – Montwermalbourg', 'Montwermalbourg – Juventus', 'Monaco – Nordsjælland', 'Saint-Étienne – Lorient', 'Real Madrid – Juventus', 'Monaco – Brest'] }],
+    ['l’affiche d’un bar', AFFICHE_DU_ZINC, { lignes: ['Monaco – Brest', 'Montwermalbourg – Juventus', 'Monaco – Nordsjælland', 'Real Madrid – Juventus'], grand: 'PSG – Barça' }],
+    ['le grand prochain match d’un bar', AFFICHE_DE_RENNES, { lignes: ['Montwermalbourg – Juventus'], grand: 'Deportivo Alavés – Montwermalbourg' }],
+  ];
+  for (const [nom, chemin, attendu] of AFFICHES) {
+    test(`${nom}, tous les 2 px, texte à 100 % dès 320 px, à 150 et 200 % dès 560 px, les noms réels dès 400 px de 125 à 200 % : chaque mot d’un nom de club sur une seule ligne, dans sa colonne`, async ({ page: onglet }) => {
+      test.setTimeout(180_000);
+      await onglet.setViewportSize({ width: 320, height: 800 });
+      await onglet.goto(`${site.adresse}${chemin}`);
+      await onglet.evaluate(() => document.fonts.ready);
+      const ecarts = [];
+      for (let largeur = 320; largeur <= 1280; largeur += 2) {
+        const ici = BALAYAGES.filter(([, de, a]) => largeur >= de && largeur <= a);
+        if (!ici.length) continue;
+        await onglet.setViewportSize({ width: largeur, height: 800 });
+        for (const [pourcent, , , reels] of ici) {
+          await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          const matchs = await motsDesNoms(onglet);
+          const cas = `${largeur} px, ${pourcent} %`;
+          expect(matchs.filter((m) => !m.grand).map((m) => m.nom), cas).toEqual(expect.arrayContaining(attendu.lignes));
+          expect(matchs.filter((m) => m.grand).map((m) => m.nom), cas).toEqual(attendu.grand ? [attendu.grand] : []);
+          for (const m of matchs) ecarts.push(...m.ecarts.filter((ecart) => !reels || !ecart.includes(`« ${NOM_INVENTE} »`)).map((ecart) => `${cas}, ${m.nom} : ${ecart}`));
+        }
+      }
+      expect(ecarts).toEqual([]);
+    });
+  }
 });

@@ -48,11 +48,11 @@ export const lireLeCadre = () => {
 // contenu : du HTML déjà échappé.
 const lien = (href, contenu, chemin, classe = '') => `<a${classe ? ` class="${classe}"` : ''} href="${href}"${href === chemin ? ' aria-current="page"' : ''}>${contenu}</a>`;
 
-// L’en-tête. action : null (l’accueil, « Pour les bars », les pages légales, la page introuvable, les affiches),
-// « ambre » ou « contour ». cible : où mène « Préviens-moi » (la liste d’attente de l’accueil, ou celle de la page quand
-// elle a la sienne). Dans le HTML, « Préviens-moi » vient avant le menu : au téléphone, il est en haut, à côté du logo,
-// et le menu en dessous ; à l’ordinateur, styles.css le met au bout de la ligne. Une page en anglais garde l’en-tête en
-// français, et le dit.
+// L’en-tête. action : null (l’accueil, « Pour les bars », les pages légales, la page introuvable, les affiches, les pages
+// en anglais), « ambre » ou « contour ». cible : où mène « Préviens-moi » (la liste d’attente de l’accueil, ou celle de
+// la page quand elle a la sienne). Dans le HTML, « Préviens-moi » vient avant le menu : au téléphone, il est en haut, à
+// côté du logo, et le menu en dessous ; à l’ordinateur, styles.css le met au bout de la ligne. Une page en anglais garde
+// l’en-tête en français, et le dit.
 export const entete = (cadre, { chemin = '', action = null, cible = '/#attente', langue = 'fr' } = {}) => {
   const m = cadre.textes.menu;
   const entree = (href, texte) => `<li>${lien(href, e(texte), chemin, 'menu__lien')}</li>`;
@@ -83,9 +83,9 @@ export const aUnBoutonAmbre = (html) => [...html.matchAll(/\sclass="([^"]*)"/g)]
   .map(([, classes]) => classes.split(/\s+/))
   .some((classes) => classes.some((c) => AMBRES.has(c)) && !classes.some((c) => DE_VERRE.has(c)));
 export const actionDeLaPage = (contenu) => (aUnBoutonAmbre(contenu) ? 'contour' : 'ambre');
-// Les pages du générateur portent « Préviens-moi », sauf les affiches à imprimer et la feuille du patron (/affiche/) :
-// elles servent au patron d’un bar.
-export const pageDuGenerateurAvecLAction = (chemin) => !chemin.includes('/affiche/');
+// Les pages du générateur portent « Préviens-moi », sauf les affiches à imprimer et la feuille du patron (/affiche/),
+// qui servent au patron d’un bar, et les pages en anglais (/en/), qui ont leur liste d’attente en anglais.
+export const pageDuGenerateurAvecLAction = (chemin) => !chemin.includes('/affiche/') && !chemin.startsWith('/en/');
 // Une page qui a sa propre liste d’attente (une ville) : « Préviens-moi » mène à elle, sur la page.
 export const cibleDeLAction = (contenu) => (/<form\b[^>]*\bid="attente"/.test(contenu) ? '#attente' : '/#attente');
 

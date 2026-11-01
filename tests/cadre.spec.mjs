@@ -221,18 +221,28 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
     if (site) rmSync(site.dossier, { recursive: true, force: true });
   });
 
-  test('sur les pages décidées, et seulement elles ; sur toutes les pages des matchs, sauf les affiches', async () => {
+  test('sur les pages décidées, et seulement elles ; sur toutes les pages des matchs, sauf les affiches et les pages en anglais', async () => {
     for (const p of PAGES_DU_CADRE) {
       expect(actionDe(lire(p.fichier)) !== null, p.chemin).toBe(AVEC_L_ACTION.includes(p.chemin));
     }
     const { pages } = await scenario();
     const avecUnEntete = pagesHtml(pages);
     expect(avecUnEntete.some((p) => p.chemin.includes('/affiche/'))).toBe(true);
-    for (const p of avecUnEntete) expect(actionDe(p.contenu) !== null, p.chemin).toBe(!p.chemin.includes('/affiche/'));
+    for (const p of avecUnEntete) expect(actionDe(p.contenu) !== null, p.chemin).toBe(!p.chemin.includes('/affiche/') && !p.chemin.startsWith('/en/'));
   });
 
-  // Une page qui a sa propre liste d’attente (une ville, et sa version anglaise) : « Préviens-moi » mène à elle, sur la
-  // page ; ailleurs, à celle de l’accueil. Son nom dit de quoi on est prévenu.
+  // Une page en anglais a sa liste d’attente en anglais (« Notify me ») : l’en-tête, resté en français, n’y ajoute pas
+  // un « Préviens-moi » en tête de page.
+  test('aucune page en anglais n’a « Préviens-moi » dans son en-tête', async () => {
+    const { pages } = await scenario();
+    const enAnglais = pagesHtml(pages).filter((p) => p.chemin.startsWith('/en/'));
+    expect(enAnglais.length, 'des pages en anglais').toBeGreaterThan(3);
+    expect(enAnglais.filter((p) => actionDe(p.contenu) !== null).map((p) => p.chemin)).toEqual([]);
+    for (const p of enAnglais) expect(p.contenu, p.chemin).toContain('id="attente"');
+  });
+
+  // Une page qui a sa propre liste d’attente (une ville) : « Préviens-moi » mène à elle, sur la page ; ailleurs, à celle
+  // de l’accueil. Son nom dit de quoi on est prévenu.
   test('vers la liste d’attente de la page quand elle en a une, sinon vers celle de l’accueil', async () => {
     const lien = (html) => html.match(ENTETE)[0].match(/<a class="entete__attente[^"]*" href="([^"]+)">([\s\S]*?)<\/a>/);
     const { pages } = await scenario();
@@ -252,7 +262,7 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
 
   // Tel qu’il est peint : une page qui montre un bouton ambre (hors de l’en-tête et du pied) a « Préviens-moi » en
   // contour, sinon en ambre ; le contour se voit à 3:1, son texte à 4,5:1.
-  const CHEMINS_GENERES = ['/matchs/', '/ce-soir/', '/matchs/psg-ol-2026-10-25/', '/regarder-le-match/paris/', '/matchs/club/psg/', '/agenda/', '/en/'];
+  const CHEMINS_GENERES = ['/matchs/', '/ce-soir/', '/matchs/psg-ol-2026-10-25/', '/regarder-le-match/paris/', '/matchs/club/psg/', '/agenda/'];
   for (const largeur of [390, 1280]) {
     for (const chemin of [...AVEC_L_ACTION, ...CHEMINS_GENERES]) {
       test(`${chemin} à ${largeur} px : ambre seulement si la page n’a pas déjà son bouton ambre`, async ({ page }) => {

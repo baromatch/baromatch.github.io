@@ -72,8 +72,9 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
   : corps);
 
 // L’en-tête et le pied de page : ceux de cadre.mjs, avec « Préviens-moi » (ambre, ou en contour si le corps a déjà son
-// bouton ambre ; vers la liste d’attente de la page quand elle en a une), sauf sur les affiches. Une page en anglais
-// garde l’en-tête et le pied du site, en français : ils le disent (lang="fr"). Les identifiants des insignes de la page
+// bouton ambre ; vers la liste d’attente de la page quand elle en a une), sauf sur les affiches et les pages en anglais
+// (pageDuGenerateurAvecLAction). Une page en anglais garde l’en-tête et le pied du site, en français : ils le disent
+// (lang="fr"). Les identifiants des insignes de la page
 // (le corps et le pied) sont uniques (identifiantsUniques).
 export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => {
   const contenu = avecLePartage(corps, { partage, titre, chemin, textesDuPartage });

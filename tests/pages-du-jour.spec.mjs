@@ -402,16 +402,17 @@ const deuxPolices = async (browser, baseURL, chemin, largeur) => {
 };
 
 // Presse, de 320 à 1 440 px, toutes les 1 px (avant : de 480 px, toutes les 8 px, qui ne voyaient rien sous 480 px), texte
-// à 100 et 200 % : le titre, le chapô et la phrase des droits ont la même hauteur dans les deux polices, et le sommaire
-// autant de rangées ; à 100 %, les deux boutons et la ligne des bars aussi (à 200 %, ils sont sous le premier écran).
+// à 100 et 200 % : le titre et le chapô ont la même hauteur dans les deux polices, et le sommaire autant de rangées ; à
+// 100 %, les deux boutons, la ligne des bars et la phrase des droits (sous les boutons depuis le 1er novembre) aussi (à
+// 200 %, ils sont sous le premier écran).
 // Avant : 214 écarts. Un texte de l’ouverture qui change peut tomber sur une largeur où les polices coupent autrement :
 // ce test le dit, et le pas de presse.css se recale (une largeur où les trois polices coupent pareil).
-const OUVERTURE_DE_PRESSE = ['.presse__titre', '.presse__chapo', '.presse__chapo + p', '.presse__actions', '.presse__bar'];
+const OUVERTURE_DE_PRESSE = ['.presse__titre', '.presse__chapo', '.presse__actions', '.presse__bar', '.presse__bar + p'];
 for (const pourcent of [100, 200]) {
   test(`Presse, de 320 à 1 440 px, texte à ${pourcent} % : l’ouverture garde ses lignes et le sommaire ses rangées quand la police arrive`, async ({ browser, baseURL }) => {
     test.setTimeout(300_000);
     const { onglets, fermer } = await deuxPolices(browser, baseURL, '/presse.html', 320);
-    const blocs = pourcent === 100 ? OUVERTURE_DE_PRESSE : OUVERTURE_DE_PRESSE.slice(0, 3);
+    const blocs = pourcent === 100 ? OUVERTURE_DE_PRESSE : OUVERTURE_DE_PRESSE.slice(0, 2);
     const lire = (onglet) => onglet.evaluate((selecteurs) => [...selecteurs.map((s) => document.querySelector(s).getBoundingClientRect().height),
       new Set([...document.querySelectorAll('.presse__sommaire li')].map((li) => Math.round(li.getBoundingClientRect().top))).size], blocs);
     const ecarts = [];
@@ -540,7 +541,9 @@ for (const { chemin } of PAGES) for (const [debut, fin, pas] of LARGEURS_DES_LIE
       for (const pourcent of [100, 150, 200]) {
         await agrandir(page, pourcent);
         const lu = await page.evaluate(toucherLesLiens);
-        expect(lu.liens, `${largeur} px, ${pourcent} %`).toBe(7);
+        // Sept liens pris dans une phrase ; sur Presse sous 360 px, « Proposer mon bar » passe sous sa question, seul sur sa
+        // ligne (presse.css, pour que rien ne bouge quand la police arrive) : il n’est plus pris dans une phrase.
+        expect(lu.liens, `${largeur} px, ${pourcent} %`).toBe(chemin === '/presse.html' && largeur < 360 ? 6 : 7);
         fautes.push(...lu.fautes.map((f) => `${largeur} px, ${pourcent} % : ${f}`));
       }
     }

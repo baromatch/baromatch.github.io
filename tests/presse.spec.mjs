@@ -14,7 +14,7 @@ import { MOT_DU_FONDATEUR, motPourMot, SIGNATURE_DU_FONDATEUR } from './outils/f
 const PAGE = '/presse.html';
 const ORIGINE = 'https://baromatch.fr';
 const MARQUE = JSON.parse(readFileSync(path.join(racine, 'marque.json'), 'utf8'));
-const PHRASE_DROITS = 'Les logos, les captures et l’affiche de cette page peuvent être utilisés pour parler de Baromatch, sans les modifier.';
+const PHRASE_DROITS = 'Les logos, les captures, l’affiche et le texte à copier de cette page peuvent être repris pour parler de Baromatch : les images sans les modifier, le texte sans en changer le sens.';
 const normaliser = (texte) => texte.replace(/[\s  ]+/g, ' ').trim();
 
 test.use({ javaScriptEnabled: false });
@@ -260,7 +260,7 @@ test('le film en texte, les droits des visuels, et une adresse qui passe à la l
   for (const html of adresses) expect(html).toBe('contact@<wbr>baromatch.fr');
 });
 
-test('les droits du kit presse : la phrase du propriétaire, citée mot pour mot dans les mentions légales, et plus de « libres d’utilisation »', async ({ page }) => {
+test('les droits du kit presse : la phrase du propriétaire, texte à copier compris, citée mot pour mot dans les mentions légales, et plus de « libres d’utilisation »', async ({ page }) => {
   const lire = (fichier) => readFileSync(path.join(racine, fichier), 'utf8');
   const texteDe = (html) => normaliser(html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' '));
   const phrase = texteDe(lire('presse.html').match(/<p>(Les logos, les captures[^<]*)<\/p>/)[1]);
@@ -273,7 +273,9 @@ test('les droits du kit presse : la phrase du propriétaire, citée mot pour mot
   await page.goto('/mentions-legales.html');
   expect(normaliser(await page.locator('main').textContent())).toContain(`« ${phrase} »`);
   await expect(page.locator('main a[href="/presse.html"]')).toHaveText('page Presse');
-  await expect(page.locator('.document__date')).toHaveText('Mises à jour le 29 octobre 2026');
+  // Les mentions sont datées du jour de la nouvelle phrase, sur la page et dans le plan du site.
+  await expect(page.locator('.document__date')).toHaveText('Mises à jour le 1er novembre 2026');
+  expect(lire('sitemap.xml')).toContain('<url><loc>https://baromatch.fr/mentions-legales.html</loc><lastmod>2026-11-01</lastmod></url>');
   // Le film reste à regarder : aucun lien de téléchargement vers le MP4.
   expect(await page.locator('a[download][href$=".mp4"]').count()).toBe(0);
   // L’ancienne formule n’est plus nulle part dans les fichiers publiés.
@@ -283,7 +285,11 @@ test('les droits du kit presse : la phrase du propriétaire, citée mot pour mot
     if (e.isDirectory()) return publies(chemin);
     return /\.(html|txt|md|json|xml|js|css)$/.test(e.name) ? [chemin] : [];
   });
-  for (const fichier of publies('.')) expect(lire(fichier), fichier).not.toContain('libres d’utilisation');
+  // Ni « libres d’utilisation », ni l’ancienne phrase des droits (le 1er novembre, le texte à copier y entre).
+  for (const fichier of publies('.')) {
+    expect(lire(fichier), fichier).not.toContain('libres d’utilisation');
+    expect(lire(fichier), fichier).not.toContain('peuvent être utilisés pour parler de Baromatch');
+  }
 });
 
 // L’ouverture dit à qui écrire : un seul bouton ambre, pour la presse (le visiteur de cette page), puis le partenariat

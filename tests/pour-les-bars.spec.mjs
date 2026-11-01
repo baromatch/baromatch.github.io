@@ -376,10 +376,11 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await expect(ouverture).not.toContainText('Premiers bars à Paris');
   });
 
-  // Sur un iPhone (393 × 659 de page, sous la barre du navigateur) et un Pixel 7 (412 × 839), « Gratuit pendant le
-  // lancement, sans engagement. » se lit sans défiler (sous la ligne d’état, elle commençait à 702 px), et le bouton
-  // « Proposer mon bar » est entier dans le premier écran (le prix remonté l’avait poussé de 13 px sous le bas de l’iPhone).
-  for (const [appareil, largeur, hauteur] of [['un iPhone', 393, 659], ['un Pixel 7', 412, 839]]) {
+  // Sur un iPhone (393 × 659 de page, sous la barre du navigateur), un Pixel 7 (412 × 839) et un Android de 360 px
+  // (360 × 640, sous les barres de Chrome), « Gratuit pendant le lancement, sans engagement. » se lit sans défiler (sous
+  // la ligne d’état, elle commençait à 702 px), et le bouton « Proposer mon bar » est entier dans le premier écran (le
+  // prix remonté l’avait poussé de 13 px sous le bas de l’iPhone ; le menu sous le logo, de 6 px sous celui d’Android).
+  for (const [appareil, largeur, hauteur] of [['un iPhone', 393, 659], ['un Pixel 7', 412, 839], ['un Android de 360 px', 360, 640]]) {
     test(`à ${largeur} × ${hauteur}, comme ${appareil} : « Gratuit pendant le lancement, sans engagement. » en gras et le bouton « Proposer mon bar » dans le premier écran`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: hauteur });
       await page.goto(PAGE);

@@ -88,7 +88,8 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-competition { grid-area: competition; color: var(--encre-douce); font-size: 0.875rem; font-weight: 600; }
 /* À l’écran, en rem (texte agrandi compris) : chaque disposition garde entier un mot de 11,55 rem (15 lettres
    larges) à côté de l’heure (4,25 rem + 62 px), de la paire (74 px), de la compétition (10,25 rem) ; le jour
-   (8,5 rem + 16 px) à gauche s’il reste l’heure à côté du nom. */
+   (8,5 rem + 16 px) à gauche s’il reste l’heure à côté du nom. Au téléphone, texte agrandi, la feuille peut être
+   plus étroite que ce mot. */
 @media screen {
   @container (width >= calc(24.3rem + 78px)) { .affiche-jour { grid-template-columns: 8.5rem minmax(0, 1fr); } }
   @container ligne (width < calc(15.8rem + 62px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }

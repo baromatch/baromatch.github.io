@@ -411,7 +411,9 @@ test('la page des bars mène à l’affiche de la semaine, une fois avant le for
 
 // ---------- Dans le navigateur ----------
 
-// Chaque match visible : son nom, et chacun de ses mots coupé (sur plus d’une ligne) ou sorti de sa colonne.
+// Chaque match visible : son nom, et chacun de ses mots coupé (sur plus d’une ligne) ou sorti de sa colonne. Un nom à
+// trait d’union peut passer à la ligne après son trait (« Saint- », puis « Étienne »), comme en typographie : ses
+// parties sont des mots, chacun d’un seul tenant.
 const motsDesNoms = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('.affiche-match, .affiche-prochain__match')].filter((b) => b.getClientRects().length).map((bloc) => {
   const colonne = bloc.getBoundingClientRect();
   const ecarts = [];
@@ -420,7 +422,7 @@ const motsDesNoms = (onglet) => onglet.evaluate(() => [...document.querySelector
   for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
     if (n.parentElement.closest('svg')) continue;
     nom += n.data;
-    for (const mot of n.data.matchAll(/[^\s–]+/g)) {
+    for (const mot of n.data.matchAll(/[^\s–-]+/g)) {
       const plage = document.createRange();
       plage.setStart(n, mot.index);
       plage.setEnd(n, mot.index + mot[0].length);
@@ -759,18 +761,26 @@ test.describe('dans le navigateur', () => {
 // ---------- Les noms longs, dans le navigateur ----------
 
 // Aucun mot coupé sur l’aperçu des affiches : chaque mot d’un nom de club (un Range par mot) tient sur une seule ligne et
-// reste dans sa colonne, texte à 100 et à 200 %, de 720 à 800 px toutes les 4 px (où « Juvent/us » et « Monac/o » se
-// coupaient), et de 560 à 1280 px toutes les 20 px. La semaine remplie, avec le nom le plus long que le générateur a
-// publié (« Deportivo Alavés »), son mot le plus long (« Nordsjælland ») et un nom inventé de 15 lettres sans espace
+// reste dans sa colonne. Tous les 2 px, sans recharger (la feuille suit la fenêtre) : texte à 100 % de 320 à 1280 px ;
+// à 150 et 200 % de 560 à 1280 px (là où « Juvent/us » et « Monac/o » se coupaient, de 720 à 760 px, et où un seuil
+// reculé de 4 px coupait de nouveau des noms, sur 4 px). Au téléphone avec le texte agrandi, la feuille est plus étroite
+// qu’un mot de 15 lettres larges, qui passe alors à la ligne (styles.css) : de 400 à 558 px, texte de 125 à 200 %, les
+// noms réels seulement (« Nordsjælland », 12 lettres, y reste entier ; sous 388 px à 200 %, il se coupe).
+// La semaine remplie, avec le nom le plus long que le générateur a publié (« Deportivo Alavés »), son mot le plus long
+// (« Nordsjælland »), un nom à trait d’union (« Saint-Étienne ») et un nom inventé de 15 lettres sans espace
 // (« Montwermalbourg ») face à la compétition la plus longue (« Trophée des champions ») ; sur l’affiche d’un bar, ses
 // lignes (le Zinc des Amis) et son grand prochain match (le Café des Sports).
+const NOM_INVENTE = 'Montwermalbourg';
 const NOMS_LONGS = [
-  ['m-ala-mwb', '2026-10-24T16:15:00Z', 'Trophée des Champions', 'Deportivo Alavés', 'Montwermalbourg'],
-  ['m-mwb-juv', '2026-10-26T18:00:00Z', 'UEFA Conference League', 'Montwermalbourg', 'Juventus'],
+  ['m-ala-mwb', '2026-10-24T16:15:00Z', 'Trophée des Champions', 'Deportivo Alavés', NOM_INVENTE],
+  ['m-mwb-juv', '2026-10-26T18:00:00Z', 'UEFA Conference League', NOM_INVENTE, 'Juventus'],
   ['m-mon-nor', '2026-10-28T20:00:00Z', 'UEFA Champions League', 'AS Monaco', 'FC Nordsjælland'],
+  ['m-ste-lor', '2026-10-25T12:00:00Z', 'Ligue 1', 'AS Saint-Étienne', 'FC Lorient'],
 ];
 const SOIREES_DES_NOMS_LONGS = [['b-zinc', 'm-mon-bre'], ['b-zinc', 'm-mwb-juv'], ['b-zinc', 'm-mon-nor'], ['b-zinc', 'm-rma-juv'], ['b-rennes', 'm-ala-mwb'], ['b-rennes', 'm-mwb-juv']];
 const AFFICHE_DE_RENNES = '/bar/le-cafe-des-sports-rennes/affiche/';
+// Les balayages : [texte en %, de, à (px), les noms réels seulement].
+const BALAYAGES = [[100, 320, 1280, false], [150, 560, 1280, false], [200, 560, 1280, false], ...[125, 150, 175, 200].map((p) => [p, 400, 558, true])];
 
 test.describe('les noms longs, dans le navigateur', () => {
   let site;
@@ -786,34 +796,31 @@ test.describe('les noms longs, dans le navigateur', () => {
   test.afterAll(async () => { await site?.arreter(); });
 
   const AFFICHES = [
-    ['l’affiche de la semaine', OUVERTE, { lignes: ['Deportivo Alavés – Montwermalbourg', 'Montwermalbourg – Juventus', 'Monaco – Nordsjælland', 'Real Madrid – Juventus', 'Monaco – Brest'] }],
+    ['l’affiche de la semaine', OUVERTE, { lignes: ['Deportivo Alavés – Montwermalbourg', 'Montwermalbourg – Juventus', 'Monaco – Nordsjælland', 'Saint-Étienne – Lorient', 'Real Madrid – Juventus', 'Monaco – Brest'] }],
     ['l’affiche d’un bar', AFFICHE_DU_ZINC, { lignes: ['Monaco – Brest', 'Montwermalbourg – Juventus', 'Monaco – Nordsjælland', 'Real Madrid – Juventus'], grand: 'PSG – Barça' }],
     ['le grand prochain match d’un bar', AFFICHE_DE_RENNES, { lignes: ['Montwermalbourg – Juventus'], grand: 'Deportivo Alavés – Montwermalbourg' }],
   ];
-  const PLAGES = [
-    ['de 720 à 800 px, toutes les 4 px', Array.from({ length: 21 }, (_, i) => 720 + 4 * i)],
-    ['de 560 à 1280 px, toutes les 20 px', Array.from({ length: 37 }, (_, i) => 560 + 20 * i)],
-  ];
   for (const [nom, chemin, attendu] of AFFICHES) {
-    for (const [plage, largeurs] of PLAGES) {
-      test(`${nom}, ${plage}, texte à 100 et 200 % : chaque mot d’un nom de club sur une seule ligne, dans sa colonne`, async ({ page: onglet }) => {
-        test.setTimeout(120_000);
-        const ecarts = [];
-        for (const largeur of largeurs) {
-          await onglet.setViewportSize({ width: largeur, height: 800 });
-          await onglet.goto(`${site.adresse}${chemin}`);
-          await onglet.evaluate(() => document.fonts.ready);
-          for (const pourcent of [100, 200]) {
-            await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
-            const matchs = await motsDesNoms(onglet);
-            const cas = `${largeur} px, ${pourcent} %`;
-            expect(matchs.filter((m) => !m.grand).map((m) => m.nom), cas).toEqual(expect.arrayContaining(attendu.lignes));
-            expect(matchs.filter((m) => m.grand).map((m) => m.nom), cas).toEqual(attendu.grand ? [attendu.grand] : []);
-            for (const m of matchs) ecarts.push(...m.ecarts.map((ecart) => `${cas}, ${m.nom} : ${ecart}`));
-          }
+    test(`${nom}, tous les 2 px, texte à 100 % dès 320 px, à 150 et 200 % dès 560 px, les noms réels dès 400 px de 125 à 200 % : chaque mot d’un nom de club sur une seule ligne, dans sa colonne`, async ({ page: onglet }) => {
+      test.setTimeout(180_000);
+      await onglet.setViewportSize({ width: 320, height: 800 });
+      await onglet.goto(`${site.adresse}${chemin}`);
+      await onglet.evaluate(() => document.fonts.ready);
+      const ecarts = [];
+      for (let largeur = 320; largeur <= 1280; largeur += 2) {
+        const ici = BALAYAGES.filter(([, de, a]) => largeur >= de && largeur <= a);
+        if (!ici.length) continue;
+        await onglet.setViewportSize({ width: largeur, height: 800 });
+        for (const [pourcent, , , reels] of ici) {
+          await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          const matchs = await motsDesNoms(onglet);
+          const cas = `${largeur} px, ${pourcent} %`;
+          expect(matchs.filter((m) => !m.grand).map((m) => m.nom), cas).toEqual(expect.arrayContaining(attendu.lignes));
+          expect(matchs.filter((m) => m.grand).map((m) => m.nom), cas).toEqual(attendu.grand ? [attendu.grand] : []);
+          for (const m of matchs) ecarts.push(...m.ecarts.filter((ecart) => !reels || !ecart.includes(`« ${NOM_INVENTE} »`)).map((ecart) => `${cas}, ${m.nom} : ${ecart}`));
         }
-        expect(ecarts).toEqual([]);
-      });
-    }
+      }
+      expect(ecarts).toEqual([]);
+    });
   }
 });

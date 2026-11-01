@@ -259,6 +259,18 @@ test('comment on choisit les bars : les matchs, les places tenues par le bar, et
   expect(normaliser(await page.locator('#refus + ul').textContent())).toContain(`« ${MENTION_SANTE} »`);
 });
 
+// La page change avec cette version (les captures de l’appli : des chiffres inventés aussi) : datée du jour de sa mise
+// en ligne, le 1er novembre 2026, la même date aux trois endroits (la page, ses données structurées, le plan du site).
+// Avant : le 20 octobre partout, alors qu’elle avait changé depuis.
+test('comment on choisit les bars : datée du 1er novembre 2026, sur la page, dans ses données structurées et dans le plan du site', async ({ page }) => {
+  await page.goto(CONFIANCE);
+  const affichee = normaliser(await page.locator('.document__date').textContent());
+  expect(affichee).toBe('Mise à jour le 1er novembre 2026');
+  const fiche = (await graphe(page)).find((n) => n['@id'] === `${ORIGINE}${CONFIANCE}#page`);
+  expect(fiche.dateModified).toBe(dateIso(affichee));
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain(`<url><loc>${ORIGINE}${CONFIANCE}</loc><lastmod>${dateIso(affichee)}</lastmod></url>`);
+});
+
 // Le pied de page des pages générées (matchs, villes, bars) : le même que celui des pages fixes, les deux pages de
 // confiance comprises. Le générateur écrit son pied lui-même (generateur/gabarits.mjs) : il ne le lit pas dans l’accueil.
 test('les pages générées ont le pied de page commun, avec « À propos » et « Comment on choisit les bars »', async () => {

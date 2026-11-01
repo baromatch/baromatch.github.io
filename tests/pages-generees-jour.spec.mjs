@@ -589,3 +589,13 @@ test.describe('en couleurs forcées', () => {
     });
   }
 });
+
+// Les villes de la liste d’attente (styles.css, comme sur l’accueil) : 8 px de côté à 100 %, comme avant ; plus quand le
+// texte grandit, pour que le bord arrondi ne touche pas le nom (16 px à 200 %).
+test('les villes de la liste d’attente : 8 px de côté à 100 %, 16 px à 200 %', async ({ page: onglet }) => {
+  await ouvrir(onglet, TYPES.find((t) => t.site === 'sansBar' && t.chemin === '/regarder-le-match/paris/'), 390);
+  const cotes = () => onglet.locator('.attente__ville span').evaluateAll((villes) => [...new Set(villes.map((v) => getComputedStyle(v).paddingLeft))]);
+  expect(await cotes()).toEqual(['8px']);
+  await agrandir(onglet, 200);
+  expect((await cotes()).map((c) => Math.round(parseFloat(c)))).toEqual([16]);
+});

@@ -408,7 +408,7 @@ a:hover { color: var(--goutte); }
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  padding: 0 max(8px, 0.58em);
+  padding: 0 max(8px, 0.57em);
   border: 1px solid var(--champ-bord);
   border-radius: 999px;
   font-size: 0.875rem;

@@ -26,6 +26,8 @@ test('Baromatch en bref : le slogan, la phrase et la description de marque.json,
   // Vrai aujourd’hui : en test, Android, Paris, pas encore ouvert ; l’appli ne coûte rien au fan (la boutique, elle,
   // vend des pièces : jamais « tu ne paies rien à Baromatch »).
   if (!MARQUE.appli.ouverte) expect(texte).toContain('L’appli n’est pas encore ouverte au public, ni sur iPhone.');
+  // « ni sur iPhone » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
+  if (texte.includes('ni sur iPhone')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « ni sur iPhone » (Presse, À propos), l’accueil et llms.txt').toBe('');
   const fait = async (nom) => normaliser(await page.locator('.presse__faits > div').filter({ has: page.locator('dt', { hasText: nom }) }).locator('dd').textContent());
   expect(await fait('Pour les fans')).toBe('L’appli ne te coûte rien. Ce que tu prends au bar, tu le paies au bar.');
   expect(await fait('Aujourd’hui')).toMatch(/^En test sur Android, à Paris\./);

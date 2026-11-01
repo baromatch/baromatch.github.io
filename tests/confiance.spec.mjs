@@ -75,6 +75,8 @@ test('à propos : ce qu’est Baromatch avec les mots de marque.json, où il en 
   await expect(page.locator('h1')).toHaveText('Savoir où voir le match avant de sortir, et s’il reste une place.');
   await expect(page.locator('.apropos__ouverture > p.surtitre')).toHaveText('À propos de Baromatch');
   if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle n’est pas encore ouverte au public, ni sur iPhone');
+  // « ni sur iPhone » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
+  if (texte.includes('ni sur iPhone')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « ni sur iPhone » (À propos, Presse), l’accueil et llms.txt').toBe('');
   // L’éditeur, comme les mentions légales le nomment ; ailleurs, le fondateur ne signe que de son prénom (son mot).
   await page.goto('/mentions-legales.html');
   const editeur = normaliser(await page.locator('h2:has-text("Directeur de la publication") + p').textContent());

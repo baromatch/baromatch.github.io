@@ -135,6 +135,18 @@ test.describe('la copie du générateur de l’appli', () => {
     expect(USAGE).toMatch(/--accepter-noms\s+\(facultatif\) accepte les noms nouveaux \(variables, fonctions, clés\) des modules copiés, après les avoir relus/);
   });
 
+  // Ce qui ne se voit pas à l’écran s’écrit en \u{…} dans le refus, dans les chaînes comme dans les noms : une espace
+  // sans chasse (U+200B : « nig », elle, « ht » se lirait « night »), une espace insécable, un caractère qui inverse le
+  // sens de l’écriture, un séparateur de ligne, un antiliant dans un nom. L’espace simple et les lettres accentuées
+  // restent tels quels, les retours à la ligne s’écrivent comme en JSON (\n).
+  test('l’export refusé écrit en \\u{…} chaque caractère qui ne se voit pas, dans les chaînes comme dans les noms', () => {
+    const refus = refusDesNouveautes({ chaines: ['nig\u200Bht', 'mot\u00A0insécable', 'droite\u202Egauche', 'retour à la ligne\n', 'fin\u2028'], noms: ['si\u200Cze', 'taille'] });
+    for (const montre of ['  "nig\\u{200B}ht"', '  "mot\\u{00A0}insécable"', '  "droite\\u{202E}gauche"', '  "retour à la ligne\\n"', '  "fin\\u{2028}"', '  si\\u{200C}ze', '  taille']) {
+      expect(refus.split('\n'), montre).toContain(montre);
+    }
+    expect(refus).not.toMatch(/[\u00A0\u200B\u200C\u202E\u2028]/);
+  });
+
   test('un seul renommage, une règle générale écrite dans la provenance : aucun nom en capitales n’y finit par « _FROM »', () => {
     expect(PROVENANCE.renommage).toBe('Dans la copie, un nom écrit en capitales qui finit par « _FROM » finit par « _AT » ; rien d’autre n’est renommé.');
     for (const fichier of readdirSync(COPIE).filter((f) => f.endsWith('.mjs'))) {

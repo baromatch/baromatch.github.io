@@ -19,11 +19,13 @@
 //  - ne contenir aucun commentaire, et passer le contrôle des documents publics (tests/outils/fuites.mjs) ;
 //  - n’avoir, dans le module de la table, que ses déclarations connues (TETE_DE_LA_TABLE) ;
 //  - n’avoir, dans aucun module copié, de chaîne de texte que la copie commitée (HEAD) n’a pas déjà : une chaîne nouvelle
-//    arrête l’export et s’affiche (toutes, chacune en entier), jusqu’à ce qu’une personne la relise et l’accepte
-//    (--accepter-chaines) ;
+//    arrête l’export et s’affiche (toutes, chacune en entier, ce qui ne se voit pas écrit en \u{…}), jusqu’à ce qu’une
+//    personne la relise et l’accepte (--accepter-chaines) ;
 //  - n’y avoir non plus aucun nom (variable, fonction, paramètre, clé, propriété) que la copie commitée n’a pas déjà : un
 //    nom nouveau arrête l’export de même, jusqu’à ce qu’on l’accepte (--accepter-noms).
 // Sinon rien n’est écrit, et la sortie dit pourquoi. Deux lancements sur les mêmes sources écrivent les mêmes octets.
+// Les nombres, eux, ne sont pas comparés à la copie commitée : un nombre changé dans les sources (une largeur, une
+// position) passe sans relecture, le dessin restant celui du paquet compilé de l’appli (ci-dessus).
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -304,13 +306,19 @@ export const chainesNouvelles = (commitees, copiees) => {
   const avant = new Set(commitees);
   return [...new Set(copiees)].filter((chaine) => !avant.has(chaine)).sort();
 };
+// Ce qui ne se voit pas à l’écran, écrit en \u{…} pour la relecture : les caractères de commande et de format (une
+// espace sans chasse, un changement de sens d’écriture…), toute espace autre que l’espace simple, les séparateurs de
+// ligne et de paragraphe, les caractères privés ou non attribués, et ce que l’affichage ignore (sélecteurs de variante…).
+const INVISIBLE = /(?! )[\p{Cc}\p{Cf}\p{Z}\p{Co}\p{Cn}\p{Default_Ignorable_Code_Point}]/gu;
+const visible = (texte) => texte.replace(INVISIBLE, (c) => `\\u{${c.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}}`);
 // Ce que la relecture doit voir avant que la copie soit écrite : chaque chaîne nouvelle, toutes, en entier, écrite comme
-// en JSON (ses espaces et ses retours à la ligne se voient), et chaque nom nouveau, tous ; chacun avec l’option qui
-// l’accepte. null quand il n’y a rien à relire, ou que tout est accepté.
+// en JSON (ses espaces et ses retours à la ligne se voient), et chaque nom nouveau, tous, l’un et l’autre avec ce qui ne
+// se voit pas écrit en \u{…} ; chacun avec l’option qui l’accepte. null quand il n’y a rien à relire, ou que tout est
+// accepté.
 export const refusDesNouveautes = ({ chaines = [], noms = [] }, { accepterChaines = false, accepterNoms = false } = {}) => {
   const parties = [];
-  if (chaines.length && !accepterChaines) parties.push(`${chaines.length} chaîne(s) de texte nouvelle(s) dans les modules copiés, toutes, en entier (écrites comme en JSON) ; relis-les, puis relance avec --accepter-chaines :\n${chaines.map((c) => `  ${JSON.stringify(c)}`).join('\n')}`);
-  if (noms.length && !accepterNoms) parties.push(`${noms.length} nom(s) nouveau(x) dans les modules copiés (variables, fonctions, clés), tous ; relis-les, puis relance avec --accepter-noms :\n${noms.map((n) => `  ${n}`).join('\n')}`);
+  if (chaines.length && !accepterChaines) parties.push(`${chaines.length} chaîne(s) de texte nouvelle(s) dans les modules copiés, toutes, en entier (écrites comme en JSON, ce qui ne se voit pas en \\u{…}) ; relis-les, puis relance avec --accepter-chaines :\n${chaines.map((c) => `  ${visible(JSON.stringify(c))}`).join('\n')}`);
+  if (noms.length && !accepterNoms) parties.push(`${noms.length} nom(s) nouveau(x) dans les modules copiés (variables, fonctions, clés), tous (ce qui ne se voit pas en \\u{…}) ; relis-les, puis relance avec --accepter-noms :\n${noms.map((n) => `  ${visible(n)}`).join('\n')}`);
   return parties.length ? parties.join('\n') : null;
 };
 // Les modules de la copie commitée (HEAD) : { nom du fichier : son texte } ; rien sans git ou sans copie.

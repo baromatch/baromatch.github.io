@@ -54,8 +54,8 @@ test('la page Confidentialité ne décrit comme destinataire ni Mapbox, ni Fireb
   await expect(page.locator('#prestataires + ul > li', { hasText: /^Sentry/ })).toContainText('une fois qu’on l’a allumé');
   // Les mails d’alerte, par Resend : des chiffres, jamais un fan.
   await expect(page.locator('#prestataires + ul > li', { hasText: /^Resend/ })).toContainText('ils ne disent que la sorte d’alerte et des chiffres, jamais un fan, un pseudo, une adresse mail, un code ni le nom d’un bar');
-  // Les notifications : seuls les rappels programmés par le téléphone.
-  await expect(page.locator('#notifications + ul')).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
+  // Les notifications : tant que celles du serveur ne sont pas allumées, seuls les rappels programmés par le téléphone.
+  await expect(page.locator('#notifications + ul')).toContainText('tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone');
   // Les photos : fermées, et la page sera mise à jour avant.
   expect(texte).toContain('Les photos de profil ne sont pas ouvertes pour l’instant.');
   expect(texte).toContain('Avant de les ouvrir, on mettra cette page à jour');
@@ -105,8 +105,8 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   expect(messages).toContain('Pour ne plus les recevoir, coupe « Messages de Baromatch » dans Réglages : ton accord est retiré.');
   // Couper les notifications du téléphone les cache, sans retirer l’accord gardé avec le compte.
   expect(messages).toContain('Couper les notifications de Baromatch dans les réglages de ton téléphone les cache aussi, sans retirer ton accord.');
-  // Aujourd’hui, rien ne part encore du serveur : la page le dit toujours, juste avant.
-  await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('Notre serveur n’envoie aucune notification sur ton téléphone pour l’instant');
+  // Tant que les notifications du serveur ne sont pas allumées, rien ne part : la page le dit toujours, juste avant.
+  await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone');
   // Sa base est écrite, et le résumé « en clair » des intérêts légitimes, auquel renvoie le droit de s’opposer, la compte.
   const base = page.locator('#pourquoi + p + ul > li', { hasText: 'T’envoyer de temps en temps un message sur un match' });
   await expect(base).toHaveCount(1);
@@ -118,6 +118,42 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   expect(await texteDe(page, '/confidentialite.html')).toContain('« Messages de Baromatch », coupé tant que tu ne l’allumes pas ;');
   expect(await texteDe(page, '/confidentialite.html')).not.toContain('Offres des bars');
   await expect(page.locator('#pourquoi + p + ul a[href="#messages-match"]')).toHaveCount(1);
+});
+
+// Les notifications des iPhone (30 octobre 2026) : une fois qu’on les allume, celles de notre serveur passent par Apple.
+// La page le dit avant : ce qu’Apple reçoit (jamais qui tu es), combien de temps, Apple dans les prestataires et dans
+// les durées ; rien chez Apple pour un téléphone Android, et la page ne nomme Apple nulle part ailleurs.
+test('la page Confidentialité : sur iPhone, les notifications de notre serveur passent par Apple, une fois allumées', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const serveur = normaliser(await page.locator('#notifications + ul > li').nth(1).innerText());
+  expect(serveur).toContain('Les notifications de notre serveur : tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone, et seules tes soirées sonnent, depuis ton téléphone.');
+  expect(serveur).toContain('Sur iPhone, une fois allumées, elles passent par le service de notifications d’Apple (voir ci-dessous).');
+  expect(serveur).toContain('Sur Android, avant qu’elles arrivent, cette page le dira.');
+  await expect(page.locator('#notifications + ul > li').nth(2)).toHaveAttribute('id', 'apple');
+  await expect(page.locator('#notifications + ul > li').nth(1).locator('a[href="#apple"]')).toHaveCount(1);
+  const apple = normaliser(await page.locator('#apple').innerText());
+  expect(apple).toContain('pour chaque notification de notre serveur, le jeton de notifications de ton iPhone, le titre et le texte de la notification (celle des matchs de ton club nomme ton club)');
+  expect(apple).toContain('Jamais ton adresse mail, ton pseudo ni l’identifiant de ton compte.');
+  expect(apple).toContain('Apple garde une notification le temps qu’elle arrive sur ton iPhone, 12 heures au plus.');
+  expect(apple).toContain('Pour un téléphone Android, rien ne part chez Apple.');
+  const prestataire = page.locator('#prestataires + ul > li', { hasText: /^Apple/ });
+  await expect(prestataire).toHaveCount(1);
+  await expect(prestataire).toContainText('transmet à ton iPhone les notifications de notre serveur, une fois qu’on les a allumées');
+  await expect(prestataire).toContainText('Apple est une société américaine.');
+  const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
+  expect(durees).toContain('Les notifications de notre serveur chez Apple, pour un iPhone : le temps qu’elles arrivent, 12 heures au plus.');
+  const choix = normaliser(await page.locator('#notifications + ul > li', { hasText: 'Tes choix, dans Réglages' }).innerText());
+  expect(choix).toContain('Aucune de ces notifications n’arrive sur ton téléphone tant qu’on n’a pas allumé celles de notre serveur.');
+  expect(choix).not.toContain('pour l’instant');
+  // Apple n’est nommé que là : la ligne des notifications du serveur, ce qu’Apple reçoit, ses prestataires, sa durée.
+  const ailleurs = await page.locator('main').evaluate((main) => {
+    const copie = main.cloneNode(true);
+    copie.querySelector('#apple').remove();
+    copie.querySelector('#notifications + ul > li:nth-child(2)').remove();
+    for (const li of copie.querySelectorAll('#prestataires + ul > li, #combien-de-temps ~ ul > li')) if (li.textContent.includes('Apple')) li.remove();
+    return copie.textContent;
+  });
+  expect(ailleurs).not.toMatch(/Apple/);
 });
 
 // Les sauvegardes : faites par nous, chiffrées, effacées une fois leurs 28 jours passés, à la sauvegarde suivante

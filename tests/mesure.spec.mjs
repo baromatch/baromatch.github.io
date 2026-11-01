@@ -192,10 +192,15 @@ test.describe('les pages écrites à la main', () => {
       return appliquerLaMesure({ racine: dossier, maintenant: Date.parse(maintenant) }).changees;
     };
     try {
+      // Un point de départ fixe, avant toutes les dates du scénario : la vraie page peut avoir été mise à jour n’importe
+      // quel jour, même le jour où le scénario fait démarrer la mesure (et alors rien ne changerait).
+      const AVANT = { texte: 'Mise à jour le 20 octobre 2026', jour: '2026-10-20' };
       for (const p of ['index.html', 'confidentialite.html']) writeFileSync(path.join(dossier, p), sansMesure(p));
+      writeFileSync(path.join(dossier, 'confidentialite.html'), readFileSync(path.join(dossier, 'confidentialite.html'), 'utf8').replace(/<p class="document__date">[^<]*<\/p>/, `<p class="document__date">${AVANT.texte}</p>`));
       const depart = date();
-      writeFileSync(path.join(dossier, 'sitemap.xml'), lire('sitemap.xml'));
-      expect(plan()).toContain(ligne(lire('sitemap.xml').match(/confidentialite\.html<\/loc><lastmod>([^<]*)</)[1]));
+      expect(depart).toBe(AVANT.texte);
+      writeFileSync(path.join(dossier, 'sitemap.xml'), lire('sitemap.xml').replace(/(confidentialite\.html<\/loc><lastmod>)[^<]*</, `$1${AVANT.jour}<`));
+      expect(plan()).toContain(ligne(AVANT.jour));
       // Arrêtée, et rien ne change : la date reste.
       expect(avecLaMarque(SANS, '2026-11-01T10:00:00Z')).toEqual([]);
       expect(date()).toBe(depart);

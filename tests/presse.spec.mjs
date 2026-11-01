@@ -180,9 +180,9 @@ test('données structurées : une page « à propos » de l’Organization de l�
   ]);
   // Datée comme la page, et comme le plan du site.
   const affichee = normaliser(await page.locator('.document__date').textContent());
-  expect(affichee).toBe('Mise à jour le 30 octobre 2026');
-  expect(fiche.dateModified).toBe('2026-10-30');
-  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/presse.html</loc><lastmod>2026-10-30</lastmod></url>');
+  expect(affichee).toBe('Mise à jour le 1er novembre 2026');
+  expect(fiche.dateModified).toBe('2026-11-01');
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/presse.html</loc><lastmod>2026-11-01</lastmod></url>');
 });
 
 test('le film en texte, les droits des visuels, et une adresse qui passe à la ligne à 200 %', async ({ page }) => {

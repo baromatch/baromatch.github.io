@@ -59,7 +59,10 @@ for (const chemin of [A_PROPOS, CONFIANCE]) {
     expect(fiche.breadcrumb['@id']).toBe(fil['@id']);
     expect(fiche.inLanguage).toBe('fr-FR');
     expect(fiche.description).toBe(await page.locator('meta[name="description"]').getAttribute('content'));
-    expect(fiche.dateModified).toBe(dateIso(await page.locator('.document__date').textContent()));
+    const date = dateIso(await page.locator('.document__date').textContent());
+    expect(fiche.dateModified).toBe(date);
+    // Et comme le plan du site : la page, ses données structurées et sitemap.xml disent la même date.
+    expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain(`<url><loc>${ORIGINE}${chemin}</loc><lastmod>${date}</lastmod></url>`);
     expect(fil.itemListElement.map((e) => [e.position, e.item])).toEqual([[1, `${ORIGINE}/`], [2, `${ORIGINE}${chemin}`]]);
   });
 }

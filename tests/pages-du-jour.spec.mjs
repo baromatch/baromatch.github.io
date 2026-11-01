@@ -235,7 +235,9 @@ for (const { chemin, feuille, ambre } of PAGES) {
           await page.goto(chemin);
           await chargerLesImages(page);
           const bouge = await page.evaluate(() => ({
-            animations: document.getAnimations().length,
+            // Aucune animation qui joue d’elle-même : celle du bandeau du bas suit le défilement (une ViewTimeline), elle
+            // ne bouge que quand on fait défiler la page.
+            animations: document.getAnimations().filter((a) => !(a.timeline instanceof ViewTimeline || a.timeline instanceof ScrollTimeline)).length,
             mobiles: [...document.querySelectorAll('main, main *')].filter((e) => {
               const s = getComputedStyle(e);
               return s.animationName !== 'none' || s.transitionDuration.split(',').some((d) => parseFloat(d) > 0);
@@ -772,7 +774,9 @@ test('À propos : les titres de rubrique gardent leur casse dans l’arbre d’a
   const cdp = await page.context().newCDPSession(page);
   const { nodes } = await cdp.send('Accessibility.getFullAXTree');
   const titres = nodes.filter((n) => n.role?.value === 'heading' && n.properties?.some((p) => p.name === 'level' && p.value.value === 2)).map((n) => n.name?.value);
-  expect(titres).toEqual(['Pourquoi Baromatch existe', 'Ce que fait l’appli', 'Ce qu’on refuse', 'Le mot du fondateur', 'Où va Baromatch', 'Et maintenant']);
+  // Les six de la page, puis ceux du pied de page rangé (ses rubriques), chacun dans sa casse.
+  expect(titres).toEqual(['Pourquoi Baromatch existe', 'Ce que fait l’appli', 'Ce qu’on refuse', 'Le mot du fondateur', 'Où va Baromatch', 'Et maintenant',
+    'Les matchs', 'Clubs', 'Compétitions', 'Villes', 'Baromatch']);
   expect(await page.locator('.apropos__rail').first().evaluate((e) => getComputedStyle(e).fontVariantCaps)).toBe('all-small-caps');
   // Des petites capitales fabriquées à 70 % : à 1,125 rem, chaque titre est au moins aussi grand que dans ses capitales
   // de 13 px d’avant (la largeur rendue du même texte, en capitales, 0,8125 rem, mêmes graisse et espacement).

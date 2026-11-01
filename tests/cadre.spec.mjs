@@ -80,7 +80,7 @@ test.describe('une seule source pour l’en-tête et le pied', () => {
     const juste = lire(page.fichier);
     const retouches = [
       juste.replace('aria-current="page">À propos</a>', 'aria-current="page">Le projet</a>'),
-      juste.replace('<a class="entete__attente" href="/#attente">', '<a class="entete__attente" href="/#attente" style="color:red">'),
+      juste.replace(/(<a class="entete__attente[^"]*" href="\/#attente")>/, '$1 style="color:red">'),
       juste.replace('<li><a href="/boutique.html">Boutique</a></li>\n', ''),
       juste.replace('<p class="pied__etat">', '<p class="pied__etat">Ouvert · '),
     ];
@@ -143,6 +143,8 @@ test.describe('la page où l’on est', () => {
         const s = getComputedStyle(a);
         return { texte: a.textContent, fond: s.backgroundColor, couleur: s.color, point: getComputedStyle(a, '::before').backgroundColor, autres: [...document.querySelectorAll('.menu__lien:not([aria-current])')].map((l) => getComputedStyle(l).backgroundColor) };
       });
+      // À propos est au jour (<html class="jour">) : la nuit se lit en retirant la classe, le jour en la remettant.
+      await page.evaluate(() => document.documentElement.classList.remove('jour'));
       const nuit = await lirePilule();
       expect(nuit.texte).toBe('À propos');
       expect(nuit.fond).toBe('rgb(247, 247, 249)');

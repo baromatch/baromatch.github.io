@@ -610,6 +610,26 @@ test.describe('la ligne d’état du pied de page suit marque.json', () => {
     const { pages } = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: { ...contenuDuScenario(), marque: ouverte } });
     for (const p of pagesHtml(pages)) expect(p.contenu.match(PIED)[0], p.chemin).not.toContain('pied__etat');
   });
+
+  // Le jour où l’appli ouvre, une page dit « Réserve ta place dans l’appli » : son cadre ne dit plus « Préviens-moi quand
+  // Baromatch arrive », ni dans l’en-tête, ni dans le pied (« Proposer mon bar » reste). Les mots qui le remplaceront
+  // reviennent au propriétaire ; d’ici là, rien plutôt qu’une phrase devenue fausse.
+  test('l’appli ouverte : plus de « Préviens-moi » dans l’en-tête ni dans le pied, sur les pages du générateur comme sur celles écrites à la main', async () => {
+    const ouverte = { ...MARQUE, appli: { ouverte: true, android: 'https://magasin.exemple/baromatch-android', iphone: '' } };
+    const attente = `${TEXTES.action}${TEXTES.actionSuite}`;
+    const { pages } = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: { ...contenuDuScenario(), marque: ouverte } });
+    const generees = pagesHtml(pages);
+    expect(generees.some((p) => p.contenu.includes('magasin.exemple/baromatch-android')), 'les pages disent « Réserve ta place dans l’appli »').toBe(true);
+    const ecrites = PAGES_DU_CADRE.map((p) => ({ chemin: p.chemin, contenu: pageAvecLeCadre(lire(p.fichier), p, { marque: ouverte }) }));
+    for (const p of [...generees, ...ecrites]) {
+      expect(actionDe(p.contenu), `${p.chemin} : l’action de l’en-tête`).toBeNull();
+      const lePied = p.contenu.match(PIED)[0];
+      expect(lePied, p.chemin).not.toContain(attente);
+      expect(lePied, p.chemin).toContain('<a class="pied__action" href="/pour-les-bars.html#proposer">');
+    }
+    // L’appli pas encore ouverte : les deux, comme aujourd’hui.
+    expect(pied(lireLeCadre(), { marque: MARQUE })).toContain(`<a class="pied__action" href="/#attente">${attente}</a>`);
+  });
 });
 
 // ---------- Les contrastes ----------

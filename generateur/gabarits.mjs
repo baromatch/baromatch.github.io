@@ -78,7 +78,7 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
 // (le corps et le pied) sont uniques (identifiantsUniques).
 export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => {
   const contenu = avecLePartage(corps, { partage, titre, chemin, textesDuPartage });
-  const action = pageDuGenerateurAvecLAction(chemin) ? actionDeLaPage(contenu) : null;
+  const action = pageDuGenerateurAvecLAction(chemin, marque) ? actionDeLaPage(contenu) : null;
   return identifiantsUniques(insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, cible: cibleDeLAction(contenu), langue })}
 
 <main id="contenu" class="regarder page">

@@ -83,9 +83,13 @@ export const aUnBoutonAmbre = (html) => [...html.matchAll(/\sclass="([^"]*)"/g)]
   .map(([, classes]) => classes.split(/\s+/))
   .some((classes) => classes.some((c) => AMBRES.has(c)) && !classes.some((c) => DE_VERRE.has(c)));
 export const actionDeLaPage = (contenu) => (aUnBoutonAmbre(contenu) ? 'contour' : 'ambre');
+// L’appli ouverte au public (marque.json) : chaque page dit « Réserve ta place dans l’appli » ; le cadre ne dit alors
+// plus « Préviens-moi quand Baromatch arrive » (ni l’en-tête, ni le pied), en attendant les mots du propriétaire.
+const appliOuverte = (marque) => Boolean(marque?.appli?.ouverte);
 // Les pages du générateur portent « Préviens-moi », sauf les affiches à imprimer et la feuille du patron (/affiche/),
-// qui servent au patron d’un bar, et les pages en anglais (/en/), qui ont leur liste d’attente en anglais.
-export const pageDuGenerateurAvecLAction = (chemin) => !chemin.includes('/affiche/') && !chemin.startsWith('/en/');
+// qui servent au patron d’un bar, et les pages en anglais (/en/), qui ont leur liste d’attente en anglais ; et aucune,
+// l’appli ouverte.
+export const pageDuGenerateurAvecLAction = (chemin, marque) => !chemin.includes('/affiche/') && !chemin.startsWith('/en/') && !appliOuverte(marque);
 // Une page qui a sa propre liste d’attente (une ville) : « Préviens-moi » mène à elle, sur la page.
 export const cibleDeLAction = (contenu) => (/<form\b[^>]*\bid="attente"/.test(contenu) ? '#attente' : '/#attente');
 
@@ -112,8 +116,7 @@ export const pied = (cadre, { marque, chemin = '', avecPresse = true, langue = '
 </div>
 <div class="pied__contact">
 <ul>
-<li>${lien('/#attente', e(t.attente), chemin, 'pied__action')}</li>
-<li>${lien('/pour-les-bars.html#proposer', e(t.proposer), chemin, 'pied__action')}</li>
+${appliOuverte(marque) ? '' : `<li>${lien('/#attente', e(t.attente), chemin, 'pied__action')}</li>\n`}<li>${lien('/pour-les-bars.html#proposer', e(t.proposer), chemin, 'pied__action')}</li>
 </ul>
 <p>${avecPresse ? lien('/presse.html', e(t.contact), chemin) : e(t.contact)}\u00A0: <a href="mailto:${e(marque.contact)}">${e(marque.contact).replace('@', '@<wbr>')}</a></p>${x ? `
 <p><a href="${e(x)}" rel="me noopener">X\u00A0: @${e(x.replace(/\/+$/, '').split('/').pop())}</a></p>` : ''}
@@ -183,7 +186,7 @@ export const pageAvecLeCadre = (html, { chemin, action }, { cadre = lireLeCadre(
   const haut = entre(html, REPERES_DU_CADRE.entete);
   const bas = entre(haut.apres, REPERES_DU_CADRE.pied);
   const reste = `${haut.avant}${bas.avant}${bas.apres}`;
-  const style = action ? actionDeLaPage(reste) : null;
+  const style = action && !appliOuverte(marque) ? actionDeLaPage(reste) : null;
   return `${haut.avant}\n${entete(cadre, { chemin, action: style, cible: cibleDeLAction(reste) })}\n${bas.avant}\n${pied(cadre, { marque, chemin, avecPresse })}\n${bas.apres}`;
 };
 

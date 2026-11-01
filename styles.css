@@ -212,10 +212,10 @@ a:hover { color: var(--goutte); }
 .menu__lien:active { background: var(--menu-survol); color: var(--texte); }
 /* Le survol seulement à la souris : au doigt, il resterait collé après le toucher. */
 @media (hover: hover) { .menu__lien:hover { background: var(--menu-survol); color: var(--texte); } }
-/* La page où tu es : la pilule pleine (bleu nuit au jour) et ta place en ambre, un point. */
+/* La page où tu es : la pilule pleine (bleu nuit au jour) et un point de la couleur du texte (l’ambre : l’action). */
 .menu__lien[aria-current="page"],
 .menu__lien[aria-current="page"]:hover { background: var(--menu-courant); color: var(--menu-envers); }
-.menu__lien[aria-current="page"]::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ambre); }
+.menu__lien[aria-current="page"]::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 /* L’anneau du focus passe devant la pilule voisine, séparé d’elle par le fond du menu. */
 .menu__lien:focus-visible { z-index: 1; box-shadow: 0 0 0 3px var(--menu-fond); }
 

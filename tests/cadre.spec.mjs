@@ -2,8 +2,8 @@
 // - chaque page écrite à la main a, entre ses repères, exactement ce que la source écrit (« npm run cadre ») ; une
 //   retouche à la main de l’en-tête ou du pied est refusée ; les pages du générateur ont le même cadre, et, à la page où
 //   l’on est et à l’action près, l’en-tête et le pied sont les mêmes partout ;
-// - la page où l’on est le dit (aria-current), dans le menu et le pied, et se voit : la pilule pleine et le point ambre ;
-//   dans le pied, elle est soulignée (pas seulement une couleur) ;
+// - la page où l’on est le dit (aria-current), dans le menu et le pied, et se voit : la pilule pleine et son point, de la
+//   couleur de son texte (l’ambre est pour l’action) ; dans le pied, elle est soulignée (pas seulement une couleur) ;
 // - « Préviens-moi » est dans l’en-tête des pages décidées, ambre si la page n’a pas déjà son bouton ambre, en contour
 //   sinon (lu tel qu’il est peint) ; il mène à la liste d’attente de la page quand elle en a une (une ville) ;
 // - le pied : ses deux actions, « Presse et partenariats » vers la page Presse, l’adresse e-mail soulignée ;
@@ -135,7 +135,7 @@ test.describe('la page où l’on est', () => {
   });
 
   for (const largeur of [390, 1280]) {
-    test(`à ${largeur} px, la pilule pleine et le point ambre, la nuit comme au jour`, async ({ page }) => {
+    test(`à ${largeur} px, la pilule pleine et son point de la couleur du texte (pas l’ambre de l’action), la nuit comme au jour`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto('/a-propos.html');
       const lirePilule = () => page.evaluate(() => {
@@ -146,16 +146,17 @@ test.describe('la page où l’on est', () => {
       const nuit = await lirePilule();
       expect(nuit.texte).toBe('À propos');
       expect(nuit.fond).toBe('rgb(247, 247, 249)');
-      expect(nuit.point).toBe(AMBRE);
+      expect(nuit.point).toBe(nuit.couleur);
+      expect(nuit.point).not.toBe(AMBRE);
       expect(rapport(lireCouleur(nuit.couleur), lireCouleur(nuit.fond))).toBeGreaterThanOrEqual(4.5);
       for (const fond of nuit.autres) expect(fond).not.toBe(nuit.fond);
       // Une page passée au jour (<html class="jour">) : le bleu nuit.
       await page.evaluate(() => document.documentElement.classList.add('jour'));
       const jour = await lirePilule();
       expect(jour.fond).toBe('rgb(10, 11, 16)');
-      expect(jour.point).toBe(AMBRE);
+      expect(jour.point).toBe(jour.couleur);
+      expect(jour.point).not.toBe(AMBRE);
       expect(rapport(lireCouleur(jour.couleur), lireCouleur(jour.fond))).toBeGreaterThanOrEqual(4.5);
-      expect(rapport(lireCouleur(jour.point), lireCouleur(jour.fond))).toBeGreaterThanOrEqual(3);
     });
   }
 });

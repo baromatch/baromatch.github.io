@@ -415,3 +415,13 @@ document.addEventListener("click", function (evenement) {
   }
   choisi.checked = true;
 })();
+
+/* Arrivé par #film-texte (le lien de la page Presse) : le texte du film s’ouvre, au chargement comme en cours de
+   route. Sans JavaScript, son résumé reste là et s’ouvre au toucher. */
+(function () {
+  var texte = document.getElementById("film-texte");
+  if (!texte) return;
+  function ouvrir() { if (location.hash === "#film-texte") texte.open = true; }
+  ouvrir();
+  window.addEventListener("hashchange", ouvrir);
+})();

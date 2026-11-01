@@ -579,6 +579,27 @@ test.describe('dans le navigateur', () => {
     });
   }
 
+  // Le grand prochain match d’un bar, le titre de son affiche : la feuille le plafonne (15 lettres larges y tiennent),
+  // mais il suit le réglage du texte (WCAG 1.4.4) et ne passe jamais sous sa date (« Samedi 24 octobre · 21:00 ») : au
+  // téléphone, texte agrandi, il gardait 29,8 px quand sa date passait à 44. Taille calculée, tous les 8 px, sans
+  // recharger (la feuille suit la fenêtre).
+  test('le grand prochain match d’un bar, texte de 100 à 200 %, de 320 à 1280 px : jamais plus petit que sa date', async ({ page: onglet }) => {
+    await onglet.setViewportSize({ width: 320, height: 800 });
+    await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
+    const ecarts = [];
+    for (let largeur = 320; largeur <= 1280; largeur += 8) {
+      await onglet.setViewportSize({ width: largeur, height: 800 });
+      for (const pourcent of [100, 125, 150, 175, 200]) {
+        const [nom, date] = await onglet.evaluate((p) => {
+          document.documentElement.style.fontSize = `${p}%`;
+          return ['.affiche-prochain__match', '.affiche-prochain__quand'].map((s) => parseFloat(getComputedStyle(document.querySelector(s)).fontSize));
+        }, pourcent);
+        if (nom < date) ecarts.push(`${largeur} px, ${pourcent} % : le nom à ${nom.toFixed(1)} px, sa date à ${date.toFixed(1)}`);
+      }
+    }
+    expect(ecarts).toEqual([]);
+  });
+
   // L’impression, émulée à la largeur imprimable du papier (A4 : 210 mm moins deux marges de 12 ; A3 : 297 mm moins
   // deux marges, et tout 1,414 fois plus grand) : chaque paire à côté de son nom, sur la même ligne, le nom d’un seul
   // tenant ; la paire d’une ligne à 8 mm de haut en A4, celle du prochain match d’un bar à 15 mm, au-dessus de son nom.

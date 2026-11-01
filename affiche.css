@@ -122,11 +122,12 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-bar { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
 .affiche--bar .affiche-tete { padding-bottom: 18px; }
 .affiche-prochain { margin: 18px 0 0; }
-/* 15 lettres larges tiennent dans la feuille. */
+/* 15 lettres larges tiennent dans la feuille. Jamais sous 1,5 rem, au-dessus de sa date (1,375) : au téléphone, texte
+   agrandi, un mot trop large passe alors à la ligne. */
 .affiche-prochain__match {
   display: block;
   font-size: clamp(2.25rem, 10vw, 3.75rem);
-  font-size: min(clamp(2.25rem, 10vw, 3.75rem), 12cqi);
+  font-size: min(clamp(2.25rem, 10vw, 3.75rem), max(12cqi, 1.5rem));
   font-weight: 800;
   font-stretch: 88%;
   line-height: 1;

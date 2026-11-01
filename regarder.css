@@ -26,8 +26,8 @@
    ne lisent pas encore la seconde. */
 .regarder-fil li { display: flex; align-items: center; }
 .regarder-fil li + li::before { content: "›"; content: "›" / ""; margin-right: 8px; color: var(--texte-discret); }
-/* Le lien, écrit en ligne, juste après le chevron (dans l’étape, il en devient le voisin direct) ; il se touche du doigt
-   sur 44 px de haut et au moins 44 px de large, comme ceux de l’en-tête. */
+/* Le lien, en ligne juste après le chevron (son voisin direct dans l’étape) : il se touche sur 44 px de haut et au
+   moins 44 px de large, comme ceux de l’en-tête. */
 .regarder-fil a { display: inline; min-width: 44px; padding: 11px 0; color: var(--texte-doux); }
 .regarder-fil a:hover { color: var(--goutte); }
 .regarder-fil [aria-current] { color: var(--texte-doux); }
@@ -324,7 +324,8 @@
 
 /* Sous la tête de la page, deux rangées de 44 px : des capsules de verre discrètes (l’ambre reste à l’appel à
    l’action), sans animation. Chaque rangée superpose ses deux possibles, le caché à sa place : rien ne bouge quand
-   partage.js arrive, à toute taille de texte. Après une copie refusée, l’adresse passe dessous. */
+   partage.js arrive, à toute taille de texte. Une copie refusée met l’adresse dessous. Une page de nuit encore en
+   ligne (sans places) cache les siens. */
 .partage { display: grid; justify-items: start; gap: 8px; margin-top: 20px; }
 .partage__bouton {
   display: inline-flex;
@@ -350,6 +351,7 @@
 .partage__place > * { grid-area: 1 / 1; place-self: start; }
 .partage__place > [hidden] { visibility: hidden; }
 .partage__place:not(:has(> [hidden])) > * { grid-area: auto; }
+.partage > [hidden] { display: none; }
 .partage__statut { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
 .partage__statut:empty { display: none; }
 

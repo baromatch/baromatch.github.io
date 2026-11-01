@@ -20,7 +20,14 @@ export const CAS_DU_PARTAGE = [
 export const SANS_LE_SCRIPT = { natif: false, whatsapp: true, copier: false, lien: true };
 export const montresAttendus = ({ partager, copier }) => ({ natif: partager, whatsapp: !partager, copier, lien: !copier });
 
-const lireCeQuiSeMontre = (onglet) => onglet.evaluate(() => Object.fromEntries(['natif', 'whatsapp', 'copier', 'lien']
+// Le navigateur d’un cas, posé avant les scripts de la page.
+export const poserLeCas = (onglet, cas) => onglet.addInitScript(({ partager, copier }) => {
+  if (partager) Object.defineProperty(Navigator.prototype, 'share', { configurable: true, value: async () => {} });
+  else delete Navigator.prototype.share;
+  Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => (copier ? { writeText: async () => {} } : undefined) });
+}, cas);
+
+export const lireCeQuiSeMontre = (onglet) => onglet.evaluate(() => Object.fromEntries(['natif', 'whatsapp', 'copier', 'lien']
   .map((nom) => [nom, document.querySelector(`.partage__${nom}`).checkVisibility({ visibilityProperty: true, opacityProperty: true })])));
 // La hauteur du bloc et le haut de ce qui le suit, dans la page.
 const lireLaPlace = (onglet) => onglet.evaluate(() => {
@@ -37,15 +44,13 @@ export const partageArriveTard = async (browser, adresse, { largeur, texte = 100
   const contexte = await browser.newContext({ viewport: { width: largeur, height: 800 } });
   try {
     const onglet = await contexte.newPage();
-    await onglet.addInitScript(({ partager, copier }) => {
-      if (partager) Object.defineProperty(Navigator.prototype, 'share', { configurable: true, value: async () => {} });
-      else delete Navigator.prototype.share;
-      Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => (copier ? { writeText: async () => {} } : undefined) });
+    await poserLeCas(onglet, cas);
+    await onglet.addInitScript(() => {
       window.decalagesDuPartage = 0;
       new PerformanceObserver((liste) => {
         for (const entree of liste.getEntries()) if (!entree.hadRecentInput) window.decalagesDuPartage += entree.value;
       }).observe({ type: 'layout-shift', buffered: true });
-    }, cas);
+    });
     await onglet.route('**/fonts/*.woff2', (route) => route.abort());
     if (texte !== 100) {
       await onglet.route('**/styles.css', async (route) => {

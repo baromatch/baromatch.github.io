@@ -11,7 +11,9 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
-import { CAS_DU_PARTAGE, montresAttendus, partageArriveTard, SANS_LE_SCRIPT } from './outils/partage-tard.mjs';
+import {
+  CAS_DU_PARTAGE, lireCeQuiSeMontre, montresAttendus, partageArriveTard, poserLeCas, SANS_LE_SCRIPT,
+} from './outils/partage-tard.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, PUBLIES_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
@@ -614,6 +616,43 @@ test.describe('le bloc « Partager »', () => {
         }
       });
     }
+  }
+
+  // Le jour de la fusion des pages au jour, en attendant que l’Action les réécrive (quelques minutes ; des heures si les
+  // listes de l’appli ne répondent pas), et pour une page refusée dont la version précédente reste en ligne (refus.mjs,
+  // 24 heures au plus) : des pages écrites par les gabarits de nuit (<html> sans la classe jour, le bloc sans ses deux
+  // places, ses quatre possibles côte à côte) sont servies avec les feuilles du jour. Leur bloc reste celui d’avant :
+  // sans JavaScript, WhatsApp et l’adresse ; avec, les bons boutons et seulement eux, l’un sous l’autre. (Avant la
+  // correction, « Partager » et « Copier le lien », cachés par leur attribut hidden, se montraient tous les quatre, sans
+  // JavaScript aussi.)
+  const ecriteALaNuit = (html) => html.replace(/<html lang="(fr|en)" class="jour">/, '<html lang="$1">')
+    .replace(/\n {2}<span class="partage__place">\n((?: {4}.*\n)+?) {2}<\/span>/g, (_, dedans) => `\n${dedans.replace(/^ {4}/gm, '  ').replace(/\n$/, '')}`);
+  for (const chemin of [MATCH, '/regarder-le-match/paris/', '/en/']) {
+    test(`${chemin} écrite par les gabarits de nuit, servie avec les feuilles du jour : sans JavaScript, WhatsApp et l’adresse ; avec, les bons boutons, l’un sous l’autre`, async ({ browser }) => {
+      for (const cas of [null, ...CAS_DU_PARTAGE]) {
+        const contexte = await browser.newContext({ javaScriptEnabled: Boolean(cas) });
+        const onglet = await contexte.newPage();
+        if (cas) await poserLeCas(onglet, cas);
+        await onglet.route(`${serveur.adresse}${chemin}`, async (route) => {
+          const reponse = await route.fetch();
+          await route.fulfill({ response: reponse, body: ecriteALaNuit(await reponse.text()) });
+        });
+        await onglet.goto(`${serveur.adresse}${chemin}`, { waitUntil: 'load' });
+        const nom = cas ? cas.nom : 'sans JavaScript';
+        // La page est bien celle des gabarits de nuit : ni la classe jour, ni les places ; les quatre possibles, enfants
+        // du bloc.
+        expect(await onglet.evaluate(() => [
+          document.documentElement.className,
+          document.querySelectorAll('.partage__place').length,
+          document.querySelectorAll('.partage > :is(.partage__natif, .partage__whatsapp, .partage__copier, .partage__lien)').length,
+        ]), nom).toEqual(['', 0, 4]);
+        expect(await lireCeQuiSeMontre(onglet), nom).toEqual(cas ? montresAttendus(cas) : SANS_LE_SCRIPT);
+        const [haut, bas] = await onglet.locator('.partage a, .partage button').evaluateAll((elements) => elements
+          .filter((e) => e.checkVisibility({ visibilityProperty: true })).map((e) => e.getBoundingClientRect().toJSON()));
+        expect(bas.top, nom).toBeGreaterThanOrEqual(haut.bottom);
+        await contexte.close();
+      }
+    });
   }
 
   test('des cibles de 44 px, sans animation, à 360 px comme au bureau', async ({ browser }) => {

@@ -89,6 +89,8 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // bouge quand partage.js arrive, à toute taille de texte) : de 17 570 à 18 640 octets ; affiche.css garde ses
 // commentaires raccourcis (16 986 octets). Mesuré : les pages générées 91,40 Ko (93 594 octets), les affiches 107,99 Ko
 // (110 580 octets). Leurs seuils de CSS montent de 1 Ko, au plus juste : de 90 à 91, de 107 à 108.
+// 1er novembre 2026 : regarder.css garde caché ce qu’une page de nuit encore en ligne cache (son bloc « Partager »,
+// le jour de la fusion) ; un commentaire raccourci. Mesuré : 91,46 Ko (93 659 octets) et 108,05 Ko : seuils inchangés.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 18, css: 73, images: 24 } },

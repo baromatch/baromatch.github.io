@@ -125,7 +125,7 @@ test('les écrans et le film : cinq écrans d’aujourd’hui chargés tard, cha
     expect(ecran.telecharger[1], nom).toBe(true);
     expect(ecran.telecharger[2], nom).toMatch(/^Télécharger l’écran .+ \(PNG, 600 px\)$/);
   }
-  expect(normaliser(await page.locator('#ecrans + p').textContent())).toContain('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés : chaque fichier le dit, sous l’écran.');
+  expect(normaliser(await page.locator('#ecrans + p').textContent())).toContain('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés. Chaque fichier le dit, sous l’écran.');
   const source = readFileSync(path.join(racine, 'presse.html'), 'utf8');
   expect(source).not.toMatch(/capture-|Oberkampf|1 place par compte/);
   expect(readdirSync(path.join(racine, 'presse')).filter((nom) => nom.startsWith('capture-'))).toEqual([]);

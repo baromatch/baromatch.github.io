@@ -84,9 +84,10 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // 30 octobre 2026, la semaine pleine : celle de l’accueil réel de ce jour (tests/donnees/semaine-pleine.json : 25 matchs,
 // 50 insignes, relus dans l’état enregistré du site), à la place de la copie des listes publiques (20 cartes). Mesurée :
 // 186,09 Ko transférés (190 559 octets) : seuil 187.
-// 1er novembre 2026, la suite des insignes : affiche.css passe de 17 273 à 17 688 octets (à l’écran, les noms des clubs
-// entiers, texte agrandi compris ; le grand prochain match d’un bar jamais plus petit que sa date). Le CSS des affiches
-// mesure 107,63 Ko (110 212 octets ; 107,49 Ko sans le grand match, à 9 octets de l’arrondi à 108) : seuil de 107 à 108.
+// 1er novembre 2026, la suite des insignes : affiche.css passe de 17 273 à 18 062 octets (à l’écran, les noms des clubs
+// entiers, texte agrandi compris ; le grand prochain match d’un bar jamais plus petit que sa date ; imprimée plus
+// étroite que l’A4, la paire au-dessus du nom). Le CSS des affiches mesure 107,99 Ko (110 586 octets ; 107,49 Ko avant
+// ces deux dernières règles, à 9 octets de l’arrondi à 108) : seuil de 107 à 108.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 18, css: 73, images: 24 } },

@@ -411,6 +411,27 @@ test('la page des bars mène à l’affiche de la semaine, une fois avant le for
 
 // ---------- Dans le navigateur ----------
 
+// Chaque match visible : son nom, et chacun de ses mots coupé (sur plus d’une ligne) ou sorti de sa colonne.
+const motsDesNoms = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('.affiche-match, .affiche-prochain__match')].filter((b) => b.getClientRects().length).map((bloc) => {
+  const colonne = bloc.getBoundingClientRect();
+  const ecarts = [];
+  let nom = '';
+  const marcheur = document.createTreeWalker(bloc, NodeFilter.SHOW_TEXT);
+  for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+    if (n.parentElement.closest('svg')) continue;
+    nom += n.data;
+    for (const mot of n.data.matchAll(/[^\s–]+/g)) {
+      const plage = document.createRange();
+      plage.setStart(n, mot.index);
+      plage.setEnd(n, mot.index + mot[0].length);
+      const boites = [...plage.getClientRects()].filter((r) => r.width > 0);
+      if (new Set(boites.map((r) => Math.round(r.top))).size > 1) ecarts.push(`« ${mot[0]} » coupé`);
+      if (Math.min(...boites.map((r) => r.left)) < colonne.left - 0.5 || Math.max(...boites.map((r) => r.right)) > colonne.right + 0.5) ecarts.push(`« ${mot[0]} » sort de sa colonne`);
+    }
+  }
+  return { nom: nom.trim(), grand: bloc.matches('.affiche-prochain__match'), ecarts };
+}));
+
 const portLibre = () => new Promise((resoudre) => {
   const sonde = createServer();
   sonde.listen(0, '127.0.0.1', () => {
@@ -644,6 +665,32 @@ test.describe('dans le navigateur', () => {
     await onglet.emulateMedia({ media: 'screen' });
   });
 
+  // Imprimée plus étroite que l’A4 (une échelle de 110 % et plus dans la fenêtre d’impression, ou l’A5 : 124 mm
+  // imprimables), émulée de même : le jour au-dessus de ses matchs, la paire au-dessus du nom, et aucun nom de club coupé
+  // en plein mot (à 124 mm, « Arsenal » et « Chelsea » se coupaient lettre par lettre), texte à 100 et à 200 %.
+  test('imprimée plus étroite que l’A4 (échelle de 110 à 150 %, ou A5) : la paire au-dessus du nom, aucun nom de club coupé en plein mot', async ({ page: onglet }) => {
+    const MM = 96 / 25.4;
+    const ecarts = [];
+    for (const chemin of [OUVERTE, AFFICHE_DU_ZINC]) {
+      for (const [papier, largeur] of [['A4 à 110 %', 186 / 1.1], ['A4 à 125 %', 186 / 1.25], ['A4 à 135 %', 186 / 1.35], ['A5', 124]]) {
+        for (const pourcent of [100, 200]) {
+          await onglet.emulateMedia({ media: 'screen' });
+          await onglet.setViewportSize({ width: Math.round(largeur * MM), height: 1200 });
+          await onglet.goto(`${serveur.adresse}${chemin}`);
+          await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          await onglet.emulateMedia({ media: 'print' });
+          const cas = `${chemin}, ${papier}, texte à ${pourcent} %`;
+          const lignes = (await lireLesMatchs(onglet)).filter((m) => !m.prochain);
+          expect(lignes.length, cas).toBeGreaterThan(chemin === OUVERTE ? 10 : 0);
+          for (const m of lignes) if (m.paire.bas > m.texte.haut + 0.5) ecarts.push(`${cas}, ${m.nom} : la paire n’est pas au-dessus du nom`);
+          for (const m of await motsDesNoms(onglet)) ecarts.push(...m.ecarts.map((ecart) => `${cas}, ${m.nom} : ${ecart}`));
+        }
+      }
+    }
+    await onglet.emulateMedia({ media: 'screen' });
+    expect(ecarts).toEqual([]);
+  });
+
   test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi ; texte à 100 et à 200 %', async ({ page: onglet }) => {
     const ailleurs = surveiller(onglet);
     for (const pourcent of [100, 200]) {
@@ -724,26 +771,6 @@ const NOMS_LONGS = [
 ];
 const SOIREES_DES_NOMS_LONGS = [['b-zinc', 'm-mon-bre'], ['b-zinc', 'm-mwb-juv'], ['b-zinc', 'm-mon-nor'], ['b-zinc', 'm-rma-juv'], ['b-rennes', 'm-ala-mwb'], ['b-rennes', 'm-mwb-juv']];
 const AFFICHE_DE_RENNES = '/bar/le-cafe-des-sports-rennes/affiche/';
-// Chaque match visible : son nom, et chacun de ses mots coupé (sur plus d’une ligne) ou sorti de sa colonne.
-const motsDesNoms = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('.affiche-match, .affiche-prochain__match')].filter((b) => b.getClientRects().length).map((bloc) => {
-  const colonne = bloc.getBoundingClientRect();
-  const ecarts = [];
-  let nom = '';
-  const marcheur = document.createTreeWalker(bloc, NodeFilter.SHOW_TEXT);
-  for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
-    if (n.parentElement.closest('svg')) continue;
-    nom += n.data;
-    for (const mot of n.data.matchAll(/[^\s–]+/g)) {
-      const plage = document.createRange();
-      plage.setStart(n, mot.index);
-      plage.setEnd(n, mot.index + mot[0].length);
-      const boites = [...plage.getClientRects()].filter((r) => r.width > 0);
-      if (new Set(boites.map((r) => Math.round(r.top))).size > 1) ecarts.push(`« ${mot[0]} » coupé`);
-      if (Math.min(...boites.map((r) => r.left)) < colonne.left - 0.5 || Math.max(...boites.map((r) => r.right)) > colonne.right + 0.5) ecarts.push(`« ${mot[0]} » sort de sa colonne`);
-    }
-  }
-  return { nom: nom.trim(), grand: bloc.matches('.affiche-prochain__match'), ecarts };
-}));
 
 test.describe('les noms longs, dans le navigateur', () => {
   let site;

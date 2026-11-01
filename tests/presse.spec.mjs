@@ -277,6 +277,26 @@ test('les couleurs et la police : chaque code, ses valeurs RVB et son disque dis
   expect(readFileSync(path.join(racine, 'fonts', 'LICENSE-OFL.txt'), 'utf8')).toMatch(/SIL OPEN FONT LICENSE/i);
 });
 
+// « Les chiffres sont à chasse fixe, pour que les heures s’alignent : 18:42, 20:37, 21:00. » : vrai sur la page même.
+// Chaque chiffre de la phrase a la même largeur (avant, la page les dessinait proportionnels : 5,5 px pour « 1 »,
+// 11,7 px pour « 0 »).
+test('la police : les chiffres de la phrase sur la chasse fixe ont tous la même largeur', async ({ page }) => {
+  await page.goto(PAGE);
+  await page.evaluate(() => document.fonts.ready);
+  const phrase = page.locator('.presse__police .presse__role').filter({ hasText: 'chasse fixe' });
+  await expect(phrase).toHaveCount(1);
+  const chiffres = await phrase.evaluate((p) => [...p.childNodes].filter((n) => n.nodeType === 3).flatMap((noeud) => [...noeud.nodeValue].flatMap((c, i) => {
+    if (!/\d/.test(c)) return [];
+    const plage = document.createRange();
+    plage.setStart(noeud, i);
+    plage.setEnd(noeud, i + 1);
+    return [[c, plage.getBoundingClientRect().width]];
+  })));
+  expect(chiffres.length).toBe(12);
+  const largeurs = chiffres.map(([, l]) => l);
+  expect(Math.max(...largeurs) - Math.min(...largeurs), chiffres.map(([c, l]) => `${c} ${l.toFixed(2)} px`).join(', ')).toBeLessThan(0.1);
+});
+
 // Le texte à copier se prend d’un geste (un toucher le sélectionne en entier), y compris sur iPhone, où Safari ne lit
 // que -webkit-user-select.
 test('le texte à copier : la phrase, la ligne et le paragraphe de marque.json, chacun sélectionné d’un geste', async ({ page }) => {

@@ -648,6 +648,53 @@ for (const { chemin } of PAGES) {
   });
 }
 
+// Une page ouverte deux fois : dans la police de secours (Bricolage Grotesque refusée) et dans Bricolage Grotesque.
+const deuxPolices = async (browser, baseURL, chemin, largeur) => {
+  const ouvrirAvec = async (secours) => {
+    const contexte = await browser.newContext({ baseURL, viewport: { width: largeur, height: 900 }, reducedMotion: 'reduce' });
+    const onglet = await contexte.newPage();
+    if (secours) await onglet.route('**/fonts/*.woff2', (route) => route.abort());
+    await onglet.goto(chemin);
+    await onglet.evaluate(() => document.fonts.ready);
+    const chargee = await onglet.evaluate(() => [...document.fonts].some((f) => f.family === 'Bricolage Grotesque' && f.status === 'loaded'));
+    expect(chargee, secours ? 'la police de secours' : 'Bricolage Grotesque').toBe(!secours);
+    return { contexte, onglet };
+  };
+  const polices = [await ouvrirAvec(true), await ouvrirAvec(false)];
+  return { onglets: polices.map((p) => p.onglet), fermer: () => Promise.all(polices.map((p) => p.contexte.close())) };
+};
+
+// L’étiquette « Écran de démonstration » d’À propos est dans le flux : sur trois colonnes, elle est centrée sur le bord du
+// cadre et peut le déborder de 8 px de chaque côté, comme au téléphone. Avant, posée dans le coin (24 px de chaque
+// côté), elle passait à la ligne dans Bricolage Grotesque et pas dans la police de secours (768 px à 100 %, 880 px à
+// 125 %) : à l’arrivée de la police, les trois écrans descendaient de 11 à 18 px. De 320 à 1 440 px, texte à 100, 125,
+// 150 et 200 % : autant de lignes dans les deux polices, et une seule à 100 %.
+test('À propos, de 320 à 1 440 px, texte à 100, 125, 150 et 200 % : l’étiquette des écrans a autant de lignes dans les deux polices, une seule à 100 %', async ({ browser, baseURL }) => {
+  test.setTimeout(120_000);
+  const { onglets, fermer } = await deuxPolices(browser, baseURL, '/a-propos.html', 320);
+  const lire = (onglet) => onglet.$$eval('.apropos__cadre .exemple', (etiquettes) => etiquettes.map((e) => {
+    const plage = document.createRange();
+    plage.selectNodeContents(e);
+    return new Set([...plage.getClientRects()].map((r) => Math.round(r.top))).size;
+  }));
+  const fautes = [];
+  try {
+    for (const pourcent of [100, 125, 150, 200]) {
+      for (const onglet of onglets) await agrandir(onglet, pourcent);
+      for (let largeur = 320; largeur <= 1440; largeur += 8) {
+        for (const onglet of onglets) await onglet.setViewportSize({ width: largeur, height: 900 });
+        const [secours, bricolage] = [await lire(onglets[0]), await lire(onglets[1])];
+        expect(secours.length).toBe(3);
+        if (secours.join() !== bricolage.join()) fautes.push(`${largeur} px, ${pourcent} % : ${secours.join(', ')} lignes dans la police de secours, ${bricolage.join(', ')} dans Bricolage Grotesque`);
+        else if (pourcent === 100 && bricolage.some((n) => n > 1)) fautes.push(`${largeur} px, 100 % : ${bricolage.join(', ')} lignes`);
+      }
+    }
+  } finally {
+    await fermer();
+  }
+  expect(fautes).toEqual([]);
+});
+
 // La carte des couleurs à 320 px, texte à 200 % : le disque passe au-dessus de son texte, qui garde toute la largeur.
 test('Presse à 320 px, texte à 200 % : chaque disque de couleur est au-dessus de son nom', async ({ page }) => {
   await ouvrir(page, '/presse.html', 320, 700);

@@ -118,6 +118,64 @@ for (const page of PAGES) {
   }
 }
 
+// Le zoom de la page (« aA » de Safari, le zoom de Chrome sur Android) rend la fenêtre plus étroite que 22,5 em, en
+// pixels CSS : un iPhone 14 zoomé à 150 % (260 × 443) ou à 200 % (195 × 332), un iPhone SE à 200 % (188 × 274). La
+// taille du texte réglée dans le navigateur aussi (32 px sur 390 px : 12 em). Les quatre entrées restent deux rangs de
+// deux (la paire des matchs, puis « Pour les bars » et « À propos »), au lieu d’une colonne qui remplit l’écran : chaque
+// entrée se voit, se touche sur 44 px, sans mot coupé ; la page ne défile pas de côté ; la page où l’on est garde son
+// point sous le mot, pas sur une ligne à lui.
+const ZOOMS = [
+  { nom: 'iPhone 14 zoomé à 150 %', largeur: 260, hauteur: 443 },
+  { nom: 'iPhone 14 zoomé à 200 %', largeur: 195, hauteur: 332 },
+  { nom: 'iPhone SE zoomé à 200 %', largeur: 188, hauteur: 274 },
+  { nom: 'le texte réglé à 32 px dans le navigateur', largeur: 390, hauteur: 844, reglage: 32 },
+];
+for (const { nom, largeur, hauteur, reglage } of ZOOMS) {
+  for (const chemin of ['/', '/a-propos.html', '/cgu.html']) {
+    test(`${nom} (${largeur} × ${hauteur}), ${chemin} : les quatre entrées en deux rangs de deux`, async ({ page: onglet }) => {
+      if (reglage) await (await onglet.context().newCDPSession(onglet)).send('Page.setFontSizes', { fontSizes: { standard: reglage, fixed: 26 } });
+      await ouvrir(onglet, chemin, largeur, hauteur);
+      const lu = await lireLEntete(onglet);
+      verifierLesLiens(lu, largeur, chemin);
+      expect(lu.pageDefile, 'la page défile de côté').toBe(false);
+      const menu = lu.liens.slice(-4);
+      const rang = (a, b) => Math.abs(a.haut - b.haut) < 1;
+      expect(rang(menu[0], menu[1]) && rang(menu[2], menu[3]) && !rang(menu[0], menu[2]), `les rangs : ${menu.map((l) => `${l.texte} ${Math.round(l.haut)}`).join(', ')}`).toBe(true);
+      const vu = await onglet.evaluate(() => {
+        const coupes = [];
+        for (const a of document.querySelectorAll('.menu__lien')) {
+          const marcheur = document.createTreeWalker(a, NodeFilter.SHOW_TEXT);
+          for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+            for (const mot of n.data.matchAll(/\S+/g)) {
+              const plage = document.createRange();
+              plage.setStart(n, mot.index);
+              plage.setEnd(n, mot.index + mot[0].length);
+              if (new Set([...plage.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size > 1) coupes.push(mot[0]);
+            }
+          }
+          if (a.scrollWidth > a.clientWidth + 1) coupes.push(`${a.textContent} déborde`);
+        }
+        // Le point de la page où l’on est : sous le mot, au bas de la pilule (comme au téléphone).
+        const courant = document.querySelector('.menu__lien[aria-current="page"]');
+        if (!courant) return { coupes, point: null };
+        const s = getComputedStyle(courant, '::before');
+        const r = courant.getBoundingClientRect();
+        const plage = document.createRange();
+        plage.selectNodeContents(courant);
+        const basDuTexte = Math.max(...[...plage.getClientRects()].filter((x) => x.width > 0).map((x) => x.bottom));
+        const bas = r.bottom - parseFloat(s.bottom);
+        return { coupes, point: { absolu: s.position === 'absolute', haut: bas - parseFloat(s.height), bas, basDuTexte, basDeLaPilule: r.bottom } };
+      });
+      expect(vu.coupes, 'mots coupés ou qui débordent').toEqual([]);
+      if (chemin === '/a-propos.html') {
+        expect(vu.point.absolu, 'le point de « À propos » sous le mot, pas sur une ligne à lui').toBe(true);
+        expect(vu.point.haut, 'le point sous le mot').toBeGreaterThanOrEqual(vu.point.basDuTexte - 0.5);
+        expect(vu.point.bas, 'le point dans la pilule').toBeLessThanOrEqual(vu.point.basDeLaPilule);
+      }
+    });
+  }
+}
+
 // Au téléphone debout (400 px de haut au moins), une fois le rang sorti de l’écran par le haut, il devient le bandeau du
 // bas (10 px au-dessus du bord) ; revenu en haut, il redevient le rang. La page ne bouge pas : la place du rang reste
 // gardée sous le logo. Ailleurs (une tablette, l’ordinateur, le téléphone couché), rien ne devient fixe.

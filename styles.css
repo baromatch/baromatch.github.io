@@ -874,6 +874,16 @@ a:hover { color: var(--goutte); }
   .menu__liste > li, .menu__matchs > li { flex: 1 1 auto; }
   .menu__liste > .menu__groupe { flex: 1.7 1 auto; }
   .menu__lien { gap: 6px; min-height: 44px; padding-inline: 5px; font-size: 0.875rem; font-stretch: 86%; }
+}
+/* Plus étroit que 22,5 em (moins de 360 px, ou la page zoomée : 260 px CSS pour un iPhone zoomé à 150 %) : deux rangs de
+   deux, serrés comme au téléphone, plutôt qu’une colonne de quatre pilules qui remplit l’écran. */
+@media screen and (max-width: 22.49em) {
+  .menu__liste > li, .menu__matchs > li { flex: 1 1 calc(50% - 1px); }
+  .menu__liste > .menu__groupe { flex-basis: 100%; }
+  .menu__lien { min-height: 44px; font-size: 0.875rem; font-stretch: 86%; }
+}
+/* Au téléphone et plus étroit, le point de la page où l’on est passe sous le mot. */
+@media screen and (max-width: 44.99em) {
   .menu__lien[aria-current="page"] { padding-bottom: 12px; }
   .menu__lien[aria-current="page"]::before { position: absolute; bottom: 6px; left: 50%; margin-left: -3.5px; }
 }

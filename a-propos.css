@@ -1,14 +1,9 @@
-/* À propos, « le parti pris » : une page éditoriale au jour (styles.css, « Le jour » : ses fonds, le bleu nuit pour le
-   texte, l’ambre seulement pour l’action). La typographie fait le travail : une grande phrase, un rail qui nomme chaque
-   rubrique, des phrases calmes en grand. La nuit revient une fois, pour trois écrans de l’appli dans leurs cadres (la
-   section « nuit » et le téléphone de verre de styles.css), puis au pied de page. Un seul bouton ambre, « Proposer mon
-   bar » ; les autres actions ont un contour à 3,6:1. Rien ne bouge : la page n’a ni animation ni script.
-   Chaque grand texte se règle en rem et en vw : avec le texte à 200 % sur 320 px, son plus long mot tient sur sa ligne
-   (tests/pages-du-jour.spec.mjs le mesure). Les colonnes suivent la taille du texte, pas la largeur de l’écran : la
-   page est un conteneur (« apropos ») large comme le texte, et chaque grille passe en colonnes à une largeur en rem (le
-   seuil d’avant en px divisé par 16) : dans une requête de conteneur, un rem suit la racine ; à 100 %, les seuils
-   d’avant au pixel près, à 200 %, leur double.
-   Chargée seulement par a-propos.html. */
+/* À propos, « le parti pris » : une page éditoriale au jour (styles.css). Une grande phrase, un rail qui nomme chaque
+   rubrique, des phrases calmes en grand ; la nuit revient pour trois écrans de l’appli. Un seul bouton ambre, « Proposer
+   mon bar » ; les autres actions ont un contour à 3,6:1. Ni animation, ni script.
+   Les grands textes en rem et en vw : à 200 % sur 320 px, le plus long mot tient sur sa ligne. Les colonnes suivent la
+   taille du texte : la page est un conteneur (« apropos ») large comme le texte, ses seuils en rem (ceux d’avant en px
+   divisés par 16 : un rem suit la racine). Chargée seulement par a-propos.html (tests/pages-du-jour.spec.mjs). */
 
 .apropos { --apropos-air: clamp(44px, 9vw, 128px); container: apropos / inline-size; max-width: calc(var(--page) + 2 * var(--gouttiere)); margin-inline: auto; }
 
@@ -145,11 +140,9 @@
 .apropos__ecran .apropos__cote-bar { margin-top: 10px; font-size: 0.9375rem; }
 .apropos__note { max-width: 40rem; margin: 0; color: var(--texte-discret); font-size: 0.9375rem; }
 
-/* Tant que la page est étroite (sous 43,75 rem, 700 px à 100 %), la page reste courte : chaque écran fait 152 px de large,
-   sa légende à côté, dès 21,25 rem de place (340 px à 100 %) ; en dessous, la légende passe dessous. La colonne de
-   l’écran ne dépasse jamais 212 px (à 200 %) : l’écran (200 px) n’est jamais plus large que le WebP de 600 px servi,
-   même à ×3. L’étiquette déborde un peu le cadre sans toucher la légende. Au-delà, trois colonnes, le cadre à 272 px
-   au plus (la place que dit sizes ; à 200 %, sa colonne de 340 px agrandissait l’écran), l’étiquette sur une ligne. */
+/* Sous 43,75 rem de page, chaque écran fait 152 px de large, sa légende à côté dès 21,25 rem de place (dessous avant) ;
+   212 px au plus : l’écran n’est jamais plus large que son WebP de 600 px, même à ×3. Au-delà, trois colonnes, le cadre
+   à 272 px au plus (la place que dit sizes). L’étiquette, centrée, déborde le cadre de 8 px au plus : une ligne. */
 @container apropos (max-width: 43.74rem) {
   @container (min-width: 21.25rem) {
     .apropos__ecran figure { grid-template-columns: min(9.5rem, 212px) minmax(0, 1fr); align-items: start; gap: 22px; }

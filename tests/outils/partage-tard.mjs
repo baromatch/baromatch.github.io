@@ -4,7 +4,8 @@
 // être plus bas) ; on lit ce qui se montre, avant et après lui. partage.js est retenu jusqu’à ce que la page ait peint
 // son bloc (deux images) : la mesure ne dépend pas de la vitesse de la machine. La police est refusée (son remplacement
 // a son propre test, tests/police.spec.mjs) ; le texte agrandi l’est dès la première image (styles.css servi avec la
-// taille de la racine, comme un réglage du navigateur). Pour tests/partage.spec.mjs et pages-generees-jour.spec.mjs.
+// taille de la racine, comme un réglage du navigateur). Pour tests/partage.spec.mjs, qui reprend aussi ses cas et sa
+// lecture de ce qui se montre (le bloc au texte agrandi, les pages des gabarits de nuit).
 
 // Les quatre cas : le navigateur a, ou non, le bouton « Partager » du téléphone (navigator.share), et sait, ou non,
 // copier (navigator.clipboard.writeText).
@@ -27,6 +28,7 @@ export const poserLeCas = (onglet, cas) => onglet.addInitScript(({ partager, cop
   Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => (copier ? { writeText: async () => {} } : undefined) });
 }, cas);
 
+// Ce qui se montre dans le bloc : chacun de ses quatre possibles, visible ou non.
 export const lireCeQuiSeMontre = (onglet) => onglet.evaluate(() => Object.fromEntries(['natif', 'whatsapp', 'copier', 'lien']
   .map((nom) => [nom, document.querySelector(`.partage__${nom}`).checkVisibility({ visibilityProperty: true, opacityProperty: true })])));
 // La hauteur du bloc et le haut de ce qui le suit, dans la page.

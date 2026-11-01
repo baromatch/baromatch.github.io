@@ -86,17 +86,19 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-match__nom { align-self: baseline; min-width: 0; overflow-wrap: anywhere; }
 .affiche-ligne { container: ligne / inline-size; }
 .affiche-competition { grid-area: competition; color: var(--encre-douce); font-size: 0.875rem; font-weight: 600; }
-/* En rem (texte agrandi compris), chaque disposition garde entier un mot de 11,55 rem (15 lettres larges) à côté
-   de l’heure (4,25 rem + 62 px), de la paire (74 px), de la compétition (10,25 rem) ; le jour (8,5 rem + 16 px) à
-   gauche s’il reste l’heure à côté du nom. */
-@container (width >= calc(24.3rem + 78px)) { .affiche-jour { grid-template-columns: 8.5rem minmax(0, 1fr); } }
-@container ligne (width < calc(15.8rem + 62px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
-@container ligne (width < calc(15.8rem + 136px)) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
-@container ligne (width >= calc(26.05rem + 148px)) {
-  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(10.25rem); grid-template-areas: "heure match competition"; }
-  .affiche-competition { text-align: right; }
+/* À l’écran, en rem (texte agrandi compris) : chaque disposition garde entier un mot de 11,55 rem (15 lettres
+   larges) à côté de l’heure (4,25 rem + 62 px), de la paire (74 px), de la compétition (10,25 rem) ; le jour
+   (8,5 rem + 16 px) à gauche s’il reste l’heure à côté du nom. */
+@media screen {
+  @container (width >= calc(24.3rem + 78px)) { .affiche-jour { grid-template-columns: 8.5rem minmax(0, 1fr); } }
+  @container ligne (width < calc(15.8rem + 62px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
+  @container ligne (width < calc(15.8rem + 136px)) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
+  @container ligne (width >= calc(26.05rem + 148px)) {
+    .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(10.25rem); grid-template-areas: "heure match competition"; }
+    .affiche-competition { text-align: right; }
+  }
+  @media (max-width: 559.98px) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
 }
-@media (max-width: 559.98px) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
 /* Ce qui sera imprimé : la ligne cochée surlignée ; dès qu’une case est cochée, les autres pâlissent. */
 .affiche-ligne:has(.affiche-case:checked) .affiche-ligne__texte { background: var(--surligne); }
 .affiche:has(.affiche-case:checked) .affiche-ligne:not(:has(.affiche-case:checked)) .affiche-ligne__texte { color: var(--encre-douce); }

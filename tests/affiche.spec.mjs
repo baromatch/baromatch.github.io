@@ -582,55 +582,64 @@ test.describe('dans le navigateur', () => {
   // L’impression, émulée à la largeur imprimable du papier (A4 : 210 mm moins deux marges de 12 ; A3 : 297 mm moins
   // deux marges, et tout 1,414 fois plus grand) : chaque paire à côté de son nom, sur la même ligne, le nom d’un seul
   // tenant ; la paire d’une ligne à 8 mm de haut en A4, celle du prochain match d’un bar à 15 mm, au-dessus de son nom.
-  test('à l’impression, en A4 et en A3 : chaque paire en haut, à côté de son nom, à l’échelle du papier ; l’heure et la compétition sur la ligne de base du nom', async ({ page: onglet }) => {
+  // Le texte agrandi à 200 % n’y change rien : la mise en page de l’écran n’entre pas dans l’impression.
+  test('à l’impression, en A4 et en A3, texte à 100 et à 200 % : chaque paire en haut, à côté de son nom, à l’échelle du papier ; l’heure et la compétition sur la ligne de base du nom', async ({ page: onglet }) => {
     const MM = 96 / 25.4;
     for (const chemin of [OUVERTE, AFFICHE_DU_ZINC]) {
       for (const [format, largeur, echelle] of [['A4', 186, 1], ['A3', 273, 1.414]]) {
-        await onglet.emulateMedia({ media: 'screen' });
-        await onglet.setViewportSize({ width: Math.round(largeur * MM), height: 1200 });
-        await onglet.goto(`${serveur.adresse}${chemin}`);
-        if (format === 'A3') await onglet.locator('#affiche-a3').check();
-        await onglet.emulateMedia({ media: 'print' });
-        const cas = `${chemin}, ${format}`;
-        const matchs = await lireLesMatchs(onglet);
-        expect(matchs.filter((m) => !m.prochain).length, cas).toBeGreaterThan(chemin === OUVERTE ? 10 : 0);
-        const ecarts = [];
-        for (const m of matchs) {
-          const attendue = (m.prochain ? 15 : 8) * MM * echelle;
-          for (const d of m.dessins) if (Math.abs(d.hauteur - attendue) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.hauteur.toFixed(1)} px de haut au lieu de ${attendue.toFixed(1)}`);
-          if (m.prochain) {
-            if (m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
-            continue;
+        for (const pourcent of [100, 200]) {
+          await onglet.emulateMedia({ media: 'screen' });
+          await onglet.setViewportSize({ width: Math.round(largeur * MM), height: 1200 });
+          await onglet.goto(`${serveur.adresse}${chemin}`);
+          if (format === 'A3') await onglet.locator('#affiche-a3').check();
+          await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          await onglet.emulateMedia({ media: 'print' });
+          const cas = `${chemin}, ${format}, texte à ${pourcent} %`;
+          const matchs = await lireLesMatchs(onglet);
+          expect(matchs.filter((m) => !m.prochain).length, cas).toBeGreaterThan(chemin === OUVERTE ? 10 : 0);
+          const ecarts = [];
+          for (const m of matchs) {
+            const attendue = (m.prochain ? 15 : 8) * MM * echelle;
+            for (const d of m.dessins) if (Math.abs(d.hauteur - attendue) > 0.5) ecarts.push(`${m.nom} : un insigne de ${d.hauteur.toFixed(1)} px de haut au lieu de ${attendue.toFixed(1)}`);
+            if (m.prochain) {
+              if (m.paire.bas > m.texte.milieu) ecarts.push(`${m.nom} : la paire n’est pas au-dessus du nom`);
+              continue;
+            }
+            // À côté de la paire, sa première ligne à hauteur de la paire ; d’un seul tenant quand il tient à côté d’elle (un
+            // nom plus long passe à la ligne à côté d’elle, jamais dessous).
+            if (m.paire.droite > m.texte.gauche + 0.5) ecarts.push(`${m.nom} : le nom n’est pas à côté de la paire`);
+            if (m.texte.milieu < m.paire.haut || m.texte.milieu > m.paire.bas) ecarts.push(`${m.nom} : la paire et le nom ne sont pas sur la même ligne`);
+            if (m.texte.gauche - m.bloc.gauche + m.surUneLigne <= m.bloc.droite - m.bloc.gauche && m.texte.lignes !== 1) ecarts.push(`${m.nom} : sur ${m.texte.lignes} lignes, alors qu’il tient sur une`);
+            // L’heure (sauf « à confirmer ») et la compétition sur la ligne de base du nom, la paire restant en haut.
+            if (!m.aConfirmer && Math.abs(m.ecartHeure) > 0.5) ecarts.push(`${m.nom} : l’heure à ${m.ecartHeure.toFixed(1)} px de la ligne de base du nom`);
+            if (Math.abs(m.ecartCompetition) > 0.5) ecarts.push(`${m.nom} : la compétition à ${m.ecartCompetition.toFixed(1)} px de la ligne de base du nom`);
+            if (Math.abs(m.paire.haut - m.bloc.haut) > 0.5) ecarts.push(`${m.nom} : la paire n’est pas en haut`);
           }
-          // À côté de la paire, sa première ligne à hauteur de la paire ; d’un seul tenant quand il tient à côté d’elle (un
-          // nom plus long passe à la ligne à côté d’elle, jamais dessous).
-          if (m.paire.droite > m.texte.gauche + 0.5) ecarts.push(`${m.nom} : le nom n’est pas à côté de la paire`);
-          if (m.texte.milieu < m.paire.haut || m.texte.milieu > m.paire.bas) ecarts.push(`${m.nom} : la paire et le nom ne sont pas sur la même ligne`);
-          if (m.texte.gauche - m.bloc.gauche + m.surUneLigne <= m.bloc.droite - m.bloc.gauche && m.texte.lignes !== 1) ecarts.push(`${m.nom} : sur ${m.texte.lignes} lignes, alors qu’il tient sur une`);
-          // L’heure (sauf « à confirmer ») et la compétition sur la ligne de base du nom, la paire restant en haut.
-          if (!m.aConfirmer && Math.abs(m.ecartHeure) > 0.5) ecarts.push(`${m.nom} : l’heure à ${m.ecartHeure.toFixed(1)} px de la ligne de base du nom`);
-          if (Math.abs(m.ecartCompetition) > 0.5) ecarts.push(`${m.nom} : la compétition à ${m.ecartCompetition.toFixed(1)} px de la ligne de base du nom`);
-          if (Math.abs(m.paire.haut - m.bloc.haut) > 0.5) ecarts.push(`${m.nom} : la paire n’est pas en haut`);
+          expect(ecarts, cas).toEqual([]);
+          if (chemin === OUVERTE) expect(matchs.filter((m) => m.texte.lignes === 1).length, cas).toBeGreaterThan(10);
         }
-        expect(ecarts, cas).toEqual([]);
-        if (chemin === OUVERTE) expect(matchs.filter((m) => m.texte.lignes === 1).length, cas).toBeGreaterThan(10);
       }
     }
     await onglet.emulateMedia({ media: 'screen' });
   });
 
-  test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi', async ({ page: onglet }) => {
+  test('14 matchs cochés : une seule page en A4, une seule en A3 ; l’affiche d’un bar aussi ; texte à 100 et à 200 %', async ({ page: onglet }) => {
     const ailleurs = surveiller(onglet);
-    await onglet.goto(`${serveur.adresse}${OUVERTE}`);
-    const cases = onglet.locator('.affiche-case');
-    for (let i = 0; i < 14; i += 1) await cases.nth(i).check();
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A4' }))).toBe(1);
-    await onglet.locator('#affiche-a3').check();
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A3' }))).toBe(1);
-    await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A4' }))).toBe(1);
-    await onglet.locator('#affiche-a3').check();
-    expect(pagesDuPdf(await onglet.pdf({ format: 'A3' }))).toBe(1);
+    for (const pourcent of [100, 200]) {
+      const texte = (p) => { document.documentElement.style.fontSize = `${p}%`; };
+      await onglet.goto(`${serveur.adresse}${OUVERTE}`);
+      await onglet.evaluate(texte, pourcent);
+      const cases = onglet.locator('.affiche-case');
+      for (let i = 0; i < 14; i += 1) await cases.nth(i).check();
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A4' })), `la semaine, A4, ${pourcent} %`).toBe(1);
+      await onglet.locator('#affiche-a3').check();
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A3' })), `la semaine, A3, ${pourcent} %`).toBe(1);
+      await onglet.goto(`${serveur.adresse}${AFFICHE_DU_ZINC}`);
+      await onglet.evaluate(texte, pourcent);
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A4' })), `un bar, A4, ${pourcent} %`).toBe(1);
+      await onglet.locator('#affiche-a3').check();
+      expect(pagesDuPdf(await onglet.pdf({ format: 'A3' })), `un bar, A3, ${pourcent} %`).toBe(1);
+    }
     expect(ailleurs).toEqual([]);
   });
 

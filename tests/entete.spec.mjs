@@ -238,24 +238,39 @@ for (const largeur of [360, 375, 390, 412, 600, 719]) {
 }
 
 // La place gardée sous le logo, au téléphone, quelle que soit la taille du texte (un font-size sur <html>, que les media
-// queries ne voient pas, comme le réglage du texte d’Android) : le rang y tient toujours (la page ne bouge pas quand il
-// devient le bandeau du bas), et elle ne dépasse pas le rang de plus de 20 px au texte normal et à 200 %.
-for (const largeur of [360, 390, 412, 576, 719]) {
-  test(`à ${largeur} px, de 100 à 300 % de texte : le rang tient dans la place gardée, sans place perdue`, async ({ page: onglet }) => {
-    await ouvrir(onglet, '/a-propos.html', largeur);
-    for (const pourcent of [100, 112.5, 115, 116, 120, 125, 150, 175, 200, 225, 250, 275, 300]) {
-      const lu = await onglet.evaluate((p) => {
-        document.documentElement.style.fontSize = `${p}%`;
-        return {
-          liste: document.querySelector('.menu__liste').getBoundingClientRect().height,
-          menu: document.querySelector('.menu').getBoundingClientRect().height,
-          reserve: parseFloat(getComputedStyle(document.querySelector('.menu')).minHeight),
-        };
-      }, pourcent);
-      expect(lu.menu, `${pourcent} % : le rang (${lu.liste} px) dépasse la place gardée`).toBe(lu.reserve);
-      if (pourcent === 100 || pourcent === 200) expect(lu.reserve - lu.liste, `${pourcent} % : place perdue`).toBeLessThanOrEqual(20);
-    }
-  });
+// queries ne voient pas, comme le réglage du texte d’Android), pour cent en cent de 100 à 300 %, avec Bricolage et avec
+// la police de secours : le rang y tient toujours (la page ne bouge pas quand il devient le bandeau du bas). Avec
+// Bricolage (la police de secours ne dure que le temps du chargement), tant que le rang tient sur une ligne, la place
+// gardée est celle d’une ligne, à 12 px près (pas une bande vide de 72 px sous lui), sauf dans les 4 % de texte qui
+// précèdent son passage à deux lignes ; et elle ne dépasse pas le rang de plus de 20 px au texte normal et à 200 %.
+for (const largeur of [360, 375, 390, 412, 430, 576, 719]) {
+  for (const secours of [false, true]) {
+    test(`à ${largeur} px, de 100 à 300 % de texte${secours ? ', avec la police de secours' : ''} : le rang tient dans la place gardée, sans place perdue`, async ({ page: onglet }) => {
+      if (secours) await onglet.route('**/fonts/*.woff2', (route) => route.abort());
+      await ouvrir(onglet, '/a-propos.html', largeur);
+      const lus = await onglet.evaluate(() => {
+        const mesures = [];
+        for (let p = 100; p <= 300; p += 1) {
+          document.documentElement.style.fontSize = `${p}%`;
+          mesures.push({
+            p,
+            liste: document.querySelector('.menu__liste').getBoundingClientRect().height,
+            menu: document.querySelector('.menu').getBoundingClientRect().height,
+            reserve: parseFloat(getComputedStyle(document.querySelector('.menu')).minHeight),
+            rangs: new Set([...document.querySelectorAll('.menu__lien')].map((a) => Math.round(a.getBoundingClientRect().top))).size,
+          });
+        }
+        return mesures;
+      });
+      expect(lus.filter((l) => l.menu > l.reserve + 0.5).map((l) => `${l.p} % : le rang (${l.liste.toFixed(1)} px) dépasse la place gardée (${l.reserve.toFixed(1)} px)`)).toEqual([]);
+      if (secours) return;
+      const derniereLigne = Math.max(...lus.filter((l) => l.rangs === 1).map((l) => l.p));
+      expect(derniereLigne, 'le rang tient sur une ligne au texte normal').toBeGreaterThanOrEqual(110);
+      expect(lus.filter((l) => l.rangs === 1 && l.p <= derniereLigne - 4 && l.reserve - l.liste > 12)
+        .map((l) => `${l.p} % : ${(l.reserve - l.liste).toFixed(1)} px vides sous le rang d’une ligne`)).toEqual([]);
+      for (const l of lus.filter((m) => m.p === 100 || m.p === 200)) expect(l.reserve - l.liste, `${l.p} % : place perdue`).toBeLessThanOrEqual(20);
+    });
+  }
 }
 
 // À l’ordinateur, l’en-tête reste en haut de la page : il ne la suit pas (rien de collant), et le menu non plus.

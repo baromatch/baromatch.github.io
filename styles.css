@@ -860,11 +860,11 @@ a:hover { color: var(--goutte); }
 
 /* Au téléphone (22,5 à 45 em de large : 360 à 719 px à texte normal), les quatre mots sur un seul rang sous le logo, un
    cran plus étroits (86 %) que le texte courant ; la place du rang est gardée, le même que l’écran soit debout ou couché.
-   --bandeau, mesuré de 360 à 719 px avec Bricolage et avec la police de secours : un rang (50 px) jusqu’à 18,4 px de
-   texte (115 %) ; au-delà, deux rangs (96 à 115 px jusqu’à 200 %), puis plus (178 px à 250 %, 268 px à 300 %) ;
-   122 px, puis 11,5 rem moins 274 px, gardent 7 à 10 px de marge sans réserver bien plus que le rang. */
+   --bandeau, mesuré de 360 à 719 px, de 100 à 300 % de texte, avec Bricolage et la police de secours : un rang tant que
+   le texte reste sous --seuil, qui suit la largeur (114 % à 360 px, 143 % à 430 px) ; puis 122 px (deux rangs, 96 à
+   121 px) ; puis 11,5 rem moins 254 px (trois rangs et plus, 168 à 268 px). */
 @media screen and (min-width: 22.5em) and (max-width: 44.99em) {
-  :root { --bandeau: clamp(50px, 50px + (1rem - 18.4px) * 1000, max(122px, 11.5rem - 274px)); }
+  :root { --seuil: calc(6.71vw - 5.85px); --bandeau: clamp(max(50px, 1.2rem + 24px), 50px + (1rem - var(--seuil)) * 1000, max(122px, 11.5rem - 254px)); }
   /* L’en-tête serré, pour que le rang ne pousse pas l’appel du premier écran hors de l’écran : le logo garde sa zone
      de 44 px (12 px au-dessus, 9 dessous, jusqu’au bord des entrées), chaque entrée ses 44 px, le rang 50 px.
      « Préviens-moi », passé sous le logo (texte agrandi), commence lui aussi au bord de cette zone. */
@@ -875,33 +875,32 @@ a:hover { color: var(--goutte); }
   .menu__liste { max-width: 28rem; margin-inline: auto; padding: 2px; }
   .menu__liste > li, .menu__matchs > li { flex: 1 1 auto; }
   .menu__liste > .menu__groupe { flex: 1.7 1 auto; }
-  .menu__lien { gap: 6px; min-height: 44px; padding-inline: 5px; font-size: 0.875rem; font-stretch: 86%; }
+  .menu__lien { gap: 6px; padding-inline: 5px; }
 }
-/* Plus étroit que 22,5 em (moins de 360 px, ou la page zoomée : 260 px CSS pour un iPhone zoomé à 150 %) : deux rangs de
-   deux, serrés comme au téléphone, plutôt qu’une colonne de quatre pilules qui remplit l’écran. */
+/* Plus étroit (moins de 360 px, une page zoomée) : deux rangs de deux, pas une colonne de quatre pilules. */
 @media screen and (max-width: 22.49em) {
   .menu__liste > li, .menu__matchs > li { flex: 1 1 calc(50% - 1px); }
   .menu__liste > .menu__groupe { flex-basis: 100%; }
-  .menu__lien { min-height: 44px; font-size: 0.875rem; font-stretch: 86%; }
 }
-/* Au téléphone et plus étroit, le point de la page où l’on est passe sous le mot. */
+/* Au téléphone et plus étroit, des entrées serrées ; le point de la page où l’on est, sous le mot. */
 @media screen and (max-width: 44.99em) {
+  .menu__lien { min-height: 44px; font-size: 0.875rem; font-stretch: 86%; }
   .menu__lien[aria-current="page"] { padding-bottom: 12px; }
   .menu__lien[aria-current="page"]::before { position: absolute; bottom: 6px; left: 50%; margin-left: -3.5px; }
 }
 @media screen and (min-width: 36em) and (max-width: 44.99em) {
+  :root { --seuil: calc(5.13vw - 6.86px); }
   .menu__liste { max-width: 32rem; }
   .menu__lien { padding-inline: 10px; font-size: 1rem; font-stretch: 100%; }
 }
-/* Le bandeau du bas : au téléphone debout (25 em de haut au moins : 400 px, plus qu’un téléphone couché, moins qu’un
-   téléphone debout dont les barres du navigateur reviennent), le rang devient un bandeau fixe en bas de l’écran
-   dès qu’il est sorti par le haut, et redevient le rang quand on remonte. À l’arrivée, il ne couvre donc rien : il est
-   à sa place, sous le logo. Sans animation liée au défilement (un navigateur plus ancien), le rang reste sous le logo.
-   Il ne cache jamais rien : le pied garde sa place au bout de la page, le focus s’arrête au-dessus de lui
-   (scroll-padding), et il rentre dans son rang quand on écrit dans un formulaire (pas pour une puce), sur une page
-   ouverte par un lien vers un formulaire (#attente, #proposer : le navigateur l’amène en haut de l’écran) et sur la
-   boutique quand sa barre de sélection est là. 10 px au-dessus du bord, plus la zone basse de l’iPhone ; rien en
-   hauteur d’écran (vh). Le rang gardé sous le logo fait qu’aucun passage de l’un à l’autre ne déplace la page. */
+/* Le bandeau du bas : au téléphone debout (25 em de haut au moins : 400 px, plus qu’un téléphone couché), le rang
+   devient un bandeau fixe en bas de l’écran dès qu’il est sorti par le haut, et redevient le rang quand on remonte : à
+   l’arrivée, il ne couvre rien. Sans animation liée au défilement, le rang reste sous le logo. Il ne cache jamais rien :
+   le pied garde sa place au bout de la page, le focus s’arrête au-dessus de lui (scroll-padding), et il rentre dans son
+   rang quand on écrit dans un formulaire (pas pour une puce), sur une page ouverte par un lien vers un formulaire
+   (#attente, #proposer, amené en haut de l’écran) et sur la boutique quand sa barre de sélection est là. 10 px au-dessus
+   du bord, plus la zone basse de l’iPhone ; rien en hauteur d’écran (vh). La place gardée sous le logo fait qu’aucun
+   passage de l’un à l’autre ne déplace la page. */
 @supports (animation-timeline: view()) {
   @media screen and (min-width: 22.5em) and (max-width: 44.99em) and (min-height: 25em) {
     html { scroll-padding-bottom: calc(var(--bandeau) + var(--zone-basse) + 18px); }

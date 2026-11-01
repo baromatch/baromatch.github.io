@@ -148,7 +148,8 @@
    sa légende à côté, dès 21,25 rem de place (340 px à 100 %) ; en dessous, la légende passe dessous. La colonne de
    l’écran ne dépasse jamais 212 px (à 200 %) : l’écran (200 px) n’est jamais plus large que le WebP de 600 px servi,
    même à ×3. L’étiquette se centre sur l’écran, qu’elle déborde un peu sans toucher la légende ; plus large que la
-   colonne (le texte agrandi), elle passe sur deux lignes. Au-delà, trois colonnes. */
+   colonne (le texte agrandi), elle passe sur deux lignes. Au-delà, trois colonnes, le cadre à 272 px au plus (la place
+   que dit sizes ; à 200 %, sa colonne de 340 px agrandissait l’écran). */
 @container apropos (max-width: 43.74rem) {
   @container (min-width: 21.25rem) {
     .apropos__ecran figure { grid-template-columns: min(9.5rem, 212px) minmax(0, 1fr); align-items: start; gap: 22px; }
@@ -158,7 +159,7 @@
 }
 @container apropos (min-width: 43.75rem) {
   .apropos__ecrans { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; align-items: start; }
-  .apropos__cadre { width: min(100%, 17rem); }
+  .apropos__cadre { width: min(100%, 17rem, 272px); }
   .apropos__cadre .exemple { position: absolute; margin: 0; }
 }
 

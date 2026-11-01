@@ -384,6 +384,50 @@ for (const [appareil, largeur, hauteur, ratio] of [['iPhone SE', 320, 568, 2], [
   });
 }
 
+// Sur un ordinateur ou une tablette (×1, ×2), de 320 à 1 920 px, texte à 100 et 200 % : aucune image n’est montrée plus
+// grande que le fichier chargé (sa place à l’écran, en pixels de l’écran, ne dépasse pas la largeur du fichier, lue en
+// le rechargeant seul). Avant, à 200 % dès 1 400 px, les trois écrans d’À propos prenaient leur colonne entière
+// (340 px pour un fichier de 300, ou de 600 à ×2) : leur cadre plafonne à 272 px. Une page chargée par largeur (le
+// fichier choisi dépend de la largeur au chargement), mesurée aux deux tailles de texte.
+const PLAGES_IMAGES = [[320, 940], [960, 1420], [1440, 1920]];
+for (const ratio of [1, 2]) for (const [debut, fin] of PLAGES_IMAGES) {
+  test(`×${ratio}, de ${debut} à ${fin} px, texte à 100 et 200 % : aucune image d’À propos ni de Presse montrée plus grande que son fichier`, async ({ browser, baseURL }) => {
+    test.setTimeout(180_000);
+    const contexte = await browser.newContext({ baseURL, viewport: { width: debut, height: 900 }, deviceScaleFactor: ratio, reducedMotion: 'reduce' });
+    const onglet = await contexte.newPage();
+    const agrandies = [];
+    let mesurees = 0;
+    try {
+      for (const { chemin } of PAGES) for (let largeur = debut; largeur <= fin; largeur += 20) {
+        await onglet.setViewportSize({ width: largeur, height: 900 });
+        await onglet.goto(chemin);
+        // Les images paresseuses, demandées toutes, puis chargées.
+        await onglet.evaluate(() => { for (const image of document.querySelectorAll('main img')) image.loading = 'eager'; });
+        await onglet.waitForFunction(() => [...document.querySelectorAll('main img')].filter((i) => i.getClientRects().length).every((i) => i.complete && i.naturalWidth > 0));
+        for (const pourcent of [100, 200]) {
+          await agrandir(onglet, pourcent);
+          const images = await onglet.evaluate(() => Promise.all([...document.querySelectorAll('main img')]
+            .filter((image) => image.getClientRects().length && !/\.svg$/.test(image.currentSrc))
+            .map(async (image) => {
+              const fichier = new Image();
+              fichier.src = image.currentSrc;
+              await fichier.decode();
+              return { src: image.currentSrc.replace(/^.*\//, ''), fichier: fichier.naturalWidth, place: image.getBoundingClientRect().width * devicePixelRatio };
+            })));
+          mesurees += images.length;
+          for (const image of images) {
+            if (image.place > image.fichier + 1) agrandies.push(`${chemin} à ${largeur} px, ${pourcent} % : ${image.src} (${image.fichier} px) montré sur ${Math.round(image.place)} px`);
+          }
+        }
+      }
+    } finally {
+      await contexte.close();
+    }
+    expect(mesurees).toBeGreaterThan(100);
+    expect(agrandies).toEqual([]);
+  });
+}
+
 // La carte des couleurs à 320 px, texte à 200 % : le disque passe au-dessus de son texte, qui garde toute la largeur.
 test('Presse à 320 px, texte à 200 % : chaque disque de couleur est au-dessus de son nom', async ({ page }) => {
   await ouvrir(page, '/presse.html', 320, 700);

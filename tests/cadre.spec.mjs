@@ -25,6 +25,7 @@ import { chargerLeQr } from '../generateur/qr.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { echapper } from '../generateur/texte.mjs';
 import { attendreLaPageFinie } from './outils/attente.mjs';
+import { bordsTropFaibles, mesurerLesBords } from './outils/bords-peints.mjs';
 import { lireCouleur, poser, rapport } from './outils/contraste.mjs';
 import { racine } from './outils/environnement.mjs';
 import { couperLAPI } from './outils/invitation.mjs';
@@ -604,3 +605,64 @@ for (const [nom, chemin] of [['la nuit (CGU)', '/cgu.html'], ['le jour (accueil)
     });
   }
 }
+
+// ---------- Les bords de l’en-tête, tels qu’ils sont peints ----------
+
+// Le bord du menu (le rang sous le logo, le bandeau du bas, la paire des matchs à l’ordinateur) et celui de
+// « Préviens-moi » en contour, lus au pixel (tests/outils/bords-peints.mjs), à 3:1 au moins contre ce qui les touche,
+// dehors et dedans, au jour (l’accueil, « Pour les bars ») comme la nuit (les CGU). Le bandeau se lit à chaque
+// demi-écran, du rang sorti jusqu’au bas de la page : sous lui passent le crème, les halos, les cartes, les bandes de
+// nuit et les images, et son ombre se pose autour de lui.
+test.describe('les bords de l’en-tête, tels qu’ils sont peints', () => {
+  test.use({ deviceScaleFactor: 3 });
+  const ouvrir = async (page, chemin, largeur, hauteur) => {
+    await couperLAPI(page);
+    await page.setViewportSize({ width: largeur, height: hauteur });
+    await page.goto(chemin);
+    await attendreLaPageFinie(page);
+    await page.evaluate(() => document.fonts.ready);
+  };
+  for (const [nom, chemin] of [['le jour (accueil)', '/'], ['le jour (« Pour les bars »)', '/pour-les-bars.html'], ['la nuit (CGU)', '/cgu.html']]) {
+    test(`${nom}, au téléphone : le rang à l’arrivée, puis le bandeau du bas tout le long de la page`, async ({ page }) => {
+      await ouvrir(page, chemin, 390, 844);
+      const faibles = bordsTropFaibles(await mesurerLesBords(page, '.menu__liste'), 3, 'le rang, à l’arrivée : ');
+      const { debut, total, ecran } = await page.evaluate(() => ({
+        debut: Math.ceil(document.querySelector('.menu').getBoundingClientRect().bottom + scrollY + 40), total: document.documentElement.scrollHeight, ecran: innerHeight,
+      }));
+      let lus = 0;
+      for (let y = debut; y < total - ecran / 2; y += Math.round(ecran / 2)) {
+        await page.evaluate((haut) => window.scrollTo({ top: haut, behavior: 'instant' }), y);
+        const fixe = await page.evaluate(async () => {
+          await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
+          return getComputedStyle(document.querySelector('.menu__liste')).position === 'fixed';
+        });
+        expect(fixe, `la page à ${y} px : le bandeau du bas`).toBe(true);
+        lus += 1;
+        faibles.push(...bordsTropFaibles(await mesurerLesBords(page, '.menu__liste'), 3, `le bandeau, la page à ${y} px : `));
+      }
+      expect(lus, 'le bandeau lu tout le long de la page').toBeGreaterThan(4);
+      expect(faibles).toEqual([]);
+    });
+
+    test(`${nom}, à l’ordinateur : la paire des matchs`, async ({ page }) => {
+      await ouvrir(page, chemin, 1280, 800);
+      const mesures = await mesurerLesBords(page, '.menu__matchs');
+      expect(mesures.flatMap((m) => m.cotes.map((c) => c.cote)).sort()).toEqual(['bas', 'haut']);
+      expect(bordsTropFaibles(mesures)).toEqual([]);
+    });
+  }
+
+  // « Préviens-moi » en contour (le guide des testeurs a son bouton ambre) : sur sa page de nuit, et sur la même passée
+  // au jour (les pages qui le portent passeront au jour).
+  for (const largeur of [390, 1280]) {
+    test(`« Préviens-moi » en contour à ${largeur} px, la nuit comme au jour`, async ({ page }) => {
+      await ouvrir(page, '/testeurs-android.html', largeur, 800);
+      const faibles = bordsTropFaibles(await mesurerLesBords(page, '.entete__attente--contour'), 3, 'la nuit : ');
+      await page.evaluate(() => document.documentElement.classList.add('jour'));
+      const jour = await mesurerLesBords(page, '.entete__attente--contour');
+      expect(jour.flatMap((m) => m.cotes.map((c) => c.cote)).sort()).toEqual(['bas', 'haut']);
+      faibles.push(...bordsTropFaibles(jour, 3, 'le jour : '));
+      expect(faibles).toEqual([]);
+    });
+  }
+});

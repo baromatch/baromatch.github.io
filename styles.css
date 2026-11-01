@@ -68,7 +68,8 @@
   --verre-reflet: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   --ombre-scene: 0 24px 60px rgba(0, 0, 0, 0.45);
   --sortie-douce: cubic-bezier(0.2, 0.8, 0.2, 1);
-  /* La navigation (cadre.mjs), la nuit ; :root.jour la passe au jour. Son bord se voit à 3:1 sur la page. */
+  /* La navigation (cadre.mjs), la nuit ; :root.jour la passe au jour. Son bord, entre deux anneaux de son fond (le
+     bandeau : « 0 0 0 1px » devant son ombre), se voit à 3:1 sur ce qui passe dessous. */
   --menu-fond: #151722;
   --menu-releve: rgba(255, 255, 255, 0.06);
   --menu-bord: rgba(255, 255, 255, 0.36);
@@ -183,7 +184,7 @@ a:hover { color: var(--goutte); }
 
 .menu { flex: 1 0 100%; order: 2; min-width: 0; }
 .menu__liste, .menu__matchs { display: flex; flex-wrap: wrap; gap: 2px; margin: 0; padding: 0; list-style: none; }
-.menu__liste { padding: 4px; border: 1px solid var(--menu-bord); border-radius: 26px; background: var(--menu-fond); }
+.menu__liste { padding: 4px; border: 1px solid var(--menu-bord); border-radius: 26px; background: var(--menu-fond); box-shadow: 0 0 0 1px var(--menu-fond); }
 .menu__liste > li { display: flex; flex: 1 1 8rem; min-width: 0; }
 .menu__liste > .menu__groupe { flex: 2 1 16rem; }
 /* « Ce soir » et « La semaine », la paire des matchs, sur un fond à part : elles passent avant tout. */
@@ -248,10 +249,10 @@ a:hover { color: var(--goutte); }
 @media (min-width: 60em) {
   .entete { column-gap: 32px; padding-top: 16px; padding-bottom: 16px; }
   .menu { flex: 1 1 auto; order: 1; }
-  .menu__liste { align-items: center; gap: 4px; padding: 0; border: 0; border-radius: 0; background: none; }
+  .menu__liste { align-items: center; gap: 4px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
   .menu__liste > li, .menu__liste > .menu__groupe, .menu__matchs > li { flex: none; }
   .menu__liste > li:nth-child(2) { margin-inline-start: auto; }
-  .menu__matchs { flex-wrap: nowrap; padding: 3px; border: 1px solid var(--menu-bord); border-radius: 999px; background: var(--menu-fond); }
+  .menu__matchs { flex-wrap: nowrap; padding: 3px; border: 1px solid var(--menu-bord); border-radius: 999px; background: var(--menu-fond); box-shadow: 0 0 0 1px var(--menu-fond); }
   .menu__lien { flex: none; flex-wrap: nowrap; min-height: 44px; padding: 0 20px; border-radius: 999px; font-size: 1rem; font-stretch: 100%; white-space: nowrap; }
   .menu__liste > li:not(.menu__groupe) .menu__lien { padding: 0 16px; }
   .entete__attente { order: 2; margin-inline-start: 8px; font-size: 1rem; }
@@ -905,7 +906,7 @@ a:hover { color: var(--goutte); }
 }
 @keyframes bandeau-du-bas {
   0%, 99.9% { position: static; }
-  100% { position: fixed; z-index: 30; left: 10px; right: 10px; bottom: calc(10px + var(--zone-basse)); box-shadow: var(--menu-ombre); }
+  100% { position: fixed; z-index: 30; left: 10px; right: 10px; bottom: calc(10px + var(--zone-basse)); box-shadow: 0 0 0 1px var(--menu-fond), var(--menu-ombre); }
 }
 
 /* Le contraste élevé de Windows : la page où l’on est soulignée (le contour reste au focus), les pilules des clubs

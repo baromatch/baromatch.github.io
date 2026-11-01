@@ -5,7 +5,8 @@
 // listes publiques). Le crème, le bleu nuit pour le texte, l’ambre seulement pour l’action ; le pied de page de nuit.
 // Mesuré tel qu’il est peint : chaque texte à 4,5:1 (tests/outils/textes-peints.mjs), chaque contour de focus et chaque
 // bord de champ à 3:1, chaque survol lisible et visible ; le premier affichage déjà au jour ; le texte à 200 % à 320 px
-// qui reste dans l’écran ; à 320 et 1280 px, texte à 100 et 200 %, des cibles de 44 × 44 px ; et CLS 0 sans la police.
+// qui reste dans l’écran ; de 320 à 1280 px, texte à 100 et 200 %, des cibles de 44 × 44 px et aucun mot coupé en
+// plein mot ; et CLS 0 sans la police.
 import { test, expect } from '@playwright/test';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -455,6 +456,7 @@ test.describe('CLS 0 sans la police', () => {
 
 // ---------- Le rendu mesuré à toutes les tailles : téléphones (320 à 430 px) et ordinateur, texte à 100 et 200 % ----------
 
+const LARGEURS_DU_RENDU = [320, 375, 390, 430, 1280];
 const agrandir = (onglet, pourcent) => onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
 
 // Chaque cible : un lien, un bouton, un résumé dépliable, un champ, ou l’étiquette d’un choix (sa case, son rond, s’ils
@@ -483,6 +485,54 @@ test.describe('les cibles de 44 × 44 px', () => {
         }
       }
       expect([...new Set(petites)]).toEqual([]);
+    });
+  }
+});
+
+// Aucun mot coupé en plein mot : un mot passé à la ligne ne l’est qu’après son trait d’union (« Saint- / Germain »), ou
+// dans une adresse (un lien d’agenda, une adresse e-mail, qui n’ont pas d’autre place). Avant, à 320 px et 200 %,
+// « Aujourd’hui, » (la semaine), « Baromatch. » (la feuille du patron, l’affiche d’un bar) passaient à la ligne en plein mot.
+// Hors jeu ici : les lignes des matchs d’une affiche (.affiche-ligne), refaites, avec leur propre test « aucun nom coupé »,
+// par la branche des insignes (tests/affiche.spec.mjs) ; ce test les reprendra quand elle sera dans main.
+const motsCoupesEnPleinMot = (onglet) => onglet.evaluate(() => {
+  const coupes = [];
+  const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+    const parent = n.parentElement;
+    if (!parent || !n.data.trim() || parent.closest('script, style, [hidden], .lien-evitement, .attente__piege, .visuellement-cache, .affiche-ligne')) continue;
+    if (!parent.checkVisibility({ visibilityProperty: true, opacityProperty: true })) continue;
+    for (const mot of n.data.matchAll(/\S+/g)) {
+      if (/[@/]|\.[a-z]{2,}/.test(mot[0])) continue;
+      let haut = null;
+      for (let i = 0; i < mot[0].length; i += 1) {
+        const plage = document.createRange();
+        plage.setStart(n, mot.index + i);
+        plage.setEnd(n, mot.index + i + 1);
+        const r = [...plage.getClientRects()].find((x) => x.width > 0);
+        if (!r) continue;
+        if (haut !== null && Math.abs(r.top - haut) > 2) {
+          if (!/[-‐]$/.test(mot[0].slice(0, i))) coupes.push(`« ${mot[0].slice(0, i)} / ${mot[0].slice(i)} » (${parent.tagName.toLowerCase()}.${String(parent.className).split(' ')[0]})`);
+          break;
+        }
+        haut = r.top;
+      }
+    }
+  }
+  return coupes;
+});
+
+test.describe('aucun mot coupé en plein mot', () => {
+  for (const type of TYPES) {
+    test(`${type.nom}, de 320 à 1280 px, texte à 100 et 200 %`, async ({ page: onglet }) => {
+      const coupes = [];
+      for (const largeur of LARGEURS_DU_RENDU) {
+        await ouvrir(onglet, type, largeur);
+        for (const pourcent of [100, 200]) {
+          await agrandir(onglet, pourcent);
+          coupes.push(...(await motsCoupesEnPleinMot(onglet)).map((c) => `${largeur} px, ${pourcent} % : ${c}`));
+        }
+      }
+      expect(coupes).toEqual([]);
     });
   }
 });

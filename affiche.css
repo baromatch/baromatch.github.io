@@ -131,7 +131,8 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-prochain__quand .affiche-heure { font-size: inherit; }
 .affiche-prochain .affiche-competition { display: block; margin-top: 2px; font-size: 1rem; }
 .affiche-sous-titre { margin: 18px 0 0; font-size: 1rem; font-weight: 750; }
-.affiche-appel { margin: 0; font-size: 1.375rem; font-weight: 800; line-height: 1.2; }
+/* « Baromatch. » tient dans la feuille à 320 px, texte à 200 % (et le titre du patron). */
+.affiche-appel { margin: 0; font-size: min(1.375rem, 13vw); font-weight: 800; line-height: 1.2; }
 .affiche-appel__suite { margin: 2px 0 14px; font-weight: 600; }
 .affiche--bar .affiche-pied { margin-top: 20px; padding-top: 16px; border-top: 3px solid var(--encre); }
 .affiche--bar .affiche-qr__code { width: 160px; height: 160px; }
@@ -217,7 +218,7 @@ label.affiche-ligne__texte { cursor: pointer; }
 
 .affiche--copie { display: none; }
 .affiche-patron__surtitre { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
-.affiche--patron .affiche-titre { font-size: clamp(2.25rem, 9vw, 3.5rem); }
+.affiche--patron .affiche-titre { font-size: min(clamp(2.25rem, 9vw, 3.5rem), 17vw); }
 .affiche-patron__lignes { margin: 0; padding: 0; list-style: none; }
 .affiche-patron__lignes li { padding: 12px 0; border-bottom: 1px solid var(--trait-papier); font-size: 1.125rem; font-weight: 650; line-height: 1.35; }
 .affiche-patron__etat { margin: 14px 0 0; color: var(--encre-douce); font-size: 0.9375rem; line-height: 1.45; }

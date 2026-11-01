@@ -416,6 +416,32 @@ for (const [largeur, hauteur] of [[360, 560], [375, 548], [390, 664], [430, 739]
   }
 }
 
+// Seul un lien vers un formulaire range le bandeau : « Aller au contenu » (#contenu, le <main>, qui contient la liste
+// d’attente ou le formulaire des bars) le garde, et le bandeau revient quand le rang sort de l’écran. Et quand un lien
+// vers un formulaire l’a rangé, rien n’est réservé en bas pour un bandeau absent (ni la marge du pied, ni scroll-padding).
+for (const chemin of ['/', '/pour-les-bars.html']) {
+  test(`arrivée par ${chemin}#contenu (« Aller au contenu ») à 390 × 844 : le bandeau revient quand le rang sort de l’écran`, async ({ page: onglet }) => {
+    await ouvrir(onglet, `${chemin}#contenu`, { largeur: 390, hauteur: 844, texte: 100 }, null);
+    expect(await sortirLeRang(onglet), 'la page est assez longue').toBe(true);
+    expect((await lireLeBandeau(onglet)).fixe, 'le bandeau du bas').toBe(true);
+  });
+}
+for (const adresse of ['/#attente', '/pour-les-bars.html#proposer']) {
+  test(`arrivée par ${adresse} à 390 × 844 : le rang reste sous le logo, et rien n’est réservé en bas pour lui`, async ({ page: onglet }) => {
+    await ouvrir(onglet, adresse, { largeur: 390, hauteur: 844, texte: 100 }, null);
+    await sortirLeRang(onglet);
+    const lu = await onglet.evaluate(async () => {
+      await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
+      return {
+        rang: getComputedStyle(document.querySelector('.menu__liste')).position,
+        pied: getComputedStyle(document.querySelector('.pied')).paddingBottom,
+        defilement: getComputedStyle(document.documentElement).scrollPaddingBottom,
+      };
+    });
+    expect(lu).toEqual({ rang: 'static', pied: '40px', defilement: 'auto' });
+  });
+}
+
 // ---------- Sans animation liée au défilement ----------
 
 // Un navigateur sans animation liée au défilement (Firefox, Safari avant la version 26) ne lit pas les règles du bandeau

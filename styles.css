@@ -913,7 +913,11 @@ a:hover { color: var(--goutte); }
 @supports (animation-timeline: view()) and selector(:has(*)) {
   @media screen and (min-width: 22.5em) and (max-width: 44.99em) and (min-height: 25em) {
     body:has(:is(form :focus, input:focus, textarea:focus, select:focus):not([type="radio"])) .menu__liste { animation: none; }
-    html:has(form:target, :target form) .menu__liste { animation: none; }
+    /* Seul un lien vers un formulaire (#attente, ou la section #proposer) range le bandeau ; « Aller au contenu » (le
+       <main>, qui contient un formulaire) le garde. Rangé, il ne réserve plus rien en bas. */
+    html:has(form:target, section:target form) .menu__liste { animation: none; }
+    html:has(form:target, section:target form) { scroll-padding-bottom: auto; }
+    html:has(form:target, section:target form) .pied { padding-bottom: 40px; }
   }
 }
 @keyframes bandeau-du-bas {

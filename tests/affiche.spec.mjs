@@ -678,3 +678,85 @@ test.describe('dans le navigateur', () => {
     }
   });
 });
+
+// ---------- Les noms longs, dans le navigateur ----------
+
+// Aucun mot coupé sur l’aperçu des affiches : chaque mot d’un nom de club (un Range par mot) tient sur une seule ligne et
+// reste dans sa colonne, texte à 100 et à 200 %, de 720 à 800 px toutes les 4 px (où « Juvent/us » et « Monac/o » se
+// coupaient), et de 560 à 1280 px toutes les 20 px. La semaine remplie, avec le nom le plus long que le générateur a
+// publié (« Deportivo Alavés »), son mot le plus long (« Nordsjælland ») et un nom inventé de 15 lettres sans espace
+// (« Montwermalbourg ») face à la compétition la plus longue (« Trophée des champions ») ; sur l’affiche d’un bar, ses
+// lignes (le Zinc des Amis) et son grand prochain match (le Café des Sports).
+const NOMS_LONGS = [
+  ['m-ala-mwb', '2026-10-24T16:15:00Z', 'Trophée des Champions', 'Deportivo Alavés', 'Montwermalbourg'],
+  ['m-mwb-juv', '2026-10-26T18:00:00Z', 'UEFA Conference League', 'Montwermalbourg', 'Juventus'],
+  ['m-mon-nor', '2026-10-28T20:00:00Z', 'UEFA Champions League', 'AS Monaco', 'FC Nordsjælland'],
+];
+const SOIREES_DES_NOMS_LONGS = [['b-zinc', 'm-mon-bre'], ['b-zinc', 'm-mwb-juv'], ['b-zinc', 'm-mon-nor'], ['b-zinc', 'm-rma-juv'], ['b-rennes', 'm-ala-mwb'], ['b-rennes', 'm-mwb-juv']];
+const AFFICHE_DE_RENNES = '/bar/le-cafe-des-sports-rennes/affiche/';
+// Chaque match visible : son nom, et chacun de ses mots coupé (sur plus d’une ligne) ou sorti de sa colonne.
+const motsDesNoms = (onglet) => onglet.evaluate(() => [...document.querySelectorAll('.affiche-match, .affiche-prochain__match')].filter((b) => b.getClientRects().length).map((bloc) => {
+  const colonne = bloc.getBoundingClientRect();
+  const ecarts = [];
+  let nom = '';
+  const marcheur = document.createTreeWalker(bloc, NodeFilter.SHOW_TEXT);
+  for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+    if (n.parentElement.closest('svg')) continue;
+    nom += n.data;
+    for (const mot of n.data.matchAll(/[^\s–]+/g)) {
+      const plage = document.createRange();
+      plage.setStart(n, mot.index);
+      plage.setEnd(n, mot.index + mot[0].length);
+      const boites = [...plage.getClientRects()].filter((r) => r.width > 0);
+      if (new Set(boites.map((r) => Math.round(r.top))).size > 1) ecarts.push(`« ${mot[0]} » coupé`);
+      if (Math.min(...boites.map((r) => r.left)) < colonne.left - 0.5 || Math.max(...boites.map((r) => r.right)) > colonne.right + 0.5) ecarts.push(`« ${mot[0]} » sort de sa colonne`);
+    }
+  }
+  return { nom: nom.trim(), grand: bloc.matches('.affiche-prochain__match'), ecarts };
+}));
+
+test.describe('les noms longs, dans le navigateur', () => {
+  let site;
+  test.beforeAll(async () => {
+    const dossier = dossierVide();
+    const scenario = scenarioCharge();
+    for (const [id, startAt, league, homeTeam, awayTeam] of NOMS_LONGS) scenario.matches.push({ id, startAt, league, homeTeam, awayTeam });
+    for (const [bar, match] of SOIREES_DES_NOMS_LONGS) scenario.matchNights.push({ id: `n-${bar}-${match}`, status: 'OPEN', bar: { id: bar }, match: { id: match }, offer: null });
+    await construireLeSiteDExemple(dossier, { rendu: null });
+    await construire({ source: ecrireLeScenario(scenario), sortie: dossier, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu, rendu: null, qr, accepterLesSuppressions: true });
+    site = await demarrerServeur(await portLibre(), -1, { dossier });
+  });
+  test.afterAll(async () => { await site?.arreter(); });
+
+  const AFFICHES = [
+    ['l’affiche de la semaine', OUVERTE, { lignes: ['Deportivo Alavés – Montwermalbourg', 'Montwermalbourg – Juventus', 'Monaco – Nordsjælland', 'Real Madrid – Juventus', 'Monaco – Brest'] }],
+    ['l’affiche d’un bar', AFFICHE_DU_ZINC, { lignes: ['Monaco – Brest', 'Montwermalbourg – Juventus', 'Monaco – Nordsjælland', 'Real Madrid – Juventus'], grand: 'PSG – Barça' }],
+    ['le grand prochain match d’un bar', AFFICHE_DE_RENNES, { lignes: ['Montwermalbourg – Juventus'], grand: 'Deportivo Alavés – Montwermalbourg' }],
+  ];
+  const PLAGES = [
+    ['de 720 à 800 px, toutes les 4 px', Array.from({ length: 21 }, (_, i) => 720 + 4 * i)],
+    ['de 560 à 1280 px, toutes les 20 px', Array.from({ length: 37 }, (_, i) => 560 + 20 * i)],
+  ];
+  for (const [nom, chemin, attendu] of AFFICHES) {
+    for (const [plage, largeurs] of PLAGES) {
+      test(`${nom}, ${plage}, texte à 100 et 200 % : chaque mot d’un nom de club sur une seule ligne, dans sa colonne`, async ({ page: onglet }) => {
+        test.setTimeout(120_000);
+        const ecarts = [];
+        for (const largeur of largeurs) {
+          await onglet.setViewportSize({ width: largeur, height: 800 });
+          await onglet.goto(`${site.adresse}${chemin}`);
+          await onglet.evaluate(() => document.fonts.ready);
+          for (const pourcent of [100, 200]) {
+            await onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+            const matchs = await motsDesNoms(onglet);
+            const cas = `${largeur} px, ${pourcent} %`;
+            expect(matchs.filter((m) => !m.grand).map((m) => m.nom), cas).toEqual(expect.arrayContaining(attendu.lignes));
+            expect(matchs.filter((m) => m.grand).map((m) => m.nom), cas).toEqual(attendu.grand ? [attendu.grand] : []);
+            for (const m of matchs) ecarts.push(...m.ecarts.map((ecart) => `${cas}, ${m.nom} : ${ecart}`));
+          }
+        }
+        expect(ecarts).toEqual([]);
+      });
+    }
+  }
+});

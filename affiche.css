@@ -40,6 +40,7 @@
   color: var(--encre);
   box-shadow: var(--ombre-scene);
   font-variant-numeric: tabular-nums;
+  container-type: inline-size;
 }
 .affiche :focus-visible { outline-color: var(--encre); }
 
@@ -57,9 +58,8 @@
 .affiche-dates { margin: 10px 0 0; font-size: 1.125rem; font-weight: 650; }
 .affiche-vide { margin: 20px 0; font-weight: 650; }
 
-/* Un jour : son nom à gauche (au-dessus sur un téléphone), ses matchs à droite. */
+/* Un jour : son nom au-dessus de ses matchs, ou à gauche (plus bas). */
 .affiche-jour { display: grid; gap: 0 16px; padding: 8px 0; border-bottom: 1px solid var(--trait-papier); }
-@media (min-width: 560px) { .affiche-jour { grid-template-columns: 8.5rem minmax(0, 1fr); } }
 .affiche-jour__nom { margin: 0; padding-top: 10px; font-size: 1rem; font-weight: 750; line-height: 1.3; }
 
 .affiche-lignes { margin: 0; padding: 0; list-style: none; }
@@ -81,22 +81,22 @@
 label.affiche-ligne__texte { cursor: pointer; }
 .affiche-heure { grid-area: heure; white-space: nowrap; font-size: 1.5rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
 .affiche-heure--a-confirmer { align-self: center; white-space: normal; font-size: 0.8125rem; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
-/* La paire à côté du nom, en haut ; au-dessus (hors du flux) sous 560 px ou dans une ligne étroite. L’heure et la
-   compétition suivent la ligne de base du nom ; plus étroite encore, l’heure passe au-dessus. */
+/* La paire à côté du nom, en haut ; l’heure et la compétition sur la ligne de base du nom. */
 .affiche-match { grid-area: match; position: relative; display: flex; align-items: flex-start; gap: 10px; min-width: 0; font-size: 1.25rem; font-weight: 750; line-height: 1.2; }
 .affiche-match__nom { align-self: baseline; min-width: 0; overflow-wrap: anywhere; }
-@media (max-width: 559.98px) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
-.affiche-ligne { container-type: inline-size; }
-@container (max-width: calc(13.25rem + 136px)) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
-@container (max-width: calc(4.25rem + 126px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
+.affiche-ligne { container: ligne / inline-size; }
 .affiche-competition { grid-area: competition; color: var(--encre-douce); font-size: 0.875rem; font-weight: 600; }
-/* Trois colonnes (la compétition à droite, 40 % au plus) dès 720 px, si la ligne en a la place (26 rem). */
-@media (min-width: 720px) {
-  @container (min-width: 26rem) {
-    .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(40%); grid-template-areas: "heure match competition"; }
-    .affiche-competition { text-align: right; }
-  }
+/* En rem (texte agrandi compris), chaque disposition garde entier un mot de 11,55 rem (15 lettres larges) à côté
+   de l’heure (4,25 rem + 62 px), de la paire (74 px), de la compétition (10,25 rem) ; le jour (8,5 rem + 16 px) à
+   gauche s’il reste l’heure à côté du nom. */
+@container (width >= calc(24.3rem + 78px)) { .affiche-jour { grid-template-columns: 8.5rem minmax(0, 1fr); } }
+@container ligne (width < calc(15.8rem + 62px)) { .affiche-ligne__texte { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heure" "match" "competition"; } }
+@container ligne (width < calc(15.8rem + 136px)) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
+@container ligne (width >= calc(26.05rem + 148px)) {
+  .affiche-ligne__texte { grid-template-columns: 4.25rem minmax(0, 1fr) fit-content(10.25rem); grid-template-areas: "heure match competition"; }
+  .affiche-competition { text-align: right; }
 }
+@media (max-width: 559.98px) { .affiche-match { display: block; padding-top: 34px; } .affiche-match > .insignes { position: absolute; top: 0; } }
 /* Ce qui sera imprimé : la ligne cochée surlignée ; dès qu’une case est cochée, les autres pâlissent. */
 .affiche-ligne:has(.affiche-case:checked) .affiche-ligne__texte { background: var(--surligne); }
 .affiche:has(.affiche-case:checked) .affiche-ligne:not(:has(.affiche-case:checked)) .affiche-ligne__texte { color: var(--encre-douce); }
@@ -120,9 +120,11 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-bar { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
 .affiche--bar .affiche-tete { padding-bottom: 18px; }
 .affiche-prochain { margin: 18px 0 0; }
+/* 15 lettres larges tiennent dans la feuille. */
 .affiche-prochain__match {
   display: block;
   font-size: clamp(2.25rem, 10vw, 3.75rem);
+  font-size: min(clamp(2.25rem, 10vw, 3.75rem), 12cqi);
   font-weight: 800;
   font-stretch: 88%;
   line-height: 1;

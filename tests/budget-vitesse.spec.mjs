@@ -100,6 +100,8 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // monte de 108 à 109, au plus juste.
 // Puis le bord des boutons en couleurs forcées (regarder.css 19 074 octets). Mesuré : les pages générées 91,89 Ko
 // (94 096 octets), les affiches 108,67 Ko (111 281 octets) : seuils inchangés.
+// Puis le choix du papier à 44 px à 100 % et un commentaire des villes (styles.css 75 047 octets). Mesuré : les pages
+// générées 91,92 Ko (94 121 octets), les affiches 108,70 Ko (111 306 octets), l’accueil 73,29 Ko : seuils inchangés.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 170, js: 18, css: 73, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 187, js: 18, css: 73, images: 24 } },

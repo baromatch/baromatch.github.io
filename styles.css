@@ -396,7 +396,8 @@ a:hover { color: var(--goutte); }
 /* La ville de la liste d’attente, choisie avant l’adresse : cinq puces de 44 px, comme les choix de la boutique, sur
    une seule ligne dès 360 px, et une phrase qui suit la ville choisie (« Pas de date pour Lyon… »), sans script : sur
    l’accueil comme sur les pages de ville, qui n’en ont pas. La ville choisie a une coche dessinée devant son nom : elle
-   ne se dit pas que par la couleur (WCAG 1.4.1). Agrandi, le texte garde ses côtés (le bord arrondi). */
+   ne se dit pas que par la couleur (WCAG 1.4.1). Quand le texte grandit, ses marges aussi : le bord arrondi ne le
+   touche pas. */
 .attente__villes { margin: 0; padding: 0; border: 0; min-width: 0; }
 .attente__villes legend { margin: 0 0 8px 4px; padding: 0; font-weight: 600; font-size: 0.9375rem; color: var(--texte); }
 .attente__options { display: flex; flex-wrap: wrap; gap: 4px; }

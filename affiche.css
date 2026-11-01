@@ -12,7 +12,7 @@
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  padding: 8px 18px;
+  padding: 6px 18px;
   border: 1px solid var(--champ-bord);
   border-radius: 22px;
   background: var(--verre);

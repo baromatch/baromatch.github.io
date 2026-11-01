@@ -568,6 +568,17 @@ test('la feuille du patron, à 390 px, texte à 200 % : le rond de chaque choix 
   expect(ronds).toEqual([[20, 20], [20, 20]]);
 });
 
+// Le choix du papier, texte à 100 % : la pilule d’avant, 44 px de haut, au téléphone comme sur ordinateur (avec 8 px de
+// haut et de bas, elle en faisait 45,9 sur ordinateur, où le texte est plus grand).
+test('la feuille du patron, texte à 100 % : chaque choix du papier garde 44 px de haut, à 390 et 1280 px', async ({ page: onglet }) => {
+  const hauteurs = [];
+  for (const largeur of [390, 1280]) {
+    await ouvrir(onglet, TYPES.find((t) => t.chemin === '/matchs/affiche/pour-le-patron/'), largeur);
+    hauteurs.push(...await onglet.locator('.affiche-format__choix').evaluateAll((liste) => liste.map((c) => Math.round(c.getBoundingClientRect().height * 10) / 10)));
+  }
+  expect(hauteurs).toEqual([44, 44, 44, 44]);
+});
+
 // En couleurs forcées (Windows, contraste élevé), le fond d’un bouton disparaît : l’appel ambre et « Me prévenir » gardent
 // un bord, donc leur forme de bouton, comme « Proposer mon bar » (tests/pages-generees.spec.mjs).
 test.describe('en couleurs forcées', () => {

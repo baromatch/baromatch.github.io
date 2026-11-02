@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "qNNO2vsBgwSA4XxlhrYkKA",
+   "empreinte": "HSGJ4AzdzoLhigkiq0yTOg",
    "change": "2026-11-02",
    "indexable": false,
    "bars": []
@@ -404,8 +404,8 @@
    "type": "match-en",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "Kz8uaW7SE-D3-EwAYDCL8g",
-   "change": "2026-11-01",
+   "empreinte": "JBMVE405nRerS2tUaTKuCw",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": []
   },
@@ -492,7 +492,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "9ZsrYfRCCS3x7FjMbUQX3w",
+   "empreinte": "cEZtkhom5BhcxZXSUhIbGA",
    "change": "2026-11-02",
    "indexable": false,
    "bars": []
@@ -2586,8 +2586,8 @@
    "type": "match",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "aYBFH0677O5z9ou_IXEMKw",
-   "change": "2026-11-01",
+   "empreinte": "5TyxpcL97Fort2V9dkiVJA",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2611,13 +2611,6 @@
      "slug": "everton-fc"
     }
    }
-  },
-  "/matchs/newcastle-everton-2026-11-02/match.ics": {
-   "type": "evenement",
-   "cle": "newcastle-everton-2026-11-02",
-   "empreinte": "kz7HXz6Byp4TNCxJRAzw_g",
-   "change": "2026-10-20",
-   "indexable": false
   },
   "/matchs/newcastle-everton-2026-11-02/partage.png": {
    "type": "partage",
@@ -3528,28 +3521,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5k1s002hryqj2vuxwdgo@baromatch.fr": {
-   "ids": [
-    "cmv6e5k1s002hryqj2vuxwdgo"
-   ],
-   "slug": "newcastle-everton-2026-11-02",
-   "debut": "2026-11-02T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "newcastle",
-    "court": "Newcastle",
-    "nom": "Newcastle United FC"
-   },
-   "exterieur": {
-    "cle": "everton",
-    "court": "Everton",
-    "nom": "Everton FC"
-   },
-   "empreinte": "rJXLKnYeg9Thv9FIsi-KFw",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmv6e5k2p002jryqjyhm5jlup@baromatch.fr": {
    "ids": [
     "cmv6e5k2p002jryqjyhm5jlup"

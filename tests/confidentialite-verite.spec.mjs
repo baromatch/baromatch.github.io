@@ -70,12 +70,12 @@ test('la page Confidentialité : l’hébergement aux Pays-Bas, et aucune garant
   expect(texte).toContain('Pour toute question sur ces transferts, écris-nous');
 });
 
-test('la page Confidentialité : les durées que l’effacement automatique appliquera disent ce qui se passe aujourd’hui', async ({ page }) => {
+test('la page Confidentialité : les durées que l’effacement automatique applique depuis le 2 novembre 2026', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const duree = normaliser(await page.locator('#combien-de-temps ~ ul').first().innerText());
-  expect(duree).toContain('Tes sessions de connexion : aujourd’hui, tant que ton compte existe. Prévu : effacées 30 jours après leur fin.');
-  expect(duree).toContain('Les matchs que tu veux voir : aujourd’hui, tant que ton compte existe. Prévu : effacés 30 jours après le match.');
-  expect(duree).toContain('aujourd’hui, tant que ton compte existe. Prévu : effacés au bout de 6 mois.');
+  expect(duree).toContain('Tes sessions de connexion : effacées 30 jours après leur fin.');
+  expect(duree).toContain('Les matchs que tu veux voir : effacés 30 jours après le match.');
+  expect(duree).toContain('L’adresse IP et l’appareil, dans les sessions et les traces de sécurité : effacés au bout de 6 mois.');
   const texte = await texteDe(page, '/confidentialite.html');
   expect(texte).not.toMatch(/effacée? automatiquement|Les journaux techniques : 30 jours|rien n’est gardé|anonymisé/);
   // La recherche d’adresse : les adresses trouvées sont gardées 5 minutes.
@@ -180,14 +180,14 @@ test('la page Confidentialité : les sauvegardes chiffrées, 5 semaines au plus,
   await page.goto('/confidentialite.html');
   const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
   for (const ligne of [
-    'L’heure à laquelle tu dis arriver avec « Je suis en retard », et l’heure jusqu’à laquelle ta place est alors gardée : aujourd’hui, avec ta place. Prévu : effacées un jour après le coup d’envoi.',
+    'L’heure à laquelle tu dis arriver avec « Je suis en retard », et l’heure jusqu’à laquelle ta place est alors gardée : effacées un jour après le coup d’envoi.',
     'L’attente après des mauvais mots de passe, pour l’équipe des bars : 24 heures après le dernier mauvais mot de passe.',
     'La case « mot de passe à changer » d’un compte de bar : jusqu’à ce que la personne choisisse son propre mot de passe.',
     'Les sauvegardes chiffrées de notre base : effacées une fois leurs 28 jours passés, à la sauvegarde suivante (5 semaines au plus).',
     'Les rapports d’erreurs chez Sentry, une fois allumé : 30 jours avec son offre gratuite, 90 avec une offre payante.',
     'Nos mails d’alerte, sans donnée personnelle : dans notre boîte mail tant qu’on les garde, et chez Resend selon ses conditions.',
     'Les compteurs du service (des nombres par tranche de 5 minutes, sans personne) : 2 heures.',
-    'La demande d’un bar envoyée par le formulaire du site : 12 mois, puis on l’efface nous-mêmes (voir « Les demandes des bars »).',
+    'La demande d’un bar envoyée par le formulaire du site : 12 mois, puis elle est effacée (voir « Les demandes des bars »).',
   ]) expect(durees).toContain(ligne);
 });
 
@@ -200,7 +200,7 @@ test('la page Confidentialité : le retard annoncé, les places en direct, tout 
   expect(retard).toContain('tu peux prévenir le bar que tu arrives dans 10, 20 ou 30 minutes, une fois par place');
   expect(retard).toContain('Ni ta position, ni un message.');
   expect(retard).toContain('toi, et le bar de cette soirée, pendant la soirée');
-  expect(retard).toContain('aujourd’hui, avec ta place. Prévu : effacées un jour après le coup d’envoi. Si tu supprimes ton compte, elles sont effacées tout de suite.');
+  expect(retard).toContain('Combien de temps : effacées un jour après le coup d’envoi. Si tu supprimes ton compte, elles sont effacées tout de suite.');
   expect(retard).toContain('La trace de sécurité (que tu as prévenu, et de combien de minutes) suit la durée des traces de sécurité');
   await expect(page.locator('#qui-voit-quoi + ul')).toContainText('se mettent à jour en direct sur les téléphones : ce sont des chiffres seulement, jamais qui a pris ou rendu une place');
   const notifications = normaliser(await page.locator('#notifications + ul').innerText());
@@ -366,4 +366,24 @@ test('les conditions d’utilisation : « Tolérance zéro », à l’ancre que 
   await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
   // La section suit « Au bar ».
   expect(await page.locator('#au-bar ~ h2').first().getAttribute('id')).toBe('respect');
+});
+
+// L’effacement automatique est en route depuis le 2 novembre 2026 : plus de durée « Prévu », plus de « pas encore en
+// route », et ce qui attendait l’effacement le dit au passé. « Supprimer ton compte » dit aussi ce que deviennent les
+// décisions de modération (12 mois, comme la page Confidentialité).
+test('la page Confidentialité : l’effacement automatique en route depuis le 2 novembre 2026', async ({ page }) => {
+  const texte = await texteDe(page, '/confidentialite.html');
+  expect(texte).toContain('Certaines de ces durées sont appliquées par un effacement automatique, en route depuis le 2 novembre 2026 : il passe une fois par heure.');
+  expect(texte).not.toMatch(/Prévu :|pas encore en route|soit en route\.|aujourd’hui, tant que ton compte existe\. /);
+  expect(texte).toContain('restaient jusqu’à ce que notre effacement automatique soit en route : il les efface depuis le 2 novembre 2026.');
+  expect(texte).toContain('gardaient l’adresse tapée en clair : depuis le 2 novembre 2026, notre effacement automatique la remplace par une empreinte.');
+  expect(texte).toContain('Un compte de porte retiré avant octobre 2026 gardait son prénom : notre effacement automatique l’efface depuis le 2 novembre 2026.');
+  expect(texte).toContain('Au bout de ce délai, notre effacement automatique efface ta demande de notre serveur, et on efface nous-mêmes de notre boîte le mail qui nous a prévenus');
+});
+
+test('la page « Supprimer ton compte » : les décisions de modération restent 12 mois, rattachées au compte vidé', async ({ page }) => {
+  await page.goto('/supprimer-mon-compte.html');
+  const decisions = normaliser(await page.locator('main li', { hasText: 'Les décisions de modération qui te concernent' }).innerText());
+  expect(decisions).toContain('s’il y en a : elles restent 12 mois après la décision, avec une empreinte de ton adresse mail, rattachées à ton compte vidé, puis elles sont effacées');
+  await expect(page.locator('main li', { hasText: /^Pour l’instant/ })).toHaveText('Pour l’instant, les totaux des bars et les traces de sécurité sont gardés sans durée fixée.');
 });

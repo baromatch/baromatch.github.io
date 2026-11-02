@@ -355,6 +355,6 @@ test('la confidentialité dit ce qu’on garde (l’adresse et la ville), pourqu
   await expect(section.locator('a[href="mailto:contact@baromatch.fr"]')).toHaveCount(1);
   expect(texte).not.toContain('rien d’autre.');
   // La date de la page, et celle du plan du site.
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
-  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-11-02</lastmod></url>');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 3 novembre 2026');
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-11-03</lastmod></url>');
 });

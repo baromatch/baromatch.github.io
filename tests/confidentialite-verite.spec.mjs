@@ -284,3 +284,34 @@ test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, 
   expect(texte).toContain('sans adresse IP ni appareil, avec une empreinte de ton adresse mail');
   await expect(page.locator('.document__date')).toHaveText('Mise à jour le 20 octobre 2026');
 });
+
+// « Bloquer » est dans l’appli depuis le 1er novembre 2026 : la page Confidentialité dit ce qu’on garde d’un blocage,
+// qui le voit, ce qu’il fait, combien de temps ; l’invitation ne montre les pseudos qu’à une personne connectée.
+test('la page Confidentialité : les personnes que tu bloques, et l’invitation sans pseudo hors connexion', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const blocages = normaliser(await page.locator('#blocages + ul').innerText());
+  expect(blocages).toContain('touche son siège, puis « Bloquer »');
+  expect(blocages).toContain('son pseudo au moment où tu l’as bloqué (effacé si l’équipe l’a remplacé), et la date');
+  expect(blocages).toContain('toi seulement, dans Réglages, « Personnes bloquées ». La personne n’est pas prévenue, et aucun bar ne le voit.');
+  expect(blocages).toContain('Tu ne peux pas rejoindre cette table.');
+  expect(blocages).toContain('Si elle y est déjà, elle garde sa place.');
+  expect(blocages).toContain('le bar, le match, l’heure et les places, sans aucun pseudo');
+  expect(blocages).toContain('les dates de tes blocages, sans le pseudo de la personne. Qui t’a bloqué n’y est pas.');
+  await expect(page.locator('#collecte + ul > li', { hasText: 'Les personnes que tu bloques' })).toHaveCount(1);
+  await expect(page.locator('#pourquoi + p + ul > li', { hasText: 'Bloquer quelqu’un à ta demande' })).toHaveCount(1);
+  const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
+  expect(durees).toContain('Les personnes que tu bloques : jusqu’à ce que tu les débloques, ou que l’un des deux comptes soit supprimé.');
+  const tablee = normaliser(await page.locator('#tablee ~ ul').first().innerText());
+  expect(tablee).toContain('les places, et l’ambiance de la salle (en parts, à partir de 5 réponses), sans aucun pseudo. Une fois connectée dans l’appli, elle peut voir aussi le pseudo de l’hôte et les pseudos de la tablée.');
+  expect(tablee).toContain('dont l’arrivée a été validée, sauf ceux que tu as bloqués.');
+  expect(normaliser(await page.locator('#suppression ~ ul').first().innerText())).toContain('Les blocages que tu as faits, et ceux qui visaient ton compte, sont supprimés.');
+  expect(normaliser(await page.locator('main').innerText())).toContain('Dans l’appli, la même invitation montre aussi les pseudos, seulement à une personne connectée');
+});
+
+test('les conditions d’utilisation : le lien d’une tablée sans pseudo hors connexion, et la bande sans ceux que tu as bloqués', async ({ page }) => {
+  await page.goto('/cgu.html');
+  const tablee = normaliser(await page.locator('#tablee ~ ul').first().innerText());
+  expect(tablee).toContain('voit le bar, le match, l’heure et les places, sans aucun pseudo. Une fois connectée dans l’appli, elle peut voir aussi le pseudo de l’hôte et les pseudos de la tablée, jamais leur camp.');
+  expect(tablee).toContain('Une personne bloquée par quelqu’un de la tablée ne peut pas la rejoindre, et, connectée, ne voit pas qui y est.');
+  expect(normaliser(await page.locator('#sous-bock + p').innerText())).toContain('les pseudos de ceux dont l’arrivée a été validée, sauf ceux que tu as bloqués.');
+});

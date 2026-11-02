@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "PVgtDaT0sjepTwCIswUztA",
-   "change": "2026-11-01",
+   "empreinte": "aRDHcuZPMvzZeadDtadVFw",
+   "change": "2026-11-02",
    "indexable": true,
    "bars": []
   },
@@ -133,8 +133,8 @@
   "/agenda/om.ics": {
    "type": "calendrier",
    "cle": "om",
-   "empreinte": "_XDfGxQBs3bxl013pD4KTg",
-   "change": "2026-11-01",
+   "empreinte": "DYzLnEYmNTLuWcI_oXVjUQ",
+   "change": "2026-11-02",
    "indexable": false,
    "memoire": {
     "court": "OM",
@@ -188,8 +188,8 @@
   "/agenda/toulouse.ics": {
    "type": "calendrier",
    "cle": "toulouse",
-   "empreinte": "F3RKOk__8hSI_tIJirEaSg",
-   "change": "2026-11-01",
+   "empreinte": "tmfmVkeaZUFMvmdngQl5rQ",
+   "change": "2026-11-02",
    "indexable": false,
    "memoire": {
     "court": "Toulouse",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "1zZOQQkii6QSDG82U5aisA",
-   "change": "2026-11-01",
+   "empreinte": "qNNO2vsBgwSA4XxlhrYkKA",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "ZvsSIt4Yu2rAFtRjbcjUbA",
-   "change": "2026-11-01",
+   "empreinte": "p2NI9sM0pEUaed8iOp8ubA",
+   "change": "2026-11-02",
    "indexable": false
   },
   "/en/": {
@@ -314,8 +314,8 @@
    "type": "match-en",
    "cle": "juventus-rennes-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "yaJyeUvUjzLlMR8wXii_XQ",
-   "change": "2026-11-01",
+   "empreinte": "Gd1_Ql332hyV_EVbYC2kQQ",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": []
   },
@@ -467,8 +467,8 @@
    "type": "match-en",
    "cle": "sturm-graz-om-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "FpFJZODINhR_hsLImZOS-A",
-   "change": "2026-11-01",
+   "empreinte": "BOEzIyuAgRp4Mw_tUElQfA",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": []
   },
@@ -492,31 +492,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "tsZKTKejKeNNiJx-VxsAOw",
-   "change": "2026-11-01",
+   "empreinte": "9ZsrYfRCCS3x7FjMbUQX3w",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "HYKNb5LpA7tYJ3Jy6mlFUQ",
-   "change": "2026-11-01",
+   "empreinte": "--AHQhU7Z5QNWGG__o58rw",
+   "change": "2026-11-02",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "XPJQhRC2oJXFVis-cFwKeg",
-   "change": "2026-11-01",
+   "empreinte": "hFJYtGUtcxVpqQr3zvl-Dg",
+   "change": "2026-11-02",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "RO8SjjW0Yu7Fj2FZgNSkAg",
-   "change": "2026-11-01",
+   "empreinte": "B0dq7DKxKLiuZSL2zmgKIg",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": []
   },
@@ -598,8 +598,8 @@
    "type": "match",
    "cle": "angers-om-2026-10-18",
    "date": "2026-10-18T13:00:00.000Z",
-   "empreinte": "3koX2i-MRv8OFRqWTF9K9Q",
-   "change": "2026-11-01",
+   "empreinte": "sY5SxpzN9MZJOMnf4cDD-w",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1203,8 +1203,8 @@
   "/matchs/club/om/": {
    "type": "club",
    "cle": "om",
-   "empreinte": "0Z1SNm2akYTSho23ru1EEQ",
-   "change": "2026-11-01",
+   "empreinte": "F8aMZgWZp_Us1ThcafIVWA",
+   "change": "2026-11-02",
    "indexable": true,
    "bars": []
   },
@@ -1243,8 +1243,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "fs3NZQkLB2T7i84VVvPC1g",
-   "change": "2026-11-01",
+   "empreinte": "M48PxDnnlPZiHL9V1Ep78g",
+   "change": "2026-11-02",
    "indexable": true,
    "bars": []
   },
@@ -1283,8 +1283,8 @@
   "/matchs/competition/serie-a/": {
    "type": "competition",
    "cle": "serie-a",
-   "empreinte": "5jwARFTE9a3wP7V3Qo3jyg",
-   "change": "2026-11-01",
+   "empreinte": "dsQzThYKFGHlONkkYtMigg",
+   "change": "2026-11-02",
    "indexable": true,
    "bars": []
   },
@@ -1452,6 +1452,50 @@
    "change": "2026-10-30",
    "indexable": false
   },
+  "/matchs/france-turquie-2026-11-15/": {
+   "type": "match",
+   "cle": "france-turquie-2026-11-15",
+   "date": "2026-11-15T19:45:00.000Z",
+   "empreinte": "O3JmfHkW9JYGKfb52N734g",
+   "change": "2026-11-02",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "france-turquie-2026-11-15",
+    "ids": [
+     "cmvxrat3q0008g7uu7qrhx99m"
+    ],
+    "debut": "2026-11-15T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des nations",
+    "domicile": {
+     "cle": "france",
+     "court": "France",
+     "nom": "France",
+     "slug": "nt-fr"
+    },
+    "exterieur": {
+     "cle": "turquie",
+     "court": "Turquie",
+     "nom": "Turquie",
+     "slug": "nt-tr"
+    }
+   }
+  },
+  "/matchs/france-turquie-2026-11-15/match.ics": {
+   "type": "evenement",
+   "cle": "france-turquie-2026-11-15",
+   "empreinte": "Sg6ciJMFUFE0zqOfHTMb5w",
+   "change": "2026-11-02",
+   "indexable": false
+  },
+  "/matchs/france-turquie-2026-11-15/partage.png": {
+   "type": "partage",
+   "cle": "france-turquie-2026-11-15",
+   "empreinte": "eetbBAZrwveuKbx6pGgwVg",
+   "change": "2026-11-02",
+   "indexable": false
+  },
   "/matchs/hoffenheim-ol-2026-10-22/": {
    "type": "match",
    "cle": "hoffenheim-ol-2026-10-22",
@@ -1516,8 +1560,8 @@
    "type": "match",
    "cle": "italie-france-2026-11-12",
    "date": "2026-11-12T19:45:00.000Z",
-   "empreinte": "9uLifOxTEZZq-RkgCvwBgg",
-   "change": "2026-11-01",
+   "empreinte": "Vla6WXpFvkToBoCAPbQ_pQ",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1560,8 +1604,8 @@
    "type": "match",
    "cle": "juventus-lazio-2026-10-18",
    "date": "2026-10-18T18:45:00.000Z",
-   "empreinte": "c0Lf39X2RbnPFHjEmo9guA",
-   "change": "2026-11-01",
+   "empreinte": "ugNcOT0yDK8nC_2ip4HkRA",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1590,8 +1634,8 @@
    "type": "match",
    "cle": "juventus-naples-2026-11-01",
    "date": "2026-11-01T19:45:00.000Z",
-   "empreinte": "6WM2usB9LKAHjYQXCEff5g",
-   "change": "2026-11-01",
+   "empreinte": "e9E26dxKbBTnREXCc1BR0A",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1616,26 +1660,12 @@
     }
    }
   },
-  "/matchs/juventus-naples-2026-11-01/match.ics": {
-   "type": "evenement",
-   "cle": "juventus-naples-2026-11-01",
-   "empreinte": "JMwZisMxW5mPmRF8Uz1qew",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/juventus-naples-2026-11-01/partage.png": {
-   "type": "partage",
-   "cle": "juventus-naples-2026-11-01",
-   "empreinte": "xyYdi_CvVyDCnWqWWttDMQ",
-   "change": "2026-10-30",
-   "indexable": false
-  },
   "/matchs/juventus-rennes-2026-10-22/": {
    "type": "match",
    "cle": "juventus-rennes-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "Fjjzp2OMtWWVxKKGD6HQgg",
-   "change": "2026-11-01",
+   "empreinte": "aVBKYRcegR_UW0WdmBet9g",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1812,8 +1842,8 @@
    "type": "match",
    "cle": "le-mans-toulouse-2026-10-16",
    "date": "2026-10-16T18:45:00.000Z",
-   "empreinte": "rgloy6BAnq8dCpbl6S5-PA",
-   "change": "2026-11-01",
+   "empreinte": "hCUeWTl8vDj1o18s_wGdAw",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2496,8 +2526,8 @@
    "type": "match",
    "cle": "naples-rome-2026-10-24",
    "date": "2026-10-24T16:00:00.000Z",
-   "empreinte": "Ffp9Cr5lla7SNovagERUYQ",
-   "change": "2026-11-01",
+   "empreinte": "5vVqt4uguG5n41_sfrFTaQ",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2690,8 +2720,8 @@
    "type": "match",
    "cle": "om-le-havre-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "SCpGHuEmu0jOU4Y0ob8sZA",
-   "change": "2026-11-01",
+   "empreinte": "RvLykRjl5Rf8HznDAfvj1w",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2720,8 +2750,8 @@
    "type": "match",
    "cle": "om-toulouse-2026-11-01",
    "date": "2026-11-01T19:45:00.000Z",
-   "empreinte": "GshD4H6_oAJeTwI1zgkC3Q",
-   "change": "2026-11-01",
+   "empreinte": "P80vMrtAFZLqfR1JK5Xuwg",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2745,20 +2775,6 @@
      "slug": "toulouse-fc"
     }
    }
-  },
-  "/matchs/om-toulouse-2026-11-01/match.ics": {
-   "type": "evenement",
-   "cle": "om-toulouse-2026-11-01",
-   "empreinte": "L4x44S01SqzmitKH1J3oAA",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/om-toulouse-2026-11-01/partage.png": {
-   "type": "partage",
-   "cle": "om-toulouse-2026-11-01",
-   "empreinte": "Y9LS1rjDVS2hYJ2BnY9bXg",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/paris-fc-monaco-2026-11-01/": {
    "type": "match",
@@ -3181,8 +3197,8 @@
    "type": "match",
    "cle": "sturm-graz-om-2026-10-22",
    "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "KwskaNsJUBo7pYWCa_oljg",
-   "change": "2026-11-01",
+   "empreinte": "4UbamxGCzWa-_6U-dHTJjQ",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3255,8 +3271,8 @@
    "type": "match",
    "cle": "toulouse-troyes-2026-10-24",
    "date": "2026-10-24T15:15:00.000Z",
-   "empreinte": "LmhW33lpzKpcUTLV7HhHxA",
-   "change": "2026-11-01",
+   "empreinte": "ivXDaOMjItM6fguDYU2h0g",
+   "change": "2026-11-02",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3512,50 +3528,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5k09002dryqjbeqv604m@baromatch.fr": {
-   "ids": [
-    "cmv6e5k09002dryqjbeqv604m"
-   ],
-   "slug": "om-toulouse-2026-11-01",
-   "debut": "2026-11-01T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "om",
-    "court": "OM",
-    "nom": "Olympique de Marseille"
-   },
-   "exterieur": {
-    "cle": "toulouse",
-    "court": "Toulouse",
-    "nom": "Toulouse FC"
-   },
-   "empreinte": "TDShQB662ClkrJJ7AC9KZA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
-  "cmv6e5k0w002fryqj0vgfp9p8@baromatch.fr": {
-   "ids": [
-    "cmv6e5k0w002fryqj0vgfp9p8"
-   ],
-   "slug": "juventus-naples-2026-11-01",
-   "debut": "2026-11-01T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Serie A",
-   "domicile": {
-    "cle": "juventus",
-    "court": "Juventus",
-    "nom": "Juventus FC"
-   },
-   "exterieur": {
-    "cle": "naples",
-    "court": "Naples",
-    "nom": "SSC Napoli"
-   },
-   "empreinte": "nsRAbRrwb-fMxI9ZF-YNMA",
-   "sequence": 0,
-   "modifie": "2026-10-20T10:48:07Z"
-  },
   "cmv6e5k1s002hryqj2vuxwdgo@baromatch.fr": {
    "ids": [
     "cmv6e5k1s002hryqj2vuxwdgo"
@@ -4611,6 +4583,28 @@
    "empreinte": "t-cevMplrWRoXGPCCMNPmA",
    "sequence": 0,
    "modifie": "2026-11-01T12:06:10Z"
+  },
+  "cmvxrat3q0008g7uu7qrhx99m@baromatch.fr": {
+   "ids": [
+    "cmvxrat3q0008g7uu7qrhx99m"
+   ],
+   "slug": "france-turquie-2026-11-15",
+   "debut": "2026-11-15T19:45:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Ligue des nations",
+   "domicile": {
+    "cle": "france",
+    "court": "France",
+    "nom": "France"
+   },
+   "exterieur": {
+    "cle": "turquie",
+    "court": "Turquie",
+    "nom": "Turquie"
+   },
+   "empreinte": "w9M-hKta9LIiq7u4Do-bFw",
+   "sequence": 0,
+   "modifie": "2026-11-02T00:41:25Z"
   }
  }
 }

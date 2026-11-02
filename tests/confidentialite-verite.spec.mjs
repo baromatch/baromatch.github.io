@@ -313,6 +313,7 @@ test('la page Confidentialité : les personnes que tu bloques, et l’invitation
 test('la page « Supprimer ton compte » : les blocages partent tout de suite, dans les deux sens', async ({ page }) => {
   await page.goto('/supprimer-mon-compte.html');
   await expect(page.locator('main li', { hasText: 'Les blocages que tu as faits, et ceux qui visaient ton compte.' })).toHaveCount(1);
+  expect(normaliser(await page.locator('main').innerText())).toContain('ce sera un compte neuf, sans tes places ni ton album. Sauf si l’équipe a fermé ton compte : pas avant 12 mois après la fermeture.');
 });
 
 test('les conditions d’utilisation : le lien d’une tablée sans pseudo hors connexion, et la bande sans ceux que tu as bloqués', async ({ page }) => {

@@ -282,7 +282,7 @@ test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, 
   expect(texte).toContain('Ces données sont pseudonymisées');
   expect(texte).not.toMatch(/Personne ne peut plus les relier à toi|au bout de 6 mois|sans ton historique/);
   expect(texte).toContain('sans adresse IP ni appareil, avec une empreinte de ton adresse mail');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 20 octobre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
 });
 
 // « Bloquer » est dans l’appli depuis le 1er novembre 2026 : la page Confidentialité dit ce qu’on garde d’un blocage,
@@ -294,8 +294,8 @@ test('la page Confidentialité : les personnes que tu bloques, et l’invitation
   expect(blocages).toContain('son pseudo au moment où tu l’as bloqué (effacé si l’équipe l’a remplacé), et la date');
   expect(blocages).toContain('toi seulement, dans Réglages, « Personnes bloquées ». La personne n’est pas prévenue, et aucun bar ne le voit.');
   expect(blocages).toContain('Tu ne peux pas rejoindre cette table.');
-  expect(blocages).toContain('Si elle y est déjà, elle garde sa place.');
-  expect(blocages).toContain('le bar, le match, l’heure et les places, sans aucun pseudo');
+  expect(blocages).toContain('connectée, elle ne voit pas qui y est. Si elle y est déjà, elle garde sa place et voit la tablée comme avant.');
+  expect(blocages).toContain('le bar, le match, l’heure, les places et l’ambiance de la salle, sans aucun pseudo');
   expect(blocages).toContain('les dates de tes blocages, sans le pseudo de la personne. Qui t’a bloqué n’y est pas.');
   await expect(page.locator('#collecte + ul > li', { hasText: 'Les personnes que tu bloques' })).toHaveCount(1);
   await expect(page.locator('#pourquoi + p + ul > li', { hasText: 'Bloquer quelqu’un à ta demande' })).toHaveCount(1);
@@ -306,6 +306,13 @@ test('la page Confidentialité : les personnes que tu bloques, et l’invitation
   expect(tablee).toContain('dont l’arrivée a été validée, sauf ceux que tu as bloqués.');
   expect(normaliser(await page.locator('#suppression ~ ul').first().innerText())).toContain('Les blocages que tu as faits, et ceux qui visaient ton compte, sont supprimés.');
   expect(normaliser(await page.locator('main').innerText())).toContain('Dans l’appli, la même invitation montre aussi les pseudos, seulement à une personne connectée');
+  expect(tablee).toContain('Une personne bloquée par quelqu’un de la tablée ne peut pas la rejoindre, et, connectée, ne voit pas qui y est');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+});
+
+test('la page « Supprimer ton compte » : les blocages partent tout de suite, dans les deux sens', async ({ page }) => {
+  await page.goto('/supprimer-mon-compte.html');
+  await expect(page.locator('main li', { hasText: 'Les blocages que tu as faits, et ceux qui visaient ton compte.' })).toHaveCount(1);
 });
 
 test('les conditions d’utilisation : le lien d’une tablée sans pseudo hors connexion, et la bande sans ceux que tu as bloqués', async ({ page }) => {

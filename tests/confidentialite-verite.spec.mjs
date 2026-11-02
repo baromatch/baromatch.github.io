@@ -282,7 +282,7 @@ test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, 
   expect(texte).toContain('Ces données sont pseudonymisées');
   expect(texte).not.toMatch(/Personne ne peut plus les relier à toi|au bout de 6 mois|sans ton historique/);
   expect(texte).toContain('sans adresse IP ni appareil, avec une empreinte de ton adresse mail');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 3 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
 });
 
 // « Bloquer » est dans l’appli depuis le 1er novembre 2026 : la page Confidentialité dit ce qu’on garde d’un blocage,
@@ -307,7 +307,7 @@ test('la page Confidentialité : les personnes que tu bloques, et l’invitation
   expect(normaliser(await page.locator('#suppression ~ ul').first().innerText())).toContain('Les blocages que tu as faits, et ceux qui visaient ton compte, sont supprimés.');
   expect(normaliser(await page.locator('main').innerText())).toContain('Dans l’appli, la même invitation montre aussi les pseudos, seulement à une personne connectée');
   expect(tablee).toContain('Une personne bloquée par quelqu’un de la tablée ne peut pas la rejoindre, et, connectée, ne voit pas qui y est');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 3 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
 });
 
 test('la page « Supprimer ton compte » : les blocages partent tout de suite, dans les deux sens', async ({ page }) => {
@@ -347,7 +347,7 @@ test('la page Confidentialité : les décisions de modération, leurs durées, e
   expect(suppression).toContain('Les décisions de modération qui te concernent restent 12 mois après la décision');
   expect(suppression).toContain('Sauf si l’équipe a fermé ton compte : pas avant 12 mois après la fermeture.');
   expect(normaliser(await page.locator('main').innerText())).toContain('Si ton compte est fermé (banni), tu ne peux plus te connecter, mais tu gardes tous tes droits. Écris-nous depuis l’adresse de ton compte, et on fait l’export ou la suppression pour toi. Un compte fermé est effacé au bout de 37 jours');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 3 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
 });
 
 // « Tolérance zéro » : les mails de décision de modération y renvoient (cgu.html#respect), avec le blocage.
@@ -363,7 +363,7 @@ test('les conditions d’utilisation : « Tolérance zéro », à l’ancre que 
   expect(respect).toContain('Tu la débloques quand tu veux, dans Réglages, « Personnes bloquées ».');
   await expect(page.locator('#respect + ul a[href="/confidentialite.html#moderation"]')).toHaveCount(1);
   await expect(page.locator('#essentiel + ul > li', { hasText: /^Tolérance zéro/ })).toHaveCount(1);
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 3 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
   // La section suit « Au bar ».
   expect(await page.locator('#au-bar ~ h2').first().getAttribute('id')).toBe('respect');
 });

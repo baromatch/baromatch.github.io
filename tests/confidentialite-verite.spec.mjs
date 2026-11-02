@@ -263,7 +263,7 @@ test('la page Confidentialité : les pseudos signalés, ce que voit la plateform
   await page.goto('/confidentialite.html');
   const signalements = normaliser(await page.locator('#signalements + ul').innerText());
   expect(signalements).toContain('qui signale (ton compte), le compte signalé, la raison choisie et la date');
-  expect(signalements).toContain('La personne signalée n’en voit rien, et aucun bar ne voit les signalements de pseudos.');
+  expect(signalements).toContain('La personne signalée ne sait jamais qui l’a signalée, et aucun bar ne voit les signalements de pseudos.');
   expect(signalements).toContain('le pseudo d’aujourd’hui, le nombre de personnes qui l’ont signalé, les raisons, et les dates du premier et du dernier signalement. Jamais qui a signalé, jamais une adresse mail.');
   expect(signalements).toContain('un signalement n’agit jamais tout seul');
   expect(signalements).toContain('qui reçoit alors un pseudo tiré au hasard');
@@ -313,6 +313,7 @@ test('la page Confidentialité : les personnes que tu bloques, et l’invitation
 test('la page « Supprimer ton compte » : les blocages partent tout de suite, dans les deux sens', async ({ page }) => {
   await page.goto('/supprimer-mon-compte.html');
   await expect(page.locator('main li', { hasText: 'Les blocages que tu as faits, et ceux qui visaient ton compte.' })).toHaveCount(1);
+  expect(normaliser(await page.locator('main').innerText())).toContain('ce sera un compte neuf, sans tes places ni ton album. Sauf si l’équipe a fermé ton compte : pas avant 12 mois après la fermeture.');
 });
 
 test('les conditions d’utilisation : le lien d’une tablée sans pseudo hors connexion, et la bande sans ceux que tu as bloqués', async ({ page }) => {
@@ -321,4 +322,48 @@ test('les conditions d’utilisation : le lien d’une tablée sans pseudo hors 
   expect(tablee).toContain('voit le bar, le match, l’heure et les places, sans aucun pseudo. Une fois connectée dans l’appli, elle peut voir aussi le pseudo de l’hôte et les pseudos de la tablée, jamais leur camp.');
   expect(tablee).toContain('Une personne bloquée par quelqu’un de la tablée ne peut pas la rejoindre, et, connectée, ne voit pas qui y est.');
   expect(normaliser(await page.locator('#sous-bock + p').innerText())).toContain('les pseudos de ceux dont l’arrivée a été validée, sauf ceux que tu as bloqués.');
+});
+
+// La modération (le règlement européen sur les services numériques, article 17) : un mail à chaque décision, avec la
+// raison et le moyen de contester ; ce qu’on garde, combien de temps ; la fermeture d’un compte et ses 37 jours.
+test('la page Confidentialité : les décisions de modération, leurs durées, et ce qui reste d’un compte fermé', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const moderation = normaliser(await page.locator('#moderation + ul').innerText());
+  expect(moderation).toContain('Ce mail ne dit jamais qui t’a signalé et ne contient rien d’autre sur toi.');
+  expect(moderation).toContain('Une personne de l’équipe relit la décision et te répond sous 7 jours.');
+  expect(moderation).toContain('tu as 30 jours pour contester');
+  expect(moderation).toContain('Au bout de 37 jours, il est effacé comme si tu le supprimais');
+  expect(moderation).toContain('la décision et l’empreinte de ton adresse, 12 mois après la décision.');
+  expect(moderation).toContain('article 17');
+  expect(moderation).toContain('Jamais le pseudo remplacé ni la photo retirée.');
+  const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
+  expect(durees).toContain('Une décision de modération qui te concerne (et une empreinte de ton adresse) : 12 mois après la décision.');
+  expect(durees).toContain('Un compte fermé par l’équipe : 37 jours après la fermeture (30 pour contester, 7 pour qu’on te réponde), puis effacé comme si tu le supprimais (voir « Les décisions de modération »).');
+  await expect(page.locator('#collecte + ul > li', { hasText: 'Les décisions de modération qui te concernent' })).toHaveCount(1);
+  await expect(page.locator('#pourquoi + p + ul > li', { hasText: 'Te prévenir d’une décision de modération' })).toHaveCount(1);
+  expect(normaliser(await page.locator('#signalements + ul').innerText())).toContain('Si on renomme le compte, on prévient la personne par mail, avec la raison et le moyen de contester, sans dire qui l’a signalée');
+  await expect(page.locator('#prestataires + ul > li', { hasText: /^Resend/ })).toContainText('le mail qui te prévient d’une décision de modération sur ton compte');
+  const suppression = normaliser(await page.locator('#suppression ~ ul').first().innerText());
+  expect(suppression).toContain('Les décisions de modération qui te concernent restent 12 mois après la décision');
+  expect(suppression).toContain('Sauf si l’équipe a fermé ton compte : pas avant 12 mois après la fermeture.');
+  expect(normaliser(await page.locator('main').innerText())).toContain('Si ton compte est fermé (banni), tu ne peux plus te connecter, mais tu gardes tous tes droits. Écris-nous depuis l’adresse de ton compte, et on fait l’export ou la suppression pour toi. Un compte fermé est effacé au bout de 37 jours');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+});
+
+// « Tolérance zéro » : les mails de décision de modération y renvoient (cgu.html#respect), avec le blocage.
+test('les conditions d’utilisation : « Tolérance zéro », à l’ancre que citent les mails de modération', async ({ page }) => {
+  await page.goto('/cgu.html');
+  await expect(page.locator('h2#respect')).toHaveText('Tolérance zéro');
+  const respect = normaliser(await page.locator('#respect + ul').innerText());
+  expect(respect).toContain('Pas de pseudo ni de photo injurieux, haineux, sexuels ou violents');
+  expect(respect).toContain('On regarde chaque signalement sous 24 heures.');
+  expect(respect).toContain('il est effacé au bout de 37 jours');
+  expect(respect).toContain('pour une fermeture, tu as 30 jours. Une personne de l’équipe relit la décision et te répond sous 7 jours.');
+  expect(respect).toContain('Tu peux bloquer quelqu’un : touche son siège dans une tablée, puis « Bloquer ».');
+  expect(respect).toContain('Tu la débloques quand tu veux, dans Réglages, « Personnes bloquées ».');
+  await expect(page.locator('#respect + ul a[href="/confidentialite.html#moderation"]')).toHaveCount(1);
+  await expect(page.locator('#essentiel + ul > li', { hasText: /^Tolérance zéro/ })).toHaveCount(1);
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+  // La section suit « Au bar ».
+  expect(await page.locator('#au-bar ~ h2').first().getAttribute('id')).toBe('respect');
 });

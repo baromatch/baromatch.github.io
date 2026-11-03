@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "aRDHcuZPMvzZeadDtadVFw",
-   "change": "2026-11-02",
+   "empreinte": "YDkSv2YRkwTuyvIK-U1bgQ",
+   "change": "2026-11-04",
    "indexable": true,
    "bars": []
   },
@@ -78,8 +78,8 @@
   "/agenda/lille.ics": {
    "type": "calendrier",
    "cle": "lille",
-   "empreinte": "VOtzTR9JSqov1no2cAEzjA",
-   "change": "2026-11-01",
+   "empreinte": "nSGrLdwbPWX6d5gevOBIrQ",
+   "change": "2026-11-04",
    "indexable": false,
    "memoire": {
     "court": "Lille",
@@ -155,8 +155,8 @@
   "/agenda/psg.ics": {
    "type": "calendrier",
    "cle": "psg",
-   "empreinte": "5TnLhzmk7iI6PSNC2UDoZw",
-   "change": "2026-11-01",
+   "empreinte": "I9bO_wfr0WoQmw3Hvwiz4g",
+   "change": "2026-11-04",
    "indexable": false,
    "memoire": {
     "court": "PSG",
@@ -210,31 +210,31 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "_9foqL77JQawzTTAPGwtlw",
-   "change": "2026-11-03",
+   "empreinte": "232_IZxq7MtUZJxuOF2q0Q",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "FVKn4KFXFdd2W_Vn4gFDxg",
-   "change": "2026-11-03",
+   "empreinte": "D6IWYXlClUfu88fhHJDisw",
+   "change": "2026-11-04",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "yd4GMmdh9zvEnfFgvwCzmA",
-   "change": "2026-11-03",
+   "empreinte": "V0Rb0e5foRHuFUEDrlKIOg",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
   "/en/champions-league/": {
    "type": "guide-en",
    "cle": "champions-league",
-   "empreinte": "mabvNLleE9S2ZhmyjzpOxw",
-   "change": "2026-11-01",
+   "empreinte": "uVoXj0_JY6HYMtyjAJhPIA",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -260,8 +260,8 @@
    "type": "match-en",
    "cle": "bodo-glimt-lille-2026-11-03",
    "date": "2026-11-03T20:00:00.000Z",
-   "empreinte": "cZf4Sq7E8Jn28K3Uehisiw",
-   "change": "2026-11-01",
+   "empreinte": "2xCTz5Z-1QY5Zvg64QwXyw",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -323,8 +323,8 @@
    "type": "match-en",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "sfflslDwfSENmJMNkhfmTg",
-   "change": "2026-11-01",
+   "empreinte": "xzAqJBVTNggduUOe2H4tAw",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -350,8 +350,8 @@
    "type": "match-en",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "BDUwb37Z87EQB67P34dm5g",
-   "change": "2026-11-01",
+   "empreinte": "T3reQ338SCkaoniGJQceNg",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -413,8 +413,8 @@
    "type": "match-en",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "2d4c9mi4nHCFfsnoLn0MBg",
-   "change": "2026-11-01",
+   "empreinte": "iDbHV5gjDNQWHs6CZI4_vw",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -422,8 +422,8 @@
    "type": "match-en",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "_iPZ6ff-zugzlQlKdD1Bmw",
-   "change": "2026-11-01",
+   "empreinte": "W4Z5Zt0UC5VKbMgVMi1Gig",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -458,8 +458,8 @@
    "type": "match-en",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "4fr4KAsL9o89nCvdwd7iKA",
-   "change": "2026-11-01",
+   "empreinte": "LWS_V9iaoLMyYVGTF5WZZg",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -476,8 +476,8 @@
    "type": "match-en",
    "cle": "villarreal-psg-2026-11-03",
    "date": "2026-11-03T20:00:00.000Z",
-   "empreinte": "OZX37DBU1HyYjiOaDXSVMw",
-   "change": "2026-11-01",
+   "empreinte": "PFCc-wH3AoRePRBm7i_MeA",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -492,31 +492,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "aAi1Mp3AQEBZFUkokLPe1Q",
-   "change": "2026-11-03",
+   "empreinte": "7bD6_t5mnlam-sPeMCSOwA",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "FKUz8ucrtk8JUJwps_friA",
-   "change": "2026-11-03",
+   "empreinte": "lVFQdO51JDKtSJbjSX7stg",
+   "change": "2026-11-04",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "4UEGi5zi668cW5kmjgak3g",
-   "change": "2026-11-03",
+   "empreinte": "JRavbixoKoZaPTpB2gWbfw",
+   "change": "2026-11-04",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "SYkxJ5y8z4Ep0XZja81DeQ",
-   "change": "2026-11-03",
+   "empreinte": "z5cz1JQ8bfNlDt8FyBFXbQ",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -956,8 +956,8 @@
    "type": "match",
    "cle": "bodo-glimt-lille-2026-11-03",
    "date": "2026-11-03T20:00:00.000Z",
-   "empreinte": "JfKQcxVDH1k-ovXZSutFNA",
-   "change": "2026-11-01",
+   "empreinte": "mlKZIR5UV-vFhejgc8yI8A",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -981,20 +981,6 @@
      "slug": "losc-lille"
     }
    }
-  },
-  "/matchs/bodo-glimt-lille-2026-11-03/match.ics": {
-   "type": "evenement",
-   "cle": "bodo-glimt-lille-2026-11-03",
-   "empreinte": "zfKB0qnZLGyZVv7Q4mKERA",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/bodo-glimt-lille-2026-11-03/partage.png": {
-   "type": "partage",
-   "cle": "bodo-glimt-lille-2026-11-03",
-   "empreinte": "0LEJV82aDEpmQmUN2LCHOQ",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/brest-nice-2026-10-23/": {
    "type": "match",
@@ -1171,8 +1157,8 @@
   "/matchs/club/lille/": {
    "type": "club",
    "cle": "lille",
-   "empreinte": "vPGYxL-iRX7D-hMCTdzLGg",
-   "change": "2026-11-01",
+   "empreinte": "KPVb1pUkkzklerhaB7rI4A",
+   "change": "2026-11-04",
    "indexable": true,
    "bars": []
   },
@@ -1211,8 +1197,8 @@
   "/matchs/club/psg/": {
    "type": "club",
    "cle": "psg",
-   "empreinte": "zremZ7MHeVYAa0xVMq7OeA",
-   "change": "2026-11-01",
+   "empreinte": "IgV_RZgC2Ehn-80BJ66sbw",
+   "change": "2026-11-04",
    "indexable": true,
    "bars": []
   },
@@ -1259,8 +1245,8 @@
   "/matchs/competition/ligue-des-champions/": {
    "type": "competition",
    "cle": "ligue-des-champions",
-   "empreinte": "oMJgOdsB2Q_nYqmlnxsIeA",
-   "change": "2026-11-01",
+   "empreinte": "13mYqje0bKAEkCxK4riK6Q",
+   "change": "2026-11-04",
    "indexable": true,
    "bars": []
   },
@@ -1768,8 +1754,8 @@
    "type": "match",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "sg3xgGCCM5t-2TCTjukCOQ",
-   "change": "2026-11-01",
+   "empreinte": "xuM0coTYjgzDeuF6VGdspg",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2094,8 +2080,8 @@
    "type": "match",
    "cle": "lille-brest-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "gG4ia0DSjpwbU5G7Zselwg",
-   "change": "2026-11-01",
+   "empreinte": "V60Fokvu11XROb_btTud-A",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2124,8 +2110,8 @@
    "type": "match",
    "cle": "lille-galatasaray-2026-10-21",
    "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "n_IkqD2oNpqjwuU-fpwibQ",
-   "change": "2026-11-01",
+   "empreinte": "k0Qzp3WRLYnA_y3yPb4q4w",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2154,8 +2140,8 @@
    "type": "match",
    "cle": "lille-lens-2026-10-30",
    "date": "2026-10-30T20:05:00.000Z",
-   "empreinte": "AdbiNVUurC3KhDRCuU3KCA",
-   "change": "2026-11-01",
+   "empreinte": "liXdlJpi-KF8iWeZVzNgpA",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2408,8 +2394,8 @@
    "type": "match",
    "cle": "monaco-lille-2026-10-25",
    "date": "2026-10-25T14:00:00.000Z",
-   "empreinte": "AAvYuwzQnNjrkLwx5IwAkg",
-   "change": "2026-11-01",
+   "empreinte": "d5c33zDvWMQqg8QJ5D77KQ",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2826,8 +2812,8 @@
    "type": "match",
    "cle": "psg-barca-2026-10-20",
    "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "8w5pJj5mxnYhx_VSmNkkyQ",
-   "change": "2026-11-01",
+   "empreinte": "T5UoHknmcNQk8-FG8CCUSg",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2857,8 +2843,8 @@
    "type": "match",
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
-   "empreinte": "xxxxbBXSjDzP14tflcJ0CA",
-   "change": "2026-11-01",
+   "empreinte": "khF_whKwenQn6dJFr5WZ8Q",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3153,8 +3139,8 @@
    "type": "match",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "IgIQ_ZSBIMNN3x1jmh0emw",
-   "change": "2026-11-01",
+   "empreinte": "hqR_WCQWlEVQFVkksW3iPQ",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3391,8 +3377,8 @@
    "type": "match",
    "cle": "villarreal-psg-2026-11-03",
    "date": "2026-11-03T20:00:00.000Z",
-   "empreinte": "mKTdiogPRAWCiJvM9-VWXg",
-   "change": "2026-11-01",
+   "empreinte": "hTA0mIKXdx0qlAAYobC8Kg",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3416,20 +3402,6 @@
      "slug": "paris-saint-germain"
     }
    }
-  },
-  "/matchs/villarreal-psg-2026-11-03/match.ics": {
-   "type": "evenement",
-   "cle": "villarreal-psg-2026-11-03",
-   "empreinte": "GIYm68VDRYwYsky4bBKOZg",
-   "change": "2026-10-20",
-   "indexable": false
-  },
-  "/matchs/villarreal-psg-2026-11-03/partage.png": {
-   "type": "partage",
-   "cle": "villarreal-psg-2026-11-03",
-   "empreinte": "Iwt45J6fLySl3KD3aP6yGA",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/regarder-le-match/": {
    "type": "villes",
@@ -3514,50 +3486,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5k2p002jryqjyhm5jlup@baromatch.fr": {
-   "ids": [
-    "cmv6e5k2p002jryqjyhm5jlup"
-   ],
-   "slug": "bodo-glimt-lille-2026-11-03",
-   "debut": "2026-11-03T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des champions",
-   "domicile": {
-    "cle": "bodo-glimt",
-    "court": "Bodø/Glimt",
-    "nom": "FK Bodø/Glimt"
-   },
-   "exterieur": {
-    "cle": "lille",
-    "court": "Lille",
-    "nom": "LOSC Lille"
-   },
-   "empreinte": "Ld8oNwzjgVsog_v2sLCwAg",
-   "sequence": 1,
-   "modifie": "2026-10-20T21:35:23Z"
-  },
-  "cmv6e5k3c002lryqjrdiqxy7e@baromatch.fr": {
-   "ids": [
-    "cmv6e5k3c002lryqjrdiqxy7e"
-   ],
-   "slug": "villarreal-psg-2026-11-03",
-   "debut": "2026-11-03T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des champions",
-   "domicile": {
-    "cle": "villarreal",
-    "court": "Villarreal",
-    "nom": "Villarreal CF"
-   },
-   "exterieur": {
-    "cle": "psg",
-    "court": "PSG",
-    "nom": "Paris Saint-Germain"
-   },
-   "empreinte": "J819TLa0Ru4_lnpDXRgLkw",
-   "sequence": 1,
-   "modifie": "2026-10-20T21:35:23Z"
-  },
   "cmv6e5k3x002nryqjla3z0k0p@baromatch.fr": {
    "ids": [
     "cmv6e5k3x002nryqjla3z0k0p"

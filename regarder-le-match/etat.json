@@ -210,23 +210,23 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "HSGJ4AzdzoLhigkiq0yTOg",
-   "change": "2026-11-02",
+   "empreinte": "1GuqsIGtfL_GoITxDQUCzw",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "p2NI9sM0pEUaed8iOp8ubA",
-   "change": "2026-11-02",
+   "empreinte": "FVKn4KFXFdd2W_Vn4gFDxg",
+   "change": "2026-11-03",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "7dKyS1BfDZRaieO0dgiFVQ",
-   "change": "2026-11-01",
+   "empreinte": "yd4GMmdh9zvEnfFgvwCzmA",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
@@ -242,8 +242,8 @@
    "type": "match-en",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "ysC11Yd7BN4nwaKMZQVpfw",
-   "change": "2026-11-01",
+   "empreinte": "Tryz4P3xEQQ7G7CgcdoApw",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
@@ -296,8 +296,8 @@
    "type": "match-en",
    "cle": "everton-chelsea-2026-10-17",
    "date": "2026-10-17T11:30:00.000Z",
-   "empreinte": "74wDDXen9L8FSDmuyAz7wA",
-   "change": "2026-11-01",
+   "empreinte": "lOVwOgO7tVwQniF8OHKVog",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
@@ -395,8 +395,8 @@
    "type": "match-en",
    "cle": "newcastle-aston-villa-2026-10-17",
    "date": "2026-10-17T16:30:00.000Z",
-   "empreinte": "pTWjnwced3e4Q0eyZDgAJg",
-   "change": "2026-11-01",
+   "empreinte": "cQX42OsntnId_UKAq-ERNQ",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
@@ -404,8 +404,8 @@
    "type": "match-en",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "JBMVE405nRerS2tUaTKuCw",
-   "change": "2026-11-02",
+   "empreinte": "0tLDcXjJvQ9WVqL96StlJA",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
@@ -484,39 +484,39 @@
   "/en/premier-league/": {
    "type": "guide-en",
    "cle": "premier-league",
-   "empreinte": "g6F7FIAPi1usLZi7ZVqGuQ",
-   "change": "2026-11-01",
+   "empreinte": "Qyodyn0mkj-KyWeJa2k17g",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "cEZtkhom5BhcxZXSUhIbGA",
-   "change": "2026-11-02",
+   "empreinte": "Wx_la56D1etq-aRWkermQg",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "--AHQhU7Z5QNWGG__o58rw",
-   "change": "2026-11-02",
+   "empreinte": "FKUz8ucrtk8JUJwps_friA",
+   "change": "2026-11-03",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "hFJYtGUtcxVpqQr3zvl-Dg",
-   "change": "2026-11-02",
+   "empreinte": "4UEGi5zi668cW5kmjgak3g",
+   "change": "2026-11-03",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "B0dq7DKxKLiuZSL2zmgKIg",
-   "change": "2026-11-02",
+   "empreinte": "SYkxJ5y8z4Ep0XZja81DeQ",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": []
   },
@@ -628,8 +628,8 @@
    "type": "match",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "lHjGwQ2GuoGLRYR06DPfHQ",
-   "change": "2026-11-01",
+   "empreinte": "sXEJgtCVRx5G_CwY9dc0mQ",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1275,8 +1275,8 @@
   "/matchs/competition/premier-league/": {
    "type": "competition",
    "cle": "premier-league",
-   "empreinte": "I97l---p7xR6LuG0t4AU9A",
-   "change": "2026-11-01",
+   "empreinte": "m4EIMCmuR0QDV3Ft4lE5iQ",
+   "change": "2026-11-03",
    "indexable": true,
    "bars": []
   },
@@ -1352,8 +1352,8 @@
    "type": "match",
    "cle": "everton-chelsea-2026-10-17",
    "date": "2026-10-17T11:30:00.000Z",
-   "empreinte": "AlFZ6J3PkAGLb9vRfOuZuQ",
-   "change": "2026-11-01",
+   "empreinte": "TLv80Nflh0dLtHOsCoAzjg",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2556,8 +2556,8 @@
    "type": "match",
    "cle": "newcastle-aston-villa-2026-10-17",
    "date": "2026-10-17T16:30:00.000Z",
-   "empreinte": "IPfUTAkeqmdXiKIVGTFp0w",
-   "change": "2026-11-01",
+   "empreinte": "ZYSeFpaZLKxpN2x44myHRA",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2586,8 +2586,8 @@
    "type": "match",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "5TyxpcL97Fort2V9dkiVJA",
-   "change": "2026-11-02",
+   "empreinte": "3mjzVAU79LPsR-S69i2c9Q",
+   "change": "2026-11-03",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2611,13 +2611,6 @@
      "slug": "everton-fc"
     }
    }
-  },
-  "/matchs/newcastle-everton-2026-11-02/partage.png": {
-   "type": "partage",
-   "cle": "newcastle-everton-2026-11-02",
-   "empreinte": "WprhJQle68M4y9LYM-yEPQ",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/nice-rennes-2026-10-31/": {
    "type": "match",

@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "232_IZxq7MtUZJxuOF2q0Q",
+   "empreinte": "wZ_0lZCTsQ-MBbD7mZl9mg",
    "change": "2026-11-04",
    "indexable": false,
    "bars": []
@@ -332,8 +332,8 @@
    "type": "match-en",
    "cle": "lens-como-1907-2026-11-04",
    "date": "2026-11-04T20:00:00.000Z",
-   "empreinte": "KUpe8YfHyRiLQBYNNl7wOA",
-   "change": "2026-11-01",
+   "empreinte": "VLX_mrZzaN6vf3Ss33INig",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": []
   },
@@ -492,7 +492,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "7bD6_t5mnlam-sPeMCSOwA",
+   "empreinte": "bh5PISoGrjewZzfhIurMkw",
    "change": "2026-11-04",
    "indexable": false,
    "bars": []
@@ -1858,8 +1858,8 @@
    "type": "match",
    "cle": "lens-como-1907-2026-11-04",
    "date": "2026-11-04T20:00:00.000Z",
-   "empreinte": "tD7cOB_nW-S9PqrJ0xSTUw",
-   "change": "2026-11-01",
+   "empreinte": "bGBpk4ld88AAWHFxbqKraQ",
+   "change": "2026-11-04",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1883,13 +1883,6 @@
      "slug": "como-1907"
     }
    }
-  },
-  "/matchs/lens-como-1907-2026-11-04/match.ics": {
-   "type": "evenement",
-   "cle": "lens-como-1907-2026-11-04",
-   "empreinte": "zpqu5IA-cvjddSSIifuJNg",
-   "change": "2026-10-21",
-   "indexable": false
   },
   "/matchs/lens-como-1907-2026-11-04/partage.png": {
    "type": "partage",

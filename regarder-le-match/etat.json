@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "YDkSv2YRkwTuyvIK-U1bgQ",
-   "change": "2026-11-04",
+   "empreinte": "fI8AkPNSKKFLsGWa1zh-9g",
+   "change": "2026-11-05",
    "indexable": true,
    "bars": []
   },
@@ -67,8 +67,8 @@
   "/agenda/lens.ics": {
    "type": "calendrier",
    "cle": "lens",
-   "empreinte": "Rgc6RbzOdh7qZgb3AiXrTw",
-   "change": "2026-11-01",
+   "empreinte": "7TZBFX7bhF-xhhMTVDp-CQ",
+   "change": "2026-11-05",
    "indexable": false,
    "memoire": {
     "court": "Lens",
@@ -210,31 +210,31 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "wZ_0lZCTsQ-MBbD7mZl9mg",
-   "change": "2026-11-04",
+   "empreinte": "tZFua5DbECft0bwPJsW5EA",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "D6IWYXlClUfu88fhHJDisw",
-   "change": "2026-11-04",
+   "empreinte": "yZn_dDKKnzB5WR7iBBwnWQ",
+   "change": "2026-11-05",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "V0Rb0e5foRHuFUEDrlKIOg",
-   "change": "2026-11-04",
+   "empreinte": "fNgsF1fpP7PJSYBwJIhSvg",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": []
   },
   "/en/champions-league/": {
    "type": "guide-en",
    "cle": "champions-league",
-   "empreinte": "uVoXj0_JY6HYMtyjAJhPIA",
-   "change": "2026-11-04",
+   "empreinte": "PlQD86Lvaj3Zc6HmrUFx9w",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": []
   },
@@ -269,8 +269,8 @@
    "type": "match-en",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "n-ItgrAUbbE2XXDjK_m8yQ",
-   "change": "2026-11-01",
+   "empreinte": "OOzhEf_z0QdOIZMyG63pJQ",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": []
   },
@@ -332,8 +332,8 @@
    "type": "match-en",
    "cle": "lens-como-1907-2026-11-04",
    "date": "2026-11-04T20:00:00.000Z",
-   "empreinte": "VLX_mrZzaN6vf3Ss33INig",
-   "change": "2026-11-04",
+   "empreinte": "0Qg0-VaDo4Apgxzd8zcjDA",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": []
   },
@@ -492,31 +492,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "bh5PISoGrjewZzfhIurMkw",
-   "change": "2026-11-04",
+   "empreinte": "QMbk3Jue7c4GdstYEAWpVg",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "lVFQdO51JDKtSJbjSX7stg",
-   "change": "2026-11-04",
+   "empreinte": "14KDZxdyHM97JsyJ7-Qq1g",
+   "change": "2026-11-05",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "JRavbixoKoZaPTpB2gWbfw",
-   "change": "2026-11-04",
+   "empreinte": "3o7XtXkW_cW4YEnBaGCzMQ",
+   "change": "2026-11-05",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "z5cz1JQ8bfNlDt8FyBFXbQ",
-   "change": "2026-11-04",
+   "empreinte": "mqRoUqq7ausy7dZOFDM1rQ",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": []
   },
@@ -1060,8 +1060,8 @@
    "type": "match",
    "cle": "bruges-lens-2026-10-21",
    "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "-0sk85i4t83zHSrqMHRcLQ",
-   "change": "2026-11-01",
+   "empreinte": "7gj8bDyLzPoWq3AaDT_lLA",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1149,8 +1149,8 @@
   "/matchs/club/lens/": {
    "type": "club",
    "cle": "lens",
-   "empreinte": "WaFiXcBq1xWccjL14pL9HA",
-   "change": "2026-11-01",
+   "empreinte": "chS3iGR_Uim1WbIBYJYfhw",
+   "change": "2026-11-05",
    "indexable": true,
    "bars": []
   },
@@ -1245,8 +1245,8 @@
   "/matchs/competition/ligue-des-champions/": {
    "type": "competition",
    "cle": "ligue-des-champions",
-   "empreinte": "13mYqje0bKAEkCxK4riK6Q",
-   "change": "2026-11-04",
+   "empreinte": "yPXMZKayau1jTpbmy3GSpw",
+   "change": "2026-11-05",
    "indexable": true,
    "bars": []
   },
@@ -1858,8 +1858,8 @@
    "type": "match",
    "cle": "lens-como-1907-2026-11-04",
    "date": "2026-11-04T20:00:00.000Z",
-   "empreinte": "bGBpk4ld88AAWHFxbqKraQ",
-   "change": "2026-11-04",
+   "empreinte": "6NNhWF3fNyKrmQsPuJzPSg",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1883,13 +1883,6 @@
      "slug": "como-1907"
     }
    }
-  },
-  "/matchs/lens-como-1907-2026-11-04/partage.png": {
-   "type": "partage",
-   "cle": "lens-como-1907-2026-11-04",
-   "empreinte": "5ubzAhnPo-HWfs7Q6QXOBA",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/lens-om-2026-11-08/": {
    "type": "match",
@@ -1939,8 +1932,8 @@
    "type": "match",
    "cle": "lens-paris-fc-2026-10-24",
    "date": "2026-10-24T18:45:00.000Z",
-   "empreinte": "YjeF0CgdbaIYXoYiK3Arsg",
-   "change": "2026-11-01",
+   "empreinte": "rMpBPetRCkjxpI_e2vYEvw",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2133,8 +2126,8 @@
    "type": "match",
    "cle": "lille-lens-2026-10-30",
    "date": "2026-10-30T20:05:00.000Z",
-   "empreinte": "liXdlJpi-KF8iWeZVzNgpA",
-   "change": "2026-11-04",
+   "empreinte": "Fb4ez5kqq9j1woKG5VI4QA",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3296,8 +3289,8 @@
    "type": "match",
    "cle": "troyes-lens-2026-10-17",
    "date": "2026-10-17T18:45:00.000Z",
-   "empreinte": "yKsP1KcquCXaEiVMvtMt9Q",
-   "change": "2026-11-01",
+   "empreinte": "iOEd2SL82PJXYm0wPhW-TA",
+   "change": "2026-11-05",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3479,28 +3472,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5k3x002nryqjla3z0k0p@baromatch.fr": {
-   "ids": [
-    "cmv6e5k3x002nryqjla3z0k0p"
-   ],
-   "slug": "lens-como-1907-2026-11-04",
-   "debut": "2026-11-04T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des champions",
-   "domicile": {
-    "cle": "lens",
-    "court": "Lens",
-    "nom": "RC Lens"
-   },
-   "exterieur": {
-    "cle": "como-1907",
-    "court": "Como 1907",
-    "nom": "Como 1907"
-   },
-   "empreinte": "onDXMNzJNASks3Je0BtzWw",
-   "sequence": 1,
-   "modifie": "2026-10-21T21:40:13Z"
-  },
   "cmv6e5k4j002pryqj5q3fdms7@baromatch.fr": {
    "ids": [
     "cmv6e5k4j002pryqj5q3fdms7"

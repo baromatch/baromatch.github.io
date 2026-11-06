@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "bFKWovpuz_4nqSGkkZRBGA",
-   "change": "2026-11-06",
+   "empreinte": "2nJ8MVUe--S373P6EKt8FQ",
+   "change": "2026-11-07",
    "indexable": true,
    "bars": []
   },
@@ -45,8 +45,8 @@
   "/agenda/le-havre.ics": {
    "type": "calendrier",
    "cle": "le-havre",
-   "empreinte": "1ZLThEP-5fs1Z69_x7LRbQ",
-   "change": "2026-11-01",
+   "empreinte": "KmdpqmRFbTyDCtHZjv1pFA",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "Le Havre",
@@ -177,8 +177,8 @@
   "/agenda/strasbourg.ics": {
    "type": "calendrier",
    "cle": "strasbourg",
-   "empreinte": "upEPQDuyMkDbrV5TFIXvaw",
-   "change": "2026-11-01",
+   "empreinte": "Jq1yNXxY6K9TS1PNH7mTBg",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "Strasbourg",
@@ -188,8 +188,8 @@
   "/agenda/toulouse.ics": {
    "type": "calendrier",
    "cle": "toulouse",
-   "empreinte": "tmfmVkeaZUFMvmdngQl5rQ",
-   "change": "2026-11-02",
+   "empreinte": "ti46GzKOY_m-3U7WkvJoIw",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "Toulouse",
@@ -199,8 +199,8 @@
   "/agenda/troyes.ics": {
    "type": "calendrier",
    "cle": "troyes",
-   "empreinte": "n9M7aLiZLHAmXGW14Jpd6Q",
-   "change": "2026-11-01",
+   "empreinte": "79MF9s58csKKQu5hHSgD2w",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "Troyes",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "wxqkLOKQ9BddtryuEWpJ-w",
-   "change": "2026-11-06",
+   "empreinte": "N_fFbGhdxH9BJtLkg_p0xw",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "FFvGoxKVZXnFrtKEUGtUfA",
-   "change": "2026-11-06",
+   "empreinte": "jKJVoaELD3xlJwQo32sw1Q",
+   "change": "2026-11-07",
    "indexable": false
   },
   "/en/": {
@@ -458,8 +458,8 @@
    "type": "match-en",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "LWS_V9iaoLMyYVGTF5WZZg",
-   "change": "2026-11-04",
+   "empreinte": "uLwjxlQcJbmnSE2N3u4qbQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
@@ -492,31 +492,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "Z5SWgWfSy72t8h7_9od45Q",
-   "change": "2026-11-06",
+   "empreinte": "tfyLR4JRif5R7Hegrn-P4w",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "OWFfjhmfS3d6R1fV7nR_sg",
-   "change": "2026-11-06",
+   "empreinte": "k5kmpUnjeO1nDA-0EgtJAQ",
+   "change": "2026-11-07",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "yUtQeXcEPFC9bfHJqWF88w",
-   "change": "2026-11-06",
+   "empreinte": "0PTifAnNyU_1CibvMakVLg",
+   "change": "2026-11-07",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "-S90weENhISn7LMUqJ_CKA",
-   "change": "2026-11-06",
+   "empreinte": "7b1-8WfpKSkTj02GAurhPw",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
@@ -1229,8 +1229,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "M48PxDnnlPZiHL9V1Ep78g",
-   "change": "2026-11-02",
+   "empreinte": "AUZUshPhTwlrLRZb5UB9Sg",
+   "change": "2026-11-07",
    "indexable": true,
    "bars": []
   },
@@ -1710,8 +1710,8 @@
    "type": "match",
    "cle": "le-havre-lorient-2026-11-08",
    "date": "2026-11-08T16:15:00.000Z",
-   "empreinte": "ymKRNrH-V1ndkoRLfQOxow",
-   "change": "2026-11-01",
+   "empreinte": "M4-ryGQtz-f41xOJOJVW8g",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1828,8 +1828,8 @@
    "type": "match",
    "cle": "le-mans-toulouse-2026-10-16",
    "date": "2026-10-16T18:45:00.000Z",
-   "empreinte": "hCUeWTl8vDj1o18s_wGdAw",
-   "change": "2026-11-02",
+   "empreinte": "nYwEyDABGaXnzPxrIQuMRA",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2680,8 +2680,8 @@
    "type": "match",
    "cle": "om-toulouse-2026-11-01",
    "date": "2026-11-01T19:45:00.000Z",
-   "empreinte": "DRMA533dkzbJtlcIgaBl9w",
-   "change": "2026-11-06",
+   "empreinte": "1P9_ZlAvhwmDBVy4u9vrpg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2831,8 +2831,8 @@
    "type": "match",
    "cle": "psg-troyes-2026-11-07",
    "date": "2026-11-07T19:45:00.000Z",
-   "empreinte": "cu_aq9FcJVlQSus1rx5xNw",
-   "change": "2026-11-01",
+   "empreinte": "Dw6wDJPGAvOimurUydit3A",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3009,8 +3009,8 @@
    "type": "match",
    "cle": "rennes-strasbourg-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "bJNQQPu49h4gmpxlvSodYw",
-   "change": "2026-11-06",
+   "empreinte": "CbOkJzoEhDb8zMRyYTeTQg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3039,8 +3039,8 @@
    "type": "match",
    "cle": "strasbourg-auxerre-2026-11-01",
    "date": "2026-11-01T14:00:00.000Z",
-   "empreinte": "izEExFM2E7oyW3k_ZRwlMQ",
-   "change": "2026-11-01",
+   "empreinte": "IlU8vpW6BqKmtez-N8rPUQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3069,8 +3069,8 @@
    "type": "match",
    "cle": "strasbourg-psg-2026-10-17",
    "date": "2026-10-17T15:15:00.000Z",
-   "empreinte": "hqR_WCQWlEVQFVkksW3iPQ",
-   "change": "2026-11-04",
+   "empreinte": "KbN4a9IevV23YRlOGPjQCg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3129,8 +3129,8 @@
    "type": "match",
    "cle": "toulouse-strasbourg-2026-11-06",
    "date": "2026-11-06T19:45:00.000Z",
-   "empreinte": "t-UGReW79Q260IaySHN8tQ",
-   "change": "2026-11-01",
+   "empreinte": "EEuxMSnriolHt5CBVa_0Bw",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3155,26 +3155,12 @@
     }
    }
   },
-  "/matchs/toulouse-strasbourg-2026-11-06/match.ics": {
-   "type": "evenement",
-   "cle": "toulouse-strasbourg-2026-11-06",
-   "empreinte": "86afbK4nU47U-0bcwG2_Uw",
-   "change": "2026-10-23",
-   "indexable": false
-  },
-  "/matchs/toulouse-strasbourg-2026-11-06/partage.png": {
-   "type": "partage",
-   "cle": "toulouse-strasbourg-2026-11-06",
-   "empreinte": "ewJZOA6jj7PRBCppxvf7fw",
-   "change": "2026-10-30",
-   "indexable": false
-  },
   "/matchs/toulouse-troyes-2026-10-24/": {
    "type": "match",
    "cle": "toulouse-troyes-2026-10-24",
    "date": "2026-10-24T15:15:00.000Z",
-   "empreinte": "ivXDaOMjItM6fguDYU2h0g",
-   "change": "2026-11-02",
+   "empreinte": "l2xXxXVR_J-Xvj13N8VJQg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3198,6 +3184,50 @@
      "slug": "estac-troyes"
     }
    }
+  },
+  "/matchs/troyes-le-havre-2026-11-20/": {
+   "type": "match",
+   "cle": "troyes-le-havre-2026-11-20",
+   "date": "2026-11-20T19:45:00.000Z",
+   "empreinte": "10CXvqkVq2MQ_PmuUlZEVw",
+   "change": "2026-11-07",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "troyes-le-havre-2026-11-20",
+    "ids": [
+     "cmvxramwh0006z71o5lu3gcvd"
+    ],
+    "debut": "2026-11-20T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "troyes",
+     "court": "Troyes",
+     "nom": "ESTAC Troyes",
+     "slug": "estac-troyes"
+    },
+    "exterieur": {
+     "cle": "le-havre",
+     "court": "Le Havre",
+     "nom": "Le Havre AC",
+     "slug": "le-havre-ac"
+    }
+   }
+  },
+  "/matchs/troyes-le-havre-2026-11-20/match.ics": {
+   "type": "evenement",
+   "cle": "troyes-le-havre-2026-11-20",
+   "empreinte": "veEZxQlc2z3v4weLKE-29w",
+   "change": "2026-11-07",
+   "indexable": false
+  },
+  "/matchs/troyes-le-havre-2026-11-20/partage.png": {
+   "type": "partage",
+   "cle": "troyes-le-havre-2026-11-20",
+   "empreinte": "5CaHK1D9RRiHmoCvlzqWQA",
+   "change": "2026-11-07",
+   "indexable": false
   },
   "/matchs/troyes-le-mans-2026-10-31/": {
    "type": "match",
@@ -3416,28 +3446,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5k74002xryqjgmm23efs@baromatch.fr": {
-   "ids": [
-    "cmv6e5k74002xryqjgmm23efs"
-   ],
-   "slug": "toulouse-strasbourg-2026-11-06",
-   "debut": "2026-11-06T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "toulouse",
-    "court": "Toulouse",
-    "nom": "Toulouse FC"
-   },
-   "exterieur": {
-    "cle": "strasbourg",
-    "court": "Strasbourg",
-    "nom": "RC Strasbourg Alsace"
-   },
-   "empreinte": "0CJMUGjyaXOCl7-Dh6JcnA",
-   "sequence": 1,
-   "modifie": "2026-10-23T21:22:18Z"
-  },
   "cmv6e5k7s002zryqjmqat0nt8@baromatch.fr": {
    "ids": [
     "cmv6e5k7s002zryqjmqat0nt8"
@@ -3742,9 +3750,9 @@
     "court": "Le Havre",
     "nom": "Le Havre AC"
    },
-   "empreinte": "RDFFLmNDeq_4bWUu3VlFGQ",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "osggfUbGYPbBVi0BHn0z_g",
+   "sequence": 1,
+   "modifie": "2026-11-06T23:05:46Z"
   },
   "cmvxramxm0008z71o33w3iy6d@baromatch.fr": {
    "ids": [

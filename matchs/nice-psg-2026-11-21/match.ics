@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxramxm0008z71o33w3iy6d@baromatch.fr
+DTSTAMP:20261107T192428Z
+SEQUENCE:1
+DTSTART:20261121T161500Z
+DTEND:20261121T181500Z
+SUMMARY:Nice – PSG
+DESCRIPTION:Ligue 1 · OGC Nice – Paris Saint-Germain\nCoup d’envoi sam
+ edi 21 novembre à 17:15\, heure de Paris.\nLa page du match : https://ba
+ romatch.fr/matchs/nice-psg-2026-11-21/
+URL:https://baromatch.fr/matchs/nice-psg-2026-11-21/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

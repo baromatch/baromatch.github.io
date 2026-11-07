@@ -4,7 +4,7 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "2nJ8MVUe--S373P6EKt8FQ",
+   "empreinte": "itprB8Qdaz89258FzWH3vQ",
    "change": "2026-11-07",
    "indexable": true,
    "bars": []
@@ -23,8 +23,8 @@
   "/agenda/auxerre.ics": {
    "type": "calendrier",
    "cle": "auxerre",
-   "empreinte": "Er221LvIJB9CAW1TZUkcdg",
-   "change": "2026-11-01",
+   "empreinte": "pQ9zi8bhXfP_cjoOM1iSVw",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "Auxerre",
@@ -111,8 +111,8 @@
   "/agenda/nice.ics": {
    "type": "calendrier",
    "cle": "nice",
-   "empreinte": "TQD94MaGg1c2GMPgpw4L4A",
-   "change": "2026-11-01",
+   "empreinte": "uh5FptbvCTri7Ib5I6wQmA",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "Nice",
@@ -144,8 +144,8 @@
   "/agenda/paris-fc.ics": {
    "type": "calendrier",
    "cle": "paris-fc",
-   "empreinte": "yWbP7I0spWeEzRGiyihVsA",
-   "change": "2026-11-01",
+   "empreinte": "FzYFXkRi1soxFDvz_GYgag",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "Paris FC",
@@ -155,8 +155,8 @@
   "/agenda/psg.ics": {
    "type": "calendrier",
    "cle": "psg",
-   "empreinte": "I9bO_wfr0WoQmw3Hvwiz4g",
-   "change": "2026-11-04",
+   "empreinte": "75VBh_v6t4ZMbu0rjeF3OQ",
+   "change": "2026-11-07",
    "indexable": false,
    "memoire": {
     "court": "PSG",
@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "N_fFbGhdxH9BJtLkg_p0xw",
+   "empreinte": "V-MKbrZm5P5ZTsWBCPrgvA",
    "change": "2026-11-07",
    "indexable": false,
    "bars": []
@@ -225,8 +225,8 @@
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "n88iw9eTA8Ucru9d_6fzIQ",
-   "change": "2026-11-06",
+   "empreinte": "ccr5linagJ3ldXBGuJJMTw",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
@@ -242,8 +242,8 @@
    "type": "match-en",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "Tryz4P3xEQQ7G7CgcdoApw",
-   "change": "2026-11-03",
+   "empreinte": "cXovTd8Uu5VJ7i8H4LXhOg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
@@ -359,8 +359,8 @@
    "type": "match-en",
    "cle": "liverpool-arsenal-2026-11-01",
    "date": "2026-11-01T16:30:00.000Z",
-   "empreinte": "aA8WzNG_CXv1SJ0DHdAZJw",
-   "change": "2026-11-01",
+   "empreinte": "VG2k4221i8QS1oaLHwSA7A",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
@@ -391,6 +391,15 @@
    "indexable": false,
    "bars": []
   },
+  "/en/matches/newcastle-arsenal-2026-11-21/": {
+   "type": "match-en",
+   "cle": "newcastle-arsenal-2026-11-21",
+   "date": "2026-11-21T17:30:00.000Z",
+   "empreinte": "KLaIcheS3OtXFr8D96V_nw",
+   "change": "2026-11-07",
+   "indexable": false,
+   "bars": []
+  },
   "/en/matches/newcastle-aston-villa-2026-10-17/": {
    "type": "match-en",
    "cle": "newcastle-aston-villa-2026-10-17",
@@ -404,8 +413,17 @@
    "type": "match-en",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "0tLDcXjJvQ9WVqL96StlJA",
-   "change": "2026-11-03",
+   "empreinte": "jKY8lC10z7Hlt2uj-o-T_A",
+   "change": "2026-11-07",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/nice-psg-2026-11-21/": {
+   "type": "match-en",
+   "cle": "nice-psg-2026-11-21",
+   "date": "2026-11-21T16:15:00.000Z",
+   "empreinte": "T6L3mwMOVxylW5KJDgs_rA",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
@@ -431,8 +449,8 @@
    "type": "match-en",
    "cle": "psg-troyes-2026-11-07",
    "date": "2026-11-07T19:45:00.000Z",
-   "empreinte": "ZRP3Ad4Ya2fLeYKmSgdyIA",
-   "change": "2026-11-01",
+   "empreinte": "y2MMiIIliLt-SYI-CoY53g",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
@@ -484,15 +502,15 @@
   "/en/premier-league/": {
    "type": "guide-en",
    "cle": "premier-league",
-   "empreinte": "Qyodyn0mkj-KyWeJa2k17g",
-   "change": "2026-11-03",
+   "empreinte": "GkMIaq4hDirm73uKx2-MqQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": []
   },
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "tfyLR4JRif5R7Hegrn-P4w",
+   "empreinte": "n6K76NlREehTEYML60DGVw",
    "change": "2026-11-07",
    "indexable": false,
    "bars": []
@@ -500,7 +518,7 @@
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "k5kmpUnjeO1nDA-0EgtJAQ",
+   "empreinte": "NLNLA5fq1tVCA-aiabpdvA",
    "change": "2026-11-07",
    "indexable": true,
    "bars": []
@@ -554,8 +572,8 @@
    "type": "match",
    "cle": "angers-nice-2026-11-08",
    "date": "2026-11-08T16:15:00.000Z",
-   "empreinte": "f96RM8UZrMg6oerYiL5ZTA",
-   "change": "2026-11-01",
+   "empreinte": "egArpU0sqJ5qfgl5vVFW4A",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -628,8 +646,8 @@
    "type": "match",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "sXEJgtCVRx5G_CwY9dc0mQ",
-   "change": "2026-11-03",
+   "empreinte": "cWYkQIQOELgHc6qiZQIFLQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -732,8 +750,8 @@
    "type": "match",
    "cle": "auxerre-le-mans-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "JeiEgCkcjDVWBuL8NN7KAA",
-   "change": "2026-11-01",
+   "empreinte": "H9Ayln9_08MUkqsaiE1vWQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -762,8 +780,8 @@
    "type": "match",
    "cle": "auxerre-paris-fc-2026-11-07",
    "date": "2026-11-07T16:15:00.000Z",
-   "empreinte": "sCADDADo_c-2hxZQ3HFSzw",
-   "change": "2026-11-01",
+   "empreinte": "5I9yx1h8c9el43bgKtluFQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -787,20 +805,6 @@
      "slug": "paris-fc"
     }
    }
-  },
-  "/matchs/auxerre-paris-fc-2026-11-07/match.ics": {
-   "type": "evenement",
-   "cle": "auxerre-paris-fc-2026-11-07",
-   "empreinte": "UzF7aOhHxBkz9jqsGc_6hw",
-   "change": "2026-10-24",
-   "indexable": false
-  },
-  "/matchs/auxerre-paris-fc-2026-11-07/partage.png": {
-   "type": "partage",
-   "cle": "auxerre-paris-fc-2026-11-07",
-   "empreinte": "XZ_kiAjBUzXvMHMrIhChYg",
-   "change": "2026-10-30",
-   "indexable": false
   },
   "/matchs/barca-deportivo-alaves-2026-10-31/": {
    "type": "match",
@@ -1173,8 +1177,8 @@
   "/matchs/club/nice/": {
    "type": "club",
    "cle": "nice",
-   "empreinte": "54SHtJzIMAKwQX08rkXE8A",
-   "change": "2026-11-01",
+   "empreinte": "0aqW-Yz1rGXF7UM5zQYdVg",
+   "change": "2026-11-07",
    "indexable": true,
    "bars": []
   },
@@ -1197,8 +1201,8 @@
   "/matchs/club/psg/": {
    "type": "club",
    "cle": "psg",
-   "empreinte": "IgV_RZgC2Ehn-80BJ66sbw",
-   "change": "2026-11-04",
+   "empreinte": "Q1trLgM1JkHI8PXhN1qzcQ",
+   "change": "2026-11-07",
    "indexable": true,
    "bars": []
   },
@@ -1229,7 +1233,7 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "AUZUshPhTwlrLRZb5UB9Sg",
+   "empreinte": "01X8ENGwJaWChgdr40XGeg",
    "change": "2026-11-07",
    "indexable": true,
    "bars": []
@@ -1261,8 +1265,8 @@
   "/matchs/competition/premier-league/": {
    "type": "competition",
    "cle": "premier-league",
-   "empreinte": "m4EIMCmuR0QDV3Ft4lE5iQ",
-   "change": "2026-11-03",
+   "empreinte": "fl8fbvnMafeOEuUsTrvfpw",
+   "change": "2026-11-07",
    "indexable": true,
    "bars": []
   },
@@ -1680,8 +1684,8 @@
    "type": "match",
    "cle": "le-havre-auxerre-2026-10-18",
    "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "jEteDfkbnLhxbTF6QsiXuw",
-   "change": "2026-11-01",
+   "empreinte": "ujJpm7VvGELCcCp80q0Cmg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1932,8 +1936,8 @@
    "type": "match",
    "cle": "lens-paris-fc-2026-10-24",
    "date": "2026-10-24T18:45:00.000Z",
-   "empreinte": "rMpBPetRCkjxpI_e2vYEvw",
-   "change": "2026-11-05",
+   "empreinte": "xpPdyD9IQUW0xSUMS5NAjQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2142,8 +2146,8 @@
    "type": "match",
    "cle": "liverpool-arsenal-2026-11-01",
    "date": "2026-11-01T16:30:00.000Z",
-   "empreinte": "9YA4SOoii2OQD_yIRyi80A",
-   "change": "2026-11-01",
+   "empreinte": "amPvqVAsCe-uOPNBBzoo-g",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2496,6 +2500,50 @@
     }
    }
   },
+  "/matchs/newcastle-arsenal-2026-11-21/": {
+   "type": "match",
+   "cle": "newcastle-arsenal-2026-11-21",
+   "date": "2026-11-21T17:30:00.000Z",
+   "empreinte": "HecfBeGVWSpa7MYQmRmp2w",
+   "change": "2026-11-07",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "newcastle-arsenal-2026-11-21",
+    "ids": [
+     "cmvxramy7000az71on8akabwo"
+    ],
+    "debut": "2026-11-21T17:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "newcastle",
+     "court": "Newcastle",
+     "nom": "Newcastle United FC",
+     "slug": "newcastle-united-fc"
+    },
+    "exterieur": {
+     "cle": "arsenal",
+     "court": "Arsenal",
+     "nom": "Arsenal FC",
+     "slug": "arsenal-fc"
+    }
+   }
+  },
+  "/matchs/newcastle-arsenal-2026-11-21/match.ics": {
+   "type": "evenement",
+   "cle": "newcastle-arsenal-2026-11-21",
+   "empreinte": "9cSCFDq8_hG7EJgUBpU6iw",
+   "change": "2026-11-07",
+   "indexable": false
+  },
+  "/matchs/newcastle-arsenal-2026-11-21/partage.png": {
+   "type": "partage",
+   "cle": "newcastle-arsenal-2026-11-21",
+   "empreinte": "8_-CA4rLvxgQC3GSzNOhbA",
+   "change": "2026-11-07",
+   "indexable": false
+  },
   "/matchs/newcastle-aston-villa-2026-10-17/": {
    "type": "match",
    "cle": "newcastle-aston-villa-2026-10-17",
@@ -2530,8 +2578,8 @@
    "type": "match",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "3mjzVAU79LPsR-S69i2c9Q",
-   "change": "2026-11-03",
+   "empreinte": "WLOHqApFhDb5Xo-f_Hokdg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2555,6 +2603,50 @@
      "slug": "everton-fc"
     }
    }
+  },
+  "/matchs/nice-psg-2026-11-21/": {
+   "type": "match",
+   "cle": "nice-psg-2026-11-21",
+   "date": "2026-11-21T16:15:00.000Z",
+   "empreinte": "Q04eCUxc7MnK8_SLtlJIwA",
+   "change": "2026-11-07",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "nice-psg-2026-11-21",
+    "ids": [
+     "cmvxramxm0008z71o33w3iy6d"
+    ],
+    "debut": "2026-11-21T16:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "nice",
+     "court": "Nice",
+     "nom": "OGC Nice",
+     "slug": "ogc-nice"
+    },
+    "exterieur": {
+     "cle": "psg",
+     "court": "PSG",
+     "nom": "Paris Saint-Germain",
+     "slug": "paris-saint-germain"
+    }
+   }
+  },
+  "/matchs/nice-psg-2026-11-21/match.ics": {
+   "type": "evenement",
+   "cle": "nice-psg-2026-11-21",
+   "empreinte": "zZ4UnysqxziaSGA-EqGLlg",
+   "change": "2026-11-07",
+   "indexable": false
+  },
+  "/matchs/nice-psg-2026-11-21/partage.png": {
+   "type": "partage",
+   "cle": "nice-psg-2026-11-21",
+   "empreinte": "sZWf2vcI_u6-VV_52aKvyw",
+   "change": "2026-11-07",
+   "indexable": false
   },
   "/matchs/nice-rennes-2026-10-31/": {
    "type": "match",
@@ -2710,8 +2802,8 @@
    "type": "match",
    "cle": "paris-fc-monaco-2026-11-01",
    "date": "2026-11-01T16:15:00.000Z",
-   "empreinte": "3UdpdxGQXYmIrmmB-WyqjQ",
-   "change": "2026-11-06",
+   "empreinte": "WmJpVTq4tI5txkSKcEVxmQ",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2740,8 +2832,8 @@
    "type": "match",
    "cle": "paris-fc-rennes-2026-10-18",
    "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "lUFG_byEX_c2dhcrLa5Z4g",
-   "change": "2026-11-06",
+   "empreinte": "QNv9v9ybdOzhZsTCO1iwTg",
+   "change": "2026-11-07",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2831,7 +2923,7 @@
    "type": "match",
    "cle": "psg-troyes-2026-11-07",
    "date": "2026-11-07T19:45:00.000Z",
-   "empreinte": "Dw6wDJPGAvOimurUydit3A",
+   "empreinte": "yHbMrjlnG11kdq7Xc02rkQ",
    "change": "2026-11-07",
    "indexable": false,
    "bars": [],
@@ -3039,7 +3131,7 @@
    "type": "match",
    "cle": "strasbourg-auxerre-2026-11-01",
    "date": "2026-11-01T14:00:00.000Z",
-   "empreinte": "IlU8vpW6BqKmtez-N8rPUQ",
+   "empreinte": "kSZcSd_SStUInT4vXmxC4g",
    "change": "2026-11-07",
    "indexable": false,
    "bars": [],
@@ -3446,28 +3538,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmv6e5k7s002zryqjmqat0nt8@baromatch.fr": {
-   "ids": [
-    "cmv6e5k7s002zryqjmqat0nt8"
-   ],
-   "slug": "auxerre-paris-fc-2026-11-07",
-   "debut": "2026-11-07T16:15:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "auxerre",
-    "court": "Auxerre",
-    "nom": "AJ Auxerre"
-   },
-   "exterieur": {
-    "cle": "paris-fc",
-    "court": "Paris FC",
-    "nom": "Paris FC"
-   },
-   "empreinte": "UkLQQHby7LzmJ1PylZOkTg",
-   "sequence": 1,
-   "modifie": "2026-10-24T20:45:22Z"
-  },
   "cmv6e5k8g0031ryqjcvt3ifw9@baromatch.fr": {
    "ids": [
     "cmv6e5k8g0031ryqjcvt3ifw9"
@@ -3772,9 +3842,31 @@
     "court": "PSG",
     "nom": "Paris Saint-Germain"
    },
-   "empreinte": "uTUTOKZHxxUDc-WtIDAXWw",
+   "empreinte": "bs4OMtgwW7u7CTSlqgzlWw",
+   "sequence": 1,
+   "modifie": "2026-11-07T19:24:28Z"
+  },
+  "cmvxramy7000az71on8akabwo@baromatch.fr": {
+   "ids": [
+    "cmvxramy7000az71on8akabwo"
+   ],
+   "slug": "newcastle-arsenal-2026-11-21",
+   "debut": "2026-11-21T17:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "newcastle",
+    "court": "Newcastle",
+    "nom": "Newcastle United FC"
+   },
+   "exterieur": {
+    "cle": "arsenal",
+    "court": "Arsenal",
+    "nom": "Arsenal FC"
+   },
+   "empreinte": "CoIu7izrQ_je1vaIw0l0Ug",
    "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "modifie": "2026-11-07T19:24:28Z"
   },
   "cmvxramzf000cz71o8hckykfg@baromatch.fr": {
    "ids": [

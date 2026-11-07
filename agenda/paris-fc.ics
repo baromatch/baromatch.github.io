@@ -11,20 +11,6 @@ X-WR-CALDESC:Paris FC : les matchs au programme de Baromatch (Ligue 1)\,
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5k7s002zryqjmqat0nt8@baromatch.fr
-DTSTAMP:20261024T204522Z
-SEQUENCE:1
-DTSTART:20261107T161500Z
-DTEND:20261107T181500Z
-SUMMARY:Auxerre – Paris FC
-DESCRIPTION:Ligue 1 · AJ Auxerre – Paris FC\nCoup d’envoi samedi 7 nov
- embre à 17:15\, heure de Paris.\nLa page du match : https://baromatch.fr
- /matchs/auxerre-paris-fc-2026-11-07/
-URL:https://baromatch.fr/matchs/auxerre-paris-fc-2026-11-07/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxran1l000kz71oy6xw45u2@baromatch.fr
 DTSTAMP:20261101T120610Z
 SEQUENCE:0

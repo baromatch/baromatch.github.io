@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxramy7000az71on8akabwo@baromatch.fr
+DTSTAMP:20261107T192428Z
+SEQUENCE:0
+DTSTART:20261121T173000Z
+DTEND:20261121T193000Z
+SUMMARY:Newcastle – Arsenal
+DESCRIPTION:Premier League · Newcastle United FC – Arsenal FC\nCoup d’
+ envoi samedi 21 novembre à 18:30\, heure de Paris.\nLa page du match : h
+ ttps://baromatch.fr/matchs/newcastle-arsenal-2026-11-21/
+URL:https://baromatch.fr/matchs/newcastle-arsenal-2026-11-21/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

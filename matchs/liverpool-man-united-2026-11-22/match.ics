@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxran30000oz71obpu5ioeu@baromatch.fr
+DTSTAMP:20261108T175437Z
+SEQUENCE:0
+DTSTART:20261122T163000Z
+DTEND:20261122T183000Z
+SUMMARY:Liverpool – Man United
+DESCRIPTION:Premier League · Liverpool FC – Manchester United\nCoup d’
+ envoi dimanche 22 novembre à 17:30\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/liverpool-man-united-2026-11-22/
+URL:https://baromatch.fr/matchs/liverpool-man-united-2026-11-22/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

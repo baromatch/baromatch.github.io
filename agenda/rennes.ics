@@ -11,28 +11,16 @@ X-WR-CALDESC:Rennes : les matchs au programme de Baromatch (Ligue 1 et Lig
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5k9v0035ryqj8c3c7zo4@baromatch.fr
-DTSTAMP:20261025T161250Z
-SEQUENCE:1
-DTSTART:20261108T140000Z
-DTEND:20261108T160000Z
-SUMMARY:Rennes – Lille
-DESCRIPTION:Ligue 1 · Stade Rennais FC – LOSC Lille\nCoup d’envoi dima
- nche 8 novembre à 15:00\, heure de Paris.\nLa page du match : https://ba
- romatch.fr/matchs/rennes-lille-2026-11-08/
-URL:https://baromatch.fr/matchs/rennes-lille-2026-11-08/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxran2g000mz71o4xdnmwiq@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261108T175437Z
+SEQUENCE:1
 DTSTART:20261122T161500Z
 DTEND:20261122T181500Z
 SUMMARY:Lorient – Rennes
 DESCRIPTION:Ligue 1 · FC Lorient – Stade Rennais FC\nCoup d’envoi dima
- nche 22 novembre à 17:15\, heure de Paris.
+ nche 22 novembre à 17:15\, heure de Paris.\nLa page du match : https://b
+ aromatch.fr/matchs/lorient-rennes-2026-11-22/
+URL:https://baromatch.fr/matchs/lorient-rennes-2026-11-22/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

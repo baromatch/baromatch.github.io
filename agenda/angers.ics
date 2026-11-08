@@ -26,13 +26,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmvxran1l000kz71oy6xw45u2@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261108T175437Z
+SEQUENCE:1
 DTSTART:20261122T140000Z
 DTEND:20261122T160000Z
 SUMMARY:Paris FC – Angers
 DESCRIPTION:Ligue 1 · Paris FC – Angers SCO\nCoup d’envoi dimanche 22 
- novembre à 15:00\, heure de Paris.
+ novembre à 15:00\, heure de Paris.\nLa page du match : https://baromatch
+ .fr/matchs/paris-fc-angers-2026-11-22/
+URL:https://baromatch.fr/matchs/paris-fc-angers-2026-11-22/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

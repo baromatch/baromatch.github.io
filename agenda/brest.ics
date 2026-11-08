@@ -26,13 +26,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmvxran11000iz71ob27rygpq@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261108T003258Z
+SEQUENCE:1
 DTSTART:20261121T194500Z
 DTEND:20261121T214500Z
 SUMMARY:Strasbourg – Brest
 DESCRIPTION:Ligue 1 · RC Strasbourg Alsace – Stade Brestois 29\nCoup d
- ’envoi samedi 21 novembre à 20:45\, heure de Paris.
+ ’envoi samedi 21 novembre à 20:45\, heure de Paris.\nLa page du match 
+ : https://baromatch.fr/matchs/strasbourg-brest-2026-11-21/
+URL:https://baromatch.fr/matchs/strasbourg-brest-2026-11-21/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

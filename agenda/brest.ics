@@ -11,20 +11,6 @@ X-WR-CALDESC:Brest : les matchs au programme de Baromatch (Ligue 1)\, à l
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5kcu003dryqjtxnfldn0@baromatch.fr
-DTSTAMP:20261025T204813Z
-SEQUENCE:1
-DTSTART:20261108T161500Z
-DTEND:20261108T181500Z
-SUMMARY:Brest – OL
-DESCRIPTION:Ligue 1 · Stade Brestois 29 – Olympique Lyonnais\nCoup d’e
- nvoi dimanche 8 novembre à 17:15\, heure de Paris.\nLa page du match : h
- ttps://baromatch.fr/matchs/brest-ol-2026-11-08/
-URL:https://baromatch.fr/matchs/brest-ol-2026-11-08/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxran11000iz71ob27rygpq@baromatch.fr
 DTSTAMP:20261108T003258Z
 SEQUENCE:1

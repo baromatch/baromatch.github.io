@@ -11,20 +11,6 @@ X-WR-CALDESC:Monaco : les matchs au programme de Baromatch (Ligue 1 et Lig
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5kc4003bryqjgzpuwjeh@baromatch.fr
-DTSTAMP:20261025T204813Z
-SEQUENCE:1
-DTSTART:20261108T161500Z
-DTEND:20261108T181500Z
-SUMMARY:Le Mans – Monaco
-DESCRIPTION:Ligue 1 · Le Mans FC – AS Monaco\nCoup d’envoi dimanche 8 
- novembre à 17:15\, heure de Paris.\nLa page du match : https://baromatch
- .fr/matchs/le-mans-monaco-2026-11-08/
-URL:https://baromatch.fr/matchs/le-mans-monaco-2026-11-08/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxran0i000gz71oxtgnghl3@baromatch.fr
 DTSTAMP:20261108T003258Z
 SEQUENCE:1

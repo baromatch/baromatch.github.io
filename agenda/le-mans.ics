@@ -11,28 +11,16 @@ X-WR-CALDESC:Le Mans : les matchs au programme de Baromatch (Ligue 1)\, à
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5kc4003bryqjgzpuwjeh@baromatch.fr
-DTSTAMP:20261025T204813Z
-SEQUENCE:1
-DTSTART:20261108T161500Z
-DTEND:20261108T181500Z
-SUMMARY:Le Mans – Monaco
-DESCRIPTION:Ligue 1 · Le Mans FC – AS Monaco\nCoup d’envoi dimanche 8 
- novembre à 17:15\, heure de Paris.\nLa page du match : https://baromatch
- .fr/matchs/le-mans-monaco-2026-11-08/
-URL:https://baromatch.fr/matchs/le-mans-monaco-2026-11-08/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxran3k000qz71otfz7l2h2@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261108T220006Z
+SEQUENCE:1
 DTSTART:20261122T194500Z
 DTEND:20261122T214500Z
 SUMMARY:OM – Le Mans
 DESCRIPTION:Ligue 1 · Olympique de Marseille – Le Mans FC\nCoup d’envo
- i dimanche 22 novembre à 20:45\, heure de Paris.
+ i dimanche 22 novembre à 20:45\, heure de Paris.\nLa page du match : htt
+ ps://baromatch.fr/matchs/om-le-mans-2026-11-22/
+URL:https://baromatch.fr/matchs/om-le-mans-2026-11-22/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

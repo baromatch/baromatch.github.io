@@ -11,20 +11,6 @@ X-WR-CALDESC:Angers : les matchs au programme de Baromatch (Ligue 1)\, à
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmv6e5kaj0037ryqjgkn2obzb@baromatch.fr
-DTSTAMP:20261025T204813Z
-SEQUENCE:1
-DTSTART:20261108T161500Z
-DTEND:20261108T181500Z
-SUMMARY:Angers – Nice
-DESCRIPTION:Ligue 1 · Angers SCO – OGC Nice\nCoup d’envoi dimanche 8 n
- ovembre à 17:15\, heure de Paris.\nLa page du match : https://baromatch.
- fr/matchs/angers-nice-2026-11-08/
-URL:https://baromatch.fr/matchs/angers-nice-2026-11-08/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxran1l000kz71oy6xw45u2@baromatch.fr
 DTSTAMP:20261108T175437Z
 SEQUENCE:1

@@ -126,14 +126,16 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
   });
 
   test('un générateur arrêté n’enregistre rien, pas même les pages que la mesure a réécrites', () => {
-    // L’étape d’envoi suit celle qui construit, sans condition : un passage raté (les données ne répondent pas) ne
-    // l’atteint jamais. La mesure d’audience démarre ou s’arrête donc avec un passage réussi, toutes pages ensemble,
-    // et l’en-tête de l’Action le dit.
+    // L’étape d’envoi suit celle qui construit, avec pour seule condition « des pages refaites » : sans always(),
+    // failure() ni continue-on-error, un passage raté (les données ne répondent pas) ne l’atteint jamais. La mesure
+    // d’audience démarre ou s’arrête donc avec un passage réussi, toutes pages ensemble, et l’en-tête de l’Action le dit.
     const action = lireLAction('pages-des-matchs.yml');
     const etapes = action.split('\n      - ').map((e) => e.split('\n')[0]);
     expect(etapes.indexOf(`name: ${ENVOI}`)).toBe(etapes.indexOf('name: Construire et contrôler les pages') + 1);
     const envoi = action.split(`\n      - name: ${ENVOI}\n`)[1].split('\n        run: |')[0];
-    expect(envoi).not.toMatch(/^ {8}if:/m);
+    expect(envoi.match(/^ {8}if:.*$/gm)).toEqual(["        if: steps.construction.outputs.refaites != 'non'"]);
+    expect(envoi).not.toMatch(/always\(\)|failure\(\)|cancelled\(\)|continue-on-error/);
+    expect(etapeDe(action, 'Construire et contrôler les pages')).not.toMatch(/continue-on-error|^ {8}if:/m);
     expect(action.split('\nname:')[0]).toContain('Elle ne change qu’avec un passage réussi du générateur, qu’on la démarre ou qu’on l’arrête');
   });
 
@@ -252,6 +254,53 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
     } finally {
       d.ranger();
     }
+  });
+});
+
+test.describe('« Pages des matchs » : un passage chaque heure les soirs de match', () => {
+  const action = lireLAction('pages-des-matchs.yml');
+  const SOIR = '17 16,17,19,20,22 * * *';
+  // L’étape « Construire et contrôler les pages », lancée telle quelle avec un « node » qui note chaque appel : le
+  // programme du passage (github.event.schedule, vide à la main ou après un envoi sur main) choisit les options.
+  const lancer = ({ programme = '', accepter = '' } = {}) => {
+    const dossier = mkdtempSync(path.join(tmpdir(), 'action-soir-'));
+    const bin = path.join(dossier, 'bin');
+    mkdirSync(bin);
+    const appels = path.join(dossier, 'appels-de-node.txt');
+    writeFileSync(path.join(bin, 'node'), `#!/bin/sh\necho "$*" >> "${appels}"\nexit 0\n`);
+    chmodSync(path.join(bin, 'node'), 0o755);
+    const resultat = spawnSync('bash', ['-e', '-c', scriptDeLEtape(action, 'Construire et contrôler les pages')], {
+      cwd: dossier, encoding: 'utf8',
+      env: { PATH: `${bin}${path.delimiter}${process.env.PATH}`, RUNNER_TEMP: dossier, PROGRAMME: programme, ACCEPTER: accepter },
+    });
+    const lignes = readFileSync(appels, 'utf8').trim().split('\n');
+    rmSync(dossier, { recursive: true, force: true });
+    expect(resultat.status, resultat.stderr).toBe(0);
+    return lignes.find((l) => l.startsWith('generateur/construire.mjs '));
+  };
+
+  test('le programme du passage arrive au script de construction', () => {
+    expect(action).toContain('      PROGRAMME: ${{ github.event.schedule }}\n');
+  });
+
+  test('le passage du soir ne refait les pages qu’un jour de match ; les autres passages refont tout, comme avant', () => {
+    expect(lancer({ programme: SOIR }).split(' ')).toContain('--seulement-un-soir-de-match');
+    for (const programme of ['17 */3 * * *', '5 22 * * *', '5 23 * * *', '']) {
+      expect(lancer({ programme }), programme || 'à la main ou après un envoi sur main').not.toContain('--seulement-un-soir-de-match');
+    }
+    const lesDeux = lancer({ programme: SOIR, accepter: 'true' }).split(' ');
+    expect(lesDeux).toContain('--seulement-un-soir-de-match');
+    expect(lesDeux).toContain('--accepter-les-suppressions');
+  });
+
+  test('un passage du soir qui n’a rien refait n’enregistre ni n’envoie rien ; la publication et IndexNow restent gardées', () => {
+    expect(etapeDe(action, 'Construire et contrôler les pages').split('\n')[0]).toBe('        id: construction');
+    const envoi = etapeDe(action, 'Enregistrer et envoyer les pages qui ont changé').split('\n');
+    expect(envoi.slice(0, 2)).toEqual(['        id: envoi', "        if: steps.construction.outputs.refaites != 'non'"]);
+    // Sans envoi, « envoye » est vide : la publication ne demande rien de neuf, et IndexNow n’est pas prévenu.
+    expect(etapeDe(action, 'Demander la publication à GitHub Pages')).toContain('ENVOYE: ${{ steps.envoi.outputs.envoye }}');
+    expect(etapeDe(action, 'Prévenir IndexNow des adresses qui ont changé').split('\n')[0])
+      .toBe("        if: steps.envoi.outputs.envoye == 'oui' && steps.publication.outputs.publie == 'oui'");
   });
 });
 

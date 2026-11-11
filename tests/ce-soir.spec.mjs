@@ -341,9 +341,16 @@ test('les places : seulement l’appli ouverte, quand les listes les donnent, à
   };
   const p = await ceSoir({ source, avec: ouverte, maintenant: '2026-10-23T17:17:00Z' });
   sansErreur(p);
-  expect(carte(p, 'La Cave des Gones')).toContain('<p class="regarder-carte__places">À 19:17, 12 places à réserver dans l’appli.</p>');
-  expect(carte(p, 'Au Bon Coin')).toContain('<p class="regarder-carte__places">À 19:17, 1 place à réserver dans l’appli.</p>');
-  expect(carte(p, 'Le Zinc des Amis')).toContain('<p class="regarder-carte__places">À 19:17, plus de place à réserver dans l’appli.</p>');
+  // Chaque phrase porte l’heure où elle cesse d’être dite (le passage et ses trois heures de vie) et ce qui la remplace
+  // alors : une page que le passage suivant n’a pas remplacée ne donne plus un nombre d’il y a des heures (places.js).
+  const places = (phrase) => `<p class="regarder-carte__places" data-jusqua="2026-10-23T20:17:00.000Z" data-sinon="Les places qui restent sont dans l’appli.">${phrase}</p>`;
+  expect(carte(p, 'La Cave des Gones')).toContain(places('À 19:17, 12 places à réserver dans l’appli.'));
+  expect(carte(p, 'Au Bon Coin')).toContain(places('À 19:17, 1 place à réserver dans l’appli.'));
+  expect(carte(p, 'Le Zinc des Amis')).toContain(places('À 19:17, plus de place à réserver dans l’appli.'));
+  // La page charge places.js, et seulement quand elle dit des places.
+  expect(p.contenu).toContain('<script src="/places.js" defer></script>');
+  // Le contrôle des pages ne permet places.js que sur « Ce soir ».
+  expect(controlerLaPage({ ...p, type: 'match' }).join()).toMatch(/un script autre que les données structurées, le partage, les places ou la mesure d’audience/);
   // Rien dans les listes, ou une soirée fermée par le bar : la carte ne dit rien des places.
   expect(carte(p, 'Le Comptoir du Canal')).not.toContain('regarder-carte__places');
   expect(carte(p, 'Le Café des Sports')).not.toContain('regarder-carte__places');
@@ -353,9 +360,49 @@ test('les places : seulement l’appli ouverte, quand les listes les donnent, à
   const fermee = await ceSoir({ source, maintenant: '2026-10-23T17:17:00Z' });
   expect(fermee.contenu).not.toContain('regarder-carte__places');
   expect(texteVisible(fermee.contenu)).not.toMatch(/places|réserv/i);
+  expect(fermee.contenu).not.toContain('places.js');
   // Le match commencé : on ne réserve plus, la carte n’en parle plus.
   const commence = await ceSoir({ source, avec: ouverte, maintenant: '2026-10-23T19:17:00Z' });
   expect(commence.contenu).not.toContain('regarder-carte__places');
+  expect(commence.contenu).not.toContain('places.js');
+});
+
+test('dans le navigateur : la phrase des places tient ses trois heures, puis laisse sa place à celle sans nombre', async ({ page: onglet }) => {
+  const source = scenarioModifie((brut) => ({
+    ...brut,
+    matchNights: brut.matchNights.map((n) => (n.id === 'n-gones-ce-soir'
+      ? { ...n, status: 'OPEN', remainingPlatformSeats: 12, isSoldOut: false, reservationsOpen: true } : n)),
+  }));
+  const p = await ceSoir({ source, avec: ouverte, maintenant: '2026-10-23T17:17:00Z' });
+  // La page servie de son adresse, avec places.js tel qu’il est publié (sa politique de sécurité : les scripts du site).
+  const ORIGINE_DU_TEST = 'https://baromatch.test';
+  await onglet.route(`${ORIGINE_DU_TEST}/**`, (route) => {
+    const { pathname } = new URL(route.request().url());
+    if (pathname === CHEMIN) return route.fulfill({ contentType: 'text/html; charset=utf-8', body: p.contenu });
+    if (pathname === '/places.js') return route.fulfill({ contentType: 'text/javascript', body: readFileSync(path.join(racine, 'places.js'), 'utf8') });
+    return route.fulfill({ status: 404, body: '' });
+  });
+  const phrase = onglet.locator('.regarder-carte__places');
+  const lire = async (heure) => {
+    await onglet.clock.setFixedTime(new Date(heure));
+    await onglet.goto(`${ORIGINE_DU_TEST}${CHEMIN}`);
+    await onglet.waitForFunction(() => document.readyState === 'complete');
+    return phrase.innerText();
+  };
+  // Pendant les trois heures de la page, et jusqu’à la dernière seconde : le nombre, avec son heure.
+  expect(await lire('2026-10-23T17:17:00Z')).toBe('À 19:17, 12 places à réserver dans l’appli.');
+  expect(await lire('2026-10-23T20:16:59Z')).toBe('À 19:17, 12 places à réserver dans l’appli.');
+  // Le passage suivant n’est pas venu : plus de nombre, la phrase qui reste vraie.
+  expect(await lire('2026-10-23T20:17:00Z')).toBe('Les places qui restent sont dans l’appli.');
+  expect(await lire('2026-10-24T09:00:00Z')).toBe('Les places qui restent sont dans l’appli.');
+  await expect(phrase).toHaveCount(1);
+  // Sans JavaScript, la phrase telle qu’écrite, avec son heure.
+  const contexte = await onglet.context().browser().newContext({ javaScriptEnabled: false });
+  const sansScript = await contexte.newPage();
+  await sansScript.route(`${ORIGINE_DU_TEST}/**`, (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: p.contenu }));
+  await sansScript.goto(`${ORIGINE_DU_TEST}${CHEMIN}`);
+  expect(await sansScript.locator('.regarder-carte__places').innerText()).toBe('À 19:17, 12 places à réserver dans l’appli.');
+  await contexte.close();
 });
 
 test('écrite : dans la liste blanche, au plan du site et à IndexNow seulement indexable, et sortie quand elle ne l’est plus', async () => {

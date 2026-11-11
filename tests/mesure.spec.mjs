@@ -279,7 +279,7 @@ test.describe('les pages générées', () => {
       '<script src="/mesure.js" data-mesure="https://essai.goatcounter.com/count"></script>',
       '<script src="https://gc.zgo.at/count.js" data-goatcounter="https://essai.goatcounter.com/count" async></script>',
     ]) {
-      expect(controler((h) => h.replace(balise, autre)), autre).toMatch(/un script autre que les données structurées et le partage/);
+      expect(controler((h) => h.replace(balise, autre)), autre).toMatch(/un script autre que les données structurées, le partage, les places ou la mesure d’audience/);
     }
     // La politique d’une mesure arrêtée, ou d’un autre compte, est refusée.
     expect(controler((h) => h.replace(`connect-src 'self' ${ORIGINE};`, "connect-src 'self';"))).toMatch(/politique de sécurité/);

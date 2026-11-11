@@ -1,8 +1,9 @@
 // Le HTML des pages générées : la tête (titre, description, adresse canonique, aperçus, données structurées, politique
 // de sécurité), l’en-tête et le pied de page du site, et le corps de chaque sorte de page. Tout est dans le HTML,
 // lisible par un robot qui n’exécute rien ; seul le bloc « Partager » (partage.mjs) charge un fichier du site,
-// partage.js, qui l’enrichit sans rien changer au reste, et la mesure d’audience, quand marque.json l’active, charge
-// /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
+// partage.js, qui l’enrichit sans rien changer au reste ; la page « Ce soir », quand elle dit des places, charge
+// places.js, qui remplace leur nombre par une phrase sans nombre une fois la page périmée ; et la mesure d’audience,
+// quand marque.json l’active, charge /mesure.js (mesure.mjs). Chaque texte venu des données est échappé.
 import { actionDeLaPage, cibleDeLAction, entete, pageDuGenerateurAvecLAction, pied } from './cadre.mjs';
 import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 import { jourEnLettres, quandEnLettres, heureDeParis } from './heure.mjs';
@@ -24,7 +25,8 @@ const IMAGE_ALT = 'Le verre de lumière de Baromatch et la phrase : Ton match. T
 // feuilles : les feuilles de style propres à la page, après celles de toutes les pages (affiche.css pour les affiches).
 // langue : « fr », ou « en » pour une page en anglais (anglais.mjs).
 // mesure : la mesure d’audience (mesure.mjs) ; active, la page charge /mesure.js.
-const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [], langue = 'fr', mesure }) => `<!doctype html>
+// scripts : les autres fichiers du site que la page charge (SCRIPT_DES_PLACES), tous permis par controle.mjs.
+const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, scripts = [], feuilles = [], langue = 'fr', mesure }) => `<!doctype html>
 <html lang="${langue}">
 <head>
 <meta charset="utf-8">
@@ -56,7 +58,7 @@ ${feuilles.map((f) => `<link rel="stylesheet" href="${f}">\n`).join('')}<meta pr
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@baromatchapp">
 <meta name="twitter:image" content="${image?.adresse ?? IMAGE}">
-${partage ? `${SCRIPT_DU_PARTAGE}\n` : ''}${mesure.active ? `${baliseDeLaMesure(mesure)}\n` : ''}<script type="application/ld+json">${blocJsonLd(jsonld)}</script>
+${partage ? `${SCRIPT_DU_PARTAGE}\n` : ''}${scripts.map((script) => `${script}\n`).join('')}${mesure.active ? `${baliseDeLaMesure(mesure)}\n` : ''}<script type="application/ld+json">${blocJsonLd(jsonld)}</script>
 </head>
 <body>
 <a class="lien-evitement" href="#contenu">${langue === 'en' ? 'Skip to content' : 'Aller au contenu'}</a>
@@ -76,10 +78,10 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
 // une fois l’appli ouverte (pageDuGenerateurAvecLAction). Une page en anglais garde l’en-tête et le pied du site, en
 // français : ils le disent (lang="fr"). Les identifiants des insignes de la page (le corps et le pied) sont uniques
 // (identifiantsUniques).
-export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, feuilles, langue = 'fr', textesDuPartage }) => {
+export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, scripts, feuilles, langue = 'fr', textesDuPartage }) => {
   const contenu = avecLePartage(corps, { partage, titre, chemin, textesDuPartage });
   const action = pageDuGenerateurAvecLAction(chemin, marque) ? actionDeLaPage(contenu) : null;
-  return identifiantsUniques(insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, cible: cibleDeLAction(contenu), langue })}
+  return identifiantsUniques(insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, scripts, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, cible: cibleDeLAction(contenu), langue })}
 
 <main id="contenu" class="regarder page">
 ${contenu}
@@ -203,13 +205,17 @@ export const enAttenteDesBars = (marque, textes, { match = null, note = Boolean(
 </section>`;
 };
 
+// Le fichier qui, sur « Ce soir », remplace la phrase des places une fois passée l’heure qu’elle porte (places.js).
+export const SCRIPT_DES_PLACES = '<script src="/places.js" defer></script>';
+
 // La carte d’un bar : son nom (vers sa page), son quartier et son adresse, ce qu’il dit de lui ; sur la page d’un
-// match, l’offre de la soirée ; sur « Ce soir », ses places (une phrase déjà écrite, ou rien).
-export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = '' } = {}) => [
+// match, l’offre de la soirée ; sur « Ce soir », ses places : une phrase déjà écrite, l’heure où elle cesse d’être
+// vraie (jusqua, en ISO) et la phrase sans nombre qui la remplace alors (sinon) ; ou rien.
+export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = null } = {}) => [
   '<li class="regarder-carte">',
   `      <h${niveau} class="regarder-carte__nom"><a href="${cheminDuBar(bar)}">${e(bar.nom)}</a></h${niveau}>`,
   `      <p class="regarder-carte__lieu">${e(bar.quartier)} · ${e(bar.adresse)}</p>`,
-  places && `      <p class="regarder-carte__places">${e(places)}</p>`,
+  places && `      <p class="regarder-carte__places" data-jusqua="${e(places.jusqua)}" data-sinon="${e(places.sinon)}">${e(places.phrase)}</p>`,
   atouts(bar, textes) && `      ${atouts(bar, textes)}`,
   soiree?.offre && `      ${offre(soiree.offre, textes)}`,
   '    </li>',

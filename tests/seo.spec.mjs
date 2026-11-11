@@ -418,7 +418,7 @@ test('robots.txt : les outils de vérification hors de l’index, le site et ses
   const fermes = [...fichiersSous('tests'), '/package.json', '/package-lock.json', '/playwright.config.mjs'];
   expect(fermes.filter((chemin) => permis(chemin))).toEqual([]);
   const ouverts = [
-    ...INDEXABLES.map((p) => p.chemin), '/t/abcdefghjkmn', '/.well-known/assetlinks.json', '/styles.css', '/main.js',
+    ...INDEXABLES.map((p) => p.chemin), '/t/abcdefghjkmn', '/.well-known/assetlinks.json', '/styles.css', '/main.js', '/places.js',
     '/tablee.js', '/boutique.js', '/boutique.css', '/fonts/bricolage-grotesque.woff2', '/img/og-image.jpg', '/favicon.svg', '/favicon.ico',
     '/apple-touch-icon.png', '/sitemap.xml', '/pour-les-bars.css', '/pour-les-bars.js', '/pour-les-bars-amorce.js',
     '/img/og-bars-2026-10.jpg', ...fichiersSous('img/bars'), '/llms.txt', ...fichiersSous('presse'), ...fichiersSous('badge'),

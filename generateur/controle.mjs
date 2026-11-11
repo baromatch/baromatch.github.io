@@ -1,13 +1,13 @@
 // Le contrôle de chaque page avant qu’elle soit écrite : ce qu’un robot y lit (un titre de 15 à 60 caractères, une
 // description de 70 à 160, l’adresse canonique, un seul h1, l’index permis ou non, les aperçus de partage), la
-// politique de sécurité, aucun script hors du bloc « Partager » et de la mesure d’audience (exactement la balise de
-// /mesure.js quand marque.json l’active, aucune sinon), et ce que la page ne dit jamais (« ! », happy hour, tournée,
+// politique de sécurité, aucun script hors du bloc « Partager », des places de « Ce soir » (places.js, sur cette page
+// seulement) et de la mesure d’audience (exactement la balise de /mesure.js quand marque.json l’active, aucune sinon), et ce que la page ne dit jamais (« ! », happy hour, tournée,
 // verre offert, score ; en anglais, aucun mot de boisson). Une page en noindex n’a pas de hreflang. Les mots d’un bar
 // (son nom, son adresse, son offre) sont les siens : ils sont retirés avant de chercher.
 // Une page en erreur est refusée (refus.mjs dit ce qu’elle devient). Les offres ne vont jamais dans la tête d’une page,
 // par construction (pages.mjs) : une offre ordinaire (« Burger » au Burger Club) ne fait refuser aucune page.
 import { MOTS_INTERDITS } from './donnees.mjs';
-import { politiqueDesPages } from './gabarits.mjs';
+import { politiqueDesPages, SCRIPT_DES_PLACES } from './gabarits.mjs';
 import { adresseDe } from './jsonld.mjs';
 import { baliseDeLaMesure, mesureDuSite } from './mesure.mjs';
 import { SCRIPT_DU_PARTAGE } from './partage.mjs';
@@ -52,8 +52,8 @@ export const controlerLaPage = (p, { motsDesBars = [], mesure = mesureDuSite() }
   const robots = tous(html, /<meta name="robots" content="([^"]*)">/g);
   exiger(robots.length === 1 && (p.indexable ? !/noindex/.test(robots[0]) : robots[0] === 'noindex'), `robots « ${robots.join()} » pour une page ${p.indexable ? 'indexable' : 'non indexable'}`);
   exiger(tous(html, /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/g).join() === politiqueDesPages(mesure), 'politique de sécurité');
-  const permis = [SCRIPT_DU_PARTAGE, baliseDeLaMesure(mesure)].filter(Boolean);
-  exiger([...html.matchAll(/<script\b([^>]*)>/g)].every((m) => m[1] === ' type="application/ld+json"' || permis.includes(`<script${m[1]}></script>`)), 'un script autre que les données structurées et le partage, ou la mesure d’audience');
+  const permis = [SCRIPT_DU_PARTAGE, p.type === 'ce-soir' && SCRIPT_DES_PLACES, baliseDeLaMesure(mesure)].filter(Boolean);
+  exiger([...html.matchAll(/<script\b([^>]*)>/g)].every((m) => m[1] === ' type="application/ld+json"' || permis.includes(`<script${m[1]}></script>`)), 'un script autre que les données structurées, le partage, les places ou la mesure d’audience');
   const balises = html.split('<script src="/mesure.js"').length - 1;
   exiger(balises === (mesure.active ? 1 : 0), `${balises} balises de la mesure d’audience pour une mesure ${mesure.active ? 'active' : 'arrêtée'}`);
   // Les vrais attributs des balises, sans leurs valeurs entre guillemets : un texte (« Le Spot onair=1 »), dans la

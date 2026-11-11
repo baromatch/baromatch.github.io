@@ -410,22 +410,64 @@ test('dans le navigateur : la phrase des places tient ses trois heures, puis lai
   await expect(phrase).toHaveCount(1);
   // La page restée ouverte : à l’heure dite, la phrase change d’elle-même, sans recharger.
   const ouvert = await onglet.context().browser().newContext();
-  const reste = await ouvert.newPage();
-  await reste.route(`${ORIGINE_DU_TEST}/**`, (route) => {
-    const { pathname } = new URL(route.request().url());
-    if (pathname === CHEMIN) return route.fulfill({ contentType: 'text/html; charset=utf-8', body: p.contenu });
-    if (pathname === '/places.js') return route.fulfill({ contentType: 'text/javascript', body: readFileSync(path.join(racine, 'places.js'), 'utf8') });
-    return route.fulfill({ status: 404, body: '' });
-  });
-  await reste.clock.install({ time: new Date('2026-10-23T20:15:00Z') });
-  await reste.goto(`${ORIGINE_DU_TEST}${CHEMIN}`);
-  await reste.waitForFunction(() => document.readyState === 'complete');
+  const ouvrir = async (heure) => {
+    const page = await ouvert.newPage();
+    await page.route(`${ORIGINE_DU_TEST}/**`, (route) => {
+      const { pathname } = new URL(route.request().url());
+      if (pathname === CHEMIN) return route.fulfill({ contentType: 'text/html; charset=utf-8', body: p.contenu });
+      if (pathname === '/places.js') return route.fulfill({ contentType: 'text/javascript', body: readFileSync(path.join(racine, 'places.js'), 'utf8') });
+      return route.fulfill({ status: 404, body: '' });
+    });
+    await page.clock.install({ time: new Date(heure) });
+    await page.goto(`${ORIGINE_DU_TEST}${CHEMIN}`);
+    await page.waitForFunction(() => document.readyState === 'complete');
+    return page;
+  };
+  const NOMBRE = 'À 19:17, 12 places à réserver dans l’appli.';
+  const SANS_NOMBRE = 'Les places qui restent sont dans l’appli.';
+  const reste = await ouvrir('2026-10-23T20:15:00Z');
   const laPhrase = reste.locator('.regarder-carte__places');
-  expect(await laPhrase.innerText()).toBe('À 19:17, 12 places à réserver dans l’appli.');
+  expect(await laPhrase.innerText()).toBe(NOMBRE);
   await reste.clock.runFor(60_000);
-  expect(await laPhrase.innerText()).toBe('À 19:17, 12 places à réserver dans l’appli.');
+  expect(await laPhrase.innerText()).toBe(NOMBRE);
   await reste.clock.runFor(61_000);
-  expect(await laPhrase.innerText()).toBe('Les places qui restent sont dans l’appli.');
+  expect(await laPhrase.innerText()).toBe(SANS_NOMBRE);
+  // Une page dont l’heure a passé sans qu’aucun minuteur ne sonne (téléphone en veille, onglet gelé) :
+  // l’horloge avance, le minuteur de 20:17 reste muet.
+  const enVeille = async () => {
+    const page = await ouvrir('2026-10-23T20:15:00Z');
+    await page.clock.pauseAt(new Date('2026-10-23T20:16:00Z'));
+    await page.clock.setSystemTime(new Date('2026-10-23T20:30:00Z'));
+    return page;
+  };
+  // Rouverte par « Précédent » depuis le cache du navigateur : relue. Un simple affichage, hors cache : rien ne change.
+  const retour = await enVeille();
+  const phraseRetour = retour.locator('.regarder-carte__places');
+  await retour.evaluate(() => dispatchEvent(new PageTransitionEvent('pageshow', { persisted: false })));
+  expect(await phraseRetour.innerText()).toBe(NOMBRE);
+  await retour.evaluate(() => dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  expect(await phraseRetour.innerText()).toBe(SANS_NOMBRE);
+  // Revenue au premier plan (onglet retrouvé, téléphone déverrouillé) : relue ; passée en arrière-plan : rien ne change.
+  const cachee = await enVeille();
+  const phraseCachee = cachee.locator('.regarder-carte__places');
+  const devient = (masquee) => cachee.evaluate((m) => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => m });
+    document.dispatchEvent(new Event('visibilitychange'));
+  }, masquee);
+  await devient(true);
+  expect(await phraseCachee.innerText()).toBe(NOMBRE);
+  await devient(false);
+  expect(await phraseCachee.innerText()).toBe(SANS_NOMBRE);
+  // Une heure à plus de 24,8 jours (la plus longue attente d’un minuteur) : la phrase attend, sans relire en boucle.
+  const tot = await ouvrir('2026-09-01T12:00:00Z');
+  await tot.evaluate(() => {
+    window.relectures = 0;
+    const minuteur = window.setTimeout;
+    window.setTimeout = (...args) => { window.relectures += 1; return minuteur(...args); };
+  });
+  await tot.clock.runFor(1_000);
+  expect(await tot.evaluate(() => window.relectures)).toBe(0);
+  expect(await tot.locator('.regarder-carte__places').innerText()).toBe(NOMBRE);
   await ouvert.close();
   // Sans JavaScript, la phrase telle qu’écrite, avec son heure.
   const contexte = await onglet.context().browser().newContext({ javaScriptEnabled: false });

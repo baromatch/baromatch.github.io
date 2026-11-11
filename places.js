@@ -4,7 +4,8 @@
 // passage n’a pas eu lieu, ne donne donc plus un nombre d’il y a des heures : elle dit que les places sont dans
 // l’appli. Une ligne remplace une ligne, rien ne bouge autour. Rien n’est lu ailleurs que dans la page, rien n’est
 // envoyé, rien n’est gardé ; sans ce fichier, la page dit sa phrase telle qu’écrite, avec son heure. Une page restée
-// ouverte change à l’heure dite, et une page rouverte par « Précédent » est relue.
+// ouverte change à l’heure dite ; une page rouverte par « Précédent » ou revenue au premier plan (onglet retrouvé,
+// téléphone déverrouillé : un minuteur peut s’y être tu) est relue.
 (() => {
   let attente;
   const relire = () => {
@@ -18,8 +19,10 @@
         phrase.removeAttribute('data-jusqua');
       } else prochaine = Math.min(prochaine, jusqua);
     }
-    if (prochaine !== Infinity) attente = setTimeout(relire, prochaine - Date.now());
+    // Un minuteur n’attend pas plus de 2^31 - 1 ms (24,8 jours) : au-delà, il sonnerait tout de suite, en boucle.
+  if (prochaine !== Infinity) attente = setTimeout(relire, Math.min(prochaine - Date.now(), 2 ** 31 - 1));
   };
   relire();
   addEventListener('pageshow', (e) => { if (e.persisted) relire(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) relire(); });
 })();

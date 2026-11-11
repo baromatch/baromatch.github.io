@@ -141,7 +141,9 @@ const validerUnEvenement = (vocabulaire, evenement, chemin, erreurs) => {
     erreurs.push(`${chemin} : Event avec une image qui n’est pas une adresse absolue`);
   }
   for (const offre of [].concat(evenement.offers ?? [])) {
-    for (const cle of ['url', 'price', 'priceCurrency', 'availability']) if (!rempli(offre[cle])) erreurs.push(`${chemin}.offers : ${cle} manque`);
+    for (const cle of ['url', 'price', 'priceCurrency']) if (!rempli(offre[cle])) erreurs.push(`${chemin}.offers : ${cle} manque`);
+    // Jamais « disponible » ni « complet » : les places changent après le passage, la page ne les sait plus.
+    if (offre.availability !== undefined) erreurs.push(`${chemin}.offers : jamais d’availability (les places changent après le passage)`);
   }
 };
 

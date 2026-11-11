@@ -685,7 +685,10 @@ test.describe('les pages', () => {
     // Au présent quand l’appli est ouverte.
     expect(p.contenu).toContain('<li><strong>Garde ta place</strong> Pour toi ou pour toute la bande, avant de sortir. Ça ne coûte rien.</li>');
     expect(p.contenu).not.toContain('tu pourras');
-    expect(deType(p, 'Event')[0].offers).toEqual({ '@type': 'Offer', price: 0, priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: 'https://magasin.exemple/baromatch-android' });
+    // La place est gratuite, mais Google ne lit jamais qu’elle est « disponible » : les places changent d’heure en
+    // heure, une page restée en ligne dirait vrai sur une soirée devenue complète.
+    expect(deType(p, 'Event')[0].offers).toEqual({ '@type': 'Offer', price: 0, priceCurrency: 'EUR', url: 'https://magasin.exemple/baromatch-android' });
+    for (const page of autre.pages) expect(page.contenu, page.chemin).not.toMatch(/InStock|availability/);
   });
 
   test('la semaine : le bloc du soir, les jours, le nombre de vrais bars de chaque match', () => {
@@ -984,6 +987,13 @@ test.describe('le validateur et le contrôle refusent ce qui est faux', () => {
     expect(erreurs({ ...evenement, location: { '@type': 'BarOrPub', name: 'Le Zinc' } })).toMatch(/sans address PostalAddress/);
     expect(erreurs({ ...evenement, location: { ...evenement.location, address: { '@type': 'PostalAddress', streetAddress: '12 Rue Oberkampf' } } })).toMatch(/postalCode manque/);
     expect(erreurs({ ...evenement, startDate: undefined })).toMatch(/sans startDate/);
+    // La place gratuite : son adresse, son prix, sa monnaie ; jamais « disponible » (une soirée peut se remplir après
+    // le passage, et une page en ligne dirait encore InStock).
+    const place = { '@type': 'Offer', price: 0, priceCurrency: 'EUR', url: 'https://magasin.exemple/baromatch-android' };
+    expect(erreurs({ ...evenement, offers: place })).toBe('');
+    expect(erreurs({ ...evenement, offers: { ...place, url: undefined } })).toMatch(/offers : url manque/);
+    expect(erreurs({ ...evenement, offers: { ...place, availability: 'https://schema.org/InStock' } })).toMatch(/offers : jamais d’availability/);
+    expect(erreurs({ ...evenement, offers: { ...place, availability: 'https://schema.org/SoldOut' } })).toMatch(/offers : jamais d’availability/);
     const fil = (elements) => ({ '@type': 'BreadcrumbList', itemListElement: elements.map((x) => ({ '@type': 'ListItem', ...x })) });
     expect(erreurs(fil([{ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 2, name: 'Paris' }]))).toBe('');
     expect(erreurs(fil([{ position: 1, name: 'Accueil' }, { position: 2, name: 'Paris' }]))).toMatch(/item manque/);

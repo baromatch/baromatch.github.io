@@ -22,7 +22,8 @@ import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDuMa
 import { barsParVille, description, titre } from './pages.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
 
-// La vie d’une page « Ce soir » : l’écart le plus long entre deux passages de l’Action (pages-des-matchs.yml).
+// La vie d’une page « Ce soir » : l’écart le plus long entre deux passages qui refont les pages (celui des 3 heures,
+// pages-des-matchs.yml).
 export const DUREE_DE_VIE_MS = 3 * HEURE_MS;
 
 export const CHEMIN_CE_SOIR = '/ce-soir/';
@@ -55,9 +56,10 @@ export const lireLesPlaces = (nuits = []) => new Map(nuits.filter((n) => n && n.
 
 // La phrase des places d’une soirée, à l’heure du passage (la page vit trois heures), ou rien : l’appli fermée, le
 // match commencé, une soirée que le bar a fermée, ou rien dans les listes.
+const estComplete = (places) => Boolean(places && (places.complet || places.restantes === 0));
 const phraseDesPlaces = (places, { heure, t }) => {
   if (!places) return '';
-  if (places.complet || places.restantes === 0) return remplir(t.complet, { heure });
+  if (estComplete(places)) return remplir(t.complet, { heure });
   if (places.restantes === null || places.ouvertes === false) return '';
   return remplir(places.restantes > 1 ? t.places : t.placesUne, { heure, n: places.restantes });
 };
@@ -117,9 +119,13 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   // La phrase porte l’heure où la page cesse d’être vraie (le passage et ses trois heures de vie, DUREE_DE_VIE_MS) : une
   // page que le passage suivant n’a pas remplacée dit alors seulement que les places sont dans l’appli (places.js).
   const jusqua = new Date(maintenant + DUREE_DE_VIE_MS).toISOString();
+  // Une soirée complète garde sa phrase : avec son heure, « plus de place » reste vrai, et la phrase sans nombre laisserait
+  // croire qu’il en reste.
   const placesDe = (s) => {
-    const phrase = marque.appli?.ouverte && !commence(s.match) ? phraseDesPlaces(places.get(s.id), { heure, t }) : '';
-    return phrase ? { phrase, jusqua, sinon: textes.places } : null;
+    const lues = places.get(s.id);
+    const phrase = marque.appli?.ouverte && !commence(s.match) ? phraseDesPlaces(lues, { heure, t }) : '';
+    if (!phrase) return null;
+    return estComplete(lues) ? { phrase } : { phrase, jusqua, sinon: textes.places };
   };
 
   const parLieu = (a, b) => a.bar.ville.nom.localeCompare(b.bar.ville.nom, 'fr')
@@ -242,7 +248,7 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
   const barsNommes = [...new Set([...soirees, ...soirsAuBar.flatMap(nommeesDu)].map((s) => s.bar.id))].sort();
   const p = {
     type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage, barsNommes,
-    scripts: soirees.some(placesDe) ? [SCRIPT_DES_PLACES] : [],
+    scripts: soirees.some((s) => placesDe(s)?.jusqua) ? [SCRIPT_DES_PLACES] : [],
     jsonld: [pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...listes.filter((l) => l.numberOfItems > 0)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">

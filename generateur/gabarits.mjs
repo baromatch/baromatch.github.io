@@ -210,12 +210,13 @@ export const SCRIPT_DES_PLACES = '<script src="/places.js" defer></script>';
 
 // La carte d’un bar : son nom (vers sa page), son quartier et son adresse, ce qu’il dit de lui ; sur la page d’un
 // match, l’offre de la soirée ; sur « Ce soir », ses places : une phrase déjà écrite, l’heure où elle cesse d’être
-// vraie (jusqua, en ISO) et la phrase sans nombre qui la remplace alors (sinon) ; ou rien.
+// vraie (jusqua, en ISO) et la phrase sans nombre qui la remplace alors (sinon), sauf « plus de place », vraie avec son
+// heure ; ou rien.
 export const carteDuBar = (bar, textes, { soiree = null, niveau = 4, places = null } = {}) => [
   '<li class="regarder-carte">',
   `      <h${niveau} class="regarder-carte__nom"><a href="${cheminDuBar(bar)}">${e(bar.nom)}</a></h${niveau}>`,
   `      <p class="regarder-carte__lieu">${e(bar.quartier)} · ${e(bar.adresse)}</p>`,
-  places && `      <p class="regarder-carte__places" data-jusqua="${e(places.jusqua)}" data-sinon="${e(places.sinon)}">${e(places.phrase)}</p>`,
+  places && `      <p class="regarder-carte__places"${places.jusqua ? ` data-jusqua="${e(places.jusqua)}" data-sinon="${e(places.sinon)}"` : ''}>${e(places.phrase)}</p>`,
   atouts(bar, textes) && `      ${atouts(bar, textes)}`,
   soiree?.offre && `      ${offre(soiree.offre, textes)}`,
   '    </li>',

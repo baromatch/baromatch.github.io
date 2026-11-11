@@ -687,7 +687,7 @@ test.describe('les pages', () => {
     expect(p.contenu).toContain('<li><strong>Garde ta place</strong> Pour toi ou pour toute la bande, avant de sortir. Ça ne coûte rien.</li>');
     expect(p.contenu).not.toContain('tu pourras');
     // La place est gratuite, mais Google ne lit jamais qu’elle est « disponible » : les places changent d’heure en
-    // heure, une page restée en ligne dirait vrai sur une soirée devenue complète.
+    // heure, une page restée en ligne dirait encore « disponible » pour une soirée devenue complète.
     expect(deType(p, 'Event')[0].offers).toEqual({ '@type': 'Offer', price: 0, priceCurrency: 'EUR', url: 'https://magasin.exemple/baromatch-android' });
     for (const page of autre.pages) expect(page.contenu, page.chemin).not.toMatch(/InStock|availability/);
   });
@@ -1545,7 +1545,8 @@ test.describe('d’un passage à l’autre', () => {
     const sortie = dossierVide();
     const sorties = path.join(sortie, '..', `sorties-${path.basename(sortie)}.txt`);
     const changees = path.join(sortie, '..', `changees-${path.basename(sortie)}.txt`);
-    // En ligne de commande, les bars publiés sont ceux du site (aucun pour l’instant) : aucun jour n’a de soirée.
+    // En ligne de commande, les bars publiés sont ceux du site, jamais les bars inventés du scénario : aucun jour n’a de
+    // soirée.
     const lancer = (...options) => spawnSync(process.execPath, [path.join(racine, 'generateur', 'construire.mjs'), `--source=scenario:${SCENARIO}`,
       `--sortie=${sortie}`, '--maintenant=2026-10-26T18:17:00Z', `--changees=${changees}`, ...options], {
       encoding: 'utf8', env: { ...process.env, GITHUB_OUTPUT: sorties },

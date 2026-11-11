@@ -346,7 +346,9 @@ test('les places : seulement l’appli ouverte, quand les listes les donnent, à
   const places = (phrase) => `<p class="regarder-carte__places" data-jusqua="2026-10-23T20:17:00.000Z" data-sinon="Les places qui restent sont dans l’appli.">${phrase}</p>`;
   expect(carte(p, 'La Cave des Gones')).toContain(places('À 19:17, 12 places à réserver dans l’appli.'));
   expect(carte(p, 'Au Bon Coin')).toContain(places('À 19:17, 1 place à réserver dans l’appli.'));
-  expect(carte(p, 'Le Zinc des Amis')).toContain(places('À 19:17, plus de place à réserver dans l’appli.'));
+  // Une soirée complète garde sa phrase : avec son heure, elle reste vraie ; la phrase sans nombre laisserait croire qu’il
+  // reste des places.
+  expect(carte(p, 'Le Zinc des Amis')).toContain('<p class="regarder-carte__places">À 19:17, plus de place à réserver dans l’appli.</p>');
   // La page charge places.js, et seulement quand elle dit des places.
   expect(p.contenu).toContain('<script src="/places.js" defer></script>');
   // Le contrôle des pages ne permet places.js que sur « Ce soir ».
@@ -365,6 +367,16 @@ test('les places : seulement l’appli ouverte, quand les listes les donnent, à
   const commence = await ceSoir({ source, avec: ouverte, maintenant: '2026-10-23T19:17:00Z' });
   expect(commence.contenu).not.toContain('regarder-carte__places');
   expect(commence.contenu).not.toContain('places.js');
+  // Seule une soirée complète dit ses places : sa phrase ne change jamais, la page ne charge pas places.js.
+  const seulementComplete = scenarioModifie((brut) => ({
+    ...brut,
+    matchNights: [...brut.matchNights, { id: 'n-zinc-brest', status: 'OPEN', bar: { id: 'b-zinc' }, match: { id: 'm-ce-soir' }, offer: null, remainingPlatformSeats: 0, isSoldOut: true, reservationsOpen: false }],
+  }));
+  const complete = await ceSoir({ source: seulementComplete, avec: ouverte, maintenant: '2026-10-23T17:17:00Z' });
+  sansErreur(complete);
+  expect(carte(complete, 'Le Zinc des Amis')).toContain('<p class="regarder-carte__places">À 19:17, plus de place à réserver dans l’appli.</p>');
+  expect(complete.contenu).not.toContain('data-jusqua');
+  expect(complete.contenu).not.toContain('places.js');
 });
 
 test('dans le navigateur : la phrase des places tient ses trois heures, puis laisse sa place à celle sans nombre', async ({ page: onglet }) => {

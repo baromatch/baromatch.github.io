@@ -3,6 +3,7 @@
 // qu’il a le droit de toucher. Le scénario inventé (tests/donnees/scenario.json) se lit à l’heure du vendredi
 // 23 octobre 2026 ; la copie réduite des listes publiques (tests/donnees/capture) à celle de son enregistrement.
 import { test, expect } from '@playwright/test';
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
@@ -685,7 +686,10 @@ test.describe('les pages', () => {
     // Au présent quand l’appli est ouverte.
     expect(p.contenu).toContain('<li><strong>Garde ta place</strong> Pour toi ou pour toute la bande, avant de sortir. Ça ne coûte rien.</li>');
     expect(p.contenu).not.toContain('tu pourras');
-    expect(deType(p, 'Event')[0].offers).toEqual({ '@type': 'Offer', price: 0, priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: 'https://magasin.exemple/baromatch-android' });
+    // La place est gratuite, mais Google ne lit jamais qu’elle est « disponible » : les places changent d’heure en
+    // heure, une page restée en ligne dirait encore « disponible » pour une soirée devenue complète.
+    expect(deType(p, 'Event')[0].offers).toEqual({ '@type': 'Offer', price: 0, priceCurrency: 'EUR', url: 'https://magasin.exemple/baromatch-android' });
+    for (const page of autre.pages) expect(page.contenu, page.chemin).not.toMatch(/InStock|availability/);
   });
 
   test('la semaine : le bloc du soir, les jours, le nombre de vrais bars de chaque match', () => {
@@ -984,6 +988,13 @@ test.describe('le validateur et le contrôle refusent ce qui est faux', () => {
     expect(erreurs({ ...evenement, location: { '@type': 'BarOrPub', name: 'Le Zinc' } })).toMatch(/sans address PostalAddress/);
     expect(erreurs({ ...evenement, location: { ...evenement.location, address: { '@type': 'PostalAddress', streetAddress: '12 Rue Oberkampf' } } })).toMatch(/postalCode manque/);
     expect(erreurs({ ...evenement, startDate: undefined })).toMatch(/sans startDate/);
+    // La place gratuite : son adresse, son prix, sa monnaie ; jamais « disponible » (une soirée peut se remplir après
+    // le passage, et une page en ligne dirait encore InStock).
+    const place = { '@type': 'Offer', price: 0, priceCurrency: 'EUR', url: 'https://magasin.exemple/baromatch-android' };
+    expect(erreurs({ ...evenement, offers: place })).toBe('');
+    expect(erreurs({ ...evenement, offers: { ...place, url: undefined } })).toMatch(/offers : url manque/);
+    expect(erreurs({ ...evenement, offers: { ...place, availability: 'https://schema.org/InStock' } })).toMatch(/offers : jamais d’availability/);
+    expect(erreurs({ ...evenement, offers: { ...place, availability: 'https://schema.org/SoldOut' } })).toMatch(/offers : jamais d’availability/);
     const fil = (elements) => ({ '@type': 'BreadcrumbList', itemListElement: elements.map((x) => ({ '@type': 'ListItem', ...x })) });
     expect(erreurs(fil([{ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 2, name: 'Paris' }]))).toBe('');
     expect(erreurs(fil([{ position: 1, name: 'Accueil' }, { position: 2, name: 'Paris' }]))).toMatch(/item manque/);
@@ -1508,6 +1519,55 @@ test.describe('d’un passage à l’autre', () => {
     expect(source).toContain('if (typeof options.changees === \'string\') writeFileSync(options.changees');
   });
 
+  test('un passage du soir (chaque heure, de 18 h à minuit à Paris) ne refait les pages qu’un jour où un bar diffuse un match', async () => {
+    // Le lundi 26 octobre, aucune soirée dans le scénario : rien n’est refait, rien n’est écrit, pas même l’état ou le
+    // plan du site, et le journal le dit.
+    const sortie = dossierVide();
+    const journal = [];
+    const rien = await passer(sortie, '2026-10-26T18:17:00Z', { seulementUnSoirDeMatch: true, journal: (ligne) => journal.push(ligne) });
+    expect(rien.ecrits).toEqual([]);
+    expect(rien.changees).toEqual([]);
+    expect(readdirSync(sortie)).toEqual([]);
+    expect(journal).toContain('Aucun bar ne diffuse de match aujourd’hui : rien n’est refait.');
+    // Le vendredi 23 octobre, une soirée à 20 h 45 : le passage du soir refait tout, comme les autres.
+    const soir = await passer(sortie, '2026-10-23T18:17:00Z', { seulementUnSoirDeMatch: true });
+    expect(soir.ecrits.length).toBeGreaterThan(0);
+    expect(existsSync(path.join(sortie, 'regarder-le-match/etat.json'))).toBe(true);
+    // Sans l’option (toutes les 3 heures, juste après minuit, à la main, après un envoi sur main), un jour sans soirée
+    // refait les pages aussi.
+    const autre = dossierVide();
+    expect((await passer(autre, '2026-10-26T18:17:00Z')).ecrits.length).toBeGreaterThan(0);
+  });
+
+  test('sur GitHub, un passage du soir sans match le dit à l’étape suivante (« refaites=non ») pour qu’elle n’enregistre rien', () => {
+    // La ligne de commande telle que l’Action la lance : rien dans la sortie, une liste d’adresses changées vide, et
+    // « refaites=non » dans les sorties de l’étape (GITHUB_OUTPUT), que l’envoi lit pour ne rien enregistrer.
+    const sortie = dossierVide();
+    const sorties = path.join(sortie, '..', `sorties-${path.basename(sortie)}.txt`);
+    const changees = path.join(sortie, '..', `changees-${path.basename(sortie)}.txt`);
+    // En ligne de commande, les bars publiés sont ceux du site, jamais les bars inventés du scénario : aucun jour n’a de
+    // soirée.
+    const lancer = (...options) => spawnSync(process.execPath, [path.join(racine, 'generateur', 'construire.mjs'), `--source=scenario:${SCENARIO}`,
+      `--sortie=${sortie}`, '--maintenant=2026-10-26T18:17:00Z', `--changees=${changees}`, ...options], {
+      encoding: 'utf8', env: { ...process.env, GITHUB_OUTPUT: sorties },
+    });
+    writeFileSync(sorties, '');
+    const rien = lancer('--seulement-un-soir-de-match');
+    expect(rien.status, rien.stderr).toBe(0);
+    expect(readFileSync(sorties, 'utf8')).toBe('refaites=non\n');
+    expect(readFileSync(changees, 'utf8')).toBe('');
+    expect(readdirSync(sortie)).toEqual([]);
+    expect(rien.stdout).toContain('Aucun bar ne diffuse de match aujourd’hui : rien n’est refait.');
+    // Des pages refaites (ici, sans l’option), rien n’est ajouté aux sorties : l’envoi se fait comme d’habitude.
+    writeFileSync(sorties, '');
+    const soir = lancer();
+    expect(soir.status, soir.stderr).toBe(0);
+    expect(readFileSync(sorties, 'utf8')).toBe('');
+    expect(readdirSync(sortie).length).toBeGreaterThan(0);
+    rmSync(sorties, { force: true });
+    rmSync(changees, { force: true });
+  });
+
   test('la prudence : un passage qui ferait disparaître plus de la moitié des pages n’écrit rien', async () => {
     // Les données manquantes ne vident pas le site : un match ou un bar absent garde sa page 30 jours (plus haut).
     // Mais un passage qui supprimerait d’un coup plus de la moitié des pages publiées (ici, après une longue pause,
@@ -1625,12 +1685,30 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // Toutes les 3 heures, et juste après minuit à Paris, en heure d’été comme d’hiver : « Ce soir » passe au nouveau
     // jour quelques minutes après minuit, pas vers 1 h ou 2 h.
     const planifies = [...action.matchAll(/^ {4}- cron: '([^']+)'$/gm)].map((m) => m[1]);
-    expect(planifies).toEqual(['17 */3 * * *', '5 22 * * *', '5 23 * * *']);
+    expect(planifies).toEqual(['17 */3 * * *', '17 16,17,19,20 * * *', '5 22 * * *', '5 23 * * *']);
     expect(action.split('\n  workflow_dispatch:')[0].split('\n  schedule:\n')[1].split('\n').filter((l) => !l.trim().startsWith('#'))).toEqual([
-      "    - cron: '17 */3 * * *'", "    - cron: '5 22 * * *'", "    - cron: '5 23 * * *'",
+      "    - cron: '17 */3 * * *'", "    - cron: '17 16,17,19,20 * * *'", "    - cron: '5 22 * * *'", "    - cron: '5 23 * * *'",
     ]);
+    // Les soirs de match, chaque heure de 18 h à minuit à Paris, en heure d’été comme d’hiver (les heures de cron sont
+    // celles de UTC) : de 16 h à 21 h, un seul passage à 17 dans l’heure, ceux des 3 heures compris ; à 22 h, rien à 17,
+    // celui de 22 h 05 vient de tout refaire ; le reste du jour, toutes les 3 heures.
+    const heuresUtc = planifies.filter((c) => c.startsWith('17 ')).flatMap((c) => {
+      const champ = c.split(' ')[1];
+      return champ === '*/3' ? [0, 3, 6, 9, 12, 15, 18, 21] : champ.split(',').map(Number);
+    });
+    for (let heure = 0; heure < 24; heure += 1) {
+      expect(heuresUtc.filter((h) => h === heure), `${heure} h UTC`).toHaveLength(heure >= 16 && heure <= 21 ? 1 : (heure % 3 === 0 ? 1 : 0));
+    }
     const quotidiens = planifies.filter((c) => /^\d+ \d+ \* \* \*$/.test(c)).map((c) => c.split(' ').map(Number));
-    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-26', '2027-01-15']) {
+    // Chaque heure de la soirée à Paris, de 18 h à 23 h, a son passage : à 17, ou celui de 5 qui refait tout, en été,
+    // en hiver et les deux jours de changement d’heure (25 octobre 2026, 28 mars 2027).
+    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-25', '2026-10-26', '2027-01-15', '2027-03-28']) {
+      const [annee, mois, date] = jour.split('-').map(Number);
+      const aParis = [...heuresUtc.map((h) => [h, 17]), ...quotidiens.map(([minute, h]) => [h, minute])]
+        .map(([h, minute]) => heureDeParis(Date.UTC(annee, mois - 1, date, h, minute)));
+      for (const heure of ['18', '19', '20', '21', '22', '23']) expect(aParis.filter((a) => a.startsWith(`${heure}:`)), `${jour} ${heure} h`).toHaveLength(1);
+    }
+    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-25', '2026-10-26', '2027-01-15', '2027-03-28']) {
       const heures = quotidiens.map(([minute, heure]) => heureDeParis(Date.UTC(...jour.split('-').map((n, i) => Number(n) - (i === 1 ? 1 : 0)), heure, minute)));
       expect(heures, jour).toContain('00:05');
     }

@@ -14,13 +14,17 @@
 // des matchs qu’elle montre, chacun vers sa page ; les soirées (Event) restent sur les pages des matchs et des bars, où
 // elles sont décrites. Comme une page de match, elle a le bloc « Partager » et son image d’aperçu (partage.mjs) : le jour
 // écrit en entier, ses matchs, le vrai nombre de vrais bars.
-import { DUREE_MATCH_MS } from './donnees.mjs';
+import { DUREE_MATCH_MS, HEURE_MS } from './donnees.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import { adresseDe, ancreDeLaSoiree, cheminDuBar, cheminDuMatch, filDAriane, pageWeb } from './jsonld.mjs';
-import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDuMatch, ligneDeListe, ligneDeMatch, page, quand, tuTiensUnBar } from './gabarits.mjs';
+import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDuMatch, ligneDeListe, ligneDeMatch, page, quand, SCRIPT_DES_PLACES, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
+
+// La vie d’une page « Ce soir » : l’écart le plus long entre deux passages qui refont les pages (celui des 3 heures,
+// pages-des-matchs.yml).
+export const DUREE_DE_VIE_MS = 3 * HEURE_MS;
 
 export const CHEMIN_CE_SOIR = '/ce-soir/';
 // Au moins un vrai bar publié sur le site : la page est indexable, ce soir comme les soirs sans bar.
@@ -52,9 +56,10 @@ export const lireLesPlaces = (nuits = []) => new Map(nuits.filter((n) => n && n.
 
 // La phrase des places d’une soirée, à l’heure du passage (la page vit trois heures), ou rien : l’appli fermée, le
 // match commencé, une soirée que le bar a fermée, ou rien dans les listes.
+const estComplete = (places) => Boolean(places && (places.complet || places.restantes === 0));
 const phraseDesPlaces = (places, { heure, t }) => {
   if (!places) return '';
-  if (places.complet || places.restantes === 0) return remplir(t.complet, { heure });
+  if (estComplete(places)) return remplir(t.complet, { heure });
   if (places.restantes === null || places.ouvertes === false) return '';
   return remplir(places.restantes > 1 ? t.places : t.placesUne, { heure, n: places.restantes });
 };
@@ -111,7 +116,18 @@ export const fabriquerCeSoir = ({ donnees, contenu, cadre, avecPresse = false, p
   };
   const places = lireLesPlaces(nuits);
   const heure = heureDeParis(maintenant);
-  const placesDe = (s) => (marque.appli?.ouverte && !commence(s.match) ? phraseDesPlaces(places.get(s.id), { heure, t }) : '');
+  // La phrase porte l’heure où la page cesse d’être vraie (le passage et ses trois heures de vie, DUREE_DE_VIE_MS) : une
+  // page que le passage suivant n’a pas remplacée dit alors seulement que les places sont dans l’appli (places.js).
+  const jusqua = new Date(maintenant + DUREE_DE_VIE_MS).toISOString();
+  // Une soirée complète garde sa phrase : avec son heure, « plus de place » reste vrai, et la phrase sans nombre laisserait
+  // croire qu’il en reste.
+  const placesDe = (s) => {
+    const lues = places.get(s.id);
+    const phrase = marque.appli?.ouverte && !commence(s.match) ? phraseDesPlaces(lues, { heure, t }) : '';
+    if (!phrase) return null;
+    return estComplete(lues) ? { phrase } : { phrase, jusqua, sinon: textes.places };
+  };
+
   const parLieu = (a, b) => a.bar.ville.nom.localeCompare(b.bar.ville.nom, 'fr')
     || (a.bar.arrondissement?.numero ?? 0) - (b.bar.arrondissement?.numero ?? 0) || a.bar.nom.localeCompare(b.bar.nom, 'fr');
   const blocDuMatch = (m) => `  <div class="regarder-soir">
@@ -232,6 +248,7 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
   const barsNommes = [...new Set([...soirees, ...soirsAuBar.flatMap(nommeesDu)].map((s) => s.bar.id))].sort();
   const p = {
     type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage, barsNommes,
+    scripts: soirees.some((s) => placesDe(s)?.jusqua) ? [SCRIPT_DES_PLACES] : [],
     jsonld: [pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...listes.filter((l) => l.numberOfItems > 0)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">

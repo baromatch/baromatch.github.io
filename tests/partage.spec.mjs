@@ -462,7 +462,7 @@ test('le contrôle des pages : partage.js, et lui seul, tel quel', async () => {
   expect(p.contenu.split(SCRIPT_DU_PARTAGE)).toHaveLength(2);
   expect(controlerLaPage(p)).toEqual([]);
   for (const autre of ['<script src="/partage.js"></script>', '<script src="/autre.js" defer></script>', '<script src="https://exemple.fr/partage.js" defer></script>', '<script>alert(1)</script>']) {
-    expect(controlerLaPage({ ...p, contenu: p.contenu.replace(SCRIPT_DU_PARTAGE, autre) }).join(), autre).toMatch(/un script autre que les données structurées et le partage/);
+    expect(controlerLaPage({ ...p, contenu: p.contenu.replace(SCRIPT_DU_PARTAGE, autre) }).join(), autre).toMatch(/un script autre que les données structurées, le partage, les places ou la mesure d’audience/);
   }
   // La semaine n’a pas de bloc « Partager », donc pas de script (sauf /mesure.js, si marque.json active la mesure).
   expect(site.pages.find((x) => x.chemin === '/matchs/').contenu.match(/<script src="[^"]*"/g) ?? []).toEqual(mesureDuSite().active ? ['<script src="/mesure.js"'] : []);

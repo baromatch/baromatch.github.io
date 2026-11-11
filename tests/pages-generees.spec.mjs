@@ -19,7 +19,8 @@ import { lireLeCadre } from '../generateur/cadre.mjs';
 import { mesureDuSite } from '../generateur/mesure.mjs';
 import { pageDeRepli } from '../generateur/refus.mjs';
 
-// partage : la page a le bloc « Partager » (et son seul script, /partage.js).
+// partage : la page a le bloc « Partager » (et son script, /partage.js). « Ce soir » ne dit pas de places ici (l’appli
+// est fermée dans le scénario), donc ne charge pas places.js : tests/ce-soir.spec.mjs le suit dans le navigateur.
 const PAGES = [
   { chemin: '/regarder-le-match/paris/', nom: 'ville avec des bars', partage: true },
   { chemin: '/matchs/psg-ol-2026-10-25/', nom: 'match avec des bars', partage: true },

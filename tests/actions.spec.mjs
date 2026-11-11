@@ -259,7 +259,8 @@ test.describe('« Pages des matchs » : l’étape qui envoie les pages', () => 
 
 test.describe('« Pages des matchs » : un passage chaque heure les soirs de match', () => {
   const action = lireLAction('pages-des-matchs.yml');
-  const SOIR = '17 16,17,19,20,22 * * *';
+  // Le programme du soir, lu dans l’Action même : le script le reconnaît mot pour mot, les deux ne peuvent pas diverger.
+  const SOIR = [...action.matchAll(/^    - cron: '(17 [\d,]+ \* \* \*)'$/gm)].map((m) => m[1]);
   // L’étape « Construire et contrôler les pages », lancée telle quelle avec un « node » qui note chaque appel : le
   // programme du passage (github.event.schedule, vide à la main ou après un envoi sur main) choisit les options.
   const lancer = ({ programme = '', accepter = '' } = {}) => {
@@ -281,14 +282,15 @@ test.describe('« Pages des matchs » : un passage chaque heure les soirs de mat
 
   test('le programme du passage arrive au script de construction', () => {
     expect(action).toContain('      PROGRAMME: ${{ github.event.schedule }}\n');
+    expect(SOIR).toEqual(['17 16,17,19,20 * * *']);
   });
 
   test('le passage du soir ne refait les pages qu’un jour de match ; les autres passages refont tout, comme avant', () => {
-    expect(lancer({ programme: SOIR }).split(' ')).toContain('--seulement-un-soir-de-match');
+    expect(lancer({ programme: SOIR[0] }).split(' ')).toContain('--seulement-un-soir-de-match');
     for (const programme of ['17 */3 * * *', '5 22 * * *', '5 23 * * *', '']) {
       expect(lancer({ programme }), programme || 'à la main ou après un envoi sur main').not.toContain('--seulement-un-soir-de-match');
     }
-    const lesDeux = lancer({ programme: SOIR, accepter: 'true' }).split(' ');
+    const lesDeux = lancer({ programme: SOIR[0], accepter: 'true' }).split(' ');
     expect(lesDeux).toContain('--seulement-un-soir-de-match');
     expect(lesDeux).toContain('--accepter-les-suppressions');
   });

@@ -37,8 +37,9 @@ on:
   schedule:
     - cron: '17 */3 * * *'
     # Les soirs de match, chaque heure de 18 h à minuit à Paris, en heure d’été (UTC+2) comme d’hiver (UTC+1) : les
-    # heures de UTC de 16 à 22, sauf 18 et 21, déjà prises par le passage des 3 heures.
-    - cron: '17 16,17,19,20,22 * * *'
+    # heures de UTC de 16 à 20, sauf 18, déjà prise par le passage des 3 heures (21 h aussi). À 22 h, rien : le passage
+    # de 22 h 05 refait déjà tout, et un second, juste après, pourrait le remplacer dans la file.
+    - cron: '17 16,17,19,20 * * *'
     # Juste après minuit à Paris : 22 h 05 en heure d’été, 23 h 05 en heure d’hiver (les heures sont celles de UTC). Le
     # passage de l’autre heure tombe à 23 h 05 ou 1 h 05 à Paris, sans rien changer d’autre.
     - cron: '5 22 * * *'
@@ -106,7 +107,7 @@ jobs:
           node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"
           option=""
           if [ "$ACCEPTER" = "true" ]; then option="--accepter-les-suppressions"; fi
-          if [ "$PROGRAMME" = "17 16,17,19,20,22 * * *" ]; then option="$option --seulement-un-soir-de-match"; fi
+          if [ "$PROGRAMME" = "17 16,17,19,20 * * *" ]; then option="$option --seulement-un-soir-de-match"; fi
           node generateur/construire.mjs --source=api --images=exiger --changees="$RUNNER_TEMP/changees.txt" $option
 
       # Un passage du soir, un jour où aucun bar ne diffuse de match, n’a rien refait (« refaites=non ») : rien n’est

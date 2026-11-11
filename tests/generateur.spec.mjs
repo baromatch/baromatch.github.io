@@ -1685,25 +1685,28 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
     // Toutes les 3 heures, et juste après minuit à Paris, en heure d’été comme d’hiver : « Ce soir » passe au nouveau
     // jour quelques minutes après minuit, pas vers 1 h ou 2 h.
     const planifies = [...action.matchAll(/^ {4}- cron: '([^']+)'$/gm)].map((m) => m[1]);
-    expect(planifies).toEqual(['17 */3 * * *', '17 16,17,19,20,22 * * *', '5 22 * * *', '5 23 * * *']);
+    expect(planifies).toEqual(['17 */3 * * *', '17 16,17,19,20 * * *', '5 22 * * *', '5 23 * * *']);
     expect(action.split('\n  workflow_dispatch:')[0].split('\n  schedule:\n')[1].split('\n').filter((l) => !l.trim().startsWith('#'))).toEqual([
-      "    - cron: '17 */3 * * *'", "    - cron: '17 16,17,19,20,22 * * *'", "    - cron: '5 22 * * *'", "    - cron: '5 23 * * *'",
+      "    - cron: '17 */3 * * *'", "    - cron: '17 16,17,19,20 * * *'", "    - cron: '5 22 * * *'", "    - cron: '5 23 * * *'",
     ]);
     // Les soirs de match, chaque heure de 18 h à minuit à Paris, en heure d’été comme d’hiver (les heures de cron sont
-    // celles de UTC) : un seul passage à 17 par heure, ceux des 3 heures compris ; le reste du jour, toutes les 3 heures.
+    // celles de UTC) : un seul passage à 17 par heure, ceux des 3 heures compris, de 16 h à 21 h ; à 22 h, rien à 17,
+    // celui de 22 h 05 vient de tout refaire ; le reste du jour, toutes les 3 heures.
     const heuresUtc = planifies.filter((c) => c.startsWith('17 ')).flatMap((c) => {
       const champ = c.split(' ')[1];
       return champ === '*/3' ? [0, 3, 6, 9, 12, 15, 18, 21] : champ.split(',').map(Number);
     });
     for (let heure = 0; heure < 24; heure += 1) {
-      expect(heuresUtc.filter((h) => h === heure), `${heure} h UTC`).toHaveLength(heure >= 16 && heure <= 22 ? 1 : (heure % 3 === 0 ? 1 : 0));
-    }
-    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-26', '2027-01-15']) {
-      const [annee, mois, date] = jour.split('-').map(Number);
-      const aParis = heuresUtc.map((h) => heureDeParis(Date.UTC(annee, mois - 1, date, h, 17)));
-      for (const heure of ['18:17', '19:17', '20:17', '21:17', '22:17', '23:17']) expect(aParis, `${jour} ${heure}`).toContain(heure);
+      expect(heuresUtc.filter((h) => h === heure), `${heure} h UTC`).toHaveLength(heure >= 16 && heure <= 21 ? 1 : (heure % 3 === 0 ? 1 : 0));
     }
     const quotidiens = planifies.filter((c) => /^\d+ \d+ \* \* \*$/.test(c)).map((c) => c.split(' ').map(Number));
+    // Chaque heure de la soirée à Paris, de 18 h à 23 h, a son passage : à 17, ou celui de 5 qui refait tout.
+    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-26', '2027-01-15']) {
+      const [annee, mois, date] = jour.split('-').map(Number);
+      const aParis = [...heuresUtc.map((h) => [h, 17]), ...quotidiens.map(([minute, h]) => [h, minute])]
+        .map(([h, minute]) => heureDeParis(Date.UTC(annee, mois - 1, date, h, minute)));
+      for (const heure of ['18', '19', '20', '21', '22', '23']) expect(aParis.filter((a) => a.startsWith(`${heure}:`)), `${jour} ${heure} h`).toHaveLength(1);
+    }
     for (const jour of ['2026-07-01', '2026-10-24', '2026-10-26', '2027-01-15']) {
       const heures = quotidiens.map(([minute, heure]) => heureDeParis(Date.UTC(...jour.split('-').map((n, i) => Number(n) - (i === 1 ? 1 : 0)), heure, minute)));
       expect(heures, jour).toContain('00:05');

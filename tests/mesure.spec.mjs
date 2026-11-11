@@ -231,7 +231,11 @@ test.describe('les pages écrites à la main', () => {
     const mesures = lignes.map((l, i) => [l, i]).filter(([l]) => l.includes('generateur/mesure.mjs'));
     expect(mesures.map(([l]) => l)).toEqual(['node generateur/mesure.mjs --ecrites="$RUNNER_TEMP/mesure.txt"']);
     const generateurs = lignes.map((l, i) => [l, i]).filter(([l]) => l.includes('node generateur/construire.mjs'));
-    expect(mesures.map(([, i]) => i + (lignes[i + 1]?.startsWith('option=') ? 3 : 1))).toEqual(generateurs.map(([, i]) => i));
+    // Entre la mesure et le générateur, rien que le choix de ses options (option="…", ou un if qui y ajoute).
+    expect(generateurs).toHaveLength(1);
+    const [[, debut], [, fin]] = [mesures[0], generateurs[0]];
+    expect(fin).toBeGreaterThan(debut);
+    expect(lignes.slice(debut + 1, fin).filter((l) => !/^(option="[^"]*"|if \[ [^\]]+ \]; then option="[^"]*"; fi)$/.test(l))).toEqual([]);
     expect(action).toContain('mesure="$RUNNER_TEMP/mesure.txt"');
     expect(action).toContain('if [ -s "$mesure" ]; then xargs -d \'\\n\' -a "$mesure" git add --; fi');
     expect(action).toContain('git diff --cached --name-only | grep -vxF -f "$mesure" | grep -vqE');

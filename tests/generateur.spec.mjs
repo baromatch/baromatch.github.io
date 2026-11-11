@@ -1690,7 +1690,7 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
       "    - cron: '17 */3 * * *'", "    - cron: '17 16,17,19,20 * * *'", "    - cron: '5 22 * * *'", "    - cron: '5 23 * * *'",
     ]);
     // Les soirs de match, chaque heure de 18 h à minuit à Paris, en heure d’été comme d’hiver (les heures de cron sont
-    // celles de UTC) : un seul passage à 17 par heure, ceux des 3 heures compris, de 16 h à 21 h ; à 22 h, rien à 17,
+    // celles de UTC) : de 16 h à 21 h, un seul passage à 17 dans l’heure, ceux des 3 heures compris ; à 22 h, rien à 17,
     // celui de 22 h 05 vient de tout refaire ; le reste du jour, toutes les 3 heures.
     const heuresUtc = planifies.filter((c) => c.startsWith('17 ')).flatMap((c) => {
       const champ = c.split(' ')[1];

@@ -553,6 +553,54 @@ test.describe('le contraste peint, texte à 200 %', () => {
   }
 });
 
+// Les pilules en verre, texte à 200 % : passé sur deux lignes, chaque ligne de texte reste dans la forme de son bord, coins
+// arrondis compris. Avant, « Ajouter à mon agenda », « Envoyer sur WhatsApp » et les atouts d’un bar (« Les deux camps
+// bienvenus ») gardaient un arrondi de pilule (999 px) : sur deux lignes, le bord coupait le haut et le bas du texte.
+const PILULES = '.partage__bouton, .regarder-agenda__bouton, .regarder-atouts li, .regarder-bars-pro__bouton, .affiche-format__choix';
+const textesQuiTouchentLeBord = (onglet) => onglet.evaluate((selecteur) => {
+  const fautes = [];
+  let vues = 0;
+  for (const pilule of document.querySelectorAll(selecteur)) {
+    if (!pilule.getClientRects().length) continue;
+    vues += 1;
+    const s = getComputedStyle(pilule);
+    const b = pilule.getBoundingClientRect();
+    const bord = Math.max(parseFloat(s.borderTopWidth), 1);
+    const r = Math.min(parseFloat(s.borderTopLeftRadius), b.height / 2, b.width / 2);
+    const plage = document.createRange();
+    plage.selectNodeContents(pilule);
+    for (const ligne of plage.getClientRects()) {
+      if (!ligne.width) continue;
+      for (const [x, y] of [[ligne.left, ligne.top], [ligne.right, ligne.top], [ligne.left, ligne.bottom], [ligne.right, ligne.bottom]]) {
+        // Le centre de l’arrondi le plus proche ; hors des coins, la distance au bord droit.
+        const cx = Math.min(Math.max(x, b.left + r), b.right - r);
+        const cy = Math.min(Math.max(y, b.top + r), b.bottom - r);
+        const dehors = Math.hypot(x - cx, y - cy) - (r - bord);
+        if (dehors > 0.5) { fautes.push(`« ${pilule.textContent.trim().slice(0, 28)} » : ${Math.round(dehors)} px sur le bord`); break; }
+      }
+    }
+  }
+  return { vues, fautes: [...new Set(fautes)] };
+}, PILULES);
+
+test.describe('les pilules en verre, texte à 200 %', () => {
+  for (const type of TYPES.filter((t) => t.partage || /affiche|bar/.test(t.chemin))) {
+    test(`${type.nom}, à 320 et 390 px : chaque ligne de texte reste dans le bord`, async ({ page: onglet }) => {
+      const fautes = [];
+      let vues = 0;
+      for (const largeur of [320, 390]) {
+        await ouvrir(onglet, type, largeur);
+        await agrandir(onglet, 200);
+        const mesure = await textesQuiTouchentLeBord(onglet);
+        vues += mesure.vues;
+        fautes.push(...mesure.fautes.map((f) => `${largeur} px, ${f}`));
+      }
+      expect(vues).toBeGreaterThan(0);
+      expect(fautes).toEqual([]);
+    });
+  }
+});
+
 // Le choix du papier, texte à 200 % : passé sur deux lignes, son rond garde 20 × 20 px (avant, serré à 14 px de large).
 test('la feuille du patron, à 390 px, texte à 200 % : le rond de chaque choix du papier garde 20 × 20 px', async ({ page: onglet }) => {
   await ouvrir(onglet, TYPES.find((t) => t.chemin === '/matchs/affiche/pour-le-patron/'), 390);

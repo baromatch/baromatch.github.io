@@ -192,10 +192,11 @@
   padding: 0;
   list-style: none;
 }
+/* Un arrondi fixe et un haut en em : sur une ligne, la même pilule ; sur deux (texte agrandi), le bord ne touche pas le texte. */
 .regarder-atouts li {
-  padding: 2px 10px;
+  padding: 0.15em 10px;
   border: 1px solid var(--verre-bord-fort);
-  border-radius: 999px;
+  border-radius: 14px;
   color: var(--texte-doux);
   font-size: 0.875rem;
 }
@@ -331,9 +332,9 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  padding: 0 18px;
+  padding: 0.4em 18px;
   border: 1px solid var(--verre-bord-fort);
-  border-radius: 999px;
+  border-radius: 22px;
   background: var(--verre-fort);
   box-shadow: var(--verre-reflet);
   color: var(--texte);
@@ -364,9 +365,9 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  padding: 0 18px;
+  padding: 0.4em 18px;
   border: 1px solid var(--verre-bord-fort);
-  border-radius: 999px;
+  border-radius: 22px;
   background: var(--verre-fort);
   box-shadow: var(--verre-reflet);
   color: var(--texte);

@@ -137,12 +137,12 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // styles.css de la navigation (Ko) : À propos 7 requêtes, 172 transférés, CSS 98, images 30 ; Presse 10, 221, CSS
 // 101, images 92 ; seuils d’À propos CSS 99, de Presse 226 transférés et CSS 102 (les autres restent). Les affiches
 // tiennent leur seuil de 121.
-// 11 novembre 2026, les pages générées au jour (<html class="jour">) : regarder.css (19 306 octets) et affiche.css
+// 11 novembre 2026, les pages générées au jour (<html class="jour">) : regarder.css (19 446 octets) et affiche.css
 // (18 312) gagnent les valeurs du jour, les deux places du bloc « Partager » (rien ne bouge quand partage.js arrive),
-// les cibles de 44 px, le bord des boutons seuls à 3:1 et en couleurs forcées ; styles.css (87 127) la marge des pilules qui
-// grandit avec leur texte. Mesuré : les pages générées 103,94 Ko (106 433 octets) : seuil 104 inchangé ; les affiches
-// 121,82 Ko (124 745 octets) : leur seuil de CSS monte de 121 à 122. Les transférés tiennent leurs seuils, comme
-// l’accueil (85,08 Ko de CSS) et les pages écrites à la main.
+// les cibles de 44 px, le bord des boutons seuls à 3:1 et en couleurs forcées, un arrondi fixe sur les pilules (texte
+// agrandi) ; styles.css (87 127) la marge des pilules qui grandit avec leur texte. Mesuré : les pages générées 104,08 Ko
+// (106 573 octets) : seuil 104 inchangé ; les affiches 121,96 Ko (124 885 octets) : leur seuil de CSS monte de 121 à
+// 122. Les transférés tiennent leurs seuils, comme l’accueil (85,08 Ko de CSS) et les pages écrites à la main.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 175, js: 19, css: 87, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 193, js: 19, css: 87, images: 24 } },

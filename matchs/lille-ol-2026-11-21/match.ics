@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxramzf000cz71o8hckykfg@baromatch.fr
+DTSTAMP:20261108T003258Z
+SEQUENCE:1
+DTSTART:20261121T194500Z
+DTEND:20261121T214500Z
+SUMMARY:Lille – OL
+DESCRIPTION:Ligue 1 · LOSC Lille – Olympique Lyonnais\nCoup d’envoi sa
+ medi 21 novembre à 20:45\, heure de Paris.\nLa page du match : https://b
+ aromatch.fr/matchs/lille-ol-2026-11-21/
+URL:https://baromatch.fr/matchs/lille-ol-2026-11-21/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

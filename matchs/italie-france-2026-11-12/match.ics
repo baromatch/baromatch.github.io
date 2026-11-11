@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrat2l0006g7uuiazgh5ah@baromatch.fr
+DTSTAMP:20261101T120610Z
+SEQUENCE:0
+DTSTART:20261112T194500Z
+DTEND:20261112T214500Z
+SUMMARY:Italie – France
+DESCRIPTION:Ligue des nations · Italie – France\nCoup d’envoi jeudi 12
+  novembre à 20:45\, heure de Paris.\nLa page du match : https://baromatc
+ h.fr/matchs/italie-france-2026-11-12/
+URL:https://baromatch.fr/matchs/italie-france-2026-11-12/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -294,7 +294,7 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
 });
 
 // Chaque page mène à « Pour les bars » depuis son en-tête et son pied de page, avec un texte qui dit où l’on va (plus
-// « Bars partenaires », ni l’ancre /#bars de l’accueil).
+// « Bars partenaires », ni l’ancre /#bars de l’accueil), et à son formulaire par « Proposer mon bar » dans le pied.
 test.describe('chaque page mène à « Pour les bars » depuis son en-tête et son pied de page', () => {
   test.use({ javaScriptEnabled: false });
 
@@ -302,21 +302,21 @@ test.describe('chaque page mène à « Pour les bars » depuis son en-tête et s
     test(`${page.nom} : le lien de l’en-tête et celui du pied de page`, async ({ page: onglet }) => {
       exigerLaPage(page);
       await onglet.goto(page.chemin);
-      const entete = await onglet.$$eval('.entete__nav a', (liens) => liens.map((l) => ({
+      const entete = await onglet.$$eval('.entete a', (liens) => liens.map((l) => ({
         href: l.getAttribute('href'), texte: l.textContent.trim(), classe: l.className, courant: l.getAttribute('aria-current'),
       })));
       expect(entete.filter((l) => l.href === '/pour-les-bars.html')).toEqual([{
         href: '/pour-les-bars.html',
         texte: 'Pour les bars',
-        classe: 'entete__lien entete__lien--bars',
+        classe: 'menu__lien',
         courant: page.chemin === '/pour-les-bars.html' ? 'page' : null,
       }]);
       expect(entete.map((l) => l.href), 'plus d’ancre vers l’accueil').not.toContain('/#bars');
       expect(entete.map((l) => l.texte)).not.toContain('Bars partenaires');
 
-      const pied = await onglet.$$eval('.pied__liens a', (liens) => liens.map((l) => ({ href: l.getAttribute('href'), texte: l.textContent.trim() })));
-      expect(pied[0], 'premier lien du pied de page').toEqual({ href: '/pour-les-bars.html', texte: 'Pour les bars' });
-      expect(pied.filter((l) => l.href === '/pour-les-bars.html')).toHaveLength(1);
+      const pied = await onglet.$$eval('.pied a', (liens) => liens.map((l) => ({ href: l.getAttribute('href'), texte: l.textContent.trim() })));
+      expect(pied.filter((l) => l.href === '/pour-les-bars.html')).toEqual([{ href: '/pour-les-bars.html', texte: 'Pour les bars' }]);
+      expect(pied.filter((l) => l.href === '/pour-les-bars.html#proposer')).toEqual([{ href: '/pour-les-bars.html#proposer', texte: 'Proposer mon bar' }]);
     });
   }
 });

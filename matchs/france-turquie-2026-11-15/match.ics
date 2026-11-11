@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrat3q0008g7uu7qrhx99m@baromatch.fr
+DTSTAMP:20261102T004125Z
+SEQUENCE:0
+DTSTART:20261115T194500Z
+DTEND:20261115T214500Z
+SUMMARY:France – Turquie
+DESCRIPTION:Ligue des nations · France – Turquie\nCoup d’envoi dimanch
+ e 15 novembre à 20:45\, heure de Paris.\nLa page du match : https://baro
+ match.fr/matchs/france-turquie-2026-11-15/
+URL:https://baromatch.fr/matchs/france-turquie-2026-11-15/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

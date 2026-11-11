@@ -508,11 +508,14 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     return filets === 0 ? 'night' : filets === insignes ? 'light' : `mêlé (${filets} sur ${insignes})`;
   };
   // Les insignes d’une page qui ne suivent pas son thème : <html class="jour"> donne le clair, sinon la nuit ; sur le
-  // papier d’une affiche, toujours le clair.
+  // papier d’une affiche, toujours le clair. Le pied de page est de nuit sur chaque page (au jour, sur une affiche) :
+  // les insignes de ses clubs, toujours sur la nuit.
   const horsDuTheme = (p) => {
     const jour = /<html[^>]*\sclass="[^"]*\bjour\b/.test(p.contenu);
     const attendu = p.type?.startsWith('affiche') || jour ? 'light' : 'night';
-    return (p.contenu.match(/<svg class="insignes?"[\s\S]*?<\/svg>/g) ?? []).map(fondDuDessin).filter((f) => f !== attendu).map((f) => `${p.chemin} : ${f} au lieu de ${attendu}`);
+    const pied = p.contenu.match(/<footer class="pied page"[\s\S]*?<\/footer>/)?.[0] ?? '';
+    const ecarts = (html, fond, ou) => (html.match(/<svg class="insignes?"[\s\S]*?<\/svg>/g) ?? []).map(fondDuDessin).filter((f) => f !== fond).map((f) => `${p.chemin}${ou} : ${f} au lieu de ${fond}`);
+    return [...ecarts(p.contenu.replace(pied, ''), attendu, ''), ...ecarts(pied, 'night', ' (le pied)')];
   };
 
   test('le fond des insignes suit le thème de chaque page : <html class="jour"> donne le clair, sinon la nuit ; sur une affiche, le clair', async () => {
@@ -527,6 +530,10 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     expect(pages.length).toBeGreaterThan(30);
     expect(pages.some((p) => p.type === 'affiche')).toBe(true);
     expect(pages.flatMap(horsDuTheme)).toEqual([]);
+    // Le pied de chaque page a ses insignes, sur la nuit, affiches comprises ; un pied dessiné sur le clair, ce test le voit.
+    expect(pages.filter((p) => !/<footer class="pied page"[\s\S]*?<svg class="insigne"[\s\S]*?<\/footer>/.test(p.contenu)).map((p) => p.chemin)).toEqual([]);
+    const affiche = pages.find((p) => p.type === 'affiche');
+    expect(horsDuTheme({ ...affiche, contenu: affiche.contenu.replace(/<footer class="pied page"[\s\S]*?<\/footer>/, (pied) => pied.replace(/<svg class="insigne"[\s\S]*?<\/svg>/, insigne({ slug: 'paris-saint-germain' }, { taille: 24, fond: 'light' }))) })).toHaveLength(1);
     // Une page générée qui change de thème sans que ses insignes suivent (le jour retiré, ou posé) : ce test le voit.
     const match = site.pages.find((p) => p.chemin === '/matchs/le-havre-psg-2026-10-30/');
     const autreTheme = match.contenu.includes('<html lang="fr" class="jour">')
@@ -681,8 +688,12 @@ test.describe('plus aucun ancien disque, et jamais un écusson', () => {
       for (const dessin of lien.match(/<svg[\s\S]*?<\/svg>/g)) expect(dessin).not.toMatch(/<image|href=|<text|<title|style=/);
     }
     expect(liensDe(planches).filter((lien) => lien.includes('insignes--drapeau'))).toHaveLength(1);
-    // Hors du bloc, aucun insigne : l’accueil écrit à la main n’en dessine pas.
-    expect(accueil.split(REPERES.debut)[0] + accueil.split(REPERES.fin)[1]).not.toContain('class="insigne');
+    // Hors du bloc, aucun insigne écrit à la main : seulement les clubs du pied de page, le cadre de toutes les pages
+    // (generateur/cadre.mjs, tests/cadre.spec.mjs), un insigne par club.
+    const horsDuBloc = accueil.split(REPERES.debut)[0] + accueil.split(REPERES.fin)[1];
+    const piedDeLAccueil = horsDuBloc.match(/<footer class="pied page"[\s\S]*?<\/footer>/)[0];
+    expect(horsDuBloc.replace(piedDeLAccueil, '')).not.toContain('class="insigne');
+    expect(piedDeLAccueil.match(/<svg class="insignes?"/g)).toHaveLength(piedDeLAccueil.match(/<a class="pied__club"/g).length);
     // Un identifiant n’y sert qu’une fois.
     const ids = [...accueil.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
     expect(ids.length - new Set(ids).size).toBe(0);

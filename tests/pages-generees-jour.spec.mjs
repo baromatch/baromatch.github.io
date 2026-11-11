@@ -20,7 +20,7 @@ import { decrireLesPlusFaibles, lignesTropFaibles, mesurerAuPixel } from './outi
 import { CAPTURE, MAINTENANT_DE_LA_CAPTURE, construireLeSiteDExemple } from './outils/site-genere.mjs';
 import { decrireLesCouples, mesurerLesTextes, textesTropFaibles } from './outils/textes-peints.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
-import { lireLeCadre } from '../generateur/gabarits.mjs';
+import { lireLeCadre } from '../generateur/cadre.mjs';
 import { pageDeRepli } from '../generateur/refus.mjs';
 
 // Chaque type de page. site : le scénario inventé (des bars publiés), ou la copie enregistrée (aucun bar publié).
@@ -75,7 +75,7 @@ test.beforeAll(async () => {
   await construireLeSiteDExemple(avecBars);
   // La page neutre (celle qui remplace une page refusée, refus.mjs), écrite à une adresse à elle.
   const neutre = pageDeRepli({ chemin: '/matchs/page-neutre/', type: 'match', cle: 'page-neutre' }, {
-    cadre: lireLeCadre(avecBars), marque: JSON.parse(readFileSync(path.join(avecBars, 'marque.json'), 'utf8')), avecPresse: existsSync(path.join(avecBars, 'presse.html')),
+    cadre: lireLeCadre(), marque: JSON.parse(readFileSync(path.join(avecBars, 'marque.json'), 'utf8')), avecPresse: existsSync(path.join(avecBars, 'presse.html')),
   });
   mkdirSync(path.join(avecBars, 'matchs', 'page-neutre'), { recursive: true });
   writeFileSync(path.join(avecBars, 'matchs', 'page-neutre', 'index.html'), neutre.contenu);

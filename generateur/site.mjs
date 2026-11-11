@@ -11,7 +11,7 @@ import { fabriquerCeSoir } from './ce-soir.mjs';
 import { chargerLeContenu, RACINE } from './contenu.mjs';
 import { preparer } from './donnees.mjs';
 import { fabriquerLaFeuilleDuPatron } from './feuille-du-patron.mjs';
-import { lireLeCadre } from './gabarits.mjs';
+import { lireLeCadre } from './cadre.mjs';
 import { controlerLaPage } from './controle.mjs';
 import { lireLaMesure } from './mesure.mjs';
 import { fabriquerLesPages } from './pages.mjs';
@@ -31,7 +31,7 @@ export const construireEnMemoire = async ({
   const mesure = lireLaMesure(contenu.marque);
   const listes = brut ?? await lireLaSource(source, adresse ? { adresse } : {});
   const donnees = preparer(listes, { maintenant, ...contenu, adresses: anciens?.adresses });
-  const cadre = lireLeCadre(racine);
+  const cadre = lireLeCadre();
   const avecPresse = existsSync(path.join(racine, 'presse.html'));
   const { pages, avertissements } = fabriquerLesPages({
     donnees, contenu, cadre, avecPresse, anciens, images, afficheDuBar: qr ? lienVersLAffiche : null, afficheDeLaSemaine: qr ? lienVersLAfficheDeLaSemaine : null,

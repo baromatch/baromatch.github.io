@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrat4f000ag7uuv1wr0fw9@baromatch.fr
+DTSTAMP:20261110T211715Z
+SEQUENCE:0
+DTSTART:20261124T174500Z
+DTEND:20261124T194500Z
+SUMMARY:Galatasaray – Aston Villa
+DESCRIPTION:Ligue des champions · Galatasaray A.Ş. – Aston Villa\nCoup 
+ d’envoi mardi 24 novembre à 18:45\, heure de Paris.\nLa page du match 
+ : https://baromatch.fr/matchs/galatasaray-aston-villa-2026-11-24/
+URL:https://baromatch.fr/matchs/galatasaray-aston-villa-2026-11-24/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

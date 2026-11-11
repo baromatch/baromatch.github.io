@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrat66000gg7uucna8lk21@baromatch.fr
+DTSTAMP:20261110T211715Z
+SEQUENCE:0
+DTSTART:20261124T200000Z
+DTEND:20261124T220000Z
+SUMMARY:Man City – Naples
+DESCRIPTION:Ligue des champions · Manchester City – SSC Napoli\nCoup d
+ ’envoi mardi 24 novembre à 21:00\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/man-city-naples-2026-11-24/
+URL:https://baromatch.fr/matchs/man-city-naples-2026-11-24/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

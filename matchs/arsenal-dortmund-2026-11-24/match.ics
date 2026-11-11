@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrat50000cg7uu6etg0ugd@baromatch.fr
+DTSTAMP:20261110T211715Z
+SEQUENCE:0
+DTSTART:20261124T200000Z
+DTEND:20261124T220000Z
+SUMMARY:Arsenal – Dortmund
+DESCRIPTION:Ligue des champions · Arsenal FC – Borussia Dortmund\nCoup d
+ ’envoi mardi 24 novembre à 21:00\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/arsenal-dortmund-2026-11-24/
+URL:https://baromatch.fr/matchs/arsenal-dortmund-2026-11-24/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -15,7 +15,7 @@ import { demarrerServeur } from './outils/serveur.mjs';
 import { racine } from './outils/environnement.mjs';
 import { CAPTURE, MAINTENANT_DE_LA_CAPTURE, construireLeSiteDExemple } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
-import { lireLeCadre } from '../generateur/gabarits.mjs';
+import { lireLeCadre } from '../generateur/cadre.mjs';
 import { mesureDuSite } from '../generateur/mesure.mjs';
 import { pageDeRepli } from '../generateur/refus.mjs';
 
@@ -55,7 +55,7 @@ test.beforeAll(async () => {
   await construireLeSiteDExemple(dossier);
   // La page neutre, écrite à une adresse à elle dans le site d’exemple.
   const neutre = pageDeRepli({ chemin: '/matchs/page-neutre/', type: 'match', cle: 'page-neutre' }, {
-    cadre: lireLeCadre(dossier), marque: JSON.parse(readFileSync(path.join(dossier, 'marque.json'), 'utf8')), avecPresse: existsSync(path.join(dossier, 'presse.html')),
+    cadre: lireLeCadre(), marque: JSON.parse(readFileSync(path.join(dossier, 'marque.json'), 'utf8')), avecPresse: existsSync(path.join(dossier, 'presse.html')),
   });
   mkdirSync(path.join(dossier, 'matchs', 'page-neutre'), { recursive: true });
   writeFileSync(path.join(dossier, 'matchs', 'page-neutre', 'index.html'), neutre.contenu);

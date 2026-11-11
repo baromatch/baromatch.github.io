@@ -82,7 +82,8 @@ const verifierLesPuces = async (onglet, navigations) => {
   await onglet.waitForFunction(() => document.readyState === 'complete');
   await onglet.evaluate(async () => {
     await document.fonts.ready;
-    await Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {})));
+    // Seulement celles qui finissent avec le temps (pas le menu qui suit le défilement).
+    await Promise.all(document.getAnimations().filter((a) => a.timeline === document.timeline && a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {})));
     await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
   });
   const lu = await lireLesPuces(onglet);
@@ -354,6 +355,6 @@ test('la confidentialité dit ce qu’on garde (l’adresse et la ville), pourqu
   await expect(section.locator('a[href="mailto:contact@baromatch.fr"]')).toHaveCount(1);
   expect(texte).not.toContain('rien d’autre.');
   // La date de la page, et celle du plan du site.
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 1er novembre 2026');
-  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-11-01</lastmod></url>');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-11-02</lastmod></url>');
 });

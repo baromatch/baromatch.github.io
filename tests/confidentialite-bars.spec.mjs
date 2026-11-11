@@ -19,10 +19,10 @@ test('la section des bars dit la durée, le brouillon de l’onglet, à qui écr
   // Le brouillon ne s’efface pas quand la demande part par la messagerie : la page ne le promet pas.
   expect(section).not.toContain('il s’efface quand ta demande part');
   expect(section).toContain('quand ta demande part depuis cette page');
-  // Au bout de 12 mois, la demande et le mail qui nous a prévenus sont effacés à la main : la page ne promet pas
-  // d’effacement automatique.
-  expect(section).toMatch(/12 mois à partir de ta demande\. Au bout de ce délai, on efface nous-mêmes ta demande[^.]*mail qui nous a prévenus/);
-  expect(section).not.toMatch(/automatique/);
+  // Au bout de 12 mois : sur le serveur, l’effacement automatique (en route depuis le 2 novembre 2026, étape 7) ; dans
+  // la boîte mail, à la main. L’effacement automatique n’est promis que là, une seule fois.
+  expect(section).toMatch(/12 mois à partir de ta demande\. Au bout de ce délai, notre effacement automatique efface ta demande de notre serveur, et on efface nous-mêmes de notre boîte le mail qui nous a prévenus/);
+  expect(section.match(/automatique/g)).toHaveLength(1);
   // Resend nommé, avec son pays, et un renvoi à la liste des prestataires. Aucune garantie de transfert n’est
   // annoncée tant qu’elle n’est pas établie.
   expect(section).toContain('Resend est l’un de nos prestataires techniques, établi aux États-Unis');
@@ -84,12 +84,12 @@ test.describe('la page Confidentialité dit, mot pour mot, le texte attendu sur 
     // La page : le repli par la messagerie du visiteur.
     'Si le formulaire ne répond pas':
       'la page te propose d’envoyer ta demande depuis ta propre messagerie : elle arrive alors dans notre boîte contact@baromatch.fr.',
-    // La durée, sur le serveur et dans la boîte mail : un effacement fait à la main, tant que l’effacement automatique
-    // n’est pas en route.
+    // La durée : sur le serveur, l’effacement automatique (en route depuis le 2 novembre 2026) ; dans la boîte mail,
+    // un effacement fait à la main.
     'Combien de temps':
       '12 mois à partir de ta demande. '
-      + 'Au bout de ce délai, on efface nous-mêmes ta demande de notre serveur, '
-      + 'et de notre boîte le mail qui nous a prévenus (ou ta demande, si elle est arrivée par mail). '
+      + 'Au bout de ce délai, notre effacement automatique efface ta demande de notre serveur, '
+      + 'et on efface nous-mêmes de notre boîte le mail qui nous a prévenus (ou ta demande, si elle est arrivée par mail). '
       + 'Resend garde ses propres journaux, selon ses propres conditions.',
     // La page : le brouillon de l’onglet (stockage de session), puis, une fois la demande partie, ce que pour-les-bars.js
     // garde de la dernière demande (baromatch-demande-bar-partie : l’adresse, le bar, l’heure ; 10 minutes).

@@ -99,8 +99,8 @@ for (const ecran of [
 // ambre que sur les pages des matchs, vers le formulaire du haut. L’ambre est pour l’action : tout ce qui est en ambre
 // dans la page (hors de la bande des bars) mène à la liste d’attente, ou, dans les matchs de la semaine, aux bars d’un
 // match (« Voir les bars », vers #titre-bars de sa page), dès qu’un bar est publié ; « Deviens testeur Android » est en
-// verre. La boutique n’est plus présentée dans l’accueil : on la trouve dans le menu et le pied de page (décision du
-// propriétaire, 28 octobre).
+// verre. La boutique n’est plus présentée dans l’accueil (décision du propriétaire, 28 octobre), ni dans le menu du
+// haut (29 octobre) : on la trouve dans le pied de page.
 const ouMeneLAmbre = (page) => page.$$eval('main a, main button', (elements) => elements
   .filter((e) => !e.closest('#bars') && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)')
   .map((e) => ({ cible: e.getAttribute('href') ?? e.closest('form')?.id, semaine: Boolean(e.closest('#semaine')) })));
@@ -121,12 +121,13 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   expect(await testeurs.evaluate((a) => getComputedStyle(a).backgroundColor)).not.toBe('rgb(255, 177, 61)');
   await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
   expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
-  await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(1);
+  await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(0);
+  await expect(page.locator('footer a[href="/boutique.html"]')).toHaveCount(1);
   const enAmbre = await ouMeneLAmbre(page);
   expect(enAmbre.filter(({ cible }) => cible === '#attente').length).toBeGreaterThan(0);
   expect(ambreAilleurs(enAmbre)).toEqual([]);
-  // L’en-tête non plus : ni bord ni souligné ambre, même translucide, sur ses liens (souligné au téléphone, capsule de
-  // « Pour les bars » dès 401 px).
+  // L’en-tête non plus : ni bord ni souligné ambre, même translucide, sur ses liens (le menu, au téléphone comme à
+  // l’ordinateur).
   for (const largeur of [360, 1280]) {
     await page.setViewportSize({ width: largeur, height: 800 });
     const enteteAmbre = await page.$$eval('header a', (liens) => liens.flatMap((a) => {
@@ -505,7 +506,7 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   await expect(page.locator('#titre-soiree')).toHaveText('Un soir de match, minute par minute.');
   // Ce que montrent ces moments est publié dans la version de test de l’appli (le propriétaire, 28 octobre).
   await expect(page.locator('.soiree .surtitre')).toHaveText('Dans la version de test de l’appli');
-  expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('Sur ces écrans, les bars, les clubs et les pseudos sont inventés.');
+  expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.');
   const lus = await page.locator('.instant').evaluateAll((instants) => instants.map((m) => ({
     heure: m.querySelector('.instant__heure time').textContent,
     titre: m.querySelector('h3.instant__titre').textContent.replace(/\s+/g, ' ').trim(),

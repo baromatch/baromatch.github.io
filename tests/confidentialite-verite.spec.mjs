@@ -54,8 +54,10 @@ test('la page Confidentialité ne décrit comme destinataire ni Mapbox, ni Fireb
   await expect(page.locator('#prestataires + ul > li', { hasText: /^Sentry/ })).toContainText('une fois qu’on l’a allumé');
   // Les mails d’alerte, par Resend : des chiffres, jamais un fan.
   await expect(page.locator('#prestataires + ul > li', { hasText: /^Resend/ })).toContainText('ils ne disent que la sorte d’alerte et des chiffres, jamais un fan, un pseudo, une adresse mail, un code ni le nom d’un bar');
-  // Les notifications : tant que celles du serveur ne sont pas allumées, seuls les rappels programmés par le téléphone.
-  await expect(page.locator('#notifications + ul')).toContainText('tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone');
+  // Les notifications : celles du serveur sont allumées sur iPhone depuis le 1er novembre 2026 ; sur Android, pas encore,
+  // seuls les rappels programmés par le téléphone.
+  await expect(page.locator('#notifications + ul')).toContainText('sur iPhone, elles sont allumées depuis le 1er novembre 2026');
+  await expect(page.locator('#notifications + ul')).toContainText('Sur Android, pas encore : notre serveur n’en envoie aucune sur ton téléphone');
   // Les photos : fermées, et la page sera mise à jour avant.
   expect(texte).toContain('Les photos de profil ne sont pas ouvertes pour l’instant.');
   expect(texte).toContain('Avant de les ouvrir, on mettra cette page à jour');
@@ -68,12 +70,12 @@ test('la page Confidentialité : l’hébergement aux Pays-Bas, et aucune garant
   expect(texte).toContain('Pour toute question sur ces transferts, écris-nous');
 });
 
-test('la page Confidentialité : les durées que l’effacement automatique appliquera disent ce qui se passe aujourd’hui', async ({ page }) => {
+test('la page Confidentialité : les durées que l’effacement automatique applique depuis le 2 novembre 2026', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const duree = normaliser(await page.locator('#combien-de-temps ~ ul').first().innerText());
-  expect(duree).toContain('Tes sessions de connexion : aujourd’hui, tant que ton compte existe. Prévu : effacées 30 jours après leur fin.');
-  expect(duree).toContain('Les matchs que tu veux voir : aujourd’hui, tant que ton compte existe. Prévu : effacés 30 jours après le match.');
-  expect(duree).toContain('aujourd’hui, tant que ton compte existe. Prévu : effacés au bout de 6 mois.');
+  expect(duree).toContain('Tes sessions de connexion : effacées 30 jours après leur fin.');
+  expect(duree).toContain('Les matchs que tu veux voir : effacés 30 jours après le match.');
+  expect(duree).toContain('L’adresse IP et l’appareil, dans les sessions et les traces de sécurité : effacés au bout de 6 mois.');
   const texte = await texteDe(page, '/confidentialite.html');
   expect(texte).not.toMatch(/effacée? automatiquement|Les journaux techniques : 30 jours|rien n’est gardé|anonymisé/);
   // La recherche d’adresse : les adresses trouvées sont gardées 5 minutes.
@@ -82,8 +84,8 @@ test('la page Confidentialité : les durées que l’effacement automatique appl
 
 // La recherche de la carte (le besoin n° 40 de l’appli, 27 octobre 2026) : tout ce que le fan tape, dès 3 caractères,
 // part vers l’IGN, même un nom de bar ou de club ; la réponse reste 5 minutes, sans le compte. Et les messages de Baromatch
-// sur un match (le besoin n° 41) : à qui, combien, et comment les couper ; aucun ne part tant que les notifications du
-// serveur n’arrivent pas sur le téléphone.
+// sur un match (le besoin n° 41) : à qui, combien, et comment les couper ; sur Android, aucun ne part tant que les
+// notifications du serveur n’y arrivent pas.
 test('la page Confidentialité : tout texte de la recherche part vers l’IGN, et les messages de Baromatch sur un match', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const ligneRecherche = page.locator('#position + ul > li', { hasText: 'La recherche de la carte' });
@@ -97,7 +99,7 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   const texte = await texteDe(page, '/confidentialite.html');
   expect(texte).not.toContain('recherche d’adresse');
   const messages = normaliser(await page.locator('#messages-match').innerText());
-  expect(messages).toContain('quand les notifications de notre serveur arriveront sur ton téléphone, Baromatch pourra t’envoyer de temps en temps un message sur un match : un match qui approche, ou la mi-temps.');
+  expect(messages).toContain('sur iPhone, et sur Android quand les notifications de notre serveur y arriveront, Baromatch peut t’envoyer de temps en temps un message sur un match : un match qui approche, ou la mi-temps.');
   expect(messages).toContain('Seulement si tu as allumé « Messages de Baromatch » dans Réglages (il est coupé au départ) : c’est ton accord, et notre serveur garde la date où tu l’as donné.');
   expect(messages).toContain('Et seulement si une de tes arrivées a été validée dans un bar ces 7 derniers jours');
   expect(messages).toContain('Par match, au plus une de ces notifications : ton club qui joue, une soirée qui ouvre, ou ce message. Aucune pour un match où tu as déjà ta place.');
@@ -105,13 +107,13 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   expect(messages).toContain('Pour ne plus les recevoir, coupe « Messages de Baromatch » dans Réglages : ton accord est retiré.');
   // Couper les notifications du téléphone les cache, sans retirer l’accord gardé avec le compte.
   expect(messages).toContain('Couper les notifications de Baromatch dans les réglages de ton téléphone les cache aussi, sans retirer ton accord.');
-  // Tant que les notifications du serveur ne sont pas allumées, rien ne part : la page le dit toujours, juste avant.
-  await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone');
+  // Sur Android, tant que les notifications du serveur n’y sont pas allumées, rien ne part : la page le dit, juste avant.
+  await expect(page.locator('#notifications + ul > li').nth(1)).toContainText('Sur Android, pas encore : notre serveur n’en envoie aucune sur ton téléphone');
   // Sa base est écrite, et le résumé « en clair » des intérêts légitimes, auquel renvoie le droit de s’opposer, la compte.
   const base = page.locator('#pourquoi + p + ul > li', { hasText: 'T’envoyer de temps en temps un message sur un match' });
   await expect(base).toHaveCount(1);
   // Un accord, coupé au départ, plus notre intérêt légitime.
-  await expect(base).toContainText('ton accord, donné en allumant « Messages de Baromatch » dans Réglages (il est coupé au départ), quand les notifications de notre serveur arriveront sur ton téléphone');
+  await expect(base).toContainText('ton accord, donné en allumant « Messages de Baromatch » dans Réglages (il est coupé au départ), sur iPhone, et sur Android quand les notifications de notre serveur y arriveront');
   await expect(base).not.toContainText('intérêt légitime');
   await expect(base).toContainText('ou qu’il arrive à la mi-temps');
   await expect(page.locator('#pourquoi ~ p', { hasText: 'Nos intérêts légitimes, en clair' })).not.toContainText('mi-temps');
@@ -120,15 +122,17 @@ test('la page Confidentialité : tout texte de la recherche part vers l’IGN, e
   await expect(page.locator('#pourquoi + p + ul a[href="#messages-match"]')).toHaveCount(1);
 });
 
-// Les notifications des iPhone (30 octobre 2026) : une fois qu’on les allume, celles de notre serveur passent par Apple.
-// La page le dit avant : ce qu’Apple reçoit (jamais qui tu es), combien de temps, Apple dans les prestataires et dans
-// les durées ; rien chez Apple pour un téléphone Android, et la page ne nomme Apple nulle part ailleurs.
-test('la page Confidentialité : sur iPhone, les notifications de notre serveur passent par Apple, une fois allumées', async ({ page }) => {
+// Les notifications des iPhone, allumées le 1er novembre 2026 : celles de notre serveur passent par Apple. La page le dit :
+// ce qu’Apple reçoit (jamais qui tu es), combien de temps, Apple dans les prestataires et dans les durées ; rien chez
+// Apple pour un téléphone Android, où elles ne sont pas encore allumées, et la page ne nomme Apple nulle part ailleurs.
+test('la page Confidentialité : sur iPhone, les notifications de notre serveur sont allumées et passent par Apple ; sur Android, pas encore', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const serveur = normaliser(await page.locator('#notifications + ul > li').nth(1).innerText());
-  expect(serveur).toContain('Les notifications de notre serveur : tant qu’on ne les a pas allumées, il n’en envoie aucune sur ton téléphone, et seules tes soirées sonnent, depuis ton téléphone.');
-  expect(serveur).toContain('Sur iPhone, une fois allumées, elles passent par le service de notifications d’Apple (voir ci-dessous).');
-  expect(serveur).toContain('Sur Android, avant qu’elles arrivent, cette page le dira.');
+  expect(serveur).toContain('Les notifications de notre serveur : sur iPhone, elles sont allumées depuis le 1er novembre 2026. Elles passent par le service de notifications d’Apple (voir ci-dessous).');
+  expect(serveur).toContain('Sur Android, pas encore : notre serveur n’en envoie aucune sur ton téléphone, et seules tes soirées sonnent, depuis ton téléphone. Avant qu’elles arrivent sur Android, cette page le dira.');
+  // Plus aucune phrase ne dit qu’elles attendent d’être allumées partout : sur iPhone, elles le sont.
+  const toute = await texteDe(page, '/confidentialite.html');
+  expect(toute).not.toMatch(/tant qu’on ne les a pas allumées|tant qu’on n’a pas allumé celles de notre serveur|une fois qu’on les a allumées|quand les notifications de notre serveur arriveront sur ton téléphone/);
   await expect(page.locator('#notifications + ul > li').nth(2)).toHaveAttribute('id', 'apple');
   await expect(page.locator('#notifications + ul > li').nth(1).locator('a[href="#apple"]')).toHaveCount(1);
   const apple = normaliser(await page.locator('#apple').innerText());
@@ -138,12 +142,12 @@ test('la page Confidentialité : sur iPhone, les notifications de notre serveur 
   expect(apple).toContain('Pour un téléphone Android, rien ne part chez Apple.');
   const prestataire = page.locator('#prestataires + ul > li', { hasText: /^Apple/ });
   await expect(prestataire).toHaveCount(1);
-  await expect(prestataire).toContainText('transmet à ton iPhone les notifications de notre serveur, une fois qu’on les a allumées');
+  await expect(prestataire).toContainText('transmet à ton iPhone les notifications de notre serveur, allumées depuis le 1er novembre 2026');
   await expect(prestataire).toContainText('Apple est une société américaine.');
   const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
   expect(durees).toContain('Les notifications de notre serveur chez Apple, pour un iPhone : le temps qu’elles arrivent, 12 heures au plus.');
   const choix = normaliser(await page.locator('#notifications + ul > li', { hasText: 'Tes choix, dans Réglages' }).innerText());
-  expect(choix).toContain('Aucune de ces notifications n’arrive sur ton téléphone tant qu’on n’a pas allumé celles de notre serveur.');
+  expect(choix).toContain('Sur Android, ces trois-là n’arrivent pas encore : les notifications de notre serveur n’y sont pas encore allumées.');
   expect(choix).not.toContain('pour l’instant');
   // Apple n’est nommé que là : la ligne des notifications du serveur, ce qu’Apple reçoit, ses prestataires, sa durée.
   const ailleurs = await page.locator('main').evaluate((main) => {
@@ -176,14 +180,14 @@ test('la page Confidentialité : les sauvegardes chiffrées, 5 semaines au plus,
   await page.goto('/confidentialite.html');
   const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
   for (const ligne of [
-    'L’heure à laquelle tu dis arriver avec « Je suis en retard », et l’heure jusqu’à laquelle ta place est alors gardée : aujourd’hui, avec ta place. Prévu : effacées un jour après le coup d’envoi.',
+    'L’heure à laquelle tu dis arriver avec « Je suis en retard », et l’heure jusqu’à laquelle ta place est alors gardée : effacées un jour après le coup d’envoi.',
     'L’attente après des mauvais mots de passe, pour l’équipe des bars : 24 heures après le dernier mauvais mot de passe.',
     'La case « mot de passe à changer » d’un compte de bar : jusqu’à ce que la personne choisisse son propre mot de passe.',
     'Les sauvegardes chiffrées de notre base : effacées une fois leurs 28 jours passés, à la sauvegarde suivante (5 semaines au plus).',
     'Les rapports d’erreurs chez Sentry, une fois allumé : 30 jours avec son offre gratuite, 90 avec une offre payante.',
     'Nos mails d’alerte, sans donnée personnelle : dans notre boîte mail tant qu’on les garde, et chez Resend selon ses conditions.',
     'Les compteurs du service (des nombres par tranche de 5 minutes, sans personne) : 2 heures.',
-    'La demande d’un bar envoyée par le formulaire du site : 12 mois, puis on l’efface nous-mêmes (voir « Les demandes des bars »).',
+    'La demande d’un bar envoyée par le formulaire du site : 12 mois, puis elle est effacée (voir « Les demandes des bars »).',
   ]) expect(durees).toContain(ligne);
 });
 
@@ -196,7 +200,7 @@ test('la page Confidentialité : le retard annoncé, les places en direct, tout 
   expect(retard).toContain('tu peux prévenir le bar que tu arrives dans 10, 20 ou 30 minutes, une fois par place');
   expect(retard).toContain('Ni ta position, ni un message.');
   expect(retard).toContain('toi, et le bar de cette soirée, pendant la soirée');
-  expect(retard).toContain('aujourd’hui, avec ta place. Prévu : effacées un jour après le coup d’envoi. Si tu supprimes ton compte, elles sont effacées tout de suite.');
+  expect(retard).toContain('Combien de temps : effacées un jour après le coup d’envoi. Si tu supprimes ton compte, elles sont effacées tout de suite.');
   expect(retard).toContain('La trace de sécurité (que tu as prévenu, et de combien de minutes) suit la durée des traces de sécurité');
   await expect(page.locator('#qui-voit-quoi + ul')).toContainText('se mettent à jour en direct sur les téléphones : ce sont des chiffres seulement, jamais qui a pris ou rendu une place');
   const notifications = normaliser(await page.locator('#notifications + ul').innerText());
@@ -259,7 +263,7 @@ test('la page Confidentialité : les pseudos signalés, ce que voit la plateform
   await page.goto('/confidentialite.html');
   const signalements = normaliser(await page.locator('#signalements + ul').innerText());
   expect(signalements).toContain('qui signale (ton compte), le compte signalé, la raison choisie et la date');
-  expect(signalements).toContain('La personne signalée n’en voit rien, et aucun bar ne voit les signalements de pseudos.');
+  expect(signalements).toContain('La personne signalée ne sait jamais qui l’a signalée, et aucun bar ne voit les signalements de pseudos.');
   expect(signalements).toContain('le pseudo d’aujourd’hui, le nombre de personnes qui l’ont signalé, les raisons, et les dates du premier et du dernier signalement. Jamais qui a signalé, jamais une adresse mail.');
   expect(signalements).toContain('un signalement n’agit jamais tout seul');
   expect(signalements).toContain('qui reçoit alors un pseudo tiré au hasard');
@@ -278,5 +282,108 @@ test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, 
   expect(texte).toContain('Ces données sont pseudonymisées');
   expect(texte).not.toMatch(/Personne ne peut plus les relier à toi|au bout de 6 mois|sans ton historique/);
   expect(texte).toContain('sans adresse IP ni appareil, avec une empreinte de ton adresse mail');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 20 octobre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+});
+
+// « Bloquer » est dans l’appli depuis le 1er novembre 2026 : la page Confidentialité dit ce qu’on garde d’un blocage,
+// qui le voit, ce qu’il fait, combien de temps ; l’invitation ne montre les pseudos qu’à une personne connectée.
+test('la page Confidentialité : les personnes que tu bloques, et l’invitation sans pseudo hors connexion', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const blocages = normaliser(await page.locator('#blocages + ul').innerText());
+  expect(blocages).toContain('touche son siège, puis « Bloquer »');
+  expect(blocages).toContain('son pseudo au moment où tu l’as bloqué (effacé si l’équipe l’a remplacé), et la date');
+  expect(blocages).toContain('toi seulement, dans Réglages, « Personnes bloquées ». La personne n’est pas prévenue, et aucun bar ne le voit.');
+  expect(blocages).toContain('Tu ne peux pas rejoindre cette table.');
+  expect(blocages).toContain('connectée, elle ne voit pas qui y est. Si elle y est déjà, elle garde sa place et voit la tablée comme avant.');
+  expect(blocages).toContain('le bar, le match, l’heure, les places et l’ambiance de la salle, sans aucun pseudo');
+  expect(blocages).toContain('les dates de tes blocages, sans le pseudo de la personne. Qui t’a bloqué n’y est pas.');
+  await expect(page.locator('#collecte + ul > li', { hasText: 'Les personnes que tu bloques' })).toHaveCount(1);
+  await expect(page.locator('#pourquoi + p + ul > li', { hasText: 'Bloquer quelqu’un à ta demande' })).toHaveCount(1);
+  const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
+  expect(durees).toContain('Les personnes que tu bloques : jusqu’à ce que tu les débloques, ou que l’un des deux comptes soit supprimé.');
+  const tablee = normaliser(await page.locator('#tablee ~ ul').first().innerText());
+  expect(tablee).toContain('les places, et l’ambiance de la salle (en parts, à partir de 5 réponses), sans aucun pseudo. Une fois connectée dans l’appli, elle peut voir aussi le pseudo de l’hôte et les pseudos de la tablée.');
+  expect(tablee).toContain('dont l’arrivée a été validée, sauf ceux que tu as bloqués.');
+  expect(normaliser(await page.locator('#suppression ~ ul').first().innerText())).toContain('Les blocages que tu as faits, et ceux qui visaient ton compte, sont supprimés.');
+  expect(normaliser(await page.locator('main').innerText())).toContain('Dans l’appli, la même invitation montre aussi les pseudos, seulement à une personne connectée');
+  expect(tablee).toContain('Une personne bloquée par quelqu’un de la tablée ne peut pas la rejoindre, et, connectée, ne voit pas qui y est');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+});
+
+test('la page « Supprimer ton compte » : les blocages partent tout de suite, dans les deux sens', async ({ page }) => {
+  await page.goto('/supprimer-mon-compte.html');
+  await expect(page.locator('main li', { hasText: 'Les blocages que tu as faits, et ceux qui visaient ton compte.' })).toHaveCount(1);
+  expect(normaliser(await page.locator('main').innerText())).toContain('ce sera un compte neuf, sans tes places ni ton album. Sauf si l’équipe a fermé ton compte : pas avant 12 mois après la fermeture.');
+});
+
+test('les conditions d’utilisation : le lien d’une tablée sans pseudo hors connexion, et la bande sans ceux que tu as bloqués', async ({ page }) => {
+  await page.goto('/cgu.html');
+  const tablee = normaliser(await page.locator('#tablee ~ ul').first().innerText());
+  expect(tablee).toContain('voit le bar, le match, l’heure et les places, sans aucun pseudo. Une fois connectée dans l’appli, elle peut voir aussi le pseudo de l’hôte et les pseudos de la tablée, jamais leur camp.');
+  expect(tablee).toContain('Une personne bloquée par quelqu’un de la tablée ne peut pas la rejoindre, et, connectée, ne voit pas qui y est.');
+  expect(normaliser(await page.locator('#sous-bock + p').innerText())).toContain('les pseudos de ceux dont l’arrivée a été validée, sauf ceux que tu as bloqués.');
+});
+
+// La modération (le règlement européen sur les services numériques, article 17) : un mail à chaque décision, avec la
+// raison et le moyen de contester ; ce qu’on garde, combien de temps ; la fermeture d’un compte et ses 37 jours.
+test('la page Confidentialité : les décisions de modération, leurs durées, et ce qui reste d’un compte fermé', async ({ page }) => {
+  await page.goto('/confidentialite.html');
+  const moderation = normaliser(await page.locator('#moderation + ul').innerText());
+  expect(moderation).toContain('Ce mail ne dit jamais qui t’a signalé et ne contient rien d’autre sur toi.');
+  expect(moderation).toContain('Une personne de l’équipe relit la décision et te répond sous 7 jours.');
+  expect(moderation).toContain('tu as 30 jours pour contester');
+  expect(moderation).toContain('Au bout de 37 jours, il est effacé comme si tu le supprimais');
+  expect(moderation).toContain('la décision et l’empreinte de ton adresse, 12 mois après la décision.');
+  expect(moderation).toContain('article 17');
+  expect(moderation).toContain('Jamais le pseudo remplacé ni la photo retirée.');
+  const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
+  expect(durees).toContain('Une décision de modération qui te concerne (et une empreinte de ton adresse) : 12 mois après la décision.');
+  expect(durees).toContain('Un compte fermé par l’équipe : 37 jours après la fermeture (30 pour contester, 7 pour qu’on te réponde), puis effacé comme si tu le supprimais (voir « Les décisions de modération »).');
+  await expect(page.locator('#collecte + ul > li', { hasText: 'Les décisions de modération qui te concernent' })).toHaveCount(1);
+  await expect(page.locator('#pourquoi + p + ul > li', { hasText: 'Te prévenir d’une décision de modération' })).toHaveCount(1);
+  expect(normaliser(await page.locator('#signalements + ul').innerText())).toContain('Si on renomme le compte, on prévient la personne par mail, avec la raison et le moyen de contester, sans dire qui l’a signalée');
+  await expect(page.locator('#prestataires + ul > li', { hasText: /^Resend/ })).toContainText('le mail qui te prévient d’une décision de modération sur ton compte');
+  const suppression = normaliser(await page.locator('#suppression ~ ul').first().innerText());
+  expect(suppression).toContain('Les décisions de modération qui te concernent restent 12 mois après la décision');
+  expect(suppression).toContain('Sauf si l’équipe a fermé ton compte : pas avant 12 mois après la fermeture.');
+  expect(normaliser(await page.locator('main').innerText())).toContain('Si ton compte est fermé (banni), tu ne peux plus te connecter, mais tu gardes tous tes droits. Écris-nous depuis l’adresse de ton compte, et on fait l’export ou la suppression pour toi. Un compte fermé est effacé au bout de 37 jours');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+});
+
+// « Tolérance zéro » : les mails de décision de modération y renvoient (cgu.html#respect), avec le blocage.
+test('les conditions d’utilisation : « Tolérance zéro », à l’ancre que citent les mails de modération', async ({ page }) => {
+  await page.goto('/cgu.html');
+  await expect(page.locator('h2#respect')).toHaveText('Tolérance zéro');
+  const respect = normaliser(await page.locator('#respect + ul').innerText());
+  expect(respect).toContain('Pas de pseudo ni de photo injurieux, haineux, sexuels ou violents');
+  expect(respect).toContain('On regarde chaque signalement sous 24 heures.');
+  expect(respect).toContain('il est effacé au bout de 37 jours');
+  expect(respect).toContain('pour une fermeture, tu as 30 jours. Une personne de l’équipe relit la décision et te répond sous 7 jours.');
+  expect(respect).toContain('Tu peux bloquer quelqu’un : touche son siège dans une tablée, puis « Bloquer ».');
+  expect(respect).toContain('Tu la débloques quand tu veux, dans Réglages, « Personnes bloquées ».');
+  await expect(page.locator('#respect + ul a[href="/confidentialite.html#moderation"]')).toHaveCount(1);
+  await expect(page.locator('#essentiel + ul > li', { hasText: /^Tolérance zéro/ })).toHaveCount(1);
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+  // La section suit « Au bar ».
+  expect(await page.locator('#au-bar ~ h2').first().getAttribute('id')).toBe('respect');
+});
+
+// L’effacement automatique est en route depuis le 2 novembre 2026 : plus de durée « Prévu », plus de « pas encore en
+// route », et ce qui attendait l’effacement le dit au passé. « Supprimer ton compte » dit aussi ce que deviennent les
+// décisions de modération (12 mois, comme la page Confidentialité).
+test('la page Confidentialité : l’effacement automatique en route depuis le 2 novembre 2026', async ({ page }) => {
+  const texte = await texteDe(page, '/confidentialite.html');
+  expect(texte).toContain('Certaines de ces durées sont appliquées par un effacement automatique, en route depuis le 2 novembre 2026 : il passe une fois par heure.');
+  expect(texte).not.toMatch(/Prévu :|pas encore en route|soit en route\.|aujourd’hui, tant que ton compte existe\. /);
+  expect(texte).toContain('restaient jusqu’à ce que notre effacement automatique soit en route : il les efface depuis le 2 novembre 2026.');
+  expect(texte).toContain('gardaient l’adresse tapée en clair : depuis le 2 novembre 2026, notre effacement automatique la remplace par une empreinte.');
+  expect(texte).toContain('Un compte de porte retiré avant octobre 2026 gardait son prénom : notre effacement automatique l’efface depuis le 2 novembre 2026.');
+  expect(texte).toContain('Au bout de ce délai, notre effacement automatique efface ta demande de notre serveur, et on efface nous-mêmes de notre boîte le mail qui nous a prévenus');
+});
+
+test('la page « Supprimer ton compte » : les décisions de modération restent 12 mois, rattachées au compte vidé', async ({ page }) => {
+  await page.goto('/supprimer-mon-compte.html');
+  const decisions = normaliser(await page.locator('main li', { hasText: 'Les décisions de modération qui te concernent' }).innerText());
+  expect(decisions).toContain('s’il y en a : elles restent 12 mois après la décision, avec une empreinte de ton adresse mail, rattachées à ton compte vidé, puis elles sont effacées');
+  await expect(page.locator('main li', { hasText: /^Pour l’instant/ })).toHaveText('Pour l’instant, les totaux des bars et les traces de sécurité sont gardés sans durée fixée.');
 });

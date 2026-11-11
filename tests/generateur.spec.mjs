@@ -1700,14 +1700,15 @@ test.describe('l’Action « Pages des matchs » et IndexNow', () => {
       expect(heuresUtc.filter((h) => h === heure), `${heure} h UTC`).toHaveLength(heure >= 16 && heure <= 21 ? 1 : (heure % 3 === 0 ? 1 : 0));
     }
     const quotidiens = planifies.filter((c) => /^\d+ \d+ \* \* \*$/.test(c)).map((c) => c.split(' ').map(Number));
-    // Chaque heure de la soirée à Paris, de 18 h à 23 h, a son passage : à 17, ou celui de 5 qui refait tout.
-    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-26', '2027-01-15']) {
+    // Chaque heure de la soirée à Paris, de 18 h à 23 h, a son passage : à 17, ou celui de 5 qui refait tout, en été,
+    // en hiver et les deux jours de changement d’heure (25 octobre 2026, 28 mars 2027).
+    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-25', '2026-10-26', '2027-01-15', '2027-03-28']) {
       const [annee, mois, date] = jour.split('-').map(Number);
       const aParis = [...heuresUtc.map((h) => [h, 17]), ...quotidiens.map(([minute, h]) => [h, minute])]
         .map(([h, minute]) => heureDeParis(Date.UTC(annee, mois - 1, date, h, minute)));
       for (const heure of ['18', '19', '20', '21', '22', '23']) expect(aParis.filter((a) => a.startsWith(`${heure}:`)), `${jour} ${heure} h`).toHaveLength(1);
     }
-    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-26', '2027-01-15']) {
+    for (const jour of ['2026-07-01', '2026-10-24', '2026-10-25', '2026-10-26', '2027-01-15', '2027-03-28']) {
       const heures = quotidiens.map(([minute, heure]) => heureDeParis(Date.UTC(...jour.split('-').map((n, i) => Number(n) - (i === 1 ? 1 : 0)), heure, minute)));
       expect(heures, jour).toContain('00:05');
     }

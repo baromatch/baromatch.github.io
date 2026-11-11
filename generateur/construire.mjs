@@ -2,15 +2,18 @@
 // Usage :
 //   node generateur/construire.mjs [--source=api | --source=capture:<dossier> | --source=scenario:<fichier>]
 //                                  [--sortie=<dossier>] [--maintenant=<date ISO>] [--changees=<fichier>]
-//                                  [--accepter-les-suppressions] [--images=exiger]
+//                                  [--accepter-les-suppressions] [--images=exiger] [--seulement-un-soir-de-match]
 // Par défaut : les listes publiques de l’appli, la racine du dépôt, l’heure de la machine.
 // Le passage lit les données, fabrique et contrôle toutes les pages en mémoire (site.mjs), refuse de supprimer d’un
 // coup plus de la moitié des pages déjà publiées, puis écrit seulement ce qui a changé, dans la liste blanche
 // (etat.mjs) : matchs/, regarder-le-match/, bar/, ce-soir/, en/, agenda/ et sitemap.xml. Hors d’elle, une seule chose :
 // le bloc « Les matchs de la semaine » de l’accueil, entre ses deux repères, et rien d’autre de index.html (accueil.mjs).
+// --seulement-un-soir-de-match (les passages du soir de l’Action, chaque heure) : un jour où aucun bar ne diffuse de
+// match, rien n’est refait ni écrit, et sur GitHub, l’étape le dit à la suivante (« refaites=non ») pour que rien ne
+// soit enregistré, pas même les pages que la mesure d’audience aurait réécrites.
 // --changees écrit, une par ligne, les adresses indexables dont le contenu a changé, et celles qui ne sont plus
 // indexables (pour IndexNow).
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { blocDeLaSemaine, controlerLaSemaine, ecrireLAccueil, preparerLAccueil } from './accueil.mjs';
@@ -64,7 +67,7 @@ export const verifierLesListes = ({ precedent, donnees, maintenant }) => {
 // null pour s’en passer ; qr : de même pour l’encodeur.
 export const construire = async ({
   source = 'api', sortie = RACINE, maintenant = Date.now(), racine = RACINE, contenu, accepterLesSuppressions = false, adresse, journal = () => {},
-  images, rendu, qr,
+  images, rendu, qr, seulementUnSoirDeMatch = false,
 } = {}) => {
   const precedent = lireLEtat(sortie);
   const charge = rendu !== undefined ? { rendu, raison: 'le rendu des images est écarté' } : await chargerLeRendu({ polices: Object.values(lesPolices()) });
@@ -74,6 +77,15 @@ export const construire = async ({
   if (!encodeur.qr && images === 'exiger') throw new Error(`Affiches exigées, rien n’est écrit : ${encodeur.raison}.`);
   if (!encodeur.qr) journal(`avertissement : affiches : ${encodeur.raison} ; les affiches à imprimer ne sont pas écrites.`);
   const site = await construireEnMemoire({ source, maintenant, racine, contenu, adresse, anciens: anciensDe(precedent), images: charge.rendu ? { signature: charge.rendu.signature } : false, qr: encodeur.qr });
+
+  // Un passage du soir, un jour où aucun bar ne diffuse de match : rien n’est refait, rien n’est écrit.
+  if (seulementUnSoirDeMatch && !site.donnees.soirees.some((s) => jourDeParis(s.match.debut) === jourDeParis(maintenant))) {
+    journal('Aucun bar ne diffuse de match aujourd’hui : rien n’est refait.');
+    return {
+      etat: precedent, plan: null, fichiers: [], ecrits: [], supprimees: [], changees: [], compte: {}, avertissements: [],
+      donnees: site.donnees, accueil: { bloc: null, ecrit: false }, refaites: false,
+    };
+  }
 
   // Une liste vide ou tronquée (bars, soirées, matchs) ne fait pas basculer le site : rien n’est écrit.
   const raisons = accepterLesSuppressions ? [] : verifierLesListes({ precedent, donnees: site.donnees, maintenant });
@@ -175,7 +187,7 @@ export const construire = async ({
     if (p.indexable) compte[p.type].indexables += 1;
   }
   for (const avertissement of avertissements) journal(`avertissement : ${avertissement}`);
-  return { etat, plan, fichiers, ecrits, supprimees, changees, compte, avertissements, donnees: site.donnees, accueil: { bloc, ecrit: Boolean(accueil) } };
+  return { etat, plan, fichiers, ecrits, supprimees, changees, compte, avertissements, donnees: site.donnees, accueil: { bloc, ecrit: Boolean(accueil) }, refaites: true };
 };
 
 // ---------- La ligne de commande ----------
@@ -203,12 +215,17 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       maintenant,
       accepterLesSuppressions: options['accepter-les-suppressions'] === true,
       images: options.images,
+      seulementUnSoirDeMatch: options['seulement-un-soir-de-match'] === true,
       journal,
     });
-    const resume = Object.entries(resultat.compte).map(([type, { pages, indexables }]) => `${type} : ${pages} (${indexables} indexables)`).join(' · ');
-    console.log(`Pages : ${resume}`);
-    console.log(`${resultat.ecrits.length} fichiers écrits ou changés, ${resultat.supprimees.length} supprimés, ${resultat.changees.length} adresses indexables changées${resultat.accueil.ecrit ? ', le bloc de l’accueil réécrit' : ''}.`);
     if (typeof options.changees === 'string') writeFileSync(options.changees, resultat.changees.map((a) => `${a}\n`).join(''));
+    if (!resultat.refaites) {
+      if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, 'refaites=non\n');
+    } else {
+      const resume = Object.entries(resultat.compte).map(([type, { pages, indexables }]) => `${type} : ${pages} (${indexables} indexables)`).join(' · ');
+      console.log(`Pages : ${resume}`);
+      console.log(`${resultat.ecrits.length} fichiers écrits ou changés, ${resultat.supprimees.length} supprimés, ${resultat.changees.length} adresses indexables changées${resultat.accueil.ecrit ? ', le bloc de l’accueil réécrit' : ''}.`);
+    }
   } catch (erreur) {
     console.error(erreur.message);
     process.exitCode = 1;

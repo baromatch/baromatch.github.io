@@ -2,7 +2,8 @@
 // son organisateur sont le bar (BarOrPub), et le match (SportsEvent, avec ses deux équipes) est ce dont elle parle
 // (about). Le match lui-même se joue au stade, pas au bar : le bar n’est jamais le lieu du SportsEvent. Une même soirée
 // a la même adresse (url et @id) sur la page du match et sur celle du bar : l’ancre de la soirée sur la page du bar.
-// Aucune offre de bar ici (loi Evin) ; « offers » (la place gratuite) seulement quand l’appli est ouverte. Aucune image
+// Aucune offre de bar ici (loi Evin) ; « offers » (la place gratuite) seulement quand l’appli est ouverte, et sans
+// « availability » : les places changent après le passage, une page en ligne ne dit jamais qu’il en reste. Aucune image
 // dans un Event : Google en demande une qui représente l’évènement, et l’image générique du site n’en est pas une.
 import { isoDeParis, jourDeParis } from './heure.mjs';
 
@@ -75,7 +76,7 @@ export const evenementDeLaSoiree = (soiree, { marque }) => {
     organizer: { '@type': 'BarOrPub', name: bar.nom, url: adresseDe(cheminDuBar(bar)) },
     about: matchDuStade(match),
     ...(marque.appli.ouverte && magasins.length
-      ? { offers: { '@type': 'Offer', price: 0, priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: magasins[0] } }
+      ? { offers: { '@type': 'Offer', price: 0, priceCurrency: 'EUR', url: magasins[0] } }
       : {}),
   };
 };

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrat8h000og7uuwk7a7qzn@baromatch.fr
+DTSTAMP:20261111T215506Z
+SEQUENCE:0
+DTSTART:20261125T200000Z
+DTEND:20261125T220000Z
+SUMMARY:Inter – Stuttgart
+DESCRIPTION:Ligue des champions · FC Internazionale Milano – VfB Stuttga
+ rt\nCoup d’envoi mercredi 25 novembre à 21:00\, heure de Paris.\nLa pag
+ e du match : https://baromatch.fr/matchs/inter-stuttgart-2026-11-25/
+URL:https://baromatch.fr/matchs/inter-stuttgart-2026-11-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

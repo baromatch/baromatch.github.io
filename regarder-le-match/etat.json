@@ -78,8 +78,8 @@
   "/agenda/lille.ics": {
    "type": "calendrier",
    "cle": "lille",
-   "empreinte": "ZgRpSGB6lgjR5L1VUe6MOA",
-   "change": "2026-11-08",
+   "empreinte": "BqUEF8Ky18OJz75Xy3wL6Q",
+   "change": "2026-11-11",
    "indexable": false,
    "memoire": {
     "court": "Lille",
@@ -155,8 +155,8 @@
   "/agenda/psg.ics": {
    "type": "calendrier",
    "cle": "psg",
-   "empreinte": "O8KAhrd_yPzKITeQATmtEQ",
-   "change": "2026-11-08",
+   "empreinte": "CedyogC2_ZuZCp13LkS3bg",
+   "change": "2026-11-11",
    "indexable": false,
    "memoire": {
     "court": "PSG",
@@ -225,7 +225,7 @@
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "1lPLSL6QXbAjaemdLHONig",
+   "empreinte": "_lRtgctJcz8tp9FlVza9KA",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -233,7 +233,7 @@
   "/en/champions-league/": {
    "type": "guide-en",
    "cle": "champions-league",
-   "empreinte": "2P2vUkGHDjx-W34A199aug",
+   "empreinte": "l-71pA00YrOb3roJK1wldA",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -283,6 +283,15 @@
    "indexable": false,
    "bars": []
   },
+  "/en/matches/bruges-liverpool-2026-11-25/": {
+   "type": "match-en",
+   "cle": "bruges-liverpool-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "-W468g2gW9qplezL8rdO3g",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": []
+  },
   "/en/matches/chelsea-man-united-2026-10-31/": {
    "type": "match-en",
    "cle": "chelsea-man-united-2026-10-31",
@@ -324,6 +333,15 @@
    "cle": "hoffenheim-ol-2026-10-22",
    "date": "2026-10-22T19:00:00.000Z",
    "empreinte": "F9UJS-O1szNtRLlW_W2lJw",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/inter-stuttgart-2026-11-25/": {
+   "type": "match-en",
+   "cle": "inter-stuttgart-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "dJA71KH8JF52oG-np5FStg",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -373,6 +391,15 @@
    "indexable": false,
    "bars": []
   },
+  "/en/matches/lille-bayern-2026-11-25/": {
+   "type": "match-en",
+   "cle": "lille-bayern-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "LKABluHvhkXW8Ab7v4IC8w",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": []
+  },
   "/en/matches/lille-galatasaray-2026-10-21/": {
    "type": "match-en",
    "cle": "lille-galatasaray-2026-10-21",
@@ -395,7 +422,7 @@
    "type": "match-en",
    "cle": "liverpool-man-united-2026-11-22",
    "date": "2026-11-22T16:30:00.000Z",
-   "empreinte": "kY07_r4Qz7JK1S1HemilbQ",
+   "empreinte": "l4d5hw_GHasKkKtCarxk2w",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -467,7 +494,7 @@
    "type": "match-en",
    "cle": "nice-psg-2026-11-21",
    "date": "2026-11-21T16:15:00.000Z",
-   "empreinte": "h6E90qnHgItglf7RlZMXWA",
+   "empreinte": "AwkzMxUsoGj0HFSSeeIbrQ",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -486,6 +513,15 @@
    "cle": "psg-ol-2026-10-25",
    "date": "2026-10-25T19:45:00.000Z",
    "empreinte": "27AWJyjQNfHsnHmm4P-qeQ",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/psg-rome-2026-11-25/": {
+   "type": "match-en",
+   "cle": "psg-rome-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "XrvbGW09mz4MHGxcOPFfsw",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -522,6 +558,24 @@
    "cle": "rennes-olympiacos-2026-11-05",
    "date": "2026-11-05T17:45:00.000Z",
    "empreinte": "W3uPB8Vyfa1I12FxIM1Suw",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/sabah-barca-2026-11-25/": {
+   "type": "match-en",
+   "cle": "sabah-barca-2026-11-25",
+   "date": "2026-11-25T17:45:00.000Z",
+   "empreinte": "BkHrbHkE5lC24zr5_EPrGg",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/sporting-clube-de-portugal-man-united-2026-11-25/": {
+   "type": "match-en",
+   "cle": "sporting-clube-de-portugal-man-united-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "1ItBZFfcR78yokLYqFkiPA",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -564,7 +618,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "cxy0J29qWAX_f4T-ZpIj8w",
+   "empreinte": "co0xEsC9o-4yFLy9Xr361Q",
    "change": "2026-11-11",
    "indexable": false,
    "bars": []
@@ -790,7 +844,7 @@
    "type": "match",
    "cle": "atalanta-inter-2026-11-22",
    "date": "2026-11-22T19:45:00.000Z",
-   "empreinte": "7WUWrl-vowgD8fPn-Ca1AA",
+   "empreinte": "Mrhx4qYdGcO9x3nlPJIKWA",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -834,7 +888,7 @@
    "type": "match",
    "cle": "atletico-barca-2026-11-08",
    "date": "2026-11-08T20:00:00.000Z",
-   "empreinte": "taTPkFluqJ5ktl05ojSJBw",
+   "empreinte": "0K8DZBPnrKeG93NoCU--NA",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -924,7 +978,7 @@
    "type": "match",
    "cle": "barca-deportivo-alaves-2026-10-31",
    "date": "2026-10-31T20:00:00.000Z",
-   "empreinte": "vstwRnQRIZQaXfLHt1J3Kg",
+   "empreinte": "ruJBDMnflZK3NODkL8l_7A",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -1044,7 +1098,7 @@
    "type": "match",
    "cle": "betis-barca-2026-10-17",
    "date": "2026-10-17T16:30:00.000Z",
-   "empreinte": "CaMRw9A9DxbKPZqkw4062g",
+   "empreinte": "KmgKiil5tw1LkMJ4jdqcGA",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -1190,6 +1244,50 @@
     }
    }
   },
+  "/matchs/bruges-liverpool-2026-11-25/": {
+   "type": "match",
+   "cle": "bruges-liverpool-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "pBlJkQ33zr37GSs3q5ScIA",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "bruges-liverpool-2026-11-25",
+    "ids": [
+     "cmvxrat7a000kg7uud2wscduq"
+    ],
+    "debut": "2026-11-25T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "bruges",
+     "court": "Bruges",
+     "nom": "Club Brugge KV",
+     "slug": "club-brugge-kv"
+    },
+    "exterieur": {
+     "cle": "liverpool",
+     "court": "Liverpool",
+     "nom": "Liverpool FC",
+     "slug": "liverpool-fc"
+    }
+   }
+  },
+  "/matchs/bruges-liverpool-2026-11-25/match.ics": {
+   "type": "evenement",
+   "cle": "bruges-liverpool-2026-11-25",
+   "empreinte": "IxGQ13K1VGbsEfekqh9aIw",
+   "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/bruges-liverpool-2026-11-25/partage.png": {
+   "type": "partage",
+   "cle": "bruges-liverpool-2026-11-25",
+   "empreinte": "iigrXrO74sbHUnDGybxylQ",
+   "change": "2026-11-11",
+   "indexable": false
+  },
   "/matchs/chelsea-man-united-2026-10-31/": {
    "type": "match",
    "cle": "chelsea-man-united-2026-10-31",
@@ -1261,7 +1359,7 @@
   "/matchs/club/lille/": {
    "type": "club",
    "cle": "lille",
-   "empreinte": "wwXkOiEqlwpftK4CzoaK0g",
+   "empreinte": "f3QyY7gx1paXO90ojwEfQg",
    "change": "2026-11-11",
    "indexable": true,
    "bars": []
@@ -1301,7 +1399,7 @@
   "/matchs/club/psg/": {
    "type": "club",
    "cle": "psg",
-   "empreinte": "BK2IXiMrTH8X64vfXlXClQ",
+   "empreinte": "__DvfxyIt8-Mn2WitW8X3g",
    "change": "2026-11-11",
    "indexable": true,
    "bars": []
@@ -1349,7 +1447,7 @@
   "/matchs/competition/ligue-des-champions/": {
    "type": "competition",
    "cle": "ligue-des-champions",
-   "empreinte": "JobFZBab-YRAILMGP3Hazw",
+   "empreinte": "mmxks9u830mn3B7OMJVZ-Q",
    "change": "2026-11-11",
    "indexable": true,
    "bars": []
@@ -1675,6 +1773,50 @@
      "slug": "acf-fiorentina"
     }
    }
+  },
+  "/matchs/inter-stuttgart-2026-11-25/": {
+   "type": "match",
+   "cle": "inter-stuttgart-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "2asnJxvqq1Kb84Y_CUX7xg",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "inter-stuttgart-2026-11-25",
+    "ids": [
+     "cmvxrat8h000og7uuwk7a7qzn"
+    ],
+    "debut": "2026-11-25T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "inter",
+     "court": "Inter",
+     "nom": "FC Internazionale Milano",
+     "slug": "fc-internazionale-milano"
+    },
+    "exterieur": {
+     "cle": "stuttgart",
+     "court": "Stuttgart",
+     "nom": "VfB Stuttgart",
+     "slug": "vfb-stuttgart"
+    }
+   }
+  },
+  "/matchs/inter-stuttgart-2026-11-25/match.ics": {
+   "type": "evenement",
+   "cle": "inter-stuttgart-2026-11-25",
+   "empreinte": "dtDPKTYx26O5iZ4SpoG_Aw",
+   "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/inter-stuttgart-2026-11-25/partage.png": {
+   "type": "partage",
+   "cle": "inter-stuttgart-2026-11-25",
+   "empreinte": "QsMRP_pPB3gy6iIRAeEtWA",
+   "change": "2026-11-11",
+   "indexable": false
   },
   "/matchs/italie-france-2026-11-12/": {
    "type": "match",
@@ -2202,7 +2344,7 @@
    "type": "match",
    "cle": "leverkusen-stuttgart-2026-10-31",
    "date": "2026-10-31T14:30:00.000Z",
-   "empreinte": "ORucQsOA9GLpykiRk1OBag",
+   "empreinte": "DeK2Xf5mIqyt1WLJElP00g",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -2227,6 +2369,50 @@
      "slug": "vfb-stuttgart"
     }
    }
+  },
+  "/matchs/lille-bayern-2026-11-25/": {
+   "type": "match",
+   "cle": "lille-bayern-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "zxHQ0ZngdVu2kWiborN7XQ",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "lille-bayern-2026-11-25",
+    "ids": [
+     "cmvxran5d000wz71ox8yz96xc"
+    ],
+    "debut": "2026-11-25T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "lille",
+     "court": "Lille",
+     "nom": "LOSC Lille",
+     "slug": "losc-lille"
+    },
+    "exterieur": {
+     "cle": "bayern",
+     "court": "Bayern",
+     "nom": "FC Bayern München",
+     "slug": "fc-bayern-munchen"
+    }
+   }
+  },
+  "/matchs/lille-bayern-2026-11-25/match.ics": {
+   "type": "evenement",
+   "cle": "lille-bayern-2026-11-25",
+   "empreinte": "IwTyXFgEhtG5jGWUjFzVXQ",
+   "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/lille-bayern-2026-11-25/partage.png": {
+   "type": "partage",
+   "cle": "lille-bayern-2026-11-25",
+   "empreinte": "K19i2v6HO3vHDPwPrgV7cw",
+   "change": "2026-11-11",
+   "indexable": false
   },
   "/matchs/lille-brest-2026-10-17/": {
    "type": "match",
@@ -2322,7 +2508,7 @@
    "type": "match",
    "cle": "lille-ol-2026-11-21",
    "date": "2026-11-21T19:45:00.000Z",
-   "empreinte": "8xgfMPUgvvZ-egwf9HkR8g",
+   "empreinte": "3yyG7nHq5s58AjCiz1dvjQ",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -2396,7 +2582,7 @@
    "type": "match",
    "cle": "liverpool-man-united-2026-11-22",
    "date": "2026-11-22T16:30:00.000Z",
-   "empreinte": "f2BIidAvhwrQ2uGhIm32VA",
+   "empreinte": "xNWuebp8IOMynqmaMvPChQ",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -2976,7 +3162,7 @@
    "type": "match",
    "cle": "nice-psg-2026-11-21",
    "date": "2026-11-21T16:15:00.000Z",
-   "empreinte": "V7K0UCibhm59zZy5M99IjA",
+   "empreinte": "O9JWo8ZUAqtY0VHCZg_5Mw",
    "change": "2026-11-11",
    "indexable": false,
    "bars": [],
@@ -3375,6 +3561,50 @@
     }
    }
   },
+  "/matchs/psg-rome-2026-11-25/": {
+   "type": "match",
+   "cle": "psg-rome-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "2MZWGbWV5uCsuzu1yBnqNw",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "psg-rome-2026-11-25",
+    "ids": [
+     "cmvxran5x000yz71o4e47dsdo"
+    ],
+    "debut": "2026-11-25T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "psg",
+     "court": "PSG",
+     "nom": "Paris Saint-Germain",
+     "slug": "paris-saint-germain"
+    },
+    "exterieur": {
+     "cle": "rome",
+     "court": "Rome",
+     "nom": "AS Roma",
+     "slug": "as-roma"
+    }
+   }
+  },
+  "/matchs/psg-rome-2026-11-25/match.ics": {
+   "type": "evenement",
+   "cle": "psg-rome-2026-11-25",
+   "empreinte": "TWRN3Ql9DPdH4NmcjZw3tA",
+   "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/psg-rome-2026-11-25/partage.png": {
+   "type": "partage",
+   "cle": "psg-rome-2026-11-25",
+   "empreinte": "MgrY1bvIiMlnX_GMorE0iA",
+   "change": "2026-11-11",
+   "indexable": false
+  },
   "/matchs/psg-troyes-2026-11-07/": {
    "type": "match",
    "cle": "psg-troyes-2026-11-07",
@@ -3598,6 +3828,94 @@
      "slug": "rc-strasbourg-alsace"
     }
    }
+  },
+  "/matchs/sabah-barca-2026-11-25/": {
+   "type": "match",
+   "cle": "sabah-barca-2026-11-25",
+   "date": "2026-11-25T17:45:00.000Z",
+   "empreinte": "WRf8WSQqLoi9PkkrCOzkiw",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "sabah-barca-2026-11-25",
+    "ids": [
+     "cmvxrat6q000ig7uuwishk793"
+    ],
+    "debut": "2026-11-25T17:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "sabah",
+     "court": "Sabah",
+     "nom": "Sabah FC",
+     "slug": "sabah-fc"
+    },
+    "exterieur": {
+     "cle": "barca",
+     "court": "Barça",
+     "nom": "FC Barcelona",
+     "slug": "fc-barcelona"
+    }
+   }
+  },
+  "/matchs/sabah-barca-2026-11-25/match.ics": {
+   "type": "evenement",
+   "cle": "sabah-barca-2026-11-25",
+   "empreinte": "SEWJ70c8O98fxwU6wYBnpw",
+   "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/sabah-barca-2026-11-25/partage.png": {
+   "type": "partage",
+   "cle": "sabah-barca-2026-11-25",
+   "empreinte": "CWuAQXWgfOJfLsMS4AYQXg",
+   "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/sporting-clube-de-portugal-man-united-2026-11-25/": {
+   "type": "match",
+   "cle": "sporting-clube-de-portugal-man-united-2026-11-25",
+   "date": "2026-11-25T20:00:00.000Z",
+   "empreinte": "AHh7EOiVVb7e2-tfUU4TXA",
+   "change": "2026-11-11",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "sporting-clube-de-portugal-man-united-2026-11-25",
+    "ids": [
+     "cmvxrat7u000mg7uur7wqzd8a"
+    ],
+    "debut": "2026-11-25T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue des champions",
+    "domicile": {
+     "cle": "sporting-clube-de-portugal",
+     "court": "Sporting Clube de Portugal",
+     "nom": "Sporting Clube de Portugal",
+     "slug": "sporting-clube-de-portugal"
+    },
+    "exterieur": {
+     "cle": "man-united",
+     "court": "Man United",
+     "nom": "Manchester United",
+     "slug": "manchester-united"
+    }
+   }
+  },
+  "/matchs/sporting-clube-de-portugal-man-united-2026-11-25/match.ics": {
+   "type": "evenement",
+   "cle": "sporting-clube-de-portugal-man-united-2026-11-25",
+   "empreinte": "1bkVvT1lZ1KZ_Tny_scwug",
+   "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/sporting-clube-de-portugal-man-united-2026-11-25/partage.png": {
+   "type": "partage",
+   "cle": "sporting-clube-de-portugal-man-united-2026-11-25",
+   "empreinte": "yU3K9_o_VAVic0zz1B4DKQ",
+   "change": "2026-11-11",
+   "indexable": false
   },
   "/matchs/strasbourg-auxerre-2026-11-01/": {
    "type": "match",
@@ -4344,9 +4662,9 @@
     "court": "Bayern",
     "nom": "FC Bayern München"
    },
-   "empreinte": "RUZ_bUmBn_c1XnAHwIBUGg",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "p-TxW7VpkXYj9rb3tMNRiA",
+   "sequence": 1,
+   "modifie": "2026-11-11T21:55:06Z"
   },
   "cmvxran5x000yz71o4e47dsdo@baromatch.fr": {
    "ids": [
@@ -4366,9 +4684,9 @@
     "court": "Rome",
     "nom": "AS Roma"
    },
-   "empreinte": "XP_YwFv8y3p-8Mh7xtUJnA",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "eaCyrog9byAHXwne7DeVcg",
+   "sequence": 1,
+   "modifie": "2026-11-11T21:55:06Z"
   },
   "cmvxran6j0010z71ogdjzd1a0@baromatch.fr": {
    "ids": [
@@ -4787,6 +5105,94 @@
    "empreinte": "1bPOFr0SZdF3lFi9mRV28A",
    "sequence": 0,
    "modifie": "2026-11-10T21:17:15Z"
+  },
+  "cmvxrat6q000ig7uuwishk793@baromatch.fr": {
+   "ids": [
+    "cmvxrat6q000ig7uuwishk793"
+   ],
+   "slug": "sabah-barca-2026-11-25",
+   "debut": "2026-11-25T17:45:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Ligue des champions",
+   "domicile": {
+    "cle": "sabah",
+    "court": "Sabah",
+    "nom": "Sabah FC"
+   },
+   "exterieur": {
+    "cle": "barca",
+    "court": "Barça",
+    "nom": "FC Barcelona"
+   },
+   "empreinte": "xZYwk_nwHsgV_TMIy4RVEA",
+   "sequence": 0,
+   "modifie": "2026-11-11T21:55:06Z"
+  },
+  "cmvxrat7a000kg7uud2wscduq@baromatch.fr": {
+   "ids": [
+    "cmvxrat7a000kg7uud2wscduq"
+   ],
+   "slug": "bruges-liverpool-2026-11-25",
+   "debut": "2026-11-25T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Ligue des champions",
+   "domicile": {
+    "cle": "bruges",
+    "court": "Bruges",
+    "nom": "Club Brugge KV"
+   },
+   "exterieur": {
+    "cle": "liverpool",
+    "court": "Liverpool",
+    "nom": "Liverpool FC"
+   },
+   "empreinte": "wMrrR6Xg3cqG0VBvEJ8XpA",
+   "sequence": 0,
+   "modifie": "2026-11-11T21:55:06Z"
+  },
+  "cmvxrat7u000mg7uur7wqzd8a@baromatch.fr": {
+   "ids": [
+    "cmvxrat7u000mg7uur7wqzd8a"
+   ],
+   "slug": "sporting-clube-de-portugal-man-united-2026-11-25",
+   "debut": "2026-11-25T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Ligue des champions",
+   "domicile": {
+    "cle": "sporting-clube-de-portugal",
+    "court": "Sporting Clube de Portugal",
+    "nom": "Sporting Clube de Portugal"
+   },
+   "exterieur": {
+    "cle": "man-united",
+    "court": "Man United",
+    "nom": "Manchester United"
+   },
+   "empreinte": "4IEEDwIrw3cVNLIi7zNTEw",
+   "sequence": 0,
+   "modifie": "2026-11-11T21:55:06Z"
+  },
+  "cmvxrat8h000og7uuwk7a7qzn@baromatch.fr": {
+   "ids": [
+    "cmvxrat8h000og7uuwk7a7qzn"
+   ],
+   "slug": "inter-stuttgart-2026-11-25",
+   "debut": "2026-11-25T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Ligue des champions",
+   "domicile": {
+    "cle": "inter",
+    "court": "Inter",
+    "nom": "FC Internazionale Milano"
+   },
+   "exterieur": {
+    "cle": "stuttgart",
+    "court": "Stuttgart",
+    "nom": "VfB Stuttgart"
+   },
+   "empreinte": "cH6ZbpefaSFGcTWTwxpcZw",
+   "sequence": 0,
+   "modifie": "2026-11-11T21:55:06Z"
   }
  }
 }

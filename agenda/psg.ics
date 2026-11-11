@@ -26,13 +26,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmvxran5x000yz71o4e47dsdo@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261111T215506Z
+SEQUENCE:1
 DTSTART:20261125T200000Z
 DTEND:20261125T220000Z
 SUMMARY:PSG – Rome
 DESCRIPTION:Ligue des champions · Paris Saint-Germain – AS Roma\nCoup d
- ’envoi mercredi 25 novembre à 21:00\, heure de Paris.
+ ’envoi mercredi 25 novembre à 21:00\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/psg-rome-2026-11-25/
+URL:https://baromatch.fr/matchs/psg-rome-2026-11-25/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrat7u000mg7uur7wqzd8a@baromatch.fr
+DTSTAMP:20261111T215506Z
+SEQUENCE:0
+DTSTART:20261125T200000Z
+DTEND:20261125T220000Z
+SUMMARY:Sporting Clube de Portugal – Man United
+DESCRIPTION:Ligue des champions · Sporting Clube de Portugal – Mancheste
+ r United\nCoup d’envoi mercredi 25 novembre à 21:00\, heure de Paris.\n
+ La page du match : https://baromatch.fr/matchs/sporting-clube-de-portugal
+ -man-united-2026-11-25/
+URL:https://baromatch.fr/matchs/sporting-clube-de-portugal-man-united-2026-
+ 11-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

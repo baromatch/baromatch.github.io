@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxran5d000wz71ox8yz96xc@baromatch.fr
+DTSTAMP:20261111T215506Z
+SEQUENCE:1
+DTSTART:20261125T200000Z
+DTEND:20261125T220000Z
+SUMMARY:Lille – Bayern
+DESCRIPTION:Ligue des champions · LOSC Lille – FC Bayern München\nCoup 
+ d’envoi mercredi 25 novembre à 21:00\, heure de Paris.\nLa page du matc
+ h : https://baromatch.fr/matchs/lille-bayern-2026-11-25/
+URL:https://baromatch.fr/matchs/lille-bayern-2026-11-25/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

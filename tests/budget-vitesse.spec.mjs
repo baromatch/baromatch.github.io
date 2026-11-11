@@ -129,24 +129,6 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // bouge plus quand la police arrive ; les commentaires des deux feuilles raccourcis pour tenir sans relever les seuils.
 // Mesuré : CSS d’À propos 83,55 Ko (seuil 84), de Presse 86,97 Ko (seuil 87).
 // Les deux ensemble : l’accueil et sa semaine pleine gardent les seuils des insignes, avec le JS de main.js à 19 Ko.
-// 30 octobre 2026, les pages générées au jour, avec les insignes : regarder.css gagne les valeurs du jour (survols, code
-// du badge, offre et cartes, liens, pilule de la liste d’attente) et les deux places du bloc « Partager » (rien ne
-// bouge quand partage.js arrive, à toute taille de texte) : de 17 570 à 18 640 octets ; affiche.css garde ses
-// commentaires raccourcis (16 986 octets). Mesuré : les pages générées 91,40 Ko (93 594 octets), les affiches 107,99 Ko
-// (110 580 octets). Leurs seuils de CSS montent de 1 Ko, au plus juste : de 90 à 91, de 107 à 108.
-// 1er novembre 2026 : regarder.css garde caché ce qu’une page de nuit encore en ligne cache (son bloc « Partager »,
-// le jour de la fusion) ; un commentaire raccourci. Mesuré : 91,46 Ko (93 659 octets) et 108,05 Ko : seuils inchangés.
-// 1er novembre 2026, la mesure du rendu des pages générées : un club (« OL ») ou une ville (« Lille ») se touche sur
-// 44 × 44 px (regarder.css, de 18 705 à 18 771 octets). Mesuré : les pages générées 91,53 Ko (93 725 octets) : leur
-// seuil de CSS monte de 91 à 92, au plus juste ; les affiches 108,12 Ko : seuil inchangé.
-// Puis, sans mot coupé à 320 px et 200 %, le titre du soir et l’appel des affiches (regarder.css 18 898 octets,
-// affiche.css 17 104), et les pilules au texte agrandi (styles.css de 74 954 à 75 022 octets, affiche.css 17 185).
-// Mesuré : les pages générées 91,72 Ko (93 920 octets) ; les affiches 108,50 Ko (111 105 octets) : leur seuil de CSS
-// monte de 108 à 109, au plus juste.
-// Puis le bord des boutons en couleurs forcées (regarder.css 19 074 octets). Mesuré : les pages générées 91,89 Ko
-// (94 096 octets), les affiches 108,67 Ko (111 281 octets) : seuils inchangés.
-// Puis le choix du papier à 44 px à 100 % et un commentaire des villes (styles.css 75 047 octets). Mesuré : les pages
-// générées 91,92 Ko (94 121 octets), les affiches 108,70 Ko (111 306 octets), l’accueil 73,29 Ko : seuils inchangés.
 // 1er novembre 2026, la suite des insignes : affiche.css passe de 17 273 à 18 144 octets (à l’écran, les noms des clubs
 // entiers, texte agrandi compris ; le grand prochain match d’un bar jamais plus petit que sa date ; imprimée plus
 // étroite que l’A4, la paire au-dessus du nom). Le CSS des affiches mesure 108,07 Ko (110 668 octets ; 107,49 Ko avant
@@ -155,14 +137,12 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // styles.css de la navigation (Ko) : À propos 7 requêtes, 172 transférés, CSS 98, images 30 ; Presse 10, 221, CSS
 // 101, images 92 ; seuils d’À propos CSS 99, de Presse 226 transférés et CSS 102 (les autres restent). Les affiches
 // tiennent leur seuil de 121.
-// 1er novembre 2026, la suite des insignes (main) fusionnée dans les pages au jour : affiche.css (18 312 octets) garde
-// les règles du jour et les corrections des deux côtés. Mesuré : les pages générées 91,92 Ko (94 121 octets) : seuil 92
-// inchangé ; les affiches 109,80 Ko (112 433 octets) : leur seuil de CSS monte de 109 à 110, au plus juste.
-// 10 novembre 2026, main (la navigation C, À propos et Presse au jour) fusionné dans les pages au jour : styles.css
-// (87 127 octets) garde la marge des pilules qui grandit avec leur texte, regarder.css (19 046) et affiche.css (18 312)
-// les règles du jour. Mesuré : les pages générées 103,68 Ko (106 173 octets) : seuil 104 inchangé ; les affiches
-// 121,57 Ko (124 485 octets) : leur seuil de CSS monte de 121 à 122, au plus juste. Les transférés tiennent (la page
-// de match 147,77 Ko, l’affiche d’un bar 150,84 Ko), comme l’accueil (85,08 Ko de CSS) et les pages écrites à la main.
+// 11 novembre 2026, les pages générées au jour (<html class="jour">) : regarder.css (19 306 octets) et affiche.css
+// (18 312) gagnent les valeurs du jour, les deux places du bloc « Partager » (rien ne bouge quand partage.js arrive),
+// les cibles de 44 px, le bord des boutons seuls à 3:1 et en couleurs forcées ; styles.css (87 127) la marge des pilules qui
+// grandit avec leur texte. Mesuré : les pages générées 103,94 Ko (106 433 octets) : seuil 104 inchangé ; les affiches
+// 121,82 Ko (124 745 octets) : leur seuil de CSS monte de 121 à 122. Les transférés tiennent leurs seuils, comme
+// l’accueil (85,08 Ko de CSS) et les pages écrites à la main.
 const PAGES = [
   { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 175, js: 19, css: 87, images: 24 } },
   { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 193, js: 19, css: 87, images: 24 } },

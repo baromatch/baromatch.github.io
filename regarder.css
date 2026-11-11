@@ -1,6 +1,6 @@
-/* Baromatch — les pages « Où regarder le match », écrites par le générateur. Elles reprennent styles.css (le jour, le
-   verre, la police, l’en-tête, le pied) ; ici, leur mise en page. L’ambre reste à l’appel à l’action. Une valeur de
-   nuit prend celle du jour par var(--fond-releve, …), qui n’existe qu’au jour. Aucune animation. */
+/* Baromatch — les pages « Où regarder le match » du générateur, sur styles.css ; ici, leur mise en page. L’ambre
+   reste à l’appel à l’action. Une valeur de nuit prend celle du jour par var(--fond-releve, …), variables posées sur
+   :root.jour seulement (un moment de nuit, .pied ou .nuit, en hérite sauf s’il les redéfinit). Aucune animation. */
 
 .regarder {
   padding-top: 8px;
@@ -323,10 +323,8 @@
 
 /* ---------- Partager la page (match, ville, bar) ---------- */
 
-/* Sous la tête de la page, deux rangées de 44 px : des capsules de verre discrètes (l’ambre reste à l’appel à
-   l’action), sans animation. Chaque rangée superpose ses deux possibles, le caché à sa place : rien ne bouge quand
-   partage.js arrive, à toute taille de texte. Une copie refusée met l’adresse dessous. Une page de nuit encore en
-   ligne (sans places) cache les siens. */
+/* Deux rangées de 44 px de capsules de verre. Chaque rangée superpose ses deux possibles, le caché à sa place : rien
+   ne bouge quand partage.js arrive. Une copie refusée met l’adresse dessous. Une page de nuit (sans places) les cache. */
 .partage { display: grid; justify-items: start; gap: 8px; margin-top: 20px; }
 .partage__bouton {
   display: inline-flex;
@@ -351,7 +349,7 @@
 .partage__place { display: grid; gap: 8px; max-width: 100%; }
 .partage__place > * { grid-area: 1 / 1; place-self: start; }
 .partage__place > [hidden] { visibility: hidden; }
-.partage__place:not(:has(> [hidden])) > * { grid-area: auto; }
+.partage__place > :not([hidden]) + :not([hidden]) { grid-area: 2 / 1; }
 .partage > [hidden] { display: none; }
 .partage__statut { margin: 0; color: var(--texte-doux); font-size: 0.9375rem; }
 .partage__statut:empty { display: none; }
@@ -416,5 +414,9 @@
 .jour .regarder-fil a:hover { color: var(--texte); }
 .jour .regarder-agenda__clubs a:hover { background: var(--fond-releve); }
 .jour .regarder-attente .attente__ligne:focus-within { border-color: var(--texte); }
+/* Un bouton en verre seul ne se détache du crème que par son bord : celui d’un champ (3:1). Un club, lu dans sa
+   phrase, garde le sien : à 200 %, un bord sombre passerait derrière le texte de la ligne voisine. */
+.jour :is(.partage__bouton, .regarder-agenda__bouton) { border-color: var(--champ-bord); }
+.jour .regarder-bars-pro__bouton { box-shadow: inset 0 0 0 1px var(--champ-bord); }
 /* Couleurs forcées : le fond d’un bouton disparaît, son bord reste. */
 @media (forced-colors: active) { .regarder :is(.capsule, .attente__bouton) { border: 1px solid; } }

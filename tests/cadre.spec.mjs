@@ -354,8 +354,8 @@ test.describe('les clubs du pied de page', () => {
       rmSync(dossier, { recursive: true, force: true });
     }
     const cadre = lireLeCadre();
-    // L’insigne que la page dessine elle-même suit son fond (« sl0 » au jour, « sn0 » la nuit) ; celui du pied reste de nuit.
-    const pages = pagesHtml(site.pages).filter((p) => / id="ib-f-as-monaco-small-s[ln]0-field"/.test(p.contenu));
+    // L’insigne que la page dessine elle-même suit son fond, le jour (« sl0 ») ; celui du pied reste de nuit (« sn0 »).
+    const pages = pagesHtml(site.pages).filter((p) => / id="ib-f-as-monaco-small-sl0-field"/.test(p.contenu));
     expect(pages.map((p) => p.chemin)).toEqual(expect.arrayContaining(['/matchs/club/monaco/', '/matchs/', '/matchs/club/nice/']));
     for (const p of pages) {
       expect(p.contenu.match(PIED)[0], p.chemin).toBe(pied(cadre, { marque: MARQUE, chemin: p.chemin, langue: p.langue ?? 'fr' }));

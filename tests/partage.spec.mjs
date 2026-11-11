@@ -597,6 +597,26 @@ test.describe('le bloc « Partager »', () => {
     expect(boiteDuLien.y).toBeGreaterThanOrEqual(boiteDuBouton.y + boiteDuBouton.height);
   });
 
+  // Un navigateur qui ne connaît pas :has() (Firefox avant la 121, Safari avant la 15.4) jette toute règle qui l’emploie :
+  // regarder.css est servi sans elles. La copie refusée garde l’adresse sous « Copier le lien », sans le recouvrir.
+  test('sans :has() (un navigateur plus ancien) : la copie refusée, l’adresse toujours sous « Copier le lien »', async ({ page: onglet }) => {
+    await onglet.route('**/regarder.css', async (route) => {
+      const reponse = await route.fetch();
+      const feuille = await reponse.text();
+      const sansHas = feuille.replace(/[^{}]*:has\([^{}]*\{[^{}]*\}/g, '');
+      expect(sansHas.length).toBeLessThan(feuille.length);
+      await route.fulfill({ response: reponse, body: sansHas });
+    });
+    await sansLeBoutonDuTelephone(onglet, { copieRefusee: true });
+    const { copier, lien, statut } = await ouvrir(onglet);
+    await copier.click();
+    await expect(statut).not.toBeEmpty();
+    await expect(lien).toBeVisible();
+    await expect(copier).toBeVisible();
+    const [boiteDuBouton, boiteDuLien] = [await copier.boundingBox(), await lien.boundingBox()];
+    expect(boiteDuLien.y).toBeGreaterThanOrEqual(boiteDuBouton.y + boiteDuBouton.height);
+  });
+
   // Le bloc a la même taille avant et après partage.js : deux rangées (le partage, puis la copie ou le lien), chacune
   // avec ses deux possibles, l’un caché mais à sa place. Quand le script arrive après le premier affichage, rien ne bouge
   // (aucun décalage hors réponse à un geste, ni la hauteur du bloc, ni ce qui le suit), à toute taille de texte ; avant

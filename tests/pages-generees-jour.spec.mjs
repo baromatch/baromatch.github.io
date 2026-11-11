@@ -17,6 +17,7 @@ import { lireCouleur, luminance, poser, rapport } from './outils/contraste.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { racine } from './outils/environnement.mjs';
 import { decrireLesPlusFaibles, lignesTropFaibles, mesurerAuPixel } from './outils/pixels-peints.mjs';
+import { CAS_DU_PARTAGE, SANS_LE_SCRIPT, montresAttendus, partageArriveTard } from './outils/partage-tard.mjs';
 import { CAPTURE, MAINTENANT_DE_LA_CAPTURE, construireLeSiteDExemple } from './outils/site-genere.mjs';
 import { decrireLesCouples, mesurerLesTextes, textesTropFaibles } from './outils/textes-peints.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
@@ -267,6 +268,20 @@ test.describe('les bords des champs et des choix sur le clair', () => {
     });
   }
 
+  // Un bouton en verre n’a que son bord pour se détacher du crème : à 3:1 au moins, comme un champ. Le bouton des bars
+  // pro dessine le sien d’une ombre intérieure (box-shadow inset), lue ici comme un bord.
+  test('un match : les boutons en verre seuls (partager, agenda, bars pro), leur bord à 3:1 au moins', async ({ page: onglet }) => {
+    await ouvrir(onglet, { chemin: '/matchs/lille-lens-2026-10-26/' }, 1280);
+    const bords = await lireLesBords(onglet, '.partage__bouton, .regarder-agenda__bouton');
+    const pro = await onglet.locator('.regarder-bars-pro__bouton').evaluateAll((elements) => elements.map((e) => {
+      const ombre = getComputedStyle(e).boxShadow.match(/(rgba?\([^)]*\))[^,]*\binset\b/);
+      return { quoi: 'a.regarder-bars-pro__bouton', largeur: ombre ? '1px' : '0px', bord: ombre?.[1] ?? 'transparent', dehors: window.fondPeint(e, false), dedans: window.fondPeint(e, true) };
+    }));
+    expect(bords.length).toBeGreaterThan(2);
+    expect(pro.length).toBeGreaterThan(0);
+    expect(bordsTropFaibles([...bords, ...pro])).toEqual([]);
+  });
+
   test('la page d’un bar : la boîte du code du badge, son bord et son texte', async ({ page: onglet }) => {
     await ouvrir(onglet, { chemin: '/bar/le-zinc-des-amis-paris-11/' }, 390);
     expect(bordsTropFaibles(await lireLesBords(onglet, '.regarder-badge__code'))).toEqual([]);
@@ -420,36 +435,16 @@ test.describe('CLS 0 sans la police', () => {
     });
   }
 
-  // partage.js arrivé tard (un réseau lent) : la page est déjà peinte quand il montre ses boutons, avec ses deux réponses
-  // (le bouton « Partager » du téléphone, ou WhatsApp et « Copier le lien »), à 320, 390 et 1280 px, le texte à 100 et à
-  // 200 %. Avant sa correction, l’adresse en lien laissait sa place aux boutons et les sections du dessous remontaient.
+  // partage.js arrivé tard (un réseau lent) : retenu jusqu’à ce que la page ait peint son bloc (tests/outils/partage-tard.mjs),
+  // il choisit ensuite ses boutons dans chacun des quatre cas (le bouton « Partager » du téléphone ou non, la copie
+  // possible ou non), à 320, 390 et 1280 px, le texte à 100 et à 200 %. Rien ne bouge : ni décalage, ni la hauteur du
+  // bloc, ni ce qui le suit ; et ce qui se montre est bien ce que partage.js devait montrer.
   for (const type of TYPES.filter((t) => t.partage)) {
-    for (const telephone of [false, true]) {
-      test(`${type.nom}, partage.js en retard, ${telephone ? 'avec' : 'sans'} le bouton du téléphone : rien ne bouge, à 100 et 200 %`, async ({ page: onglet }) => {
-        let texte = 100;
-        await onglet.route('**/fonts/bricolage-grotesque.woff2', (route) => route.abort());
-        await onglet.route('**/styles.css', async (route) => {
-          const reponse = await route.fetch();
-          await route.fulfill({ response: reponse, body: `${await reponse.text()}\n:root { font-size: ${texte}%; }\n` });
-        });
-        await onglet.route('**/partage.js', async (route) => {
-          await new Promise((r) => { setTimeout(r, 300); });
-          await route.continue();
-        });
-        await onglet.addInitScript((avec) => {
-          if (avec) Object.defineProperty(Navigator.prototype, 'share', { configurable: true, value: async () => {} });
-          else delete Navigator.prototype.share;
-          Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => ({ writeText: async () => {} }) });
-        }, telephone);
-        await compterLesDecalages(onglet);
-        for (const [largeur, taille] of [[320, 200], [390, 100], [390, 200], [1280, 100]]) {
-          texte = taille;
-          await onglet.setViewportSize({ width: largeur, height: 900 });
-          await onglet.goto(adresseDe(type));
-          // partage.js est passé : ses boutons sont là.
-          await expect(onglet.locator(telephone ? '.partage__natif' : '.partage__copier')).toBeVisible();
-          await onglet.evaluate(() => new Promise((r) => { requestAnimationFrame(() => requestAnimationFrame(r)); }));
-          expect(await onglet.evaluate(() => window.decalages), `${largeur} px, texte à ${taille} %`).toBe(0);
+    for (const cas of CAS_DU_PARTAGE) {
+      test(`${type.nom}, partage.js en retard, ${cas.nom} : rien ne bouge, à 100 et 200 %`, async ({ browser }) => {
+        for (const [largeur, texte] of [[320, 200], [390, 100], [390, 200], [1280, 100]]) {
+          expect(await partageArriveTard(browser, adresseDe(type), { largeur, texte, cas }), `${largeur} px, texte à ${texte} %`)
+            .toEqual({ decalages: 0, bouge: { hauteur: 0, dessous: 0 }, avant: SANS_LE_SCRIPT, apres: montresAttendus(cas) });
         }
       });
     }

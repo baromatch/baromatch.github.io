@@ -8,7 +8,7 @@
 //   sinon (lu tel qu’il est peint) ; il mène à la liste d’attente de la page quand elle en a une (une ville) ;
 // - le pied : ses deux actions, « Presse et partenariats » vers la page Presse, l’adresse e-mail soulignée ;
 // - la ligne d’état du pied suit marque.json (comme la pilule de l’accueil) ;
-// - l’ancien cadre (les pages des matchs publiées avant cette navigation) reste en forme avec la feuille de style neuve ;
+// - plus aucune page publiée ne porte l’ancien cadre, et la feuille de style ne le met plus en forme ;
 // - les contrastes, mesurés tels qu’ils sont peints, la nuit et au jour : 4,5:1 pour le texte, 3:1 pour le focus et les
 //   bords.
 import { test, expect } from '@playwright/test';
@@ -481,7 +481,7 @@ const pagesPubliees = () => {
   const trouvees = [];
   const parcourir = (dossier) => {
     for (const entree of readdirSync(path.join(racine, dossier), { withFileTypes: true })) {
-      if (entree.name.startsWith('.') || ['node_modules', 'tests', 'test-results', 'playwright-report'].includes(entree.name)) continue;
+      if (entree.name.startsWith('.') || ['node_modules', 'tests', 'test-results', 'playwright-report', 'lighthouse', 'apercu'].includes(entree.name)) continue;
       const relatif = path.join(dossier, entree.name);
       if (entree.isDirectory()) parcourir(relatif);
       else if (entree.name.endsWith('.html')) trouvees.push(relatif);

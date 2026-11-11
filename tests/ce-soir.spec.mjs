@@ -408,6 +408,25 @@ test('dans le navigateur : la phrase des places tient ses trois heures, puis lai
   expect(await lire('2026-10-23T20:17:00Z')).toBe('Les places qui restent sont dans l’appli.');
   expect(await lire('2026-10-24T09:00:00Z')).toBe('Les places qui restent sont dans l’appli.');
   await expect(phrase).toHaveCount(1);
+  // La page restée ouverte : à l’heure dite, la phrase change d’elle-même, sans recharger.
+  const ouvert = await onglet.context().browser().newContext();
+  const reste = await ouvert.newPage();
+  await reste.route(`${ORIGINE_DU_TEST}/**`, (route) => {
+    const { pathname } = new URL(route.request().url());
+    if (pathname === CHEMIN) return route.fulfill({ contentType: 'text/html; charset=utf-8', body: p.contenu });
+    if (pathname === '/places.js') return route.fulfill({ contentType: 'text/javascript', body: readFileSync(path.join(racine, 'places.js'), 'utf8') });
+    return route.fulfill({ status: 404, body: '' });
+  });
+  await reste.clock.install({ time: new Date('2026-10-23T20:15:00Z') });
+  await reste.goto(`${ORIGINE_DU_TEST}${CHEMIN}`);
+  await reste.waitForFunction(() => document.readyState === 'complete');
+  const laPhrase = reste.locator('.regarder-carte__places');
+  expect(await laPhrase.innerText()).toBe('À 19:17, 12 places à réserver dans l’appli.');
+  await reste.clock.runFor(60_000);
+  expect(await laPhrase.innerText()).toBe('À 19:17, 12 places à réserver dans l’appli.');
+  await reste.clock.runFor(61_000);
+  expect(await laPhrase.innerText()).toBe('Les places qui restent sont dans l’appli.');
+  await ouvert.close();
   // Sans JavaScript, la phrase telle qu’écrite, avec son heure.
   const contexte = await onglet.context().browser().newContext({ javaScriptEnabled: false });
   const sansScript = await contexte.newPage();

@@ -1,5 +1,6 @@
 // Le bloc « Partager » des pages des matchs, des villes et des bars (écrit par le générateur), toujours sur deux rangées,
-// de la même hauteur avant et après ce fichier (rien ne bouge en dessous quand il arrive après le premier affichage) :
+// de la même taille avant et après ce fichier, à toute taille de texte : chaque rangée garde ses deux possibles, l’un
+// caché mais à sa place (regarder.css). Rien ne bouge quand il arrive après le premier affichage.
 // - la première : le bouton « Partager » du téléphone (navigator.share) quand il existe, sinon « Envoyer sur
 //   WhatsApp » (sans ce fichier aussi) ;
 // - la seconde : « Copier le lien » quand le navigateur sait copier, sinon l’adresse de la page en lien (sans ce

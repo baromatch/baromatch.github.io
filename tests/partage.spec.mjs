@@ -11,6 +11,9 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
+import {
+  CAS_DU_PARTAGE, lireCeQuiSeMontre, montresAttendus, partageArriveTard, poserLeCas, SANS_LE_SCRIPT,
+} from './outils/partage-tard.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple, contenuDuScenario, PUBLIES_DU_SCENARIO, SCENARIO } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
@@ -583,63 +586,170 @@ test.describe('le bloc « Partager »', () => {
     expect(await onglet.evaluate(() => window.__copies)).toEqual([canonique(MATCH)]);
   });
 
-  test('la copie refusée : l’adresse revient en lien, et la page dit comment la copier', async ({ page: onglet }) => {
+  test('la copie refusée : l’adresse revient en lien, sous « Copier le lien » sans le recouvrir, et la page dit comment la copier', async ({ page: onglet }) => {
     await sansLeBoutonDuTelephone(onglet, { copieRefusee: true });
     const { copier, lien, statut } = await ouvrir(onglet);
     await copier.click();
     await expect(statut).toHaveText('Copie impossible : appuie longtemps sur le lien pour le copier.'.replace(' :', ' :'));
     await expect(lien).toBeVisible();
+    await expect(copier).toBeVisible();
+    const [boiteDuBouton, boiteDuLien] = [await copier.boundingBox(), await lien.boundingBox()];
+    expect(boiteDuLien.y).toBeGreaterThanOrEqual(boiteDuBouton.y + boiteDuBouton.height);
   });
 
-  // Le bloc a la même hauteur avant et après partage.js (deux rangées : le partage, puis la copie ou le lien) : quand le
-  // script arrive après le premier affichage, rien ne bouge en dessous. partage.js retardé d’une seconde, la page se
-  // peint, puis la somme des décalages (layout-shift, hors réponse à un geste) doit être nulle : avec le bouton du
-  // téléphone, sans lui, sans presse-papiers, et sans l’un ni l’autre.
-  const CAS = [
-    { nom: 'le bouton du téléphone et le presse-papiers', partager: true, copier: true },
-    { nom: 'le bouton du téléphone sans presse-papiers', partager: true, copier: false },
-    { nom: 'sans le bouton du téléphone', partager: false, copier: true },
-    { nom: 'sans le bouton du téléphone ni presse-papiers', partager: false, copier: false },
-  ];
-  const decalagesQuandPartageArriveTard = async (browser, { chemin = MATCH, largeur, cas }) => {
-    const contexte = await browser.newContext({ viewport: { width: largeur, height: 800 } });
-    const onglet = await contexte.newPage();
-    await onglet.addInitScript(({ partager, copier }) => {
-      if (partager) Object.defineProperty(Navigator.prototype, 'share', { configurable: true, value: async () => {} });
-      else delete Navigator.prototype.share;
-      Object.defineProperty(Navigator.prototype, 'clipboard', { configurable: true, get: () => (copier ? { writeText: async () => {} } : undefined) });
-      window.__decalages = 0;
-      new PerformanceObserver((liste) => {
-        for (const entree of liste.getEntries()) if (!entree.hadRecentInput) window.__decalages += entree.value;
-      }).observe({ type: 'layout-shift', buffered: true });
-    }, cas);
-    await onglet.route('**/partage.js', async (route) => {
-      await new Promise((resoudre) => { setTimeout(resoudre, 1000); });
-      await route.continue();
+  // Un navigateur qui ne connaît pas :has() (Firefox avant la 121, Safari avant la 15.4) jette toute règle qui l’emploie :
+  // regarder.css est servi sans elles. La copie refusée garde l’adresse sous « Copier le lien », sans le recouvrir.
+  test('sans :has() (un navigateur plus ancien) : la copie refusée, l’adresse toujours sous « Copier le lien »', async ({ page: onglet }) => {
+    await onglet.route('**/regarder.css', async (route) => {
+      const reponse = await route.fetch();
+      const feuille = await reponse.text();
+      const sansHas = feuille.replace(/[^{}]*:has\([^{}]*\{[^{}]*\}/g, '');
+      expect(sansHas.length).toBeLessThan(feuille.length);
+      await route.fulfill({ response: reponse, body: sansHas });
     });
-    await onglet.goto(`${serveur.adresse}${chemin}`, { waitUntil: 'load' });
-    await onglet.evaluate(() => new Promise((resoudre) => { requestAnimationFrame(() => requestAnimationFrame(resoudre)); }));
-    await onglet.waitForTimeout(300);
-    // Le script a bien tourné : le bon bouton est là, et la bonne seconde rangée.
-    await expect(onglet.locator(cas.partager ? '.partage__natif' : '.partage__whatsapp')).toBeVisible();
-    await expect(onglet.locator(cas.copier ? '.partage__copier' : '.partage__lien')).toBeVisible();
-    const decalages = await onglet.evaluate(() => window.__decalages);
-    await contexte.close();
-    return decalages;
-  };
-  for (const cas of CAS) {
-    test(`le bloc ne fait rien bouger quand partage.js arrive tard : ${cas.nom}, à 320, 390, 412 et 1280 px`, async ({ browser }) => {
-      for (const largeur of [320, 390, 412, 1280]) {
-        expect(await decalagesQuandPartageArriveTard(browser, { largeur, cas }), `${largeur} px`).toBe(0);
+    await sansLeBoutonDuTelephone(onglet, { copieRefusee: true });
+    const { copier, lien, statut } = await ouvrir(onglet);
+    await copier.click();
+    await expect(statut).not.toBeEmpty();
+    await expect(lien).toBeVisible();
+    await expect(copier).toBeVisible();
+    const [boiteDuBouton, boiteDuLien] = [await copier.boundingBox(), await lien.boundingBox()];
+    expect(boiteDuLien.y).toBeGreaterThanOrEqual(boiteDuBouton.y + boiteDuBouton.height);
+  });
+
+  // Le bloc a la même taille avant et après partage.js : deux rangées (le partage, puis la copie ou le lien), chacune
+  // avec ses deux possibles, l’un caché mais à sa place. Quand le script arrive après le premier affichage, rien ne bouge
+  // (aucun décalage hors réponse à un geste, ni la hauteur du bloc, ni ce qui le suit), à toute taille de texte ; avant
+  // lui, WhatsApp et l’adresse ; après lui, les bons boutons, et seulement eux. Les quatre cas (le bouton du téléphone,
+  // le presse-papiers, l’un, l’autre, aucun ; tests/outils/partage-tard.mjs), à 320, 390, 412 et 1280 px, le texte à
+  // 100, 125, 150 et 200 %, sur chaque sorte de page qui a ce bloc : un match, une ville, un bar, « Ce soir », un match
+  // et Paris en anglais.
+  const PAGES_DU_BLOC = [MATCH, '/regarder-le-match/paris/', '/bar/le-zinc-des-amis-paris-11/', '/ce-soir/', '/en/matches/psg-ol-2026-10-25/', '/en/'];
+  for (const chemin of PAGES_DU_BLOC) {
+    for (const cas of CAS_DU_PARTAGE) {
+      test(`${chemin}, partage.js en retard, ${cas.nom} : rien ne bouge à 320, 390, 412 et 1280 px, le texte de 100 à 200 %, et les bons boutons se montrent`, async ({ browser }) => {
+        const attendu = { decalages: 0, bouge: { hauteur: 0, dessous: 0 }, avant: SANS_LE_SCRIPT, apres: montresAttendus(cas) };
+        for (const largeur of [320, 390, 412, 1280]) {
+          for (const texte of [100, 125, 150, 200]) {
+            expect(await partageArriveTard(browser, `${serveur.adresse}${chemin}`, { largeur, texte, cas }), `${largeur} px, texte à ${texte} %`).toEqual(attendu);
+          }
+        }
+      });
+    }
+  }
+
+  // Le jour de la fusion des pages au jour, en attendant que l’Action les réécrive (quelques minutes ; des heures si les
+  // listes de l’appli ne répondent pas), et pour une page refusée dont la version précédente reste en ligne (refus.mjs,
+  // 24 heures au plus) : des pages écrites par les gabarits de nuit (<html> sans la classe jour, le bloc sans ses deux
+  // places, ses quatre possibles côte à côte) sont servies avec les feuilles du jour. Leur bloc reste celui d’avant :
+  // sans JavaScript, WhatsApp et l’adresse ; avec, les bons boutons et seulement eux, l’un sous l’autre. (Avant la
+  // correction, « Partager » et « Copier le lien », cachés par leur attribut hidden, se montraient tous les quatre, sans
+  // JavaScript aussi.)
+  const ecriteALaNuit = (html) => html.replace(/<html lang="(fr|en)" class="jour">/, '<html lang="$1">')
+    .replace(/\n {2}<span class="partage__place">\n((?: {4}.*\n)+?) {2}<\/span>/g, (_, dedans) => `\n${dedans.replace(/^ {4}/gm, '  ').replace(/\n$/, '')}`);
+  for (const chemin of [MATCH, '/regarder-le-match/paris/', '/en/']) {
+    test(`${chemin} écrite par les gabarits de nuit, servie avec les feuilles du jour : sans JavaScript, WhatsApp et l’adresse ; avec, les bons boutons, l’un sous l’autre`, async ({ browser }) => {
+      for (const cas of [null, ...CAS_DU_PARTAGE]) {
+        const contexte = await browser.newContext({ javaScriptEnabled: Boolean(cas) });
+        const onglet = await contexte.newPage();
+        if (cas) await poserLeCas(onglet, cas);
+        await onglet.route(`${serveur.adresse}${chemin}`, async (route) => {
+          const reponse = await route.fetch();
+          await route.fulfill({ response: reponse, body: ecriteALaNuit(await reponse.text()) });
+        });
+        await onglet.goto(`${serveur.adresse}${chemin}`, { waitUntil: 'load' });
+        const nom = cas ? cas.nom : 'sans JavaScript';
+        // La page est bien celle des gabarits de nuit : ni la classe jour, ni les places ; les quatre possibles, enfants
+        // du bloc.
+        expect(await onglet.evaluate(() => [
+          document.documentElement.className,
+          document.querySelectorAll('.partage__place').length,
+          document.querySelectorAll('.partage > :is(.partage__natif, .partage__whatsapp, .partage__copier, .partage__lien)').length,
+        ]), nom).toEqual(['', 0, 4]);
+        expect(await lireCeQuiSeMontre(onglet), nom).toEqual(cas ? montresAttendus(cas) : SANS_LE_SCRIPT);
+        const [haut, bas] = await onglet.locator('.partage a, .partage button').evaluateAll((elements) => elements
+          .filter((e) => e.checkVisibility({ visibilityProperty: true })).map((e) => e.getBoundingClientRect().toJSON()));
+        expect(bas.top, nom).toBeGreaterThanOrEqual(haut.bottom);
+        await contexte.close();
       }
     });
   }
-  test('les autres pages qui ont ce bloc (une ville, un bar, « Ce soir », en anglais) : rien ne bouge non plus', async ({ browser }) => {
-    for (const chemin of ['/regarder-le-match/paris/', '/bar/le-zinc-des-amis-paris-11/', '/ce-soir/', '/en/matches/psg-ol-2026-10-25/', '/en/']) {
-      expect(await decalagesQuandPartageArriveTard(browser, { chemin, largeur: 390, cas: CAS[0] }), `${chemin}, 390 px`).toBe(0);
-      expect(await decalagesQuandPartageArriveTard(browser, { chemin, largeur: 1280, cas: CAS[3] }), `${chemin}, 1280 px`).toBe(0);
+
+  // Le bloc au texte agrandi, de 320 à 1280 px (tous les 10 px), le texte à 100, 125, 150 et 200 % (le réglage du
+  // navigateur, comme tests/texte-agrandi.spec.mjs), la police arrivée. Ses états sont posés comme partage.js les pose
+  // (l’attribut hidden de chaque possible ; partage.js retenu) : avant lui ou sans JavaScript, chacun de ses quatre
+  // choix, et la copie refusée (l’adresse revenue sous « Copier le lien »). Dans chacun : la page ne défile pas de côté,
+  // le bloc reste dans sa colonne et chaque possible montré dans le bloc, chaque bouton garde 44 × 44 px au moins et
+  // tout son texte (l’adresse, sur une ligne, peut finir par « … »), rien ne se recouvre. Et chaque choix de partage.js
+  // garde la hauteur du bloc et le haut de ce qui le suit : rien ne bouge quand il arrive, à toute largeur et à toute
+  // taille de texte (les vrais décalages, partage.js arrivé tard, sont comptés plus haut).
+  const ETATS_DU_BLOC = [
+    { nom: 'avant partage.js', montres: SANS_LE_SCRIPT },
+    ...CAS_DU_PARTAGE.map((cas) => ({ nom: cas.nom, montres: montresAttendus(cas), choix: true })),
+    { nom: 'la copie refusée, avec le bouton du téléphone', montres: { natif: true, whatsapp: false, copier: true, lien: true } },
+    { nom: 'la copie refusée, sans le bouton du téléphone', montres: { natif: false, whatsapp: true, copier: true, lien: true } },
+  ];
+  const mesurerLeBlocAgrandi = (onglet, etats) => onglet.evaluate((liste) => {
+    const bloc = document.querySelector('.partage');
+    const possibles = ['natif', 'whatsapp', 'copier', 'lien'].map((nom) => [nom, bloc.querySelector(`.partage__${nom}`)]);
+    const arrondi = (n) => Math.round(n * 100) / 100;
+    const problemes = [];
+    let mesures = 0;
+    for (const texte of [100, 125, 150, 200]) {
+      document.documentElement.style.fontSize = `${texte}%`;
+      let avant = null;
+      for (const etat of liste) {
+        for (const [nom, e] of possibles) e.hidden = !etat.montres[nom];
+        const dire = (probleme) => problemes.push(`texte à ${texte} %, ${etat.nom} : ${probleme}`);
+        const ecran = document.documentElement.clientWidth;
+        const colonne = bloc.parentElement.getBoundingClientRect();
+        const b = bloc.getBoundingClientRect();
+        if (document.documentElement.scrollWidth > ecran) dire(`la page défile de côté (${document.documentElement.scrollWidth} px pour ${ecran})`);
+        if (b.left < colonne.left - 0.5 || b.right > Math.min(colonne.right, ecran) + 0.5) dire(`le bloc sort de sa colonne (${arrondi(b.left)} à ${arrondi(b.right)} px, la colonne de ${arrondi(colonne.left)} à ${arrondi(colonne.right)} px)`);
+        const vus = possibles.filter(([, e]) => e.checkVisibility({ visibilityProperty: true, opacityProperty: true }));
+        const montres = Object.fromEntries(possibles.map(([nom, e]) => [nom, vus.some(([, v]) => v === e)]));
+        if (JSON.stringify(montres) !== JSON.stringify(etat.montres)) dire(`se montrent ${JSON.stringify(montres)}`);
+        for (const [nom, e] of vus) {
+          const r = e.getBoundingClientRect();
+          if (r.left < b.left - 0.5 || r.right > b.right + 0.5) dire(`${nom} sort du bloc (${arrondi(r.left)} à ${arrondi(r.right)} px)`);
+          if (r.width < 44 || r.height < 44) dire(`${nom} mesure ${arrondi(r.width)} × ${arrondi(r.height)} px`);
+          if (nom !== 'lien' && (e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1)) dire(`le texte de ${nom} sort de sa capsule (${e.scrollWidth} × ${e.scrollHeight} px dans ${e.clientWidth} × ${e.clientHeight})`);
+        }
+        for (const [i, [nom, e]] of vus.entries()) {
+          for (const [autre, f] of vus.slice(i + 1)) {
+            const [r, s] = [e.getBoundingClientRect(), f.getBoundingClientRect()];
+            if (Math.min(r.right, s.right) - Math.max(r.left, s.left) > 0.5 && Math.min(r.bottom, s.bottom) - Math.max(r.top, s.top) > 0.5) dire(`${nom} et ${autre} se recouvrent`);
+          }
+        }
+        const place = { hauteur: arrondi(b.height), dessous: arrondi((bloc.nextElementSibling?.getBoundingClientRect().top ?? b.bottom) + window.scrollY) };
+        if (!avant) avant = place;
+        else if (etat.choix && JSON.stringify(place) !== JSON.stringify(avant)) dire(`le bloc bouge : ${JSON.stringify(avant)} avant partage.js, ${JSON.stringify(place)} après`);
+        mesures += 1;
+      }
     }
-  });
+    document.documentElement.style.fontSize = '';
+    for (const [nom, e] of possibles) e.hidden = !liste[0].montres[nom];
+    return { problemes, mesures };
+  }, etats);
+  for (const chemin of PAGES_DU_BLOC) {
+    test(`${chemin}, le texte de 100 à 200 %, de 320 à 1280 px : le bloc reste dans sa colonne, ses boutons gardent 44 px et leur texte, et rien ne bouge quand partage.js choisit`, async ({ page: onglet }) => {
+      await onglet.route('**/partage.js', (route) => route.abort());
+      await onglet.setViewportSize({ width: 320, height: 800 });
+      await onglet.goto(`${serveur.adresse}${chemin}`);
+      await onglet.evaluate(() => document.fonts.ready);
+      expect(await lireCeQuiSeMontre(onglet)).toEqual(SANS_LE_SCRIPT);
+      const problemes = [];
+      let mesures = 0;
+      for (let largeur = 320; largeur <= 1280; largeur += 10) {
+        await onglet.setViewportSize({ width: largeur, height: 800 });
+        const lu = await mesurerLeBlocAgrandi(onglet, ETATS_DU_BLOC);
+        problemes.push(...lu.problemes.map((p) => `${largeur} px, ${p}`));
+        mesures += lu.mesures;
+      }
+      expect(mesures).toBe(97 * 4 * ETATS_DU_BLOC.length);
+      expect({ problemes: problemes.length, premiers: problemes.slice(0, 20) }).toEqual({ problemes: 0, premiers: [] });
+    });
+  }
 
   test('des cibles de 44 px, sans animation, à 360 px comme au bureau', async ({ browser }) => {
     for (const largeur of [360, 1280]) {

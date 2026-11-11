@@ -1,8 +1,7 @@
-/* Baromatch — les affiches à imprimer (de la semaine, de chaque bar publié, la feuille du patron ; generateur/affiche.mjs,
-   generateur/feuille-du-patron.mjs), par-dessus styles.css et regarder.css. À l’écran, la feuille en aperçu ; imprimée,
-   la feuille seule, encre noire sur blanc (une pleine nuit viderait la cartouche), une touche d’ambre. Seules les lignes
-   cochées s’impriment (rien de coché, ou sans :has() : toutes). Le papier n’est pas fixé (@page size bloquerait A4 / A3) :
-   le bouton A3 agrandit tout (--echelle). Ni script, ni animation ; chiffres tabulaires. */
+/* Baromatch — les affiches à imprimer (generateur/affiche.mjs, feuille-du-patron.mjs) : celle de la semaine, celle
+   de chaque bar, la feuille du patron. À l’écran, le jour et la feuille blanche ; imprimée, la feuille seule, encre
+   noire, une touche d’ambre (le verre). Seules les lignes cochées s’impriment, toutes si rien n’est coché (ou sans
+   :has()). Sans @page size (il bloquerait A4 / A3) : A3 agrandit tout (--echelle). Aucun script, aucune animation. */
 
 /* ---------- Le choix du papier ---------- */
 
@@ -13,15 +12,18 @@
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  padding: 0 18px;
+  padding: 6px 18px;
   border: 1px solid var(--champ-bord);
-  border-radius: 999px;
+  border-radius: 22px;
   background: var(--verre);
   font-weight: 650;
   cursor: pointer;
 }
-.affiche-format__choix:has(:checked) { border-color: var(--ambre); }
-.affiche-format input { width: 20px; height: 20px; margin: 0; accent-color: var(--ambre); }
+/* Sur deux lignes (texte agrandi), le bord ne touche pas le texte. Le choix et les cases à la couleur du texte :
+   l’ambre, sur le clair, ferait 1,9:1. */
+.affiche-format__choix:hover { background: var(--fond-releve, var(--verre-fort)); }
+.affiche-format__choix:has(:checked) { border-color: var(--texte); }
+.affiche-format input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--texte); }
 
 /* ---------- La feuille, à l’écran ---------- */
 
@@ -42,6 +44,7 @@
   font-variant-numeric: tabular-nums;
   container-type: inline-size;
 }
+@media screen { .jour .affiche { box-shadow: 0 0 0 1px var(--trait), var(--ombre-carte); } }
 .affiche :focus-visible { outline-color: var(--encre); }
 
 .affiche-tete { padding-bottom: 14px; border-bottom: 3px solid var(--encre); }
@@ -64,7 +67,7 @@
 
 .affiche-lignes { margin: 0; padding: 0; list-style: none; }
 .affiche-ligne { display: flex; align-items: center; gap: 12px; }
-.affiche-case { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--ambre); cursor: pointer; }
+.affiche-case { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--encre); cursor: pointer; }
 /* La ligne entière est l’étiquette de sa case : 44 px de haut au moins, au doigt. */
 .affiche-ligne__texte {
   flex: 1;
@@ -139,7 +142,8 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche-prochain__quand .affiche-heure { font-size: inherit; }
 .affiche-prochain .affiche-competition { display: block; margin-top: 2px; font-size: 1rem; }
 .affiche-sous-titre { margin: 18px 0 0; font-size: 1rem; font-weight: 750; }
-.affiche-appel { margin: 0; font-size: 1.375rem; font-weight: 800; line-height: 1.2; }
+/* « Baromatch. » tient dans la feuille à 320 px, texte à 200 % (et le titre du patron). */
+.affiche-appel { margin: 0; font-size: min(1.375rem, 13vw); font-weight: 800; line-height: 1.2; }
 .affiche-appel__suite { margin: 2px 0 14px; font-weight: 600; }
 .affiche--bar .affiche-pied { margin-top: 20px; padding-top: 16px; border-top: 3px solid var(--encre); }
 .affiche--bar .affiche-qr__code { width: 160px; height: 160px; }
@@ -149,7 +153,7 @@ label.affiche-ligne__texte { cursor: pointer; }
 @media print {
   @page { margin: 12mm; }
   :root { color-scheme: light; }
-  html, body { background: #FFFFFF; color: #000000; }
+  html, body, .jour body { background: #FFFFFF; color: #000000; }
   /* Seulement la feuille : ni l’en-tête du site, ni son pied, ni le mode d’emploi, ni les cases. */
   body > :not(main), main > :not(.affiche-zone), .affiche-zone > :not(.affiche), .affiche-case, .affiche-stylo { display: none !important; }
   main.page { max-width: none; margin: 0; padding: 0; }
@@ -227,12 +231,11 @@ label.affiche-ligne__texte { cursor: pointer; }
 }
 
 /* ---------- La feuille à laisser au patron (/matchs/affiche/pour-le-patron/) ----------
-   Le même papier : surtitre, titre, quatre lignes, « Où on en est », puis le pied (appel, contact, « Laissée par » au
-   stylo, date, verre ; QR code à droite). Sa copie (seconde feuille de l’A4) ne se montre jamais à l’écran. */
+   Le même papier ; sa copie (la seconde feuille de l’A4) ne se montre jamais à l’écran. */
 
 .affiche--copie { display: none; }
 .affiche-patron__surtitre { margin: 0 0 10px; font-size: 0.9375rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
-.affiche--patron .affiche-titre { font-size: clamp(2.25rem, 9vw, 3.5rem); }
+.affiche--patron .affiche-titre { font-size: min(clamp(2.25rem, 9vw, 3.5rem), 17vw); }
 .affiche-patron__lignes { margin: 0; padding: 0; list-style: none; }
 .affiche-patron__lignes li { padding: 12px 0; border-bottom: 1px solid var(--trait-papier); font-size: 1.125rem; font-weight: 650; line-height: 1.35; }
 .affiche-patron__etat { margin: 14px 0 0; color: var(--encre-douce); font-size: 0.9375rem; line-height: 1.45; }
@@ -240,13 +243,12 @@ label.affiche-ligne__texte { cursor: pointer; }
 .affiche--patron .affiche-pied { margin-top: 20px; padding-top: 16px; border-top: 3px solid var(--encre); }
 .affiche--patron .affiche-appel { font-size: 1.25rem; }
 /* « Laissée par : » et sa ligne vide, à remplir au stylo : imprimée, et un dessin pour un lecteur d’écran. */
-.affiche-laissee { display: flex; align-items: flex-end; gap: 8px; max-width: 22rem; margin: 0 0 16px; font-weight: 650; }
+.affiche-laissee { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; max-width: 22rem; margin: 0 0 16px; font-weight: 650; }
 .affiche-laissee__trait { flex: 1; min-width: 6rem; height: 1.5em; border-bottom: 1px solid var(--encre-douce); }
 .affiche--patron .affiche-qr__code { width: 144px; height: 144px; }
 
-/* Imprimée en A4 (par défaut) : la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la coupe au milieu (268 mm
-   sur 273 imprimables). Une page plus courte (Letter, un téléphone) : la copie passe entière à la page suivante. A5 : la
-   feuille seule. Sans :has(), une seule feuille, en haut. */
+/* Imprimée en A4 : la feuille et sa copie, 127 mm chacune, 14 mm entre elles, la coupe au milieu (268 mm sur 273). Une
+   page plus courte : la copie passe entière à la suivante. A5 : la feuille seule. Sans :has() : une feuille, en haut. */
 @media print {
   .affiche--patron { min-height: 0; height: 127mm; break-inside: avoid; }
   .regarder:has(#patron-a4:checked) .affiche--copie { display: flex; margin-top: 14mm; }

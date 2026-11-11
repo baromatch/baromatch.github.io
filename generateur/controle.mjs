@@ -33,9 +33,9 @@ export const controlerLaPage = (p, { motsDesBars = [], mesure = mesureDuSite() }
   const erreurs = [];
   const exiger = (condition, message) => { if (!condition) erreurs.push(`${p.chemin} : ${message}`); };
 
-  // Une page en anglais (anglais.mjs) le dit : <html lang="en">.
+  // Une page en anglais (anglais.mjs) le dit : <html lang="en">. Chaque page est du jour (class="jour", styles.css).
   const langue = p.langue ?? 'fr';
-  exiger(html.startsWith(`<!doctype html>\n<html lang="${langue}">`), `<html lang="${langue}"> attendu en tête`);
+  exiger(html.startsWith(`<!doctype html>\n<html lang="${langue}" class="jour">\n`), `<html lang="${langue}" class="jour"> attendu en tête`);
   // hreflang relie deux pages indexables, jamais une page en noindex (anglais.mjs, lierLesLangues).
   exiger(p.indexable || !html.includes('<link rel="alternate" hreflang='), 'hreflang sur une page en noindex');
   const titres = tous(html, /<title>([^<]*)<\/title>/g);

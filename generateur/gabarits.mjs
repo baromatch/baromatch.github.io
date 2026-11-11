@@ -25,7 +25,7 @@ const IMAGE_ALT = 'Le verre de lumière de Baromatch et la phrase : Ton match. T
 // langue : « fr », ou « en » pour une page en anglais (anglais.mjs).
 // mesure : la mesure d’audience (mesure.mjs) ; active, la page charge /mesure.js.
 const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, feuilles = [], langue = 'fr', mesure }) => `<!doctype html>
-<html lang="${langue}">
+<html lang="${langue}" class="jour">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +36,7 @@ const tete = ({ titre, description, chemin, indexable, jsonld, image, partage, f
 <meta name="description" content="${e(description)}">
 <meta name="robots" content="${indexable ? 'max-image-preview:large' : 'noindex'}">
 <link rel="canonical" href="${adresseDe(chemin)}">
-<meta name="theme-color" content="#0A0B10">
+<meta name="theme-color" content="#FAF7F1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -92,10 +92,11 @@ ${pied(cadre, { marque, chemin, avecPresse, langue })}
 
 // ---------- Morceaux communs ----------
 
-// Les insignes des clubs (insigne.mjs), sur le fond de nuit des pages générées : la paire d’un match dans une liste
-// (30 px, comme la liste « Les matchs » de l’appli) ; les deux insignes de l’en-tête d’un match, ou celui d’un club
-// (58 px, comme son écran « Ce soir »).
-export const FOND_DES_PAGES = 'night';
+// Les insignes des clubs (insigne.mjs), sur le fond clair des pages générées (le jour, class="jour") : dessinés pour le
+// clair, avec le filet d’encre des insignes clairs, comme sur l’accueil et les affiches. La paire d’un match dans une
+// liste (30 px, comme la liste « Les matchs » de l’appli) ; les deux insignes de l’en-tête d’un match, ou celui d’un
+// club (58 px, comme son écran « Ce soir »).
+export const FOND_DES_PAGES = 'light';
 export const insignesDuMatch = (match, { fond = FOND_DES_PAGES } = {}) => paireDInsignes(match.domicile, match.exterieur, { fond });
 export const insignesDeLEnTete = (...clubs) => `  <div class="regarder-insignes">${clubs.map((club) => insigne(club, { taille: TAILLES.entete, fond: FOND_DES_PAGES })).join('')}</div>
 `;

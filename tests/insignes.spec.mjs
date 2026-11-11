@@ -356,23 +356,23 @@ test.describe('les pages générées : les insignes là où l’appli les montre
   });
   const pageDe = (chemin) => site.pages.find((p) => p.chemin === chemin)?.contenu;
 
-  test('l’en-tête d’un match : les deux insignes de l’appli à 58 px, sur la nuit, domicile puis extérieur', () => {
+  test('l’en-tête d’un match : les deux insignes de l’appli à 58 px, sur le clair (le jour), domicile puis extérieur', () => {
     const tete = (chemin) => pageDe(chemin).match(/<header class="regarder-tete">([\s\S]*?)<\/header>/)[1];
     const seul = (cle) => `${ouverture('insigne', 58, 58, '0 0 200 200')}${sansRacine(REFERENCES[cle])}</svg>`;
-    const lens = insigne({ slug: 'losc-lille' }, { taille: 58, fond: 'night' });
+    const lens = insigne({ slug: 'losc-lille' }, { taille: 58, fond: 'light' });
     expect(tete('/matchs/lille-lens-2026-10-31/').startsWith(`\n  <div class="regarder-insignes">${lens}`)).toBe(true);
-    expect(tete('/matchs/lille-lens-2026-10-31/')).toContain(`<div class="regarder-insignes">${lens}${seul('rc-lens@58/night')}</div>`);
+    expect(tete('/matchs/lille-lens-2026-10-31/')).toContain(`<div class="regarder-insignes">${lens}${seul('rc-lens@58/light')}</div>`);
     // Le PSG à l’extérieur sur deux pages : sur chacune, le dessin de l’appli, ses identifiants tels quels.
-    expect(tete('/matchs/le-havre-psg-2026-10-30/')).toContain(`${seul('paris-saint-germain@58/night')}</div>`);
-    expect(tete('/matchs/real-madrid-psg-2026-11-03/')).toContain(`${seul('paris-saint-germain@58/night')}</div>`);
+    expect(tete('/matchs/le-havre-psg-2026-10-30/')).toContain(`${seul('paris-saint-germain@58/light')}</div>`);
+    expect(tete('/matchs/real-madrid-psg-2026-11-03/')).toContain(`${seul('paris-saint-germain@58/light')}</div>`);
     // Une sélection : son drapeau ; un club inconnu de l’appli : son insigne neutre.
     expect(tete('/matchs/france-italie-2026-11-01/')).toContain('<div class="regarder-insignes"><svg class="insigne" width="58" height="58" viewBox="0 0 58 58"');
-    expect(tete('/matchs/monaco-pafos-2026-11-04/')).toContain(`${ouverture('insigne', 58, 58, '0 0 200 200')}${sansRacine(REFERENCES['neutre:Pafos FC@58/night'])}</svg></div>`);
+    expect(tete('/matchs/monaco-pafos-2026-11-04/')).toContain(`${ouverture('insigne', 58, 58, '0 0 200 200')}${sansRacine(REFERENCES['neutre:Pafos FC@58/light'])}</svg></div>`);
     // La page en anglais d’un match, de même.
-    expect(pageDe('/en/matches/le-havre-psg-2026-10-30/')).toContain(`${seul('paris-saint-germain@58/night')}</div>`);
+    expect(pageDe('/en/matches/le-havre-psg-2026-10-30/')).toContain(`${seul('paris-saint-germain@58/light')}</div>`);
   });
 
-  test('chaque ligne de match, sur chaque page, porte la paire de l’appli (30 px, nuit) devant son nom', () => {
+  test('chaque ligne de match, sur chaque page, porte la paire de l’appli (30 px, sur le clair) devant son nom', () => {
     const pages = site.pages.filter((p) => p.chemin.endsWith('/') && /<a class="regarder-matchs__match" href="\/(?:en\/)?match(?:s|es)\/[^"]+-20\d\d-\d\d-\d\d\/"/.test(p.contenu));
     const chemins = pages.map((p) => p.chemin);
     for (const attendu of ['/matchs/', '/ce-soir/', '/matchs/club/psg/', '/matchs/competition/ligue-1/', '/matchs/le-havre-psg-2026-10-30/']) expect(chemins).toContain(attendu);
@@ -383,18 +383,18 @@ test.describe('les pages générées : les insignes là où l’appli les montre
         expect(dedans, `${p.chemin} → ${adresse}`).toMatch(/^(?:<svg class="insignes" width="64" height="30" viewBox="0 0 426\.6666666666667 200" aria-hidden="true" focusable="false">[\s\S]*?<\/svg>|<span class="insignes insignes--drapeau" aria-hidden="true">(?:<svg class="insigne" width="30" height="30"[\s\S]*?<\/svg>){2}<\/span>)<span class="regarder-matchs__nom">[^<]+<\/span>$/);
       }
     }
-    // Le Havre – PSG, dans la semaine : exactement la paire de l’appli, sur la nuit.
+    // Le Havre – PSG, dans la semaine : exactement la paire de l’appli, sur le clair.
     expect(pageDe('/matchs/')).toContain('<svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false">'
-      + `<g>${sansRacine(REFERENCES['le-havre-ac@30/night'])}</g><g transform="translate(226.66666666666666 0)">${sansRacine(REFERENCES['paris-saint-germain@30/night'])}</g></svg><span class="regarder-matchs__nom">Le Havre – PSG</span></a>`);
+      + `<g>${sansRacine(REFERENCES['le-havre-ac@30/light'])}</g><g transform="translate(226.66666666666666 0)">${sansRacine(REFERENCES['paris-saint-germain@30/light'])}</g></svg><span class="regarder-matchs__nom">Le Havre – PSG</span></a>`);
   });
 
   test('l’en-tête d’un club et l’agenda : l’insigne du club, à côté de son nom', () => {
-    expect(pageDe('/matchs/club/psg/')).toContain(`<header class="regarder-tete">\n  <div class="regarder-insignes">${ouverture('insigne', 58, 58, '0 0 200 200')}${sansRacine(REFERENCES['paris-saint-germain@58/night'])}</svg></div>`);
+    expect(pageDe('/matchs/club/psg/')).toContain(`<header class="regarder-tete">\n  <div class="regarder-insignes">${ouverture('insigne', 58, 58, '0 0 200 200')}${sansRacine(REFERENCES['paris-saint-germain@58/light'])}</svg></div>`);
     const agenda = pageDe('/agenda/');
     const cartes = [...agenda.matchAll(/<h3 class="regarder-carte__nom">(<svg class="insigne" width="30" height="30" viewBox="0 0 200 200" aria-hidden="true" focusable="false">[\s\S]*?<\/svg>)([^<]+)<\/h3>/g)];
     expect(cartes.length).toBeGreaterThan(0);
     const psg = cartes.find(([, , nom]) => nom === 'PSG');
-    expect(psg[1]).toBe(`${ouverture('insigne', 30, 30, '0 0 200 200')}${sansRacine(REFERENCES['paris-saint-germain@30/night'])}</svg>`);
+    expect(psg[1]).toBe(`${ouverture('insigne', 30, 30, '0 0 200 200')}${sansRacine(REFERENCES['paris-saint-germain@30/light'])}</svg>`);
   });
 
   test('l’agenda : un club que l’appli connaît, absent de clubs.json, y a son insigne, le même que dans les lignes de match', async () => {
@@ -409,7 +409,7 @@ test.describe('les pages générées : les insignes là où l’appli les montre
       }));
       const avec = await construireEnMemoire({ source: `scenario:${fichier}`, maintenant: JEUDI, racine });
       expect(Object.values(chargerLeContenu(racine).clubs).some((c) => c.slugs?.includes('fc-nordsj-lland'))).toBe(false);
-      const farum = insigne({ slug: 'fc-nordsj-lland', nom: 'FC Nordsjælland' }, { taille: 30, fond: 'night' });
+      const farum = insigne({ slug: 'fc-nordsj-lland', nom: 'FC Nordsjælland' }, { taille: 30, fond: 'light' });
       expect(farum).not.toContain('fill="#1B1D27"');
       const agenda = avec.pages.find((p) => p.chemin === '/agenda/').contenu;
       expect(agenda).toContain(`<h3 class="regarder-carte__nom">${farum}Nordsjælland</h3>`);
@@ -418,7 +418,7 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     }
   });
 
-  test('la page d’un bar : chaque soirée annoncée porte la paire de l’appli (30 px, nuit) devant le nom du match', async () => {
+  test('la page d’un bar : chaque soirée annoncée porte la paire de l’appli (30 px, sur le clair) devant le nom du match', async () => {
     const scenario = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario() });
     const pages = scenario.pages.filter((p) => p.type === 'bar' && p.contenu.includes('id="titre-soirees"'));
     expect(pages.length).toBeGreaterThan(0);
@@ -434,7 +434,7 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     // Le PSG – OL du Zinc : exactement la paire que la semaine en donne.
     const zinc = scenario.pages.find((p) => p.chemin === '/bar/le-zinc-des-amis-paris-11/').contenu;
     const psgOl = scenario.donnees.matchs.find((m) => m.slug === 'psg-ol-2026-10-25');
-    expect(zinc).toContain(`<h3 class="regarder-carte__nom">${paireDInsignes(psgOl.domicile, psgOl.exterieur, { fond: 'night' })}<a href="/matchs/psg-ol-2026-10-25/">PSG – OL</a></h3>`);
+    expect(zinc).toContain(`<h3 class="regarder-carte__nom">${paireDInsignes(psgOl.domicile, psgOl.exterieur, { fond: 'light' })}<a href="/matchs/psg-ol-2026-10-25/">PSG – OL</a></h3>`);
   });
 
   test('chaque page : des identifiants uniques, chaque renvoi vers l’un d’eux, aucun dessin qui ne soit un insigne décoratif', async () => {
@@ -534,9 +534,13 @@ test.describe('les pages générées : les insignes là où l’appli les montre
     expect(pages.filter((p) => !/<footer class="pied page"[\s\S]*?<svg class="insigne"[\s\S]*?<\/footer>/.test(p.contenu)).map((p) => p.chemin)).toEqual([]);
     const affiche = pages.find((p) => p.type === 'affiche');
     expect(horsDuTheme({ ...affiche, contenu: affiche.contenu.replace(/<footer class="pied page"[\s\S]*?<\/footer>/, (pied) => pied.replace(/<svg class="insigne"[\s\S]*?<\/svg>/, insigne({ slug: 'paris-saint-germain' }, { taille: 24, fond: 'light' }))) })).toHaveLength(1);
-    // Une page générée passée au jour sans que ses insignes suivent : ce test le voit.
+    // Une page générée qui change de thème sans que ses insignes suivent (le jour retiré, ou posé) : ce test le voit.
     const match = site.pages.find((p) => p.chemin === '/matchs/le-havre-psg-2026-10-30/');
-    expect(horsDuTheme({ ...match, contenu: match.contenu.replace('<html lang="fr">', '<html lang="fr" class="jour">') }).length).toBeGreaterThan(2);
+    const autreTheme = match.contenu.includes('<html lang="fr" class="jour">')
+      ? match.contenu.replace('<html lang="fr" class="jour">', '<html lang="fr">')
+      : match.contenu.replace('<html lang="fr">', '<html lang="fr" class="jour">');
+    expect(autreTheme).not.toBe(match.contenu);
+    expect(horsDuTheme({ ...match, contenu: autreTheme }).length).toBeGreaterThan(2);
   });
 
   test('l’image de partage d’un match : les deux insignes de l’appli à 160 px, sur la nuit, la saison écrite', () => {

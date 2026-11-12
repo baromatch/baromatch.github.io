@@ -100,8 +100,8 @@
   "/agenda/monaco.ics": {
    "type": "calendrier",
    "cle": "monaco",
-   "empreinte": "6OQGZPEsf-QRPd-l4mkULg",
-   "change": "2026-11-08",
+   "empreinte": "tZ1WFgKj6zrP0MI7mXiyiA",
+   "change": "2026-11-13",
    "indexable": false,
    "memoire": {
     "court": "Monaco",
@@ -122,8 +122,8 @@
   "/agenda/ol.ics": {
    "type": "calendrier",
    "cle": "ol",
-   "empreinte": "cisohVCEkr-Ddi7rZAJa3A",
-   "change": "2026-11-08",
+   "empreinte": "KJL7hKjPhbjTHTwQmpfnLg",
+   "change": "2026-11-13",
    "indexable": false,
    "memoire": {
     "court": "OL",
@@ -133,8 +133,8 @@
   "/agenda/om.ics": {
    "type": "calendrier",
    "cle": "om",
-   "empreinte": "I-ws6lrXPqwuzetbWhpE3g",
-   "change": "2026-11-09",
+   "empreinte": "0v4F3f7liJf4VPvQq15X0w",
+   "change": "2026-11-13",
    "indexable": false,
    "memoire": {
     "court": "OM",
@@ -166,8 +166,8 @@
   "/agenda/rennes.ics": {
    "type": "calendrier",
    "cle": "rennes",
-   "empreinte": "moWjw-YqVltYOoiN8qSGzQ",
-   "change": "2026-11-08",
+   "empreinte": "8B2hxbFjY7Q9ygql8UNdaw",
+   "change": "2026-11-13",
    "indexable": false,
    "memoire": {
     "court": "Rennes",
@@ -210,31 +210,31 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "jqUMJKz8n0Yq27vPCxyIyg",
-   "change": "2026-11-12",
+   "empreinte": "F92IL0af9Ybdiw8TzUB1LA",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "ZMzUkmW6UvH3IFjEDMlZRA",
-   "change": "2026-11-12",
+   "empreinte": "kd7zPlBi7rBzOIg1hNDB9w",
+   "change": "2026-11-13",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "C5mSvKF-bw-1qO3BpSyYiA",
-   "change": "2026-11-12",
+   "empreinte": "uYxF3p2GxdpicEJRyYVRRw",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
   "/en/champions-league/": {
    "type": "guide-en",
    "cle": "champions-league",
-   "empreinte": "vdt_YES_e0m6490MUE8VOw",
-   "change": "2026-11-12",
+   "empreinte": "vF-Lxf2sujbrn1wPi7ZPMA",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
@@ -325,6 +325,15 @@
    "date": "2026-11-24T17:45:00.000Z",
    "empreinte": "9d6mXGDUdd2DgGd90nJT2w",
    "change": "2026-11-12",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/heart-of-midlothian-monaco-2026-11-26/": {
+   "type": "match-en",
+   "cle": "heart-of-midlothian-monaco-2026-11-26",
+   "date": "2026-11-26T17:45:00.000Z",
+   "empreinte": "TFUuWHJb9n-9li960K599w",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
@@ -499,6 +508,33 @@
    "indexable": false,
    "bars": []
   },
+  "/en/matches/nijmegen-rennes-2026-11-26/": {
+   "type": "match-en",
+   "cle": "nijmegen-rennes-2026-11-26",
+   "date": "2026-11-26T20:00:00.000Z",
+   "empreinte": "azn7Xun77Np1yo1JBmUbbA",
+   "change": "2026-11-13",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/ol-lillestrom-2026-11-26/": {
+   "type": "match-en",
+   "cle": "ol-lillestrom-2026-11-26",
+   "date": "2026-11-26T20:00:00.000Z",
+   "empreinte": "56jIIfPifiqUEPg5XNjASg",
+   "change": "2026-11-13",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/om-levski-sofia-2026-11-26/": {
+   "type": "match-en",
+   "cle": "om-levski-sofia-2026-11-26",
+   "date": "2026-11-26T17:45:00.000Z",
+   "empreinte": "RGuHYiD48D6WL0Vsu0OVhA",
+   "change": "2026-11-13",
+   "indexable": false,
+   "bars": []
+  },
   "/en/matches/psg-barca-2026-10-20/": {
    "type": "match-en",
    "cle": "psg-barca-2026-10-20",
@@ -618,31 +654,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "Dki_WHSoalqz3GEw3DCQJQ",
-   "change": "2026-11-12",
+   "empreinte": "YavZvBe-JdNST7iE0lxy_w",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "1SFJWFyhDygD2BNBBqDOcg",
-   "change": "2026-11-12",
+   "empreinte": "KXn_Xcd-ANoe1M_VIiWtTQ",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "v3Tj73iR_pSxzaOG1egV8w",
-   "change": "2026-11-12",
+   "empreinte": "4afk1H9Jmc1tqBuQ2qhfYw",
+   "change": "2026-11-13",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "I4fslXrFph2y0ioZvMQ-Ow",
-   "change": "2026-11-12",
+   "empreinte": "6XdoWPLg3UFull7WR-Oytw",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
@@ -1367,8 +1403,8 @@
   "/matchs/club/monaco/": {
    "type": "club",
    "cle": "monaco",
-   "empreinte": "dml8Dl2ZbZHX5Mcy5vCMig",
-   "change": "2026-11-12",
+   "empreinte": "6aRh4NLpb_iB18rXOK67NA",
+   "change": "2026-11-13",
    "indexable": true,
    "bars": []
   },
@@ -1383,16 +1419,16 @@
   "/matchs/club/ol/": {
    "type": "club",
    "cle": "ol",
-   "empreinte": "nb9z0-TyeO3pwYnbnkEKVw",
-   "change": "2026-11-12",
+   "empreinte": "1UG_fdv21D7bh3aqoUFVQg",
+   "change": "2026-11-13",
    "indexable": true,
    "bars": []
   },
   "/matchs/club/om/": {
    "type": "club",
    "cle": "om",
-   "empreinte": "00czuAyX_H9i0TzvU5Rm3g",
-   "change": "2026-11-12",
+   "empreinte": "uRSWF4N3pAdpV54zYTKBMA",
+   "change": "2026-11-13",
    "indexable": true,
    "bars": []
   },
@@ -1407,8 +1443,8 @@
   "/matchs/club/rennes/": {
    "type": "club",
    "cle": "rennes",
-   "empreinte": "-T50uqeYoaz1hitMoMzV_w",
-   "change": "2026-11-12",
+   "empreinte": "bItEY-ZuXy8gkuV4Xw1eJg",
+   "change": "2026-11-13",
    "indexable": true,
    "bars": []
   },
@@ -1439,8 +1475,8 @@
   "/matchs/competition/ligue-conference/": {
    "type": "competition",
    "cle": "ligue-conference",
-   "empreinte": "Cbns1fKaqb46CDInU92BSw",
-   "change": "2026-11-12",
+   "empreinte": "KLLsoGdcim1Xp3dxcAQb1g",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": []
   },
@@ -1455,8 +1491,8 @@
   "/matchs/competition/ligue-europa/": {
    "type": "competition",
    "cle": "ligue-europa",
-   "empreinte": "Z4u1YTSjieGTBYSNdEjEng",
-   "change": "2026-11-12",
+   "empreinte": "xq_jok9jXst71k0B1vEqyA",
+   "change": "2026-11-13",
    "indexable": true,
    "bars": []
   },
@@ -1714,6 +1750,50 @@
    "change": "2026-11-10",
    "indexable": false
   },
+  "/matchs/heart-of-midlothian-monaco-2026-11-26/": {
+   "type": "match",
+   "cle": "heart-of-midlothian-monaco-2026-11-26",
+   "date": "2026-11-26T17:45:00.000Z",
+   "empreinte": "bBWXB4Yg-yXKivyzHoe7Rg",
+   "change": "2026-11-13",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "heart-of-midlothian-monaco-2026-11-26",
+    "ids": [
+     "cmvxran6j0010z71ogdjzd1a0"
+    ],
+    "debut": "2026-11-26T17:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Conférence",
+    "domicile": {
+     "cle": "heart-of-midlothian",
+     "court": "Heart of Midlothian",
+     "nom": "Heart of Midlothian FC",
+     "slug": "heart-of-midlothian-fc"
+    },
+    "exterieur": {
+     "cle": "monaco",
+     "court": "Monaco",
+     "nom": "AS Monaco",
+     "slug": "as-monaco"
+    }
+   }
+  },
+  "/matchs/heart-of-midlothian-monaco-2026-11-26/match.ics": {
+   "type": "evenement",
+   "cle": "heart-of-midlothian-monaco-2026-11-26",
+   "empreinte": "RepunJcZ6mG7rx1Bg4g7aA",
+   "change": "2026-11-13",
+   "indexable": false
+  },
+  "/matchs/heart-of-midlothian-monaco-2026-11-26/partage.png": {
+   "type": "partage",
+   "cle": "heart-of-midlothian-monaco-2026-11-26",
+   "empreinte": "eZIPVzV_wrvKVqgtbodnmA",
+   "change": "2026-11-13",
+   "indexable": false
+  },
   "/matchs/hoffenheim-ol-2026-10-22/": {
    "type": "match",
    "cle": "hoffenheim-ol-2026-10-22",
@@ -1822,8 +1902,8 @@
    "type": "match",
    "cle": "italie-france-2026-11-12",
    "date": "2026-11-12T19:45:00.000Z",
-   "empreinte": "mf79T-2cfnOEMxPSPnDVtw",
-   "change": "2026-11-12",
+   "empreinte": "6jsBR7o1yy2t647dLEbIqA",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1847,20 +1927,6 @@
      "slug": "nt-fr"
     }
    }
-  },
-  "/matchs/italie-france-2026-11-12/match.ics": {
-   "type": "evenement",
-   "cle": "italie-france-2026-11-12",
-   "empreinte": "qpTTTLvc9DJsmrqtmVL8JA",
-   "change": "2026-11-01",
-   "indexable": false
-  },
-  "/matchs/italie-france-2026-11-12/partage.png": {
-   "type": "partage",
-   "cle": "italie-france-2026-11-12",
-   "empreinte": "kzYN-MIJEcc_79E8dzFvXA",
-   "change": "2026-11-01",
-   "indexable": false
   },
   "/matchs/juventus-lazio-2026-10-18/": {
    "type": "match",
@@ -2508,8 +2574,8 @@
    "type": "match",
    "cle": "lille-ol-2026-11-21",
    "date": "2026-11-21T19:45:00.000Z",
-   "empreinte": "3qqBMFJLPekilUSEcdWXZQ",
-   "change": "2026-11-12",
+   "empreinte": "GqmMA5GY7krRF3Jopxj-Bg",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2686,8 +2752,8 @@
    "type": "match",
    "cle": "lorient-rennes-2026-11-22",
    "date": "2026-11-22T16:15:00.000Z",
-   "empreinte": "EyIThlrmKe3WiwZC5KLSNQ",
-   "change": "2026-11-12",
+   "empreinte": "Ia73X55_wMq3eudzmdrbhQ",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2864,8 +2930,8 @@
    "type": "match",
    "cle": "monaco-auxerre-2026-11-21",
    "date": "2026-11-21T19:45:00.000Z",
-   "empreinte": "V4knemtN6iueCzHwYCULwA",
-   "change": "2026-11-12",
+   "empreinte": "DBoAHhARUtO5oxqwugFTYw",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3232,6 +3298,50 @@
     }
    }
   },
+  "/matchs/nijmegen-rennes-2026-11-26/": {
+   "type": "match",
+   "cle": "nijmegen-rennes-2026-11-26",
+   "date": "2026-11-26T20:00:00.000Z",
+   "empreinte": "rLOZdrLKXQTAgrA5I4VXRw",
+   "change": "2026-11-13",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "nijmegen-rennes-2026-11-26",
+    "ids": [
+     "cmvxran7p0014z71oy60gpm12"
+    ],
+    "debut": "2026-11-26T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Europa",
+    "domicile": {
+     "cle": "nijmegen",
+     "court": "Nijmegen",
+     "nom": "N.E.C. Nijmegen",
+     "slug": "n-e-c-nijmegen"
+    },
+    "exterieur": {
+     "cle": "rennes",
+     "court": "Rennes",
+     "nom": "Stade Rennais FC",
+     "slug": "stade-rennais-fc"
+    }
+   }
+  },
+  "/matchs/nijmegen-rennes-2026-11-26/match.ics": {
+   "type": "evenement",
+   "cle": "nijmegen-rennes-2026-11-26",
+   "empreinte": "AQHGX0WfIBNhljWJtVPiOw",
+   "change": "2026-11-13",
+   "indexable": false
+  },
+  "/matchs/nijmegen-rennes-2026-11-26/partage.png": {
+   "type": "partage",
+   "cle": "nijmegen-rennes-2026-11-26",
+   "empreinte": "l8HZRIFOX85k3TxfWVi1Dg",
+   "change": "2026-11-13",
+   "indexable": false
+  },
   "/matchs/ol-angers-2026-10-31/": {
    "type": "match",
    "cle": "ol-angers-2026-10-31",
@@ -3261,6 +3371,50 @@
      "slug": "angers-sco"
     }
    }
+  },
+  "/matchs/ol-lillestrom-2026-11-26/": {
+   "type": "match",
+   "cle": "ol-lillestrom-2026-11-26",
+   "date": "2026-11-26T20:00:00.000Z",
+   "empreinte": "NNCU1WgNvvWgG5pkCy3YbQ",
+   "change": "2026-11-13",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "ol-lillestrom-2026-11-26",
+    "ids": [
+     "cmvxran890016z71ofg7ywdgx"
+    ],
+    "debut": "2026-11-26T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Europa",
+    "domicile": {
+     "cle": "ol",
+     "court": "OL",
+     "nom": "Olympique Lyonnais",
+     "slug": "olympique-lyonnais"
+    },
+    "exterieur": {
+     "cle": "lillestrom",
+     "court": "Lillestrøm",
+     "nom": "Lillestrøm SK",
+     "slug": "lillestr-m-sk"
+    }
+   }
+  },
+  "/matchs/ol-lillestrom-2026-11-26/match.ics": {
+   "type": "evenement",
+   "cle": "ol-lillestrom-2026-11-26",
+   "empreinte": "fVfR3KkhK5WqYv1b_5LIpA",
+   "change": "2026-11-13",
+   "indexable": false
+  },
+  "/matchs/ol-lillestrom-2026-11-26/partage.png": {
+   "type": "partage",
+   "cle": "ol-lillestrom-2026-11-26",
+   "empreinte": "OM4MxpXzVIBI6-PmhVirWw",
+   "change": "2026-11-13",
+   "indexable": false
   },
   "/matchs/ol-nice-2026-10-18/": {
    "type": "match",
@@ -3326,8 +3480,8 @@
    "type": "match",
    "cle": "om-le-mans-2026-11-22",
    "date": "2026-11-22T19:45:00.000Z",
-   "empreinte": "pFQ37A8ib3qVwllZXtOfbg",
-   "change": "2026-11-12",
+   "empreinte": "eM4fBs-cJEiMC5Rxf2-WCQ",
+   "change": "2026-11-13",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3364,6 +3518,50 @@
    "cle": "om-le-mans-2026-11-22",
    "empreinte": "CluudBSSrfzB4p_kLI-5CQ",
    "change": "2026-11-08",
+   "indexable": false
+  },
+  "/matchs/om-levski-sofia-2026-11-26/": {
+   "type": "match",
+   "cle": "om-levski-sofia-2026-11-26",
+   "date": "2026-11-26T17:45:00.000Z",
+   "empreinte": "s0yGIa4OMQezYaAo6V7rFg",
+   "change": "2026-11-13",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "om-levski-sofia-2026-11-26",
+    "ids": [
+     "cmvxran730012z71o4qcwecrb"
+    ],
+    "debut": "2026-11-26T17:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue Europa",
+    "domicile": {
+     "cle": "om",
+     "court": "OM",
+     "nom": "Olympique de Marseille",
+     "slug": "olympique-de-marseille"
+    },
+    "exterieur": {
+     "cle": "levski-sofia",
+     "court": "Levski Sofia",
+     "nom": "PFC Levski Sofia",
+     "slug": "pfc-levski-sofia"
+    }
+   }
+  },
+  "/matchs/om-levski-sofia-2026-11-26/match.ics": {
+   "type": "evenement",
+   "cle": "om-levski-sofia-2026-11-26",
+   "empreinte": "Vq7l3rjuJeW8Jlpj_m0PXw",
+   "change": "2026-11-13",
+   "indexable": false
+  },
+  "/matchs/om-levski-sofia-2026-11-26/partage.png": {
+   "type": "partage",
+   "cle": "om-levski-sofia-2026-11-26",
+   "empreinte": "ScCfxQmHPqSK6i97vMIHnA",
+   "change": "2026-11-13",
    "indexable": false
   },
   "/matchs/om-toulouse-2026-11-01/": {
@@ -4706,9 +4904,9 @@
     "court": "Monaco",
     "nom": "AS Monaco"
    },
-   "empreinte": "oVhD1SH6W7uVjq6vr0jleg",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "Pf_AX7n1Byf9trlypj2vog",
+   "sequence": 1,
+   "modifie": "2026-11-12T23:35:35Z"
   },
   "cmvxran730012z71o4qcwecrb@baromatch.fr": {
    "ids": [
@@ -4728,9 +4926,9 @@
     "court": "Levski Sofia",
     "nom": "PFC Levski Sofia"
    },
-   "empreinte": "2lhn6rmdHsPAAA3bzz2FLg",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "RQAALf8v8X56UA-3wu-bsA",
+   "sequence": 1,
+   "modifie": "2026-11-12T23:35:35Z"
   },
   "cmvxran7p0014z71oy60gpm12@baromatch.fr": {
    "ids": [
@@ -4750,9 +4948,9 @@
     "court": "Rennes",
     "nom": "Stade Rennais FC"
    },
-   "empreinte": "t3lQOrNvi7-s9IxHXQ7nwQ",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "uRv_fnChEdRdiw3YSZFKVw",
+   "sequence": 1,
+   "modifie": "2026-11-12T23:35:35Z"
   },
   "cmvxran890016z71ofg7ywdgx@baromatch.fr": {
    "ids": [
@@ -4772,9 +4970,9 @@
     "court": "Lillestrøm",
     "nom": "Lillestrøm SK"
    },
-   "empreinte": "mqHuolpBRlYdDT_eLXu3PA",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "lQMeXmMnsdZSiZyTmvpgjQ",
+   "sequence": 1,
+   "modifie": "2026-11-12T23:35:35Z"
   },
   "cmvxran8z0018z71ow6tfwegc@baromatch.fr": {
    "ids": [
@@ -4971,28 +5169,6 @@
     "nom": "AS Monaco"
    },
    "empreinte": "G8f6CzfmDKU3ooMmVZFpbg",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
-  },
-  "cmvxrat2l0006g7uuiazgh5ah@baromatch.fr": {
-   "ids": [
-    "cmvxrat2l0006g7uuiazgh5ah"
-   ],
-   "slug": "italie-france-2026-11-12",
-   "debut": "2026-11-12T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des nations",
-   "domicile": {
-    "cle": "italie",
-    "court": "Italie",
-    "nom": "Italie"
-   },
-   "exterieur": {
-    "cle": "france",
-    "court": "France",
-    "nom": "France"
-   },
-   "empreinte": "t-cevMplrWRoXGPCCMNPmA",
    "sequence": 0,
    "modifie": "2026-11-01T12:06:10Z"
   },

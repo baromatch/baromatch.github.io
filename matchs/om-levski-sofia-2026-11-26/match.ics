@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxran730012z71o4qcwecrb@baromatch.fr
+DTSTAMP:20261112T233535Z
+SEQUENCE:1
+DTSTART:20261126T174500Z
+DTEND:20261126T194500Z
+SUMMARY:OM – Levski Sofia
+DESCRIPTION:Ligue Europa · Olympique de Marseille – PFC Levski Sofia\nCo
+ up d’envoi jeudi 26 novembre à 18:45\, heure de Paris.\nLa page du matc
+ h : https://baromatch.fr/matchs/om-levski-sofia-2026-11-26/
+URL:https://baromatch.fr/matchs/om-levski-sofia-2026-11-26/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

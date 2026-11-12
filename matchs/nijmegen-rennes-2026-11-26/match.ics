@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxran7p0014z71oy60gpm12@baromatch.fr
+DTSTAMP:20261112T233535Z
+SEQUENCE:1
+DTSTART:20261126T200000Z
+DTEND:20261126T220000Z
+SUMMARY:Nijmegen – Rennes
+DESCRIPTION:Ligue Europa · N.E.C. Nijmegen – Stade Rennais FC\nCoup d’
+ envoi jeudi 26 novembre à 21:00\, heure de Paris.\nLa page du match : ht
+ tps://baromatch.fr/matchs/nijmegen-rennes-2026-11-26/
+URL:https://baromatch.fr/matchs/nijmegen-rennes-2026-11-26/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

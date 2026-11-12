@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxran6j0010z71ogdjzd1a0@baromatch.fr
+DTSTAMP:20261112T233535Z
+SEQUENCE:1
+DTSTART:20261126T174500Z
+DTEND:20261126T194500Z
+SUMMARY:Heart of Midlothian – Monaco
+DESCRIPTION:Ligue Conférence · Heart of Midlothian FC – AS Monaco\nCoup
+  d’envoi jeudi 26 novembre à 18:45\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/heart-of-midlothian-monaco-2026-11-26/
+URL:https://baromatch.fr/matchs/heart-of-midlothian-monaco-2026-11-26/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

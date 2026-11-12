@@ -27,11 +27,11 @@ test('le premier écran dit « iPhone et Android », « gratuite pour les fans �
   const ouverture = page.locator('section.ouverture');
   await expect(ouverture.locator('h1')).toHaveText('Ton match. Ton bar. Ce soir.');
   const statut = ouverture.locator('.ouverture__statut');
-  await expect(statut).toHaveText('Sur iPhone et Android · Bientôt sur l’App Store et Google Play');
+  await expect(statut).toHaveText('iPhone et Android · Arrive bientôt');
   // Le statut est dit avant la promesse, au même niveau qu’elle : juste au-dessus du titre.
   expect(await statut.evaluate((e) => e.nextElementSibling?.tagName)).toBe('H1');
   const texte = normaliser(await ouverture.locator('.ouverture__texte').innerText());
-  expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Elle arrive bientôt sur l’App Store et Google Play : rien à réserver ce soir.');
+  expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Bientôt sur les stores : rien à réserver ce soir.');
   expect(normaliser(await ouverture.innerText())).toContain(PLATEFORMES);
   // Aucune date de lancement (rien n’est annoncé), ni lien vers un store, texte du film compris (son image de fin dit
   // « Bientôt sur Android, à Paris »).

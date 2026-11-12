@@ -1,6 +1,6 @@
 # Baromatch
 
-> Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. Sur iPhone et Android, d’abord à Paris ; bientôt sur l’App Store et Google Play.
+> Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. Sur iPhone et Android, bientôt sur les stores.
 
 Ton match. Ton bar. Ce soir. Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.
 

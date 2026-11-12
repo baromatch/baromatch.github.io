@@ -353,7 +353,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const prix = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix');
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix + .ouverture-bars__etat');
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
-    await expect(etat).toHaveText('Où on en est : L’appli Baromatch existe sur iPhone et Android, d’abord à Paris, et arrive bientôt sur l’App Store et Google Play. Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
+    await expect(etat).toHaveText('Où on en est : L’appli existe sur iPhone et Android, bientôt sur les stores, à Paris. Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
     // Les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du gratuit des clients.
     const bouton = ouverture.locator('.ouverture-bars__etat + .actions .capsule[href="#proposer"]');
     await expect(prix).toHaveText(CONDITIONS_COURTES);

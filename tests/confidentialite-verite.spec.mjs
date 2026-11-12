@@ -147,7 +147,7 @@ test('la page Confidentialité : sur iPhone, les notifications de notre serveur 
   const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
   expect(durees).toContain('Les notifications de notre serveur chez Apple, pour un iPhone : le temps qu’elles arrivent, 12 heures au plus.');
   const choix = normaliser(await page.locator('#notifications + ul > li', { hasText: 'Tes choix, dans Réglages' }).innerText());
-  expect(choix).toContain('Sur Android, ces trois-là n’arrivent pas encore : les notifications de notre serveur n’y sont pas encore allumées.');
+  expect(choix).toContain('Sur Android, ces quatre-là n’arrivent pas encore : les notifications de notre serveur n’y sont pas encore allumées.');
   expect(choix).not.toContain('pour l’instant');
   // Apple n’est nommé que là : la ligne des notifications du serveur, ce qu’Apple reçoit, ses prestataires, sa durée.
   const ailleurs = await page.locator('main').evaluate((main) => {
@@ -282,7 +282,7 @@ test('la page « Supprimer ton compte » : contact@, ce qui part tout de suite, 
   expect(texte).toContain('Ces données sont pseudonymisées');
   expect(texte).not.toMatch(/Personne ne peut plus les relier à toi|au bout de 6 mois|sans ton historique/);
   expect(texte).toContain('sans adresse IP ni appareil, avec une empreinte de ton adresse mail');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 12 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
 });
 
 // « Bloquer » est dans l’appli depuis le 1er novembre 2026 : la page Confidentialité dit ce qu’on garde d’un blocage,
@@ -363,7 +363,7 @@ test('les conditions d’utilisation : « Tolérance zéro », à l’ancre que 
   expect(respect).toContain('Tu la débloques quand tu veux, dans Réglages, « Personnes bloquées ».');
   await expect(page.locator('#respect + ul a[href="/confidentialite.html#moderation"]')).toHaveCount(1);
   await expect(page.locator('#essentiel + ul > li', { hasText: /^Tolérance zéro/ })).toHaveCount(1);
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 12 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
   // La section suit « Au bar ».
   expect(await page.locator('#au-bar ~ h2').first().getAttribute('id')).toBe('respect');
 });

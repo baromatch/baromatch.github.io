@@ -1,10 +1,10 @@
-// Les surtitres (la petite ligne au-dessus d’un titre : « Dans la version de test de l’appli », « Pour les bars »,
+// Les surtitres (la petite ligne au-dessus d’un titre : « Dans l’appli », « Pour les bars »,
 // « La boutique », le type d’une pièce de la boutique) et le cadre de chaque page (l’en-tête, le bandeau du bas, le pied
 // en feuille de match) se lisent dans leur casse, et s’affichent comme ils se lisent.
 //
 // Écrit en capitales, ou mis en capitales par le style, un mot peut être épelé ou lu comme un sigle par un lecteur
 // d’écran : Safari (VoiceOver) lit le texte que text-transform a transformé. L’arbre d’accessibilité de Chromium, lui,
-// garde la casse du HTML même sous text-transform (vérifié : « Dans la version de test de l’appli » y reste tel quel) :
+// garde la casse du HTML même sous text-transform (vérifié : « Dans l’appli » y reste tel quel) :
 // il ne peut donc pas prouver ce que Safari lit, ni pour text-transform, ni pour des petites capitales que Chromium
 // fabrique (Bricolage Grotesque n’en a pas). La correction sûre : la casse normale dans le HTML et à l’écran, sans
 // text-transform ni petites capitales, et une autre mise en forme pour l’étiquette (petite, grasse, espacée, discrète),
@@ -21,7 +21,7 @@ import { couperLAPI } from './outils/invitation.mjs';
 
 // Les surtitres des pages de cette navigation, tels qu’ils sont écrits (la boutique écrit ses pièces par son script).
 const SURTITRES = [
-  { chemin: '/', selecteur: '.surtitre', textes: ['Dans la version de test de l’appli', 'Testeurs Android'] },
+  { chemin: '/', selecteur: '.surtitre', textes: ['Dans l’appli'] },
   { chemin: '/pour-les-bars.html', selecteur: '.etiquette', textes: ['Pour les bars'] },
   { chemin: '/boutique.html', selecteur: '.boutique-sur', textes: ['La boutique'] },
   { chemin: '/boutique.html', selecteur: '#boutique-grille .boutique-produit__type', textes: ['T-shirt', 'Sweat à capuche', 'Casquette brodée', 'Écharpe tricotée', 'Tote bag', 'Lot de 6'] },

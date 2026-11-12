@@ -155,35 +155,19 @@ test('la page dit la même durée que Confidentialité, et y mène', async ({ pa
   await expect(page.locator('#tes-donnees + p a')).toHaveAttribute('href', '/confidentialite.html#testeurs-android');
 });
 
-test('l’accueil mène à la page, avec ce qu’il faut pour être testeur', async ({ page }) => {
+test('plus aucun lien vers la page : ni l’accueil, ni À propos, ni le plan du site, ni llms.txt', async ({ page }) => {
   await page.goto('/');
-  const bloc = page.locator('section.testeurs-accueil');
-  await expect(bloc.locator('h2')).toHaveText('Teste Baromatch avant son ouverture.');
-  expect(normaliser(await bloc.locator('.testeurs-accueil__texte').innerText())).toBe('Tu as 18 ans ou plus, un téléphone Android et un compte Google ? Inscris-toi au test fermé de l’appli sur Google Play : tu restes inscrit au moins 14 jours d’affilée, tu t’en sers, et tu nous dis ce que tu en penses. Rien n’est payé.');
-  await expect(bloc.getByRole('link', { name: 'Deviens testeur Android' })).toHaveAttribute('href', CHEMIN);
-  // À propos y mène aussi.
+  await expect(page.locator('section.testeurs-accueil')).toHaveCount(0);
+  await expect(page.locator('a[href="/testeurs-android.html"]')).toHaveCount(0);
   await page.goto('/a-propos.html');
-  await expect(page.locator('#aujourd-hui ~ p a[href="/testeurs-android.html"]')).toHaveText('Deviens testeur');
-});
-
-test('où en est l’appli : une phrase vraie sans mois, avant comme pendant le test, sur l’accueil, À propos et llms.txt', async ({ page }) => {
+  await expect(page.locator('a[href="/testeurs-android.html"]')).toHaveCount(0);
+  expect(normaliser(await page.locator('#aujourd-hui + p').innerText())).toBe('L’appli commence à Paris, avec ses premiers bars.');
   const datee = new RegExp(`\\b[Ee]n (?:${MOIS}) \\d{4}, l’appli`);
   for (const fichier of ['index.html', 'a-propos.html', 'llms.txt']) {
     const texte = lire(fichier);
     expect(texte, fichier).not.toMatch(datee);
-    expect(texte, fichier).toContain('Pour l’instant, l’appli est en test sur Android');
-    // Vrai aussi pendant le test fermé : ses testeurs (et les équipes des bars) s’en servent, le public pas encore.
-    expect(texte, fichier).not.toContain('on ne peut pas encore y garder de place');
-    expect(texte, fichier).not.toMatch(/: on ne peut pas encore y réserver de place/);
-    expect(texte, fichier).not.toContain('seuls ses testeurs');
+    expect(texte, fichier).not.toMatch(/en test sur Android|pas encore ouverte?|testeurs? Android|pas d’appli iPhone/i);
   }
-  await page.goto('/');
-  expect(normaliser(await page.locator('.faits dt:has-text("Quand") + dd').innerText())).toBe('Pour l’instant, l’appli est en test sur Android. Elle n’est pas encore ouverte au public, ni en téléchargement public sur Google Play, et il n’y a pas encore de version iPhone.');
-  await page.goto('/a-propos.html');
-  expect(normaliser(await page.locator('#aujourd-hui + p').innerText())).toBe('Pour l’instant, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, ni sur iPhone.');
-});
-
-test('le plan du site et llms.txt donnent la page', () => {
-  expect(lire('sitemap.xml')).toContain('<url><loc>https://baromatch.fr/testeurs-android.html</loc><lastmod>2026-10-22</lastmod></url>');
-  expect(lire('llms.txt')).toMatch(/^- \[Deviens testeur Android\]\(https:\/\/baromatch\.fr\/testeurs-android\.html\): .*Rien n’est payé\.$/m);
+  expect(lire('sitemap.xml')).not.toContain('testeurs-android.html');
+  expect(lire('llms.txt')).not.toContain('testeurs-android.html');
 });

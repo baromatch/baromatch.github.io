@@ -20,25 +20,26 @@ const portLibre = () => new Promise((resoudre) => {
 });
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
-const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
+const PLATEFORMES = 'Baromatch commence à Paris.';
 
-test('le premier écran dit « pas encore ouvert », « gratuite pour les fans », et Android ou iPhone', async ({ page }) => {
+test('le premier écran dit « d’abord à Paris », « gratuite pour les fans », sans « pas encore ouvert »', async ({ page }) => {
   await page.goto('/');
   const ouverture = page.locator('section.ouverture');
   await expect(ouverture.locator('h1')).toHaveText('Ton match. Ton bar. Ce soir.');
   const statut = ouverture.locator('.ouverture__statut');
-  await expect(statut).toHaveText('Pas encore ouvert · Bientôt à Paris');
+  await expect(statut).toHaveText('D’abord à Paris');
   // Le statut est dit avant la promesse, au même niveau qu’elle : juste au-dessus du titre.
   expect(await statut.evaluate((e) => e.nextElementSibling?.tagName)).toBe('H1');
   const texte = normaliser(await ouverture.locator('.ouverture__texte').innerText());
-  expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Elle n’est pas encore ouverte : rien à réserver ce soir.');
+  expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. D’abord à Paris.');
   expect(normaliser(await ouverture.innerText())).toContain(PLATEFORMES);
-  // Aucune promesse d’appli iPhone ni de date de lancement (rien n’est annoncé), texte du film compris (son image de fin
-  // dit « Bientôt sur Android, à Paris »).
+  // Aucune promesse d’appli iPhone ni de date de lancement (rien n’est annoncé), texte du film compris (sa dernière carte,
+  // « Bientôt sur Android, à Paris », n’est plus citée : le film est à refaire).
   await page.locator('#film-texte summary').click();
   const page_ = normaliser(await page.evaluate(() => document.body.innerText));
   expect(page_).not.toMatch(/bientôt sur (Android et )?iPhone|iPhone bientôt|disponible sur iPhone/i);
   expect(page_).not.toContain('!');
+  expect(page_).not.toMatch(/pas encore ouvert|testeurs? Android|pas d’appli iPhone/i);
 });
 
 test('le statut se lit comme une étiquette, pas comme un bouton : ni bord ni fond ambre (l’ambre est pour les actions)', async ({ page }) => {
@@ -112,13 +113,11 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await page.goto('/');
   const rappels = page.locator('main .rappel-attente a.capsule');
   await expect(rappels).toHaveCount(2);
-  await expect(rappels).toHaveText(['L’appli ouvre bientôt : préviens-moi', 'L’appli ouvre bientôt : préviens-moi']);
+  await expect(rappels).toHaveText(['Préviens-moi quand Baromatch arrive', 'Préviens-moi quand Baromatch arrive']);
   for (const lien of await rappels.all()) await expect(lien).toHaveAttribute('href', '#attente');
   expect(await page.$$eval('main .rappel-attente', (p) => p.map((e) => e.closest('section').className.split(' ')[0])))
     .toEqual(['soiree', 'questions-fans']);
-  const testeurs = page.locator('main a[href="/testeurs-android.html"]');
-  await expect(testeurs).toHaveCount(1);
-  expect(await testeurs.evaluate((a) => getComputedStyle(a).backgroundColor)).not.toBe('rgb(255, 177, 61)');
+  await expect(page.locator('a[href="/testeurs-android.html"]')).toHaveCount(0);
   await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
   expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
   await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(0);
@@ -396,7 +395,6 @@ const LIGNES_DU_FILM = [
   'Ta soirée se colle dans ton album.',
   'Ton match. Ton bar. Ce soir.',
   'baromatch.fr',
-  'Bientôt sur Android, à Paris',
 ];
 
 test('le texte du film est juste sous lui, replié, avec chaque phrase du film dans l’ordre', async ({ page }) => {
@@ -505,7 +503,7 @@ test('la soirée en huit moments, dans l’ordre, chacun avec son écran de dém
   await page.goto('/');
   await expect(page.locator('#titre-soiree')).toHaveText('Un soir de match, minute par minute.');
   // Ce que montrent ces moments est publié dans la version de test de l’appli (le propriétaire, 28 octobre).
-  await expect(page.locator('.soiree .surtitre')).toHaveText('Dans la version de test de l’appli');
+  await expect(page.locator('.soiree .surtitre')).toHaveText('Dans l’appli');
   expect(normaliser(await page.locator('.soiree__chapo').innerText())).toBe('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.');
   const lus = await page.locator('.instant').evaluateAll((instants) => instants.map((m) => ({
     heure: m.querySelector('.instant__heure time').textContent,

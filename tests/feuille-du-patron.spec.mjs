@@ -48,7 +48,7 @@ const LIGNES = [
   'Gratuit pour tes clients. Pour ton bar, gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.',
   'Sur baromatch.fr, ton bar n’apparaît qu’avec ton accord écrit.',
 ];
-const OU_EN_EST = 'Baromatch cherche ses premiers bars à Paris. L’appli est en test sur Android ; les fans ne réservent pas encore.';
+const OU_EN_EST = 'Baromatch cherche ses premiers bars à Paris.';
 
 const dossiers = [];
 const dossierVide = () => {
@@ -196,7 +196,7 @@ test('le texte de la feuille : le titre, les quatre lignes, où on en est et le 
     [LIGNES[2], 'pour-les-bars.html', ['Gratuit pour tes clients', 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.']],
     [LIGNES[3], 'comment-on-choisit-les-bars.html', ['Il n’apparaît sur ce site qu’avec son accord écrit.']],
     [LIGNES[3], 'pour-les-bars.html', ['Sur ce site, ton bar n’apparaît qu’avec ton accord écrit']],
-    [OU_EN_EST, 'pour-les-bars.html', ['Baromatch cherche ses premiers bars à Paris.', 'en test sur Android', 'les fans ne réservent pas encore']],
+    [OU_EN_EST, 'pour-les-bars.html', ['Baromatch cherche ses premiers bars à Paris.']],
   ];
   for (const [phrase, page, dejaDit] of SOURCES) for (const morceau of dejaDit) expect(publie[page], `${phrase} ← ${page}`).toContain(morceau.toLowerCase());
 });
@@ -214,7 +214,7 @@ test('les conditions des premiers bars sur la feuille ; aucune page générée n
 });
 
 test('« Où on en est » suit marque.json : l’appli ouverte, la feuille n’est plus écrite tant que sa phrase n’est pas relue', async () => {
-  // La feuille dit « les fans ne réservent pas encore » : vrai tant que l’appli n’est pas ouverte. Le jour où elle ouvre
+  // La ligne « Où on en est » de la feuille est écrite pour l’appli d’avant son ouverture au public. Le jour où elle ouvre
   // (marque.json), ce test échoue tant que la phrase de l’appli ouverte n’est pas écrite et relue.
   expect(MARQUE.appli.ouverte, 'l’appli est ouverte : écrire la ligne « Où on en est » de l’appli ouverte (generateur/contenu/feuille-du-patron.json, « ouverte »), puis ce test').toBe(false);
   expect(TEXTES_DE_LA_FEUILLE_DU_PATRON.feuille.ouEnEst.ouverte).toBe('');

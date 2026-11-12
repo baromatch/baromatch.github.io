@@ -347,13 +347,11 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await page.goto(PAGE);
     const ouverture = page.locator('.ouverture-bars');
     // Le prix d’abord, juste sous la phrase d’ouverture (gratuit, sans engagement : l’argument d’un premier contact, lu
-    // dans le premier écran d’un iPhone), puis la ligne d’état : tant que l’appli n’est pas ouverte (marque.json), elle
-    // dit que les fans ne réservent pas encore, avant la plateforme. Le jour où l’appli ouvre, ce test échoue tant que la
-    // ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
+    // dans le premier écran d’un iPhone), puis la ligne d’état : une phrase vraie aujourd’hui (Paris, les premiers bars),
+    // sans « pas encore », sans plateforme ni magasin d’applis.
     const prix = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix');
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix + .ouverture-bars__etat');
-    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
-    await expect(etat).toHaveText('Où on en est : Baromatch est en test sur Android, à Paris (pas encore sur iPhone). Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
+    await expect(etat).toHaveText('Où on en est : Baromatch commence à Paris, avec ses premiers bars.');
     // Les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du gratuit des clients.
     const bouton = ouverture.locator('.ouverture-bars__etat + .actions .capsule[href="#proposer"]');
     await expect(prix).toHaveText(CONDITIONS_COURTES);
@@ -477,7 +475,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const reponse = (debut) => lues.find((q) => q.question.startsWith(debut)).reponse;
     expect(reponse('Combien')).toBe(COMBIEN);
     expect(reponse('Je m’engage')).toBe(ENGAGEMENT);
-    expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite, en test sur Android pour l’instant\. Pour entrer, non : /);
+    expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite\. Pour entrer, non : /);
     // Le délai de réponse d’abord (sous 48 h), puis l’ordre des choses, sans autre durée promise : ni mise en place, ni
     // ouverture.
     expect(reponse('Comment je démarre')).toMatch(/^On te répond sous 48 h\. Dans l’ordre : tu envoies ta demande/);

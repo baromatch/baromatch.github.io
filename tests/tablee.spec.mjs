@@ -81,12 +81,12 @@ test('invitation ouverte : la carte, puis « tu peux venir sans l’appli », pu
   // Juste sous la carte, avant ce qui parle de l’appli.
   expect(await page.evaluate(() => document.getElementById('tablee-carte').nextElementSibling.id)).toBe('tablee-venir');
 
-  // Comment avoir l’appli : le test fermé sur Android, sinon la liste d’attente. « Ouvrir dans l’appli » est pour Android.
+  // Comment avoir l’appli : une phrase vraie aujourd’hui, puis la liste d’attente. « Ouvrir dans l’appli » est pour Android.
   const appli = page.locator('#tablee-appli');
-  await expect(appli).toContainText('Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.');
-  await expect(appli).toContainText('Tu as un téléphone Android ? Deviens testeur pour installer l’appli avant tout le monde. Sinon, laisse ton adresse : on te prévient au lancement.');
-  await expect(appli.getByRole('link', { name: 'Deviens testeur' })).toHaveAttribute('href', '/testeurs-android.html');
-  await expect(appli.getByRole('link', { name: 'Me prévenir au lancement' })).toHaveAttribute('href', '/#attente');
+  await expect(appli).toContainText('Baromatch commence à Paris.');
+  await expect(appli).toContainText('Laisse ton adresse : on te prévient quand Baromatch arrive dans ta ville.');
+  await expect(appli).not.toContainText(/testeur|en test sur Android|pas d’appli iPhone/i);
+  await expect(appli.getByRole('link', { name: 'Me prévenir' })).toHaveAttribute('href', '/#attente');
   await expect(page.locator('#tablee-ouvrir')).toBeHidden();
   await expect(page.locator('#tablee-reessayer')).toBeHidden();
   expect((await visibles(page)).join(' ')).not.toMatch(/Ouvre ce lien|avec Baromatch\./);

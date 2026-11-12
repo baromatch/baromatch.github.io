@@ -77,9 +77,9 @@ test('à propos : ce qu’est Baromatch avec les mots de marque.json, où il en 
   // Le titre dit la phrase, seule ; « À propos de Baromatch » est une ligne à part, au-dessus.
   await expect(page.locator('h1')).toHaveText('Savoir où voir le match avant de sortir, et s’il reste une place.');
   await expect(page.locator('.apropos__ouverture > p.surtitre')).toHaveText('À propos de Baromatch');
-  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle n’est pas encore ouverte au public, ni sur iPhone');
-  // « ni sur iPhone » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
-  if (texte.includes('ni sur iPhone')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « ni sur iPhone » (À propos, Presse), l’accueil et llms.txt').toBe('');
+  expect(texte).toContain('L’appli commence à Paris, avec ses premiers bars.');
+  // Rien qui dise que l’appli n’est pas ouverte, ni sur quel téléphone elle manque.
+  expect(texte).not.toMatch(/pas encore ouverte|en test sur Android|testeurs? Android|ni sur iPhone|pas d’appli iPhone/i);
   // L’éditeur, comme les mentions légales le nomment ; ailleurs, le fondateur ne signe que de son prénom (son mot).
   await page.goto('/mentions-legales.html');
   const editeur = normaliser(await page.locator('h2:has-text("Directeur de la publication") + p').textContent());
@@ -160,8 +160,8 @@ test('à propos : des phrases qui se lisent seules, et l’arrivée d’un bar s
   const paris = normaliser(await page.locator('#paris ~ .apropos__corps .apropos__lead').textContent());
   expect(paris).toContain('Chaque bar arrive après un échange avec nous : pas de compte à créer en ligne.');
   expect(paris).not.toMatch(/téléphone/);
-  // « Deviens testeur » : une seule fois, dans « Aujourd’hui ».
-  await expect(page.locator('main a[href="/testeurs-android.html"]')).toHaveCount(1);
+  // Plus de lien vers la page des testeurs Android.
+  await expect(page.locator('main a[href="/testeurs-android.html"]')).toHaveCount(0);
 });
 
 // Une entrée pour chaque visiteur, dès l’ouverture, qui dit où elle mène ; et en bas, une carte pour chacun, avec ce qui
@@ -195,8 +195,8 @@ test('à propos : une entrée pour le bar, le fan et la presse, en haut comme en
 });
 
 // Ce que fait l’appli : trois écrans de l’accueil, chacun marqué « Écran de démonstration », et sous chacun, ce qui se
-// passe côté bar, avec les mots de « Pour les bars ». La bande dit aussi que les fans ne réservent pas encore.
-test('à propos : trois écrans de démonstration, ce qui se passe côté bar, et les fans qui ne réservent pas encore', async ({ page }) => {
+// passe côté bar, avec les mots de « Pour les bars ». La bande ne dit pas que l’appli n’est pas ouverte.
+test('à propos : trois écrans de démonstration, ce qui se passe côté bar, sans « pas encore »', async ({ page }) => {
   await page.goto(A_PROPOS);
   const ecrans = await page.locator('.apropos__ecran').evaluateAll((li) => li.map((e) => [
     e.querySelector('img').getAttribute('src'), e.querySelector('.exemple').textContent.trim(), e.querySelector('.apropos__cote-bar').textContent.replace(/[\s\u00a0]+/g, ' ').trim(),
@@ -206,11 +206,11 @@ test('à propos : trois écrans de démonstration, ce qui se passe côté bar, e
     ['/img/appli/ta-soiree-300.webp', 'Écran de démonstration', 'Côté bar : à la porte, l’équipe voit ton pseudo et le nombre de personnes.'],
     ['/img/appli/tu-y-es-300.webp', 'Écran de démonstration', 'Côté bar : après le match, l’Historique compte les réservations, les arrivées et les absents.'],
   ]);
-  expect(normaliser(await page.locator('.apropos__note').textContent())).toBe('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés. Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
+  expect(normaliser(await page.locator('.apropos__note').textContent())).toBe('Sur ces écrans, les bars, les clubs, les pseudos et les chiffres sont inventés.');
   const bars = normaliser(readFileSync(path.join(racine, 'pour-les-bars.html'), 'utf8').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' '));
   expect(bars).toContain('À la porte : le pseudo et le nombre de personnes.');
   expect(bars).toContain('l’Historique fait les comptes : réservations, arrivées, absents');
-  expect(bars).toContain('Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
+  expect(bars).not.toMatch(/ne réservent pas encore|en test sur Android|pas encore sur iPhone/);
 });
 
 test('comment on choisit les bars : un h1, et chaque intertitre pose la question à laquelle il répond', async ({ page }) => {
@@ -308,7 +308,7 @@ test.describe('accueil : la FAQ des fans', () => {
     expect(faq.isPartOf['@id']).toBe(`${ORIGINE}/#site`);
     expect(faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text].map(normaliser))).toEqual(visibles);
     expect(visibles.map(([question]) => question)).toEqual([
-      'Je peux déjà garder une place ?',
+      'Comment je garde une place ?',
       'C’est gratuit ?',
       'Il faut un compte ?',
       'Je peux venir avec des potes ?',
@@ -323,11 +323,10 @@ test.describe('accueil : la FAQ des fans', () => {
   test('les réponses disent les règles de l’appli : gratuit, code de 6 chiffres, 1 à 8, 30 minutes au plus, Paris', async ({ page }) => {
     const { visibles } = await lireLaFaq(page);
     const reponse = (debut) => visibles.find(([question]) => question.startsWith(debut))[1];
-    if (!MARQUE.appli.ouverte) {
-      expect(reponse('Je peux déjà')).toMatch(/^Pas encore\. Baromatch est en test sur Android, à Paris/);
-      // Le lien dans la réponse (le rappel « préviens-moi », sous les questions, est vérifié par accueil.spec.mjs).
-      await expect(page.locator('.questions-fans details a[href="#attente"]')).toHaveText('Laisse ton adresse');
-    }
+    expect(reponse('Comment je garde')).toMatch(/^Dans l’appli Baromatch : choisis ton match, puis un bar qui le diffuse, et garde ta place gratuitement\. Baromatch commence à Paris\./);
+    expect(reponse('Comment je garde')).not.toMatch(/Pas encore|en test sur Android|iPhone/);
+    // Le lien dans la réponse (le rappel « préviens-moi », sous les questions, est vérifié par accueil.spec.mjs).
+    await expect(page.locator('.questions-fans details a[href="#attente"]')).toHaveText('laisse ton adresse');
     expect(reponse('C’est gratuit')).toMatch(/^Oui\..*Ce que tu prends au bar, tu le paies au bar\.$/);
     expect(reponse('Il faut un compte')).toContain('code de 6 chiffres, valable 10 minutes');
     expect(reponse('Il faut un compte')).toContain('18 ans ou plus');

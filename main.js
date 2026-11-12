@@ -31,11 +31,11 @@
     incomplete: "Il manque la fin de ton adresse, par exemple .fr ou .com.",
     refusee: "Cette adresse ne semble pas valide. Vérifie-la : elle doit ressembler à prenom@exemple.fr. Si elle est juste, écris à " + CONTACT + ".",
     panne: "L’inscription n’est pas passée. Réessaie dans un instant, ou écris à " + CONTACT + ".",
-    messagerie: "Ta messagerie s’ouvre : envoie le mail et on te préviendra au lancement.",
+    messagerie: "Ta messagerie s’ouvre : envoie le mail et on te préviendra.",
     envoi: "Envoi…",
     note: "C’est noté",
     inscrite: function (courriel, ville) {
-      var quand = ville === "Paris" || !ville ? "au lancement et pour les premiers tests"
+      var quand = ville === "Paris" || !ville ? "pour te parler de Baromatch à Paris"
         : ville === "Autre" ? "si Baromatch ouvre dans une nouvelle ville" : "si Baromatch arrive à " + ville;
       return "C’est noté : on t’écrit à " + courriel + " " + quand + ".";
     }
@@ -138,7 +138,7 @@
   }
 
   function ouvrirLaMessagerie(courriel, ville) {
-    var sujet = encodeURIComponent("Préviens-moi au lancement");
+    var sujet = encodeURIComponent("Préviens-moi quand Baromatch arrive");
     var corps = encodeURIComponent("Mon adresse : " + courriel + (ville ? "\nMa ville : " + ville : ""));
     window.location.href = "mailto:" + CONTACT + "?subject=" + sujet + "&body=" + corps;
     afficher(TEXTES.messagerie, "ok");

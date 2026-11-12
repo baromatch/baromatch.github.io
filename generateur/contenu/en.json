@@ -28,7 +28,7 @@
     "championsLeague": "Champions League"
   },
   "appli": {
-    "fermee": "Good to know: the Baromatch app is still in testing, on Android only, in Paris. It works in English as well as French, and you don’t need it to use these pages.",
+    "fermee": "Good to know: Baromatch starts in Paris. The app works in English as well as French, and you don’t need it to use these pages.",
     "ouverte": "Good to know: the Baromatch app works in English as well as French, on {plateformes}."
   },
   "appel": {
@@ -36,11 +36,11 @@
     "ouverteNote": "Holding your spot is free. Do it before you head out."
   },
   "attente": {
-    "titre": "Get an email when the app opens in Paris",
+    "titre": "Get an email about Baromatch in Paris",
     "etiquette": "Your email",
     "exemple": "you@example.com",
     "bouton": "Notify me",
-    "note": "We only write when Baromatch opens in Paris, and about early tests.",
+    "note": "We only write about Baromatch in Paris.",
     "lienNote": "What we keep, and for how long (in French)",
     "viePriveeContact": "contact@baromatch.fr",
     "viePrivee": [
@@ -56,7 +56,7 @@
   "commentCaMarche": {
     "titre": "How Baromatch works",
     "fermee": {
-      "intro": "When the app opens, you’ll be able to:",
+      "intro": "With the app, you’ll be able to:",
       "etapes": [
         { "titre": "Pick your match", "texte": "Tonight or later in the week, with the kick-off time." },
         { "titre": "Find your bar", "texte": "The ones showing it near you." },

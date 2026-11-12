@@ -11,7 +11,7 @@
   "actionSuite": " quand Baromatch arrive",
   "pied": {
     "etat": {
-      "fermee": "Pas encore ouvert · Bientôt à Paris",
+      "fermee": "",
       "ouverte": ""
     },
     "attente": "Préviens-moi quand Baromatch arrive",

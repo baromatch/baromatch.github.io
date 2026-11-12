@@ -27,12 +27,12 @@
   // Dès cette heure (de Paris), un match du jour se dit « Ce soir » plutôt que « Aujourd’hui ».
   var HEURE_DU_SOIR = 18;
   var CARTE = "https://www.google.com/maps/search/?api=1&query=";
-  // L’appli n’existe que sur Android : ailleurs, « Ouvrir dans l’appli » ne mènerait nulle part. Le lien est un
+  // Ce lien n’est montré que sur Android : ailleurs, « Ouvrir dans l’appli » ne mènerait nulle part. Le lien est un
   // « intent » de Chrome : il ouvre baromatch://t/‹code› dans l’appli (son propre schéma, qui ouvre l’invitation même
   // sans assetlinks.json) ; sans l’appli, le navigateur va à SANS_L_APPLI au lieu de ne rien faire.
   var ANDROID = /Android/i.test(navigator.userAgent || "");
   var PAQUET = "fr.baromatch.app";
-  var SANS_L_APPLI = "https://baromatch.fr/testeurs-android.html";
+  var SANS_L_APPLI = "https://baromatch.fr/";
 
   var titre = document.getElementById("tablee-titre");
   var etat = document.getElementById("tablee-etat");
@@ -45,7 +45,7 @@
   var ouvrir = document.getElementById("tablee-ouvrir");
   var ouvrirLien = document.getElementById("tablee-ouvrir-lien");
 
-  // Ce que chaque état montre. Un lien mort : le titre, la phrase d’état et « Me prévenir au lancement ». Une panne :
+  // Ce que chaque état montre. Un lien mort : le titre, la phrase d’état et « Me prévenir ». Une panne :
   // les mêmes, plus la définition d’une tablée et « Réessayer ». Ni l’un ni l’autre ne dit rien sur l’appli ni sur la
   // façon de venir. En attente, le bloc de l’appli (visible dans le HTML, pour qui n’a pas ce script) sort de la page :
   // rien n’est dessous dans le premier écran (styles.css garde le pied de page plus bas), il ne pousse donc rien en

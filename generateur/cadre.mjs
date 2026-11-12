@@ -133,7 +133,6 @@ ${colonne(t.baromatch, liste([
     ...(avecPresse ? [['/presse.html', t.presse]] : []),
     ['/comment-on-choisit-les-bars.html', t.choisir],
     ['/trouver-un-bar-qui-diffuse-le-match.html', t.guide],
-    ['/testeurs-android.html', t.testeurs],
     ['/boutique.html', t.boutique],
   ]))}
 </nav>

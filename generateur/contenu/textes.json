@@ -2,9 +2,9 @@
   "_lisezMoi": "Les textes fixes des pages « Où regarder le match ». Garde les clés et les mots entre accolades ({ville}, {heure}…) : le générateur y met les vraies données. Tutoiement, phrases courtes, aucun point d’exclamation. Tant que l’appli n’est pas ouverte, tout ce qui parle de garder sa place se dit au futur (les clés « fermee ») ; au présent quand elle l’est (les clés « ouverte »). Une espace insécable avant « ? », « : » et « ; ».",
   "appel": {
     "fermee": {
-      "texte": "L’appli ouvre bientôt : préviens-moi",
+      "texte": "Préviens-moi quand Baromatch arrive",
       "adresse": "/#attente",
-      "note": "Baromatch est en test sur Android, à Paris. Laisse ton adresse : on te prévient le jour où l’appli ouvre."
+      "note": "Baromatch commence à Paris. Laisse ton adresse : on te prévient quand Baromatch arrive dans ta ville."
     },
     "ouverte": {
       "texte": "Réserve ta place dans l’appli",
@@ -14,14 +14,14 @@
   },
   "attente": {
     "titreArrive": "Préviens-moi quand Baromatch arrive à {ville}",
-    "titreOuvre": "Préviens-moi quand l’appli ouvre à {ville}",
+    "titreOuvre": "Préviens-moi pour Baromatch à {ville}",
     "etiquette": "Ton adresse mail",
     "bouton": "Me prévenir",
     "villes": "Ta ville",
     "pasDeDate": "Pas de date pour {ville}. On t’écrit seulement si Baromatch y arrive.",
     "pasDeDateAutre": "Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.",
-    "plateformes": "Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.",
-    "note": "On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests.",
+    "plateformes": "Baromatch commence à Paris.",
+    "note": "On t’écrit seulement à propos de Baromatch dans ta ville.",
     "lienNote": "Ce qu’on garde, et combien de temps",
     "sujet": "Nouvelle inscription à la liste d’attente Baromatch"
   },
@@ -34,7 +34,7 @@
   "commentCaMarche": {
     "titre": "Comment ça marche",
     "fermee": {
-      "intro": "Quand l’appli ouvre, tu pourras :",
+      "intro": "Avec l’appli, tu pourras :",
       "etapes": [
         {
           "titre": "Choisir ton match",
@@ -192,7 +192,7 @@
     "estIciOui": "Oui. {bars} de {ville} diffuse le match sur Baromatch.",
     "estIciOuiPluriel": "Oui. {bars} de {ville} diffusent le match sur Baromatch.",
     "estIciNon": "Pas encore de bar à {ville} sur Baromatch.",
-    "appliFermee": "L’appli, elle, est en test sur Android, à Paris, et n’est pas encore ouverte : laisse ton adresse dans le formulaire de cette page, on te prévient le jour où elle ouvre.",
+    "appliFermee": "Baromatch commence à Paris : laisse ton adresse dans le formulaire de cette page, on te prévient quand Baromatch arrive dans ta ville.",
     "appliOuverte": "L’appli est ouverte : tu y trouves les bars et tu gardes ta place."
   },
   "bar": {

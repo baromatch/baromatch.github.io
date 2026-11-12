@@ -13,7 +13,7 @@ import { arreterLHorloge } from './outils/horloge.mjs';
 // toHaveText ramène chaque blanc, espace insécable compris, à une espace simple.
 const PANNE = 'L’inscription n’est pas passée. Réessaie dans un instant, ou écris à contact@baromatch.fr.';
 const REFUSEE = 'Cette adresse ne semble pas valide. Vérifie-la : elle doit ressembler à prenom@exemple.fr. Si elle est juste, écris à contact@baromatch.fr.';
-const INSCRITE = (adresse) => `C’est noté : on t’écrit à ${adresse} au lancement et pour les premiers tests.`;
+const INSCRITE = (adresse) => `C’est noté : on t’écrit à ${adresse} pour te parler de Baromatch à Paris.`;
 
 const retour = (page) => page.locator('#attente-retour');
 const champ = (page) => page.locator('#attente-mail');

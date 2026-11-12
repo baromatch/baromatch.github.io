@@ -171,7 +171,7 @@ export const appel = (marque, textes, { note = true, sansBar = false } = {}) => 
 </div>`;
 };
 
-// Tant que l’appli n’est pas ouverte, au futur (« Quand l’appli ouvre, tu pourras… ») : rien n’est promis aujourd’hui.
+// Tant que l’appli n’est pas ouverte, au futur (« Avec l’appli, tu pourras… ») : rien n’est promis aujourd’hui.
 export const commentCaMarche = (textes, marque) => {
   const { intro, etapes } = textes.commentCaMarche[marque.appli?.ouverte ? 'ouverte' : 'fermee'];
   return `<section class="regarder-section" aria-labelledby="titre-comment">

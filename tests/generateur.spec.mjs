@@ -574,7 +574,7 @@ test.describe('les pages', () => {
       expect(p.titre).toMatch(/^Où regarder le match à (Marseille|Lille) — Baromatch$/);
       expect(robotsDe(p)).toBe('noindex');
       expect(p.contenu).toMatch(/Aucun bar de (Marseille|Lille) n’est encore sur Baromatch\./);
-      expect(deType(p, 'FAQPage')[0].mainEntity[0].acceptedAnswer.text).toMatch(/^Pas encore de bar à (Marseille|Lille) sur Baromatch\. L’appli, elle, est en test/);
+      expect(deType(p, 'FAQPage')[0].mainEntity[0].acceptedAnswer.text).toMatch(/^Pas encore de bar à (Marseille|Lille) sur Baromatch\. Baromatch commence à Paris/);
       expect(deType(p, 'ItemList')).toEqual([]);
     }
   });
@@ -667,10 +667,10 @@ test.describe('les pages', () => {
     for (const p of site.pages) {
       expect(p.contenu, p.chemin).not.toMatch(/\bscores?\b|\b3 – 1\b|places? restantes?|Réserve ta place/i);
       expect(p.contenu, p.chemin).not.toContain('Les places qui restent sont dans l’appli.');
-      // Ni place gardée, ni places, ni réservation dans ce que lit le visiteur : « Quand l’appli ouvre, tu pourras… ».
+      // Ni place gardée, ni places, ni réservation dans ce que lit le visiteur : « Avec l’appli, tu pourras… ».
       expect(texteVisible(p.contenu), p.chemin).not.toMatch(/garde ta place|places|réserv/i);
     }
-    expect(pageDe('/matchs/').contenu).toContain(insecables('<p>Quand l’appli ouvre, tu pourras :</p>'));
+    expect(pageDe('/matchs/').contenu).toContain(insecables('<p>Avec l’appli, tu pourras :</p>'));
   });
 
   test('l’appli ouverte : « Réserve ta place dans l’appli » vers le magasin, et la place gratuite dans chaque Event', async () => {

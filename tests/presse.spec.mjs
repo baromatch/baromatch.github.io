@@ -23,19 +23,17 @@ test('Baromatch en bref : le slogan, la phrase et la description de marque.json,
   await page.goto(PAGE);
   const texte = normaliser(await page.locator('main').textContent());
   for (const cle of ['slogan', 'uneLigne', 'description']) expect(texte, cle).toContain(normaliser(MARQUE[cle]));
-  // Vrai aujourd’hui : en test, Android, Paris, pas encore ouvert ; l’appli ne coûte rien au fan (la boutique, elle,
-  // vend des pièces : jamais « tu ne paies rien à Baromatch »).
-  if (!MARQUE.appli.ouverte) expect(texte).toContain('L’appli n’est pas encore ouverte au public, ni sur iPhone.');
-  // « ni sur iPhone » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
-  if (texte.includes('ni sur iPhone')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « ni sur iPhone » (Presse, À propos), l’accueil et llms.txt').toBe('');
+  // Vrai aujourd’hui : Baromatch commence à Paris. Aucune phrase ne dit l’appli fermée, en test, ou absente d’un téléphone ;
+  // l’appli ne coûte rien au fan (la boutique, elle, vend des pièces : jamais « tu ne paies rien à Baromatch »).
+  expect(texte).not.toMatch(/pas encore ouverte|ni sur iPhone|en test sur Android/i);
   const fait = async (nom) => normaliser(await page.locator('.presse__faits > div').filter({ has: page.locator('dt', { hasText: nom }) }).locator('dd').textContent());
   expect(await fait('Pour les fans')).toBe('L’appli ne te coûte rien. Ce que tu prends au bar, tu le paies au bar.');
-  expect(await fait('Aujourd’hui')).toMatch(/^En test sur Android, à Paris\./);
+  expect(await fait('Aujourd’hui')).toBe('Baromatch commence à Paris, avec ses premiers bars.');
   // Qui publie : le nom, puis les mentions légales pour le reste.
   expect(await fait('Qui publie')).toBe('Skander Kamoun, fondateur. Détails dans les mentions légales.');
   expect(texte).not.toMatch(/Tu ne paies rien|Gratuit\. Ce qu’ils/);
   // Le chapô : la description de marque.json, puis ce qu’on trouve sur la page.
-  expect(normaliser(await page.locator('.presse__chapo').textContent())).toBe(`${normaliser(MARQUE.description)} Ici : le logo, les écrans, le film à regarder et un texte à copier.`);
+  expect(normaliser(await page.locator('.presse__chapo').textContent())).toBe(`${normaliser(MARQUE.description)} Sur cette page : le logo, les écrans, le film à regarder et un texte à copier.`);
 });
 
 // Une seule liste : ce que Baromatch n’est pas, et ce qu’il refuse (les écussons et les logos de compétition ou de

@@ -438,13 +438,13 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     });
   }
 
-  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console, pour le seul patron', async ({ page }) => {
+  test('l’appli de la porte, dite sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans l’appli, la page Scan de la Console, pour le seul patron', async ({ page }) => {
     await page.goto(PAGE);
     const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });
-    await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte. Il marche sur Android pour l’instant');
+    await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte.');
     // La page Scan de la Console n’est ouverte qu’au compte du patron (un compte de la porte n’y a pas accès), et sa
     // caméra ne marche pas partout : le code tapé est le chemin sûr. La page ne la promet pas à « ton équipe ».
-    await expect(carte).toContainText('Il marche sur Android pour l’instant. Sans Android, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron : tu tapes le code à 6 chiffres du fan.');
+    await expect(carte).toContainText('c’est le Mode bar, l’écran de la porte. Sans l’appli, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron : tu tapes le code à 6 chiffres du fan.');
     const tout = normaliser(await page.locator('main').textContent());
     for (const phrase of tout.split(/(?<=[.;?])\s/).filter((p) => p.includes('page Scan'))) expect(phrase, phrase).toContain('ton compte de patron');
     expect(tout).not.toContain('valide aussi un pass, depuis un navigateur');
@@ -452,9 +452,9 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const etape = page.locator('.marche__etape').nth(2);
     await expect(etape).toContainText('On t’explique comment installer l’appli de la porte.');
     const besoin = (await questions(page)).find((q) => q.question === 'De quoi j’ai besoin ?');
-    expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone Android : pour l’instant, elle n’existe que sur Android\./);
+    expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone\./);
     expect(besoin.reponse).toContain('On t’explique comment installer l’appli quand on te répond.');
-    expect(besoin.reponse).toContain('Sans Android, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron, en tapant le code du fan.');
+    expect(besoin.reponse).toContain('Sans l’appli, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron, en tapant le code du fan.');
     // Rien sur une version iPhone à venir, ni de date : rien n’est annoncé.
     expect(normaliser(await page.locator('main').textContent())).not.toMatch(/iPhone[^.]*(bientôt|prochainement|arrive|bientot)/i);
   });
@@ -657,7 +657,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(ordre.indexOf('contact')).toBe(ordre.length - 2);
     const lignes = page.locator('.egares__ligne');
     await expect(lignes).toHaveText([
-      'Tu cherches un bar pour regarder le match ? Baromatch est en test à Paris. Laisse ton e-mail pour être prévenu.',
+      'Tu cherches un bar pour regarder le match ? Baromatch commence à Paris. Laisse ton e-mail pour être prévenu.',
       'Ton bar préféré n’est pas sur Baromatch ? Montre cette page au patron.',
       'Partenaire, club, ville ou journaliste ? Écris-nous, ou va sur la page Presse.',
     ]);

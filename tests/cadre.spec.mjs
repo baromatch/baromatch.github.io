@@ -82,7 +82,7 @@ test.describe('une seule source pour l’en-tête et le pied', () => {
       juste.replace('aria-current="page">À propos</a>', 'aria-current="page">Le projet</a>'),
       juste.replace(/(<a class="entete__attente[^"]*" href="\/#attente")>/, '$1 style="color:red">'),
       juste.replace('<li><a href="/boutique.html">Boutique</a></li>\n', ''),
-      juste.replace('<p class="pied__etat">', '<p class="pied__etat">Ouvert · '),
+      juste.replace('<p class="pied__slogan">', '<p class="pied__etat">Ouvert</p>\n<p class="pied__slogan">'),
     ];
     for (const retouche of retouches) {
       expect(retouche).not.toBe(juste);
@@ -501,18 +501,21 @@ test('plus d’ancien cadre : aucune page publiée ne le porte, styles.css ne le
 // ---------- La ligne d’état du pied ----------
 
 test.describe('la ligne d’état du pied de page suit marque.json', () => {
-  test('sur chaque page écrite à la main : celle de l’état de l’appli, la même que la pilule de l’accueil', () => {
+  // La phrase de l’appli fermée est vide depuis le 12 novembre 2026 (plus de « Pas encore ouvert ») : aucune ligne d’état.
+  test('sur chaque page écrite à la main : celle de l’état de l’appli, et aucune tant que sa phrase est vide', () => {
     const etat = TEXTES.pied.etat[MARQUE.appli.ouverte ? 'ouverte' : 'fermee'];
-    expect(etat).toBeTruthy();
-    for (const p of PAGES_DU_CADRE) expect(lire(p.fichier).match(PIED)[0], p.fichier).toContain(`<p class="pied__etat">${etat}</p>`);
-    expect(lire('index.html')).toContain(`<p class="ouverture__statut">${etat}</p>`);
+    for (const p of PAGES_DU_CADRE) {
+      const lu = lire(p.fichier).match(PIED)[0];
+      if (etat) expect(lu, p.fichier).toContain(`<p class="pied__etat">${etat}</p>`);
+      else expect(lu, p.fichier).not.toContain('pied__etat');
+    }
   });
 
   test('l’appli ouverte : la phrase de l’appli ouverte, et aucune ligne tant qu’elle n’est pas écrite', async () => {
     const cadre = lireLeCadre();
     const ouverte = { ...MARQUE, appli: { ouverte: true, android: 'https://magasin.exemple/baromatch-android', iphone: '' } };
     expect(pied(cadre, { marque: ouverte })).not.toContain('pied__etat');
-    expect(pied(cadre, { marque: MARQUE })).toContain(`<p class="pied__etat">${TEXTES.pied.etat.fermee}</p>`);
+    expect(pied(cadre, { marque: MARQUE })).not.toContain('pied__etat');
     const avecPhrase = { ...cadre, textes: { ...cadre.textes, pied: { ...cadre.textes.pied, etat: { ...cadre.textes.pied.etat, ouverte: 'Ouvert à Paris' } } } };
     expect(pied(avecPhrase, { marque: ouverte })).toContain('<p class="pied__etat">Ouvert à Paris</p>');
     // Les pages du générateur, construites avec l’appli ouverte : plus la ligne « Pas encore ouvert ».

@@ -3,7 +3,7 @@
 // (« Ouvrir dans l’appli » sur Android seulement, pour qui l’a déjà). Aucune donnée personnelle : ni le pseudo de l’hôte,
 // ni ceux de la tablée, même quand le serveur les envoie.
 // Plus de « Ouvre ce lien sur ton téléphone avec Baromatch » (on y est déjà, et sans l’appli). Un lien mort ne montre
-// que le titre, la phrase d’état et « Me prévenir au lancement » ; une panne (serveur muet 8 s, coupure, réponse
+// que le titre, la phrase d’état et « Me prévenir » ; une panne (serveur muet 8 s, coupure, réponse
 // incomplète) y ajoute la définition d’une tablée et « Réessayer ». L’heure se lit « Ce soir, coup d’envoi à 21 h ».
 // L’API ne répond qu’à https://baromatch.fr : depuis www ou http, la page y renvoie d’abord, même chemin.
 import { test, expect } from '@playwright/test';
@@ -58,7 +58,7 @@ const visibles = (page) => page.locator('#tablee').evaluate((t) => [...t.querySe
 const verifierLaPanne = async (page) => {
   await expect(page.locator('#tablee-titre')).toHaveText('Une tablée t’attend.');
   await expect(page.locator('#tablee-etat')).toHaveText(PANNE);
-  expect(await visibles(page)).toEqual(['La tablée', 'Une tablée t’attend.', PANNE, DEFINITION, 'Réessayer', 'Me prévenir au lancement']);
+  expect(await visibles(page)).toEqual(['La tablée', 'Une tablée t’attend.', PANNE, DEFINITION, 'Réessayer', 'Me prévenir']);
 };
 
 test('invitation ouverte : la carte, puis « tu peux venir sans l’appli », puis l’appli ; plus de « Ouvre ce lien »', async ({ page }) => {
@@ -122,9 +122,9 @@ test('table pleine : demander à la personne qui t’invite, sans la note sur so
   expect((await visibles(page)).join(' ')).not.toMatch(/pass compte|regarde dans l’appli/);
 });
 
-// « Ouvrir dans l’appli », sur Android seulement (l’appli n’existe pas ailleurs) : pour qui a l’appli et voit quand même
+// « Ouvrir dans l’appli », sur Android seulement (l’intent est propre à Chrome sur Android) : pour qui a l’appli et voit quand même
 // cette page. Un « intent » de Chrome ouvre baromatch://t/‹code› dans fr.baromatch.app ; sans l’appli, le navigateur va
-// à la page des testeurs Android. Seulement quand l’invitation est là (ouverte ou pleine).
+// à l’accueil du site. Seulement quand l’invitation est là (ouverte ou pleine).
 const INTENT = 'intent://t/abcdefghjkmn#Intent;scheme=baromatch;package=fr.baromatch.app;S.browser_fallback_url=';
 
 test.describe('sur Android', () => {
@@ -140,7 +140,7 @@ test.describe('sur Android', () => {
       await expect(page.locator('#tablee-ouvrir p')).toHaveText('Tu l’as déjà sur ce téléphone ?');
       await expect(lien).toBeVisible();
       await expect(lien).toHaveText('Ouvrir dans l’appli');
-      await expect(lien).toHaveAttribute('href', `${INTENT}${encodeURIComponent('https://baromatch.fr/testeurs-android.html')};end`);
+      await expect(lien).toHaveAttribute('href', `${INTENT}${encodeURIComponent('https://baromatch.fr/')};end`);
       const ordre = await page.locator('#tablee-appli-detail').evaluate((d) => [...d.children].map((e) => e.id || e.tagName.toLowerCase()));
       expect(ordre).toEqual(['h2', 'tablee-ouvrir', 'p', 'p']);
     });
@@ -178,11 +178,11 @@ test.describe('sur Android', () => {
 test.describe('sur iPhone', () => {
   test.use({ userAgent: IPHONE });
 
-  test('l’invitation, sans « Ouvrir dans l’appli » (pas d’appli iPhone)', async ({ page }) => {
+  test('l’invitation, sans « Ouvrir dans l’appli » (l’intent est propre à Android)', async ({ page }) => {
     await ouvrir(page, { statut: 200, corps: invitation() });
     await expect(page.locator('#tablee-carte')).toBeVisible();
     await expect(page.locator('#tablee-ouvrir')).toBeHidden();
-    await expect(page.getByRole('link', { name: 'Me prévenir au lancement' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Me prévenir' })).toBeVisible();
   });
 });
 
@@ -203,12 +203,12 @@ for (const cas of [
   { nom: 'lien inconnu (404)', statut: 404, titre: 'Ce lien ne mène à aucune tablée.', etat: 'Il a peut-être changé : demande le nouveau lien à la personne qui t’invite.' },
   { nom: 'invitation terminée (410)', statut: 410, titre: 'Cette invitation est terminée.', etat: 'Le match a commencé, ou la tablée n’existe plus.' },
 ]) {
-  test(`${cas.nom} : le titre, la phrase d’état et « Me prévenir au lancement », rien d’autre`, async ({ page }) => {
+  test(`${cas.nom} : le titre, la phrase d’état et « Me prévenir », rien d’autre`, async ({ page }) => {
     await ouvrir(page, { statut: cas.statut });
     await expect(page.locator('#tablee-titre')).toHaveText(cas.titre);
     await expect(page.locator('#tablee-etat')).toHaveText(cas.etat);
     await expect(page.locator('#tablee-appli .tablee__bouton')).toBeVisible();
-    expect(await visibles(page)).toEqual(['La tablée', cas.titre, cas.etat, 'Me prévenir au lancement']);
+    expect(await visibles(page)).toEqual(['La tablée', cas.titre, cas.etat, 'Me prévenir']);
   });
 }
 
@@ -248,7 +248,7 @@ test('un code mal formé : « aucune tablée », sans rien demander au serveur',
   const demandes = await simulerLAPI(page, { statut: 200, corps: invitation() });
   await page.goto('/t/abc');
   await expect(page.locator('#tablee-titre')).toHaveText('Ce lien ne mène à aucune tablée.');
-  expect(await visibles(page)).toEqual(['La tablée', 'Ce lien ne mène à aucune tablée.', 'Il a peut-être changé : demande le nouveau lien à la personne qui t’invite.', 'Me prévenir au lancement']);
+  expect(await visibles(page)).toEqual(['La tablée', 'Ce lien ne mène à aucune tablée.', 'Il a peut-être changé : demande le nouveau lien à la personne qui t’invite.', 'Me prévenir']);
   expect(demandes).toHaveLength(0);
 });
 
@@ -350,13 +350,13 @@ test('une invitation ouverte sans nombre de places : pas de ligne vide sous le t
   await expect(page.locator('#tablee-etat')).toBeHidden();
 });
 
-test('si tablee.js ne se charge pas, la page ne reste pas sur « On regarde l’invitation… » : « Me prévenir au lancement » est là', async ({ page }) => {
+test('si tablee.js ne se charge pas, la page ne reste pas sur « On regarde l’invitation… » : « Me prévenir » est là', async ({ page }) => {
   await page.route('**/tablee.js', (route) => route.abort());
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto(LIEN);
   await expect(page.locator('#tablee-titre')).toHaveText('Une tablée t’attend.');
   await expect(page.locator('#tablee-appli .tablee__bouton')).toBeVisible();
-  await expect(page.locator('#tablee-appli .tablee__bouton')).toHaveText('Me prévenir au lancement');
+  await expect(page.locator('#tablee-appli .tablee__bouton')).toHaveText('Me prévenir');
   expect((await visibles(page)).join(' ')).not.toContain('On regarde l’invitation');
 });
 

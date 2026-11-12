@@ -204,8 +204,8 @@ for (const largeur of [320, 360]) {
           defile: document.documentElement.scrollWidth > document.documentElement.clientWidth,
         };
       });
-      expect(r.lignes.join(' | ')).not.toMatch(/préviens-$|préviens- \|/);
-      expect(r.lignes.some((l) => l.endsWith('préviens-moi') || l === 'préviens-moi')).toBe(true);
+      expect(r.lignes.join(' | ')).not.toMatch(/préviens-$|préviens- \|/i);
+      expect(r.lignes.some((l) => /préviens-moi/i.test(l))).toBe(true);
       expect(r.hauteur).toBeGreaterThanOrEqual(44);
       expect(r.dedans).toBe(true);
       expect(r.defile).toBe(false);

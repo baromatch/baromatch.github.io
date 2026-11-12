@@ -47,7 +47,7 @@ const verifierLeChamp = async (onglet, choisie) => {
     .map((c) => `${c.name}:${c.type}`));
   expect(champs).toEqual(['email:email']);
   // Ce à quoi sert la ville, juste après le champ, et lié à lui.
-  await expect(groupe).toHaveAccessibleDescription(/On t’écrit seulement quand Baromatch ouvre dans ta ville/);
+  await expect(groupe).toHaveAccessibleDescription(/On t’écrit seulement à propos de Baromatch dans ta ville/);
 };
 
 // Les puces mesurées, et de quoi comprendre une mesure fausse : la taille de chaque puce (sa boîte peinte et sa boîte
@@ -202,7 +202,7 @@ test.describe('les pages de ville', () => {
       expect(blocs(html), p.chemin).toEqual(finDeLAccueil);
       // Le champ piège et l’objet du mail, ceux de l’accueil.
       for (const champ of [/<input id="attente-piege"[^>]*>/, /<input type="hidden" name="_subject"[^>]*>/]) expect(html.match(champ)?.[0]).toBe(ACCUEIL.match(champ)?.[0]);
-      expect(html).toContain(i === 0 ? '<h2 id="titre-attente">Préviens-moi quand l’appli ouvre à Paris</h2>' : `<h2 id="titre-attente">Préviens-moi quand Baromatch arrive à ${VILLES[i]}</h2>`);
+      expect(html).toContain(i === 0 ? '<h2 id="titre-attente">Préviens-moi pour Baromatch à Paris</h2>' : `<h2 id="titre-attente">Préviens-moi quand Baromatch arrive à ${VILLES[i]}</h2>`);
       // Le navigateur vérifie l’adresse : aucun script n’est là pour le faire.
       expect(html).toMatch(/<input class="attente__champ" id="attente-mail" name="email" type="email"[^>]* required>/);
       expect(html).not.toMatch(/<form[^>]*novalidate/);

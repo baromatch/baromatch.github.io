@@ -1,7 +1,7 @@
 // Les pages du site que les vérifications parcourent (chemin servi, nom court pour les rapports).
 // Le lien de tablée est servi avec le statut 404 (comme sur GitHub Pages) : Lighthouse refuse de mesurer
 // une page en 404, il mesure donc son HTML à /404.html ; axe, les liens et les captures le voient tel quel.
-// indexable: false : la page dit noindex (404.html, et le lien de tablée qu’elle sert).
+// indexable: false : la page dit noindex (404.html, le lien de tablée qu’elle sert, et l’ancienne page des testeurs Android).
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { racine } from './environnement.mjs';
@@ -18,7 +18,7 @@ export const PAGES = [
   { chemin: '/a-propos.html', nom: 'a-propos' },
   { chemin: '/comment-on-choisit-les-bars.html', nom: 'comment-on-choisit-les-bars' },
   { chemin: '/trouver-un-bar-qui-diffuse-le-match.html', nom: 'guide-trouver-un-bar' },
-  { chemin: '/testeurs-android.html', nom: 'testeurs-android' },
+  { chemin: '/testeurs-android.html', nom: 'testeurs-android', indexable: false },
   { chemin: '/404.html', nom: '404', indexable: false },
   { chemin: '/t/abcdefghjkmn', nom: 'tablee', lighthouse: false, indexable: false },
 ];

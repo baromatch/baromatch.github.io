@@ -43,7 +43,7 @@
    capsules du sommaire assez larges dans les trois polices. */
 .presse__ouverture-texte > p { max-width: 32rem; max-width: min(32rem, calc(round(down, 100% - .9375rem, 1.3125rem) + .9375rem)); color: var(--texte-doux); text-wrap: pretty; }
 .presse__ouverture-texte > .surtitre { color: var(--texte-discret); }
-.presse__ouverture-texte > .presse__chapo { max-width: min(32rem, calc(round(down, 100% - 1rem, 1.46875rem) + 1rem)); margin-top: 20px; color: var(--texte); font-size: 1.1875rem; }
+.presse__ouverture-texte > .presse__chapo { max-width: min(32rem, calc(round(down, 100% - 1rem, 1.625rem) + 1rem)); margin-top: 20px; color: var(--texte); font-size: 1.1875rem; }
 @media (min-width: 720px) { .presse__ouverture-texte > .presse__chapo { font-size: 1.3125rem; } }
 
 /* Les deux boutons l’un sous l’autre, de la largeur du plus grand ; côte à côte dès 36 rem (16 px d’air au moins). */

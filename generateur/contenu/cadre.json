@@ -11,7 +11,7 @@
   "actionSuite": " quand Baromatch arrive",
   "pied": {
     "etat": {
-      "fermee": "Pas encore ouvert · Bientôt à Paris",
+      "fermee": "iPhone et Android · Arrive bientôt",
       "ouverte": ""
     },
     "attente": "Préviens-moi quand Baromatch arrive",
@@ -28,7 +28,6 @@
     "presse": "Presse et partenariats",
     "choisir": "Comment on choisit les bars",
     "guide": "Comment trouver un bar qui diffuse le match",
-    "testeurs": "Testeurs Android",
     "boutique": "Boutique",
     "legal": "Informations légales",
     "mentions": "Mentions légales",

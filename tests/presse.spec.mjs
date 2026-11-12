@@ -23,14 +23,14 @@ test('Baromatch en bref : le slogan, la phrase et la description de marque.json,
   await page.goto(PAGE);
   const texte = normaliser(await page.locator('main').textContent());
   for (const cle of ['slogan', 'uneLigne', 'description']) expect(texte, cle).toContain(normaliser(MARQUE[cle]));
-  // Vrai aujourd’hui : en test, Android, Paris, pas encore ouvert ; l’appli ne coûte rien au fan (la boutique, elle,
+  // Vrai aujourd’hui : iPhone et Android, d’abord Paris, bientôt sur les stores ; l’appli ne coûte rien au fan (la boutique, elle,
   // vend des pièces : jamais « tu ne paies rien à Baromatch »).
-  if (!MARQUE.appli.ouverte) expect(texte).toContain('L’appli n’est pas encore ouverte au public, ni sur iPhone.');
-  // « ni sur iPhone » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
-  if (texte.includes('ni sur iPhone')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « ni sur iPhone » (Presse, À propos), l’accueil et llms.txt').toBe('');
+  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle arrive bientôt sur l’App Store et Google Play.');
+  // « bientôt sur l’App Store » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
+  if (texte.includes('bientôt sur l’App Store')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « bientôt sur l’App Store » (Presse, À propos), l’accueil et llms.txt').toBe('');
   const fait = async (nom) => normaliser(await page.locator('.presse__faits > div').filter({ has: page.locator('dt', { hasText: nom }) }).locator('dd').textContent());
   expect(await fait('Pour les fans')).toBe('L’appli ne te coûte rien. Ce que tu prends au bar, tu le paies au bar.');
-  expect(await fait('Aujourd’hui')).toMatch(/^En test sur Android, à Paris\./);
+  expect(await fait('Aujourd’hui')).toBe('L’appli existe sur iPhone et Android, d’abord à Paris. Elle arrive bientôt sur l’App Store et Google Play.');
   // Qui publie : le nom, puis les mentions légales pour le reste.
   expect(await fait('Qui publie')).toBe('Skander Kamoun, fondateur. Détails dans les mentions légales.');
   expect(texte).not.toMatch(/Tu ne paies rien|Gratuit\. Ce qu’ils/);

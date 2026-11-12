@@ -171,16 +171,17 @@ test('où en est l’appli : une phrase vraie sans mois, avant comme pendant le 
   for (const fichier of ['index.html', 'a-propos.html', 'llms.txt']) {
     const texte = lire(fichier);
     expect(texte, fichier).not.toMatch(datee);
-    expect(texte, fichier).toContain('Pour l’instant, l’appli est en test sur Android');
+    expect(texte, fichier).toContain('existe sur iPhone et Android');
+    expect(texte, fichier).toContain('bientôt sur l’App Store et Google Play');
     // Vrai aussi pendant le test fermé : ses testeurs (et les équipes des bars) s’en servent, le public pas encore.
     expect(texte, fichier).not.toContain('on ne peut pas encore y garder de place');
     expect(texte, fichier).not.toMatch(/: on ne peut pas encore y réserver de place/);
     expect(texte, fichier).not.toContain('seuls ses testeurs');
   }
   await page.goto('/');
-  expect(normaliser(await page.locator('.faits dt:has-text("Quand") + dd').innerText())).toBe('Pour l’instant, l’appli est en test sur Android. Elle n’est pas encore ouverte au public, ni en téléchargement public sur Google Play, et il n’y a pas encore de version iPhone.');
+  expect(normaliser(await page.locator('.faits dt:has-text("Quand") + dd').innerText())).toBe('L’appli existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
   await page.goto('/a-propos.html');
-  expect(normaliser(await page.locator('#aujourd-hui + p').innerText())).toBe('Pour l’instant, l’appli est en test sur Android, à Paris. Elle n’est pas encore ouverte au public, ni sur iPhone.');
+  expect(normaliser(await page.locator('#aujourd-hui + p').innerText())).toBe('L’appli existe sur iPhone et Android, d’abord à Paris. Elle arrive bientôt sur l’App Store et Google Play.');
 });
 
 test('le plan du site et llms.txt donnent la page', () => {

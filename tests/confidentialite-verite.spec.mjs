@@ -147,7 +147,7 @@ test('la page Confidentialité : sur iPhone, les notifications de notre serveur 
   const durees = (await page.locator('#combien-de-temps ~ ul').first().locator('> li').allInnerTexts()).map(normaliser);
   expect(durees).toContain('Les notifications de notre serveur chez Apple, pour un iPhone : le temps qu’elles arrivent, 12 heures au plus.');
   const choix = normaliser(await page.locator('#notifications + ul > li', { hasText: 'Tes choix, dans Réglages' }).innerText());
-  expect(choix).toContain('Sur Android, ces trois-là n’arrivent pas encore : les notifications de notre serveur n’y sont pas encore allumées.');
+  expect(choix).toContain('Sur Android, ces quatre-là n’arrivent pas encore : les notifications de notre serveur n’y sont pas encore allumées.');
   expect(choix).not.toContain('pour l’instant');
   // Apple n’est nommé que là : la ligne des notifications du serveur, ce qu’Apple reçoit, ses prestataires, sa durée.
   const ailleurs = await page.locator('main').evaluate((main) => {
@@ -307,7 +307,7 @@ test('la page Confidentialité : les personnes que tu bloques, et l’invitation
   expect(normaliser(await page.locator('#suppression ~ ul').first().innerText())).toContain('Les blocages que tu as faits, et ceux qui visaient ton compte, sont supprimés.');
   expect(normaliser(await page.locator('main').innerText())).toContain('Dans l’appli, la même invitation montre aussi les pseudos, seulement à une personne connectée');
   expect(tablee).toContain('Une personne bloquée par quelqu’un de la tablée ne peut pas la rejoindre, et, connectée, ne voit pas qui y est');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 12 novembre 2026');
 });
 
 test('la page « Supprimer ton compte » : les blocages partent tout de suite, dans les deux sens', async ({ page }) => {
@@ -347,7 +347,7 @@ test('la page Confidentialité : les décisions de modération, leurs durées, e
   expect(suppression).toContain('Les décisions de modération qui te concernent restent 12 mois après la décision');
   expect(suppression).toContain('Sauf si l’équipe a fermé ton compte : pas avant 12 mois après la fermeture.');
   expect(normaliser(await page.locator('main').innerText())).toContain('Si ton compte est fermé (banni), tu ne peux plus te connecter, mais tu gardes tous tes droits. Écris-nous depuis l’adresse de ton compte, et on fait l’export ou la suppression pour toi. Un compte fermé est effacé au bout de 37 jours');
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 12 novembre 2026');
 });
 
 // « Tolérance zéro » : les mails de décision de modération y renvoient (cgu.html#respect), avec le blocage.

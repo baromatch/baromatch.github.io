@@ -77,9 +77,9 @@ test('à propos : ce qu’est Baromatch avec les mots de marque.json, où il en 
   // Le titre dit la phrase, seule ; « À propos de Baromatch » est une ligne à part, au-dessus.
   await expect(page.locator('h1')).toHaveText('Savoir où voir le match avant de sortir, et s’il reste une place.');
   await expect(page.locator('.apropos__ouverture > p.surtitre')).toHaveText('À propos de Baromatch');
-  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle n’est pas encore ouverte au public, ni sur iPhone');
-  // « ni sur iPhone » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
-  if (texte.includes('ni sur iPhone')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « ni sur iPhone » (À propos, Presse), l’accueil et llms.txt').toBe('');
+  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle arrive bientôt sur l’App Store et Google Play');
+  // « bientôt sur l’App Store » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
+  if (texte.includes('bientôt sur l’App Store')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « bientôt sur l’App Store » (À propos, Presse), l’accueil et llms.txt').toBe('');
   // L’éditeur, comme les mentions légales le nomment ; ailleurs, le fondateur ne signe que de son prénom (son mot).
   await page.goto('/mentions-legales.html');
   const editeur = normaliser(await page.locator('h2:has-text("Directeur de la publication") + p').textContent());
@@ -324,7 +324,7 @@ test.describe('accueil : la FAQ des fans', () => {
     const { visibles } = await lireLaFaq(page);
     const reponse = (debut) => visibles.find(([question]) => question.startsWith(debut))[1];
     if (!MARQUE.appli.ouverte) {
-      expect(reponse('Je peux déjà')).toMatch(/^Pas encore\. Baromatch est en test sur Android, à Paris/);
+      expect(reponse('Je peux déjà')).toMatch(/^Pas encore\. L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play, d’abord à Paris/);
       // Le lien dans la réponse (le rappel « préviens-moi », sous les questions, est vérifié par accueil.spec.mjs).
       await expect(page.locator('.questions-fans details a[href="#attente"]')).toHaveText('Laisse ton adresse');
     }

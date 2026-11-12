@@ -37,7 +37,6 @@ export const PIED = [
   ['/presse.html', 'Presse et partenariats'],
   ['/comment-on-choisit-les-bars.html', 'Comment on choisit les bars'],
   ['/trouver-un-bar-qui-diffuse-le-match.html', 'Comment trouver un bar qui diffuse le match'],
-  ['/testeurs-android.html', 'Testeurs Android'],
   ['/boutique.html', 'Boutique'],
   ['/mentions-legales.html', 'Mentions légales'],
   ['/cgu.html', 'Règles de l’appli (CGU)'],

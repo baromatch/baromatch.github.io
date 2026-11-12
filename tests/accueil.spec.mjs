@@ -1,6 +1,6 @@
-// L’accueil vu par un fan qui arrive un soir de match : dès le premier écran, il lit que Baromatch n’est pas encore
-// ouvert, que l’appli est gratuite pour les fans et où elle en est (Android en test, pas d’iPhone), et il voit le champ
-// et le bouton de la liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… pas encore ouverte »).
+// L’accueil vu par un fan qui arrive un soir de match : dès le premier écran, il lit que l’appli existe sur iPhone et
+// Android et arrive bientôt sur les stores, qu’elle est gratuite pour les fans, et il voit le champ et le bouton de la
+// liste d’attente (sur ordinateur, même un écran court, la phrase « gratuite… bientôt sur l’App Store et Google Play »).
 // La phrase de l’accueil « Ton match. Ton bar. Ce soir. » reste celle de la marque.
 import { test, expect } from '@playwright/test';
 import { mkdtempSync, rmSync } from 'node:fs';
@@ -20,24 +20,25 @@ const portLibre = () => new Promise((resoudre) => {
 });
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
-const PLATEFORMES = 'Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.';
+const PLATEFORMES = 'L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.';
 
-test('le premier écran dit « pas encore ouvert », « gratuite pour les fans », et Android ou iPhone', async ({ page }) => {
+test('le premier écran dit « iPhone et Android », « gratuite pour les fans », et « bientôt sur l’App Store et Google Play »', async ({ page }) => {
   await page.goto('/');
   const ouverture = page.locator('section.ouverture');
   await expect(ouverture.locator('h1')).toHaveText('Ton match. Ton bar. Ce soir.');
   const statut = ouverture.locator('.ouverture__statut');
-  await expect(statut).toHaveText('Pas encore ouvert · Bientôt à Paris');
+  await expect(statut).toHaveText('iPhone et Android · Arrive bientôt');
   // Le statut est dit avant la promesse, au même niveau qu’elle : juste au-dessus du titre.
   expect(await statut.evaluate((e) => e.nextElementSibling?.tagName)).toBe('H1');
   const texte = normaliser(await ouverture.locator('.ouverture__texte').innerText());
-  expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Elle n’est pas encore ouverte : rien à réserver ce soir.');
+  expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Bientôt sur les stores : rien à réserver ce soir.');
   expect(normaliser(await ouverture.innerText())).toContain(PLATEFORMES);
-  // Aucune promesse d’appli iPhone ni de date de lancement (rien n’est annoncé), texte du film compris (son image de fin
-  // dit « Bientôt sur Android, à Paris »).
+  // Aucune date de lancement (rien n’est annoncé), ni lien vers un store, texte du film compris (son image de fin dit
+  // « Bientôt sur Android, à Paris »).
   await page.locator('#film-texte summary').click();
   const page_ = normaliser(await page.evaluate(() => document.body.innerText));
-  expect(page_).not.toMatch(/bientôt sur (Android et )?iPhone|iPhone bientôt|disponible sur iPhone/i);
+  expect(page_).not.toMatch(/disponible sur l’App Store|disponible sur Google Play|télécharge(r|z)? (sur|dans) l’App Store/i);
+  await expect(page.locator('a[href*="apps.apple.com"], a[href*="play.google.com"]')).toHaveCount(0);
   expect(page_).not.toContain('!');
 });
 
@@ -71,7 +72,7 @@ for (const largeur of [320, 360, 1280]) {
 
 // Sur téléphone, de 640 px de haut (barre du navigateur ôtée) à plus : le statut, le champ et le bouton. Sur ordinateur,
 // des écrans courts (1 280 × 720, 1 366 × 768, barre du navigateur ôtée) aux grands (900 px de haut), le titre reste
-// très grand : le statut, le titre et la phrase « gratuite pour les fans… pas encore ouverte » sont dans le premier
+// très grand : le statut, le titre et la phrase « gratuite pour les fans… bientôt sur les stores » sont dans le premier
 // écran, le formulaire juste dessous.
 for (const ecran of [
   { largeur: 360, hauteur: 640, formulaire: true },
@@ -82,7 +83,7 @@ for (const ecran of [
   { largeur: 1280, hauteur: 800, formulaire: false },
   { largeur: 1440, hauteur: 900, formulaire: false },
 ]) {
-  test(`à ${ecran.largeur} × ${ecran.hauteur} : le statut${ecran.formulaire ? ', le champ et le bouton de la liste d’attente sont' : ', le titre et la phrase « gratuite… pas encore ouverte » sont'} dans le premier écran`, async ({ page }) => {
+  test(`à ${ecran.largeur} × ${ecran.hauteur} : le statut${ecran.formulaire ? ', le champ et le bouton de la liste d’attente sont' : ', le titre et la phrase « gratuite… bientôt sur les stores » sont'} dans le premier écran`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: ecran.largeur, height: ecran.hauteur });
     await page.goto('/');
@@ -112,7 +113,7 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   await page.goto('/');
   const rappels = page.locator('main .rappel-attente a.capsule');
   await expect(rappels).toHaveCount(2);
-  await expect(rappels).toHaveText(['L’appli ouvre bientôt : préviens-moi', 'L’appli ouvre bientôt : préviens-moi']);
+  await expect(rappels).toHaveText(['L’appli arrive bientôt : préviens-moi', 'L’appli arrive bientôt : préviens-moi']);
   for (const lien of await rappels.all()) await expect(lien).toHaveAttribute('href', '#attente');
   expect(await page.$$eval('main .rappel-attente', (p) => p.map((e) => e.closest('section').className.split(' ')[0])))
     .toEqual(['soiree', 'questions-fans']);

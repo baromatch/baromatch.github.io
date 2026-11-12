@@ -202,7 +202,7 @@ test.describe('les pages de ville', () => {
       expect(blocs(html), p.chemin).toEqual(finDeLAccueil);
       // Le champ piège et l’objet du mail, ceux de l’accueil.
       for (const champ of [/<input id="attente-piege"[^>]*>/, /<input type="hidden" name="_subject"[^>]*>/]) expect(html.match(champ)?.[0]).toBe(ACCUEIL.match(champ)?.[0]);
-      expect(html).toContain(i === 0 ? '<h2 id="titre-attente">Préviens-moi quand l’appli ouvre à Paris</h2>' : `<h2 id="titre-attente">Préviens-moi quand Baromatch arrive à ${VILLES[i]}</h2>`);
+      expect(html).toContain(i === 0 ? '<h2 id="titre-attente">Préviens-moi quand l’appli arrive à Paris</h2>' : `<h2 id="titre-attente">Préviens-moi quand Baromatch arrive à ${VILLES[i]}</h2>`);
       // Le navigateur vérifie l’adresse : aucun script n’est là pour le faire.
       expect(html).toMatch(/<input class="attente__champ" id="attente-mail" name="email" type="email"[^>]* required>/);
       expect(html).not.toMatch(/<form[^>]*novalidate/);
@@ -355,6 +355,6 @@ test('la confidentialité dit ce qu’on garde (l’adresse et la ville), pourqu
   await expect(section.locator('a[href="mailto:contact@baromatch.fr"]')).toHaveCount(1);
   expect(texte).not.toContain('rien d’autre.');
   // La date de la page, et celle du plan du site.
-  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 2 novembre 2026');
-  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-11-02</lastmod></url>');
+  await expect(page.locator('.document__date')).toHaveText('Mise à jour le 12 novembre 2026');
+  expect(readFileSync(path.join(racine, 'sitemap.xml'), 'utf8')).toContain('<url><loc>https://baromatch.fr/confidentialite.html</loc><lastmod>2026-11-12</lastmod></url>');
 });

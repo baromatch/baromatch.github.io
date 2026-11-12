@@ -81,9 +81,10 @@ test('invitation ouverte : la carte, puis « tu peux venir sans l’appli », pu
   // Juste sous la carte, avant ce qui parle de l’appli.
   expect(await page.evaluate(() => document.getElementById('tablee-carte').nextElementSibling.id)).toBe('tablee-venir');
 
-  // Comment avoir l’appli : le test fermé sur Android, sinon la liste d’attente. « Ouvrir dans l’appli » est pour Android.
+  // Comment avoir l’appli : iPhone et Android, bientôt sur les stores ; le test fermé sur Android, sinon la liste
+  // d’attente. « Ouvrir dans l’appli » est pour Android.
   const appli = page.locator('#tablee-appli');
-  await expect(appli).toContainText('Baromatch est en test sur Android, à Paris. Pas d’appli iPhone pour l’instant.');
+  await expect(appli).toContainText('L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
   await expect(appli).toContainText('Tu as un téléphone Android ? Deviens testeur pour installer l’appli avant tout le monde. Sinon, laisse ton adresse : on te prévient au lancement.');
   await expect(appli.getByRole('link', { name: 'Deviens testeur' })).toHaveAttribute('href', '/testeurs-android.html');
   await expect(appli.getByRole('link', { name: 'Me prévenir au lancement' })).toHaveAttribute('href', '/#attente');

@@ -353,7 +353,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const prix = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix');
     const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix + .ouverture-bars__etat');
     expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
-    await expect(etat).toHaveText('Où on en est : Baromatch est en test sur Android, à Paris (pas encore sur iPhone). Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
+    await expect(etat).toHaveText('Où on en est : L’appli existe sur iPhone et Android, bientôt sur les stores, à Paris. Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
     // Les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du gratuit des clients.
     const bouton = ouverture.locator('.ouverture-bars__etat + .actions .capsule[href="#proposer"]');
     await expect(prix).toHaveText(CONDITIONS_COURTES);
@@ -440,13 +440,13 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     });
   }
 
-  test('l’appli de la porte, Android seulement pour l’instant, dit sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans Android, la page Scan de la Console, pour le seul patron', async ({ page }) => {
+  test('l’appli de la porte, sur iPhone et Android, dite sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans l’appli, la page Scan de la Console, pour le seul patron', async ({ page }) => {
     await page.goto(PAGE);
     const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });
-    await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte. Il marche sur Android pour l’instant');
+    await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte. Il marche sur iPhone et sur Android');
     // La page Scan de la Console n’est ouverte qu’au compte du patron (un compte de la porte n’y a pas accès), et sa
     // caméra ne marche pas partout : le code tapé est le chemin sûr. La page ne la promet pas à « ton équipe ».
-    await expect(carte).toContainText('Il marche sur Android pour l’instant. Sans Android, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron : tu tapes le code à 6 chiffres du fan.');
+    await expect(carte).toContainText('Il marche sur iPhone et sur Android. Sans l’appli, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron : tu tapes le code à 6 chiffres du fan.');
     const tout = normaliser(await page.locator('main').textContent());
     for (const phrase of tout.split(/(?<=[.;?])\s/).filter((p) => p.includes('page Scan'))) expect(phrase, phrase).toContain('ton compte de patron');
     expect(tout).not.toContain('valide aussi un pass, depuis un navigateur');
@@ -454,11 +454,12 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const etape = page.locator('.marche__etape').nth(2);
     await expect(etape).toContainText('On t’explique comment installer l’appli de la porte.');
     const besoin = (await questions(page)).find((q) => q.question === 'De quoi j’ai besoin ?');
-    expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone Android : pour l’instant, elle n’existe que sur Android\./);
+    expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone, iPhone ou Android\./);
     expect(besoin.reponse).toContain('On t’explique comment installer l’appli quand on te répond.');
-    expect(besoin.reponse).toContain('Sans Android, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron, en tapant le code du fan.');
-    // Rien sur une version iPhone à venir, ni de date : rien n’est annoncé.
-    expect(normaliser(await page.locator('main').textContent())).not.toMatch(/iPhone[^.]*(bientôt|prochainement|arrive|bientot)/i);
+    expect(besoin.reponse).toContain('Sans l’appli, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron, en tapant le code du fan.');
+    // Ni lien vers un store, ni date : rien n’est annoncé.
+    expect(normaliser(await page.locator('main').textContent())).not.toMatch(/bientôt[^.]*\b(20\d\d|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\b/i);
+    await expect(page.locator('a[href*="apps.apple.com"], a[href*="play.google.com"]')).toHaveCount(0);
   });
 
   test('les questions : le prix d’abord, ouvert, puis l’engagement ; une réponse franche en tête ; les clients, le délai et l’offre sur une boisson répondus', async ({ page }) => {
@@ -477,7 +478,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const reponse = (debut) => lues.find((q) => q.question.startsWith(debut)).reponse;
     expect(reponse('Combien')).toBe(COMBIEN);
     expect(reponse('Je m’engage')).toBe(ENGAGEMENT);
-    expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite, en test sur Android pour l’instant\. Pour entrer, non : /);
+    expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite, sur iPhone et Android, bientôt sur l’App Store et Google Play\. Pour entrer, non : /);
     // Le délai de réponse d’abord (sous 48 h), puis l’ordre des choses, sans autre durée promise : ni mise en place, ni
     // ouverture.
     expect(reponse('Comment je démarre')).toMatch(/^On te répond sous 48 h\. Dans l’ordre : tu envoies ta demande/);

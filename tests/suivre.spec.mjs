@@ -95,7 +95,7 @@ test('aujourd’hui, sans aucun bar publié : indexable avec des matchs à venir
     // page attend, l’appel des fans et une ligne pour les bars. Aucune ligne de match ne le répète, et la section des
     // bars n’est pas là.
     // L’appel a sa phrase : la page n’en a pas d’autre.
-    expect(corps(p), chemin).toContain('Pas encore de bar sur Baromatch Baromatch cherche ses premiers bars à Paris. Dès qu’un bar annonce un match, il s’affiche ici. L’appli ouvre bientôt : préviens-moi Baromatch est en test sur Android, à Paris. Laisse ton adresse : on te prévient le jour où l’appli ouvre. Tu tiens un bar ? Proposer mon bar');
+    expect(corps(p), chemin).toContain('Pas encore de bar sur Baromatch Baromatch cherche ses premiers bars à Paris. Dès qu’un bar annonce un match, il s’affiche ici. L’appli arrive bientôt : préviens-moi L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play. Laisse ton adresse : on te prévient le jour où elle y est. Tu tiens un bar ? Proposer mon bar');
     expect(p.contenu, chemin).toMatch(/<\/header>\n<section class="regarder-section regarder-premiers" aria-labelledby="titre-premiers">[\s\S]*?<\/section>\n<section class="regarder-section" aria-labelledby="titre-matchs">/);
     expect(corps(p).match(/Pas encore de bar/g), chemin).toHaveLength(1);
     expect(p.contenu, chemin).not.toContain('id="titre-bars"');

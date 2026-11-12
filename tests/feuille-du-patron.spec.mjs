@@ -48,7 +48,7 @@ const LIGNES = [
   'Gratuit pour tes clients. Pour ton bar, gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.',
   'Sur baromatch.fr, ton bar n’apparaît qu’avec ton accord écrit.',
 ];
-const OU_EN_EST = 'Baromatch cherche ses premiers bars à Paris. L’appli est en test sur Android ; les fans ne réservent pas encore.';
+const OU_EN_EST = 'Baromatch cherche ses premiers bars à Paris. L’appli existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play ; les fans ne réservent pas encore.';
 
 const dossiers = [];
 const dossierVide = () => {
@@ -196,7 +196,7 @@ test('le texte de la feuille : le titre, les quatre lignes, où on en est et le 
     [LIGNES[2], 'pour-les-bars.html', ['Gratuit pour tes clients', 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.']],
     [LIGNES[3], 'comment-on-choisit-les-bars.html', ['Il n’apparaît sur ce site qu’avec son accord écrit.']],
     [LIGNES[3], 'pour-les-bars.html', ['Sur ce site, ton bar n’apparaît qu’avec ton accord écrit']],
-    [OU_EN_EST, 'pour-les-bars.html', ['Baromatch cherche ses premiers bars à Paris.', 'en test sur Android', 'les fans ne réservent pas encore']],
+    [OU_EN_EST, 'pour-les-bars.html', ['Baromatch cherche ses premiers bars à Paris.', 'existe sur iPhone et Android', 'bientôt sur l’App Store et Google Play', 'les fans ne réservent pas encore']],
   ];
   for (const [phrase, page, dejaDit] of SOURCES) for (const morceau of dejaDit) expect(publie[page], `${phrase} ← ${page}`).toContain(morceau.toLowerCase());
 });

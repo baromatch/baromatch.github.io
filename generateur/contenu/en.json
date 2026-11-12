@@ -28,7 +28,7 @@
     "championsLeague": "Champions League"
   },
   "appli": {
-    "fermee": "Good to know: the Baromatch app is still in testing, on Android only, in Paris. It works in English as well as French, and you don’t need it to use these pages.",
+    "fermee": "Good to know: the Baromatch app is on iPhone and Android, and arrives on the App Store and Google Play soon, starting in Paris. It works in English as well as French, and you don’t need it to use these pages.",
     "ouverte": "Good to know: the Baromatch app works in English as well as French, on {plateformes}."
   },
   "appel": {
@@ -56,7 +56,7 @@
   "commentCaMarche": {
     "titre": "How Baromatch works",
     "fermee": {
-      "intro": "When the app opens, you’ll be able to:",
+      "intro": "With the app, you’ll be able to:",
       "etapes": [
         { "titre": "Pick your match", "texte": "Tonight or later in the week, with the kick-off time." },
         { "titre": "Find your bar", "texte": "The ones showing it near you." },

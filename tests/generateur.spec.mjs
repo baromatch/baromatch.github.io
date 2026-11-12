@@ -737,7 +737,7 @@ test.describe('les pages', () => {
       expect(bloc.indexOf('<a class="capsule" href="/#attente">'), p.chemin).toBeGreaterThan(-1);
       // La phrase de l’appel : sur les pages qui n’ont pas d’autre appel (un match, un club, une compétition).
       expect(bloc.includes(insecables(contenu.textes.appel.fermee.note)), p.chemin).toBe(['match', 'club', 'competition'].includes(p.type));
-      expect(texteVisible(p.contenu).match(/Baromatch est en test sur Android, à Paris. Laisse ton adresse/g), p.chemin).toHaveLength(1);
+      expect(texteVisible(p.contenu).match(/arrive bientôt sur l’App Store et Google Play. Laisse ton adresse/g), p.chemin).toHaveLength(1);
       expect(bloc.indexOf('<a class="capsule"'), p.chemin).toBeLessThan(bloc.indexOf('<a href="/pour-les-bars.html#proposer">Proposer mon bar</a>'));
       const main = p.contenu.split('<main')[1];
       expect(main.indexOf(bloc), p.chemin).toBeGreaterThan(main.indexOf('<header class="regarder-tete">'));

@@ -71,8 +71,8 @@ test('les faits qui évitent les erreurs : ce que Baromatch est, ce qu’il n’
   expect(texte).not.toMatch(/disque/);
   expect(texte).toContain('Baromatch n’affiche ni écusson, ni logo de club, de compétition ou de chaîne.');
   expect(texte).toContain('L’appli est gratuite pour les fans.');
-  expect(texte).toContain('en test sur Android, à Paris');
-  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle n’est pas encore ouverte au public');
+  expect(texte).toContain('existe sur iPhone et Android, d’abord à Paris');
+  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle arrive bientôt sur l’App Store et Google Play');
   expect(texte).toContain(MARQUE.contact);
 });
 

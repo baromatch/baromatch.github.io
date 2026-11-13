@@ -34,8 +34,8 @@
   "/agenda/brest.ics": {
    "type": "calendrier",
    "cle": "brest",
-   "empreinte": "2YOB4D-QKWH__ONdRjxx1Q",
-   "change": "2026-11-08",
+   "empreinte": "2LCVe-mX8rIO2UVS5-yO2g",
+   "change": "2026-11-14",
    "indexable": false,
    "memoire": {
     "court": "Brest",
@@ -144,8 +144,8 @@
   "/agenda/paris-fc.ics": {
    "type": "calendrier",
    "cle": "paris-fc",
-   "empreinte": "sFLQbn29nQTwq3ESdO1cow",
-   "change": "2026-11-08",
+   "empreinte": "vM9CWPa3Oi9FSiJ2o8hn6w",
+   "change": "2026-11-14",
    "indexable": false,
    "memoire": {
     "court": "Paris FC",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "F92IL0af9Ybdiw8TzUB1LA",
-   "change": "2026-11-13",
+   "empreinte": "7yPds1cYlOYyEeN2wo81Bg",
+   "change": "2026-11-14",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "kd7zPlBi7rBzOIg1hNDB9w",
-   "change": "2026-11-13",
+   "empreinte": "IRA6-MsCjNHxTvLOK2drcA",
+   "change": "2026-11-14",
    "indexable": false
   },
   "/en/": {
@@ -654,31 +654,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "kuQTsIE0dCVr-92nrK8D1w",
-   "change": "2026-11-13",
+   "empreinte": "bP6dSxYzLv86187IUWEY5Q",
+   "change": "2026-11-14",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "KXn_Xcd-ANoe1M_VIiWtTQ",
-   "change": "2026-11-13",
+   "empreinte": "FTjdzpjmU14qK63efmU3ww",
+   "change": "2026-11-14",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "4afk1H9Jmc1tqBuQ2qhfYw",
-   "change": "2026-11-13",
+   "empreinte": "P_rt7-2D1y7B4GbfEswnXA",
+   "change": "2026-11-14",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "6XdoWPLg3UFull7WR-Oytw",
-   "change": "2026-11-13",
+   "empreinte": "ah1YFPFhVn6FR14XBfXiyQ",
+   "change": "2026-11-14",
    "indexable": false,
    "bars": []
   },
@@ -1250,6 +1250,50 @@
     }
    }
   },
+  "/matchs/brest-paris-fc-2026-11-27/": {
+   "type": "match",
+   "cle": "brest-paris-fc-2026-11-27",
+   "date": "2026-11-27T19:45:00.000Z",
+   "empreinte": "dGSc7EC4AxN8LQb7ekvk3g",
+   "change": "2026-11-14",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "brest-paris-fc-2026-11-27",
+    "ids": [
+     "cmvxran8z0018z71ow6tfwegc"
+    ],
+    "debut": "2026-11-27T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "brest",
+     "court": "Brest",
+     "nom": "Stade Brestois 29",
+     "slug": "stade-brestois-29"
+    },
+    "exterieur": {
+     "cle": "paris-fc",
+     "court": "Paris FC",
+     "nom": "Paris FC",
+     "slug": "paris-fc"
+    }
+   }
+  },
+  "/matchs/brest-paris-fc-2026-11-27/match.ics": {
+   "type": "evenement",
+   "cle": "brest-paris-fc-2026-11-27",
+   "empreinte": "M0GKLqNhYlwHhUfGWk-VpQ",
+   "change": "2026-11-14",
+   "indexable": false
+  },
+  "/matchs/brest-paris-fc-2026-11-27/partage.png": {
+   "type": "partage",
+   "cle": "brest-paris-fc-2026-11-27",
+   "empreinte": "2QA5wUJyFO3WMWkoeGtHsQ",
+   "change": "2026-11-14",
+   "indexable": false
+  },
   "/matchs/bruges-lens-2026-10-21/": {
    "type": "match",
    "cle": "bruges-lens-2026-10-21",
@@ -1467,8 +1511,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "wFJX_9psvQWIBihTNvFALg",
-   "change": "2026-11-12",
+   "empreinte": "qzrBl1gXAolBOCC-3JyPeg",
+   "change": "2026-11-14",
    "indexable": true,
    "bars": []
   },
@@ -3598,8 +3642,8 @@
    "type": "match",
    "cle": "paris-fc-angers-2026-11-22",
    "date": "2026-11-22T14:00:00.000Z",
-   "empreinte": "Xz5UgLui_tWLIktoY0S2fg",
-   "change": "2026-11-12",
+   "empreinte": "zip3-NheRxvLc_4EG7G16Q",
+   "change": "2026-11-14",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4149,8 +4193,8 @@
    "type": "match",
    "cle": "strasbourg-brest-2026-11-21",
    "date": "2026-11-21T19:45:00.000Z",
-   "empreinte": "QEk1ZIVsQghjkUEkBbOZIA",
-   "change": "2026-11-12",
+   "empreinte": "h_aXQRPe7jEtsgko-kD6Rw",
+   "change": "2026-11-14",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4992,9 +5036,9 @@
     "court": "Paris FC",
     "nom": "Paris FC"
    },
-   "empreinte": "Fobw5SLD4dOVcYvAjECfww",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
+   "empreinte": "Vv65nO0m3_MUEyzeli3v-A",
+   "sequence": 1,
+   "modifie": "2026-11-13T23:30:43Z"
   },
   "cmvxran9l001az71oeozcwpmj@baromatch.fr": {
    "ids": [

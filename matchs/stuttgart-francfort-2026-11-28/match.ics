@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrana5001cz71oclnp0tkt@baromatch.fr
+DTSTAMP:20261114T195510Z
+SEQUENCE:0
+DTSTART:20261128T173000Z
+DTEND:20261128T193000Z
+SUMMARY:Stuttgart – Francfort
+DESCRIPTION:Bundesliga · VfB Stuttgart – Eintracht Frankfurt\nCoup d’e
+ nvoi samedi 28 novembre à 18:30\, heure de Paris.\nLa page du match : ht
+ tps://baromatch.fr/matchs/stuttgart-francfort-2026-11-28/
+URL:https://baromatch.fr/matchs/stuttgart-francfort-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

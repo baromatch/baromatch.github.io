@@ -40,13 +40,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmvxran9l001az71oeozcwpmj@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261114T195510Z
+SEQUENCE:1
 DTSTART:20261128T161500Z
 DTEND:20261128T181500Z
 SUMMARY:Angers – Lens
 DESCRIPTION:Ligue 1 · Angers SCO – RC Lens\nCoup d’envoi samedi 28 nov
- embre à 17:15\, heure de Paris.
+ embre à 17:15\, heure de Paris.\nLa page du match : https://baromatch.fr
+ /matchs/angers-lens-2026-11-28/
+URL:https://baromatch.fr/matchs/angers-lens-2026-11-28/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

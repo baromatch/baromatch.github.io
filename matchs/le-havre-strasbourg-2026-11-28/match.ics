@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxranbu001iz71odupxmw18@baromatch.fr
+DTSTAMP:20261114T195510Z
+SEQUENCE:1
+DTSTART:20261128T194500Z
+DTEND:20261128T214500Z
+SUMMARY:Le Havre – Strasbourg
+DESCRIPTION:Ligue 1 · Le Havre AC – RC Strasbourg Alsace\nCoup d’envoi
+  samedi 28 novembre à 20:45\, heure de Paris.\nLa page du match : https:
+ //baromatch.fr/matchs/le-havre-strasbourg-2026-11-28/
+URL:https://baromatch.fr/matchs/le-havre-strasbourg-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxrancy001mz71os20gjtp5@baromatch.fr
+DTSTAMP:20261115T184844Z
+SEQUENCE:0
+DTSTART:20261129T120000Z
+DTEND:20261129T140000Z
+SUMMARY:Everton – Liverpool
+DESCRIPTION:Premier League · Everton FC – Liverpool FC\nCoup d’envoi d
+ imanche 29 novembre à 13:00\, heure de Paris.\nLa page du match : https:
+ //baromatch.fr/matchs/everton-liverpool-2026-11-29/
+URL:https://baromatch.fr/matchs/everton-liverpool-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

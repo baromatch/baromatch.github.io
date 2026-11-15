@@ -40,13 +40,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmvxrane2001qz71oiv2obms6@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261115T184844Z
+SEQUENCE:1
 DTSTART:20261129T161500Z
 DTEND:20261129T181500Z
 SUMMARY:Toulouse – Rennes
 DESCRIPTION:Ligue 1 · Toulouse FC – Stade Rennais FC\nCoup d’envoi dim
- anche 29 novembre à 17:15\, heure de Paris.
+ anche 29 novembre à 17:15\, heure de Paris.\nLa page du match : https://
+ baromatch.fr/matchs/toulouse-rennes-2026-11-29/
+URL:https://baromatch.fr/matchs/toulouse-rennes-2026-11-29/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

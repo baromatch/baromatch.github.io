@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxranf6001uz71oevxgwjbg@baromatch.fr
+DTSTAMP:20261115T184844Z
+SEQUENCE:0
+DTSTART:20261129T183000Z
+DTEND:20261129T203000Z
+SUMMARY:Dortmund – Leverkusen
+DESCRIPTION:Bundesliga · Borussia Dortmund – Bayer 04 Leverkusen\nCoup d
+ ’envoi dimanche 29 novembre à 19:30\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/dortmund-leverkusen-2026-11-29/
+URL:https://baromatch.fr/matchs/dortmund-leverkusen-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

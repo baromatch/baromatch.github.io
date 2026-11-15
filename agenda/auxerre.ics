@@ -26,13 +26,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmvxrandh001oz71ooiow4744@baromatch.fr
-DTSTAMP:20261101T120610Z
-SEQUENCE:0
+DTSTAMP:20261115T184844Z
+SEQUENCE:1
 DTSTART:20261129T140000Z
 DTEND:20261129T160000Z
 SUMMARY:Auxerre – OM
 DESCRIPTION:Ligue 1 · AJ Auxerre – Olympique de Marseille\nCoup d’envo
- i dimanche 29 novembre à 15:00\, heure de Paris.
+ i dimanche 29 novembre à 15:00\, heure de Paris.\nLa page du match : htt
+ ps://baromatch.fr/matchs/auxerre-om-2026-11-29/
+URL:https://baromatch.fr/matchs/auxerre-om-2026-11-29/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

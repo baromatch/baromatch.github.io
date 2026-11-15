@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxranem001sz71olmcr2l32@baromatch.fr
+DTSTAMP:20261115T184844Z
+SEQUENCE:0
+DTSTART:20261129T163000Z
+DTEND:20261129T183000Z
+SUMMARY:Arsenal – Man City
+DESCRIPTION:Premier League · Arsenal FC – Manchester City\nCoup d’envo
+ i dimanche 29 novembre à 17:30\, heure de Paris.\nLa page du match : htt
+ ps://baromatch.fr/matchs/arsenal-man-city-2026-11-29/
+URL:https://baromatch.fr/matchs/arsenal-man-city-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

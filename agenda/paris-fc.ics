@@ -4,10 +4,10 @@ PRODID:-//Baromatch//Ton club dans ton agenda//FR
 CALSCALE:GREGORIAN
 X-WR-CALNAME:Paris FC · Baromatch
 X-WR-CALDESC:Paris FC : les matchs au programme de Baromatch (Ligue 1)\, 
- à l’heure de Paris\, pour l’instant jusqu’au dimanche 29 novembre. 
- Pas de Coupe de France ni de match amical pour l’instant. Un match repor
- té ou annulé reste sept jours\, marqué comme tel. https://baromatch.fr/
- agenda/
+ à l’heure de Paris\, pour l’instant jusqu’au dimanche 3 janvier. Pa
+ s de Coupe de France ni de match amical pour l’instant. Un match report
+ é ou annulé reste sept jours\, marqué comme tel. https://baromatch.fr/a
+ genda/
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
@@ -35,6 +35,30 @@ DESCRIPTION:Ligue 1 · Stade Brestois 29 – Paris FC\nCoup d’envoi vendr
  edi 27 novembre à 20:45\, heure de Paris.\nLa page du match : https://ba
  romatch.fr/matchs/brest-paris-fc-2026-11-27/
 URL:https://baromatch.fr/matchs/brest-paris-fc-2026-11-27/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbts7z0012i2y60nujcwiz@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20261212T161500Z
+DTEND:20261212T181500Z
+SUMMARY:PSG – Paris FC
+DESCRIPTION:Ligue 1 · Paris Saint-Germain – Paris FC\nCoup d’envoi sam
+ edi 12 décembre à 17:15\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbtsqx002gi2y63okhfiy0@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20270102T200000Z
+DTEND:20270102T220000Z
+SUMMARY:Paris FC – Le Havre
+DESCRIPTION:Ligue 1 · Paris FC – Le Havre AC\nCoup d’envoi samedi 2 ja
+ nvier à 21:00\, heure de Paris.
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

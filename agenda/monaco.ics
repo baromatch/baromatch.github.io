@@ -5,9 +5,9 @@ CALSCALE:GREGORIAN
 X-WR-CALNAME:Monaco · Baromatch
 X-WR-CALDESC:Monaco : les matchs au programme de Baromatch (Ligue 1 et Lig
  ue Conférence)\, à l’heure de Paris\, pour l’instant jusqu’au dima
- nche 29 novembre. Pas de Coupe de France ni de match amical pour l’insta
- nt. Un match reporté ou annulé reste sept jours\, marqué comme tel. htt
- ps://baromatch.fr/agenda/
+ nche 3 janvier. Pas de Coupe de France ni de match amical pour l’instant
+ . Un match reporté ou annulé reste sept jours\, marqué comme tel. https
+ ://baromatch.fr/agenda/
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
@@ -49,6 +49,54 @@ DESCRIPTION:Ligue 1 · Olympique Lyonnais – AS Monaco\nCoup d’envoi dim
  anche 29 novembre à 20:45\, heure de Paris.\nLa page du match : https://
  baromatch.fr/matchs/ol-monaco-2026-11-29/
 URL:https://baromatch.fr/matchs/ol-monaco-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbts5v000wi2y6bbopa3ol@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20261210T200000Z
+DTEND:20261210T220000Z
+SUMMARY:Brighton & Hove Albion – Monaco
+DESCRIPTION:Ligue Conférence · Brighton & Hove Albion – AS Monaco\nCoup
+  d’envoi jeudi 10 décembre à 21:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbtsen001ii2y6h5mucde4@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20261213T161500Z
+DTEND:20261213T181500Z
+SUMMARY:Rennes – Monaco
+DESCRIPTION:Ligue 1 · Stade Rennais FC – AS Monaco\nCoup d’envoi diman
+ che 13 décembre à 17:15\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbtsgf001oi2y692pp5s8r@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20261217T200000Z
+DTEND:20261217T220000Z
+SUMMARY:Monaco – Lincoln Red Imps
+DESCRIPTION:Ligue Conférence · AS Monaco – Lincoln Red Imps FC\nCoup d
+ ’envoi jeudi 17 décembre à 21:00\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbtsof002ai2y6puxvbnbm@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20270102T200000Z
+DTEND:20270102T220000Z
+SUMMARY:Monaco – Nice
+DESCRIPTION:Ligue 1 · AS Monaco – OGC Nice\nCoup d’envoi samedi 2 janv
+ ier à 21:00\, heure de Paris.
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

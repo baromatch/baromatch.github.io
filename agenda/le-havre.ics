@@ -4,10 +4,10 @@ PRODID:-//Baromatch//Ton club dans ton agenda//FR
 CALSCALE:GREGORIAN
 X-WR-CALNAME:Le Havre · Baromatch
 X-WR-CALDESC:Le Havre : les matchs au programme de Baromatch (Ligue 1)\, 
- à l’heure de Paris\, pour l’instant jusqu’au dimanche 29 novembre. 
- Pas de Coupe de France ni de match amical pour l’instant. Un match repor
- té ou annulé reste sept jours\, marqué comme tel. https://baromatch.fr/
- agenda/
+ à l’heure de Paris\, pour l’instant jusqu’au dimanche 3 janvier. Pa
+ s de Coupe de France ni de match amical pour l’instant. Un match report
+ é ou annulé reste sept jours\, marqué comme tel. https://baromatch.fr/a
+ genda/
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
@@ -35,6 +35,30 @@ DESCRIPTION:Ligue 1 · Le Havre AC – RC Strasbourg Alsace\nCoup d’envoi
   samedi 28 novembre à 20:45\, heure de Paris.\nLa page du match : https:
  //baromatch.fr/matchs/le-havre-strasbourg-2026-11-28/
 URL:https://baromatch.fr/matchs/le-havre-strasbourg-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbtsbj0018i2y6uq9rfm5u@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20261212T194500Z
+DTEND:20261212T214500Z
+SUMMARY:Le Havre – Le Mans
+DESCRIPTION:Ligue 1 · Le Havre AC – Le Mans FC\nCoup d’envoi samedi 12
+  décembre à 20:45\, heure de Paris.
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:cmwjbtsqx002gi2y63okhfiy0@baromatch.fr
+DTSTAMP:20261116T215824Z
+SEQUENCE:0
+DTSTART:20270102T200000Z
+DTEND:20270102T220000Z
+SUMMARY:Paris FC – Le Havre
+DESCRIPTION:Ligue 1 · Paris FC – Le Havre AC\nCoup d’envoi samedi 2 ja
+ nvier à 21:00\, heure de Paris.
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

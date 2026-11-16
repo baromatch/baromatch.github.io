@@ -100,8 +100,8 @@
   "/agenda/monaco.ics": {
    "type": "calendrier",
    "cle": "monaco",
-   "empreinte": "tZ1WFgKj6zrP0MI7mXiyiA",
-   "change": "2026-11-13",
+   "empreinte": "OqdSZqbqDQbf0xReQJ6SEg",
+   "change": "2026-11-16",
    "indexable": false,
    "memoire": {
     "court": "Monaco",
@@ -122,8 +122,8 @@
   "/agenda/ol.ics": {
    "type": "calendrier",
    "cle": "ol",
-   "empreinte": "KJL7hKjPhbjTHTwQmpfnLg",
-   "change": "2026-11-13",
+   "empreinte": "6cXBLys71AhuBx-wbwaYGw",
+   "change": "2026-11-16",
    "indexable": false,
    "memoire": {
     "court": "OL",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "n_3BwefJCvAPrUvHMxQLuA",
-   "change": "2026-11-15",
+   "empreinte": "V2ihdxoIEIpl8gpzoi2Azg",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "5-dRmj8M9eridtzcDBtnoQ",
-   "change": "2026-11-15",
+   "empreinte": "UYXQa20YcRn0eB7fnBWoig",
+   "change": "2026-11-16",
    "indexable": false
   },
   "/en/": {
@@ -681,31 +681,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "BYxYF3VisTipNcs_I4eUlw",
-   "change": "2026-11-15",
+   "empreinte": "DIRcGypPMrKO2l0oOZDUJw",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "GFLUyF1uM2KJ7uIwhA9knw",
-   "change": "2026-11-15",
+   "empreinte": "JTdBmHzuX4JPYthpDi8Viw",
+   "change": "2026-11-16",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "K72W4ViSTEyTrf7XAkb7Ug",
-   "change": "2026-11-15",
+   "empreinte": "0nbPjosKO-L3_U6P93JHLA",
+   "change": "2026-11-16",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "bg7iEb4Kv3USSqsSYQQjsA",
-   "change": "2026-11-15",
+   "empreinte": "sEduLlxS5R4MzPjYnxi4nQ",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": []
   },
@@ -1606,8 +1606,8 @@
   "/matchs/club/monaco/": {
    "type": "club",
    "cle": "monaco",
-   "empreinte": "6aRh4NLpb_iB18rXOK67NA",
-   "change": "2026-11-13",
+   "empreinte": "zFoKdv-2d_G4cBpC3d8QsA",
+   "change": "2026-11-16",
    "indexable": true,
    "bars": []
   },
@@ -1622,8 +1622,8 @@
   "/matchs/club/ol/": {
    "type": "club",
    "cle": "ol",
-   "empreinte": "1UG_fdv21D7bh3aqoUFVQg",
-   "change": "2026-11-13",
+   "empreinte": "15oDEvbaXAQN3C3sLEOP1Q",
+   "change": "2026-11-16",
    "indexable": true,
    "bars": []
   },
@@ -1670,8 +1670,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "xg6dlsnNV1hecs4vvT2swg",
-   "change": "2026-11-15",
+   "empreinte": "3x-Xmd61pIN_8_U57l0U4Q",
+   "change": "2026-11-16",
    "indexable": true,
    "bars": []
   },
@@ -1957,8 +1957,8 @@
    "type": "match",
    "cle": "france-turquie-2026-11-15",
    "date": "2026-11-15T19:45:00.000Z",
-   "empreinte": "UOsSuHL-y-cQCDP2LyAdbw",
-   "change": "2026-11-12",
+   "empreinte": "Wk5_uEQJrQRz9c5rddXeQg",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1982,20 +1982,6 @@
      "slug": "nt-tr"
     }
    }
-  },
-  "/matchs/france-turquie-2026-11-15/match.ics": {
-   "type": "evenement",
-   "cle": "france-turquie-2026-11-15",
-   "empreinte": "Sg6ciJMFUFE0zqOfHTMb5w",
-   "change": "2026-11-02",
-   "indexable": false
-  },
-  "/matchs/france-turquie-2026-11-15/partage.png": {
-   "type": "partage",
-   "cle": "france-turquie-2026-11-15",
-   "empreinte": "eetbBAZrwveuKbx6pGgwVg",
-   "change": "2026-11-02",
-   "indexable": false
   },
   "/matchs/galatasaray-aston-villa-2026-11-24/": {
    "type": "match",
@@ -2045,8 +2031,8 @@
    "type": "match",
    "cle": "heart-of-midlothian-monaco-2026-11-26",
    "date": "2026-11-26T17:45:00.000Z",
-   "empreinte": "bBWXB4Yg-yXKivyzHoe7Rg",
-   "change": "2026-11-13",
+   "empreinte": "ZIcXMeD8kQWDtpU7INuNNg",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2193,8 +2179,8 @@
    "type": "match",
    "cle": "italie-france-2026-11-12",
    "date": "2026-11-12T19:45:00.000Z",
-   "empreinte": "6jsBR7o1yy2t647dLEbIqA",
-   "change": "2026-11-13",
+   "empreinte": "iFYxKJ2h4B9-qNNAU6FiKw",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2923,8 +2909,8 @@
    "type": "match",
    "cle": "lille-ol-2026-11-21",
    "date": "2026-11-21T19:45:00.000Z",
-   "empreinte": "9KwmMrzMEruWwoJ8jixMfA",
-   "change": "2026-11-14",
+   "empreinte": "ATwkChrTtsI_iviDMenedA",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3279,8 +3265,8 @@
    "type": "match",
    "cle": "monaco-auxerre-2026-11-21",
    "date": "2026-11-21T19:45:00.000Z",
-   "empreinte": "uGRFtiHfRE0-ss1MCak8NQ",
-   "change": "2026-11-15",
+   "empreinte": "eJzSw_L4jocr883vsoLphg",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3769,8 +3755,8 @@
    "type": "match",
    "cle": "ol-lillestrom-2026-11-26",
    "date": "2026-11-26T20:00:00.000Z",
-   "empreinte": "NNCU1WgNvvWgG5pkCy3YbQ",
-   "change": "2026-11-13",
+   "empreinte": "Sd07C6KX-PZKwXyNTtTF-g",
+   "change": "2026-11-16",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3807,6 +3793,50 @@
    "cle": "ol-lillestrom-2026-11-26",
    "empreinte": "OM4MxpXzVIBI6-PmhVirWw",
    "change": "2026-11-13",
+   "indexable": false
+  },
+  "/matchs/ol-monaco-2026-11-29/": {
+   "type": "match",
+   "cle": "ol-monaco-2026-11-29",
+   "date": "2026-11-29T19:45:00.000Z",
+   "empreinte": "L9VVdQzT-OtGbxR3xTc8_w",
+   "change": "2026-11-16",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "ol-monaco-2026-11-29",
+    "ids": [
+     "cmvxranfq001wz71o28as23h1"
+    ],
+    "debut": "2026-11-29T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "ol",
+     "court": "OL",
+     "nom": "Olympique Lyonnais",
+     "slug": "olympique-lyonnais"
+    },
+    "exterieur": {
+     "cle": "monaco",
+     "court": "Monaco",
+     "nom": "AS Monaco",
+     "slug": "as-monaco"
+    }
+   }
+  },
+  "/matchs/ol-monaco-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "ol-monaco-2026-11-29",
+   "empreinte": "XAbxtk1yCKKaJZJ_Txf17Q",
+   "change": "2026-11-16",
+   "indexable": false
+  },
+  "/matchs/ol-monaco-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "ol-monaco-2026-11-29",
+   "empreinte": "iarDAMHTsfkAWAM1qJAvmg",
+   "change": "2026-11-16",
    "indexable": false
   },
   "/matchs/ol-nice-2026-10-18/": {
@@ -5781,31 +5811,9 @@
     "court": "Monaco",
     "nom": "AS Monaco"
    },
-   "empreinte": "G8f6CzfmDKU3ooMmVZFpbg",
-   "sequence": 0,
-   "modifie": "2026-11-01T12:06:10Z"
-  },
-  "cmvxrat3q0008g7uu7qrhx99m@baromatch.fr": {
-   "ids": [
-    "cmvxrat3q0008g7uu7qrhx99m"
-   ],
-   "slug": "france-turquie-2026-11-15",
-   "debut": "2026-11-15T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des nations",
-   "domicile": {
-    "cle": "france",
-    "court": "France",
-    "nom": "France"
-   },
-   "exterieur": {
-    "cle": "turquie",
-    "court": "Turquie",
-    "nom": "Turquie"
-   },
-   "empreinte": "w9M-hKta9LIiq7u4Do-bFw",
-   "sequence": 0,
-   "modifie": "2026-11-02T00:41:25Z"
+   "empreinte": "er3JC4K7OVZ8ZWECkQOJ6w",
+   "sequence": 1,
+   "modifie": "2026-11-16T00:59:18Z"
   },
   "cmvxrat4f000ag7uuv1wr0fw9@baromatch.fr": {
    "ids": [

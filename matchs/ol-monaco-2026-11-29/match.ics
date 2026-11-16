@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxranfq001wz71o28as23h1@baromatch.fr
+DTSTAMP:20261116T005918Z
+SEQUENCE:1
+DTSTART:20261129T194500Z
+DTEND:20261129T214500Z
+SUMMARY:OL – Monaco
+DESCRIPTION:Ligue 1 · Olympique Lyonnais – AS Monaco\nCoup d’envoi dim
+ anche 29 novembre à 20:45\, heure de Paris.\nLa page du match : https://
+ baromatch.fr/matchs/ol-monaco-2026-11-29/
+URL:https://baromatch.fr/matchs/ol-monaco-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

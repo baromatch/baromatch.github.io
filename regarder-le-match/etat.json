@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "zM6SMSF2Ko8UG-eNsIeH6A",
-   "change": "2026-11-16",
+   "empreinte": "gw0HHU7Cm-zJLwQgAvOj_w",
+   "change": "2026-11-17",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "UYXQa20YcRn0eB7fnBWoig",
-   "change": "2026-11-16",
+   "empreinte": "SZ9Ub6IaUYgF-_hXaqzmCQ",
+   "change": "2026-11-17",
    "indexable": false
   },
   "/en/": {
@@ -654,31 +654,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "501uMmXHjygYN9u4ohwviQ",
-   "change": "2026-11-16",
+   "empreinte": "iaHJu7gzRw6NniwKmmcu0Q",
+   "change": "2026-11-17",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "G_1sVOeEH0Vpyx_h8wCfXQ",
-   "change": "2026-11-16",
+   "empreinte": "FN3_Zu7KkBadXUHPhe1Mow",
+   "change": "2026-11-17",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "0nbPjosKO-L3_U6P93JHLA",
-   "change": "2026-11-16",
+   "empreinte": "zjPqUJge5G_VjaOlH_x3Iw",
+   "change": "2026-11-17",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "sEduLlxS5R4MzPjYnxi4nQ",
-   "change": "2026-11-16",
+   "empreinte": "YHixygMsjyAZvrC3KLxrFA",
+   "change": "2026-11-17",
    "indexable": false,
    "bars": []
   },

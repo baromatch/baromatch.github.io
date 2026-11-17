@@ -161,19 +161,21 @@ test('la page Confidentialité : sur iPhone, les notifications de notre serveur 
 });
 
 // Les sauvegardes : faites par nous, chiffrées, effacées une fois leurs 28 jours passés, à la sauvegarde suivante
-// (5 semaines au plus avec une sauvegarde par semaine), jamais chez Railway ; un compte supprimé y reste autant. Et chaque durée de conservation de l’appli a sa ligne dans « Combien de temps ».
-test('la page Confidentialité : les sauvegardes chiffrées, 5 semaines au plus, et une ligne par durée', async ({ page }) => {
+// (5 semaines avec une sauvegarde par semaine, puis 30 jours dans la corbeille du stockage en ligne : 65 jours au plus), jamais chez Railway ; un compte supprimé y reste autant. Et chaque durée de conservation de l’appli a sa ligne dans « Combien de temps ».
+test('la page Confidentialité : les sauvegardes chiffrées, 65 jours au plus, et une ligne par durée', async ({ page }) => {
   await page.goto('/confidentialite.html');
   const sauvegardes = normaliser(await page.locator('#sauvegardes + ul').innerText());
   expect(sauvegardes).toContain('Qui les fait : nous, pas Railway.');
   expect(sauvegardes).toContain('chaque copie est chiffrée avec une phrase de passe que seul le responsable de Baromatch connaît');
   expect(sauvegardes).toContain('Jamais chez Railway.');
-  expect(sauvegardes).toContain('une sauvegarde est effacée une fois ses 28 jours passés, au moment de la sauvegarde suivante');
+  expect(sauvegardes).toContain('une sauvegarde est effacée une fois ses 28 jours passés, au moment de la sauvegarde suivante, avec sa deuxième copie');
   expect(sauvegardes).toContain('une copie vit donc 5 semaines au plus');
+  expect(sauvegardes).toContain('la copie effacée peut encore rester 30 jours dans sa corbeille, toujours chiffrée : 65 jours au plus en tout.');
+  expect(sauvegardes).not.toContain('à la main, chaque semaine');
   expect(sauvegardes).toContain('par exemple OneDrive, de Microsoft, une société américaine');
   expect(sauvegardes).not.toContain('effacée au bout de 28 jours');
-  expect(sauvegardes).toContain('il reste dans les sauvegardes faites avant, jusqu’à ce qu’elles soient effacées : 5 semaines au plus.');
-  await expect(page.locator('#suppression + p + ul')).toContainText('ton compte reste dans les sauvegardes faites avant ta suppression, jusqu’à ce qu’elles soient effacées : 5 semaines au plus');
+  expect(sauvegardes).toContain('il reste dans les sauvegardes faites avant, jusqu’à ce qu’elles soient effacées : 65 jours au plus.');
+  await expect(page.locator('#suppression + p + ul')).toContainText('ton compte reste dans les sauvegardes faites avant ta suppression, jusqu’à ce qu’elles soient effacées : 65 jours au plus');
   await expect(page.locator('#prestataires + ul > li', { hasText: /^Railway/ })).toContainText('Railway ne fait pas de sauvegarde de notre base : c’est nous qui les faisons');
   const texte = await texteDe(page, '/confidentialite.html');
   expect(texte).not.toMatch(/sauvegarde de notre base, chez Railway|copies de sauvegarde de notre base, chez Railway/);
@@ -183,7 +185,7 @@ test('la page Confidentialité : les sauvegardes chiffrées, 5 semaines au plus,
     'L’heure à laquelle tu dis arriver avec « Je suis en retard », et l’heure jusqu’à laquelle ta place est alors gardée : effacées un jour après le coup d’envoi.',
     'L’attente après des mauvais mots de passe, pour l’équipe des bars : 24 heures après le dernier mauvais mot de passe.',
     'La case « mot de passe à changer » d’un compte de bar : jusqu’à ce que la personne choisisse son propre mot de passe.',
-    'Les sauvegardes chiffrées de notre base : effacées une fois leurs 28 jours passés, à la sauvegarde suivante (5 semaines au plus).',
+    'Les sauvegardes chiffrées de notre base : effacées une fois leurs 28 jours passés, à la sauvegarde suivante (65 jours au plus, corbeille du stockage en ligne comprise).',
     'Les rapports d’erreurs chez Sentry, une fois allumé : 30 jours avec son offre gratuite, 90 avec une offre payante.',
     'Nos mails d’alerte, sans donnée personnelle : dans notre boîte mail tant qu’on les garde, et chez Resend selon ses conditions.',
     'Les compteurs du service (des nombres par tranche de 5 minutes, sans personne) : 2 heures.',

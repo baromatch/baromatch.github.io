@@ -654,7 +654,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "iaHJu7gzRw6NniwKmmcu0Q",
+   "empreinte": "OhMIknFYvpVGVFh2Uo7l_A",
    "change": "2026-11-17",
    "indexable": false,
    "bars": []
@@ -783,36 +783,6 @@
      "court": "Nice",
      "nom": "OGC Nice",
      "slug": "ogc-nice"
-    }
-   }
-  },
-  "/matchs/angers-om-2026-10-18/": {
-   "type": "match",
-   "cle": "angers-om-2026-10-18",
-   "date": "2026-10-18T13:00:00.000Z",
-   "empreinte": "RJ31jlSuPIUeUxREO5WRiw",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "angers-om-2026-10-18",
-    "ids": [
-     "cmuy4o2tf000tzz9wztggbhpf"
-    ],
-    "debut": "2026-10-18T13:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue 1",
-    "domicile": {
-     "cle": "angers",
-     "court": "Angers",
-     "nom": "Angers SCO",
-     "slug": "angers-sco"
-    },
-    "exterieur": {
-     "cle": "om",
-     "court": "OM",
-     "nom": "Olympique de Marseille",
-     "slug": "olympique-de-marseille"
     }
    }
   },
@@ -2148,36 +2118,6 @@
     }
    }
   },
-  "/matchs/le-havre-auxerre-2026-10-18/": {
-   "type": "match",
-   "cle": "le-havre-auxerre-2026-10-18",
-   "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "wPdJlYvJmbwTAdorO7lYhA",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "le-havre-auxerre-2026-10-18",
-    "ids": [
-     "cmuy4o31c000zzz9wvq8fcogl"
-    ],
-    "debut": "2026-10-18T15:15:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue 1",
-    "domicile": {
-     "cle": "le-havre",
-     "court": "Le Havre",
-     "nom": "Le Havre AC",
-     "slug": "le-havre-ac"
-    },
-    "exterieur": {
-     "cle": "auxerre",
-     "court": "Auxerre",
-     "nom": "AJ Auxerre",
-     "slug": "aj-auxerre"
-    }
-   }
-  },
   "/matchs/le-havre-lorient-2026-11-08/": {
    "type": "match",
    "cle": "le-havre-lorient-2026-11-08",
@@ -2876,36 +2816,6 @@
     }
    }
   },
-  "/matchs/lorient-monaco-2026-10-18/": {
-   "type": "match",
-   "cle": "lorient-monaco-2026-10-18",
-   "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "1bJXnPfPNiy6fqzOFtlLig",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "lorient-monaco-2026-10-18",
-    "ids": [
-     "cmuy4o2wd000xzz9wwnjsot1s"
-    ],
-    "debut": "2026-10-18T15:15:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue 1",
-    "domicile": {
-     "cle": "lorient",
-     "court": "Lorient",
-     "nom": "FC Lorient",
-     "slug": "fc-lorient"
-    },
-    "exterieur": {
-     "cle": "monaco",
-     "court": "Monaco",
-     "nom": "AS Monaco",
-     "slug": "as-monaco"
-    }
-   }
-  },
   "/matchs/lorient-rennes-2026-11-22/": {
    "type": "match",
    "cle": "lorient-rennes-2026-11-22",
@@ -3021,36 +2931,6 @@
      "court": "Aston Villa",
      "nom": "Aston Villa",
      "slug": "aston-villa"
-    }
-   }
-  },
-  "/matchs/milan-atalanta-2026-10-18/": {
-   "type": "match",
-   "cle": "milan-atalanta-2026-10-18",
-   "date": "2026-10-18T16:00:00.000Z",
-   "empreinte": "UmDLTB7GixspftPKnlxE5Q",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "milan-atalanta-2026-10-18",
-    "ids": [
-     "cmv6e5jdr000jryqjohg84l52"
-    ],
-    "debut": "2026-10-18T16:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Serie A",
-    "domicile": {
-     "cle": "milan",
-     "court": "Milan",
-     "nom": "AC Milan",
-     "slug": "ac-milan"
-    },
-    "exterieur": {
-     "cle": "atalanta",
-     "court": "Atalanta",
-     "nom": "Atalanta BC",
-     "slug": "atalanta-bc"
     }
    }
   },
@@ -3881,36 +3761,6 @@
      "court": "Monaco",
      "nom": "AS Monaco",
      "slug": "as-monaco"
-    }
-   }
-  },
-  "/matchs/paris-fc-rennes-2026-10-18/": {
-   "type": "match",
-   "cle": "paris-fc-rennes-2026-10-18",
-   "date": "2026-10-18T15:15:00.000Z",
-   "empreinte": "fpqFPDbuyCkMdQ2RGiABMg",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "paris-fc-rennes-2026-10-18",
-    "ids": [
-     "cmuy4o2us000vzz9wjza1c2ln"
-    ],
-    "debut": "2026-10-18T15:15:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue 1",
-    "domicile": {
-     "cle": "paris-fc",
-     "court": "Paris FC",
-     "nom": "Paris FC",
-     "slug": "paris-fc"
-    },
-    "exterieur": {
-     "cle": "rennes",
-     "court": "Rennes",
-     "nom": "Stade Rennais FC",
-     "slug": "stade-rennais-fc"
     }
    }
   },

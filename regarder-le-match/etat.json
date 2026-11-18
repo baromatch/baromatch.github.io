@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "gw0HHU7Cm-zJLwQgAvOj_w",
-   "change": "2026-11-17",
+   "empreinte": "bgP5yl0p6yUwqzykgdG82A",
+   "change": "2026-11-18",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "SZ9Ub6IaUYgF-_hXaqzmCQ",
-   "change": "2026-11-17",
+   "empreinte": "q-iztoPl3KvlOYVcLbTiZQ",
+   "change": "2026-11-18",
    "indexable": false
   },
   "/en/": {
@@ -654,31 +654,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "OhMIknFYvpVGVFh2Uo7l_A",
-   "change": "2026-11-17",
+   "empreinte": "LcJ7uuj3DoBLioAVEE5Ppw",
+   "change": "2026-11-18",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "FN3_Zu7KkBadXUHPhe1Mow",
-   "change": "2026-11-17",
+   "empreinte": "TTzbXoz7_igP_1D90w3CIw",
+   "change": "2026-11-18",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "zjPqUJge5G_VjaOlH_x3Iw",
-   "change": "2026-11-17",
+   "empreinte": "RcSFmpBEUzS6qQeO-x_ASw",
+   "change": "2026-11-18",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "YHixygMsjyAZvrC3KLxrFA",
-   "change": "2026-11-17",
+   "empreinte": "e0nOeYGMioYOmTxpI-OmiA",
+   "change": "2026-11-18",
    "indexable": false,
    "bars": []
   },
@@ -2025,36 +2025,6 @@
      "court": "France",
      "nom": "France",
      "slug": "nt-fr"
-    }
-   }
-  },
-  "/matchs/juventus-lazio-2026-10-18/": {
-   "type": "match",
-   "cle": "juventus-lazio-2026-10-18",
-   "date": "2026-10-18T18:45:00.000Z",
-   "empreinte": "l9cTwRygxsUGghTkVOgXCQ",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "juventus-lazio-2026-10-18",
-    "ids": [
-     "cmv6e5jeh000lryqj7h3np9lc"
-    ],
-    "debut": "2026-10-18T18:45:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Serie A",
-    "domicile": {
-     "cle": "juventus",
-     "court": "Juventus",
-     "nom": "Juventus FC",
-     "slug": "juventus-fc"
-    },
-    "exterieur": {
-     "cle": "lazio",
-     "court": "Lazio",
-     "nom": "SS Lazio",
-     "slug": "ss-lazio"
     }
    }
   },
@@ -3512,36 +3482,6 @@
    "change": "2026-11-16",
    "indexable": false
   },
-  "/matchs/ol-nice-2026-10-18/": {
-   "type": "match",
-   "cle": "ol-nice-2026-10-18",
-   "date": "2026-10-18T18:45:00.000Z",
-   "empreinte": "HWq_9ZWuBOvk0Q7u5DEJ0w",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "ol-nice-2026-10-18",
-    "ids": [
-     "cmuy4o32c0011zz9wnmirx1mt"
-    ],
-    "debut": "2026-10-18T18:45:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue 1",
-    "domicile": {
-     "cle": "ol",
-     "court": "OL",
-     "nom": "Olympique Lyonnais",
-     "slug": "olympique-lyonnais"
-    },
-    "exterieur": {
-     "cle": "nice",
-     "court": "Nice",
-     "nom": "OGC Nice",
-     "slug": "ogc-nice"
-    }
-   }
-  },
   "/matchs/om-le-havre-2026-10-25/": {
    "type": "match",
    "cle": "om-le-havre-2026-10-25",
@@ -4030,36 +3970,6 @@
    "empreinte": "UjxlrYCBIP0tMOzE4RHPYA",
    "change": "2026-11-10",
    "indexable": false
-  },
-  "/matchs/real-madrid-seville-2026-10-18/": {
-   "type": "match",
-   "cle": "real-madrid-seville-2026-10-18",
-   "date": "2026-10-18T19:00:00.000Z",
-   "empreinte": "6PQNTVJ3gcy9Wsv_QiBX2A",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "real-madrid-seville-2026-10-18",
-    "ids": [
-     "cmv6e5jf7000nryqjjgrf6o6g"
-    ],
-    "debut": "2026-10-18T19:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "LaLiga",
-    "domicile": {
-     "cle": "real-madrid",
-     "court": "Real Madrid",
-     "nom": "Real Madrid C.F.",
-     "slug": "real-madrid-c-f"
-    },
-    "exterieur": {
-     "cle": "seville",
-     "court": "Séville",
-     "nom": "Sevilla FC",
-     "slug": "sevilla-fc"
-    }
-   }
   },
   "/matchs/real-sociedad-ol-2026-11-05/": {
    "type": "match",

@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "aPJTnoZJGciyoMhufZgJQQ",
+   "empreinte": "hPnbnECaCzPhDJDkt9CZjA",
    "change": "2026-11-19",
    "indexable": false,
    "bars": []
@@ -535,15 +535,6 @@
    "indexable": false,
    "bars": []
   },
-  "/en/matches/psg-barca-2026-10-20/": {
-   "type": "match-en",
-   "cle": "psg-barca-2026-10-20",
-   "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "CNbNxKwL1WXfVm1CP2Vzbg",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": []
-  },
   "/en/matches/psg-lorient-2026-11-28/": {
    "type": "match-en",
    "cle": "psg-lorient-2026-11-28",
@@ -654,7 +645,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "vD05aQDKZvET6gCuKJSj2w",
+   "empreinte": "mQMpgroqvt97xKbHAHpEgA",
    "change": "2026-11-19",
    "indexable": false,
    "bars": []
@@ -3708,8 +3699,8 @@
    "type": "match",
    "cle": "paris-feminines-koge-feminines-2026-11-19",
    "date": "2026-11-19T17:45:00.000Z",
-   "empreinte": "x2Nd4Njqzkv3AdaSj_BfvA",
-   "change": "2026-11-16",
+   "empreinte": "DkUXq-HioBrAJ_g4ZbAjKw",
+   "change": "2026-11-19",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3734,50 +3725,12 @@
     }
    }
   },
-  "/matchs/paris-feminines-koge-feminines-2026-11-19/match.ics": {
-   "type": "evenement",
-   "cle": "paris-feminines-koge-feminines-2026-11-19",
-   "empreinte": "RYRIW7IVIT98Ibj5sqkwvQ",
-   "change": "2026-11-16",
-   "indexable": false
-  },
   "/matchs/paris-feminines-koge-feminines-2026-11-19/partage.png": {
    "type": "partage",
    "cle": "paris-feminines-koge-feminines-2026-11-19",
    "empreinte": "LTzcG6eV8-C0ngYFhFGUbA",
    "change": "2026-11-16",
    "indexable": false
-  },
-  "/matchs/psg-barca-2026-10-20/": {
-   "type": "match",
-   "cle": "psg-barca-2026-10-20",
-   "date": "2026-10-20T19:00:00.000Z",
-   "empreinte": "7o8rkTeX0lbG6ENAFUz2zg",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "psg-barca-2026-10-20",
-    "ids": [
-     "cmuy4o3bt001lzz9w12rhfcw6",
-     "cmv6e5jfu000pryqjcr3s6v8f"
-    ],
-    "debut": "2026-10-20T19:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue des champions",
-    "domicile": {
-     "cle": "psg",
-     "court": "PSG",
-     "nom": "Paris Saint-Germain",
-     "slug": "paris-saint-germain"
-    },
-    "exterieur": {
-     "cle": "barca",
-     "court": "Barça",
-     "nom": "FC Barcelona",
-     "slug": "fc-barcelona"
-    }
-   }
   },
   "/matchs/psg-lorient-2026-11-28/": {
    "type": "match",
@@ -5527,28 +5480,6 @@
    "empreinte": "cH6ZbpefaSFGcTWTwxpcZw",
    "sequence": 0,
    "modifie": "2026-11-11T21:55:06Z"
-  },
-  "cmwjbtjba000477h13bsphzry@baromatch.fr": {
-   "ids": [
-    "cmwjbtjba000477h13bsphzry"
-   ],
-   "slug": "paris-feminines-koge-feminines-2026-11-19",
-   "debut": "2026-11-19T17:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des champions féminine",
-   "domicile": {
-    "cle": "paris-feminines",
-    "court": "Paris féminines",
-    "nom": "Paris FC féminines"
-   },
-   "exterieur": {
-    "cle": "koge-feminines",
-    "court": "Køge féminines",
-    "nom": "HB Køge féminines"
-   },
-   "empreinte": "lprBzOdvpIIYhr2Q-r7-fQ",
-   "sequence": 0,
-   "modifie": "2026-11-16T21:58:24Z"
   },
   "cmwjbtryy0008i2y6kjno8xu3@baromatch.fr": {
    "ids": [

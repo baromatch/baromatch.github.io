@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "9BlLsWCVZ7j9nO8yP0-xSA",
+   "empreinte": "L83ewGJHwk5Rt2e3IpJvuQ",
    "change": "2026-11-20",
    "indexable": false,
    "bars": []
@@ -279,15 +279,6 @@
    "cle": "bodo-glimt-lille-2026-11-03",
    "date": "2026-11-03T20:00:00.000Z",
    "empreinte": "AElQCcgoEB-geGtj9oM0fA",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": []
-  },
-  "/en/matches/bruges-lens-2026-10-21/": {
-   "type": "match-en",
-   "cle": "bruges-lens-2026-10-21",
-   "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "p4IFcjG9KMoypKF95F4CYQ",
    "change": "2026-11-12",
    "indexable": false,
    "bars": []
@@ -415,15 +406,6 @@
    "date": "2026-11-25T20:00:00.000Z",
    "empreinte": "VNGrmepaNpM0yougZW8pYA",
    "change": "2026-11-16",
-   "indexable": false,
-   "bars": []
-  },
-  "/en/matches/lille-galatasaray-2026-10-21/": {
-   "type": "match-en",
-   "cle": "lille-galatasaray-2026-10-21",
-   "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "SYpWxdBY2ioYQLxuC_3Rog",
-   "change": "2026-11-12",
    "indexable": false,
    "bars": []
   },
@@ -645,7 +627,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "trovS7pUDIzL0Z6O2ifIPw",
+   "empreinte": "zLryn_f34MKaaO5_HV7rOA",
    "change": "2026-11-20",
    "indexable": false,
    "bars": []
@@ -1326,36 +1308,6 @@
    "empreinte": "2QA5wUJyFO3WMWkoeGtHsQ",
    "change": "2026-11-14",
    "indexable": false
-  },
-  "/matchs/bruges-lens-2026-10-21/": {
-   "type": "match",
-   "cle": "bruges-lens-2026-10-21",
-   "date": "2026-10-21T19:00:00.000Z",
-   "empreinte": "DL3ayw562rgnvYqXFHQbBQ",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "bruges-lens-2026-10-21",
-    "ids": [
-     "cmv6e5jh6000tryqjnandqqmv"
-    ],
-    "debut": "2026-10-21T19:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue des champions",
-    "domicile": {
-     "cle": "bruges",
-     "court": "Bruges",
-     "nom": "Club Brugge KV",
-     "slug": "club-brugge-kv"
-    },
-    "exterieur": {
-     "cle": "lens",
-     "court": "Lens",
-     "nom": "RC Lens",
-     "slug": "rc-lens"
-    }
-   }
   },
   "/matchs/bruges-liverpool-2026-11-25/": {
    "type": "match",
@@ -2568,36 +2520,6 @@
    "empreinte": "K19i2v6HO3vHDPwPrgV7cw",
    "change": "2026-11-11",
    "indexable": false
-  },
-  "/matchs/lille-galatasaray-2026-10-21/": {
-   "type": "match",
-   "cle": "lille-galatasaray-2026-10-21",
-   "date": "2026-10-21T16:45:00.000Z",
-   "empreinte": "WoxQzztXXD4X3RjaH5xhvg",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "lille-galatasaray-2026-10-21",
-    "ids": [
-     "cmv6e5jgj000rryqjd3m8s710"
-    ],
-    "debut": "2026-10-21T16:45:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue des champions",
-    "domicile": {
-     "cle": "lille",
-     "court": "Lille",
-     "nom": "LOSC Lille",
-     "slug": "losc-lille"
-    },
-    "exterieur": {
-     "cle": "galatasaray",
-     "court": "Galatasaray",
-     "nom": "Galatasaray A.Ş.",
-     "slug": "galatasaray-a-s"
-    }
-   }
   },
   "/matchs/lille-lens-2026-10-30/": {
    "type": "match",
@@ -4381,8 +4303,8 @@
    "type": "match",
    "cle": "troyes-le-havre-2026-11-20",
    "date": "2026-11-20T19:45:00.000Z",
-   "empreinte": "WS87zudb3hRLEu3nHwZNTg",
-   "change": "2026-11-16",
+   "empreinte": "3rfFC7TJdEtbtphDLiQD8A",
+   "change": "2026-11-20",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4406,13 +4328,6 @@
      "slug": "le-havre-ac"
     }
    }
-  },
-  "/matchs/troyes-le-havre-2026-11-20/match.ics": {
-   "type": "evenement",
-   "cle": "troyes-le-havre-2026-11-20",
-   "empreinte": "veEZxQlc2z3v4weLKE-29w",
-   "change": "2026-11-07",
-   "indexable": false
   },
   "/matchs/troyes-le-havre-2026-11-20/partage.png": {
    "type": "partage",

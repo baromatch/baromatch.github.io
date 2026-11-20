@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "hPnbnECaCzPhDJDkt9CZjA",
-   "change": "2026-11-19",
+   "empreinte": "9BlLsWCVZ7j9nO8yP0-xSA",
+   "change": "2026-11-20",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "YlmPr9QDB2digFdxtq4M6w",
-   "change": "2026-11-19",
+   "empreinte": "JXcJB0_Pzn5ZEi9mCZpURw",
+   "change": "2026-11-20",
    "indexable": false
   },
   "/en/": {
@@ -645,31 +645,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "mQMpgroqvt97xKbHAHpEgA",
-   "change": "2026-11-19",
+   "empreinte": "trovS7pUDIzL0Z6O2ifIPw",
+   "change": "2026-11-20",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "dPngh7Ga6R42SM4rQ3a7uQ",
-   "change": "2026-11-19",
+   "empreinte": "iDM1WPqVjLBMbB0sOIqgqw",
+   "change": "2026-11-20",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "VyrSQPjeiJwmgKl7Vo27Vg",
-   "change": "2026-11-19",
+   "empreinte": "uoyCfRGRh2niE2C-9UnUoQ",
+   "change": "2026-11-20",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "kMfR7sEWt335xc2xnOUcdg",
-   "change": "2026-11-19",
+   "empreinte": "djIjtR0cjsSNrxgX5DU31Q",
+   "change": "2026-11-20",
    "indexable": false,
    "bars": []
   },
@@ -3699,8 +3699,8 @@
    "type": "match",
    "cle": "paris-feminines-koge-feminines-2026-11-19",
    "date": "2026-11-19T17:45:00.000Z",
-   "empreinte": "DkUXq-HioBrAJ_g4ZbAjKw",
-   "change": "2026-11-19",
+   "empreinte": "VuXYee9TbYj0AfJ3JbiuYg",
+   "change": "2026-11-20",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3724,13 +3724,6 @@
      "slug": "hb-koge-feminines"
     }
    }
-  },
-  "/matchs/paris-feminines-koge-feminines-2026-11-19/partage.png": {
-   "type": "partage",
-   "cle": "paris-feminines-koge-feminines-2026-11-19",
-   "empreinte": "LTzcG6eV8-C0ngYFhFGUbA",
-   "change": "2026-11-16",
-   "indexable": false
   },
   "/matchs/psg-lorient-2026-11-28/": {
    "type": "match",

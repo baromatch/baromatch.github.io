@@ -4,8 +4,8 @@
   "/agenda/": {
    "type": "agenda",
    "cle": "agenda",
-   "empreinte": "GdJmvCJJqaTyyoa9HxtD7w",
-   "change": "2026-11-16",
+   "empreinte": "HkV_Tuk92Z8IjWenXnxLSg",
+   "change": "2026-11-21",
    "indexable": true,
    "bars": []
   },
@@ -45,8 +45,8 @@
   "/agenda/le-havre.ics": {
    "type": "calendrier",
    "cle": "le-havre",
-   "empreinte": "TlgfAebDnoQZRfDslZFC7Q",
-   "change": "2026-11-16",
+   "empreinte": "HuxBcuK7b4ywnSDASeJYIA",
+   "change": "2026-11-21",
    "indexable": false,
    "memoire": {
     "court": "Le Havre",
@@ -199,8 +199,8 @@
   "/agenda/troyes.ics": {
    "type": "calendrier",
    "cle": "troyes",
-   "empreinte": "169ArIdTpV2muINn4ySCXQ",
-   "change": "2026-11-16",
+   "empreinte": "FPO_pi94pO2T5fpiGOhy2A",
+   "change": "2026-11-21",
    "indexable": false,
    "memoire": {
     "court": "Troyes",
@@ -210,16 +210,16 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "L83ewGJHwk5Rt2e3IpJvuQ",
-   "change": "2026-11-20",
+   "empreinte": "Fx3rnF7xxJvM_q_sfcGuHg",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "JXcJB0_Pzn5ZEi9mCZpURw",
-   "change": "2026-11-20",
+   "empreinte": "P5FcondjXgNk6Wv-CcxI9Q",
+   "change": "2026-11-21",
    "indexable": false
   },
   "/en/": {
@@ -368,8 +368,8 @@
    "type": "match-en",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "1VpA0rTHuy2adGuyfDPXPg",
-   "change": "2026-11-12",
+   "empreinte": "fJLvPcCyCCdrNeyxlamSsA",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": []
   },
@@ -548,8 +548,8 @@
    "type": "match-en",
    "cle": "psg-troyes-2026-11-07",
    "date": "2026-11-07T19:45:00.000Z",
-   "empreinte": "-7LdLrAY4bG8ukfdnqrYJg",
-   "change": "2026-11-12",
+   "empreinte": "XtPFhIlf65BgvdBoaX1XXw",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": []
   },
@@ -627,31 +627,31 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "zLryn_f34MKaaO5_HV7rOA",
-   "change": "2026-11-20",
+   "empreinte": "24WIvOqyaHJflJD8NEY7Pw",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": []
   },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "iDM1WPqVjLBMbB0sOIqgqw",
-   "change": "2026-11-20",
+   "empreinte": "mWEDJqT3oQYMwgXEG7MleQ",
+   "change": "2026-11-21",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "uoyCfRGRh2niE2C-9UnUoQ",
-   "change": "2026-11-20",
+   "empreinte": "BAxO2oSbJX_A1JGooYYKNA",
+   "change": "2026-11-21",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "djIjtR0cjsSNrxgX5DU31Q",
-   "change": "2026-11-20",
+   "empreinte": "OUPN2dqbavowsU6-vR2G3w",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": []
   },
@@ -1496,8 +1496,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "UbzkqHHzBCpIU_iW-MejIg",
-   "change": "2026-11-16",
+   "empreinte": "YEsOCShLsbMqPLShrfnl6w",
+   "change": "2026-11-21",
    "indexable": true,
    "bars": []
   },
@@ -2035,8 +2035,8 @@
    "type": "match",
    "cle": "le-havre-lorient-2026-11-08",
    "date": "2026-11-08T16:15:00.000Z",
-   "empreinte": "6aLifiWMWS1vkoTmmxvESg",
-   "change": "2026-11-12",
+   "empreinte": "Ok-FO0sad_XHRw6261b1Dw",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2065,8 +2065,8 @@
    "type": "match",
    "cle": "le-havre-psg-2026-10-30",
    "date": "2026-10-30T18:00:00.000Z",
-   "empreinte": "1iIRbmShMVQKDU5YizMgJA",
-   "change": "2026-11-12",
+   "empreinte": "56nbkoDUj6zNQS7od1M1zg",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3399,8 +3399,8 @@
    "type": "match",
    "cle": "om-le-havre-2026-10-25",
    "date": "2026-10-25T16:15:00.000Z",
-   "empreinte": "R8oD65J3CATtgwfH6Ts1iQ",
-   "change": "2026-11-12",
+   "empreinte": "U2N7TXRjGR1EC6bq7R6uqg",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3769,8 +3769,8 @@
    "type": "match",
    "cle": "psg-troyes-2026-11-07",
    "date": "2026-11-07T19:45:00.000Z",
-   "empreinte": "-L5u1JAjZjo_zN5ipLqeiw",
-   "change": "2026-11-12",
+   "empreinte": "NVPYjDA1UzPcToonQwVGgg",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4273,8 +4273,8 @@
    "type": "match",
    "cle": "toulouse-troyes-2026-10-24",
    "date": "2026-10-24T15:15:00.000Z",
-   "empreinte": "sQEt4hQtDMNJTAVPHyr6Lw",
-   "change": "2026-11-12",
+   "empreinte": "QCDghJnrUISJdJZTPqM31A",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4303,8 +4303,8 @@
    "type": "match",
    "cle": "troyes-le-havre-2026-11-20",
    "date": "2026-11-20T19:45:00.000Z",
-   "empreinte": "3rfFC7TJdEtbtphDLiQD8A",
-   "change": "2026-11-20",
+   "empreinte": "R2lqsSKCFrlGA_rATTBFVA",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4329,19 +4329,12 @@
     }
    }
   },
-  "/matchs/troyes-le-havre-2026-11-20/partage.png": {
-   "type": "partage",
-   "cle": "troyes-le-havre-2026-11-20",
-   "empreinte": "5CaHK1D9RRiHmoCvlzqWQA",
-   "change": "2026-11-07",
-   "indexable": false
-  },
   "/matchs/troyes-le-mans-2026-10-31/": {
    "type": "match",
    "cle": "troyes-le-mans-2026-10-31",
    "date": "2026-10-31T19:45:00.000Z",
-   "empreinte": "AONhOmjV5US0v886W6xAHg",
-   "change": "2026-11-12",
+   "empreinte": "lwfBs2ocg8Q2_owILFTMqA",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4509,28 +4502,6 @@
  },
  "adresses": {},
  "evenements": {
-  "cmvxramwh0006z71o5lu3gcvd@baromatch.fr": {
-   "ids": [
-    "cmvxramwh0006z71o5lu3gcvd"
-   ],
-   "slug": "troyes-le-havre-2026-11-20",
-   "debut": "2026-11-20T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue 1",
-   "domicile": {
-    "cle": "troyes",
-    "court": "Troyes",
-    "nom": "ESTAC Troyes"
-   },
-   "exterieur": {
-    "cle": "le-havre",
-    "court": "Le Havre",
-    "nom": "Le Havre AC"
-   },
-   "empreinte": "osggfUbGYPbBVi0BHn0z_g",
-   "sequence": 1,
-   "modifie": "2026-11-06T23:05:46Z"
-  },
   "cmvxramxm0008z71o33w3iy6d@baromatch.fr": {
    "ids": [
     "cmvxramxm0008z71o33w3iy6d"

@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "Fx3rnF7xxJvM_q_sfcGuHg",
+   "empreinte": "qGPl0HHgIwbmus-iVToFjA",
    "change": "2026-11-21",
    "indexable": false,
    "bars": []
@@ -337,30 +337,12 @@
    "indexable": false,
    "bars": []
   },
-  "/en/matches/hoffenheim-ol-2026-10-22/": {
-   "type": "match-en",
-   "cle": "hoffenheim-ol-2026-10-22",
-   "date": "2026-10-22T19:00:00.000Z",
-   "empreinte": "ZMw83hn0X6I-nhyF7Mm9-Q",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": []
-  },
   "/en/matches/inter-stuttgart-2026-11-25/": {
    "type": "match-en",
    "cle": "inter-stuttgart-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
    "empreinte": "KxNb9grqXf5OhMLmviH1Dg",
    "change": "2026-11-16",
-   "indexable": false,
-   "bars": []
-  },
-  "/en/matches/juventus-rennes-2026-10-22/": {
-   "type": "match-en",
-   "cle": "juventus-rennes-2026-10-22",
-   "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "psxyvIdFunADl0l11wf-tQ",
-   "change": "2026-11-12",
    "indexable": false,
    "bars": []
   },
@@ -445,15 +427,6 @@
    "indexable": false,
    "bars": []
   },
-  "/en/matches/monaco-fribourg-2026-10-22/": {
-   "type": "match-en",
-   "cle": "monaco-fribourg-2026-10-22",
-   "date": "2026-10-22T19:00:00.000Z",
-   "empreinte": "w4fT-1fzJLiV4MpFdya3pw",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": []
-  },
   "/en/matches/monaco-nordsjaelland-2026-11-05/": {
    "type": "match-en",
    "cle": "monaco-nordsjaelland-2026-11-05",
@@ -467,8 +440,8 @@
    "type": "match-en",
    "cle": "newcastle-arsenal-2026-11-21",
    "date": "2026-11-21T17:30:00.000Z",
-   "empreinte": "Ee-Zk5Au1sdy0ymdXlW4dw",
-   "change": "2026-11-16",
+   "empreinte": "tvSKxvYm5YG59IlNI6DIiQ",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": []
   },
@@ -485,8 +458,8 @@
    "type": "match-en",
    "cle": "nice-psg-2026-11-21",
    "date": "2026-11-21T16:15:00.000Z",
-   "empreinte": "FO8xzkN1mvFChCOeCRT9sQ",
-   "change": "2026-11-16",
+   "empreinte": "j779KC7iu0i3GjHg8O_KJw",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": []
   },
@@ -598,15 +571,6 @@
    "indexable": false,
    "bars": []
   },
-  "/en/matches/sturm-graz-om-2026-10-22/": {
-   "type": "match-en",
-   "cle": "sturm-graz-om-2026-10-22",
-   "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "rhZ-vtcc5M3qRF8WpkuoTw",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": []
-  },
   "/en/matches/villarreal-psg-2026-11-03/": {
    "type": "match-en",
    "cle": "villarreal-psg-2026-11-03",
@@ -627,7 +591,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "24WIvOqyaHJflJD8NEY7Pw",
+   "empreinte": "-NhnFf2k3sUJMFN6n9EMdg",
    "change": "2026-11-21",
    "indexable": false,
    "bars": []
@@ -1837,36 +1801,6 @@
    "change": "2026-11-13",
    "indexable": false
   },
-  "/matchs/hoffenheim-ol-2026-10-22/": {
-   "type": "match",
-   "cle": "hoffenheim-ol-2026-10-22",
-   "date": "2026-10-22T19:00:00.000Z",
-   "empreinte": "mE4tjzK3gogf2r7am406bQ",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "hoffenheim-ol-2026-10-22",
-    "ids": [
-     "cmv6e5jjt0011ryqjfdp9xljj"
-    ],
-    "debut": "2026-10-22T19:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue Europa",
-    "domicile": {
-     "cle": "hoffenheim",
-     "court": "Hoffenheim",
-     "nom": "TSG Hoffenheim",
-     "slug": "tsg-hoffenheim"
-    },
-    "exterieur": {
-     "cle": "ol",
-     "court": "OL",
-     "nom": "Olympique Lyonnais",
-     "slug": "olympique-lyonnais"
-    }
-   }
-  },
   "/matchs/inter-fiorentina-2026-10-25/": {
    "type": "match",
    "cle": "inter-fiorentina-2026-10-25",
@@ -1998,36 +1932,6 @@
      "court": "Naples",
      "nom": "SSC Napoli",
      "slug": "ssc-napoli"
-    }
-   }
-  },
-  "/matchs/juventus-rennes-2026-10-22/": {
-   "type": "match",
-   "cle": "juventus-rennes-2026-10-22",
-   "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "8M3B3z3poB-b_NMiYYAz7A",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "juventus-rennes-2026-10-22",
-    "ids": [
-     "cmv6e5jhu000vryqjf2moooj3"
-    ],
-    "debut": "2026-10-22T16:45:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue Europa",
-    "domicile": {
-     "cle": "juventus",
-     "court": "Juventus",
-     "nom": "Juventus FC",
-     "slug": "juventus-fc"
-    },
-    "exterieur": {
-     "cle": "rennes",
-     "court": "Rennes",
-     "nom": "Stade Rennais FC",
-     "slug": "stade-rennais-fc"
     }
    }
   },
@@ -2891,36 +2795,6 @@
    "change": "2026-11-08",
    "indexable": false
   },
-  "/matchs/monaco-fribourg-2026-10-22/": {
-   "type": "match",
-   "cle": "monaco-fribourg-2026-10-22",
-   "date": "2026-10-22T19:00:00.000Z",
-   "empreinte": "fdItA4U8qg5N35Xh5eI1Rg",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "monaco-fribourg-2026-10-22",
-    "ids": [
-     "cmv6e5jj6000zryqjk9dgjf13"
-    ],
-    "debut": "2026-10-22T19:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue Conférence",
-    "domicile": {
-     "cle": "monaco",
-     "court": "Monaco",
-     "nom": "AS Monaco",
-     "slug": "as-monaco"
-    },
-    "exterieur": {
-     "cle": "fribourg",
-     "court": "Fribourg",
-     "nom": "SC Freiburg",
-     "slug": "sc-freiburg"
-    }
-   }
-  },
   "/matchs/monaco-lille-2026-10-25/": {
    "type": "match",
    "cle": "monaco-lille-2026-10-25",
@@ -3045,8 +2919,8 @@
    "type": "match",
    "cle": "newcastle-arsenal-2026-11-21",
    "date": "2026-11-21T17:30:00.000Z",
-   "empreinte": "97w6qyHXiOWq30Dycd9hvQ",
-   "change": "2026-11-16",
+   "empreinte": "BS4Zg2GeosEru04mWiXioA",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3070,13 +2944,6 @@
      "slug": "arsenal-fc"
     }
    }
-  },
-  "/matchs/newcastle-arsenal-2026-11-21/match.ics": {
-   "type": "evenement",
-   "cle": "newcastle-arsenal-2026-11-21",
-   "empreinte": "9cSCFDq8_hG7EJgUBpU6iw",
-   "change": "2026-11-07",
-   "indexable": false
   },
   "/matchs/newcastle-arsenal-2026-11-21/partage.png": {
    "type": "partage",
@@ -3119,8 +2986,8 @@
    "type": "match",
    "cle": "nice-psg-2026-11-21",
    "date": "2026-11-21T16:15:00.000Z",
-   "empreinte": "2weeK_e4uwgSZlYCG9Cmxw",
-   "change": "2026-11-16",
+   "empreinte": "bFE6q6eMu6KlpuNLDLDciw",
+   "change": "2026-11-21",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3144,13 +3011,6 @@
      "slug": "paris-saint-germain"
     }
    }
-  },
-  "/matchs/nice-psg-2026-11-21/match.ics": {
-   "type": "evenement",
-   "cle": "nice-psg-2026-11-21",
-   "empreinte": "zZ4UnysqxziaSGA-EqGLlg",
-   "change": "2026-11-07",
-   "indexable": false
   },
   "/matchs/nice-psg-2026-11-21/partage.png": {
    "type": "partage",
@@ -4121,36 +3981,6 @@
    "change": "2026-11-08",
    "indexable": false
   },
-  "/matchs/sturm-graz-om-2026-10-22/": {
-   "type": "match",
-   "cle": "sturm-graz-om-2026-10-22",
-   "date": "2026-10-22T16:45:00.000Z",
-   "empreinte": "_7iIk2jpOiQJf5EbH6Eh6w",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "sturm-graz-om-2026-10-22",
-    "ids": [
-     "cmv6e5jih000xryqjvv55d6np"
-    ],
-    "debut": "2026-10-22T16:45:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue Europa",
-    "domicile": {
-     "cle": "sturm-graz",
-     "court": "Sturm Graz",
-     "nom": "SK Sturm Graz",
-     "slug": "sk-sturm-graz"
-    },
-    "exterieur": {
-     "cle": "om",
-     "court": "OM",
-     "nom": "Olympique de Marseille",
-     "slug": "olympique-de-marseille"
-    }
-   }
-  },
   "/matchs/stuttgart-francfort-2026-11-28/": {
    "type": "match",
    "cle": "stuttgart-francfort-2026-11-28",
@@ -4522,28 +4352,6 @@
    },
    "empreinte": "bs4OMtgwW7u7CTSlqgzlWw",
    "sequence": 1,
-   "modifie": "2026-11-07T19:24:28Z"
-  },
-  "cmvxramy7000az71on8akabwo@baromatch.fr": {
-   "ids": [
-    "cmvxramy7000az71on8akabwo"
-   ],
-   "slug": "newcastle-arsenal-2026-11-21",
-   "debut": "2026-11-21T17:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "newcastle",
-    "court": "Newcastle",
-    "nom": "Newcastle United FC"
-   },
-   "exterieur": {
-    "cle": "arsenal",
-    "court": "Arsenal",
-    "nom": "Arsenal FC"
-   },
-   "empreinte": "CoIu7izrQ_je1vaIw0l0Ug",
-   "sequence": 0,
    "modifie": "2026-11-07T19:24:28Z"
   },
   "cmvxramzf000cz71o8hckykfg@baromatch.fr": {

@@ -11,20 +11,6 @@ X-WR-CALDESC:Lorient : les matchs au programme de Baromatch (Ligue 1)\, à
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmvxran2g000mz71o4xdnmwiq@baromatch.fr
-DTSTAMP:20261108T175437Z
-SEQUENCE:1
-DTSTART:20261122T161500Z
-DTEND:20261122T181500Z
-SUMMARY:Lorient – Rennes
-DESCRIPTION:Ligue 1 · FC Lorient – Stade Rennais FC\nCoup d’envoi dima
- nche 22 novembre à 17:15\, heure de Paris.\nLa page du match : https://b
- aromatch.fr/matchs/lorient-rennes-2026-11-22/
-URL:https://baromatch.fr/matchs/lorient-rennes-2026-11-22/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxranap001ez71oeiheug5e@baromatch.fr
 DTSTAMP:20261114T195510Z
 SEQUENCE:1

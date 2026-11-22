@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmvxranga001yz71oga4rbjgx@baromatch.fr
+DTSTAMP:20261122T193324Z
+SEQUENCE:0
+DTSTART:20261206T140000Z
+DTEND:20261206T160000Z
+SUMMARY:Lazio – Atalanta
+DESCRIPTION:Serie A · SS Lazio – Atalanta BC\nCoup d’envoi dimanche 6 
+ décembre à 15:00\, heure de Paris.\nLa page du match : https://baromatc
+ h.fr/matchs/lazio-atalanta-2026-12-06/
+URL:https://baromatch.fr/matchs/lazio-atalanta-2026-12-06/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

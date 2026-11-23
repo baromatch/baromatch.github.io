@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6doz6001lrcssof4d5usj@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261128T173000Z
+DTEND:20261128T193000Z
+SUMMARY:Ipswich Town – Aston Villa
+DESCRIPTION:Premier League · Ipswich Town FC – Aston Villa\nCoup d’env
+ oi samedi 28 novembre à 18:30\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/ipswich-town-aston-villa-2026-11-28/
+URL:https://baromatch.fr/matchs/ipswich-town-aston-villa-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

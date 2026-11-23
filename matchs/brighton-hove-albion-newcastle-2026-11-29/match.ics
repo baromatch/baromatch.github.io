@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dp11001rrcssxzvfkz7t@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261129T140500Z
+DTEND:20261129T160500Z
+SUMMARY:Brighton & Hove Albion – Newcastle
+DESCRIPTION:Premier League · Brighton & Hove Albion – Newcastle United F
+ C\nCoup d’envoi dimanche 29 novembre à 15:05\, heure de Paris.\nLa page
+  du match : https://baromatch.fr/matchs/brighton-hove-albion-newcastle-20
+ 26-11-29/
+URL:https://baromatch.fr/matchs/brighton-hove-albion-newcastle-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

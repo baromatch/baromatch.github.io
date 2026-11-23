@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "YVI8saW-lc1PjWj1IIvaSA",
+   "empreinte": "FmTEBESf4FUuRTmA57rYUw",
    "change": "2026-11-23",
    "indexable": false,
    "bars": []
@@ -218,15 +218,15 @@
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "kw4nZPcPCGRxQbMBm3aC6w",
+   "empreinte": "VElX3U9rRMqaggNElaO35Q",
    "change": "2026-11-23",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "_vzQDlvBKmY_JZivCRFxiw",
-   "change": "2026-11-22",
+   "empreinte": "kWDTU0ruOBd_IxyHiu9oyA",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -251,8 +251,8 @@
    "type": "match-en",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "ookLcQKnreuy56e2-5-x_Q",
-   "change": "2026-11-22",
+   "empreinte": "tAgEG6auUY0S5BhDVuGy8Q",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -265,21 +265,30 @@
    "indexable": false,
    "bars": []
   },
-  "/en/matches/aston-villa-man-city-2026-10-24/": {
-   "type": "match-en",
-   "cle": "aston-villa-man-city-2026-10-24",
-   "date": "2026-10-24T11:30:00.000Z",
-   "empreinte": "tUfWEpb1EQ-0qEZQMtAICA",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": []
-  },
   "/en/matches/bodo-glimt-lille-2026-11-03/": {
    "type": "match-en",
    "cle": "bodo-glimt-lille-2026-11-03",
    "date": "2026-11-03T20:00:00.000Z",
    "empreinte": "OpNoSrnhZdQlEiU3qCsQsw",
    "change": "2026-11-22",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/brentford-everton-2026-11-23/": {
+   "type": "match-en",
+   "cle": "brentford-everton-2026-11-23",
+   "date": "2026-11-23T20:00:00.000Z",
+   "empreinte": "o726i6SYe1OjzOVuw_qxDw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/brighton-hove-albion-newcastle-2026-11-29/": {
+   "type": "match-en",
+   "cle": "brighton-hove-albion-newcastle-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "eTu4R3IwNI7LIKunEYnNUQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -305,8 +314,17 @@
    "type": "match-en",
    "cle": "chelsea-tottenham-2026-10-24",
    "date": "2026-10-24T16:30:00.000Z",
-   "empreinte": "eQIqLiHaOHiD9zj8wUIB0g",
-   "change": "2026-11-16",
+   "empreinte": "mAep1iKaocb-oW_dK0wPPA",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/crystal-palace-hull-city-2026-11-29/": {
+   "type": "match-en",
+   "cle": "crystal-palace-hull-city-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "oJaiWGuP6XmhpKkuHnwtRA",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -319,12 +337,21 @@
    "indexable": false,
    "bars": []
   },
+  "/en/matches/fulham-bournemouth-2026-11-29/": {
+   "type": "match-en",
+   "cle": "fulham-bournemouth-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "89Ev5GeDRb9Gq5zBRblYvg",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": []
+  },
   "/en/matches/galatasaray-aston-villa-2026-11-24/": {
    "type": "match-en",
    "cle": "galatasaray-aston-villa-2026-11-24",
    "date": "2026-11-24T17:45:00.000Z",
-   "empreinte": "9c7noPRZNMIvGTURPbC2ZA",
-   "change": "2026-11-16",
+   "empreinte": "bUsxsj06et0gU8TCtQ37wg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -341,8 +368,17 @@
    "type": "match-en",
    "cle": "inter-stuttgart-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "KxNb9grqXf5OhMLmviH1Dg",
-   "change": "2026-11-16",
+   "empreinte": "lDPClQxKzgn0h6M_u-zMlQ",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/ipswich-town-aston-villa-2026-11-28/": {
+   "type": "match-en",
+   "cle": "ipswich-town-aston-villa-2026-11-28",
+   "date": "2026-11-28T17:30:00.000Z",
+   "empreinte": "E05kjlkHtaT1_lCMK3dIDg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -355,12 +391,21 @@
    "indexable": false,
    "bars": []
   },
+  "/en/matches/leeds-united-coventry-city-2026-11-28/": {
+   "type": "match-en",
+   "cle": "leeds-united-coventry-city-2026-11-28",
+   "date": "2026-11-28T15:00:00.000Z",
+   "empreinte": "yYlmTqn_7OiZRaGhaGu1uA",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": []
+  },
   "/en/matches/leipzig-lens-2026-11-24/": {
    "type": "match-en",
    "cle": "leipzig-lens-2026-11-24",
    "date": "2026-11-24T20:00:00.000Z",
-   "empreinte": "pOeVu3NuL_Rh1rFVJpq3Rg",
-   "change": "2026-11-16",
+   "empreinte": "V8_gKQdiw0aZBgzedzzfeg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -386,8 +431,8 @@
    "type": "match-en",
    "cle": "lille-bayern-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "VNGrmepaNpM0yougZW8pYA",
-   "change": "2026-11-16",
+   "empreinte": "Vai8qQo0ew9R8aP3ikaOyQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -413,8 +458,8 @@
    "type": "match-en",
    "cle": "man-city-naples-2026-11-24",
    "date": "2026-11-24T20:00:00.000Z",
-   "empreinte": "3l9WH4gZY-jBKk2cgbasDA",
-   "change": "2026-11-16",
+   "empreinte": "EQG9MXVEtuPu5AZ1kv1cYQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -424,6 +469,15 @@
    "date": "2026-11-08T16:30:00.000Z",
    "empreinte": "-wDv5NvFeESY3kA1F09l9A",
    "change": "2026-11-22",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/man-united-brentford-2026-11-28/": {
+   "type": "match-en",
+   "cle": "man-united-brentford-2026-11-28",
+   "date": "2026-11-28T15:00:00.000Z",
+   "empreinte": "jHP2Ouhp9lS0IhzkPNR4ag",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -449,8 +503,8 @@
    "type": "match-en",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "8HfGkCjhoj7v9_0045EZEg",
-   "change": "2026-11-22",
+   "empreinte": "581C72dBRs98RpzJFiCoeA",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -469,6 +523,15 @@
    "date": "2026-11-26T20:00:00.000Z",
    "empreinte": "Ao3-bZL5-F7w0fuOs7Upww",
    "change": "2026-11-16",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/nottingham-forest-chelsea-2026-11-27/": {
+   "type": "match-en",
+   "cle": "nottingham-forest-chelsea-2026-11-27",
+   "date": "2026-11-27T20:00:00.000Z",
+   "empreinte": "-jl1-z8uQ-4qZH46asxAUQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -512,8 +575,8 @@
    "type": "match-en",
    "cle": "psg-rome-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "DGzHGR69AA0Lfth4GtaijQ",
-   "change": "2026-11-16",
+   "empreinte": "4JyP6Lz-iIc8wNQEd9LaOg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -530,8 +593,8 @@
    "type": "match-en",
    "cle": "real-madrid-eindhoven-2026-11-24",
    "date": "2026-11-24T20:00:00.000Z",
-   "empreinte": "GxwTj8j1wefB-Iz8ANPNPg",
-   "change": "2026-11-16",
+   "empreinte": "f6EU6LQAoNQe_Sgn0EOYrQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -557,8 +620,8 @@
    "type": "match-en",
    "cle": "sabah-barca-2026-11-25",
    "date": "2026-11-25T17:45:00.000Z",
-   "empreinte": "AjmEYmfDtbr6TjV3285ZcQ",
-   "change": "2026-11-16",
+   "empreinte": "hx1A6rIA-zpIECYCIcJiqg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -566,8 +629,17 @@
    "type": "match-en",
    "cle": "sporting-clube-de-portugal-man-united-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "HrO4nkbzNiRx09RjsD21rA",
-   "change": "2026-11-16",
+   "empreinte": "MGuoZzHEKBraQCHqIyEn9Q",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": []
+  },
+  "/en/matches/sunderland-tottenham-2026-11-29/": {
+   "type": "match-en",
+   "cle": "sunderland-tottenham-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "ZFjUh9L2PrES5pN7HTvoYw",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -583,23 +655,111 @@
   "/en/premier-league/": {
    "type": "guide-en",
    "cle": "premier-league",
-   "empreinte": "w637bhB81cbKUu8v2RQ7PA",
-   "change": "2026-11-22",
+   "empreinte": "6X9dKh0TXYimeaQ9A3ssMQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "Bi7hHIEcAfvFtZo1El6lsA",
+   "empreinte": "iCOYBIVglIy-RSA8czs8pA",
    "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
+  "/matchs/1-koln-07-elversberg-2026-11-28/": {
+   "type": "match",
+   "cle": "1-koln-07-elversberg-2026-11-28",
+   "date": "2026-11-28T14:30:00.000Z",
+   "empreinte": "8jMTl7C5M7j2JmuKSOhD1w",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "1-koln-07-elversberg-2026-11-28",
+    "ids": [
+     "cmwt6dorn000xrcsst29lrvqr"
+    ],
+    "debut": "2026-11-28T14:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "1-koln",
+     "court": "1. Köln",
+     "nom": "1. FC Köln",
+     "slug": "1-fc-koln"
+    },
+    "exterieur": {
+     "cle": "07-elversberg",
+     "court": "07 Elversberg",
+     "nom": "SV 07 Elversberg",
+     "slug": "sv-07-elversberg"
+    }
+   }
+  },
+  "/matchs/1-koln-07-elversberg-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "1-koln-07-elversberg-2026-11-28",
+   "empreinte": "cQ7wogFy8RLPvKAKdTfw1w",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/1-koln-07-elversberg-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "1-koln-07-elversberg-2026-11-28",
+   "empreinte": "nN2r6Nj2MTXWa0aL8ZzIgg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/1-mainz-05-1-union-berlin-2026-11-28/": {
+   "type": "match",
+   "cle": "1-mainz-05-1-union-berlin-2026-11-28",
+   "date": "2026-11-28T14:30:00.000Z",
+   "empreinte": "A9uK8Srf4PjzV1kW-fLJVw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "1-mainz-05-1-union-berlin-2026-11-28",
+    "ids": [
+     "cmwt6dos9000zrcssfq5hbc0b"
+    ],
+    "debut": "2026-11-28T14:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "1-mainz-05",
+     "court": "1. Mainz 05",
+     "nom": "1. FSV Mainz 05",
+     "slug": "1-fsv-mainz-05"
+    },
+    "exterieur": {
+     "cle": "1-union-berlin",
+     "court": "1. Union Berlin",
+     "nom": "1. FC Union Berlin",
+     "slug": "1-fc-union-berlin"
+    }
+   }
+  },
+  "/matchs/1-mainz-05-1-union-berlin-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "1-mainz-05-1-union-berlin-2026-11-28",
+   "empreinte": "4LsQVn6nDmBtGi3mMKUDQg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/1-mainz-05-1-union-berlin-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "1-mainz-05-1-union-berlin-2026-11-28",
+   "empreinte": "M7PWyH9ruwvviDVEnjAeTQ",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "hO6PVFfKxKAw6Azw89EPhw",
+   "empreinte": "MJXcn2MzxDDkXV7G0bDJhg",
    "change": "2026-11-23",
    "indexable": true,
    "bars": []
@@ -771,8 +931,8 @@
    "type": "match",
    "cle": "arsenal-everton-2026-10-24",
    "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "XXPB9CR4ctBxinLAhoSsKQ",
-   "change": "2026-11-22",
+   "empreinte": "tNtSG1NKbqVcCefTu-CrxQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -840,36 +1000,6 @@
    "empreinte": "EX2XX5gIFOxZOHN_k4Vahg",
    "change": "2026-11-15",
    "indexable": false
-  },
-  "/matchs/aston-villa-man-city-2026-10-24/": {
-   "type": "match",
-   "cle": "aston-villa-man-city-2026-10-24",
-   "date": "2026-10-24T11:30:00.000Z",
-   "empreinte": "fXP82ms-6gmCEx7kMwuU_w",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "aston-villa-man-city-2026-10-24",
-    "ids": [
-     "cmv6e5jkn0013ryqj4pur0exz"
-    ],
-    "debut": "2026-10-24T11:30:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Premier League",
-    "domicile": {
-     "cle": "aston-villa",
-     "court": "Aston Villa",
-     "nom": "Aston Villa",
-     "slug": "aston-villa"
-    },
-    "exterieur": {
-     "cle": "man-city",
-     "court": "Man City",
-     "nom": "Manchester City",
-     "slug": "manchester-city"
-    }
-   }
   },
   "/matchs/atalanta-inter-2026-11-22/": {
    "type": "match",
@@ -1125,6 +1255,50 @@
     }
    }
   },
+  "/matchs/betis-rayo-vallecano-2026-11-28/": {
+   "type": "match",
+   "cle": "betis-rayo-vallecano-2026-11-28",
+   "date": "2026-11-28T13:00:00.000Z",
+   "empreinte": "3pWotDZGaM5KWPbKXMdAiw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "betis-rayo-vallecano-2026-11-28",
+    "ids": [
+     "cmwt6dow9001drcssny86gqx6"
+    ],
+    "debut": "2026-11-28T13:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "betis",
+     "court": "Betis",
+     "nom": "Real Betis Balompié",
+     "slug": "real-betis-balompie"
+    },
+    "exterieur": {
+     "cle": "rayo-vallecano",
+     "court": "Rayo Vallecano",
+     "nom": "Rayo Vallecano",
+     "slug": "rayo-vallecano"
+    }
+   }
+  },
+  "/matchs/betis-rayo-vallecano-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "betis-rayo-vallecano-2026-11-28",
+   "empreinte": "ReQHdDAVS2ZdDlSMvHP7uA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/betis-rayo-vallecano-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "betis-rayo-vallecano-2026-11-28",
+   "empreinte": "JXoFpHKaa50tARJ6XYD5MQ",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/bodo-glimt-lille-2026-11-03/": {
    "type": "match",
    "cle": "bodo-glimt-lille-2026-11-03",
@@ -1154,6 +1328,50 @@
      "slug": "losc-lille"
     }
    }
+  },
+  "/matchs/brentford-everton-2026-11-23/": {
+   "type": "match",
+   "cle": "brentford-everton-2026-11-23",
+   "date": "2026-11-23T20:00:00.000Z",
+   "empreinte": "LMcwNcCGWPe48CV-ecLlcw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "brentford-everton-2026-11-23",
+    "ids": [
+     "cmwt6c6hy0006nntlnwttgrb5"
+    ],
+    "debut": "2026-11-23T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "brentford",
+     "court": "Brentford",
+     "nom": "Brentford FC",
+     "slug": "brentford-fc"
+    },
+    "exterieur": {
+     "cle": "everton",
+     "court": "Everton",
+     "nom": "Everton FC",
+     "slug": "everton-fc"
+    }
+   }
+  },
+  "/matchs/brentford-everton-2026-11-23/match.ics": {
+   "type": "evenement",
+   "cle": "brentford-everton-2026-11-23",
+   "empreinte": "KwKEW8J4OmH-X1C8cf0b2w",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/brentford-everton-2026-11-23/partage.png": {
+   "type": "partage",
+   "cle": "brentford-everton-2026-11-23",
+   "empreinte": "9wx9K6TDCO-YLS-Q6UOwXQ",
+   "change": "2026-11-23",
+   "indexable": false
   },
   "/matchs/brest-ol-2026-11-08/": {
    "type": "match",
@@ -1227,6 +1445,50 @@
    "cle": "brest-paris-fc-2026-11-27",
    "empreinte": "2QA5wUJyFO3WMWkoeGtHsQ",
    "change": "2026-11-14",
+   "indexable": false
+  },
+  "/matchs/brighton-hove-albion-newcastle-2026-11-29/": {
+   "type": "match",
+   "cle": "brighton-hove-albion-newcastle-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "OK6WiDhyItvW5i3RBQVs6Q",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "brighton-hove-albion-newcastle-2026-11-29",
+    "ids": [
+     "cmwt6dp11001rrcssxzvfkz7t"
+    ],
+    "debut": "2026-11-29T14:05:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "brighton-hove-albion",
+     "court": "Brighton & Hove Albion",
+     "nom": "Brighton & Hove Albion",
+     "slug": "brighton-hove-albion"
+    },
+    "exterieur": {
+     "cle": "newcastle",
+     "court": "Newcastle",
+     "nom": "Newcastle United FC",
+     "slug": "newcastle-united-fc"
+    }
+   }
+  },
+  "/matchs/brighton-hove-albion-newcastle-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "brighton-hove-albion-newcastle-2026-11-29",
+   "empreinte": "NtRvCTzqoN3LO2AmIfkVmg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/brighton-hove-albion-newcastle-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "brighton-hove-albion-newcastle-2026-11-29",
+   "empreinte": "K7xbV5-_Ew_Wm2HbF-nkAA",
+   "change": "2026-11-23",
    "indexable": false
   },
   "/matchs/bruges-liverpool-2026-11-25/": {
@@ -1307,8 +1569,8 @@
    "type": "match",
    "cle": "chelsea-tottenham-2026-10-24",
    "date": "2026-10-24T16:30:00.000Z",
-   "empreinte": "xmdqWWEXZU_xokaxg87VWA",
-   "change": "2026-11-16",
+   "empreinte": "Nu4-hUyYqFVTJCW8IJVhKw",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1397,20 +1659,64 @@
    "indexable": true,
    "bars": []
   },
+  "/matchs/como-1907-juventus-2026-11-29/": {
+   "type": "match",
+   "cle": "como-1907-juventus-2026-11-29",
+   "date": "2026-11-29T19:45:00.000Z",
+   "empreinte": "749YVKIw80J-oNcU0OLs1w",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "como-1907-juventus-2026-11-29",
+    "ids": [
+     "cmwt6dp5o0027rcss4as1thvr"
+    ],
+    "debut": "2026-11-29T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "como-1907",
+     "court": "Como 1907",
+     "nom": "Como 1907",
+     "slug": "como-1907"
+    },
+    "exterieur": {
+     "cle": "juventus",
+     "court": "Juventus",
+     "nom": "Juventus FC",
+     "slug": "juventus-fc"
+    }
+   }
+  },
+  "/matchs/como-1907-juventus-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "como-1907-juventus-2026-11-29",
+   "empreinte": "RtS6NyOQ0HdGRKUtiZajKw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/como-1907-juventus-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "como-1907-juventus-2026-11-29",
+   "empreinte": "S5f-nEF2IQAv7Dqe1Bmmwg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/competition/bundesliga/": {
    "type": "competition",
    "cle": "bundesliga",
-   "empreinte": "m-g_zG6Ux0Kvvf3ps9hOyA",
-   "change": "2026-11-15",
+   "empreinte": "aNDRB7d24r-K8DNrv29S2A",
+   "change": "2026-11-23",
    "indexable": true,
    "bars": []
   },
   "/matchs/competition/liga/": {
    "type": "competition",
    "cle": "liga",
-   "empreinte": "Q6bN6mM-Hy484CIwT3cyFw",
-   "change": "2026-11-12",
-   "indexable": false,
+   "empreinte": "wz8UUcZkuH_o7fuZBhjd-g",
+   "change": "2026-11-23",
+   "indexable": true,
    "bars": []
   },
   "/matchs/competition/ligue-1/": {
@@ -1448,18 +1754,106 @@
   "/matchs/competition/premier-league/": {
    "type": "competition",
    "cle": "premier-league",
-   "empreinte": "ZRxrqHSu2PNcTN_AUA64vA",
-   "change": "2026-11-22",
+   "empreinte": "dj7XAfXWFtmY9Knn7kL98Q",
+   "change": "2026-11-23",
    "indexable": true,
    "bars": []
   },
   "/matchs/competition/serie-a/": {
    "type": "competition",
    "cle": "serie-a",
-   "empreinte": "ioqglQhaBBMJwU6Xpr8H3w",
+   "empreinte": "073iOCvWVERZMsIiXfuZgg",
    "change": "2026-11-23",
    "indexable": true,
    "bars": []
+  },
+  "/matchs/crystal-palace-hull-city-2026-11-29/": {
+   "type": "match",
+   "cle": "crystal-palace-hull-city-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "5CgsiAvsRIs3f2Vh0NnT5Q",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "crystal-palace-hull-city-2026-11-29",
+    "ids": [
+     "cmwt6dp1n001trcss7jy3rrw2"
+    ],
+    "debut": "2026-11-29T14:05:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "crystal-palace",
+     "court": "Crystal Palace",
+     "nom": "Crystal Palace FC",
+     "slug": "crystal-palace-fc"
+    },
+    "exterieur": {
+     "cle": "hull-city",
+     "court": "Hull City",
+     "nom": "Hull City AFC",
+     "slug": "hull-city-afc"
+    }
+   }
+  },
+  "/matchs/crystal-palace-hull-city-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "crystal-palace-hull-city-2026-11-29",
+   "empreinte": "sn54K--82WORqPO8aIrb5A",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/crystal-palace-hull-city-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "crystal-palace-hull-city-2026-11-29",
+   "empreinte": "YZ8EhM6R1hISmdG7dref9g",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/deportivo-de-coruna-barca-2026-11-29/": {
+   "type": "match",
+   "cle": "deportivo-de-coruna-barca-2026-11-29",
+   "date": "2026-11-29T15:15:00.000Z",
+   "empreinte": "O_aGRmprs4hCU3aZfNuHHw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "deportivo-de-coruna-barca-2026-11-29",
+    "ids": [
+     "cmwt6doxf001hrcss7ta8552c"
+    ],
+    "debut": "2026-11-29T15:15:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "deportivo-de-coruna",
+     "court": "Deportivo de Coruña",
+     "nom": "RC Deportivo de A Coruña",
+     "slug": "rc-deportivo-de-a-coruna"
+    },
+    "exterieur": {
+     "cle": "barca",
+     "court": "Barça",
+     "nom": "FC Barcelona",
+     "slug": "fc-barcelona"
+    }
+   }
+  },
+  "/matchs/deportivo-de-coruna-barca-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "deportivo-de-coruna-barca-2026-11-29",
+   "empreinte": "trvU6xG_numOWc8B4ae2Hw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/deportivo-de-coruna-barca-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "deportivo-de-coruna-barca-2026-11-29",
+   "empreinte": "Z6UTBP5JIjpSWrmvq75SyQ",
+   "change": "2026-11-23",
+   "indexable": false
   },
   "/matchs/dortmund-francfort-2026-10-24/": {
    "type": "match",
@@ -1535,6 +1929,50 @@
    "change": "2026-11-15",
    "indexable": false
   },
+  "/matchs/elche-atletico-2026-11-28/": {
+   "type": "match",
+   "cle": "elche-atletico-2026-11-28",
+   "date": "2026-11-28T17:30:00.000Z",
+   "empreinte": "YfEdscZ_Pr8KD06vBfEsaw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "elche-atletico-2026-11-28",
+    "ids": [
+     "cmwt6dovo001brcsst5nmk0rj"
+    ],
+    "debut": "2026-11-28T17:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "elche",
+     "court": "Elche",
+     "nom": "Elche CF",
+     "slug": "elche-cf"
+    },
+    "exterieur": {
+     "cle": "atletico",
+     "court": "Atlético",
+     "nom": "Atlético de Madrid",
+     "slug": "atletico-de-madrid"
+    }
+   }
+  },
+  "/matchs/elche-atletico-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "elche-atletico-2026-11-28",
+   "empreinte": "nx-Fhp1u_NLNOwf6uChWQA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/elche-atletico-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "elche-atletico-2026-11-28",
+   "empreinte": "k8JiT5xUmf_AetJ8jbHOFw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/everton-liverpool-2026-11-29/": {
    "type": "match",
    "cle": "everton-liverpool-2026-11-29",
@@ -1583,7 +2021,7 @@
    "type": "match",
    "cle": "fiorentina-atalanta-2026-10-29",
    "date": "2026-10-29T19:45:00.000Z",
-   "empreinte": "wBzA8-PaEbQ6rRzaHluJWQ",
+   "empreinte": "x2HfiKFr1ZF9CL4uWyO8xw",
    "change": "2026-11-23",
    "indexable": false,
    "bars": [],
@@ -1613,8 +2051,8 @@
    "type": "match",
    "cle": "fiorentina-juventus-2026-11-08",
    "date": "2026-11-08T19:45:00.000Z",
-   "empreinte": "BdJQTDA9xGyZSqbXgnw9lA",
-   "change": "2026-11-16",
+   "empreinte": "h1o2LkLysTT52PI-CoLLPw",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1669,12 +2107,144 @@
     }
    }
   },
+  "/matchs/fribourg-leipzig-2026-11-29/": {
+   "type": "match",
+   "cle": "fribourg-leipzig-2026-11-29",
+   "date": "2026-11-29T14:30:00.000Z",
+   "empreinte": "EFVef7OdWqRkW9SVBzRtMw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "fribourg-leipzig-2026-11-29",
+    "ids": [
+     "cmwt6dou00015rcssq2kjzlr6"
+    ],
+    "debut": "2026-11-29T14:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "fribourg",
+     "court": "Fribourg",
+     "nom": "SC Freiburg",
+     "slug": "sc-freiburg"
+    },
+    "exterieur": {
+     "cle": "leipzig",
+     "court": "Leipzig",
+     "nom": "RB Leipzig",
+     "slug": "rb-leipzig"
+    }
+   }
+  },
+  "/matchs/fribourg-leipzig-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "fribourg-leipzig-2026-11-29",
+   "empreinte": "vAilyG9eUwvdnGMRUiml7A",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/fribourg-leipzig-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "fribourg-leipzig-2026-11-29",
+   "empreinte": "fPT-lDPUYs1JtEo8YwsFWg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/frosinone-calcio-parma-calcio-1913-2026-11-28/": {
+   "type": "match",
+   "cle": "frosinone-calcio-parma-calcio-1913-2026-11-28",
+   "date": "2026-11-28T14:00:00.000Z",
+   "empreinte": "q8Kucn3PxNjn3aHu4apZ7Q",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "frosinone-calcio-parma-calcio-1913-2026-11-28",
+    "ids": [
+     "cmwt6dp4h0023rcssxlvgmzx3"
+    ],
+    "debut": "2026-11-28T14:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "frosinone-calcio",
+     "court": "Frosinone Calcio",
+     "nom": "Frosinone Calcio",
+     "slug": "frosinone-calcio"
+    },
+    "exterieur": {
+     "cle": "parma-calcio-1913",
+     "court": "Parma Calcio 1913",
+     "nom": "Parma Calcio 1913",
+     "slug": "parma-calcio-1913"
+    }
+   }
+  },
+  "/matchs/frosinone-calcio-parma-calcio-1913-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "frosinone-calcio-parma-calcio-1913-2026-11-28",
+   "empreinte": "-eUQ822ezPtRdJ_VqUekww",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/frosinone-calcio-parma-calcio-1913-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "frosinone-calcio-parma-calcio-1913-2026-11-28",
+   "empreinte": "lv5kGjipMtZ6vnFSlIQX1A",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/fulham-bournemouth-2026-11-29/": {
+   "type": "match",
+   "cle": "fulham-bournemouth-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "UhwPRKkQkcruNrJ70glnlQ",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "fulham-bournemouth-2026-11-29",
+    "ids": [
+     "cmwt6dp28001vrcsse46m1hu1"
+    ],
+    "debut": "2026-11-29T14:05:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "fulham",
+     "court": "Fulham",
+     "nom": "Fulham FC",
+     "slug": "fulham-fc"
+    },
+    "exterieur": {
+     "cle": "bournemouth",
+     "court": "Bournemouth",
+     "nom": "AFC Bournemouth",
+     "slug": "afc-bournemouth"
+    }
+   }
+  },
+  "/matchs/fulham-bournemouth-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "fulham-bournemouth-2026-11-29",
+   "empreinte": "2eSUcrStYMpGZZPJ3FYDRA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/fulham-bournemouth-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "fulham-bournemouth-2026-11-29",
+   "empreinte": "RFmeEx57CaKaeHpw9r3wKg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/galatasaray-aston-villa-2026-11-24/": {
    "type": "match",
    "cle": "galatasaray-aston-villa-2026-11-24",
    "date": "2026-11-24T17:45:00.000Z",
-   "empreinte": "KsBusAqNWCF5efqfjY6GTw",
-   "change": "2026-11-16",
+   "empreinte": "FIKee66ICHl89evzP_AFFQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1711,6 +2281,50 @@
    "cle": "galatasaray-aston-villa-2026-11-24",
    "empreinte": "xWm5lHw2btqRN2iSJpfSJg",
    "change": "2026-11-10",
+   "indexable": false
+  },
+  "/matchs/hamburger-bayern-2026-11-28/": {
+   "type": "match",
+   "cle": "hamburger-bayern-2026-11-28",
+   "date": "2026-11-28T14:30:00.000Z",
+   "empreinte": "9i1BS2ejTeeMof3t-IeDxg",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "hamburger-bayern-2026-11-28",
+    "ids": [
+     "cmwt6dosv0011rcsso08pz7iw"
+    ],
+    "debut": "2026-11-28T14:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "hamburger",
+     "court": "Hamburger",
+     "nom": "Hamburger SV",
+     "slug": "hamburger-sv"
+    },
+    "exterieur": {
+     "cle": "bayern",
+     "court": "Bayern",
+     "nom": "FC Bayern München",
+     "slug": "fc-bayern-munchen"
+    }
+   }
+  },
+  "/matchs/hamburger-bayern-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "hamburger-bayern-2026-11-28",
+   "empreinte": "Uhn0XUl4SGGtQfWkA5EJdw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/hamburger-bayern-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "hamburger-bayern-2026-11-28",
+   "empreinte": "QqGplVkIKIszhHqXGaEOeQ",
+   "change": "2026-11-23",
    "indexable": false
   },
   "/matchs/heart-of-midlothian-monaco-2026-11-26/": {
@@ -1757,11 +2371,55 @@
    "change": "2026-11-13",
    "indexable": false
   },
+  "/matchs/hoffenheim-augsburg-2026-11-29/": {
+   "type": "match",
+   "cle": "hoffenheim-augsburg-2026-11-29",
+   "date": "2026-11-29T16:30:00.000Z",
+   "empreinte": "i5yI6Pc20w6i9smLhShruw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "hoffenheim-augsburg-2026-11-29",
+    "ids": [
+     "cmwt6doul0017rcssxnfm9y1t"
+    ],
+    "debut": "2026-11-29T16:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "hoffenheim",
+     "court": "Hoffenheim",
+     "nom": "TSG Hoffenheim",
+     "slug": "tsg-hoffenheim"
+    },
+    "exterieur": {
+     "cle": "augsburg",
+     "court": "Augsburg",
+     "nom": "FC Augsburg",
+     "slug": "fc-augsburg"
+    }
+   }
+  },
+  "/matchs/hoffenheim-augsburg-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "hoffenheim-augsburg-2026-11-29",
+   "empreinte": "dMQ5XzRXncun3P_lPlI7LQ",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/hoffenheim-augsburg-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "hoffenheim-augsburg-2026-11-29",
+   "empreinte": "YomEDDFIPHLMOXDhk-fFRQ",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/inter-fiorentina-2026-10-25/": {
    "type": "match",
    "cle": "inter-fiorentina-2026-10-25",
    "date": "2026-10-25T11:30:00.000Z",
-   "empreinte": "1Hcme-fbPUBwL7eeFKufRA",
+   "empreinte": "0DgcMhDh_17wE3iN2UlKQg",
    "change": "2026-11-23",
    "indexable": false,
    "bars": [],
@@ -1787,12 +2445,56 @@
     }
    }
   },
+  "/matchs/inter-genoa-2026-11-28/": {
+   "type": "match",
+   "cle": "inter-genoa-2026-11-28",
+   "date": "2026-11-28T19:45:00.000Z",
+   "empreinte": "zTfWkk60aJFV-kl-MS90Ag",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "inter-genoa-2026-11-28",
+    "ids": [
+     "cmwt6dp3y0021rcssfw3u5tq1"
+    ],
+    "debut": "2026-11-28T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "inter",
+     "court": "Inter",
+     "nom": "FC Internazionale Milano",
+     "slug": "fc-internazionale-milano"
+    },
+    "exterieur": {
+     "cle": "genoa",
+     "court": "Genoa",
+     "nom": "Genoa CFC",
+     "slug": "genoa-cfc"
+    }
+   }
+  },
+  "/matchs/inter-genoa-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "inter-genoa-2026-11-28",
+   "empreinte": "kYhGZTLz-lsmqmbmNA8kOg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/inter-genoa-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "inter-genoa-2026-11-28",
+   "empreinte": "GZjMrD69fdBIrxnnDfF3ag",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/inter-stuttgart-2026-11-25/": {
    "type": "match",
    "cle": "inter-stuttgart-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "XiAdC07Im01fbFTEfk8i9Q",
-   "change": "2026-11-16",
+   "empreinte": "dCNFwzg4zEXl_eiQI96CdQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1829,6 +2531,50 @@
    "cle": "inter-stuttgart-2026-11-25",
    "empreinte": "QsMRP_pPB3gy6iIRAeEtWA",
    "change": "2026-11-11",
+   "indexable": false
+  },
+  "/matchs/ipswich-town-aston-villa-2026-11-28/": {
+   "type": "match",
+   "cle": "ipswich-town-aston-villa-2026-11-28",
+   "date": "2026-11-28T17:30:00.000Z",
+   "empreinte": "VdcdvtVm2fDBJYW4Z8MrMg",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "ipswich-town-aston-villa-2026-11-28",
+    "ids": [
+     "cmwt6doz6001lrcssof4d5usj"
+    ],
+    "debut": "2026-11-28T17:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "ipswich-town",
+     "court": "Ipswich Town",
+     "nom": "Ipswich Town FC",
+     "slug": "ipswich-town-fc"
+    },
+    "exterieur": {
+     "cle": "aston-villa",
+     "court": "Aston Villa",
+     "nom": "Aston Villa",
+     "slug": "aston-villa"
+    }
+   }
+  },
+  "/matchs/ipswich-town-aston-villa-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "ipswich-town-aston-villa-2026-11-28",
+   "empreinte": "jdgfF2HdDKnXSMZSFA-XiQ",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/ipswich-town-aston-villa-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "ipswich-town-aston-villa-2026-11-28",
+   "empreinte": "KOAvcx_GHxfHjlqpVI1iWw",
+   "change": "2026-11-23",
    "indexable": false
   },
   "/matchs/italie-france-2026-11-12/": {
@@ -2113,12 +2859,56 @@
     }
    }
   },
+  "/matchs/leeds-united-coventry-city-2026-11-28/": {
+   "type": "match",
+   "cle": "leeds-united-coventry-city-2026-11-28",
+   "date": "2026-11-28T15:00:00.000Z",
+   "empreinte": "2OjSgMAIovhjldtktkNWYg",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "leeds-united-coventry-city-2026-11-28",
+    "ids": [
+     "cmwt6dozs001nrcsslj54gdb2"
+    ],
+    "debut": "2026-11-28T15:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "leeds-united",
+     "court": "Leeds United",
+     "nom": "Leeds United FC",
+     "slug": "leeds-united-fc"
+    },
+    "exterieur": {
+     "cle": "coventry-city",
+     "court": "Coventry City",
+     "nom": "Coventry City FC",
+     "slug": "coventry-city-fc"
+    }
+   }
+  },
+  "/matchs/leeds-united-coventry-city-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "leeds-united-coventry-city-2026-11-28",
+   "empreinte": "Ot4m5DAaZI6iYigVSgTyZA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/leeds-united-coventry-city-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "leeds-united-coventry-city-2026-11-28",
+   "empreinte": "ap5lMmSSSYvOPDvxxoYSSg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/leipzig-lens-2026-11-24/": {
    "type": "match",
    "cle": "leipzig-lens-2026-11-24",
    "date": "2026-11-24T20:00:00.000Z",
-   "empreinte": "IQC-ZP8FhjfFgbWK-YJ9QA",
-   "change": "2026-11-16",
+   "empreinte": "YqA_sccAjS3CDGA30Ucdzw",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2281,8 +3071,8 @@
    "type": "match",
    "cle": "levante-atletico-2026-10-31",
    "date": "2026-10-31T13:00:00.000Z",
-   "empreinte": "Sg7A-ZTuHhv7fZCEo0uupQ",
-   "change": "2026-11-16",
+   "empreinte": "-YFDw5IUYKDdOyOY1cbr2w",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2306,6 +3096,94 @@
      "slug": "atletico-de-madrid"
     }
    }
+  },
+  "/matchs/levante-elche-2026-11-23/": {
+   "type": "match",
+   "cle": "levante-elche-2026-11-23",
+   "date": "2026-11-23T20:00:00.000Z",
+   "empreinte": "IWqNWw7Ps6eCbGsdSrhouQ",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "levante-elche-2026-11-23",
+    "ids": [
+     "cmwt6c6gu0004nntllpyyi3tl"
+    ],
+    "debut": "2026-11-23T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "levante",
+     "court": "Levante",
+     "nom": "Levante UD",
+     "slug": "levante-ud"
+    },
+    "exterieur": {
+     "cle": "elche",
+     "court": "Elche",
+     "nom": "Elche CF",
+     "slug": "elche-cf"
+    }
+   }
+  },
+  "/matchs/levante-elche-2026-11-23/match.ics": {
+   "type": "evenement",
+   "cle": "levante-elche-2026-11-23",
+   "empreinte": "HGFvrwPGM-CN0RG4vPghiQ",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/levante-elche-2026-11-23/partage.png": {
+   "type": "partage",
+   "cle": "levante-elche-2026-11-23",
+   "empreinte": "RLhGIJ6Oh0BKfnsPGYuZ4A",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/levante-real-racing-club-de-santander-2026-11-27/": {
+   "type": "match",
+   "cle": "levante-real-racing-club-de-santander-2026-11-27",
+   "date": "2026-11-27T20:00:00.000Z",
+   "empreinte": "0J2Fp-pxf9KDDDPOIiXEtg",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "levante-real-racing-club-de-santander-2026-11-27",
+    "ids": [
+     "cmwt6dov40019rcssvayjktii"
+    ],
+    "debut": "2026-11-27T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "levante",
+     "court": "Levante",
+     "nom": "Levante UD",
+     "slug": "levante-ud"
+    },
+    "exterieur": {
+     "cle": "real-racing-club-de-santander",
+     "court": "Real Racing Club de Santander",
+     "nom": "Real Racing Club de Santander",
+     "slug": "real-racing-club-de-santander"
+    }
+   }
+  },
+  "/matchs/levante-real-racing-club-de-santander-2026-11-27/match.ics": {
+   "type": "evenement",
+   "cle": "levante-real-racing-club-de-santander-2026-11-27",
+   "empreinte": "ijG8fU-PsFkxmVs8_X-rxw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/levante-real-racing-club-de-santander-2026-11-27/partage.png": {
+   "type": "partage",
+   "cle": "levante-real-racing-club-de-santander-2026-11-27",
+   "empreinte": "217XEKhp0cgFIWiPGnPH_Q",
+   "change": "2026-11-23",
+   "indexable": false
   },
   "/matchs/leverkusen-om-2026-11-05/": {
    "type": "match",
@@ -2371,8 +3249,8 @@
    "type": "match",
    "cle": "lille-bayern-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "K0-nWCTBIvzeB1eA7clXeA",
-   "change": "2026-11-16",
+   "empreinte": "WeHWKOvhoSoQpl27NpIYDg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2595,8 +3473,8 @@
    "type": "match",
    "cle": "man-city-naples-2026-11-24",
    "date": "2026-11-24T20:00:00.000Z",
-   "empreinte": "uDw_Cs9qXZfGy8FgTH3XSg",
-   "change": "2026-11-16",
+   "empreinte": "Oa3h4zI3_GHH6x0Tam2GPg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2664,6 +3542,50 @@
      "slug": "aston-villa"
     }
    }
+  },
+  "/matchs/man-united-brentford-2026-11-28/": {
+   "type": "match",
+   "cle": "man-united-brentford-2026-11-28",
+   "date": "2026-11-28T15:00:00.000Z",
+   "empreinte": "sFrKI5k0ap26yeI_mItt8g",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "man-united-brentford-2026-11-28",
+    "ids": [
+     "cmwt6dp0e001prcssmmi1quf7"
+    ],
+    "debut": "2026-11-28T15:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "man-united",
+     "court": "Man United",
+     "nom": "Manchester United",
+     "slug": "manchester-united"
+    },
+    "exterieur": {
+     "cle": "brentford",
+     "court": "Brentford",
+     "nom": "Brentford FC",
+     "slug": "brentford-fc"
+    }
+   }
+  },
+  "/matchs/man-united-brentford-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "man-united-brentford-2026-11-28",
+   "empreinte": "oLE-W3TM2BKFtXRStjcxIg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/man-united-brentford-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "man-united-brentford-2026-11-28",
+   "empreinte": "Kn30yY6p9V28dKm8HTptHA",
+   "change": "2026-11-23",
+   "indexable": false
   },
   "/matchs/milan-inter-2026-10-31/": {
    "type": "match",
@@ -2785,6 +3707,50 @@
     }
    }
   },
+  "/matchs/monza-fiorentina-2026-11-23/": {
+   "type": "match",
+   "cle": "monza-fiorentina-2026-11-23",
+   "date": "2026-11-23T19:45:00.000Z",
+   "empreinte": "rcaBvhu0Z-knK4ZpZifE3Q",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "monza-fiorentina-2026-11-23",
+    "ids": [
+     "cmwt6c6iz0008nntlwdlk98qz"
+    ],
+    "debut": "2026-11-23T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "monza",
+     "court": "Monza",
+     "nom": "AC Monza",
+     "slug": "ac-monza"
+    },
+    "exterieur": {
+     "cle": "fiorentina",
+     "court": "Fiorentina",
+     "nom": "ACF Fiorentina",
+     "slug": "acf-fiorentina"
+    }
+   }
+  },
+  "/matchs/monza-fiorentina-2026-11-23/match.ics": {
+   "type": "evenement",
+   "cle": "monza-fiorentina-2026-11-23",
+   "empreinte": "iyFvBLg1IUHPoN0nGUzLTw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/monza-fiorentina-2026-11-23/partage.png": {
+   "type": "partage",
+   "cle": "monza-fiorentina-2026-11-23",
+   "empreinte": "4xuT5r1pwG63XwZMo5u07w",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/naples-lazio-2026-11-08/": {
    "type": "match",
    "cle": "naples-lazio-2026-11-08",
@@ -2879,8 +3845,8 @@
    "type": "match",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "18a_X09RHIpDCUtqGaNjQQ",
-   "change": "2026-11-22",
+   "empreinte": "1RniwfwoD6mzpWWwoeRIJA",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3051,6 +4017,50 @@
    "cle": "nijmegen-rennes-2026-11-26",
    "empreinte": "l8HZRIFOX85k3TxfWVi1Dg",
    "change": "2026-11-13",
+   "indexable": false
+  },
+  "/matchs/nottingham-forest-chelsea-2026-11-27/": {
+   "type": "match",
+   "cle": "nottingham-forest-chelsea-2026-11-27",
+   "date": "2026-11-27T20:00:00.000Z",
+   "empreinte": "dJ1qtM5vPYIhP9b0opTmdA",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "nottingham-forest-chelsea-2026-11-27",
+    "ids": [
+     "cmwt6doy1001jrcss8xb2eyac"
+    ],
+    "debut": "2026-11-27T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "nottingham-forest",
+     "court": "Nottingham Forest",
+     "nom": "Nottingham Forest FC",
+     "slug": "nottingham-forest-fc"
+    },
+    "exterieur": {
+     "cle": "chelsea",
+     "court": "Chelsea",
+     "nom": "Chelsea FC",
+     "slug": "chelsea-fc"
+    }
+   }
+  },
+  "/matchs/nottingham-forest-chelsea-2026-11-27/match.ics": {
+   "type": "evenement",
+   "cle": "nottingham-forest-chelsea-2026-11-27",
+   "empreinte": "_DF5GBSajZ3ohMXKGs7luw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/nottingham-forest-chelsea-2026-11-27/partage.png": {
+   "type": "partage",
+   "cle": "nottingham-forest-chelsea-2026-11-27",
+   "empreinte": "GTleCUe9qUwgVjaK98Fw7g",
+   "change": "2026-11-23",
    "indexable": false
   },
   "/matchs/ol-angers-2026-10-31/": {
@@ -3305,6 +4315,50 @@
     }
    }
   },
+  "/matchs/paderborn-07-schalke-04-2026-11-28/": {
+   "type": "match",
+   "cle": "paderborn-07-schalke-04-2026-11-28",
+   "date": "2026-11-28T14:30:00.000Z",
+   "empreinte": "Q_Vy8Pd17i5cY8jvONa4RQ",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "paderborn-07-schalke-04-2026-11-28",
+    "ids": [
+     "cmwt6dotg0013rcssdbwnknbq"
+    ],
+    "debut": "2026-11-28T14:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "paderborn-07",
+     "court": "Paderborn 07",
+     "nom": "SC Paderborn 07",
+     "slug": "sc-paderborn-07"
+    },
+    "exterieur": {
+     "cle": "schalke-04",
+     "court": "Schalke 04",
+     "nom": "FC Schalke 04",
+     "slug": "fc-schalke-04"
+    }
+   }
+  },
+  "/matchs/paderborn-07-schalke-04-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "paderborn-07-schalke-04-2026-11-28",
+   "empreinte": "tnUAKpXUWpwQtfju20dtsA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/paderborn-07-schalke-04-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "paderborn-07-schalke-04-2026-11-28",
+   "empreinte": "7h1D8nPPxxErnmR9ekQJrw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/paris-fc-angers-2026-11-22/": {
    "type": "match",
    "cle": "paris-fc-angers-2026-11-22",
@@ -3473,8 +4527,8 @@
    "type": "match",
    "cle": "psg-rome-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "WXO0vRH83pQDMv2V2QYjaA",
-   "change": "2026-11-16",
+   "empreinte": "6py2VvHCAZkWOK_K4BkeMQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3543,12 +4597,56 @@
     }
    }
   },
+  "/matchs/real-madrid-deportivo-alaves-2026-11-28/": {
+   "type": "match",
+   "cle": "real-madrid-deportivo-alaves-2026-11-28",
+   "date": "2026-11-28T20:00:00.000Z",
+   "empreinte": "-W0rCxgqRPyAKmVhBnxmkw",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "real-madrid-deportivo-alaves-2026-11-28",
+    "ids": [
+     "cmwt6dowu001frcssg9kmkwlk"
+    ],
+    "debut": "2026-11-28T20:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "LaLiga",
+    "domicile": {
+     "cle": "real-madrid",
+     "court": "Real Madrid",
+     "nom": "Real Madrid C.F.",
+     "slug": "real-madrid-c-f"
+    },
+    "exterieur": {
+     "cle": "deportivo-alaves",
+     "court": "Deportivo Alavés",
+     "nom": "Deportivo Alavés",
+     "slug": "deportivo-alaves"
+    }
+   }
+  },
+  "/matchs/real-madrid-deportivo-alaves-2026-11-28/match.ics": {
+   "type": "evenement",
+   "cle": "real-madrid-deportivo-alaves-2026-11-28",
+   "empreinte": "K3qxxHdKAwKrl5RQAylxRA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/real-madrid-deportivo-alaves-2026-11-28/partage.png": {
+   "type": "partage",
+   "cle": "real-madrid-deportivo-alaves-2026-11-28",
+   "empreinte": "apaPMGmsby2ppZ2jPBYXpA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/real-madrid-eindhoven-2026-11-24/": {
    "type": "match",
    "cle": "real-madrid-eindhoven-2026-11-24",
    "date": "2026-11-24T20:00:00.000Z",
-   "empreinte": "15EiMsSdx3DRC0s03qjidA",
-   "change": "2026-11-16",
+   "empreinte": "ij0pBuYA9Nfswz5ep38RqQ",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3707,12 +4805,56 @@
     }
    }
   },
+  "/matchs/rome-monza-2026-11-29/": {
+   "type": "match",
+   "cle": "rome-monza-2026-11-29",
+   "date": "2026-11-29T17:00:00.000Z",
+   "empreinte": "qrxvLrE_yP8OuYYlpTvD7A",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "rome-monza-2026-11-29",
+    "ids": [
+     "cmwt6dp520025rcsskq6qmjtu"
+    ],
+    "debut": "2026-11-29T17:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "rome",
+     "court": "Rome",
+     "nom": "AS Roma",
+     "slug": "as-roma"
+    },
+    "exterieur": {
+     "cle": "monza",
+     "court": "Monza",
+     "nom": "AC Monza",
+     "slug": "ac-monza"
+    }
+   }
+  },
+  "/matchs/rome-monza-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "rome-monza-2026-11-29",
+   "empreinte": "8xiObCVdN1Gp90happ5kaQ",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/rome-monza-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "rome-monza-2026-11-29",
+   "empreinte": "S6LLWOaYPVV3FnmIMr3rhA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/sabah-barca-2026-11-25/": {
    "type": "match",
    "cle": "sabah-barca-2026-11-25",
    "date": "2026-11-25T17:45:00.000Z",
-   "empreinte": "cGOwx8M9Uldpie5faLBONQ",
-   "change": "2026-11-16",
+   "empreinte": "JhRtuVKiA26Aw6AEnm0xbg",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3751,12 +4893,56 @@
    "change": "2026-11-11",
    "indexable": false
   },
+  "/matchs/sassuolo-calcio-naples-2026-11-29/": {
+   "type": "match",
+   "cle": "sassuolo-calcio-naples-2026-11-29",
+   "date": "2026-11-29T14:00:00.000Z",
+   "empreinte": "8EjTzpWuwVTZQLI8-xtx1A",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "sassuolo-calcio-naples-2026-11-29",
+    "ids": [
+     "cmwt6dp6u002brcsshaoqo78j"
+    ],
+    "debut": "2026-11-29T14:00:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "sassuolo-calcio",
+     "court": "Sassuolo Calcio",
+     "nom": "US Sassuolo Calcio",
+     "slug": "us-sassuolo-calcio"
+    },
+    "exterieur": {
+     "cle": "naples",
+     "court": "Naples",
+     "nom": "SSC Napoli",
+     "slug": "ssc-napoli"
+    }
+   }
+  },
+  "/matchs/sassuolo-calcio-naples-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "sassuolo-calcio-naples-2026-11-29",
+   "empreinte": "aU7T83efzpaIB9c5AXouBg",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/sassuolo-calcio-naples-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "sassuolo-calcio-naples-2026-11-29",
+   "empreinte": "ISOby_zl3LgnoujG5TM6xA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/sporting-clube-de-portugal-man-united-2026-11-25/": {
    "type": "match",
    "cle": "sporting-clube-de-portugal-man-united-2026-11-25",
    "date": "2026-11-25T20:00:00.000Z",
-   "empreinte": "hREliJWaUasgDpm4-eoH6A",
-   "change": "2026-11-16",
+   "empreinte": "eaB33Rb1wihJJTDlvqyJEw",
+   "change": "2026-11-23",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3897,6 +5083,50 @@
    "cle": "stuttgart-francfort-2026-11-28",
    "empreinte": "7NA0jX2w0txaoMXzGxYLVA",
    "change": "2026-11-14",
+   "indexable": false
+  },
+  "/matchs/sunderland-tottenham-2026-11-29/": {
+   "type": "match",
+   "cle": "sunderland-tottenham-2026-11-29",
+   "date": "2026-11-29T14:05:00.000Z",
+   "empreinte": "D6mrE3JcSyBjqsJssuY8-A",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "sunderland-tottenham-2026-11-29",
+    "ids": [
+     "cmwt6dp2t001xrcsscsxeztap"
+    ],
+    "debut": "2026-11-29T14:05:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Premier League",
+    "domicile": {
+     "cle": "sunderland",
+     "court": "Sunderland",
+     "nom": "Sunderland AFC",
+     "slug": "sunderland-afc"
+    },
+    "exterieur": {
+     "cle": "tottenham",
+     "court": "Tottenham",
+     "nom": "Tottenham Hotspur",
+     "slug": "tottenham-hotspur"
+    }
+   }
+  },
+  "/matchs/sunderland-tottenham-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "sunderland-tottenham-2026-11-29",
+   "empreinte": "cjYYu7dorj6vW0truKvhzA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/sunderland-tottenham-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "sunderland-tottenham-2026-11-29",
+   "empreinte": "4RVYHvVZwU6NEVgV_5sCcQ",
+   "change": "2026-11-23",
    "indexable": false
   },
   "/matchs/toulouse-rennes-2026-11-29/": {
@@ -4063,6 +5293,50 @@
     }
    }
   },
+  "/matchs/udinese-calcio-fiorentina-2026-11-29/": {
+   "type": "match",
+   "cle": "udinese-calcio-fiorentina-2026-11-29",
+   "date": "2026-11-29T11:30:00.000Z",
+   "empreinte": "xWOPrs7cscnkbOfIboY2NQ",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "udinese-calcio-fiorentina-2026-11-29",
+    "ids": [
+     "cmwt6dp690029rcss7fs6wz0s"
+    ],
+    "debut": "2026-11-29T11:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "udinese-calcio",
+     "court": "Udinese Calcio",
+     "nom": "Udinese Calcio",
+     "slug": "udinese-calcio"
+    },
+    "exterieur": {
+     "cle": "fiorentina",
+     "court": "Fiorentina",
+     "nom": "ACF Fiorentina",
+     "slug": "acf-fiorentina"
+    }
+   }
+  },
+  "/matchs/udinese-calcio-fiorentina-2026-11-29/match.ics": {
+   "type": "evenement",
+   "cle": "udinese-calcio-fiorentina-2026-11-29",
+   "empreinte": "bbsq0l0FowSRhW-HIoUl3Q",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/udinese-calcio-fiorentina-2026-11-29/partage.png": {
+   "type": "partage",
+   "cle": "udinese-calcio-fiorentina-2026-11-29",
+   "empreinte": "nAwch-dXa_428WDKXq9zkw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/valencia-real-madrid-2026-11-07/": {
    "type": "match",
    "cle": "valencia-real-madrid-2026-11-07",
@@ -4093,6 +5367,50 @@
     }
    }
   },
+  "/matchs/venezia-bologna-1909-2026-11-27/": {
+   "type": "match",
+   "cle": "venezia-bologna-1909-2026-11-27",
+   "date": "2026-11-27T19:45:00.000Z",
+   "empreinte": "9_FPpS8qUN9TciSO7Rofhg",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "venezia-bologna-1909-2026-11-27",
+    "ids": [
+     "cmwt6dp3e001zrcssbl26jytb"
+    ],
+    "debut": "2026-11-27T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Serie A",
+    "domicile": {
+     "cle": "venezia",
+     "court": "Venezia",
+     "nom": "Venezia FC",
+     "slug": "venezia-fc"
+    },
+    "exterieur": {
+     "cle": "bologna-1909",
+     "court": "Bologna 1909",
+     "nom": "Bologna FC 1909",
+     "slug": "bologna-fc-1909"
+    }
+   }
+  },
+  "/matchs/venezia-bologna-1909-2026-11-27/match.ics": {
+   "type": "evenement",
+   "cle": "venezia-bologna-1909-2026-11-27",
+   "empreinte": "7Q_YHqwvde1-GeVbZB2i6g",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/venezia-bologna-1909-2026-11-27/partage.png": {
+   "type": "partage",
+   "cle": "venezia-bologna-1909-2026-11-27",
+   "empreinte": "Z4KUKd-kjoZoN8DoCCmwKA",
+   "change": "2026-11-23",
+   "indexable": false
+  },
   "/matchs/villarreal-psg-2026-11-03/": {
    "type": "match",
    "cle": "villarreal-psg-2026-11-03",
@@ -4122,6 +5440,50 @@
      "slug": "paris-saint-germain"
     }
    }
+  },
+  "/matchs/werder-bremen-borussia-monchengladbach-2026-11-27/": {
+   "type": "match",
+   "cle": "werder-bremen-borussia-monchengladbach-2026-11-27",
+   "date": "2026-11-27T19:30:00.000Z",
+   "empreinte": "GyATPRVpqAARdv89JfgvYA",
+   "change": "2026-11-23",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "werder-bremen-borussia-monchengladbach-2026-11-27",
+    "ids": [
+     "cmwt6doqi000vrcsss7mih6bc"
+    ],
+    "debut": "2026-11-27T19:30:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Bundesliga",
+    "domicile": {
+     "cle": "werder-bremen",
+     "court": "Werder Bremen",
+     "nom": "SV Werder Bremen",
+     "slug": "sv-werder-bremen"
+    },
+    "exterieur": {
+     "cle": "borussia-monchengladbach",
+     "court": "Borussia Mönchengladbach",
+     "nom": "Borussia Mönchengladbach",
+     "slug": "borussia-monchengladbach"
+    }
+   }
+  },
+  "/matchs/werder-bremen-borussia-monchengladbach-2026-11-27/match.ics": {
+   "type": "evenement",
+   "cle": "werder-bremen-borussia-monchengladbach-2026-11-27",
+   "empreinte": "nGm7WPkpijeyzMGqHXp7Dw",
+   "change": "2026-11-23",
+   "indexable": false
+  },
+  "/matchs/werder-bremen-borussia-monchengladbach-2026-11-27/partage.png": {
+   "type": "partage",
+   "cle": "werder-bremen-borussia-monchengladbach-2026-11-27",
+   "empreinte": "-rEyMBLLcmZAK7P1OqZgrA",
+   "change": "2026-11-23",
+   "indexable": false
   },
   "/regarder-le-match/": {
    "type": "villes",
@@ -5415,6 +6777,666 @@
    "empreinte": "VH0NzemRb85wVli7UMIYFw",
    "sequence": 0,
    "modifie": "2026-11-16T21:58:24Z"
+  },
+  "cmwt6c6gu0004nntllpyyi3tl@baromatch.fr": {
+   "ids": [
+    "cmwt6c6gu0004nntllpyyi3tl"
+   ],
+   "slug": "levante-elche-2026-11-23",
+   "debut": "2026-11-23T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "LaLiga",
+   "domicile": {
+    "cle": "levante",
+    "court": "Levante",
+    "nom": "Levante UD"
+   },
+   "exterieur": {
+    "cle": "elche",
+    "court": "Elche",
+    "nom": "Elche CF"
+   },
+   "empreinte": "zT69YHRw8XQAzoQQNMbk2Q",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6c6hy0006nntlnwttgrb5@baromatch.fr": {
+   "ids": [
+    "cmwt6c6hy0006nntlnwttgrb5"
+   ],
+   "slug": "brentford-everton-2026-11-23",
+   "debut": "2026-11-23T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "brentford",
+    "court": "Brentford",
+    "nom": "Brentford FC"
+   },
+   "exterieur": {
+    "cle": "everton",
+    "court": "Everton",
+    "nom": "Everton FC"
+   },
+   "empreinte": "8ZEwNeuKC0JGtvG0pomfkA",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6c6iz0008nntlwdlk98qz@baromatch.fr": {
+   "ids": [
+    "cmwt6c6iz0008nntlwdlk98qz"
+   ],
+   "slug": "monza-fiorentina-2026-11-23",
+   "debut": "2026-11-23T19:45:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "monza",
+    "court": "Monza",
+    "nom": "AC Monza"
+   },
+   "exterieur": {
+    "cle": "fiorentina",
+    "court": "Fiorentina",
+    "nom": "ACF Fiorentina"
+   },
+   "empreinte": "BzqVh3S5ttH2R6ko0x8HDg",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6doqi000vrcsss7mih6bc@baromatch.fr": {
+   "ids": [
+    "cmwt6doqi000vrcsss7mih6bc"
+   ],
+   "slug": "werder-bremen-borussia-monchengladbach-2026-11-27",
+   "debut": "2026-11-27T19:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Bundesliga",
+   "domicile": {
+    "cle": "werder-bremen",
+    "court": "Werder Bremen",
+    "nom": "SV Werder Bremen"
+   },
+   "exterieur": {
+    "cle": "borussia-monchengladbach",
+    "court": "Borussia Mönchengladbach",
+    "nom": "Borussia Mönchengladbach"
+   },
+   "empreinte": "CdzT1ay5PCfSlPb3x0Pt4Q",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dorn000xrcsst29lrvqr@baromatch.fr": {
+   "ids": [
+    "cmwt6dorn000xrcsst29lrvqr"
+   ],
+   "slug": "1-koln-07-elversberg-2026-11-28",
+   "debut": "2026-11-28T14:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Bundesliga",
+   "domicile": {
+    "cle": "1-koln",
+    "court": "1. Köln",
+    "nom": "1. FC Köln"
+   },
+   "exterieur": {
+    "cle": "07-elversberg",
+    "court": "07 Elversberg",
+    "nom": "SV 07 Elversberg"
+   },
+   "empreinte": "B5iv79jJE2FdGt9ovxQmJQ",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dos9000zrcssfq5hbc0b@baromatch.fr": {
+   "ids": [
+    "cmwt6dos9000zrcssfq5hbc0b"
+   ],
+   "slug": "1-mainz-05-1-union-berlin-2026-11-28",
+   "debut": "2026-11-28T14:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Bundesliga",
+   "domicile": {
+    "cle": "1-mainz-05",
+    "court": "1. Mainz 05",
+    "nom": "1. FSV Mainz 05"
+   },
+   "exterieur": {
+    "cle": "1-union-berlin",
+    "court": "1. Union Berlin",
+    "nom": "1. FC Union Berlin"
+   },
+   "empreinte": "CXCamVR9BJoCpZQ74wXRYQ",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dosv0011rcsso08pz7iw@baromatch.fr": {
+   "ids": [
+    "cmwt6dosv0011rcsso08pz7iw"
+   ],
+   "slug": "hamburger-bayern-2026-11-28",
+   "debut": "2026-11-28T14:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Bundesliga",
+   "domicile": {
+    "cle": "hamburger",
+    "court": "Hamburger",
+    "nom": "Hamburger SV"
+   },
+   "exterieur": {
+    "cle": "bayern",
+    "court": "Bayern",
+    "nom": "FC Bayern München"
+   },
+   "empreinte": "ALX-GydrcxgGZfTeIFi_YA",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dotg0013rcssdbwnknbq@baromatch.fr": {
+   "ids": [
+    "cmwt6dotg0013rcssdbwnknbq"
+   ],
+   "slug": "paderborn-07-schalke-04-2026-11-28",
+   "debut": "2026-11-28T14:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Bundesliga",
+   "domicile": {
+    "cle": "paderborn-07",
+    "court": "Paderborn 07",
+    "nom": "SC Paderborn 07"
+   },
+   "exterieur": {
+    "cle": "schalke-04",
+    "court": "Schalke 04",
+    "nom": "FC Schalke 04"
+   },
+   "empreinte": "vINLIaCWiHqqy9O4Z3ID5A",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dou00015rcssq2kjzlr6@baromatch.fr": {
+   "ids": [
+    "cmwt6dou00015rcssq2kjzlr6"
+   ],
+   "slug": "fribourg-leipzig-2026-11-29",
+   "debut": "2026-11-29T14:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Bundesliga",
+   "domicile": {
+    "cle": "fribourg",
+    "court": "Fribourg",
+    "nom": "SC Freiburg"
+   },
+   "exterieur": {
+    "cle": "leipzig",
+    "court": "Leipzig",
+    "nom": "RB Leipzig"
+   },
+   "empreinte": "Oo4eBZ5-2WqUMC_8T59IOA",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6doul0017rcssxnfm9y1t@baromatch.fr": {
+   "ids": [
+    "cmwt6doul0017rcssxnfm9y1t"
+   ],
+   "slug": "hoffenheim-augsburg-2026-11-29",
+   "debut": "2026-11-29T16:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Bundesliga",
+   "domicile": {
+    "cle": "hoffenheim",
+    "court": "Hoffenheim",
+    "nom": "TSG Hoffenheim"
+   },
+   "exterieur": {
+    "cle": "augsburg",
+    "court": "Augsburg",
+    "nom": "FC Augsburg"
+   },
+   "empreinte": "bZyeg66VKuHJyzezfHiUDQ",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dov40019rcssvayjktii@baromatch.fr": {
+   "ids": [
+    "cmwt6dov40019rcssvayjktii"
+   ],
+   "slug": "levante-real-racing-club-de-santander-2026-11-27",
+   "debut": "2026-11-27T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "LaLiga",
+   "domicile": {
+    "cle": "levante",
+    "court": "Levante",
+    "nom": "Levante UD"
+   },
+   "exterieur": {
+    "cle": "real-racing-club-de-santander",
+    "court": "Real Racing Club de Santander",
+    "nom": "Real Racing Club de Santander"
+   },
+   "empreinte": "Mpm3bxQtJq_p4A4Nc4NupQ",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dovo001brcsst5nmk0rj@baromatch.fr": {
+   "ids": [
+    "cmwt6dovo001brcsst5nmk0rj"
+   ],
+   "slug": "elche-atletico-2026-11-28",
+   "debut": "2026-11-28T17:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "LaLiga",
+   "domicile": {
+    "cle": "elche",
+    "court": "Elche",
+    "nom": "Elche CF"
+   },
+   "exterieur": {
+    "cle": "atletico",
+    "court": "Atlético",
+    "nom": "Atlético de Madrid"
+   },
+   "empreinte": "HC8B7awof0_LiS7Ru-p2VA",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dow9001drcssny86gqx6@baromatch.fr": {
+   "ids": [
+    "cmwt6dow9001drcssny86gqx6"
+   ],
+   "slug": "betis-rayo-vallecano-2026-11-28",
+   "debut": "2026-11-28T13:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "LaLiga",
+   "domicile": {
+    "cle": "betis",
+    "court": "Betis",
+    "nom": "Real Betis Balompié"
+   },
+   "exterieur": {
+    "cle": "rayo-vallecano",
+    "court": "Rayo Vallecano",
+    "nom": "Rayo Vallecano"
+   },
+   "empreinte": "j9MsuJ6LBHOeDXwEkragHg",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dowu001frcssg9kmkwlk@baromatch.fr": {
+   "ids": [
+    "cmwt6dowu001frcssg9kmkwlk"
+   ],
+   "slug": "real-madrid-deportivo-alaves-2026-11-28",
+   "debut": "2026-11-28T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "LaLiga",
+   "domicile": {
+    "cle": "real-madrid",
+    "court": "Real Madrid",
+    "nom": "Real Madrid C.F."
+   },
+   "exterieur": {
+    "cle": "deportivo-alaves",
+    "court": "Deportivo Alavés",
+    "nom": "Deportivo Alavés"
+   },
+   "empreinte": "BakY0CH2a3nZoRJDLnS9_w",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6doxf001hrcss7ta8552c@baromatch.fr": {
+   "ids": [
+    "cmwt6doxf001hrcss7ta8552c"
+   ],
+   "slug": "deportivo-de-coruna-barca-2026-11-29",
+   "debut": "2026-11-29T15:15:00.000Z",
+   "heureConfirmee": true,
+   "competition": "LaLiga",
+   "domicile": {
+    "cle": "deportivo-de-coruna",
+    "court": "Deportivo de Coruña",
+    "nom": "RC Deportivo de A Coruña"
+   },
+   "exterieur": {
+    "cle": "barca",
+    "court": "Barça",
+    "nom": "FC Barcelona"
+   },
+   "empreinte": "2chSdFTp1rnnYo3dOhzJ2w",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6doy1001jrcss8xb2eyac@baromatch.fr": {
+   "ids": [
+    "cmwt6doy1001jrcss8xb2eyac"
+   ],
+   "slug": "nottingham-forest-chelsea-2026-11-27",
+   "debut": "2026-11-27T20:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "nottingham-forest",
+    "court": "Nottingham Forest",
+    "nom": "Nottingham Forest FC"
+   },
+   "exterieur": {
+    "cle": "chelsea",
+    "court": "Chelsea",
+    "nom": "Chelsea FC"
+   },
+   "empreinte": "Mze-rK4dQEcLXqF-qUrncg",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6doz6001lrcssof4d5usj@baromatch.fr": {
+   "ids": [
+    "cmwt6doz6001lrcssof4d5usj"
+   ],
+   "slug": "ipswich-town-aston-villa-2026-11-28",
+   "debut": "2026-11-28T17:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "ipswich-town",
+    "court": "Ipswich Town",
+    "nom": "Ipswich Town FC"
+   },
+   "exterieur": {
+    "cle": "aston-villa",
+    "court": "Aston Villa",
+    "nom": "Aston Villa"
+   },
+   "empreinte": "E2rVLxxmhAgUNJZ10OFr-Q",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dozs001nrcsslj54gdb2@baromatch.fr": {
+   "ids": [
+    "cmwt6dozs001nrcsslj54gdb2"
+   ],
+   "slug": "leeds-united-coventry-city-2026-11-28",
+   "debut": "2026-11-28T15:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "leeds-united",
+    "court": "Leeds United",
+    "nom": "Leeds United FC"
+   },
+   "exterieur": {
+    "cle": "coventry-city",
+    "court": "Coventry City",
+    "nom": "Coventry City FC"
+   },
+   "empreinte": "ApsILPASSlCKAxw7gQm-fQ",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp0e001prcssmmi1quf7@baromatch.fr": {
+   "ids": [
+    "cmwt6dp0e001prcssmmi1quf7"
+   ],
+   "slug": "man-united-brentford-2026-11-28",
+   "debut": "2026-11-28T15:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "man-united",
+    "court": "Man United",
+    "nom": "Manchester United"
+   },
+   "exterieur": {
+    "cle": "brentford",
+    "court": "Brentford",
+    "nom": "Brentford FC"
+   },
+   "empreinte": "C_Rg3NRpwNwyMDH_pTnPXg",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp11001rrcssxzvfkz7t@baromatch.fr": {
+   "ids": [
+    "cmwt6dp11001rrcssxzvfkz7t"
+   ],
+   "slug": "brighton-hove-albion-newcastle-2026-11-29",
+   "debut": "2026-11-29T14:05:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "brighton-hove-albion",
+    "court": "Brighton & Hove Albion",
+    "nom": "Brighton & Hove Albion"
+   },
+   "exterieur": {
+    "cle": "newcastle",
+    "court": "Newcastle",
+    "nom": "Newcastle United FC"
+   },
+   "empreinte": "UCTYUne6YsakAxJrPxpM2w",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp1n001trcss7jy3rrw2@baromatch.fr": {
+   "ids": [
+    "cmwt6dp1n001trcss7jy3rrw2"
+   ],
+   "slug": "crystal-palace-hull-city-2026-11-29",
+   "debut": "2026-11-29T14:05:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "crystal-palace",
+    "court": "Crystal Palace",
+    "nom": "Crystal Palace FC"
+   },
+   "exterieur": {
+    "cle": "hull-city",
+    "court": "Hull City",
+    "nom": "Hull City AFC"
+   },
+   "empreinte": "09jCfz0OGqCaSSWmEPyjZA",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp28001vrcsse46m1hu1@baromatch.fr": {
+   "ids": [
+    "cmwt6dp28001vrcsse46m1hu1"
+   ],
+   "slug": "fulham-bournemouth-2026-11-29",
+   "debut": "2026-11-29T14:05:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "fulham",
+    "court": "Fulham",
+    "nom": "Fulham FC"
+   },
+   "exterieur": {
+    "cle": "bournemouth",
+    "court": "Bournemouth",
+    "nom": "AFC Bournemouth"
+   },
+   "empreinte": "sBikTyCWdPTO4ZIZbZRiMw",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp2t001xrcsscsxeztap@baromatch.fr": {
+   "ids": [
+    "cmwt6dp2t001xrcsscsxeztap"
+   ],
+   "slug": "sunderland-tottenham-2026-11-29",
+   "debut": "2026-11-29T14:05:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Premier League",
+   "domicile": {
+    "cle": "sunderland",
+    "court": "Sunderland",
+    "nom": "Sunderland AFC"
+   },
+   "exterieur": {
+    "cle": "tottenham",
+    "court": "Tottenham",
+    "nom": "Tottenham Hotspur"
+   },
+   "empreinte": "C3Gld4abEXRlhxjrEQPfGQ",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp3e001zrcssbl26jytb@baromatch.fr": {
+   "ids": [
+    "cmwt6dp3e001zrcssbl26jytb"
+   ],
+   "slug": "venezia-bologna-1909-2026-11-27",
+   "debut": "2026-11-27T19:45:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "venezia",
+    "court": "Venezia",
+    "nom": "Venezia FC"
+   },
+   "exterieur": {
+    "cle": "bologna-1909",
+    "court": "Bologna 1909",
+    "nom": "Bologna FC 1909"
+   },
+   "empreinte": "eei0glqOZXvgRDAVHLjo1Q",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp3y0021rcssfw3u5tq1@baromatch.fr": {
+   "ids": [
+    "cmwt6dp3y0021rcssfw3u5tq1"
+   ],
+   "slug": "inter-genoa-2026-11-28",
+   "debut": "2026-11-28T19:45:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "inter",
+    "court": "Inter",
+    "nom": "FC Internazionale Milano"
+   },
+   "exterieur": {
+    "cle": "genoa",
+    "court": "Genoa",
+    "nom": "Genoa CFC"
+   },
+   "empreinte": "H_6PYSzOViLD748cwY9zJg",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp4h0023rcssxlvgmzx3@baromatch.fr": {
+   "ids": [
+    "cmwt6dp4h0023rcssxlvgmzx3"
+   ],
+   "slug": "frosinone-calcio-parma-calcio-1913-2026-11-28",
+   "debut": "2026-11-28T14:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "frosinone-calcio",
+    "court": "Frosinone Calcio",
+    "nom": "Frosinone Calcio"
+   },
+   "exterieur": {
+    "cle": "parma-calcio-1913",
+    "court": "Parma Calcio 1913",
+    "nom": "Parma Calcio 1913"
+   },
+   "empreinte": "9hU2drwU-8askeEceI7wgg",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp520025rcsskq6qmjtu@baromatch.fr": {
+   "ids": [
+    "cmwt6dp520025rcsskq6qmjtu"
+   ],
+   "slug": "rome-monza-2026-11-29",
+   "debut": "2026-11-29T17:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "rome",
+    "court": "Rome",
+    "nom": "AS Roma"
+   },
+   "exterieur": {
+    "cle": "monza",
+    "court": "Monza",
+    "nom": "AC Monza"
+   },
+   "empreinte": "3l2JrH4qZMcpix3PFKnGcA",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp5o0027rcss4as1thvr@baromatch.fr": {
+   "ids": [
+    "cmwt6dp5o0027rcss4as1thvr"
+   ],
+   "slug": "como-1907-juventus-2026-11-29",
+   "debut": "2026-11-29T19:45:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "como-1907",
+    "court": "Como 1907",
+    "nom": "Como 1907"
+   },
+   "exterieur": {
+    "cle": "juventus",
+    "court": "Juventus",
+    "nom": "Juventus FC"
+   },
+   "empreinte": "89oG1RF1k-peIVrG3mA1lw",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp690029rcss7fs6wz0s@baromatch.fr": {
+   "ids": [
+    "cmwt6dp690029rcss7fs6wz0s"
+   ],
+   "slug": "udinese-calcio-fiorentina-2026-11-29",
+   "debut": "2026-11-29T11:30:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "udinese-calcio",
+    "court": "Udinese Calcio",
+    "nom": "Udinese Calcio"
+   },
+   "exterieur": {
+    "cle": "fiorentina",
+    "court": "Fiorentina",
+    "nom": "ACF Fiorentina"
+   },
+   "empreinte": "sVzjmxwre1SwW0GYJKFCuA",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
+  },
+  "cmwt6dp6u002brcsshaoqo78j@baromatch.fr": {
+   "ids": [
+    "cmwt6dp6u002brcsshaoqo78j"
+   ],
+   "slug": "sassuolo-calcio-naples-2026-11-29",
+   "debut": "2026-11-29T14:00:00.000Z",
+   "heureConfirmee": true,
+   "competition": "Serie A",
+   "domicile": {
+    "cle": "sassuolo-calcio",
+    "court": "Sassuolo Calcio",
+    "nom": "US Sassuolo Calcio"
+   },
+   "exterieur": {
+    "cle": "naples",
+    "court": "Naples",
+    "nom": "SSC Napoli"
+   },
+   "empreinte": "A6l4ZQZQmNxwoUgnAp0LtQ",
+   "sequence": 0,
+   "modifie": "2026-11-23T12:28:14Z"
   }
  }
 }

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6doxf001hrcss7ta8552c@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261129T151500Z
+DTEND:20261129T171500Z
+SUMMARY:Deportivo de Coruña – Barça
+DESCRIPTION:LaLiga · RC Deportivo de A Coruña – FC Barcelona\nCoup d’
+ envoi dimanche 29 novembre à 16:15\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/deportivo-de-coruna-barca-2026-11-29/
+URL:https://baromatch.fr/matchs/deportivo-de-coruna-barca-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

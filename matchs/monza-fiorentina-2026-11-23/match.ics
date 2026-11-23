@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6c6iz0008nntlwdlk98qz@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261123T194500Z
+DTEND:20261123T214500Z
+SUMMARY:Monza – Fiorentina
+DESCRIPTION:Serie A · AC Monza – ACF Fiorentina\nCoup d’envoi lundi 23
+  novembre à 20:45\, heure de Paris.\nLa page du match : https://baromatc
+ h.fr/matchs/monza-fiorentina-2026-11-23/
+URL:https://baromatch.fr/matchs/monza-fiorentina-2026-11-23/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6doul0017rcssxnfm9y1t@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261129T163000Z
+DTEND:20261129T183000Z
+SUMMARY:Hoffenheim – Augsburg
+DESCRIPTION:Bundesliga · TSG Hoffenheim – FC Augsburg\nCoup d’envoi di
+ manche 29 novembre à 17:30\, heure de Paris.\nLa page du match : https:/
+ /baromatch.fr/matchs/hoffenheim-augsburg-2026-11-29/
+URL:https://baromatch.fr/matchs/hoffenheim-augsburg-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

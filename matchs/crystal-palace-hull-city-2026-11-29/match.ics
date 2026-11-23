@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dp1n001trcss7jy3rrw2@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261129T140500Z
+DTEND:20261129T160500Z
+SUMMARY:Crystal Palace – Hull City
+DESCRIPTION:Premier League · Crystal Palace FC – Hull City AFC\nCoup d
+ ’envoi dimanche 29 novembre à 15:05\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/crystal-palace-hull-city-2026-11-29/
+URL:https://baromatch.fr/matchs/crystal-palace-hull-city-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

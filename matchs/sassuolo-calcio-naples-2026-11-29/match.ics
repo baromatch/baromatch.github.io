@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dp6u002brcsshaoqo78j@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261129T140000Z
+DTEND:20261129T160000Z
+SUMMARY:Sassuolo Calcio – Naples
+DESCRIPTION:Serie A · US Sassuolo Calcio – SSC Napoli\nCoup d’envoi di
+ manche 29 novembre à 15:00\, heure de Paris.\nLa page du match : https:/
+ /baromatch.fr/matchs/sassuolo-calcio-naples-2026-11-29/
+URL:https://baromatch.fr/matchs/sassuolo-calcio-naples-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

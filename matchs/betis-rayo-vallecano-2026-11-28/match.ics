@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dow9001drcssny86gqx6@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261128T130000Z
+DTEND:20261128T150000Z
+SUMMARY:Betis – Rayo Vallecano
+DESCRIPTION:LaLiga · Real Betis Balompié – Rayo Vallecano\nCoup d’env
+ oi samedi 28 novembre à 14:00\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/betis-rayo-vallecano-2026-11-28/
+URL:https://baromatch.fr/matchs/betis-rayo-vallecano-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

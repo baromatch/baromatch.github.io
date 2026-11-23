@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dp28001vrcsse46m1hu1@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261129T140500Z
+DTEND:20261129T160500Z
+SUMMARY:Fulham – Bournemouth
+DESCRIPTION:Premier League · Fulham FC – AFC Bournemouth\nCoup d’envoi
+  dimanche 29 novembre à 15:05\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/fulham-bournemouth-2026-11-29/
+URL:https://baromatch.fr/matchs/fulham-bournemouth-2026-11-29/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

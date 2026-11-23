@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dowu001frcssg9kmkwlk@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261128T200000Z
+DTEND:20261128T220000Z
+SUMMARY:Real Madrid – Deportivo Alavés
+DESCRIPTION:LaLiga · Real Madrid C.F. – Deportivo Alavés\nCoup d’envo
+ i samedi 28 novembre à 21:00\, heure de Paris.\nLa page du match : https
+ ://baromatch.fr/matchs/real-madrid-deportivo-alaves-2026-11-28/
+URL:https://baromatch.fr/matchs/real-madrid-deportivo-alaves-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

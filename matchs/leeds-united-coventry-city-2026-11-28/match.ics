@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dozs001nrcsslj54gdb2@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261128T150000Z
+DTEND:20261128T170000Z
+SUMMARY:Leeds United – Coventry City
+DESCRIPTION:Premier League · Leeds United FC – Coventry City FC\nCoup d
+ ’envoi samedi 28 novembre à 16:00\, heure de Paris.\nLa page du match 
+ : https://baromatch.fr/matchs/leeds-united-coventry-city-2026-11-28/
+URL:https://baromatch.fr/matchs/leeds-united-coventry-city-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

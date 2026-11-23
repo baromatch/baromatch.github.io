@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dovo001brcsst5nmk0rj@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261128T173000Z
+DTEND:20261128T193000Z
+SUMMARY:Elche – Atlético
+DESCRIPTION:LaLiga · Elche CF – Atlético de Madrid\nCoup d’envoi same
+ di 28 novembre à 18:30\, heure de Paris.\nLa page du match : https://bar
+ omatch.fr/matchs/elche-atletico-2026-11-28/
+URL:https://baromatch.fr/matchs/elche-atletico-2026-11-28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

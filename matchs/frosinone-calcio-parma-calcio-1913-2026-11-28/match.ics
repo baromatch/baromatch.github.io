@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwt6dp4h0023rcssxlvgmzx3@baromatch.fr
+DTSTAMP:20261123T122814Z
+SEQUENCE:0
+DTSTART:20261128T140000Z
+DTEND:20261128T160000Z
+SUMMARY:Frosinone Calcio – Parma Calcio 1913
+DESCRIPTION:Serie A · Frosinone Calcio – Parma Calcio 1913\nCoup d’env
+ oi samedi 28 novembre à 15:00\, heure de Paris.\nLa page du match : http
+ s://baromatch.fr/matchs/frosinone-calcio-parma-calcio-1913-2026-11-28/
+URL:https://baromatch.fr/matchs/frosinone-calcio-parma-calcio-1913-2026-11-
+ 28/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

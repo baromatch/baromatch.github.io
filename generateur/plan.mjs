@@ -8,9 +8,11 @@
 // posé à un point du plan, avec ou sans étiquette. Dès qu’un vrai bar est publié, la démo disparaît : le plan n’allume
 // que les arrondissements de vrais bars (aucun niveau de remplissage : l’appli ne le donne pas).
 // Rien ne dépend d’un script : le match coché allume son plan par du CSS seul (plan.css, frères d’un bouton radio) ;
-// plan.js ajoute « Près de », le geste, l’état de chaque match d’après l’horloge de Paris (« dans 1 h 42 », « Le match a
-// commencé. » : jamais figé à la fabrication), l’heure qui avance et le sous-bock. Aucun style en ligne (politique de
-// sécurité).
+// plan.js ajoute le geste, l’état de chaque match d’après l’horloge de Paris (« dans 1 h 42 », « Le match a commencé. » :
+// jamais figé à la fabrication), l’heure qui avance et le sous-bock. Il ne sert que l’accueil : « Ce soir » et la page
+// d’un match (planDeParis avec script: false) n’en chargent aucun, leur budget de vitesse ne l’admet pas ; leur plan
+// s’y lit pareil, la lumière des deux clubs allumée par la feuille (.soir--sans-script), sans heure qui avance, sans
+// état d’horloge, et le geste devient un lien vers la liste d’attente. Aucun style en ligne (politique de sécurité).
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
@@ -24,6 +26,8 @@ export const GEO = lire('plan-paris.json');
 export const TEXTES_DU_PLAN = lire('plan.json');
 export const SCRIPT_DU_PLAN = '<script src="/plan.js" defer></script>';
 export const FEUILLE_DU_PLAN = '/plan.css';
+// Une page porte le plan quand elle contient sa racine : c’est elle, et non un script, qui rend l’action de l’en-tête ambre.
+export const aLePlan = (html) => html.includes('<div class="soir ');
 // Le choix du propriétaire, en attente : « arrondissements » (une démo marquée « Démo », à l’échelle des arrondissements,
 // jamais à une adresse) ou « aucune » (le plan reste vide, avec la phrase vraie). Un seul interrupteur.
 export const PLAN_DEMO = 'arrondissements';
@@ -122,7 +126,7 @@ ${atouts ? `<ul class="bar__atouts">${atouts}</ul>\n` : ''}${lien}<p class="bar_
 };
 
 // La lumière des deux clubs, sur le plan : deux halos (des dégradés SVG, aucune image ni style en ligne), que plan.js
-// fait monter avec le défilement ; sans script, ils restent éteints (le jour).
+// fait monter avec le défilement ; sans script (« Ce soir », la page d’un match), plan.css les allume (.soir--sans-script).
 const lueur = (match, k) => {
   const [a, b] = couleursDuClub(match.domicile);
   const [c] = couleursDuClub(match.exterieur);
@@ -132,7 +136,7 @@ const lueur = (match, k) => {
 };
 
 // Une scène : le plan et la liste d’un match.
-const scene = (match, k, { donnees, T, avecPage, fixe }) => {
+const scene = (match, k, { donnees, T, avecPage, fixe, script }) => {
   const sansBarPublie = donnees.bars.length === 0;
   const demo = sansBarPublie && PLAN_DEMO === 'arrondissements';
   const vrais = sansBarPublie ? [] : vraisBarsDuMatch(match);
@@ -155,7 +159,7 @@ const scene = (match, k, { donnees, T, avecPage, fixe }) => {
   }
   const page = avecPage ? `<p class="liste__page"><a class="lien" href="${cheminDuMatch(match)}">${e(T.pageDuMatch)}<span class="visuellement-cache"> : ${e(nom)}</span></a></p>` : '';
   const hors = ailleurs && avecPage && vrais.length ? `<p class="liste__ailleurs"><a class="lien" href="${cheminDuMatch(match)}">${e(T.verite.ailleurs)}</a></p>\n` : '';
-  const heure = match.heureConfirmee ? heureDeParis(match.debut - 138 * 60000) : '';
+  const heure = script && match.heureConfirmee ? heureDeParis(match.debut - 138 * 60000) : '';
   return `<div class="scene" data-i="${k}">
 ${verite}
 <div class="soir__grille">
@@ -176,8 +180,9 @@ ${liste}${hors}${page}
 
 // Le programme et ses scènes. matchs : ceux à montrer (déjà triés par heure), au plus MATCHS_MAX ; jour : « ce soir »,
 // « aujourd’hui » ou le jour écrit ; guide : la page « Ce soir » (programme de haut en bas) ; fixe : la page d’un match
-// (un seul, sans programme à choisir). aUnePage(match) : le match a sa page.
-export const planDeParis = ({ matchs, donnees, marque, chemin, maintenant, jour = 'ce soir', guide = false, fixe = false, aUnePage = () => true, niveau = 'h2' }) => {
+// (un seul, sans programme à choisir). aUnePage(match) : le match a sa page. script : la page charge plan.js (l’accueil) ;
+// sans lui (« Ce soir », la page d’un match), ni heure qui avance, ni état d’horloge, ni geste : un lien vers la liste d’attente.
+export const planDeParis = ({ matchs, donnees, marque, chemin, maintenant, jour = 'ce soir', guide = false, fixe = false, script = true, aUnePage = () => true, niveau = 'h2' }) => {
   const T = TEXTES_DU_PLAN;
   const liste = matchs.slice(0, MATCHS_MAX);
   if (!liste.length) return '';
@@ -193,7 +198,7 @@ export const planDeParis = ({ matchs, donnees, marque, chemin, maintenant, jour 
     const lien = guide && aUnePage(m)
       ? `<a class="prog__page" href="${cheminDuMatch(m)}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="visuellement-cache">${e(T.pageDuMatch)} : ${e(nomCourt(m))}</span></a>`
       : '';
-    return `<div class="prog" data-i="${k}"><label class="prog__l" for="m-${k}"><span class="visuellement-cache">${e(heure)}, </span><span class="lockup">${paireDInsignes(m.domicile, m.exterieur, { fond: 'light', maintenant })}<span class="lockup__t">${e(nomCourt(m))}</span></span><span class="prog__c">${e(m.competition)}</span><span class="prog__etat" data-debut="${debutDe(m)}" data-fin="${fin}"></span></label>${lien}</div>`;
+    return `<div class="prog" data-i="${k}"><label class="prog__l" for="m-${k}"><span class="visuellement-cache">${e(heure)}, </span><span class="lockup">${paireDInsignes(m.domicile, m.exterieur, { fond: 'light', maintenant })}<span class="lockup__t">${e(nomCourt(m))}</span></span><span class="prog__c">${e(m.competition)}</span>${script ? `<span class="prog__etat" data-debut="${debutDe(m)}" data-fin="${fin}"></span>` : ''}</label>${lien}</div>`;
   };
   const colonnes = groupes.map((g) => `<div class="guide__col" role="group" aria-label="${e(remplir(T.coup, { heure: g.heure }))}"><p class="guide__heure" aria-hidden="true"><span>${e(g.heure)}</span></p><div class="guide__cells">${g.matchs.map(([m, k]) => cellule(m, k, g.heure)).join('')}</div></div>`).join('\n');
   const titre = (n, id, a, suite) => `<${niveau} class="etape" id="${id}"><span class="etape__n" aria-hidden="true">${n}</span> ${e(a)}${suite ? ` <span class="etape__q">· ${e(suite)}</span>` : ''}</${niveau}>`;
@@ -204,18 +209,21 @@ export const planDeParis = ({ matchs, donnees, marque, chemin, maintenant, jour 
   const programme = fixe ? '' : `${radios}\n<div class="guide" role="radiogroup" aria-labelledby="soir-etape1"><div class="guide__rail" tabindex="0" role="group" aria-label="${e(T.programme)}">\n${colonnes}\n</div></div>\n`;
   const fixeRadio = fixe ? `<input class="prog__radio" type="radio" name="match" id="m-1" data-i="1" value="${e(liste[0].slug)}" checked hidden>\n` : '';
   const etape2 = `<div class="soir__tete">${titre(2, 'soir-etape2', T.etape2, T.etape2Suite)}</div>`;
-  const scenes = liste.map((m, i) => scene(m, i + 1, { donnees, T, avecPage: aUnePage(m) && !fixe, fixe })).join('\n');
+  const scenes = liste.map((m, i) => scene(m, i + 1, { donnees, T, avecPage: aUnePage(m) && !fixe, fixe, script })).join('\n');
   const racine = chemin === '/' ? '' : '/';
   const essai = marque.appli?.ouverte ? '' : `<div class="essai-place">${titre(3, 'soir-etape3', T.etape3, '')}
 <p class="essai-place__texte">${e(T.essai.texte)}</p>
 <div class="tenir">
-<a class="tenir__btn" href="${racine}#attente" data-hold><span class="tenir__liq" aria-hidden="true"></span><span class="tenir__txt">${e(T.fiche.tenir)}</span><span class="tenir__ok" aria-hidden="true">${e(T.fiche.ok)}</span></a>
+${script
+    ? `<a class="tenir__btn" href="${racine}#attente" data-hold><span class="tenir__liq" aria-hidden="true"></span><span class="tenir__txt">${e(T.fiche.tenir)}</span><span class="tenir__ok" aria-hidden="true">${e(T.fiche.ok)}</span></a>
 <p class="tenir__note">${e(T.fiche.demo)}</p>
-<p class="tenir__suite" role="status" data-attente="${racine}#attente"></p>
+<p class="tenir__suite" role="status" data-attente="${racine}#attente"></p>`
+    : `<a class="tenir__btn" href="${racine}#attente"><span class="tenir__txt">${e(T.fiche.tenirSansScript)}</span></a>
+<p class="tenir__note">${e(T.fiche.demo)}</p>`}
 </div>
 </div>
 `;
-  return `<div class="soir soir--${guide ? 'guide' : fixe ? 'fixe' : 'rail'}" data-n="${liste.length}">
+  return `<div class="soir soir--${guide ? 'guide' : fixe ? 'fixe' : 'rail'}${script ? '' : ' soir--sans-script'}" data-n="${liste.length}">
 ${defs()}
 ${haut}${etape1}${fixeRadio}${programme}${etape2}
 <div class="scenes">

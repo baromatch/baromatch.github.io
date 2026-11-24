@@ -11,7 +11,7 @@ import { politiqueDesPages, SCRIPT_DES_PLACES } from './gabarits.mjs';
 import { adresseDe } from './jsonld.mjs';
 import { baliseDeLaMesure, mesureDuSite } from './mesure.mjs';
 import { SCRIPT_DU_PARTAGE } from './partage.mjs';
-import { controlerLePlan, SCRIPT_DU_PLAN } from './plan.mjs';
+import { controlerLePlan } from './plan.mjs';
 
 const ENTITES = { amp: '&', lt: '<', gt: '>', quot: '"', nbsp: ' ', '#39': '\'' };
 const decoder = (texte) => texte.replace(/&(amp|lt|gt|quot|nbsp|#39);/g, (_, nom) => ENTITES[nom]);
@@ -53,7 +53,7 @@ export const controlerLaPage = (p, { motsDesBars = [], mesure = mesureDuSite() }
   const robots = tous(html, /<meta name="robots" content="([^"]*)">/g);
   exiger(robots.length === 1 && (p.indexable ? !/noindex/.test(robots[0]) : robots[0] === 'noindex'), `robots « ${robots.join()} » pour une page ${p.indexable ? 'indexable' : 'non indexable'}`);
   exiger(tous(html, /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/g).join() === politiqueDesPages(mesure), 'politique de sécurité');
-  const permis = [SCRIPT_DU_PARTAGE, p.type === 'ce-soir' && SCRIPT_DES_PLACES, SCRIPT_DU_PLAN, baliseDeLaMesure(mesure)].filter(Boolean);
+  const permis = [SCRIPT_DU_PARTAGE, p.type === 'ce-soir' && SCRIPT_DES_PLACES, baliseDeLaMesure(mesure)].filter(Boolean);
   exiger([...html.matchAll(/<script\b([^>]*)>/g)].every((m) => m[1] === ' type="application/ld+json"' || permis.includes(`<script${m[1]}></script>`)), 'un script autre que les données structurées, le partage, les places ou la mesure d’audience');
   const balises = html.split('<script src="/mesure.js"').length - 1;
   exiger(balises === (mesure.active ? 1 : 0), `${balises} balises de la mesure d’audience pour une mesure ${mesure.active ? 'active' : 'arrêtée'}`);

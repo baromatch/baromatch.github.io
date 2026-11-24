@@ -5,15 +5,20 @@
 //   sur Baromatch. » ; avec de vrais bars, la démo disparaît ;
 // - « Maintiens » : « Place gardée, en démo », jamais « réserv… » sur un bouton, une étiquette ou un titre, sauf
 //   « rien n’est réservé » ;
+// - « Ce soir » et la page d’un match ne chargent pas plan.js (leur budget de vitesse : 4 Ko de JavaScript) : leur plan se
+//   lit sans lui, sa lumière allumée par plan.css, sans heure qui avance ni état d’horloge, le geste devenu un lien ;
 // - un match commencé dit « Le match a commencé. » (l’appli connaît l’heure, pas l’état du match), jamais « en cours » ;
 // - le premier écran de l’accueil au téléphone (390 × 844) : la vérité, « Préviens-moi » en ambre, la bande des matchs ;
 // - le pied de chaque page : Supprimer mon compte, Confidentialité, CGU, Mentions légales, Deviens testeur Android, contact ;
 // - chaque étiquette « Démo » fait au moins 12 px ; aucun style en ligne, aucun « % », aucun « ! ».
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { createServer } from 'node:net';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
-import { contenuDuScenario } from './outils/site-genere.mjs';
+import { demarrerServeur } from './outils/serveur.mjs';
+import { construireLeSiteDExemple, contenuDuScenario } from './outils/site-genere.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { controlerLaPage, texteVisible } from '../generateur/controle.mjs';
@@ -101,12 +106,19 @@ test.describe('ce que le plan ne dit jamais', () => {
     }
   });
 
-  test('« Maintiens pour garder ta place » : le bouton, la démo, jamais une réservation', async () => {
+  test('« Maintiens pour garder ta place » : le geste (accueil, avec plan.js) ou son lien (sans), la démo, jamais une réservation', async () => {
     const site = await fabriquer(sansBarPublie);
-    const plan = pageDe(site, '/ce-soir/').contenu;
-    expect(plan).toContain('Maintiens pour garder ta place');
-    expect(plan.replace(/\u00a0/g, ' ')).toContain('Démo : rien n’est réservé. Pour de vrai, c’est dans l’appli.');
-    for (const bouton of plan.matchAll(/<a class="tenir__btn"[\s\S]*?<\/a>/g)) expect(texteVisible(`<body>${bouton[0]}`)).not.toMatch(MENTION);
+    const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
+    const accueil = blocDeLaSemaine({ donnees: site.donnees, textes: sansBarPublie.textes, marque: sansBarPublie.marque, maintenant: VENDREDI });
+    expect(accueil).toContain('Maintiens pour garder ta place');
+    expect(accueil).toContain('data-hold');
+    const ceSoir = pageDe(site, '/ce-soir/').contenu;
+    expect(ceSoir).toContain('Garder ta place dans l’appli');
+    expect(ceSoir, 'pas de geste sans le script qui le fait').not.toContain('data-hold');
+    for (const plan of [accueil, ceSoir]) {
+      expect(plan.replace(/\u00a0/g, ' ')).toContain('Démo : rien n’est réservé. Pour de vrai, c’est dans l’appli.');
+      for (const bouton of plan.matchAll(/<a class="tenir__btn"[\s\S]*?<\/a>/g)) expect(texteVisible(`<body>${bouton[0]}`)).not.toMatch(MENTION);
+    }
   });
 
   test('la page d’un match : l’arrondissement le plus proche, jamais une adresse', async () => {
@@ -116,6 +128,78 @@ test.describe('ce que le plan ne dit jamais', () => {
     const plan = p.contenu.match(LE_PLAN)[0];
     for (const bar of site.donnees.bars) expect(plan, `l’adresse de ${bar.nom}`).not.toContain(bar.rue);
   });
+});
+
+test.describe('« Ce soir » et la page d’un match : le plan sans plan.js', () => {
+  test('aucune page générée ne charge plan.js ; le plan est allumé par la feuille, sans heure ni état d’horloge', async () => {
+    for (const contenu of [sansBarPublie, avecBarsPublies]) {
+      const site = await fabriquer(contenu);
+      const avecPlan = [pageDe(site, '/ce-soir/'), ...site.pages.filter((p) => p.type === 'match')].filter((p) => p.contenu.includes('<div class="soir '));
+      expect(avecPlan.length, 'des pages avec le plan').toBeGreaterThan(1);
+      for (const p of site.pages) expect(p.contenu, `${p.chemin} : plan.js`).not.toContain('/plan.js');
+      for (const p of avecPlan) {
+        expect(p.contenu, p.chemin).toContain('<link rel="stylesheet" href="/plan.css">');
+        expect(p.contenu, `${p.chemin} : la lumière allumée par la feuille`).toContain('soir--sans-script');
+        expect(p.contenu, `${p.chemin} : un état d’horloge`).not.toContain('prog__etat');
+        expect(p.contenu, `${p.chemin} : une heure qui avance`).not.toContain('plan__heure');
+        expect(p.contenu, `${p.chemin} : un geste`).not.toContain('data-hold');
+      }
+    }
+  });
+
+  test('l’accueil, lui, garde son script : le bloc du plan n’est pas la version sans script', async () => {
+    const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
+    const site = await fabriquer(sansBarPublie);
+    const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: sansBarPublie.textes, marque: sansBarPublie.marque, maintenant: VENDREDI });
+    expect(bloc).not.toContain('soir--sans-script');
+    expect(bloc).toContain('prog__etat');
+    expect(bloc).toContain('plan__heure');
+    expect(lire('index.html')).toContain('<script src="/plan.js" defer></script>');
+  });
+});
+
+test.describe('« Ce soir » servi : le plan allumé sans plan.js', () => {
+  let dossier;
+  let serveur;
+  const portLibre = () => new Promise((resoudre) => {
+    const sonde = createServer();
+    sonde.listen(0, '127.0.0.1', () => {
+      const { port } = sonde.address();
+      sonde.close(() => resoudre(port));
+    });
+  });
+  test.beforeAll(async () => {
+    dossier = mkdtempSync(path.join(tmpdir(), 'plan-ce-soir-'));
+    await construireLeSiteDExemple(dossier, { rendu: null });
+    serveur = await demarrerServeur(await portLibre(), -1, { dossier });
+  });
+  test.afterAll(async () => {
+    await serveur?.arreter();
+    if (dossier) rmSync(dossier, { recursive: true, force: true });
+  });
+
+  for (const chemin of ['/ce-soir/', '/matchs/psg-ol-2026-10-25/']) {
+    test(`${chemin} à 390 × 844 : pas de plan.js, la lumière des clubs allumée, « Préviens-moi » ambre dans l’en-tête`, async ({ browser }) => {
+      const contexte = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      const onglet = await contexte.newPage();
+      const scripts = [];
+      onglet.on('request', (r) => { if (r.resourceType() === 'script') scripts.push(new URL(r.url()).pathname); });
+      await onglet.goto(`${serveur.adresse}${chemin}`);
+      await onglet.waitForLoadState('networkidle');
+      expect(scripts.filter((s) => s === '/plan.js')).toEqual([]);
+      const lueur = onglet.locator('.scene[data-i="1"] .lueur');
+      await expect(lueur).toHaveCount(1);
+      expect(await lueur.evaluate((n) => Number(getComputedStyle(n).opacity))).toBeGreaterThan(0.9);
+      await expect(onglet.locator('.scene[data-i="1"] .plan__svg')).toBeVisible();
+      await expect(onglet.locator('.scene[data-i="1"] .liste')).toBeVisible();
+      const action = onglet.locator('.entete__attente');
+      expect(await action.evaluate((a) => getComputedStyle(a).backgroundColor)).toBe('rgb(255, 177, 61)');
+      const lien = onglet.locator('.essai-place .tenir__btn');
+      await expect(lien).toHaveText('Garder ta place dans l’appli');
+      await expect(lien).toHaveAttribute('href', '/#attente');
+      await contexte.close();
+    });
+  }
 });
 
 test('planDeParis : sans match, rien', async () => {

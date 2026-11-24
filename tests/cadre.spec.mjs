@@ -21,6 +21,7 @@ import {
 } from '../generateur/cadre.mjs';
 import { insigne } from '../generateur/insigne.mjs';
 import { pagesEcritesALaMain } from '../generateur/mesure.mjs';
+import { aLePlan } from '../generateur/plan.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { echapper } from '../generateur/texte.mjs';
@@ -100,8 +101,8 @@ test.describe('une seule source pour l’en-tête et le pied', () => {
     for (const p of generees) {
       const langue = p.langue ?? 'fr';
       const corps = p.contenu.slice(p.contenu.indexOf('<main'), p.contenu.indexOf('</main>'));
-      // Une page qui porte le plan (plan.js) a « Préviens-moi » en ambre dès l’en-tête.
-      const action = pageDuGenerateurAvecLAction(p.chemin) ? (p.contenu.includes('<script src="/plan.js" defer></script>') ? 'ambre' : actionDeLaPage(corps)) : null;
+      // Une page qui porte le plan (aLePlan) a « Préviens-moi » en ambre dès l’en-tête.
+      const action = pageDuGenerateurAvecLAction(p.chemin) ? (aLePlan(p.contenu) ? 'ambre' : actionDeLaPage(corps)) : null;
       expect(p.contenu.match(ENTETE)[0], p.chemin).toBe(entete(cadre, { chemin: p.chemin, action, cible: cibleDeLAction(corps), langue }));
       expect(p.contenu.match(PIED)[0], p.chemin).toBe(pied(cadre, { marque: MARQUE, chemin: p.chemin, langue }));
     }

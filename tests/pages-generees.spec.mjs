@@ -117,7 +117,6 @@ for (const page of PAGES) {
     test(`sans JavaScript, la page est la même, elle ne charge ${page.partage ? 'que partage.js' : 'aucun script'}, et sa politique de sécurité n’arrête rien`, async ({ browser }) => {
       const scripts = [];
       const refus = [];
-      let plan = false;
       const lire = async (avecScript) => {
         const contexte = await browser.newContext({ javaScriptEnabled: avecScript, viewport: { width: 360, height: 800 } });
         const onglet = await contexte.newPage();
@@ -127,9 +126,9 @@ for (const page of PAGES) {
         // Le bloc « Partager » est le seul que JavaScript change (tests/partage.spec.mjs le suit avec et sans).
         expect(await onglet.locator('.partage').count()).toBe(page.partage ? 1 : 0);
         await onglet.locator('.partage').evaluateAll((blocs) => blocs.forEach((bloc) => bloc.remove()));
-        // L’état de chaque match (« dans 1 h 42 ») vient de l’horloge de la page : il n’existe qu’avec le script (plan.js).
-        plan = (await onglet.locator('.soir').count()) > 0;
-        await onglet.locator('.prog__etat').evaluateAll((n) => n.forEach((e) => e.remove()));
+        // Le plan de « Ce soir » et de la page d’un match se lit sans script : ni état d’horloge (« dans 1 h 42 »), ni heure
+        // qui avance, ni geste ; la page ne charge pas plan.js (budget de vitesse), seul l’accueil le charge.
+        expect(await onglet.locator('.prog__etat, .plan__heure').count(), 'rien de ce que plan.js écrit').toBe(0);
         const texte = await onglet.locator('main').innerText();
         const titre = await onglet.locator('h1').innerText();
         await contexte.close();
@@ -140,7 +139,7 @@ for (const page of PAGES) {
       expect(sans).toEqual(avec);
       expect(sans.titre.length).toBeGreaterThan(0);
       // Et /mesure.js, si marque.json active la mesure d’audience (hors de baromatch.fr, elle ne compte rien).
-      expect(scripts).toEqual([...(page.partage ? [`${serveur.adresse}/partage.js`] : []), ...(plan ? [`${serveur.adresse}/plan.js`] : []), ...(mesureDuSite().active ? [`${serveur.adresse}/mesure.js`] : [])]);
+      expect(scripts).toEqual([...(page.partage ? [`${serveur.adresse}/partage.js`] : []), ...(mesureDuSite().active ? [`${serveur.adresse}/mesure.js`] : [])]);
       expect(refus).toEqual([]);
     });
 

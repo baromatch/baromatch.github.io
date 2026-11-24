@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbtrxs0006i2y6to4iz08b@baromatch.fr
+DTSTAMP:20261124T235229Z
+SEQUENCE:0
+DTSTART:20261208T200000Z
+DTEND:20261208T220000Z
+SUMMARY:Rome – Sporting Clube de Portugal
+DESCRIPTION:Ligue des champions · AS Roma – Sporting Clube de Portugal\n
+ Coup d’envoi mardi 8 décembre à 21:00\, heure de Paris.\nLa page du ma
+ tch : https://baromatch.fr/matchs/rome-sporting-clube-de-portugal-2026-12
+ -08/
+URL:https://baromatch.fr/matchs/rome-sporting-clube-de-portugal-2026-12-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

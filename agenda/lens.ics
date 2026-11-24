@@ -11,20 +11,6 @@ X-WR-CALDESC:Lens : les matchs au programme de Baromatch (Ligue 1 et Ligue
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmvxran4t000uz71o8g0z1i3t@baromatch.fr
-DTSTAMP:20261110T211715Z
-SEQUENCE:1
-DTSTART:20261124T200000Z
-DTEND:20261124T220000Z
-SUMMARY:Leipzig – Lens
-DESCRIPTION:Ligue des champions · RB Leipzig – RC Lens\nCoup d’envoi m
- ardi 24 novembre à 21:00\, heure de Paris.\nLa page du match : https://b
- aromatch.fr/matchs/leipzig-lens-2026-11-24/
-URL:https://baromatch.fr/matchs/leipzig-lens-2026-11-24/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxran9l001az71oeozcwpmj@baromatch.fr
 DTSTAMP:20261114T195510Z
 SEQUENCE:1

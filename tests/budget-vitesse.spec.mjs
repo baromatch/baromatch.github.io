@@ -237,8 +237,10 @@ test.afterAll(async () => {
 test('la semaine pleine : 25 cartes sur ses sept jours, 50 insignes', () => {
   const accueil = readFileSync(path.join(sites[0].plein.dossier, 'index.html'), 'utf8');
   const bloc = accueil.split('<!-- semaine:debut -->')[1].split('<!-- semaine:fin -->')[0];
-  expect((bloc.match(/<li class="carte-match/g) ?? []).length).toBe(25);
-  expect((bloc.match(/<svg class="insignes"/g) ?? []).length * 2 + (bloc.match(/<svg class="insigne"/g) ?? []).length).toBe(50);
+  // (Le plan « Paris, ce soir » ouvre le bloc avec ses propres insignes : on compte ceux de la semaine.)
+  const semaine = bloc.slice(bloc.indexOf('<section class="semaine"'));
+  expect((semaine.match(/<li class="carte-match/g) ?? []).length).toBe(25);
+  expect((semaine.match(/<svg class="insignes"/g) ?? []).length * 2 + (semaine.match(/<svg class="insigne"/g) ?? []).length).toBe(50);
 });
 
 for (const [rang, { nom, marque, plus }] of MESURES.entries()) {

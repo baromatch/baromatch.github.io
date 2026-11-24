@@ -18,7 +18,9 @@ const lireLesDebordements = (onglet) => onglet.evaluate(() => {
   const dehors = [];
   for (const e of document.querySelectorAll('body *')) {
     if (!e.getClientRects().length) continue;
-    if (e.closest('.verre, svg, .lien-evitement, .attente__piege, .formulaire__piege, .visuellement-cache')) continue;
+    // (Et le contenu des deux rangées qui défilent de côté exprès, avec leur propre barre : le programme du soir, et les
+    // moments de la soirée au téléphone ; la page, elle, ne défile pas de côté : `defile`, plus bas.)
+    if (e.closest('.verre, svg, .lien-evitement, .attente__piege, .formulaire__piege, .visuellement-cache, .guide__rail, .instants')) continue;
     const r = e.getBoundingClientRect();
     if (r.right > largeur + 0.5 || r.left < -0.5) {
       dehors.push(`${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}${e.className && typeof e.className === 'string' ? `.${e.className.split(' ')[0]}` : ''} « ${e.textContent.trim().replace(/\s+/g, ' ').slice(0, 40)} » de ${Math.round(r.left)} à ${Math.round(r.right)} px`);

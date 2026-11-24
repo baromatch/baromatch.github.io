@@ -726,11 +726,11 @@ test.describe('le délai de réponse : sous 48 h', () => {
     // axe lit « C’est envoyé. » et ses liens dans tests/pour-les-bars-formulaire.spec.mjs, à 360 et 1280 px.
   });
 
-  // Dans les conditions, avant le formulaire, dans « Comment je démarre » et dans « C’est envoyé. ».
-  test('un seul délai, dit quatre fois avec les mêmes mots ; la FAQ balisée le dit aussi', async ({ page }) => {
+  // Dans l’ouverture (un des quatre faits du haut), dans les conditions, avant le formulaire, dans « Comment je démarre » et dans « C’est envoyé. ».
+  test('un seul délai, dit cinq fois avec les mêmes mots ; la FAQ balisée le dit aussi', async ({ page }) => {
     await page.goto(PAGE);
     const texte = normaliser(await page.locator('main').textContent());
-    expect(fois(texte, DELAI)).toBe(4);
+    expect(fois(texte, DELAI)).toBe(5);
     await expect(page.locator('.conditions__liste li', { hasText: 'Une réponse sous 48' })).toHaveText('Une réponse sous 48 h. Une personne lit chaque demande. Propose ton bar');
     expect(texte).not.toMatch(/48\s*heures|deux jours|2 jours|24 h/i);
     const balisee = normaliser(await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]

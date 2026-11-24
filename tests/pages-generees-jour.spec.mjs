@@ -199,8 +199,8 @@ const lireLeFocus = (onglet) => onglet.evaluate(() => {
   if (!actif || actif === document.body) return null;
   const visible = (e) => e.checkVisibility({ visibilityProperty: true, opacityProperty: true });
   const contoure = (e) => { const s = getComputedStyle(e); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0; };
-  const candidats = [actif, actif.nextElementSibling, ...(function* parents() { for (let e = actif.parentElement; e; e = e.parentElement) yield e; }())]
-    .filter((e) => e && visible(e) && contoure(e) && (e === actif || e === actif.nextElementSibling || e.matches(':has(:focus-visible)')));
+  const candidats = [actif, actif.nextElementSibling, ...(actif.labels ?? []), ...(function* parents() { for (let e = actif.parentElement; e; e = e.parentElement) yield e; }())]
+    .filter((e) => e && visible(e) && contoure(e) && (e === actif || e === actif.nextElementSibling || [...(actif.labels ?? [])].includes(e) || e.matches(':has(:focus-visible)')));
   const peint = candidats[0];
   const quoi = `${actif.tagName.toLowerCase()}${actif.className && typeof actif.className === 'string' ? `.${actif.className.split(' ')[0]}` : ''} « ${(actif.textContent || actif.getAttribute('aria-label') || actif.value || '').trim().slice(0, 30)} »`;
   if (!peint) return { quoi, contour: null };
@@ -391,7 +391,8 @@ test.describe('le texte à 200 % sur 320 px', () => {
       const lu = await onglet.evaluate(() => {
         const ecran = document.documentElement.clientWidth;
         const dehors = [...document.querySelectorAll('main *')]
-          .filter((n) => n.checkVisibility() && n.getBoundingClientRect().width > 0 && n.getBoundingClientRect().right > ecran + 0.5 && !n.closest('.visuellement-cache, .attente__piege'))
+          .filter((n) => n.checkVisibility() && n.getBoundingClientRect().width > 0 && n.getBoundingClientRect().right > ecran + 0.5 && !n.closest('.visuellement-cache, .attente__piege') && !(n.closest('.plan__svg, .lueur') && !n.matches('.plan__svg, .lueur')))
+          // (Le dessin du plan est coupé par son cadre : la Seine sort exprès de son viewBox.)
           .map((n) => `${n.tagName.toLowerCase()}.${typeof n.className === 'string' ? n.className.split(' ')[0] : ''} (${Math.round(n.getBoundingClientRect().right)} px)`);
         return { defile: document.documentElement.scrollWidth - ecran, dehors: [...new Set(dehors)] };
       });

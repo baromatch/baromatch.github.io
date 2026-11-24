@@ -123,7 +123,8 @@ test.describe('le bloc, du générateur', () => {
     expect(sans).not.toContain('carte-match__voir');
     // La phrase le dit une fois : aucune carte ne répète « Pas encore de bar » (comme la semaine, /matchs/). Une carte
     // garde l’agenda de son match, ou rien (un match déjà commencé n’a plus de fichier d’agenda : pas de ligne vide).
-    expect(sans).not.toContain(textes.accueil.pasDeBar);
+    // (Le plan, avant la semaine, dit « Pas encore de bar sur Baromatch » une fois : la semaine, elle, ne le répète pas.)
+    expect(sans.slice(sans.indexOf('<section class="semaine"'))).not.toContain(textes.accueil.pasDeBar);
     expect(cartesDe(sans, '2026-10-31').map((c) => texteDe(c.split('<p class="carte-match__bas">')[1] ?? ''))).toEqual([
       'Dans mon agenda \u00a0: Nice – Rennes', 'Match reporté', 'Dans mon agenda \u00a0: OL – Angers', 'Dans mon agenda \u00a0: Troyes – Le Mans',
     ]);
@@ -224,7 +225,7 @@ test.describe('le bloc, du générateur', () => {
     expect(inconnu.match(/<circle cx="100" cy="100" r="96" fill="#1B1D27"\/>/g)).toHaveLength(2);
     // Aucune image, aucun lien, aucun texte ni titre dans un dessin : l’insigne est fait de formes, ses lettres de tracés.
     expect(html).not.toMatch(/<img|\.(?:png|svg|webp)"/);
-    for (const dessin of html.match(/<svg[\s\S]*?<\/svg>/g)) expect(dessin).not.toMatch(/<image|href=|<text|<title|style=/);
+    for (const dessin of html.match(/<svg class="insignes?"[\s\S]*?<\/svg>/g)) expect(dessin).not.toMatch(/<image|href=|<text|<title|style=/);
   });
 
   test('le bloc passe son contrôle : ni style en ligne, ni script, ni « ! », ni mot interdit, et un seul titre h2', () => {
@@ -247,10 +248,11 @@ test.describe('l’accueil : le générateur n’écrit que le bloc', () => {
     // enregistré (le reste du bloc vient des données du passage ; l’Action le réécrit dans les 3 heures).
     const phrases = [textes.accueil.sansBar, textes.accueil.avecBars].map((phrase) => insecables(`<p class="semaine__chapo">${echapper(phrase)}</p>`));
     expect(phrases).toContain(dedans.match(/<p class="semaine__chapo">[^<]*<\/p>/)?.[0]);
-    // Le bloc est dans l’ouverture, juste avant le film : au téléphone, les matchs viennent après la liste d’attente.
-    const ouverture = ACCUEIL.split('<section class="ouverture')[1].split('\n  </section>')[0];
-    expect(ouverture.indexOf(REPERES.debut)).toBeGreaterThan(ouverture.indexOf('</form>'));
-    expect(ouverture.indexOf(REPERES.fin)).toBeLessThan(ouverture.indexOf('<figure class="film">'));
+    // Le bloc suit l’ouverture, dans la grille du haut : le plan d’abord, puis les matchs de la semaine ; le film vient bien après.
+    const grille = ACCUEIL.split('<div class="une-grille')[1].split('\n  </div>')[0];
+    expect(grille.indexOf(REPERES.debut)).toBeGreaterThan(grille.indexOf('<section class="ouverture'));
+    expect(ACCUEIL.indexOf(REPERES.fin)).toBeLessThan(ACCUEIL.indexOf('<figure class="film">'));
+    expect(dedans.trimStart().startsWith('<section class="paris"'), 'le plan « Paris, ce soir » ouvre le bloc').toBe(true);
   });
 
   test('accueilAvecLaSemaine remplace ce qui est entre les repères, et seulement cela ; des repères absents ou doublés arrêtent tout', () => {
@@ -458,12 +460,13 @@ test.describe('la barre des jours, dans le navigateur (le scénario, vendredi 23
     const semaine = await ouvrir(page);
     const ambreHorsAction = () => page.evaluate(() => {
       const trouves = [];
+      // (Le match coché de la bande « Paris, ce soir » porte une barre ambre : c’est le choix du fan, son action.)
       for (const e of document.querySelectorAll('main *')) {
         if (e.closest('.nuit') || !e.checkVisibility({ visibilityProperty: true, opacityProperty: true })) continue;
         for (const pseudo of [null, '::before', '::after']) {
           const style = getComputedStyle(e, pseudo);
           if (pseudo && style.content === 'none') continue;
-          if (style.backgroundColor === 'rgb(255, 177, 61)' && !e.closest('a, button')) trouves.push(`${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]}${pseudo ?? ''}`);
+          if (style.backgroundColor === 'rgb(255, 177, 61)' && !e.closest('a, button, label.prog__l')) trouves.push(`${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]}${pseudo ?? ''}`);
         }
       }
       return trouves;
@@ -935,8 +938,8 @@ test.describe('le contraste de chaque ligne de texte sur le clair, mesuré au pi
       await page.waitForLoadState('networkidle');
       const mesures = await mesurerAuPixel(page, NUIT_DE_L_ACCUEIL);
       expect(mesures.length).toBeGreaterThan(80);
-      // La note du film en est : la ligne la plus proche de l’ombre du cadre.
-      expect(mesures.filter((m) => m.quoi.startsWith('p.film__note')).length).toBeGreaterThan(0);
+      // La ligne de vérité du plan en est (le film est dans l’étape 4, sur la nuit).
+      expect(mesures.filter((m) => m.quoi.startsWith('p.soir__verite')).length).toBeGreaterThan(0);
       infos.annotations.push({ type: 'contraste peint', description: `${mesures.length} lignes ; les plus faibles : ${decrireLesPlusFaibles(mesures)}` });
       expect(lignesTropFaibles(mesures)).toEqual([]);
     });
@@ -963,8 +966,8 @@ const lireLeFocus = (page) => page.evaluate(() => {
   if (!actif || actif === document.body) return null;
   const visible = (e) => e.checkVisibility({ visibilityProperty: true, opacityProperty: true });
   const contoure = (e) => { const s = getComputedStyle(e); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0; };
-  const candidats = [actif, actif.nextElementSibling, ...(function* parents() { for (let e = actif.parentElement; e; e = e.parentElement) yield e; }())]
-    .filter((e) => e && visible(e) && contoure(e) && (e === actif || e === actif.nextElementSibling || e.matches(':has(:focus-visible)')));
+  const candidats = [actif, actif.nextElementSibling, ...(actif.labels ?? []), ...(function* parents() { for (let e = actif.parentElement; e; e = e.parentElement) yield e; }())]
+    .filter((e) => e && visible(e) && contoure(e) && (e === actif || e === actif.nextElementSibling || [...(actif.labels ?? [])].includes(e) || e.matches(':has(:focus-visible)')));
   const peint = candidats[0];
   const quoi = `${actif.tagName.toLowerCase()}${actif.className && typeof actif.className === 'string' ? `.${actif.className.split(' ')[0]}` : ''} « ${(actif.textContent || actif.getAttribute('aria-label') || actif.value || '').trim().slice(0, 30)} »`;
   // Le lecteur classique du film (mouvement réduit) : ses commandes, dans le cadre sombre du film, ont le contour du

@@ -597,7 +597,8 @@ test.describe('les pages', () => {
     <a class="regarder-bars-pro__bouton" href="/pour-les-bars.html#proposer">Proposer mon bar</a>
   </div>`));
     expect(p.contenu).not.toMatch(/te trouvent|Annonce tes matchs/);
-    expect(p.contenu).not.toMatch(/démo|Lucette/i);
+    // (Le plan dit « Démo » : ses arrondissements allumés ne sont pas des bars.)
+      expect(p.contenu.replace(/[Dd]émo/g, '')).not.toMatch(/démo|Lucette/i);
     expect(deType(p, 'Event')).toEqual([]);
   });
 
@@ -668,7 +669,8 @@ test.describe('les pages', () => {
       expect(p.contenu, p.chemin).not.toMatch(/\bscores?\b|\b3 – 1\b|places? restantes?|Réserve ta place/i);
       expect(p.contenu, p.chemin).not.toContain('Les places qui restent sont dans l’appli.');
       // Ni place gardée, ni places, ni réservation dans ce que lit le visiteur : « Avec l’appli, tu pourras… ».
-      expect(texteVisible(p.contenu), p.chemin).not.toMatch(/garde ta place|places|réserv/i);
+      // (« Maintiens pour garder ta place », à l’essai, et « rien n’est réservé » : le geste de l’appli en démo, qui le dit.)
+      expect(texteVisible(p.contenu).replace(/Maintiens pour garder ta place/g, '').replace(/Place gardée\./g, '').replace(/rien n’est réservé/g, ''), p.chemin).not.toMatch(/garde ta place|places|réserv/i);
     }
     expect(pageDe('/matchs/').contenu).toContain(insecables('<p>Avec l’appli, tu pourras :</p>'));
   });
@@ -954,7 +956,7 @@ test.describe('les pages', () => {
     }
     expect(capture.pages.filter((p) => p.type === 'bar')).toEqual([]);
     expect(capture.pages.filter((p) => !p.indexable).every((p) => robotsDe(p) === 'noindex')).toBe(true);
-    for (const p of capture.pages) expect(p.contenu, p.chemin).not.toMatch(/démo|Rivoli/i);
+    for (const p of capture.pages) expect(p.contenu.replace(/[Dd]émo/g, ''), p.chemin).not.toMatch(/démo|Rivoli/i);
   });
 });
 

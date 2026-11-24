@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-XYwwJwW0Cm7mQsWMwdB7KcJJNli+t0wzSiJ1Vm4ilkc='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-PxRZf7R/TJspy17xOp83/UjBpoN1uhVrbVWmIUVkr58='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -191,6 +191,18 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
 .jour .formulaire .panier__champ { border-color: var(--champ-bord); background: var(--carte) padding-box; }
 .jour .formulaire .panier__accord input { accent-color: var(--texte); }
 .jour #pb-verre stop { stop-color: #0A0B10; }
+
+/* Direction B : en haut, dans l’ordre d’un patron pressé (le titre, gratuit et sans engagement, la réponse sous 48 h, le bouton), puis « Où on en est », puis ce que fait Baromatch. L’ordre du HTML ne change pas : seul l’ordre peint. */
+.ouverture-bars__texte-bloc { display: flex; flex-direction: column; align-items: flex-start; }
+.ouverture-bars__haut { order: 0; align-self: stretch; }
+.ouverture-bars__titre { order: 1; }
+.ouverture-bars__prix { order: 2; margin-top: 18px; font-weight: 800; line-height: 1.25; }
+.ouverture-bars__delai { order: 3; max-width: 36rem; margin: 6px 0 0; color: var(--texte); font-size: 1.0625rem; font-weight: 700; line-height: 1.3; }
+.ouverture-bars .actions { order: 4; margin-top: 16px; }
+.ouverture-bars__etat { order: 5; margin-top: 22px; }
+.ouverture-bars__texte { order: 6; margin-top: 10px; font-size: 1rem; }
+.ouverture-bars .boutique-promesses { order: 7; }
+@media (max-width: 719px) { .ouverture-bars .ouverture-bars__prix { margin-top: 12px; } .ouverture-bars .ouverture-bars__texte, .ouverture-bars .ouverture-bars__etat { margin-top: 8px; } .ouverture-bars .actions { margin-top: 12px; } }
 </style>
 <noscript><link rel="stylesheet" href="/pour-les-bars.css"></noscript>
 <meta property="og:type" content="website">
@@ -272,6 +284,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
         <li><strong>Tu choisis</strong> combien de places tu ouvres</li>
         <li><strong>Gratuit</strong> pour tes clients · <strong>pour ton bar</strong>, pendant le lancement, sans engagement</li>
       </ul>
+      <p class="ouverture-bars__delai">Réponse sous 48&nbsp;h, par une personne.</p>
     </div>
 
     <figure class="salle-soir nuit" aria-labelledby="salle-titre">
@@ -299,7 +312,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
         <li><i data-e=s></i>sans réservation</li>
         <li><i data-e=l></i>le reste de ta salle</li>
       </ul>
-      <figcaption class="legende">Un exemple, avec les chiffres d’une soirée de démonstration&nbsp;: 80 places dans la salle, 35 sur Baromatch au départ, un coup d’envoi à 21:00.</figcaption>
+      <figcaption class="legende">Exemple, pas un résultat promis. Les chiffres d’une soirée de démonstration&nbsp;: 80 places dans la salle, 35 sur Baromatch au départ, un coup d’envoi à 21:00.</figcaption>
     </figure>
   </section>
 
@@ -614,6 +627,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
     <p class="egares__ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg><span>Partenaire, club, ville ou journaliste&nbsp;? <a class="insecable" href="mailto:contact@baromatch.fr?subject=Partenariat%20ou%20presse%20%E2%80%93%20Baromatch">Écris-nous</a>, ou va sur la <a href="/presse.html">page Presse</a>.</span></p>
   </aside>
 </main>
+<div class="collant" id="collant" hidden><a class="capsule" href="#proposer">Proposer mon bar</a></div>
 <!-- pied:debut -->
 <footer class="pied page">
 <div class="pied__tete">
@@ -626,6 +640,7 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
 <ul>
 <li><a class="pied__action" href="/#attente">Préviens-moi quand Baromatch arrive</a></li>
 <li><a class="pied__action" href="/pour-les-bars.html#proposer">Proposer mon bar</a></li>
+<li><a href="/testeurs-android.html">Deviens testeur Android</a></li>
 </ul>
 <p><a href="/presse.html">Presse et partenariats</a> : <a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a></p>
 <p><a href="https://x.com/baromatchapp" rel="me noopener">X : @baromatchapp</a></p>

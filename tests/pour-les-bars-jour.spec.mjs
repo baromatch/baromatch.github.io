@@ -200,6 +200,8 @@ test.describe('le contraste, mesuré sur ce que le navigateur peint', () => {
       await attendreLaPageFinie(page);
       await page.waitForLoadState('networkidle');
       await toutOuvrir(page);
+      // Le bouton collé en bas du téléphone flotte sur la page : il est mesuré à part, pas sous les lignes de texte.
+      await page.evaluate(() => document.getElementById('collant')?.remove());
       const mesures = await mesurerAuPixel(page, NUIT_DES_BARS);
       // Des centaines de lignes (les réponses des questions comprises) : une mesure qui n’en lit presque aucune ne prouve rien.
       expect(mesures.length).toBeGreaterThan(150);
@@ -275,7 +277,8 @@ test.describe('le jour posé', () => {
   test('« Proposer mon bar » survolé reste lisible : 4,5:1 au moins sur le fond du bouton survolé, chacun des trois', async ({ page }) => {
     await ouvrir(page, 1280);
     // Les trois boutons ; les liens discrets des moments ont le survol des liens (le gris du texte), sans fond.
-    const boutons = page.locator(':is(.capsule, .bouton-nuit)', { hasText: 'Proposer mon bar' });
+    // (Le « Proposer mon bar » collé en bas du téléphone est hors de main : il a ses propres vérifications.)
+    const boutons = page.locator('main :is(.capsule, .bouton-nuit)', { hasText: 'Proposer mon bar' });
     await expect(boutons).toHaveCount(3);
     for (let i = 0; i < 3; i += 1) {
       const bouton = boutons.nth(i);

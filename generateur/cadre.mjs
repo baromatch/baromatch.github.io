@@ -117,6 +117,7 @@ export const pied = (cadre, { marque, chemin = '', avecPresse = true, langue = '
 <div class="pied__contact">
 <ul>
 ${appliOuverte(marque) ? '' : `<li>${lien('/#attente', e(t.attente), chemin, 'pied__action')}</li>\n`}<li>${lien('/pour-les-bars.html#proposer', e(t.proposer), chemin, 'pied__action')}</li>
+<li>${lien('/testeurs-android.html', e(t.testeur), chemin)}</li>
 </ul>
 <p>${avecPresse ? lien('/presse.html', e(t.contact), chemin) : e(t.contact)}\u00A0: <a href="mailto:${e(marque.contact)}">${e(marque.contact).replace('@', '@<wbr>')}</a></p>${x ? `
 <p><a href="${e(x)}" rel="me noopener">X\u00A0: @${e(x.replace(/\/+$/, '').split('/').pop())}</a></p>` : ''}
@@ -151,7 +152,7 @@ ${liste([['/mentions-legales.html', t.mentions], ['/cgu.html', t.cgu], ['/confid
 // sur l’accueil, qui a le formulaire, ni sur « Pour les bars », dont l’action est « Proposer mon bar », ni sur les pages
 // légales et la page introuvable). Une page écrite à la main qui n’est pas ici fait échouer « npm run cadre ».
 export const PAGES_DU_CADRE = [
-  { fichier: 'index.html', chemin: '/', action: false },
+  { fichier: 'index.html', chemin: '/', action: true },
   { fichier: 'pour-les-bars.html', chemin: '/pour-les-bars.html', action: false },
   { fichier: 'mentions-legales.html', chemin: '/mentions-legales.html', action: false },
   { fichier: 'cgu.html', chemin: '/cgu.html', action: false },

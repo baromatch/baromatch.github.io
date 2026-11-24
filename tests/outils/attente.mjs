@@ -45,6 +45,16 @@ export const chargerLesImages = async (onglet) => {
       window.scrollTo(0, y);
       await new Promise((suite) => requestAnimationFrame(() => requestAnimationFrame(suite)));
     }
+    // Les rangées qui défilent de côté (les moments de la soirée, au téléphone) : le visiteur les amène à l'écran et les
+    // fait défiler aussi, pour que leurs images paresseuses se chargent.
+    for (const rangee of document.querySelectorAll('.instants, .guide__rail')) {
+      rangee.scrollIntoView({ block: 'center' });
+      for (let x = 0; x <= rangee.scrollWidth; x += rangee.clientWidth / 2) {
+        rangee.scrollLeft = x;
+        await new Promise((suite) => { setTimeout(suite, 120); });
+      }
+      rangee.scrollLeft = 0;
+    }
     window.scrollTo(0, 0);
   });
   await onglet.waitForFunction(() => [...document.images].filter((image) => image.getClientRects().length > 0)

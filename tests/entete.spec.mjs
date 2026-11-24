@@ -19,9 +19,9 @@ const CIBLE = 44;
 const LOGO_MINIMUM = 120;
 const MENU = [['/ce-soir/', 'Ce soir'], ['/matchs/', 'La semaine'], ['/pour-les-bars.html', 'Pour les bars'], ['/a-propos.html', 'À propos']];
 const ACTION = ['/#attente', 'Préviens-moi quand Baromatch arrive'];
-// Les pages sans « Préviens-moi » dans l’en-tête : l’accueil (il a le formulaire), « Pour les bars » (son action est
+// Les pages sans « Préviens-moi » dans l’en-tête : « Pour les bars » (son action est
 // « Proposer mon bar »), les pages légales, la page introuvable et le lien de tablée qu’elle sert.
-const SANS_ACTION = new Set(['/', '/pour-les-bars.html', '/mentions-legales.html', '/cgu.html', '/confidentialite.html', '/supprimer-mon-compte.html', '/404.html', '/t/abcdefghjkmn']);
+const SANS_ACTION = new Set(['/pour-les-bars.html', '/mentions-legales.html', '/cgu.html', '/confidentialite.html', '/supprimer-mon-compte.html', '/404.html', '/t/abcdefghjkmn']);
 
 const ouvrir = async (onglet, chemin, largeur, hauteur = 800) => {
   await couperLAPI(onglet);
@@ -58,7 +58,7 @@ const lireLEntete = (onglet) => onglet.evaluate(() => {
 const serecouvrent = (a, b) => a.gauche < b.droite - 0.5 && b.gauche < a.droite - 0.5 && a.haut < b.bas - 0.5 && b.haut < a.bas - 0.5;
 
 const verifierLesLiens = (lu, largeur, chemin) => {
-  const attendus = [['/', ''], ...(SANS_ACTION.has(chemin) ? [] : [ACTION]), ...MENU];
+  const attendus = [['/', ''], ...(SANS_ACTION.has(chemin) ? [] : [chemin === '/' ? ['#attente', ACTION[1]] : ACTION]), ...MENU];
   expect(lu.liens.map((l) => [l.nom, l.texte])).toEqual(attendus);
   expect(lu.enteteDefile, 'l’en-tête défile de côté').toBe(false);
   expect(lu.logo, 'largeur du logo').toBeGreaterThanOrEqual(LOGO_MINIMUM);

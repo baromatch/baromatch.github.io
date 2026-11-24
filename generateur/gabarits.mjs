@@ -11,6 +11,7 @@ import { adresseDe, ancreDeLaSoiree, blocJsonLd, cheminDuBar, cheminDuMatch, che
 import { baliseDeLaMesure, lireLaMesure, politiqueAvecLaMesure } from './mesure.mjs';
 import { blocPartager, SCRIPT_DU_PARTAGE } from './partage.mjs';
 import { identifiantsUniques, insigne, paireDInsignes, TAILLES } from './insigne.mjs';
+import { SCRIPT_DU_PLAN } from './plan.mjs';
 
 // form-action : la liste d’attente des pages de ville part vers Formspree, sans JavaScript (attente.mjs).
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action https://formspree.io";
@@ -80,7 +81,9 @@ const avecLePartage = (corps, { partage, titre, chemin, textesDuPartage }) => (p
 // (identifiantsUniques).
 export const page = ({ cadre, marque, avecPresse, titre, description, chemin, indexable, jsonld, corps, image, partage, scripts, feuilles, langue = 'fr', textesDuPartage }) => {
   const contenu = avecLePartage(corps, { partage, titre, chemin, textesDuPartage });
-  const action = pageDuGenerateurAvecLAction(chemin, marque) ? actionDeLaPage(contenu) : null;
+  // Une page qui porte le plan (« Paris, ce soir ») : « Préviens-moi » est ambre dès le premier écran, dans l’en-tête ; le
+  // plan et sa liste n’ont aucun bouton ambre plein, et l’appel du bas de page reste un second appel vers la même liste.
+  const action = pageDuGenerateurAvecLAction(chemin, marque) ? (scripts?.includes(SCRIPT_DU_PLAN) ? 'ambre' : actionDeLaPage(contenu)) : null;
   return identifiantsUniques(insecables(`${tete({ titre, description, chemin, indexable, jsonld, image, partage, scripts, feuilles, langue, mesure: lireLaMesure(marque) })}${entete(cadre, { chemin, action, cible: cibleDeLAction(contenu), langue })}
 
 <main id="contenu" class="regarder page">

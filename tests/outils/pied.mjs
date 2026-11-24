@@ -5,6 +5,7 @@
 export const PIED = [
   ['/#attente', 'Préviens-moi quand Baromatch arrive'],
   ['/pour-les-bars.html#proposer', 'Proposer mon bar'],
+  ['/testeurs-android.html', 'Deviens testeur Android'],
   ['/presse.html', 'Presse et partenariats'],
   ['mailto:contact@baromatch.fr', 'contact@baromatch.fr'],
   ['https://x.com/baromatchapp', 'X : @baromatchapp'],

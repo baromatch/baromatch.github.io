@@ -21,6 +21,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/plan.css">
 <!-- Sans JavaScript, le lecteur de secours (dans #film-cadre, avec ses commandes) prend la place du film, que main.js
      lance et arrête ; les écrans de « Un soir de match » se montrent sans attendre main.js. -->
 <noscript><style>#film { display: none; } .soiree:not(.est-proche) .instant__ecran img { display: block; }</style></noscript>
@@ -37,37 +38,110 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@baromatchapp">
 <meta name="twitter:image" content="https://baromatch.fr/img/og-image.jpg">
-<script type="application/ld+json">
-{"@context": "https://schema.org", "@graph": [
-  {"@type": "Organization", "@id": "https://baromatch.fr/#organisation", "name": "Baromatch", "url": "https://baromatch.fr/",
-   "slogan": "Ton match. Ton bar. Ce soir.",
-   "description": "Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. Sur iPhone et Android, bientôt sur les stores.",
-   "logo": "https://baromatch.fr/presse/baromatch-icone.png", "email": "contact@baromatch.fr", "sameAs": ["https://x.com/baromatchapp"],
-   "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "contact@baromatch.fr", "availableLanguage": "fr"}},
-  {"@type": "WebSite", "@id": "https://baromatch.fr/#site", "name": "Baromatch", "url": "https://baromatch.fr/", "inLanguage": "fr-FR",
-   "publisher": {"@id": "https://baromatch.fr/#organisation"}},
-  {"@type": "MobileApplication", "@id": "https://baromatch.fr/#appli", "name": "Baromatch",
-   "description": "Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.",
-   "applicationCategory": "LifestyleApplication", "inLanguage": "fr", "publisher": {"@id": "https://baromatch.fr/#organisation"}},
-  {"@type": "FAQPage", "@id": "https://baromatch.fr/#questions", "url": "https://baromatch.fr/", "name": "Baromatch — Trouve un bar qui diffuse ton match, à Paris", "inLanguage": "fr-FR",
-   "isPartOf": {"@id": "https://baromatch.fr/#site"}, "mainEntity": [
-    {"@type": "Question", "name": "Je peux déjà garder une place\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pas encore. L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play, d’abord à Paris. Laisse ton adresse\u00a0: on te prévient le jour où elle y est."}},
-    {"@type": "Question", "name": "C’est gratuit\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar."}},
-    {"@type": "Question", "name": "Il faut un compte\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Pour regarder les matchs et les bars, non. Pour garder une place, oui\u00a0: ton adresse e-mail suffit. Pas de mot de passe\u00a0: on t’envoie un code de 6\u00a0chiffres, valable 10\u00a0minutes. Il faut avoir 18\u00a0ans ou plus."}},
-    {"@type": "Question", "name": "Je peux venir avec des potes\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée\u00a0: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass\u00a0; pour les autres, ton pass compte à la porte."}},
-    {"@type": "Question", "name": "Ma place est vraiment gardée\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch\u00a0: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde."}},
-    {"@type": "Question", "name": "Et si j’arrive en retard\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Ta place est gardée jusqu’à 30\u00a0minutes après le coup d’envoi au plus. Le bar peut choisir moins\u00a0: 15\u00a0minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan."}},
-    {"@type": "Question", "name": "Comment j’annule ma place\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "Dans l’appli, ouvre l’onglet «\u00a0Ta soirée\u00a0», touche «\u00a0Je ne viens plus\u00a0», puis «\u00a0Libérer\u00a0». Tu peux le faire jusqu’au dernier moment\u00a0: ta place repart à quelqu’un d’autre."}},
-    {"@type": "Question", "name": "Dans quelles villes\u00a0?", "acceptedAnswer": {"@type": "Answer", "text": "À Paris, pour commencer\u00a0: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes."}}
-  ]}
-]}
-</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://baromatch.fr/#organisation",
+      "name": "Baromatch",
+      "url": "https://baromatch.fr/",
+      "slogan": "Ton match. Ton bar. Ce soir.",
+      "description": "Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. Sur iPhone et Android, bientôt sur les stores.",
+      "logo": "https://baromatch.fr/presse/baromatch-icone.png",
+      "email": "contact@baromatch.fr",
+      "sameAs": [
+        "https://x.com/baromatchapp"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "contact@baromatch.fr",
+        "availableLanguage": "fr"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://baromatch.fr/#site",
+      "name": "Baromatch",
+      "url": "https://baromatch.fr/",
+      "inLanguage": "fr-FR",
+      "publisher": {
+        "@id": "https://baromatch.fr/#organisation"
+      }
+    },
+    {
+      "@type": "MobileApplication",
+      "@id": "https://baromatch.fr/#appli",
+      "name": "Baromatch",
+      "description": "Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.",
+      "applicationCategory": "LifestyleApplication",
+      "inLanguage": "fr",
+      "publisher": {
+        "@id": "https://baromatch.fr/#organisation"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://baromatch.fr/#questions",
+      "url": "https://baromatch.fr/",
+      "name": "Baromatch — Trouve un bar qui diffuse ton match, à Paris",
+      "inLanguage": "fr-FR",
+      "isPartOf": {
+        "@id": "https://baromatch.fr/#site"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Je peux déjà garder une place ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pas encore. L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play, d’abord à Paris. Laisse ton adresse : on te prévient le jour où elle y est."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "C’est gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Il faut un compte ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour regarder les matchs et les bars, non. Pour garder une place, oui : ton adresse e-mail suffit. Pas de mot de passe : on t’envoie un code de 6 chiffres, valable 10 minutes. Il faut avoir 18 ans ou plus."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ma place est vraiment gardée ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch : dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Et si j’arrive en retard ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ta place est gardée jusqu’à 30 minutes après le coup d’envoi au plus. Le bar peut choisir moins : 15 minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan."
+          }
+        }
+      ]
+    }
+  ]
+}</script>
 </head>
 <body>
 <a class="lien-evitement" href="#contenu">Aller au contenu</a>
 <!-- entete:debut -->
 <header class="entete page">
 <a class="entete__logo" href="/" aria-label="Baromatch, accueil"><svg viewBox="0 0 1122 220" role="img" aria-label="Baromatch"><defs><linearGradient id="en-verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.52"/></linearGradient><linearGradient id="en-ambre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="0.38" stop-color="#FFB13D"/><stop offset="1" stop-color="#D97A0C"/></linearGradient><clipPath id="en-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><path d="M23.8 150v-132h57q12.4 0 22.3 2.1 9.9 2.1 16.9 6.4 7 4.3 10.7 11 3.7 6.7 3.7 15.9 0 7.8-3.3 13.6-3.3 5.8-10.3 9.4-7 3.6-18.6 4.8v3.4q19.2 1.2 28.4 9.2 9.2 8 9.2 21.6 0 11.6-6.2 19.2-6.2 7.6-18.2 11.5-12 3.9-29.6 3.9zm30.8-25.6h30q12.2 0 18-3.5 5.8-3.5 5.8-11.1 0-8.4-7-12.6-7-4.2-21.4-4.2h-25.4zm0-51h21q14.2 0 20.8-3.9 6.6-3.9 6.6-11.7 0-7.6-6.1-11.1-6.1-3.5-18.5-3.5h-23.8zm128 79.4q-8.8 0-15.6-3.5-6.8-3.5-10.6-10.2-3.8-6.7-3.8-16.3 0-9 3.5-14.9 3.5-5.9 10.2-9.4 6.7-3.5 16.1-5.8 9.4-2.3 21.4-4.1 5.8-1 9.7-1.9 3.9-.9 5.9-2.9 2-2 2-5.8 0-5-3.6-8.6-3.6-3.6-11.6-3.6-5.6 0-10.1 2-4.5 2-7.7 5.8-3.2 3.8-4.8 9.2l-28.4-8.4q2.6-8.4 7.3-14.6 4.7-6.2 11.3-10.3 6.6-4.1 15.1-6 8.5-1.9 18.1-1.9 16 0 26.1 5.1 10.1 5.1 15 15.8 4.9 10.7 4.9 27.5v16.2q0 7.2 .3 14.5 .3 7.3 .8 14.6 .5 7.3 1.3 14.7h-28.4q-.8-4.6-1.6-11.1-.8-6.5-1.2-13.3h-3.8q-2.8 7.6-8.1 13.9-5.3 6.3-12.8 9.8-7.5 3.5-16.9 3.5zm14.6-22.8q3.6 0 7.3-1.3 3.7-1.3 7.1-3.6 3.4-2.3 6.2-5.7 2.8-3.4 4.2-7.4l-.4-15.8 4.4 1q-3.8 2.4-8.4 3.8-4.6 1.4-9.3 2.2-4.7 .8-9.2 1.7-4.5 .9-8 2.3-3.5 1.4-5.5 3.8-2 2.4-2 6.6 0 5.6 3.8 9 3.8 3.4 9.8 3.4zm76.6 20v-49-56.6h26.4l.6 35.8h4q1.4-14 5.3-22.3 3.9-8.3 11.2-12.1 7.3-3.8 18.1-3.8 1.6 0 3.6 .1 2 .1 4.6 .5l-1.2 34.4q-3.2-1.6-6.9-2.1-3.7-.5-6.5-.5-7.8 0-13.5 3-5.7 3-9 9.2-3.3 6.2-4.3 15.6v47.8z" fill="#F7F7F9"/><g transform="translate(346.267 23.867) scale(0.73333)"><g clip-path="url(#en-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="url(#en-ambre)"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="url(#en-verre)" stroke-width="24" stroke-linecap="round"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></g><path d="M504 150v-68.2-37.4h25.4l.4 31h4q2.8-11.4 7.4-18.9 4.6-7.5 11.2-11.2 6.6-3.7 15.4-3.7 9.2 0 15.3 3.9 6.1 3.9 9.7 11.4 3.6 7.5 4.8 18.5h3.4q3.2-11.8 8.4-19.3 5.2-7.5 12.4-11 7.2-3.5 15.6-3.5 9 0 15.7 3.5 6.7 3.5 11.2 10.4 4.5 6.9 6.7 17.2 2.2 10.3 2.2 23.9v53.4h-32.4v-49.4q0-10.6-1.7-17.6-1.7-7-5.3-10.5-3.6-3.5-9.2-3.5-6.4 0-10.9 4.2-4.5 4.2-6.9 11.7-2.4 7.5-2.4 16.9v48.2h-31.6v-48.8q0-11-1.9-18-1.9-7-5.6-10.6-3.7-3.6-9.3-3.6-6.4 0-10.8 4.2-4.4 4.2-6.7 11.7-2.3 7.5-2.3 16.9v48.2zm214.4 2.8q-8.8 0-15.6-3.5-6.8-3.5-10.6-10.2-3.8-6.7-3.8-16.3 0-9 3.5-14.9 3.5-5.9 10.2-9.4 6.7-3.5 16.1-5.8 9.4-2.3 21.4-4.1 5.8-1 9.7-1.9 3.9-.9 5.9-2.9 2-2 2-5.8 0-5-3.6-8.6-3.6-3.6-11.6-3.6-5.6 0-10.1 2-4.5 2-7.7 5.8-3.2 3.8-4.8 9.2l-28.4-8.4q2.6-8.4 7.3-14.6 4.7-6.2 11.3-10.3 6.6-4.1 15.1-6 8.5-1.9 18.1-1.9 16 0 26.1 5.1 10.1 5.1 15 15.8 4.9 10.7 4.9 27.5v16.2q0 7.2 .3 14.5 .3 7.3 .8 14.6 .5 7.3 1.3 14.7h-28.4q-.8-4.6-1.6-11.1-.8-6.5-1.2-13.3h-3.8q-2.8 7.6-8.1 13.9-5.3 6.3-12.8 9.8-7.5 3.5-16.9 3.5zm14.6-22.8q3.6 0 7.3-1.3 3.7-1.3 7.1-3.6 3.4-2.3 6.2-5.7 2.8-3.4 4.2-7.4l-.4-15.8 4.4 1q-3.8 2.4-8.4 3.8-4.6 1.4-9.3 2.2-4.7 .8-9.2 1.7-4.5 .9-8 2.3-3.5 1.4-5.5 3.8-2 2.4-2 6.6 0 5.6 3.8 9 3.8 3.4 9.8 3.4zm117.8 22.6q-18.6 0-27.4-9.9-8.8-9.9-8.8-31.7v-41.4h-15l.6-25h10.8q6.4-.2 9.7-2 3.3-1.8 4.1-6.8l2.6-14.8h18.2v23.4h25.4v26.2h-25.4v39q0 6.8 3.3 10 3.3 3.2 10.1 3.2 3.8 0 7.2-.8 3.4-.8 5.6-2.2v29.8q-6.4 2-11.7 2.5-5.3 .5-9.3 .5zm86.8 .2q-13.6 0-24-3.8-10.4-3.8-17.4-10.9-7-7.1-10.7-17.1-3.7-10-3.7-22.4 0-12.8 3.7-23.2 3.7-10.4 10.7-18 7-7.6 17.2-11.7 10.2-4.1 23.4-4.1 13.2 0 22.8 4.2 9.6 4.2 15.7 11.8 6.1 7.6 8.3 17.6l-29.8 10q-.6-6.6-3.2-10.8-2.6-4.2-6.7-6.1-4.1-1.9-8.9-1.9-5 0-8.8 2-3.8 2-6.4 6-2.6 4-4 9.7-1.4 5.7-1.4 13.1 0 10.6 2.7 17.7 2.7 7.1 8 10.7 5.3 3.6 12.9 3.6 7.8 0 12.2-3.2 4.4-3.2 6.4-7.9 2-4.7 2.4-9.3l28 6.2q-.8 7.4-3.9 14.3-3.1 6.9-9.1 12.2-6 5.3-14.9 8.3-8.9 3-21.5 3zm61.4-2.8v-67.2-76.8h32.2v33q0 4-.3 8.3-.3 4.3-1 8.8-.7 4.5-1.4 9.1-.7 4.6-1.7 9h4.8q2.8-9.8 7-17.1 4.2-7.3 11-11.4 6.8-4.1 17.4-4.1 18.8 0 28.1 13.1 9.3 13.1 9.3 40.3v55h-32.4v-49.6q0-16.2-4.7-24.3-4.7-8.1-14.3-8.1-7.4 0-12.2 4.6-4.8 4.6-7.2 12.3-2.4 7.7-2.4 17.1v48z" fill="#F7F7F9"/></svg></a>
+<a class="entete__attente entete__attente--contour" href="#attente">Préviens-moi<span class="visuellement-cache"> quand Baromatch arrive</span></a>
 <nav class="menu" aria-label="Navigation principale">
 <ul class="menu__liste">
 <li class="menu__groupe">
@@ -84,6 +158,7 @@
 <!-- entete:fin -->
 
 <main id="contenu">
+  <div class="une-grille page">
   <section class="ouverture anime page" aria-labelledby="titre">
     <div class="verre">
       <div class="verre__halo" aria-hidden="true"></div>
@@ -93,41 +168,168 @@
     <h1 class="ouverture__titre" id="titre"><span>Ton match.</span> <span>Ton bar.</span> <span>Ce soir.</span></h1>
     <div class="ouverture__suite">
       <p class="ouverture__texte">Une appli gratuite pour les fans&nbsp;: trouve un bar qui diffuse ton match et garde ta place. Bientôt sur les stores&nbsp;: rien à réserver ce soir.</p>
+      <p class="ouverture__cta"><a class="capsule" href="#attente">Préviens-moi</a><a class="ouverture__testeur" href="/testeurs-android.html">Deviens testeur Android</a></p>
 
-      <form class="attente" id="attente" action="https://formspree.io/f/mqpeedoj" method="POST" novalidate>
-        <fieldset class="attente__villes" aria-describedby="attente-usage">
-          <legend>Ta ville</legend>
-          <div class="attente__options">
-            <label class="attente__ville" for="attente-ville-0"><input id="attente-ville-0" type="radio" name="ville" value="Paris" checked><span>Paris</span></label>
-            <label class="attente__ville" for="attente-ville-1"><input id="attente-ville-1" type="radio" name="ville" value="Lyon"><span>Lyon</span></label>
-            <label class="attente__ville" for="attente-ville-2"><input id="attente-ville-2" type="radio" name="ville" value="Marseille"><span>Marseille</span></label>
-            <label class="attente__ville" for="attente-ville-3"><input id="attente-ville-3" type="radio" name="ville" value="Lille"><span>Lille</span></label>
-            <label class="attente__ville" for="attente-ville-4"><input id="attente-ville-4" type="radio" name="ville" value="Autre"><span>Autre</span></label>
-          </div>
-        </fieldset>
-        <p class="attente__date" data-ville="Lyon">Pas de date pour Lyon. On t’écrit seulement si Baromatch y arrive.</p>
-        <p class="attente__date" data-ville="Marseille">Pas de date pour Marseille. On t’écrit seulement si Baromatch y arrive.</p>
-        <p class="attente__date" data-ville="Lille">Pas de date pour Lille. On t’écrit seulement si Baromatch y arrive.</p>
-        <p class="attente__date" data-ville="Autre">Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.</p>
-        <label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
-        <div class="attente__ligne">
-          <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
-          <button class="attente__bouton" type="submit">Me prévenir</button>
-        </div>
-        <div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
-        <input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
-        <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
-        <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
-        <p class="attente__plateformes">L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</p>
-        <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
-      </form>
+
     </div>
+  </section>
     <!-- Les matchs de la semaine : le générateur (generateur/accueil.mjs) réécrit tout ce qui est entre les deux repères,
          toutes les 3 heures et juste après minuit, des mêmes données que les pages des matchs. Ne rien écrire à la main
          entre eux : ce serait effacé au passage suivant. -->
-    <section class="semaine" id="semaine" aria-labelledby="titre-semaine">
 <!-- semaine:debut -->
-<div class="semaine__tete">
+<section class="paris" id="paris" aria-labelledby="soir-etape1">
+<div class="soir soir--rail" data-n="5">
+<svg class="plan-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><clipPath id="pl-bol"><circle cx="100" cy="100" r="64"/></clipPath><symbol id="pl-verre" viewBox="0 0 200 200"><path d="M68.3 28.7A78 78 0 1 0 131.7 28.7" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round"/></symbol><g id="pl-base"><path class="paris" d="M204 238 L290 171 L394 90 L486 54 L577 41 L669 38 L740 45 L829 59 L873 130 L903 216 L956 315 L974 423 L983 522 L968 594 L930 639 L882 684 L817 716 L740 752 L669 787 L574 792 L462 752 L361 711 L266 671 L184 635 L113 594 L53 549 L30 477 L77 414 L124 351 L163 292Z"/><g class="arrs"><path id="pl-a1" d="M608 393 L607 384 L485 317 L471 317 L428 379 L444 383 L509 414 L563 434 L579 443Z"/><path id="pl-a2" d="M609 264 L485 317 L607 384 L642 314Z"/><path id="pl-a3" d="M607 384 L608 393 L717 434 L759 317 L642 314Z"/><path id="pl-a4" d="M743 534 L717 434 L608 393 L579 443 L610 459 L657 491 L705 535 L729 556Z"/><path id="pl-a5" d="M529 597 L572 645 L753 576 L705 535 L657 491 L610 459 L592 450Z"/><path id="pl-a6" d="M402 554 L407 568 L529 597 L592 450 L563 434 L509 414 L478 399Z"/><path id="pl-a7" d="M402 554 L478 399 L444 383 L373 369 L320 378 L272 414 L240 444Z"/><path id="pl-a8" d="M289 402 L320 378 L373 369 L428 379 L471 317 L448 198 L213 255Z"/><path id="pl-a9" d="M471 317 L485 317 L609 264 L613 198 L475 140 L448 198Z"/><path id="pl-a10" d="M642 314 L759 317 L795 292 L706 147 L613 198 L609 264Z"/><path id="pl-a11" d="M743 534 L880 479 L809 293 L795 292 L759 317 L717 434Z"/><path id="pl-a12" d="M880 479 L743 534 L729 556 L835 644 L885 682 L930 639 L968 594 L983 522 L981 500Z"/><path id="pl-a13" d="M572 645 L559 787 L574 792 L669 787 L740 752 L817 716 L882 684 L885 682 L835 644 L753 576Z"/><path id="pl-a14" d="M572 645 L529 597 L407 568 L336 700 L462 752 L559 787Z"/><path id="pl-a15" d="M407 568 L402 554 L240 444 L225 459 L184 513 L148 567 L120 599 L184 635 L336 700Z"/><path id="pl-a16" d="M213 255 L200 244 L163 292 L124 351 L30 477 L53 549 L113 594 L120 599 L148 567 L184 513 L225 459 L272 414 L289 402Z"/><path id="pl-a17" d="M213 255 L448 198 L475 140 L461 64 L394 90 L204 238 L200 244Z"/><path id="pl-a18" d="M475 140 L613 198 L706 147 L734 44 L669 38 L577 41 L486 54 L461 64Z"/><path id="pl-a19" d="M706 147 L795 292 L809 293 L918 245 L903 216 L873 130 L829 59 L734 44Z"/><path id="pl-a20" d="M809 293 L880 479 L981 500 L974 423 L956 315 L918 245Z"/></g><path class="seine" d="M1486 1013 C1403 968 1086 795 989 743 C892 690 932 714 906 698 C880 681 859 662 835 644 C811 625 786 603 764 585 C742 567 722 551 705 535 C687 520 673 503 657 491 C641 478 626 468 610 459 C594 450 579 441 563 434 C546 426 529 423 509 414 C489 405 467 390 444 383 C421 375 394 370 373 369 C352 368 337 371 320 378 C303 386 288 400 272 414 C257 427 240 443 225 459 C210 476 196 495 184 513 C171 531 162 549 148 567 C134 585 156 558 101 621 C45 684 -136 891 -184 945"/><path class="ile" d="M554 427 C560 430 580 434 592 441 C604 448 624 462 628 468 C631 474 622 480 613 479 C604 478 585 468 574 461 C563 454 551 442 548 437 C544 431 553 429 554 427"/><path class="ile" d="M637 471 C642 474 665 483 669 488 C674 492 670 498 663 497 C657 496 635 485 631 481 C626 476 636 472 637 471"/></g><g id="pl-noms"><text id="pl-l1" x="519" y="390">1er</text><text id="pl-l2" x="578" y="331">2e</text><text id="pl-l3" x="684" y="375">3e</text><text id="pl-l4" x="681" y="484">4e</text><text id="pl-l5" x="624" y="565">5e</text><text id="pl-l6" x="498" y="512">6e</text><text id="pl-l7" x="368" y="454">7e</text><text id="pl-l8" x="354" y="305">8e</text><text id="pl-l9" x="523" y="238">9e</text><text id="pl-l10" x="693" y="255">10e</text><text id="pl-l11" x="791" y="430">11e</text><text id="pl-l12" x="871" y="576">12e</text><text id="pl-l13" x="697" y="697">13e</text><text id="pl-l14" x="468" y="682">14e</text><text id="pl-l15" x="271" y="585">15e</text><text id="pl-l16" x="156" y="438">16e</text><text id="pl-l17" x="366" y="176">17e</text><text id="pl-l18" x="599" y="115">18e</text><text id="pl-l19" x="806" y="176">19e</text><text id="pl-l20" x="904" y="381">20e</text></g></defs></svg>
+<p class="soir__verite soir__verite--haut"><span class="etiquette-demo etiquette-demo--grand">Démo</span> Aucun bar publié pour l’instant : on cherche les premiers, à Paris. Le plan est une démo.</p>
+<h2 class="etape" id="soir-etape1"><span class="etape__n" aria-hidden="true">1</span> Ton match <span class="etape__q">· ce soir</span></h2>
+<input class="prog__radio" type="radio" name="match" id="m-1" data-i="1" value="galatasaray-aston-villa-2026-11-24" checked>
+<input class="prog__radio" type="radio" name="match" id="m-2" data-i="2" value="arsenal-dortmund-2026-11-24">
+<input class="prog__radio" type="radio" name="match" id="m-3" data-i="3" value="leipzig-lens-2026-11-24">
+<input class="prog__radio" type="radio" name="match" id="m-4" data-i="4" value="man-city-naples-2026-11-24">
+<input class="prog__radio" type="radio" name="match" id="m-5" data-i="5" value="real-madrid-eindhoven-2026-11-24">
+<div class="guide" role="radiogroup" aria-labelledby="soir-etape1"><div class="guide__rail" tabindex="0" role="group" aria-label="Le programme du soir, à faire défiler">
+<div class="guide__col" role="group" aria-label="Coup d’envoi à 18:45"><p class="guide__heure" aria-hidden="true"><span>18:45</span></p><div class="guide__cells"><div class="prog" data-i="1"><label class="prog__l" for="m-1"><span class="visuellement-cache">18:45, </span><span class="lockup"><svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false"><g><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#A90432"/><path d="M100 14.67A85.33 85.33 0 0 1 185.32 98.69L185.32 101.31A85.33 85.33 0 0 1 100 185.33Z" fill="#FDB912"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#E2D6B8"/></g><path d="M59.38 117L59.38 83L70.97 83Q73.34 83 75.4 83.52Q77.46 83.98 79.11 85.11Q80.71 86.19 81.63 87.95Q82.51 89.7 82.51 92.22Q82.51 94.49 81.74 95.98Q80.97 97.42 79.37 98.25Q77.77 99.07 75.3 99.33L75.3 100.1Q79.73 100.36 81.74 102.37Q83.8 104.33 83.8 107.98Q83.8 111.02 82.41 113.03Q81.02 115.04 78.34 116.02Q75.61 117 71.69 117ZM67.21 110.77L71.13 110.77Q73.39 110.77 74.47 109.79Q75.56 108.81 75.56 106.85Q75.56 104.84 74.22 103.66Q72.88 102.42 70.61 102.42L67.21 102.42ZM67.21 97.37L69.73 97.37Q72.26 97.37 73.44 96.39Q74.58 95.42 74.58 93.3Q74.58 91.24 73.55 90.21Q72.52 89.18 70.3 89.18L67.21 89.18ZM89.21 117L89.21 83L97.3 83L97.3 117ZM94.77 117L94.77 110.61L108.63 110.61L108.63 117ZM94.77 102.68L94.77 96.75L106.98 96.75L106.98 102.68ZM94.77 89.39L94.77 83L108.58 83L108.58 89.39ZM122.02 117L122.02 106.18L111.51 83L121.46 83L126.2 100.82L126.66 100.82L131.24 83L140.62 83L130.42 106.18L130.42 117Z" fill="#A90432"/></g><g transform="translate(226.66666666666666 0)"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="82.33" fill="#670E36"/><path d="M17.68 98.72A82.33 82.33 0 0 1 53.89 31.79L53.89 168.21A82.33 82.33 0 0 1 17.68 101.28Z" fill="#95BFE5"/><path d="M146.11 31.79A82.33 82.33 0 0 1 182.32 98.72L182.32 101.28A82.33 82.33 0 0 1 146.11 168.21Z" fill="#95BFE5"/></g><g><path d="M177.4 125A81.33 81.33 0 0 1 175.6 130L24.4 130A81.33 81.33 0 0 1 22.6 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M177.4 75A81.33 81.33 0 0 1 177.4 125L22.6 125A81.33 81.33 0 0 1 22.6 75Z" fill="#E2D6B8"/></g><path d="M59.9 117L67.31 83L79.73 83L87.04 117L78.29 117L73.75 89.28L72.98 89.28L68.34 117ZM66.13 111.18L66.13 106.03L81.48 106.03L81.48 111.18ZM102.19 117.72Q98.63 117.72 96.21 116.74Q93.84 115.76 92.45 114.17Q91.06 112.57 90.6 110.51Q90.08 108.5 90.29 106.34L97.5 105.2Q97.4 107.01 97.86 108.5Q98.33 109.99 99.46 110.87Q100.59 111.8 102.34 111.8Q103.37 111.8 104.25 111.44Q105.13 111.13 105.64 110.35Q106.21 109.63 106.21 108.35Q106.21 106.85 105.38 105.82Q104.56 104.74 103.12 103.86Q101.62 102.99 99.61 102.01Q97.81 101.13 96.16 100.21Q94.46 99.28 93.12 98.09Q91.83 96.91 91.06 95.31Q90.29 93.72 90.29 91.55Q90.29 88.82 91.53 86.81Q92.81 84.75 95.39 83.57Q97.91 82.38 101.73 82.38Q106 82.38 108.63 83.82Q111.2 85.22 112.39 87.58Q113.57 90.01 113.52 92.89L106.31 94.08Q106.41 92.89 106.16 91.86Q105.85 90.83 105.23 90.06Q104.61 89.28 103.73 88.87Q102.81 88.46 101.67 88.46Q100.54 88.46 99.72 88.82Q98.94 89.18 98.48 89.85Q98.02 90.47 98.02 91.35Q98.02 92.58 98.84 93.46Q99.72 94.38 101 95.05Q102.29 95.72 103.73 96.34Q105.54 97.17 107.34 98.15Q109.2 99.18 110.69 100.52Q112.23 101.85 113.16 103.71Q114.04 105.56 114.04 108.09Q114.04 110.72 112.85 112.93Q111.67 115.09 109.09 116.43Q106.47 117.72 102.19 117.72ZM124.55 117L124.55 83L132.58 83L132.58 117ZM117.08 89.54L117.08 83L140.1 83L140.1 89.54Z" fill="#670E36"/></g></svg><span class="lockup__t">Galatasaray – Aston Villa</span></span><span class="prog__c">Ligue des champions</span><span class="prog__etat" data-debut="2026-11-24T18:45:00+01:00" data-fin="2026-11-24T20:45:00.000Z"></span></label></div></div></div>
+<div class="guide__col" role="group" aria-label="Coup d’envoi à 21:00"><p class="guide__heure" aria-hidden="true"><span>21:00</span></p><div class="guide__cells"><div class="prog" data-i="2"><label class="prog__l" for="m-2"><span class="visuellement-cache">21:00, </span><span class="lockup"><svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false"><g><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#EF0107"/><path d="M14.68 98.69A85.33 85.33 0 0 1 52.21 29.3L52.21 170.7A85.33 85.33 0 0 1 14.68 101.31Z" fill="#FFFFFF"/><path d="M147.79 29.3A85.33 85.33 0 0 1 185.32 98.69L185.32 101.31A85.33 85.33 0 0 1 147.79 170.7Z" fill="#FFFFFF"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#E2D6B8"/></g><path d="M69.37 117L69.37 83L77.51 83L77.51 117ZM95.18 117.72Q91.63 117.72 89.21 116.74Q86.84 115.76 85.45 114.17Q84.06 112.57 83.59 110.51Q83.08 108.5 83.28 106.34L90.5 105.2Q90.39 107.01 90.86 108.5Q91.32 109.99 92.45 110.87Q93.59 111.8 95.34 111.8Q96.37 111.8 97.24 111.44Q98.12 111.13 98.63 110.35Q99.2 109.63 99.2 108.35Q99.2 106.85 98.38 105.82Q97.55 104.74 96.11 103.86Q94.62 102.99 92.61 102.01Q90.8 101.13 89.16 100.21Q87.46 99.28 86.12 98.09Q84.83 96.91 84.06 95.31Q83.28 93.72 83.28 91.55Q83.28 88.82 84.52 86.81Q85.81 84.75 88.38 83.57Q90.91 82.38 94.72 82.38Q99 82.38 101.62 83.82Q104.2 85.22 105.38 87.58Q106.57 90.01 106.52 92.89L99.3 94.08Q99.41 92.89 99.15 91.86Q98.84 90.83 98.22 90.06Q97.6 89.28 96.73 88.87Q95.8 88.46 94.67 88.46Q93.53 88.46 92.71 88.82Q91.94 89.18 91.47 89.85Q91.01 90.47 91.01 91.35Q91.01 92.58 91.83 93.46Q92.71 94.38 94 95.05Q95.29 95.72 96.73 96.34Q98.53 97.17 100.33 98.15Q102.19 99.18 103.68 100.52Q105.23 101.85 106.16 103.71Q107.03 105.56 107.03 108.09Q107.03 110.72 105.85 112.93Q104.66 115.09 102.09 116.43Q99.46 117.72 95.18 117.72ZM112.49 117L112.49 83L120.53 83L120.53 117ZM114.04 117L114.04 110.1L130.63 110.1L130.63 117Z" fill="#14151F"/></g><g transform="translate(226.66666666666666 0)"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#FDE100"/><circle cx="100" cy="100" r="79.71" fill="none" stroke="#111111" stroke-width="10.24"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#111111"/></g><path d="M61.21 117L61.21 110.61L67.8 110.61Q69.76 110.61 71 109.48Q72.23 108.29 72.85 105.92Q73.47 103.55 73.47 100Q73.47 97.22 73.11 95.21Q72.75 93.2 72.03 91.91Q71.31 90.57 70.12 90.01Q68.99 89.39 67.34 89.39L61.21 89.39L61.21 83L67.24 83Q71.51 83 74.76 85.01Q78 86.97 79.75 90.78Q81.56 94.59 81.56 100Q81.56 104.43 80.63 107.47Q79.65 110.51 78.11 112.36Q76.51 114.27 74.71 115.25Q72.9 116.28 71.15 116.64Q69.4 117 68.06 117ZM57.24 117L57.24 83L65.28 83L65.28 117ZM99.23 117.72Q96.03 117.72 93.66 116.59Q91.35 115.51 89.75 113.29Q88.15 111.13 87.38 107.78Q86.61 104.48 86.61 100.05Q86.61 93.92 88.1 90.01Q89.59 86.09 92.43 84.18Q95.31 82.33 99.33 82.33Q102.42 82.33 104.84 83.36Q107.21 84.44 108.86 86.55Q110.51 88.72 111.33 92.07Q112.16 95.36 112.16 99.85Q112.16 104.38 111.33 107.73Q110.46 111.13 108.86 113.34Q107.21 115.56 104.79 116.64Q102.37 117.72 99.23 117.72ZM99.33 111.54Q100.82 111.54 101.85 110.25Q102.88 108.96 103.45 106.44Q103.97 103.97 103.97 100.36Q103.97 96.65 103.4 93.97Q102.83 91.35 101.75 89.95Q100.67 88.56 99.18 88.56Q97.78 88.56 96.81 89.85Q95.78 91.19 95.26 93.72Q94.75 96.24 94.75 99.95Q94.75 102.73 95.05 104.89Q95.36 107.06 95.93 108.55Q96.5 110.05 97.32 110.77Q98.2 111.54 99.33 111.54ZM118.18 117L118.18 83L129.62 83Q130.81 83 132.4 83.21Q134 83.41 135.65 83.98Q137.35 84.55 138.79 85.68Q140.18 86.81 141.06 88.67Q141.98 90.52 141.98 93.3Q141.98 94.95 141.57 96.29Q141.16 97.68 140.28 98.82Q139.36 99.95 137.92 100.72Q136.47 101.49 134.31 101.91L134.31 102.42Q136.83 102.78 138.12 103.92Q139.41 105.05 140.03 106.75Q140.7 108.4 141.16 110.46L142.76 117L134.26 117L133.23 111.33Q132.87 109.53 132.4 108.19Q131.89 106.85 131.01 106.08Q130.08 105.31 128.49 105.31L126.22 105.31L126.22 117ZM126.22 99.9L128.69 99.9Q131.32 99.9 132.56 98.56Q133.85 97.22 133.85 94.28Q133.85 91.71 132.66 90.52Q131.48 89.28 128.9 89.28L126.22 89.28Z" fill="#FEFDFC"/></g></svg><span class="lockup__t">Arsenal – Dortmund</span></span><span class="prog__c">Ligue des champions</span><span class="prog__etat" data-debut="2026-11-24T21:00:00+01:00" data-fin="2026-11-24T23:00:00.000Z"></span></label></div><div class="prog" data-i="3"><label class="prog__l" for="m-3"><span class="visuellement-cache">21:00, </span><span class="lockup"><svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false"><g><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#FFFFFF"/><circle cx="100" cy="100" r="79.71" fill="none" stroke="#DD0741" stroke-width="10.24"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#E2D6B8"/></g><path d="M72.08 117L72.08 83L80.12 83L80.12 117ZM73.62 117L73.62 110.1L90.21 110.1L90.21 117ZM94.75 117L94.75 83L102.83 83L102.83 117ZM100.31 117L100.31 110.61L114.17 110.61L114.17 117ZM100.31 102.68L100.31 96.75L112.52 96.75L112.52 102.68ZM100.31 89.39L100.31 83L114.12 83L114.12 89.39ZM119.78 117L119.78 83L127.92 83L127.92 117Z" fill="#BA0637"/></g><g transform="translate(226.66666666666666 0)"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#ED1C24"/><path d="M100 14.67A85.33 85.33 0 0 1 185.32 98.69L185.32 101.31A85.33 85.33 0 0 1 100 185.33Z" fill="#FFD100" stroke="#E2D6B8" stroke-width="6.67"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#E2D6B8"/></g><path d="M62.86 117L62.86 83L70.89 83L70.89 117ZM64.4 117L64.4 110.1L80.99 110.1L80.99 117ZM85.52 117L85.52 83L93.61 83L93.61 117ZM91.09 117L91.09 110.61L104.95 110.61L104.95 117ZM91.09 102.68L91.09 96.75L103.3 96.75L103.3 102.68ZM91.09 89.39L91.09 83L104.89 83L104.89 89.39ZM110.56 117L110.56 83L120.09 83L129.42 104.79L130.08 104.79L129.62 83L137.14 83L137.14 117L128.08 117L118.29 94.08L117.62 94.08L118.08 117Z" fill="#14151F"/></g></svg><span class="lockup__t">Leipzig – Lens</span></span><span class="prog__c">Ligue des champions</span><span class="prog__etat" data-debut="2026-11-24T21:00:00+01:00" data-fin="2026-11-24T23:00:00.000Z"></span></label></div><div class="prog" data-i="4"><label class="prog__l" for="m-4"><span class="visuellement-cache">21:00, </span><span class="lockup"><svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false"><g><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#6CABDD"/><circle cx="100" cy="100" r="79.71" fill="none" stroke="#FFFFFF" stroke-width="10.24"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#FFFFFF"/></g><path d="M51.19 117L51.19 83L62.63 83L68.29 108.14L68.91 108.14L74.63 83L86.01 83L86.01 117L78.7 117L79.16 90.88L78.49 90.88L72.21 117L65 117L58.81 90.88L58.14 90.88L58.66 117ZM90.55 117L97.97 83L110.38 83L117.7 117L108.94 117L104.4 89.28L103.63 89.28L99 117ZM96.78 111.18L96.78 106.03L112.13 106.03L112.13 111.18ZM122.23 117L122.23 83L131.76 83L141.08 104.79L141.75 104.79L141.29 83L148.81 83L148.81 117L139.74 117L129.96 94.08L129.29 94.08L129.75 117Z" fill="#14151F"/></g><g transform="translate(226.66666666666666 0)"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#12A0D7"/><circle cx="100" cy="100" r="79.71" fill="none" stroke="#FFFFFF" stroke-width="10.24"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#FFFFFF"/></g><path d="M56.47 117L56.47 83L66 83L75.32 104.79L75.99 104.79L75.53 83L83.05 83L83.05 117L73.98 117L64.2 94.08L63.53 94.08L63.99 117ZM87.64 117L95.05 83L107.47 83L114.78 117L106.03 117L101.49 89.28L100.72 89.28L96.08 117ZM93.87 111.18L93.87 106.03L109.22 106.03L109.22 111.18ZM125.35 108.6L125.35 102.27L129.83 102.27Q132.56 102.27 133.9 100.67Q135.18 99.12 135.18 95.67Q135.18 92.43 133.95 90.83Q132.66 89.28 129.93 89.28L125.35 89.28L125.35 83L130.65 83Q132.97 83 135.24 83.62Q137.5 84.24 139.36 85.73Q141.26 87.22 142.4 89.65Q143.53 92.12 143.53 95.78Q143.53 100.26 141.73 103.09Q139.87 105.92 136.58 107.26Q133.28 108.6 128.9 108.6ZM119.32 117L119.32 83L127.35 83L127.35 117Z" fill="#14151F"/></g></svg><span class="lockup__t">Man City – Naples</span></span><span class="prog__c">Ligue des champions</span><span class="prog__etat" data-debut="2026-11-24T21:00:00+01:00" data-fin="2026-11-24T23:00:00.000Z"></span></label></div><div class="prog" data-i="5"><label class="prog__l" for="m-5"><span class="visuellement-cache">21:00, </span><span class="lockup"><svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false"><g><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#FFFFFF"/><circle cx="100" cy="100" r="79.71" fill="none" stroke="#00529F" stroke-width="10.24"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#00529F"/></g><path d="M52.32 117L52.32 83L63.76 83L69.43 108.14L70.04 108.14L75.76 83L87.15 83L87.15 117L79.83 117L80.3 90.88L79.63 90.88L73.34 117L66.13 117L59.95 90.88L59.28 90.88L59.79 117ZM91.68 117L99.1 83L111.51 83L118.83 117L110.07 117L105.54 89.28L104.77 89.28L100.13 117ZM97.91 111.18L97.91 106.03L113.27 106.03L113.27 111.18ZM127.33 117L127.33 110.61L133.92 110.61Q135.88 110.61 137.12 109.48Q138.35 108.29 138.97 105.92Q139.59 103.55 139.59 100Q139.59 97.22 139.23 95.21Q138.87 93.2 138.15 91.91Q137.43 90.57 136.24 90.01Q135.11 89.39 133.46 89.39L127.33 89.39L127.33 83L133.36 83Q137.63 83 140.88 85.01Q144.12 86.97 145.87 90.78Q147.68 94.59 147.68 100Q147.68 104.43 146.75 107.47Q145.77 110.51 144.23 112.36Q142.63 114.27 140.83 115.25Q139.02 116.28 137.27 116.64Q135.52 117 134.18 117ZM123.36 117L123.36 83L131.4 83L131.4 117Z" fill="#FEFDFC"/></g><g transform="translate(226.66666666666666 0)"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="92.67" fill="none" stroke="rgba(20,21,31,0.6)" stroke-width="6.67"/><circle cx="100" cy="100" r="89.67" fill="none" stroke="#D2C5A8" stroke-width="6.67"/><g><circle cx="100" cy="100" r="85.33" fill="#F00000"/><path d="M71.56 19.55A85.33 85.33 0 0 1 128.44 19.55L128.44 180.45A85.33 85.33 0 0 1 71.56 180.45Z" fill="#FFFFFF"/></g><g><path d="M180.54 125A84.33 84.33 0 0 1 178.82 130L21.18 130A84.33 84.33 0 0 1 19.46 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M180.54 75A84.33 84.33 0 0 1 180.54 125L19.46 125A84.33 84.33 0 0 1 19.46 75Z" fill="#E2D6B8"/></g><path d="M66.67 117L66.67 83L74.76 83L74.76 117ZM72.23 117L72.23 110.61L86.09 110.61L86.09 117ZM72.23 102.68L72.23 96.75L84.44 96.75L84.44 102.68ZM72.23 89.39L72.23 83L86.04 83L86.04 89.39ZM91.71 117L91.71 83L99.85 83L99.85 117ZM106.75 117L106.75 83L116.28 83L125.6 104.79L126.27 104.79L125.81 83L133.33 83L133.33 117L124.26 117L114.48 94.08L113.81 94.08L114.27 117Z" fill="#14151F"/></g></svg><span class="lockup__t">Real Madrid – Eindhoven</span></span><span class="prog__c">Ligue des champions</span><span class="prog__etat" data-debut="2026-11-24T21:00:00+01:00" data-fin="2026-11-24T23:00:00.000Z"></span></label></div></div></div>
+</div></div>
+<div class="soir__tete"><h2 class="etape" id="soir-etape2"><span class="etape__n" aria-hidden="true">2</span> Ton bar <span class="etape__q">· sur le plan</span></h2></div>
+<div class="scenes">
+<div class="scene" data-i="1">
+<p class="soir__verite"><strong>Aucun bar ne l’annonce encore sur Baromatch.</strong></p>
+<div class="soir__grille">
+<figure class="plan plan--demo">
+<div class="plan__cadre"><p class="plan__demo">Démo</p><p class="plan__heure" aria-hidden="true" data-debut="2026-11-24T18:45:00+01:00">16:27</p>
+<svg class="plan__svg" viewBox="22 30 970 772" role="group" aria-labelledby="pl-leg-1"><g class="monde"><use class="base" href="#pl-base"/><use class="allume" href="#pl-a1"/><use class="allume" href="#pl-a2"/><use class="allume" href="#pl-a3"/><use class="allume" href="#pl-a8"/><use class="allume" href="#pl-a9"/><g class="noms" aria-hidden="true"><use class="nom" href="#pl-noms"/><use class="nom nom--allume" href="#pl-l1"/><use class="nom nom--allume" href="#pl-l2"/><use class="nom nom--allume" href="#pl-l3"/><use class="nom nom--allume" href="#pl-l8"/><use class="nom nom--allume" href="#pl-l9"/></g><g class="pins"></g></g></svg>
+<svg class="lueur" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs><radialGradient id="lu-1-a"><stop offset="0" stop-color="#A90432" stop-opacity="0.5"/><stop offset="1" stop-color="#A90432" stop-opacity="0"/></radialGradient><radialGradient id="lu-1-b"><stop offset="0" stop-color="#670E36" stop-opacity="0.5"/><stop offset="1" stop-color="#670E36" stop-opacity="0"/></radialGradient></defs><ellipse cx="14" cy="22" rx="46" ry="42" fill="url(#lu-1-a)"/><ellipse cx="90" cy="30" rx="46" ry="42" fill="url(#lu-1-b)"/></svg>
+</div>
+<figcaption id="pl-leg-1">Plan de Paris, par arrondissement. La démo allume des arrondissements, jamais une adresse. La liste dit la même chose en mots.</figcaption>
+</figure>
+<div class="liste">
+<div class="liste__entete"><h3 class="liste__titre">Les bars qui passent le match, par arrondissement</h3><span class="etiquette-demo">Démo</span></div>
+<p class="liste__compte">La démo allume 1er, 2e, 3e, 8e et 9e. Rien n’est posé à une adresse.</p>
+<ol class="bars bars--demo">
+<li class="bar bar--demo" id="b1-a1" data-arr="1"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">1er</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b1-a2" data-arr="2"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">2e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b1-a3" data-arr="3"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">3e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b1-a8" data-arr="8"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">8e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b1-a9" data-arr="9"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">9e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+</ol>
+<p class="liste__page"><a class="lien" href="/matchs/galatasaray-aston-villa-2026-11-24/">La page du match<span class="visuellement-cache"> : Galatasaray – Aston Villa</span></a></p>
+</div>
+</div>
+</div>
+<div class="scene" data-i="2">
+<p class="soir__verite"><strong>Aucun bar ne l’annonce encore sur Baromatch.</strong></p>
+<div class="soir__grille">
+<figure class="plan plan--demo">
+<div class="plan__cadre"><p class="plan__demo">Démo</p><p class="plan__heure" aria-hidden="true" data-debut="2026-11-24T21:00:00+01:00">18:42</p>
+<svg class="plan__svg" viewBox="22 30 970 772" role="group" aria-labelledby="pl-leg-2"><g class="monde"><use class="base" href="#pl-base"/><use class="allume" href="#pl-a2"/><use class="allume" href="#pl-a3"/><use class="allume" href="#pl-a4"/><use class="allume" href="#pl-a5"/><use class="allume" href="#pl-a6"/><use class="allume" href="#pl-a7"/><use class="allume" href="#pl-a20"/><g class="noms" aria-hidden="true"><use class="nom" href="#pl-noms"/><use class="nom nom--allume" href="#pl-l2"/><use class="nom nom--allume" href="#pl-l3"/><use class="nom nom--allume" href="#pl-l4"/><use class="nom nom--allume" href="#pl-l5"/><use class="nom nom--allume" href="#pl-l6"/><use class="nom nom--allume" href="#pl-l7"/><use class="nom nom--allume" href="#pl-l20"/></g><g class="pins"></g></g></svg>
+<svg class="lueur" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs><radialGradient id="lu-2-a"><stop offset="0" stop-color="#EF0107" stop-opacity="0.5"/><stop offset="1" stop-color="#EF0107" stop-opacity="0"/></radialGradient><radialGradient id="lu-2-b"><stop offset="0" stop-color="#FDE100" stop-opacity="0.5"/><stop offset="1" stop-color="#FDE100" stop-opacity="0"/></radialGradient></defs><ellipse cx="14" cy="22" rx="46" ry="42" fill="url(#lu-2-a)"/><ellipse cx="90" cy="30" rx="46" ry="42" fill="url(#lu-2-b)"/></svg>
+</div>
+<figcaption id="pl-leg-2">Plan de Paris, par arrondissement. La démo allume des arrondissements, jamais une adresse. La liste dit la même chose en mots.</figcaption>
+</figure>
+<div class="liste">
+<div class="liste__entete"><h3 class="liste__titre">Les bars qui passent le match, par arrondissement</h3><span class="etiquette-demo">Démo</span></div>
+<p class="liste__compte">La démo allume 2e, 3e, 4e, 5e, 6e, 7e et 20e. Rien n’est posé à une adresse.</p>
+<ol class="bars bars--demo">
+<li class="bar bar--demo" id="b2-a2" data-arr="2"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">2e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b2-a3" data-arr="3"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">3e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b2-a4" data-arr="4"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">4e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b2-a5" data-arr="5"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">5e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b2-a6" data-arr="6"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">6e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b2-a7" data-arr="7"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">7e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b2-a20" data-arr="20"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">20e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+</ol>
+<p class="liste__page"><a class="lien" href="/matchs/arsenal-dortmund-2026-11-24/">La page du match<span class="visuellement-cache"> : Arsenal – Dortmund</span></a></p>
+</div>
+</div>
+</div>
+<div class="scene" data-i="3">
+<p class="soir__verite"><strong>Aucun bar ne l’annonce encore sur Baromatch.</strong></p>
+<div class="soir__grille">
+<figure class="plan plan--demo">
+<div class="plan__cadre"><p class="plan__demo">Démo</p><p class="plan__heure" aria-hidden="true" data-debut="2026-11-24T21:00:00+01:00">18:42</p>
+<svg class="plan__svg" viewBox="22 30 970 772" role="group" aria-labelledby="pl-leg-3"><g class="monde"><use class="base" href="#pl-base"/><use class="allume" href="#pl-a2"/><use class="allume" href="#pl-a3"/><use class="allume" href="#pl-a8"/><use class="allume" href="#pl-a9"/><use class="allume" href="#pl-a18"/><use class="allume" href="#pl-a19"/><g class="noms" aria-hidden="true"><use class="nom" href="#pl-noms"/><use class="nom nom--allume" href="#pl-l2"/><use class="nom nom--allume" href="#pl-l3"/><use class="nom nom--allume" href="#pl-l8"/><use class="nom nom--allume" href="#pl-l9"/><use class="nom nom--allume" href="#pl-l18"/><use class="nom nom--allume" href="#pl-l19"/></g><g class="pins"></g></g></svg>
+<svg class="lueur" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs><radialGradient id="lu-3-a"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.5"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient><radialGradient id="lu-3-b"><stop offset="0" stop-color="#ED1C24" stop-opacity="0.5"/><stop offset="1" stop-color="#ED1C24" stop-opacity="0"/></radialGradient></defs><ellipse cx="14" cy="22" rx="46" ry="42" fill="url(#lu-3-a)"/><ellipse cx="90" cy="30" rx="46" ry="42" fill="url(#lu-3-b)"/></svg>
+</div>
+<figcaption id="pl-leg-3">Plan de Paris, par arrondissement. La démo allume des arrondissements, jamais une adresse. La liste dit la même chose en mots.</figcaption>
+</figure>
+<div class="liste">
+<div class="liste__entete"><h3 class="liste__titre">Les bars qui passent le match, par arrondissement</h3><span class="etiquette-demo">Démo</span></div>
+<p class="liste__compte">La démo allume 2e, 3e, 8e, 9e, 18e et 19e. Rien n’est posé à une adresse.</p>
+<ol class="bars bars--demo">
+<li class="bar bar--demo" id="b3-a2" data-arr="2"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">2e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b3-a3" data-arr="3"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">3e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b3-a8" data-arr="8"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">8e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b3-a9" data-arr="9"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">9e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b3-a18" data-arr="18"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">18e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b3-a19" data-arr="19"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">19e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+</ol>
+<p class="liste__page"><a class="lien" href="/matchs/leipzig-lens-2026-11-24/">La page du match<span class="visuellement-cache"> : Leipzig – Lens</span></a></p>
+</div>
+</div>
+</div>
+<div class="scene" data-i="4">
+<p class="soir__verite"><strong>Aucun bar ne l’annonce encore sur Baromatch.</strong></p>
+<div class="soir__grille">
+<figure class="plan plan--demo">
+<div class="plan__cadre"><p class="plan__demo">Démo</p><p class="plan__heure" aria-hidden="true" data-debut="2026-11-24T21:00:00+01:00">18:42</p>
+<svg class="plan__svg" viewBox="22 30 970 772" role="group" aria-labelledby="pl-leg-4"><g class="monde"><use class="base" href="#pl-base"/><use class="allume" href="#pl-a11"/><use class="allume" href="#pl-a12"/><use class="allume" href="#pl-a13"/><use class="allume" href="#pl-a14"/><use class="allume" href="#pl-a15"/><use class="allume" href="#pl-a16"/><use class="allume" href="#pl-a17"/><g class="noms" aria-hidden="true"><use class="nom" href="#pl-noms"/><use class="nom nom--allume" href="#pl-l11"/><use class="nom nom--allume" href="#pl-l12"/><use class="nom nom--allume" href="#pl-l13"/><use class="nom nom--allume" href="#pl-l14"/><use class="nom nom--allume" href="#pl-l15"/><use class="nom nom--allume" href="#pl-l16"/><use class="nom nom--allume" href="#pl-l17"/></g><g class="pins"></g></g></svg>
+<svg class="lueur" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs><radialGradient id="lu-4-a"><stop offset="0" stop-color="#6CABDD" stop-opacity="0.5"/><stop offset="1" stop-color="#6CABDD" stop-opacity="0"/></radialGradient><radialGradient id="lu-4-b"><stop offset="0" stop-color="#12A0D7" stop-opacity="0.5"/><stop offset="1" stop-color="#12A0D7" stop-opacity="0"/></radialGradient></defs><ellipse cx="14" cy="22" rx="46" ry="42" fill="url(#lu-4-a)"/><ellipse cx="90" cy="30" rx="46" ry="42" fill="url(#lu-4-b)"/></svg>
+</div>
+<figcaption id="pl-leg-4">Plan de Paris, par arrondissement. La démo allume des arrondissements, jamais une adresse. La liste dit la même chose en mots.</figcaption>
+</figure>
+<div class="liste">
+<div class="liste__entete"><h3 class="liste__titre">Les bars qui passent le match, par arrondissement</h3><span class="etiquette-demo">Démo</span></div>
+<p class="liste__compte">La démo allume 11e, 12e, 13e, 14e, 15e, 16e et 17e. Rien n’est posé à une adresse.</p>
+<ol class="bars bars--demo">
+<li class="bar bar--demo" id="b4-a11" data-arr="11"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">11e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b4-a12" data-arr="12"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">12e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b4-a13" data-arr="13"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">13e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b4-a14" data-arr="14"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">14e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b4-a15" data-arr="15"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">15e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b4-a16" data-arr="16"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">16e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b4-a17" data-arr="17"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">17e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+</ol>
+<p class="liste__page"><a class="lien" href="/matchs/man-city-naples-2026-11-24/">La page du match<span class="visuellement-cache"> : Man City – Naples</span></a></p>
+</div>
+</div>
+</div>
+<div class="scene" data-i="5">
+<p class="soir__verite"><strong>Aucun bar ne l’annonce encore sur Baromatch.</strong></p>
+<div class="soir__grille">
+<figure class="plan plan--demo">
+<div class="plan__cadre"><p class="plan__demo">Démo</p><p class="plan__heure" aria-hidden="true" data-debut="2026-11-24T21:00:00+01:00">18:42</p>
+<svg class="plan__svg" viewBox="22 30 970 772" role="group" aria-labelledby="pl-leg-5"><g class="monde"><use class="base" href="#pl-base"/><use class="allume" href="#pl-a16"/><use class="allume" href="#pl-a17"/><use class="allume" href="#pl-a18"/><use class="allume" href="#pl-a19"/><use class="allume" href="#pl-a20"/><g class="noms" aria-hidden="true"><use class="nom" href="#pl-noms"/><use class="nom nom--allume" href="#pl-l16"/><use class="nom nom--allume" href="#pl-l17"/><use class="nom nom--allume" href="#pl-l18"/><use class="nom nom--allume" href="#pl-l19"/><use class="nom nom--allume" href="#pl-l20"/></g><g class="pins"></g></g></svg>
+<svg class="lueur" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs><radialGradient id="lu-5-a"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.5"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient><radialGradient id="lu-5-b"><stop offset="0" stop-color="#F00000" stop-opacity="0.5"/><stop offset="1" stop-color="#F00000" stop-opacity="0"/></radialGradient></defs><ellipse cx="14" cy="22" rx="46" ry="42" fill="url(#lu-5-a)"/><ellipse cx="90" cy="30" rx="46" ry="42" fill="url(#lu-5-b)"/></svg>
+</div>
+<figcaption id="pl-leg-5">Plan de Paris, par arrondissement. La démo allume des arrondissements, jamais une adresse. La liste dit la même chose en mots.</figcaption>
+</figure>
+<div class="liste">
+<div class="liste__entete"><h3 class="liste__titre">Les bars qui passent le match, par arrondissement</h3><span class="etiquette-demo">Démo</span></div>
+<p class="liste__compte">La démo allume 16e, 17e, 18e, 19e et 20e. Rien n’est posé à une adresse.</p>
+<ol class="bars bars--demo">
+<li class="bar bar--demo" id="b5-a16" data-arr="16"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">16e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b5-a17" data-arr="17"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">17e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b5-a18" data-arr="18"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">18e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b5-a19" data-arr="19"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">19e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+<li class="bar bar--demo" id="b5-a20" data-arr="20"><span class="bar__ligne"><svg class="jauge bar__jauge" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><use class="jauge__verre" href="#pl-verre"/></svg><span class="bar__nom">20e</span><span class="bar__statut">Les bars publiés s’afficheront ici.</span></span></li>
+</ol>
+<p class="liste__page"><a class="lien" href="/matchs/real-madrid-eindhoven-2026-11-24/">La page du match<span class="visuellement-cache"> : Real Madrid – Eindhoven</span></a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="essai-place"><h2 class="etape" id="soir-etape3"><span class="etape__n" aria-hidden="true">3</span> Ta place</h2>
+<p class="essai-place__texte">Le geste de l’appli : tu maintiens, le verre monte, ta place est gardée.</p>
+<div class="tenir">
+<a class="tenir__btn" href="#attente" data-hold><span class="tenir__liq" aria-hidden="true"></span><span class="tenir__txt">Maintiens pour garder ta place</span><span class="tenir__ok" aria-hidden="true">Place gardée.</span></a>
+<p class="tenir__note">Démo : rien n’est réservé. Pour de vrai, c’est dans l’appli.</p>
+<p class="tenir__suite" role="status" data-attente="#attente"></p>
+</div>
+</div>
+</div>
+</section>
+<section class="semaine" id="semaine" aria-labelledby="titre-semaine"><div class="semaine__tete">
 <h2 class="titre-section" id="titre-semaine">Les matchs de la semaine</h2>
 <a class="semaine__toute" href="/matchs/">Toute la semaine</a>
 </div>
@@ -458,36 +660,9 @@
 <h3 class="semaine__titre-jour">Lundi 30 novembre</h3>
 <p class="semaine__rien">Pas de match annoncé ce jour-là.</p>
 </div>
-</div>
+</div></section>
 <!-- semaine:fin -->
-    </section>
-    <!-- Le film n’a pas de son : sa version en mots, « Ce que montre le film », dit ce qu’il montre à l’écran, lu sur
-         ses images, et rien d’autre (WCAG 1.2.1). Chaque lecteur cite la note qui le dit. -->
-    <figure class="film">
-      <div class="film__cadre" id="film-cadre">
-        <video class="film__video" id="film" width="540" height="960" playsinline muted loop preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video>
-        <noscript><video class="film__video" width="540" height="960" controls playsinline preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video></noscript>
-        <button class="film__bouton" id="film-lecture" type="button" hidden aria-label="Mettre le film en pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
-      </div>
-      <figcaption class="film__legende">
-        <p class="film__note" id="film-note">Un film sans le son, raconté en mots juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
-        <details class="film__texte" id="film-texte">
-          <summary>Ce que montre le film</summary>
-          <ol>
-            <li>Un quartier, la nuit, vu d’en haut&nbsp;: des bars s’allument, chacun avec son verre. «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;» Il est 18:42.</li>
-            <li>«&nbsp;Écrans de démonstration&nbsp;». «&nbsp;La Lucarne Lunaire.&nbsp;» L’écran pour garder sa place&nbsp;: «&nbsp;Tu arrives vers&nbsp;» 20:00, 20:30 ou 21:00, et 20:30 est choisi. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» «&nbsp;Au comptoir, tu es @Zephyr&nbsp;». Le bouton «&nbsp;Maintiens pour réserver&nbsp;», et dessous&nbsp;: «&nbsp;Tiens appuyé, le verre se remplit. Lâche avant la fin, rien n’est réservé.&nbsp;» Plus bas, «&nbsp;Réserver sans maintenir&nbsp;».</li>
-            <li>«&nbsp;Maintiens.&nbsp;» Le bouton est tenu appuyé et se remplit d’ambre. «&nbsp;Le verre se remplit.&nbsp;»</li>
-            <li>L’ambre remplit l’écran&nbsp;: «&nbsp;Place gardée.&nbsp;»</li>
-            <li>L’écran «&nbsp;Ta soirée&nbsp;»&nbsp;: «&nbsp;Ce soir · coup d’envoi 21:00&nbsp;», «&nbsp;Place gardée&nbsp;». Alvène – Orvèle, 21:00, au bar La Lucarne Lunaire, pour 1 personne, ton camp&nbsp;: juste le match. Le QR code du pass, et «&nbsp;Ou donne ce code&nbsp;».</li>
-            <li>20:37. «&nbsp;Scanne le QR du bar&nbsp;», La Lucarne Lunaire · Alvène – Orvèle. Sur l’écran du bar&nbsp;: «&nbsp;Tu y es. Scanne-moi.&nbsp;» «&nbsp;Ouvre Baromatch, scanne ce code&nbsp;: ta place est validée et ton sous-bock se colle dans ton album.&nbsp;» Dessous, «&nbsp;ou entre son code&nbsp;».</li>
-            <li>«&nbsp;Tu y es&nbsp;»&nbsp;: «&nbsp;Arrivée validée à 20:37 à La Lucarne Lunaire. Coup d’envoi dans 23 minutes.&nbsp;» «&nbsp;arrivée · deux vibrations&nbsp;», puis «&nbsp;Sous-bock n°08 collé&nbsp;».</li>
-            <li>20:38. «&nbsp;Ta soirée se colle dans ton album.&nbsp;» Le sous-bock n°08, Alvène – Orvèle, à La Lucarne Lunaire, se pose parmi les autres&nbsp;: Alvène – Orvèle, Port-Ambrail – Brisecôte, Hautvergne – Mirebelle, Sablerive – Kerbrume, Lucival – Valbrume. L’album passe de 7 à 8 sous-bocks, et de 4 à 5 bars.</li>
-            <li>21:00. Le sous-bock rejoint le verre de Baromatch, qui se remplit. Puis Baromatch&nbsp;: «&nbsp;Ton match. Ton bar. Ce soir.&nbsp;» «&nbsp;baromatch.fr&nbsp;» «&nbsp;Bientôt sur Android, à Paris&nbsp;»</li>
-          </ol>
-        </details>
-      </figcaption>
-    </figure>
-  </section>
+  </div>
 
   <section class="soiree nuit page" aria-labelledby="titre-soiree">
     <p class="surtitre">Dans la version de test de l’appli</p>
@@ -586,6 +761,77 @@
     <p class="soiree__suite"><a href="/ce-soir/">Où regarder le match ce soir</a></p>
   </section>
 
+  <section class="appli nuit page" id="appli" aria-labelledby="titre-appli">
+    <div class="appli__texte">
+      <h2 class="etape etape--nuit" id="titre-appli"><span class="etape__n" aria-hidden="true">4</span> L’appli</h2>
+      <p class="appli__titre">Ta soirée se colle dans ton album.</p>
+      <p class="appli__chapo">Le soir venu, le bar scanne ton pass, et la soirée devient un sous-bock, gardé dans ton album. L’appli arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</p>
+      <form class="attente" id="attente" action="https://formspree.io/f/mqpeedoj" method="POST" novalidate>
+        <fieldset class="attente__villes" aria-describedby="attente-usage">
+          <legend>Ta ville</legend>
+          <div class="attente__options">
+            <label class="attente__ville" for="attente-ville-0"><input id="attente-ville-0" type="radio" name="ville" value="Paris" checked><span>Paris</span></label>
+            <label class="attente__ville" for="attente-ville-1"><input id="attente-ville-1" type="radio" name="ville" value="Lyon"><span>Lyon</span></label>
+            <label class="attente__ville" for="attente-ville-2"><input id="attente-ville-2" type="radio" name="ville" value="Marseille"><span>Marseille</span></label>
+            <label class="attente__ville" for="attente-ville-3"><input id="attente-ville-3" type="radio" name="ville" value="Lille"><span>Lille</span></label>
+            <label class="attente__ville" for="attente-ville-4"><input id="attente-ville-4" type="radio" name="ville" value="Autre"><span>Autre</span></label>
+          </div>
+        </fieldset>
+        <p class="attente__date" data-ville="Lyon">Pas de date pour Lyon. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Marseille">Pas de date pour Marseille. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Lille">Pas de date pour Lille. On t’écrit seulement si Baromatch y arrive.</p>
+        <p class="attente__date" data-ville="Autre">Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.</p>
+        <label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
+        <div class="attente__ligne">
+          <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
+          <button class="attente__bouton" type="submit">Me prévenir</button>
+        </div>
+        <div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+        <input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
+        <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
+        <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
+        <p class="attente__plateformes">L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</p>
+        <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
+      </form>
+      <p class="partage-site"><a class="lien" href="https://wa.me/?text=Baromatch%20%3A%20ton%20match%2C%20ton%20bar%2C%20ce%20soir.%20https%3A%2F%2Fbaromatch.fr%2F" rel="noopener" data-partage-site>Envoie-le à ta bande</a><button class="lien" type="button" data-copier hidden>Copier le lien</button><span class="visuellement-cache partage-site__statut" role="status"></span></p>
+      <figure class="album" id="album">
+        <p class="etiquette-demo etiquette-demo--album">Démo</p>
+        <svg class="album__svg" viewBox="0 0 300 200" role="img" aria-labelledby="album-legende" focusable="false">
+          <g class="album__trous" fill="none" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="4 5"><circle cx="50" cy="52" r="38"/><circle cx="150" cy="52" r="38"/><circle cx="250" cy="52" r="38"/><circle cx="50" cy="148" r="38"/><circle cx="150" cy="148" r="38"/><circle cx="250" cy="148" r="38"/></g>
+          <g class="album__colles"><g transform="translate(50 52)"><clipPath id="al-1"><circle r="36"/></clipPath><g clip-path="url(#al-1)"><rect x="-36" y="-36" width="72" height="72" fill="#3A3FA8"/><rect x="-30" y="-36" width="11" height="72" fill="#C6E45A"/><rect x="-8" y="-36" width="11" height="72" fill="#C6E45A"/><rect x="14" y="-36" width="11" height="72" fill="#C6E45A"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(150 52)"><clipPath id="al-2"><circle r="36"/></clipPath><g clip-path="url(#al-2)"><rect x="-36" y="-36" width="72" height="72" fill="#C2552B"/><rect x="-36" y="-9" width="72" height="18" fill="#F4E3C1"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(250 52)"><clipPath id="al-3"><circle r="36"/></clipPath><g clip-path="url(#al-3)"><rect x="-36" y="-36" width="72" height="72" fill="#6B2F8A"/><rect x="0" y="-36" width="36" height="72" fill="#F2C94C"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(50 148)"><clipPath id="al-4"><circle r="36"/></clipPath><g clip-path="url(#al-4)"><rect x="-36" y="-36" width="72" height="72" fill="#1D5F8A"/><rect x="-36" y="-36" width="16" height="72" fill="#FFFFFF"/><rect x="20" y="-36" width="16" height="72" fill="#FFFFFF"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(150 148)"><clipPath id="al-5"><circle r="36"/></clipPath><g clip-path="url(#al-5)"><rect x="-36" y="-36" width="72" height="72" fill="#2E7D4F"/><rect x="-36" y="-30" width="72" height="11" fill="#E8E3D3"/><rect x="-36" y="-8" width="72" height="11" fill="#E8E3D3"/><rect x="-36" y="14" width="72" height="11" fill="#E8E3D3"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g></g>
+          <g class="album__place" transform="translate(250 148)"><g class="album__neuf"><g class="album__dos"><circle r="36" fill="#15171F"/><circle r="35.5" fill="none" stroke="#FFFFFF" stroke-opacity=".5"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="2"/></g><g class="album__face"><g transform="translate(0 0)"><clipPath id="al-6"><circle r="36"/></clipPath><g clip-path="url(#al-6)"><rect x="-36" y="-36" width="72" height="72" fill="#0F8B7E"/><rect x="-36" y="-30" width="72" height="11" fill="#FF7F66"/><rect x="-36" y="-8" width="72" height="11" fill="#FF7F66"/><rect x="-36" y="14" width="72" height="11" fill="#FF7F66"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><circle r="39" fill="none" stroke="#FFB13D" stroke-width="3.5"/></g></g></g>
+        </svg>
+        <figcaption id="album-legende">Le sous-bock n°08 se colle dans l’album, parmi les autres. Sous-bocks et clubs inventés.</figcaption>
+      </figure>
+    </div>
+    <!-- Le film n’a pas de son : sa version en mots, « Ce que montre le film », dit ce qu’il montre à l’écran, lu sur
+         ses images, et rien d’autre (WCAG 1.2.1). Chaque lecteur cite la note qui le dit. -->
+    <figure class="film">
+      <div class="film__cadre" id="film-cadre">
+        <video class="film__video" id="film" width="540" height="960" playsinline muted loop preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video>
+        <noscript><video class="film__video" width="540" height="960" controls playsinline preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video></noscript>
+        <button class="film__bouton" id="film-lecture" type="button" hidden aria-label="Mettre le film en pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+      </div>
+      <figcaption class="film__legende">
+        <p class="film__note" id="film-note">Un film sans le son, raconté en mots juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
+        <details class="film__texte" id="film-texte">
+          <summary>Ce que montre le film</summary>
+          <ol>
+            <li>Un quartier, la nuit, vu d’en haut&nbsp;: des bars s’allument, chacun avec son verre. «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;» Il est 18:42.</li>
+            <li>«&nbsp;Écrans de démonstration&nbsp;». «&nbsp;La Lucarne Lunaire.&nbsp;» L’écran pour garder sa place&nbsp;: «&nbsp;Tu arrives vers&nbsp;» 20:00, 20:30 ou 21:00, et 20:30 est choisi. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» «&nbsp;Au comptoir, tu es @Zephyr&nbsp;». Le bouton «&nbsp;Maintiens pour réserver&nbsp;», et dessous&nbsp;: «&nbsp;Tiens appuyé, le verre se remplit. Lâche avant la fin, rien n’est réservé.&nbsp;» Plus bas, «&nbsp;Réserver sans maintenir&nbsp;».</li>
+            <li>«&nbsp;Maintiens.&nbsp;» Le bouton est tenu appuyé et se remplit d’ambre. «&nbsp;Le verre se remplit.&nbsp;»</li>
+            <li>L’ambre remplit l’écran&nbsp;: «&nbsp;Place gardée.&nbsp;»</li>
+            <li>L’écran «&nbsp;Ta soirée&nbsp;»&nbsp;: «&nbsp;Ce soir · coup d’envoi 21:00&nbsp;», «&nbsp;Place gardée&nbsp;». Alvène – Orvèle, 21:00, au bar La Lucarne Lunaire, pour 1 personne, ton camp&nbsp;: juste le match. Le QR code du pass, et «&nbsp;Ou donne ce code&nbsp;».</li>
+            <li>20:37. «&nbsp;Scanne le QR du bar&nbsp;», La Lucarne Lunaire · Alvène – Orvèle. Sur l’écran du bar&nbsp;: «&nbsp;Tu y es. Scanne-moi.&nbsp;» «&nbsp;Ouvre Baromatch, scanne ce code&nbsp;: ta place est validée et ton sous-bock se colle dans ton album.&nbsp;» Dessous, «&nbsp;ou entre son code&nbsp;».</li>
+            <li>«&nbsp;Tu y es&nbsp;»&nbsp;: «&nbsp;Arrivée validée à 20:37 à La Lucarne Lunaire. Coup d’envoi dans 23 minutes.&nbsp;» «&nbsp;arrivée · deux vibrations&nbsp;», puis «&nbsp;Sous-bock n°08 collé&nbsp;».</li>
+            <li>20:38. «&nbsp;Ta soirée se colle dans ton album.&nbsp;» Le sous-bock n°08, Alvène – Orvèle, à La Lucarne Lunaire, se pose parmi les autres&nbsp;: Alvène – Orvèle, Port-Ambrail – Brisecôte, Hautvergne – Mirebelle, Sablerive – Kerbrume, Lucival – Valbrume. L’album passe de 7 à 8 sous-bocks, et de 4 à 5 bars.</li>
+            <li>21:00. Le sous-bock rejoint le verre de Baromatch, qui se remplit. Puis Baromatch&nbsp;: «&nbsp;Ton match. Ton bar. Ce soir.&nbsp;» «&nbsp;baromatch.fr&nbsp;» «&nbsp;Bientôt sur Android, à Paris&nbsp;»</li>
+          </ol>
+        </details>
+      </figcaption>
+    </figure>
+  </section>
+
   <section class="bars" id="bars" aria-labelledby="titre-bars">
     <div class="bars__contenu page">
       <div>
@@ -636,24 +882,12 @@
       <p>Pour regarder les matchs et les bars, non. Pour garder une place, oui&nbsp;: ton adresse e-mail suffit. Pas de mot de passe&nbsp;: on t’envoie un code de 6&nbsp;chiffres, valable 10&nbsp;minutes. Il faut avoir 18&nbsp;ans ou plus.</p>
     </details>
     <details>
-      <summary>Je peux venir avec des potes&nbsp;?</summary>
-      <p>Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée&nbsp;: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass&nbsp;; pour les autres, ton pass compte à la porte.</p>
-    </details>
-    <details>
       <summary>Ma place est vraiment gardée&nbsp;?</summary>
       <p>Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch&nbsp;: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde.</p>
     </details>
     <details>
       <summary>Et si j’arrive en retard&nbsp;?</summary>
       <p>Ta place est gardée jusqu’à 30&nbsp;minutes après le coup d’envoi au plus. Le bar peut choisir moins&nbsp;: 15&nbsp;minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan.</p>
-    </details>
-    <details>
-      <summary>Comment j’annule ma place&nbsp;?</summary>
-      <p>Dans l’appli, ouvre l’onglet «&nbsp;Ta soirée&nbsp;», touche «&nbsp;Je ne viens plus&nbsp;», puis «&nbsp;Libérer&nbsp;». Tu peux le faire jusqu’au dernier moment&nbsp;: ta place repart à quelqu’un d’autre.</p>
-    </details>
-    <details>
-      <summary>Dans quelles villes&nbsp;?</summary>
-      <p>À Paris, pour commencer&nbsp;: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes.</p>
     </details>
     <p class="rappel-attente"><a class="capsule" href="#attente">L’appli arrive bientôt&nbsp;: préviens-moi</a></p>
   </section>
@@ -671,6 +905,7 @@
 <ul>
 <li><a class="pied__action" href="/#attente">Préviens-moi quand Baromatch arrive</a></li>
 <li><a class="pied__action" href="/pour-les-bars.html#proposer">Proposer mon bar</a></li>
+<li><a href="/testeurs-android.html">Deviens testeur Android</a></li>
 </ul>
 <p><a href="/presse.html">Presse et partenariats</a> : <a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a></p>
 <p><a href="https://x.com/baromatchapp" rel="me noopener">X : @baromatchapp</a></p>
@@ -747,5 +982,6 @@
 </footer>
 <!-- pied:fin -->
 <script src="/main.js" defer></script>
+<script src="/plan.js" defer></script>
 </body>
 </html>

@@ -89,7 +89,8 @@ test('un soir avec un vrai bar publié : indexable, le match, le bar, la date en
   // La description dit le jour, le nombre de vrais bars et leur ville.
   expect(p.description).toBe('Vendredi 23 octobre : 1 bar diffuse un match aujourd’hui sur Baromatch, à Lyon. Les adresses et l’heure du coup d’envoi, à l’heure de Paris.');
   // Jamais un faux bar : ni le bar de démo, ni un bar d’essai, même dans la liste des bars publiés du scénario.
-  expect(p.contenu).not.toMatch(/démo|TestBar|Testament/i);
+  // (« Démo : rien n’est réservé », sous « Maintiens à l’essai », est le geste de l’appli à l’essai, pas un bar de démonstration.)
+  expect(p.contenu.replace(/Démo\s*: rien n’est réservé/, '')).not.toMatch(/démo|TestBar|Testament/i);
   // Les prochains matchs, vers leur page, avec leurs vrais bars.
   const prochains = sectionDe(p, 'titre-prochains');
   expect(sansInsignes(prochains)).toContain('<h3 class="regarder-jour">Samedi 24 octobre</h3>\n  <ul class="regarder-matchs">\n    <li><a class="regarder-matchs__match" href="/matchs/psg-barca-2026-10-24/">PSG – Barça</a> <span class="regarder-matchs__infos"><time datetime="2026-10-24T21:00:00+02:00">21:00</time> · Ligue des champions · <span class="regarder-compte"><a href="/regarder-le-match/paris/">2 bars à Paris</a></span></span></li>');
@@ -155,7 +156,8 @@ test('un jour sans vrai bar : noindex, les matchs du jour et les suivants vers l
   expect(texteVisible(p.contenu.split('</header>')[0])).not.toMatch(/les bars qui l(?:e|es) diffusen?t/);
   // Ni bar, ni place, ni réservation : rien que la page ne puisse tenir.
   expect(p.contenu).not.toMatch(/Cave des Gones|Zinc|Comptoir|BarOrPub|regarder-carte__nom/);
-  expect(texteVisible(p.contenu)).not.toMatch(/places|réserv/i);
+  // (Le geste « Maintiens » à l’essai dit « rien n’est réservé » : la page ne réserve rien, elle le dit.)
+  expect(texteVisible(p.contenu).replace(/rien n’est réservé/g, '')).not.toMatch(/places|réserv/i);
   // L’ItemList : les matchs du jour, vers leurs pages.
   expect(deType(p, 'ItemList')[0].itemListElement.map((i) => i.url)).toEqual(['https://baromatch.fr/matchs/brest-nice-2026-10-23/']);
 });
@@ -208,7 +210,8 @@ test('la copie des listes publiques, un samedi soir : le bar de démo n’est ja
   const p = await ceSoir({ source: `capture:${CAPTURE}`, maintenant: '2026-10-17T16:00:00Z' });
   sansErreur(p);
   expect(p.indexable).toBe(false);
-  expect(p.contenu).not.toMatch(/démo|Exemple/i);
+  // (Le plan dit « Démo » : ses arrondissements allumés ne sont pas des bars ; aucun bar de démo ni d’exemple n’est nommé.)
+  expect(p.contenu.replace(/[Dd]émo/g, '')).not.toMatch(/démo|Exemple/i);
   const matchs = sectionDe(p, 'titre-matchs');
   expect(matchs).toMatch(/^id="titre-matchs">Au programme<\/h2>/);
   expect(sansInsignes(matchs)).toContain('Strasbourg – PSG</a> <span class="regarder-matchs__infos">Commencé à <time datetime="2026-10-17T17:15:00+02:00">17:15</time>');
@@ -361,7 +364,7 @@ test('les places : seulement l’appli ouverte, quand les listes les donnent, à
   // L’appli fermée : aucun nombre, même donné par les listes.
   const fermee = await ceSoir({ source, maintenant: '2026-10-23T17:17:00Z' });
   expect(fermee.contenu).not.toContain('regarder-carte__places');
-  expect(texteVisible(fermee.contenu)).not.toMatch(/places|réserv/i);
+  expect(texteVisible(fermee.contenu).replace(/rien n’est réservé/g, '')).not.toMatch(/places|réserv/i);
   expect(fermee.contenu).not.toContain('places.js');
   // Le match commencé : on ne réserve plus, la carte n’en parle plus.
   const commence = await ceSoir({ source, avec: ouverte, maintenant: '2026-10-23T19:17:00Z' });

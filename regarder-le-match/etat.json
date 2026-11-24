@@ -2293,36 +2293,6 @@
    "change": "2026-11-23",
    "indexable": false
   },
-  "/matchs/inter-fiorentina-2026-10-25/": {
-   "type": "match",
-   "cle": "inter-fiorentina-2026-10-25",
-   "date": "2026-10-25T11:30:00.000Z",
-   "empreinte": "1Hcme-fbPUBwL7eeFKufRA",
-   "change": "2026-11-24",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "inter-fiorentina-2026-10-25",
-    "ids": [
-     "cmv6e5jny001dryqjip19u5u8"
-    ],
-    "debut": "2026-10-25T11:30:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Serie A",
-    "domicile": {
-     "cle": "inter",
-     "court": "Inter",
-     "nom": "FC Internazionale Milano",
-     "slug": "fc-internazionale-milano"
-    },
-    "exterieur": {
-     "cle": "fiorentina",
-     "court": "Fiorentina",
-     "nom": "ACF Fiorentina",
-     "slug": "acf-fiorentina"
-    }
-   }
-  },
   "/matchs/inter-genoa-2026-11-28/": {
    "type": "match",
    "cle": "inter-genoa-2026-11-28",

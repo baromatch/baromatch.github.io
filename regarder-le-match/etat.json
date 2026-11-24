@@ -210,23 +210,23 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "FmTEBESf4FUuRTmA57rYUw",
-   "change": "2026-11-23",
+   "empreinte": "kvPe0WBGGY3iqmtFzTr0cQ",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": []
   },
   "/ce-soir/partage.png": {
    "type": "partage",
    "cle": "ce-soir",
-   "empreinte": "VElX3U9rRMqaggNElaO35Q",
-   "change": "2026-11-23",
+   "empreinte": "AefxGqiksUrhXWPChFnBbQ",
+   "change": "2026-11-24",
    "indexable": false
   },
   "/en/": {
    "type": "guide-en",
    "cle": "paris",
-   "empreinte": "kWDTU0ruOBd_IxyHiu9oyA",
-   "change": "2026-11-23",
+   "empreinte": "9uQoyfSA58j0ua5JeP3UlA",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": []
   },
@@ -244,15 +244,6 @@
    "date": "2026-11-24T20:00:00.000Z",
    "empreinte": "AomACDwz2Ey98YVXIlg0NQ",
    "change": "2026-11-16",
-   "indexable": false,
-   "bars": []
-  },
-  "/en/matches/arsenal-everton-2026-10-24/": {
-   "type": "match-en",
-   "cle": "arsenal-everton-2026-10-24",
-   "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "tAgEG6auUY0S5BhDVuGy8Q",
-   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -278,8 +269,8 @@
    "type": "match-en",
    "cle": "brentford-everton-2026-11-23",
    "date": "2026-11-23T20:00:00.000Z",
-   "empreinte": "o726i6SYe1OjzOVuw_qxDw",
-   "change": "2026-11-23",
+   "empreinte": "Ry6v2hSXAcNQ8XfDu68Nfg",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": []
   },
@@ -307,15 +298,6 @@
    "date": "2026-10-31T12:30:00.000Z",
    "empreinte": "QAYebYrQxgBXYgU2yug4CA",
    "change": "2026-11-22",
-   "indexable": false,
-   "bars": []
-  },
-  "/en/matches/chelsea-tottenham-2026-10-24/": {
-   "type": "match-en",
-   "cle": "chelsea-tottenham-2026-10-24",
-   "date": "2026-10-24T16:30:00.000Z",
-   "empreinte": "mAep1iKaocb-oW_dK0wPPA",
-   "change": "2026-11-23",
    "indexable": false,
    "bars": []
   },
@@ -503,8 +485,8 @@
    "type": "match-en",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "581C72dBRs98RpzJFiCoeA",
-   "change": "2026-11-23",
+   "empreinte": "8HfGkCjhoj7v9_0045EZEg",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": []
   },
@@ -655,16 +637,16 @@
   "/en/premier-league/": {
    "type": "guide-en",
    "cle": "premier-league",
-   "empreinte": "6X9dKh0TXYimeaQ9A3ssMQ",
-   "change": "2026-11-23",
+   "empreinte": "SzXx21DzL8kW97gof5aq9Q",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": []
   },
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "iCOYBIVglIy-RSA8czs8pA",
-   "change": "2026-11-23",
+   "empreinte": "bxHVON6DXsxzBRID1ClNAA",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": []
   },
@@ -759,23 +741,23 @@
   "/matchs/affiche/": {
    "type": "affiche",
    "cle": "affiche",
-   "empreinte": "MJXcn2MzxDDkXV7G0bDJhg",
-   "change": "2026-11-23",
+   "empreinte": "9JVY_0E7EHSrYHaI7OnbHg",
+   "change": "2026-11-24",
    "indexable": true,
    "bars": []
   },
   "/matchs/affiche/partage.png": {
    "type": "partage",
    "cle": "affiche",
-   "empreinte": "EzH3nAK7EDRfHpHOguyVww",
-   "change": "2026-11-23",
+   "empreinte": "U4MkUPuXgvPj_kKEbchvLQ",
+   "change": "2026-11-24",
    "indexable": false
   },
   "/matchs/affiche/pour-le-patron/": {
    "type": "affiche-patron",
    "cle": "pour-le-patron",
-   "empreinte": "vrM9OQnqsDN5iWpFDuZuLg",
-   "change": "2026-11-23",
+   "empreinte": "8FgcHklXZUXjEmh9hbAA1Q",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": []
   },
@@ -926,36 +908,6 @@
    "empreinte": "xrMvp1xDZYHIrJ4x4zYKaQ",
    "change": "2026-11-10",
    "indexable": false
-  },
-  "/matchs/arsenal-everton-2026-10-24/": {
-   "type": "match",
-   "cle": "arsenal-everton-2026-10-24",
-   "date": "2026-10-24T14:00:00.000Z",
-   "empreinte": "tNtSG1NKbqVcCefTu-CrxQ",
-   "change": "2026-11-23",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "arsenal-everton-2026-10-24",
-    "ids": [
-     "cmv6e5jlc0015ryqjmrogsn28"
-    ],
-    "debut": "2026-10-24T14:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Premier League",
-    "domicile": {
-     "cle": "arsenal",
-     "court": "Arsenal",
-     "nom": "Arsenal FC",
-     "slug": "arsenal-fc"
-    },
-    "exterieur": {
-     "cle": "everton",
-     "court": "Everton",
-     "nom": "Everton FC",
-     "slug": "everton-fc"
-    }
-   }
   },
   "/matchs/arsenal-man-city-2026-11-29/": {
    "type": "match",
@@ -1333,8 +1285,8 @@
    "type": "match",
    "cle": "brentford-everton-2026-11-23",
    "date": "2026-11-23T20:00:00.000Z",
-   "empreinte": "LMcwNcCGWPe48CV-ecLlcw",
-   "change": "2026-11-23",
+   "empreinte": "sP02xeOIFAYo9mA7H8Up9Q",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1358,20 +1310,6 @@
      "slug": "everton-fc"
     }
    }
-  },
-  "/matchs/brentford-everton-2026-11-23/match.ics": {
-   "type": "evenement",
-   "cle": "brentford-everton-2026-11-23",
-   "empreinte": "KwKEW8J4OmH-X1C8cf0b2w",
-   "change": "2026-11-23",
-   "indexable": false
-  },
-  "/matchs/brentford-everton-2026-11-23/partage.png": {
-   "type": "partage",
-   "cle": "brentford-everton-2026-11-23",
-   "empreinte": "9wx9K6TDCO-YLS-Q6UOwXQ",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/brest-ol-2026-11-08/": {
    "type": "match",
@@ -1565,36 +1503,6 @@
     }
    }
   },
-  "/matchs/chelsea-tottenham-2026-10-24/": {
-   "type": "match",
-   "cle": "chelsea-tottenham-2026-10-24",
-   "date": "2026-10-24T16:30:00.000Z",
-   "empreinte": "Nu4-hUyYqFVTJCW8IJVhKw",
-   "change": "2026-11-23",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "chelsea-tottenham-2026-10-24",
-    "ids": [
-     "cmv6e5jna001bryqjr7o8dr8h"
-    ],
-    "debut": "2026-10-24T16:30:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Premier League",
-    "domicile": {
-     "cle": "chelsea",
-     "court": "Chelsea",
-     "nom": "Chelsea FC",
-     "slug": "chelsea-fc"
-    },
-    "exterieur": {
-     "cle": "tottenham",
-     "court": "Tottenham",
-     "nom": "Tottenham Hotspur",
-     "slug": "tottenham-hotspur"
-    }
-   }
-  },
   "/matchs/club/lens/": {
    "type": "club",
    "cle": "lens",
@@ -1714,8 +1622,8 @@
   "/matchs/competition/liga/": {
    "type": "competition",
    "cle": "liga",
-   "empreinte": "wz8UUcZkuH_o7fuZBhjd-g",
-   "change": "2026-11-23",
+   "empreinte": "DQU3RGnHMh9PoJCtzZAe0A",
+   "change": "2026-11-24",
    "indexable": true,
    "bars": []
   },
@@ -1754,16 +1662,16 @@
   "/matchs/competition/premier-league/": {
    "type": "competition",
    "cle": "premier-league",
-   "empreinte": "dj7XAfXWFtmY9Knn7kL98Q",
-   "change": "2026-11-23",
+   "empreinte": "wXK2b12d572jd7skYT_z8w",
+   "change": "2026-11-24",
    "indexable": true,
    "bars": []
   },
   "/matchs/competition/serie-a/": {
    "type": "competition",
    "cle": "serie-a",
-   "empreinte": "073iOCvWVERZMsIiXfuZgg",
-   "change": "2026-11-23",
+   "empreinte": "Jkj2YVh4GqQUBxa7X7Hyyw",
+   "change": "2026-11-24",
    "indexable": true,
    "bars": []
   },
@@ -1854,36 +1762,6 @@
    "empreinte": "Z6UTBP5JIjpSWrmvq75SyQ",
    "change": "2026-11-23",
    "indexable": false
-  },
-  "/matchs/dortmund-francfort-2026-10-24/": {
-   "type": "match",
-   "cle": "dortmund-francfort-2026-10-24",
-   "date": "2026-10-24T16:30:00.000Z",
-   "empreinte": "cy6ce5dUlMjuK6BWmYelJw",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "dortmund-francfort-2026-10-24",
-    "ids": [
-     "cmv6e5jmn0019ryqjgpesydcl"
-    ],
-    "debut": "2026-10-24T16:30:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Bundesliga",
-    "domicile": {
-     "cle": "dortmund",
-     "court": "Dortmund",
-     "nom": "Borussia Dortmund",
-     "slug": "borussia-dortmund"
-    },
-    "exterieur": {
-     "cle": "francfort",
-     "court": "Francfort",
-     "nom": "Eintracht Frankfurt",
-     "slug": "eintracht-frankfurt"
-    }
-   }
   },
   "/matchs/dortmund-leverkusen-2026-11-29/": {
    "type": "match",
@@ -2021,8 +1899,8 @@
    "type": "match",
    "cle": "fiorentina-atalanta-2026-10-29",
    "date": "2026-10-29T19:45:00.000Z",
-   "empreinte": "x2HfiKFr1ZF9CL4uWyO8xw",
-   "change": "2026-11-23",
+   "empreinte": "dRxolhl2M1SEzEzC9pBHIg",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2051,8 +1929,8 @@
    "type": "match",
    "cle": "fiorentina-juventus-2026-11-08",
    "date": "2026-11-08T19:45:00.000Z",
-   "empreinte": "h1o2LkLysTT52PI-CoLLPw",
-   "change": "2026-11-23",
+   "empreinte": "IU1wc9K8QFLc8hpsk_VHLA",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2419,8 +2297,8 @@
    "type": "match",
    "cle": "inter-fiorentina-2026-10-25",
    "date": "2026-10-25T11:30:00.000Z",
-   "empreinte": "0DgcMhDh_17wE3iN2UlKQg",
-   "change": "2026-11-23",
+   "empreinte": "1Hcme-fbPUBwL7eeFKufRA",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3007,36 +2885,6 @@
     }
    }
   },
-  "/matchs/lens-paris-fc-2026-10-24/": {
-   "type": "match",
-   "cle": "lens-paris-fc-2026-10-24",
-   "date": "2026-10-24T18:45:00.000Z",
-   "empreinte": "yrCsGi8srk8APurirUoMvQ",
-   "change": "2026-11-22",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "lens-paris-fc-2026-10-24",
-    "ids": [
-     "cmuy4o35b0017zz9w95w0gkfv"
-    ],
-    "debut": "2026-10-24T18:45:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue 1",
-    "domicile": {
-     "cle": "lens",
-     "court": "Lens",
-     "nom": "RC Lens",
-     "slug": "rc-lens"
-    },
-    "exterieur": {
-     "cle": "paris-fc",
-     "court": "Paris FC",
-     "nom": "Paris FC",
-     "slug": "paris-fc"
-    }
-   }
-  },
   "/matchs/lens-toulouse-2026-11-21/": {
    "type": "match",
    "cle": "lens-toulouse-2026-11-21",
@@ -3071,8 +2919,8 @@
    "type": "match",
    "cle": "levante-atletico-2026-10-31",
    "date": "2026-10-31T13:00:00.000Z",
-   "empreinte": "-YFDw5IUYKDdOyOY1cbr2w",
-   "change": "2026-11-23",
+   "empreinte": "HWoe9ZeNg_BjJkXOPnEe0w",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3101,8 +2949,8 @@
    "type": "match",
    "cle": "levante-elche-2026-11-23",
    "date": "2026-11-23T20:00:00.000Z",
-   "empreinte": "IWqNWw7Ps6eCbGsdSrhouQ",
-   "change": "2026-11-23",
+   "empreinte": "vnhYHNuL1yxYsUXEAzXEkw",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3126,20 +2974,6 @@
      "slug": "elche-cf"
     }
    }
-  },
-  "/matchs/levante-elche-2026-11-23/match.ics": {
-   "type": "evenement",
-   "cle": "levante-elche-2026-11-23",
-   "empreinte": "HGFvrwPGM-CN0RG4vPghiQ",
-   "change": "2026-11-23",
-   "indexable": false
-  },
-  "/matchs/levante-elche-2026-11-23/partage.png": {
-   "type": "partage",
-   "cle": "levante-elche-2026-11-23",
-   "empreinte": "RLhGIJ6Oh0BKfnsPGYuZ4A",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/levante-real-racing-club-de-santander-2026-11-27/": {
    "type": "match",
@@ -3711,8 +3545,8 @@
    "type": "match",
    "cle": "monza-fiorentina-2026-11-23",
    "date": "2026-11-23T19:45:00.000Z",
-   "empreinte": "rcaBvhu0Z-knK4ZpZifE3Q",
-   "change": "2026-11-23",
+   "empreinte": "S-kE2GLZ0p5r-T3ZXFtgAg",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3736,20 +3570,6 @@
      "slug": "acf-fiorentina"
     }
    }
-  },
-  "/matchs/monza-fiorentina-2026-11-23/match.ics": {
-   "type": "evenement",
-   "cle": "monza-fiorentina-2026-11-23",
-   "empreinte": "iyFvBLg1IUHPoN0nGUzLTw",
-   "change": "2026-11-23",
-   "indexable": false
-  },
-  "/matchs/monza-fiorentina-2026-11-23/partage.png": {
-   "type": "partage",
-   "cle": "monza-fiorentina-2026-11-23",
-   "empreinte": "4xuT5r1pwG63XwZMo5u07w",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/naples-lazio-2026-11-08/": {
    "type": "match",
@@ -3778,36 +3598,6 @@
      "court": "Lazio",
      "nom": "SS Lazio",
      "slug": "ss-lazio"
-    }
-   }
-  },
-  "/matchs/naples-rome-2026-10-24/": {
-   "type": "match",
-   "cle": "naples-rome-2026-10-24",
-   "date": "2026-10-24T16:00:00.000Z",
-   "empreinte": "TOemmWgCB1HNxfw32fZLEg",
-   "change": "2026-11-12",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "naples-rome-2026-10-24",
-    "ids": [
-     "cmv6e5jm00017ryqj0ecs7n5p"
-    ],
-    "debut": "2026-10-24T16:00:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Serie A",
-    "domicile": {
-     "cle": "naples",
-     "court": "Naples",
-     "nom": "SSC Napoli",
-     "slug": "ssc-napoli"
-    },
-    "exterieur": {
-     "cle": "rome",
-     "court": "Rome",
-     "nom": "AS Roma",
-     "slug": "as-roma"
     }
    }
   },
@@ -3845,8 +3635,8 @@
    "type": "match",
    "cle": "newcastle-everton-2026-11-02",
    "date": "2026-11-02T20:00:00.000Z",
-   "empreinte": "1RniwfwoD6mzpWWwoeRIJA",
-   "change": "2026-11-23",
+   "empreinte": "18a_X09RHIpDCUtqGaNjQQ",
+   "change": "2026-11-24",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -5200,36 +4990,6 @@
      "court": "Strasbourg",
      "nom": "RC Strasbourg Alsace",
      "slug": "rc-strasbourg-alsace"
-    }
-   }
-  },
-  "/matchs/toulouse-troyes-2026-10-24/": {
-   "type": "match",
-   "cle": "toulouse-troyes-2026-10-24",
-   "date": "2026-10-24T15:15:00.000Z",
-   "empreinte": "_HgYXk0_suoL1d8uqnl35A",
-   "change": "2026-11-22",
-   "indexable": false,
-   "bars": [],
-   "memoire": {
-    "slug": "toulouse-troyes-2026-10-24",
-    "ids": [
-     "cmuy4o34h0015zz9wqdz2927p"
-    ],
-    "debut": "2026-10-24T15:15:00.000Z",
-    "heureConfirmee": true,
-    "competition": "Ligue 1",
-    "domicile": {
-     "cle": "toulouse",
-     "court": "Toulouse",
-     "nom": "Toulouse FC",
-     "slug": "toulouse-fc"
-    },
-    "exterieur": {
-     "cle": "troyes",
-     "court": "Troyes",
-     "nom": "ESTAC Troyes",
-     "slug": "estac-troyes"
     }
    }
   },
@@ -6777,72 +6537,6 @@
    "empreinte": "VH0NzemRb85wVli7UMIYFw",
    "sequence": 0,
    "modifie": "2026-11-16T21:58:24Z"
-  },
-  "cmwt6c6gu0004nntllpyyi3tl@baromatch.fr": {
-   "ids": [
-    "cmwt6c6gu0004nntllpyyi3tl"
-   ],
-   "slug": "levante-elche-2026-11-23",
-   "debut": "2026-11-23T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "LaLiga",
-   "domicile": {
-    "cle": "levante",
-    "court": "Levante",
-    "nom": "Levante UD"
-   },
-   "exterieur": {
-    "cle": "elche",
-    "court": "Elche",
-    "nom": "Elche CF"
-   },
-   "empreinte": "zT69YHRw8XQAzoQQNMbk2Q",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6c6hy0006nntlnwttgrb5@baromatch.fr": {
-   "ids": [
-    "cmwt6c6hy0006nntlnwttgrb5"
-   ],
-   "slug": "brentford-everton-2026-11-23",
-   "debut": "2026-11-23T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "brentford",
-    "court": "Brentford",
-    "nom": "Brentford FC"
-   },
-   "exterieur": {
-    "cle": "everton",
-    "court": "Everton",
-    "nom": "Everton FC"
-   },
-   "empreinte": "8ZEwNeuKC0JGtvG0pomfkA",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6c6iz0008nntlwdlk98qz@baromatch.fr": {
-   "ids": [
-    "cmwt6c6iz0008nntlwdlk98qz"
-   ],
-   "slug": "monza-fiorentina-2026-11-23",
-   "debut": "2026-11-23T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Serie A",
-   "domicile": {
-    "cle": "monza",
-    "court": "Monza",
-    "nom": "AC Monza"
-   },
-   "exterieur": {
-    "cle": "fiorentina",
-    "court": "Fiorentina",
-    "nom": "ACF Fiorentina"
-   },
-   "empreinte": "BzqVh3S5ttH2R6ko0x8HDg",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
   },
   "cmwt6doqi000vrcsss7mih6bc@baromatch.fr": {
    "ids": [

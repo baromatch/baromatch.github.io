@@ -147,6 +147,14 @@ test.describe('« Ce soir » et la page d’un match : le plan sans plan.js', ()
     }
   });
 
+  test('le contrôle des pages refuse plan.js sur une page générée : l’Action ne peut pas le remettre', async () => {
+    const site = await fabriquer(sansBarPublie);
+    const p = pageDe(site, '/ce-soir/');
+    expect(controlerLaPage(p), 'la page telle qu’elle est').toEqual([]);
+    const avecLeScript = { ...p, contenu: p.contenu.replace('</head>', '<script src="/plan.js" defer></script>\n</head>') };
+    expect(controlerLaPage(avecLeScript).join(' ')).toMatch(/un script autre que/);
+  });
+
   test('l’accueil, lui, garde son script : le bloc du plan n’est pas la version sans script', async () => {
     const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
     const site = await fabriquer(sansBarPublie);

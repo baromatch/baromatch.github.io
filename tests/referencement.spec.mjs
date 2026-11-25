@@ -12,7 +12,7 @@
 //   match passé comme le robot le supprime ; robots.txt n’en ferme aucune ;
 // - les liens qui relient l’accueil, « Ce soir », les pages des matchs et « Pour les bars », avec un texte qui dit où l’on va.
 import { test, expect } from '@playwright/test';
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { racine } from './outils/environnement.mjs';
@@ -316,6 +316,11 @@ test.describe('le plan du site au fil des passages', () => {
   test.beforeEach(async () => {
     dossier = mkdtempSync(path.join(tmpdir(), 'referencement-jours-'));
     await construireLeSiteDExemple(dossier, { maintenant: MAINTENANT_DU_SCENARIO, rendu: null });
+    // Le plan du dossier d’essai vient de celui du dépôt, que le robot réécrit à chaque passage (la date de l’accueil
+    // avance). L’essai part de la date du plan écrit à la main, 2026-10-28, jamais de celle du jour : il réécrit la
+    // ligne de l’accueil dans sa copie et ne lit jamais le fichier du robot.
+    const plan = path.join(dossier, 'sitemap.xml');
+    writeFileSync(plan, readFileSync(plan, 'utf8').replace(/(<loc>https:\/\/baromatch\.fr\/<\/loc><lastmod>)[^<]*/, '$12026-10-28'));
   });
   test.afterEach(() => {
     if (dossier) rmSync(dossier, { recursive: true, force: true });

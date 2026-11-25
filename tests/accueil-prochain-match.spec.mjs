@@ -50,7 +50,7 @@ test.describe('le choix du match, du générateur', () => {
     expect(html).toContain('data-coup="2026-11-25T21:00:00+01:00"');
     expect(html).toContain('href="/matchs/psg-rome-2026-11-25/"');
     // Sabah – Barça se joue : il n’est pas la carte, il est dans la bande, « en cours ».
-    expect(texteDe(html.match(/<h3 class="coup__titre">([\s\S]*?)<\/h3>/)[1])).toBe('PSG – Rome');
+    expect(texteDe(html.match(/<h3 class="coup__titre" data-mot="\d+">([\s\S]*?)<\/h3>/)[1])).toBe('PSG – Rome');
     expect(html).toMatch(/<a class="puce" href="\/matchs\/sabah-barca-2026-11-25\/">[^]*?<span class="puce__en-cours">en cours<\/span>/);
   });
 
@@ -368,6 +368,103 @@ test.describe('à 200 % de texte', () => {
     });
     expect(defaut.coupes).toEqual([]);
     expect(defaut.defile).toBeLessThanOrEqual(0);
+  });
+});
+
+// Des noms longs, d’un seul mot pour la plupart (ceux qui sortaient de leur carte à 320 et 360 px, texte à 200 %), et
+// les deux d’une vraie soirée : « OM – 1. Heidenheim 1846 » et « Werder Bremen – Borussia Mönchengladbach ». Chaque paire
+// est la carte du prochain match une fois (le titre, ses insignes), et les suivantes de la bande (les puces) : un nom ne
+// sort jamais de sa carte, aucun mot n’est coupé, la page ne défile pas de côté.
+const PAIRES_LONGUES = [
+  [['leverkusen', 'Leverkusen'], ['strasbourg', 'Strasbourg']], [['newcastle', 'Newcastle'], ['bodo-glimt', 'Bodø/Glimt']],
+  [['olympiacos', 'Olympiacos'], ['nordsjaelland', 'Nordsjælland']], [['guadalajara', 'Guadalajara'], ['galatasaray', 'Galatasaray']],
+  [['fenerbahce', 'Fenerbahçe'], ['hearts', 'Heart of Midlothian']], [['om', 'OM'], ['heidenheim', '1. Heidenheim 1846']],
+  [['werder', 'Werder Bremen'], ['gladbach', 'Borussia Mönchengladbach']],
+];
+// La page du soir où la paire « tourne » est la première : chacune est la carte une fois, et les autres sont la bande.
+const matchsAuxNomsLongs = (tour) => [...PAIRES_LONGUES.slice(tour), ...PAIRES_LONGUES.slice(0, tour)].map(([[a, nomA], [b, nomB]], i) => unMatch({
+  slug: `${a}-${b}-2026-11-27`, debut: new Date(Date.parse('2026-11-27T19:00:00Z') + i * 10 * 60_000).toISOString(), domicile: club(a, nomA), exterieur: club(b, nomB), competition: 'Ligue Europa',
+}));
+const VENDREDI = Date.parse('2026-11-27T17:00:00Z');
+// Pour chaque nom de la carte et de la bande : où est son texte (une plage par mot), par rapport à sa carte.
+const lireLesNomsLongs = (page) => page.evaluate(() => {
+  const mots = (element) => {
+    const plage = document.createRange();
+    const lus = [];
+    const marche = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    for (let n = marche.nextNode(); n; n = marche.nextNode()) {
+      if (n.parentElement.closest('.visuellement-cache')) continue;
+      for (const m of n.data.matchAll(/[^\s/-]+(?:[/-][^\s/-]+)*/g)) {
+        plage.setStart(n, m.index);
+        plage.setEnd(n, m.index + m[0].length);
+        lus.push({ mot: m[0], rects: [...plage.getClientRects()].filter((r) => r.width > 0) });
+      }
+    }
+    return lus;
+  };
+  const dedans = (element, carte) => {
+    const style = getComputedStyle(carte);
+    const bord = carte.getBoundingClientRect();
+    const gauche = bord.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
+    const droite = bord.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+    const lus = mots(element);
+    const tous = lus.flatMap((m) => m.rects);
+    return {
+      nom: element.textContent.trim().replace(/\s+/g, ' '),
+      // Un mot sur deux lignes : une coupure au milieu d’un mot.
+      coupes: lus.filter((m) => new Set(m.rects.map((r) => Math.round(r.top))).size > 1).map((m) => m.mot),
+      dehorsGauche: Math.round(gauche - Math.min(...tous.map((r) => r.left))),
+      dehorsDroite: Math.round(Math.max(...tous.map((r) => r.right)) - droite),
+    };
+  };
+  const noms = [dedans(document.querySelector('.coup__titre a'), document.querySelector('.coup'))];
+  for (const puce of document.querySelectorAll('.bande .puce')) noms.push(dedans(puce.querySelector('.puce__nom'), puce));
+  return { noms, defile: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+});
+
+test.describe('les noms longs du prochain match et de la bande, à 100 et 200 %', () => {
+  for (const largeur of [320, 360, 390, 412]) {
+    test(`à ${largeur} px : aucun mot coupé, aucun nom hors de sa carte, la page ne défile pas de côté`, async ({ context }) => {
+      test.setTimeout(90_000);
+      const lus = [];
+      for (let tour = 0; tour < PAIRES_LONGUES.length; tour += 1) {
+        // Une page par soir : l’horloge simulée ne s’installe qu’une fois par page.
+        const page = await context.newPage();
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await page.setViewportSize({ width: largeur, height: 800 });
+        await ouvrirLAccueil(page, { maintenant: VENDREDI, instant: VENDREDI, matchs: matchsAuxNomsLongs(tour) });
+        await page.evaluate(() => document.fonts.ready);
+        for (const pourcent of [100, 200]) {
+          await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+          lus.push({ cas: `tour ${tour}, ${pourcent} %`, ...await lireLesNomsLongs(page) });
+        }
+        await page.close();
+      }
+      // La carte et la bande portent bien les noms attendus (les plus longs de la liste, dans les deux).
+      const vus = new Set(lus.flatMap((l) => l.noms.map((n) => n.nom)));
+      for (const attendu of ['Werder Bremen – Borussia Mönchengladbach', 'OM – 1. Heidenheim 1846', 'Fenerbahçe – Heart of Midlothian', 'Olympiacos – Nordsjælland']) expect([...vus], attendu).toContain(attendu);
+      for (const l of lus) {
+        expect(l.noms.flatMap((n) => n.coupes.map((m) => `${n.nom} : « ${m} » coupé`)), l.cas).toEqual([]);
+        expect(l.noms.filter((n) => n.dehorsGauche > 0 || n.dehorsDroite > 0).map((n) => `${n.nom} : +${n.dehorsGauche} px à gauche, +${n.dehorsDroite} px à droite`), l.cas).toEqual([]);
+        expect(l.defile, `${l.cas} : la page défile de côté`).toBeLessThanOrEqual(0);
+      }
+    });
+  }
+
+  test('sans JavaScript, à 320 px et 200 % : le générateur a déjà réglé la taille des noms', async ({ browser }) => {
+    const contexte = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 800 }, locale: 'fr-FR' });
+    const page = await contexte.newPage();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const html = accueilAvecLaSemaine(ACCUEIL, bloc({ maintenant: VENDREDI, matchs: matchsAuxNomsLongs(PAIRES_LONGUES.length - 1) }));
+    await page.route((adresse) => adresse.pathname === '/', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: html }));
+    await page.goto('/');
+    await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+    const l = await lireLesNomsLongs(page);
+    expect(l.noms[0].nom).toBe('Werder Bremen – Borussia Mönchengladbach');
+    expect(l.noms.flatMap((n) => n.coupes)).toEqual([]);
+    expect(l.noms.filter((n) => n.dehorsGauche > 0 || n.dehorsDroite > 0)).toEqual([]);
+    expect(l.defile).toBeLessThanOrEqual(0);
+    await contexte.close();
   });
 });
 

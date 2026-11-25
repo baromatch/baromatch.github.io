@@ -237,7 +237,7 @@ test.afterAll(async () => {
 test('la semaine pleine : le bloc de l’accueil ne porte que la carte, sa bande (4 au plus) et 6 matchs, quel que soit le nombre de matchs de la semaine', () => {
   const accueil = readFileSync(path.join(sites[0].plein.dossier, 'index.html'), 'utf8');
   const bloc = accueil.split('<!-- semaine:debut -->')[1].split('<!-- semaine:fin -->')[0];
-  expect((bloc.match(/<h3 class="coup__titre">/g) ?? []).length).toBe(1);
+  expect((bloc.match(/<h3 class="coup__titre" data-mot="\d+">/g) ?? []).length).toBe(1);
   expect((bloc.match(/<a class="puce"/g) ?? []).length).toBeLessThanOrEqual(4);
   const donnees = JSON.parse(bloc.match(/<script type="application\/json" id="donnees-ce-soir">([\s\S]*?)<\/script>/)[1]);
   expect(donnees.matchs).toHaveLength(6);

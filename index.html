@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Politique de sécurité (GitHub Pages ne permet pas d’en-tête) : seulement les fichiers du site ; Formspree pour la
-     liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même). L’empreinte du style du noscript : une retouche de ce style change son empreinte (tests/politique-de-securite.spec.mjs donne la nouvelle). -->
+<!-- Politique de sécurité : les fichiers du site, et Formspree pour la liste d’attente. Retoucher le style du noscript change son empreinte (tests/politique-de-securite.spec.mjs donne la nouvelle). -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-Luah/3kMW/T3ZhWpTYhfRkXZEQsOZrPjg7FjPz5V07w='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
 <meta name="google-site-verification" content="nBxxD8vbrngLKD1Te1fRcbC8tGC2-gwezW9NG9urIaw" />
 <!-- Bing Webmaster Tools : remplace la ligne suivante par la balise de vérification que Bing donne (elle commence par <meta name="msvalidate.01"). -->
@@ -36,125 +35,125 @@
 <meta name="twitter:site" content="@baromatchapp">
 <meta name="twitter:image" content="https://baromatch.fr/img/og-image.jpg">
 <script type="application/ld+json">{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://baromatch.fr/#organisation",
-      "name": "Baromatch",
-      "url": "https://baromatch.fr/",
-      "slogan": "Ton match. Ton bar. Ce soir.",
-      "description": "Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. Sur iPhone et Android, bientôt sur les stores.",
-      "logo": "https://baromatch.fr/presse/baromatch-icone.png",
-      "email": "contact@baromatch.fr",
-      "sameAs": [
-        "https://x.com/baromatchapp"
-      ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "email": "contact@baromatch.fr",
-        "availableLanguage": "fr"
-      }
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://baromatch.fr/#site",
-      "name": "Baromatch",
-      "url": "https://baromatch.fr/",
-      "inLanguage": "fr-FR",
-      "publisher": {
-        "@id": "https://baromatch.fr/#organisation"
-      }
-    },
-    {
-      "@type": "MobileApplication",
-      "@id": "https://baromatch.fr/#appli",
-      "name": "Baromatch",
-      "description": "Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.",
-      "applicationCategory": "LifestyleApplication",
-      "inLanguage": "fr",
-      "publisher": {
-        "@id": "https://baromatch.fr/#organisation"
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://baromatch.fr/#questions",
-      "url": "https://baromatch.fr/",
-      "name": "Baromatch — Trouve un bar qui diffuse ton match, à Paris",
-      "inLanguage": "fr-FR",
-      "isPartOf": {
-        "@id": "https://baromatch.fr/#site"
-      },
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Je peux déjà garder une place ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Pas encore. L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play, d’abord à Paris. Laisse ton adresse : on te prévient le jour où elle y est."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "C’est gratuit ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Il faut un compte ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Pour regarder les matchs et les bars, non. Pour garder une place, oui : ton adresse e-mail suffit. Pas de mot de passe : on t’envoie un code de 6 chiffres, valable 10 minutes. Il faut avoir 18 ans ou plus."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Je peux venir avec des potes ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée : tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass ; pour les autres, ton pass compte à la porte."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Ma place est vraiment gardée ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch : dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Et si j’arrive en retard ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Ta place est gardée jusqu’à 30 minutes après le coup d’envoi au plus. Le bar peut choisir moins : 15 minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Comment j’annule ma place ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Dans l’appli, ouvre l’onglet « Ta soirée », touche « Je ne viens plus », puis « Libérer ». Tu peux le faire jusqu’au dernier moment : ta place repart à quelqu’un d’autre."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Dans quelles villes ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "À Paris, pour commencer : les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes."
-          }
-        }
-      ]
-    }
-  ]
+"@context": "https://schema.org",
+"@graph": [
+{
+"@type": "Organization",
+"@id": "https://baromatch.fr/#organisation",
+"name": "Baromatch",
+"url": "https://baromatch.fr/",
+"slogan": "Ton match. Ton bar. Ce soir.",
+"description": "Baromatch est une appli gratuite pour les fans de foot : choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir. Sur iPhone et Android, bientôt sur les stores.",
+"logo": "https://baromatch.fr/presse/baromatch-icone.png",
+"email": "contact@baromatch.fr",
+"sameAs": [
+"https://x.com/baromatchapp"
+],
+"contactPoint": {
+"@type": "ContactPoint",
+"contactType": "customer support",
+"email": "contact@baromatch.fr",
+"availableLanguage": "fr"
+}
+},
+{
+"@type": "WebSite",
+"@id": "https://baromatch.fr/#site",
+"name": "Baromatch",
+"url": "https://baromatch.fr/",
+"inLanguage": "fr-FR",
+"publisher": {
+"@id": "https://baromatch.fr/#organisation"
+}
+},
+{
+"@type": "MobileApplication",
+"@id": "https://baromatch.fr/#appli",
+"name": "Baromatch",
+"description": "Les bars qui diffusent ton match, une place qui t’attend, et la soirée gardée en souvenir.",
+"applicationCategory": "LifestyleApplication",
+"inLanguage": "fr",
+"publisher": {
+"@id": "https://baromatch.fr/#organisation"
+}
+},
+{
+"@type": "FAQPage",
+"@id": "https://baromatch.fr/#questions",
+"url": "https://baromatch.fr/",
+"name": "Baromatch — Trouve un bar qui diffuse ton match, à Paris",
+"inLanguage": "fr-FR",
+"isPartOf": {
+"@id": "https://baromatch.fr/#site"
+},
+"mainEntity": [
+{
+"@type": "Question",
+"name": "Je peux déjà garder une place ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "Pas encore. L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play, d’abord à Paris. Laisse ton adresse : on te prévient le jour où elle y est."
+}
+},
+{
+"@type": "Question",
+"name": "C’est gratuit ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar."
+}
+},
+{
+"@type": "Question",
+"name": "Il faut un compte ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "Pour regarder les matchs et les bars, non. Pour garder une place, oui : ton adresse e-mail suffit. Pas de mot de passe : on t’envoie un code de 6 chiffres, valable 10 minutes. Il faut avoir 18 ans ou plus."
+}
+},
+{
+"@type": "Question",
+"name": "Je peux venir avec des potes ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée : tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass ; pour les autres, ton pass compte à la porte."
+}
+},
+{
+"@type": "Question",
+"name": "Ma place est vraiment gardée ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch : dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde."
+}
+},
+{
+"@type": "Question",
+"name": "Et si j’arrive en retard ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "Ta place est gardée jusqu’à 30 minutes après le coup d’envoi au plus. Le bar peut choisir moins : 15 minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan."
+}
+},
+{
+"@type": "Question",
+"name": "Comment j’annule ma place ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "Dans l’appli, ouvre l’onglet « Ta soirée », touche « Je ne viens plus », puis « Libérer ». Tu peux le faire jusqu’au dernier moment : ta place repart à quelqu’un d’autre."
+}
+},
+{
+"@type": "Question",
+"name": "Dans quelles villes ?",
+"acceptedAnswer": {
+"@type": "Answer",
+"text": "À Paris, pour commencer : les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes."
+}
+}
+]
+}
+]
 }</script>
 </head>
 <body>
@@ -180,57 +179,55 @@
 
 
 <main id="contenu">
-  <section class="geste page" aria-labelledby="titre">
-    <svg class="planche" width="0" height="0" aria-hidden="true" focusable="false"><defs><symbol id="d-alvene" viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="90.5" fill="none" stroke="#D2C5A8" stroke-width="5"/><g><circle cx="100" cy="100" r="87" fill="#0F8B7E"/><path d="M47.8 30.4A87 87 0 0 1 82.6 14.76L82.6 185.24A87 87 0 0 1 47.8 169.6Z" fill="#FF7F66" stroke="#E2D6B8" stroke-width="5"/><path d="M117.4 14.76A87 87 0 0 1 152.2 30.4L152.2 169.6A87 87 0 0 1 117.4 185.24Z" fill="#FF7F66" stroke="#E2D6B8" stroke-width="5"/></g><g><path d="M182.29 125A86 86 0 0 1 181.05 128.75L18.95 128.75A86 86 0 0 1 17.71 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M182.29 75A86 86 0 0 1 182.29 125L17.71 125A86 86 0 0 1 17.71 75Z" fill="#E2D6B8"/></g><path d="M61.83 117L69.25 83L81.66 83L88.98 117L80.22 117L75.68 89.28L74.91 89.28L70.28 117ZM68.06 111.18L68.06 106.03L83.41 106.03L83.41 111.18ZM93.51 117L93.51 83L101.55 83L101.55 117ZM95.05 117L95.05 110.1L111.64 110.1L111.64 117ZM119.27 117L111.54 83L120.04 83L124.62 110.66L125.35 110.66L129.83 83L138.17 83L130.39 117Z" fill="#14151F"/></symbol><symbol id="d-orvele" viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="90.5" fill="none" stroke="#D2C5A8" stroke-width="5"/><g><circle cx="100" cy="100" r="87" fill="#3A3FA8"/><path d="M47.8 30.4A87 87 0 0 1 82.6 14.76L82.6 185.24A87 87 0 0 1 47.8 169.6Z" fill="#C6E45A"/><path d="M117.4 14.76A87 87 0 0 1 152.2 30.4L152.2 169.6A87 87 0 0 1 117.4 185.24Z" fill="#C6E45A"/></g><g><path d="M182.29 125A86 86 0 0 1 181.05 128.75L18.95 128.75A86 86 0 0 1 17.71 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M182.29 75A86 86 0 0 1 182.29 125L17.71 125A86 86 0 0 1 17.71 75Z" fill="#E2D6B8"/></g><path d="M69.99 117.72Q66.8 117.72 64.43 116.59Q62.11 115.51 60.51 113.29Q58.92 111.13 58.14 107.78Q57.37 104.48 57.37 100.05Q57.37 93.92 58.87 90.01Q60.36 86.09 63.19 84.18Q66.08 82.33 70.1 82.33Q73.19 82.33 75.61 83.36Q77.98 84.44 79.63 86.55Q81.27 88.72 82.1 92.07Q82.92 95.36 82.92 99.85Q82.92 104.38 82.1 107.73Q81.22 111.13 79.63 113.34Q77.98 115.56 75.56 116.64Q73.13 117.72 69.99 117.72ZM70.1 111.54Q71.59 111.54 72.62 110.25Q73.65 108.96 74.22 106.44Q74.73 103.97 74.73 100.36Q74.73 96.65 74.17 93.97Q73.6 91.35 72.52 89.95Q71.43 88.56 69.94 88.56Q68.55 88.56 67.57 89.85Q66.54 91.19 66.03 93.72Q65.51 96.24 65.51 99.95Q65.51 102.73 65.82 104.89Q66.13 107.06 66.7 108.55Q67.26 110.05 68.09 110.77Q68.96 111.54 70.1 111.54ZM88.95 117L88.95 83L100.39 83Q101.57 83 103.17 83.21Q104.77 83.41 106.41 83.98Q108.11 84.55 109.56 85.68Q110.95 86.81 111.82 88.67Q112.75 90.52 112.75 93.3Q112.75 94.95 112.34 96.29Q111.93 97.68 111.05 98.82Q110.12 99.95 108.68 100.72Q107.24 101.49 105.07 101.91L105.07 102.42Q107.6 102.78 108.89 103.92Q110.17 105.05 110.79 106.75Q111.46 108.4 111.93 110.46L113.52 117L105.02 117L103.99 111.33Q103.63 109.53 103.17 108.19Q102.65 106.85 101.78 106.08Q100.85 105.31 99.25 105.31L96.99 105.31L96.99 117ZM96.99 99.9L99.46 99.9Q102.09 99.9 103.32 98.56Q104.61 97.22 104.61 94.28Q104.61 91.71 103.43 90.52Q102.24 89.28 99.67 89.28L96.99 89.28ZM123.72 117L116 83L124.5 83L129.08 110.66L129.8 110.66L134.28 83L142.63 83L134.85 117Z" fill="#3A3FA8"/></symbol></defs></svg>
-    <h1 class="geste__titre" id="titre"><span>Ton match.</span> <span>Ton bar.</span> <span>Ce soir.</span></h1>
-    <p class="geste__texte">Une appli gratuite pour les fans&nbsp;: trouve un bar qui diffuse ton match et garde ta place. Bientôt sur les stores&nbsp;: rien à réserver ce soir.</p>
-    <div class="geste__scene">
-      <div class="geste__lumiere" aria-hidden="true"><i></i><i></i><i></i></div>
-      <figure class="g-tel" aria-labelledby="g-tel-legende">
-        <p class="etiquette-demo g-tel__demo">Démo</p>
-        <button class="g-tel__pause" type="button" data-etat="rejouer" aria-label="Rejouer la démo" hidden><svg data-icone="pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg><svg data-icone="jouer" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 2.2v11.6L13.5 8z"/></svg><svg data-icone="rejouer" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.8"/><path d="M2.6 1.8v3h3"/></svg></button>
-        <div class="g-tel__fenetre">
-          <div class="g-tel__cadre">
-            <div class="g-ecran">
-              <span class="g-ecran__ile" aria-hidden="true"></span>
-              <span class="g-ecran__halo g-ecran__halo--a" aria-hidden="true"></span>
-              <span class="g-ecran__halo g-ecran__halo--b" aria-hidden="true"></span>
-              <span class="g-ecran__halo g-ecran__halo--c" aria-hidden="true"></span>
-              <div class="g-bar" aria-hidden="true">
-                <p class="g-bar__lieu">Paris · bar inventé pour la démo</p>
-                <p class="g-bar__nom">Bar de démonstration</p>
-                <ul class="g-bar__puces"><li>Grand écran</li><li>Son du match</li><li>Les deux camps</li></ul>
-                <p class="g-bar__match"><span class="g-bar__club"><svg class="insigne g-disque g-disque--grand" aria-hidden="true" focusable="false"><use href="#d-alvene"/></svg>Alvène</span><span class="g-bar__heure">21:00</span><span class="g-bar__club"><svg class="insigne g-disque g-disque--grand" aria-hidden="true" focusable="false"><use href="#d-orvele"/></svg>Orvèle</span></p>
-              </div>
-              <div class="g-feuille">
-                <span class="g-feuille__poignee" aria-hidden="true"></span>
-                <div aria-hidden="true">
-                  <p class="g-feuille__bar">Bar de démonstration</p>
-                  <p class="g-feuille__titre"><span class="g-titre--repos">Garder ma place</span><span class="g-titre--ok">Place gardée.</span></p>
-                  <p class="g-feuille__match"><svg class="insigne g-disque" aria-hidden="true" focusable="false"><use href="#d-alvene"/></svg><svg class="insigne g-disque" aria-hidden="true" focusable="false"><use href="#d-orvele"/></svg>Alvène – Orvèle · <span class="g-chiffre">21:00</span></p>
-                  <p class="g-feuille__etiq">Tu arrives vers</p>
-                  <p class="g-heures"><span>20:00</span><span class="est-choisi">20:30</span><span>21:00</span></p>
-                </div>
-                <span class="g-lueur" aria-hidden="true"></span>
-                <button class="g-verre" type="button" aria-label="Démo : maintiens pour garder 2 places. Rien n’est réservé pour de vrai.">
-                  <span class="g-verre__liq" aria-hidden="true"><span class="g-verre__contre"><span class="g-verre__mot g-verre__mot--repos g-verre__mot--dedans">Maintiens · 2&nbsp;places jusqu’à&nbsp;21:30</span></span><span class="g-verre__vague"><svg viewBox="0 0 280 12" preserveAspectRatio="none"><path d="M0 6 Q17.5 0 35 6 T70 6 T105 6 T140 6 T175 6 T210 6 T245 6 T280 6 V12 H0Z" fill="currentColor"/></svg></span></span>
-                  <span class="g-verre__mot g-verre__mot--repos" aria-hidden="true">Maintiens · 2&nbsp;places jusqu’à&nbsp;21:30</span>
-                  <span class="g-verre__mot g-verre__mot--ok" aria-hidden="true">Place gardée.</span>
-                </button>
-                <p class="g-feuille__note" aria-hidden="true">Si le bar dit oui, gardée jusqu’à 21:30.</p>
-                <span class="g-pouce" aria-hidden="true"><svg viewBox="0 0 76 76"><circle class="g-pouce__fond" cx="38" cy="38" r="35"/><circle class="g-pouce__anneau" cx="38" cy="38" r="35"/></svg><span class="g-pouce__doigt"></span><span class="g-pouce__onde"></span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <figcaption class="g-tel__legende" id="g-tel-legende"><span class="visuellement-cache">Démo de l’appli&nbsp;: au Bar de démonstration, pour Alvène – Orvèle, on maintient le bouton, le verre se remplit d’ambre, et l’écran dit «&nbsp;Place gardée.&nbsp;». </span>Bar et clubs inventés. Rien n’est réservé. <span class="g-tel__aide">Maintiens le verre, au doigt, à la souris ou avec la barre d’espace.</span></figcaption>
-      </figure>
-    </div>
-  </section>
+<section class="geste page" aria-labelledby="titre">
+<svg class="planche" width="0" height="0" aria-hidden="true" focusable="false"><defs><symbol id="d-alvene" viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="90.5" fill="none" stroke="#D2C5A8" stroke-width="5"/><g><circle cx="100" cy="100" r="87" fill="#0F8B7E"/><path d="M47.8 30.4A87 87 0 0 1 82.6 14.76L82.6 185.24A87 87 0 0 1 47.8 169.6Z" fill="#FF7F66" stroke="#E2D6B8" stroke-width="5"/><path d="M117.4 14.76A87 87 0 0 1 152.2 30.4L152.2 169.6A87 87 0 0 1 117.4 185.24Z" fill="#FF7F66" stroke="#E2D6B8" stroke-width="5"/></g><g><path d="M182.29 125A86 86 0 0 1 181.05 128.75L18.95 128.75A86 86 0 0 1 17.71 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M182.29 75A86 86 0 0 1 182.29 125L17.71 125A86 86 0 0 1 17.71 75Z" fill="#E2D6B8"/></g><path d="M61.83 117L69.25 83L81.66 83L88.98 117L80.22 117L75.68 89.28L74.91 89.28L70.28 117ZM68.06 111.18L68.06 106.03L83.41 106.03L83.41 111.18ZM93.51 117L93.51 83L101.55 83L101.55 117ZM95.05 117L95.05 110.1L111.64 110.1L111.64 117ZM119.27 117L111.54 83L120.04 83L124.62 110.66L125.35 110.66L129.83 83L138.17 83L130.39 117Z" fill="#14151F"/></symbol><symbol id="d-orvele" viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" fill="#E9DFC8"/><circle cx="100" cy="100" r="90.5" fill="none" stroke="#D2C5A8" stroke-width="5"/><g><circle cx="100" cy="100" r="87" fill="#3A3FA8"/><path d="M47.8 30.4A87 87 0 0 1 82.6 14.76L82.6 185.24A87 87 0 0 1 47.8 169.6Z" fill="#C6E45A"/><path d="M117.4 14.76A87 87 0 0 1 152.2 30.4L152.2 169.6A87 87 0 0 1 117.4 185.24Z" fill="#C6E45A"/></g><g><path d="M182.29 125A86 86 0 0 1 181.05 128.75L18.95 128.75A86 86 0 0 1 17.71 125Z" fill="#14151F" fill-opacity="0.28"/><path d="M182.29 75A86 86 0 0 1 182.29 125L17.71 125A86 86 0 0 1 17.71 75Z" fill="#E2D6B8"/></g><path d="M69.99 117.72Q66.8 117.72 64.43 116.59Q62.11 115.51 60.51 113.29Q58.92 111.13 58.14 107.78Q57.37 104.48 57.37 100.05Q57.37 93.92 58.87 90.01Q60.36 86.09 63.19 84.18Q66.08 82.33 70.1 82.33Q73.19 82.33 75.61 83.36Q77.98 84.44 79.63 86.55Q81.27 88.72 82.1 92.07Q82.92 95.36 82.92 99.85Q82.92 104.38 82.1 107.73Q81.22 111.13 79.63 113.34Q77.98 115.56 75.56 116.64Q73.13 117.72 69.99 117.72ZM70.1 111.54Q71.59 111.54 72.62 110.25Q73.65 108.96 74.22 106.44Q74.73 103.97 74.73 100.36Q74.73 96.65 74.17 93.97Q73.6 91.35 72.52 89.95Q71.43 88.56 69.94 88.56Q68.55 88.56 67.57 89.85Q66.54 91.19 66.03 93.72Q65.51 96.24 65.51 99.95Q65.51 102.73 65.82 104.89Q66.13 107.06 66.7 108.55Q67.26 110.05 68.09 110.77Q68.96 111.54 70.1 111.54ZM88.95 117L88.95 83L100.39 83Q101.57 83 103.17 83.21Q104.77 83.41 106.41 83.98Q108.11 84.55 109.56 85.68Q110.95 86.81 111.82 88.67Q112.75 90.52 112.75 93.3Q112.75 94.95 112.34 96.29Q111.93 97.68 111.05 98.82Q110.12 99.95 108.68 100.72Q107.24 101.49 105.07 101.91L105.07 102.42Q107.6 102.78 108.89 103.92Q110.17 105.05 110.79 106.75Q111.46 108.4 111.93 110.46L113.52 117L105.02 117L103.99 111.33Q103.63 109.53 103.17 108.19Q102.65 106.85 101.78 106.08Q100.85 105.31 99.25 105.31L96.99 105.31L96.99 117ZM96.99 99.9L99.46 99.9Q102.09 99.9 103.32 98.56Q104.61 97.22 104.61 94.28Q104.61 91.71 103.43 90.52Q102.24 89.28 99.67 89.28L96.99 89.28ZM123.72 117L116 83L124.5 83L129.08 110.66L129.8 110.66L134.28 83L142.63 83L134.85 117Z" fill="#3A3FA8"/></symbol></defs></svg>
+<h1 class="geste__titre" id="titre"><span>Ton match.</span> <span>Ton bar.</span> <span>Ce soir.</span></h1>
+<p class="geste__texte">Une appli gratuite pour les fans&nbsp;: trouve un bar qui diffuse ton match et garde ta place. Bientôt sur les stores&nbsp;: rien à réserver ce soir.</p>
+<div class="geste__scene">
+<div class="geste__lumiere" aria-hidden="true"><i></i><i></i><i></i></div>
+<figure class="g-tel" aria-labelledby="g-tel-legende">
+<p class="etiquette-demo g-tel__demo">Démo</p>
+<button class="g-tel__pause" type="button" data-etat="rejouer" aria-label="Rejouer la démo" hidden><svg data-icone="pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg><svg data-icone="jouer" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 2.2v11.6L13.5 8z"/></svg><svg data-icone="rejouer" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.8"/><path d="M2.6 1.8v3h3"/></svg></button>
+<div class="g-tel__fenetre">
+<div class="g-tel__cadre">
+<div class="g-ecran">
+<span class="g-ecran__ile" aria-hidden="true"></span>
+<span class="g-ecran__halo g-ecran__halo--a" aria-hidden="true"></span>
+<span class="g-ecran__halo g-ecran__halo--b" aria-hidden="true"></span>
+<span class="g-ecran__halo g-ecran__halo--c" aria-hidden="true"></span>
+<div class="g-bar" aria-hidden="true">
+<p class="g-bar__lieu">Paris · bar inventé pour la démo</p>
+<p class="g-bar__nom">Bar de démonstration</p>
+<ul class="g-bar__puces"><li>Grand écran</li><li>Son du match</li><li>Les deux camps</li></ul>
+<p class="g-bar__match"><span class="g-bar__club"><svg class="insigne g-disque g-disque--grand" aria-hidden="true" focusable="false"><use href="#d-alvene"/></svg>Alvène</span><span class="g-bar__heure">21:00</span><span class="g-bar__club"><svg class="insigne g-disque g-disque--grand" aria-hidden="true" focusable="false"><use href="#d-orvele"/></svg>Orvèle</span></p>
+</div>
+<div class="g-feuille">
+<span class="g-feuille__poignee" aria-hidden="true"></span>
+<div aria-hidden="true">
+<p class="g-feuille__bar">Bar de démonstration</p>
+<p class="g-feuille__titre"><span class="g-titre--repos">Garder ma place</span><span class="g-titre--ok">Place gardée.</span></p>
+<p class="g-feuille__match"><svg class="insigne g-disque" aria-hidden="true" focusable="false"><use href="#d-alvene"/></svg><svg class="insigne g-disque" aria-hidden="true" focusable="false"><use href="#d-orvele"/></svg>Alvène – Orvèle · <span class="g-chiffre">21:00</span></p>
+<p class="g-feuille__etiq">Tu arrives vers</p>
+<p class="g-heures"><span>20:00</span><span class="est-choisi">20:30</span><span>21:00</span></p>
+</div>
+<span class="g-lueur" aria-hidden="true"></span>
+<button class="g-verre" type="button" aria-label="Démo : maintiens pour garder 2 places. Rien n’est réservé pour de vrai.">
+<span class="g-verre__liq" aria-hidden="true"><span class="g-verre__contre"><span class="g-verre__mot g-verre__mot--repos g-verre__mot--dedans">Maintiens · 2&nbsp;places jusqu’à&nbsp;21:30</span></span><span class="g-verre__vague"><svg viewBox="0 0 280 12" preserveAspectRatio="none"><path d="M0 6 Q17.5 0 35 6 T70 6 T105 6 T140 6 T175 6 T210 6 T245 6 T280 6 V12 H0Z" fill="currentColor"/></svg></span></span>
+<span class="g-verre__mot g-verre__mot--repos" aria-hidden="true">Maintiens · 2&nbsp;places jusqu’à&nbsp;21:30</span>
+<span class="g-verre__mot g-verre__mot--ok" aria-hidden="true">Place gardée.</span>
+</button>
+<p class="g-feuille__note" aria-hidden="true">Si le bar dit oui, gardée jusqu’à 21:30.</p>
+<span class="g-pouce" aria-hidden="true"><svg viewBox="0 0 76 76"><circle class="g-pouce__fond" cx="38" cy="38" r="35"/><circle class="g-pouce__anneau" cx="38" cy="38" r="35"/></svg><span class="g-pouce__doigt"></span><span class="g-pouce__onde"></span></span>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="g-tel__legende" id="g-tel-legende"><span class="visuellement-cache">Démo de l’appli&nbsp;: au Bar de démonstration, pour Alvène – Orvèle, on maintient le bouton, il se remplit d’ambre, et l’écran dit «&nbsp;Place gardée.&nbsp;». </span>Bar et clubs inventés. Rien n’est réservé. <span class="g-tel__aide">Maintiens le bouton&nbsp;: doigt, souris ou barre d’espace.</span><span class="g-tel__fixe">Image fixe&nbsp;: le bouton est tenu, l’écran dit «&nbsp;Place gardée.&nbsp;».</span></figcaption>
+</figure>
+</div>
+</section>
 
-  <!-- Le prochain match : le générateur (generateur/accueil.mjs) réécrit tout ce qui est entre les deux repères,
-       toutes les 3 heures et juste après minuit, des mêmes données que les pages des matchs. Ne rien écrire à la main
-       entre eux : ce serait effacé au passage suivant. -->
+<!-- Le prochain match : le générateur (generateur/accueil.mjs) réécrit tout ce qui est entre les deux repères, toutes les 3 heures. Rien à la main entre eux. -->
 <!-- semaine:debut -->
 <section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
 <h2 class="prochain__etiquette" id="soir-titre">Le prochain match</h2>
@@ -238,149 +235,149 @@
 </section>
 <!-- semaine:fin -->
 
-  <section class="appli nuit page" id="appli" aria-labelledby="titre-appli">
-    <div class="appli__texte">
-      <h2 class="etape etape--nuit" id="titre-appli">L’appli</h2>
-      <p class="appli__titre">Ta soirée se colle dans ton album.</p>
-      <p class="appli__chapo">Le soir venu, le bar scanne ton pass, et la soirée devient un sous-bock, gardé dans ton album. L’appli arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</p>
-      <form class="attente" id="attente" action="https://formspree.io/f/mqpeedoj" method="POST" data-attente novalidate>
-        <fieldset class="attente__villes" aria-describedby="attente-usage">
-          <legend>Ta ville</legend>
-          <div class="attente__options">
-            <label class="attente__ville" for="attente-ville-0"><input id="attente-ville-0" type="radio" name="ville" value="Paris" checked><span>Paris</span></label>
-            <label class="attente__ville" for="attente-ville-1"><input id="attente-ville-1" type="radio" name="ville" value="Lyon"><span>Lyon</span></label>
-            <label class="attente__ville" for="attente-ville-2"><input id="attente-ville-2" type="radio" name="ville" value="Marseille"><span>Marseille</span></label>
-            <label class="attente__ville" for="attente-ville-3"><input id="attente-ville-3" type="radio" name="ville" value="Lille"><span>Lille</span></label>
-            <label class="attente__ville" for="attente-ville-4"><input id="attente-ville-4" type="radio" name="ville" value="Autre"><span>Autre</span></label>
-          </div>
-        </fieldset>
-        <p class="attente__date" data-ville="Lyon">Pas de date pour Lyon. On t’écrit seulement si Baromatch y arrive.</p>
-        <p class="attente__date" data-ville="Marseille">Pas de date pour Marseille. On t’écrit seulement si Baromatch y arrive.</p>
-        <p class="attente__date" data-ville="Lille">Pas de date pour Lille. On t’écrit seulement si Baromatch y arrive.</p>
-        <p class="attente__date" data-ville="Autre">Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.</p>
-        <label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
-        <div class="attente__ligne">
-          <input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
-          <button class="attente__bouton" type="submit">Me prévenir</button>
-        </div>
-        <div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
-        <input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
-        <p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
-        <button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
-        <p class="attente__plateformes">L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</p>
-        <p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
-      </form>
-      <p class="partage-site"><a class="lien" href="https://wa.me/?text=Baromatch%20%3A%20ton%20match%2C%20ton%20bar%2C%20ce%20soir.%20https%3A%2F%2Fbaromatch.fr%2F" rel="noopener" data-partage-site>Envoie-le à ta bande</a></p>
-      <figure class="album" id="album">
-        <p class="etiquette-demo etiquette-demo--album">Démo</p>
-        <svg class="album__svg" viewBox="0 0 300 200" role="img" aria-labelledby="album-legende" focusable="false">
-          <g class="album__trous" fill="none" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="4 5"><circle cx="50" cy="52" r="38"/><circle cx="150" cy="52" r="38"/><circle cx="250" cy="52" r="38"/><circle cx="50" cy="148" r="38"/><circle cx="150" cy="148" r="38"/><circle cx="250" cy="148" r="38"/></g>
-          <g class="album__colles"><g transform="translate(50 52)"><clipPath id="al-1"><circle r="36"/></clipPath><g clip-path="url(#al-1)"><rect x="-36" y="-36" width="72" height="72" fill="#3A3FA8"/><rect x="-30" y="-36" width="11" height="72" fill="#C6E45A"/><rect x="-8" y="-36" width="11" height="72" fill="#C6E45A"/><rect x="14" y="-36" width="11" height="72" fill="#C6E45A"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(150 52)"><clipPath id="al-2"><circle r="36"/></clipPath><g clip-path="url(#al-2)"><rect x="-36" y="-36" width="72" height="72" fill="#C2552B"/><rect x="-36" y="-9" width="72" height="18" fill="#F4E3C1"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(250 52)"><clipPath id="al-3"><circle r="36"/></clipPath><g clip-path="url(#al-3)"><rect x="-36" y="-36" width="72" height="72" fill="#6B2F8A"/><rect x="0" y="-36" width="36" height="72" fill="#F2C94C"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(50 148)"><clipPath id="al-4"><circle r="36"/></clipPath><g clip-path="url(#al-4)"><rect x="-36" y="-36" width="72" height="72" fill="#1D5F8A"/><rect x="-36" y="-36" width="16" height="72" fill="#FFFFFF"/><rect x="20" y="-36" width="16" height="72" fill="#FFFFFF"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(150 148)"><clipPath id="al-5"><circle r="36"/></clipPath><g clip-path="url(#al-5)"><rect x="-36" y="-36" width="72" height="72" fill="#2E7D4F"/><rect x="-36" y="-30" width="72" height="11" fill="#E8E3D3"/><rect x="-36" y="-8" width="72" height="11" fill="#E8E3D3"/><rect x="-36" y="14" width="72" height="11" fill="#E8E3D3"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g></g>
-          <g class="album__place" transform="translate(250 148)"><g class="album__neuf"><g class="album__dos"><circle r="36" fill="#15171F"/><circle r="35.5" fill="none" stroke="#FFFFFF" stroke-opacity=".5"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="2"/></g><g class="album__face"><g transform="translate(0 0)"><clipPath id="al-6"><circle r="36"/></clipPath><g clip-path="url(#al-6)"><rect x="-36" y="-36" width="72" height="72" fill="#0F8B7E"/><rect x="-36" y="-30" width="72" height="11" fill="#FF7F66"/><rect x="-36" y="-8" width="72" height="11" fill="#FF7F66"/><rect x="-36" y="14" width="72" height="11" fill="#FF7F66"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><circle r="39" fill="none" stroke="#FFB13D" stroke-width="3.5"/></g></g></g>
-        </svg>
-        <figcaption id="album-legende">Le sous-bock n°08 se colle dans l’album, parmi les autres. Sous-bocks et clubs inventés.</figcaption>
-      </figure>
-    </div>
-    <!-- Le film n’a pas de son : sa version en mots, « Ce que montre le film », dit ce qu’il montre à l’écran, lu sur
-         ses images, et rien d’autre (WCAG 1.2.1). Chaque lecteur cite la note qui le dit. -->
-    <figure class="film">
-      <div class="film__cadre" id="film-cadre">
-        <video class="film__video" id="film" width="540" height="960" playsinline muted loop preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video>
-        <noscript><video class="film__video" width="540" height="960" controls playsinline preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video></noscript>
-        <button class="film__bouton" id="film-lecture" type="button" hidden aria-label="Mettre le film en pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
-      </div>
-      <figcaption class="film__legende">
-        <p class="film__note" id="film-note">Un film sans le son, raconté en mots juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
-        <details class="film__texte" id="film-texte">
-          <summary>Ce que montre le film</summary>
-          <ol>
-            <li>Un quartier, la nuit, vu d’en haut&nbsp;: des bars s’allument, chacun avec son verre. «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;» Il est 18:42.</li>
-            <li>«&nbsp;Écrans de démonstration&nbsp;». «&nbsp;La Lucarne Lunaire.&nbsp;» L’écran pour garder sa place&nbsp;: «&nbsp;Tu arrives vers&nbsp;» 20:00, 20:30 ou 21:00, et 20:30 est choisi. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» «&nbsp;Au comptoir, tu es @Zephyr&nbsp;». Le bouton «&nbsp;Maintiens pour réserver&nbsp;», et dessous&nbsp;: «&nbsp;Tiens appuyé, le verre se remplit. Lâche avant la fin, rien n’est réservé.&nbsp;» Plus bas, «&nbsp;Réserver sans maintenir&nbsp;».</li>
-            <li>«&nbsp;Maintiens.&nbsp;» Le bouton est tenu appuyé et se remplit d’ambre. «&nbsp;Le verre se remplit.&nbsp;»</li>
-            <li>L’ambre remplit l’écran&nbsp;: «&nbsp;Place gardée.&nbsp;»</li>
-            <li>L’écran «&nbsp;Ta soirée&nbsp;»&nbsp;: «&nbsp;Ce soir · coup d’envoi 21:00&nbsp;», «&nbsp;Place gardée&nbsp;». Alvène – Orvèle, 21:00, au bar La Lucarne Lunaire, pour 1 personne, ton camp&nbsp;: juste le match. Le QR code du pass, et «&nbsp;Ou donne ce code&nbsp;».</li>
-            <li>20:37. «&nbsp;Scanne le QR du bar&nbsp;», La Lucarne Lunaire · Alvène – Orvèle. Sur l’écran du bar&nbsp;: «&nbsp;Tu y es. Scanne-moi.&nbsp;» «&nbsp;Ouvre Baromatch, scanne ce code&nbsp;: ta place est validée et ton sous-bock se colle dans ton album.&nbsp;» Dessous, «&nbsp;ou entre son code&nbsp;».</li>
-            <li>«&nbsp;Tu y es&nbsp;»&nbsp;: «&nbsp;Arrivée validée à 20:37 à La Lucarne Lunaire. Coup d’envoi dans 23 minutes.&nbsp;» «&nbsp;arrivée · deux vibrations&nbsp;», puis «&nbsp;Sous-bock n°08 collé&nbsp;».</li>
-            <li>20:38. «&nbsp;Ta soirée se colle dans ton album.&nbsp;» Le sous-bock n°08, Alvène – Orvèle, à La Lucarne Lunaire, se pose parmi les autres&nbsp;: Alvène – Orvèle, Port-Ambrail – Brisecôte, Hautvergne – Mirebelle, Sablerive – Kerbrume, Lucival – Valbrume. L’album passe de 7 à 8 sous-bocks, et de 4 à 5 bars.</li>
-            <li>21:00. Le sous-bock rejoint le verre de Baromatch, qui se remplit. Puis Baromatch&nbsp;: «&nbsp;Ton match. Ton bar. Ce soir.&nbsp;» «&nbsp;baromatch.fr&nbsp;» «&nbsp;Bientôt sur Android, à Paris&nbsp;»</li>
-          </ol>
-        </details>
-      </figcaption>
-    </figure>
-  </section>
+<section class="appli nuit page" id="appli" aria-labelledby="titre-appli">
+<div class="appli__texte">
+<h2 class="etape etape--nuit" id="titre-appli">L’appli</h2>
+<p class="appli__titre">Ta soirée se colle dans ton album.</p>
+<p class="appli__chapo">Le soir venu, le bar scanne ton pass, et la soirée devient un sous-bock, gardé dans ton album. L’appli arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</p>
+<form class="attente" id="attente" action="https://formspree.io/f/mqpeedoj" method="POST" data-attente novalidate>
+<fieldset class="attente__villes" aria-describedby="attente-usage">
+<legend>Ta ville</legend>
+<div class="attente__options">
+<label class="attente__ville" for="attente-ville-0"><input id="attente-ville-0" type="radio" name="ville" value="Paris" checked><span>Paris</span></label>
+<label class="attente__ville" for="attente-ville-1"><input id="attente-ville-1" type="radio" name="ville" value="Lyon"><span>Lyon</span></label>
+<label class="attente__ville" for="attente-ville-2"><input id="attente-ville-2" type="radio" name="ville" value="Marseille"><span>Marseille</span></label>
+<label class="attente__ville" for="attente-ville-3"><input id="attente-ville-3" type="radio" name="ville" value="Lille"><span>Lille</span></label>
+<label class="attente__ville" for="attente-ville-4"><input id="attente-ville-4" type="radio" name="ville" value="Autre"><span>Autre</span></label>
+</div>
+</fieldset>
+<p class="attente__date" data-ville="Lyon">Pas de date pour Lyon. On t’écrit seulement si Baromatch y arrive.</p>
+<p class="attente__date" data-ville="Marseille">Pas de date pour Marseille. On t’écrit seulement si Baromatch y arrive.</p>
+<p class="attente__date" data-ville="Lille">Pas de date pour Lille. On t’écrit seulement si Baromatch y arrive.</p>
+<p class="attente__date" data-ville="Autre">Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.</p>
+<label class="attente__etiquette" for="attente-mail">Préviens-moi quand Baromatch arrive</label>
+<div class="attente__ligne">
+<input class="attente__champ" id="attente-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="attente-retour">
+<button class="attente__bouton" type="submit">Me prévenir</button>
+</div>
+<div class="attente__piege" aria-hidden="true"><label for="attente-piege">Laisse ce champ vide</label><input id="attente-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+<input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
+<p class="attente__retour" id="attente-retour" role="status" aria-live="polite"></p>
+<button class="attente__corriger" id="attente-corriger" type="button" hidden>Corriger l’adresse</button>
+<p class="attente__plateformes">L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</p>
+<p class="attente__note" id="attente-usage">On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests. <a href="/confidentialite.html#liste-attente">Ce qu’on garde, et combien de temps</a>.</p>
+</form>
+<p class="partage-site"><a class="lien" href="https://wa.me/?text=Baromatch%20%3A%20ton%20match%2C%20ton%20bar%2C%20ce%20soir.%20https%3A%2F%2Fbaromatch.fr%2F" rel="noopener" data-partage-site>Envoie-le à ta bande</a></p>
+<figure class="album" id="album">
+<p class="etiquette-demo etiquette-demo--album">Démo</p>
+<svg class="album__svg" viewBox="0 0 300 200" role="img" aria-labelledby="album-legende" focusable="false">
+<g class="album__trous" fill="none" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="4 5"><circle cx="50" cy="52" r="38"/><circle cx="150" cy="52" r="38"/><circle cx="250" cy="52" r="38"/><circle cx="50" cy="148" r="38"/><circle cx="150" cy="148" r="38"/><circle cx="250" cy="148" r="38"/></g>
+<g class="album__colles"><g transform="translate(50 52)"><clipPath id="al-1"><circle r="36"/></clipPath><g clip-path="url(#al-1)"><rect x="-36" y="-36" width="72" height="72" fill="#3A3FA8"/><rect x="-30" y="-36" width="11" height="72" fill="#C6E45A"/><rect x="-8" y="-36" width="11" height="72" fill="#C6E45A"/><rect x="14" y="-36" width="11" height="72" fill="#C6E45A"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(150 52)"><clipPath id="al-2"><circle r="36"/></clipPath><g clip-path="url(#al-2)"><rect x="-36" y="-36" width="72" height="72" fill="#C2552B"/><rect x="-36" y="-9" width="72" height="18" fill="#F4E3C1"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(250 52)"><clipPath id="al-3"><circle r="36"/></clipPath><g clip-path="url(#al-3)"><rect x="-36" y="-36" width="72" height="72" fill="#6B2F8A"/><rect x="0" y="-36" width="36" height="72" fill="#F2C94C"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(50 148)"><clipPath id="al-4"><circle r="36"/></clipPath><g clip-path="url(#al-4)"><rect x="-36" y="-36" width="72" height="72" fill="#1D5F8A"/><rect x="-36" y="-36" width="16" height="72" fill="#FFFFFF"/><rect x="20" y="-36" width="16" height="72" fill="#FFFFFF"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><g transform="translate(150 148)"><clipPath id="al-5"><circle r="36"/></clipPath><g clip-path="url(#al-5)"><rect x="-36" y="-36" width="72" height="72" fill="#2E7D4F"/><rect x="-36" y="-30" width="72" height="11" fill="#E8E3D3"/><rect x="-36" y="-8" width="72" height="11" fill="#E8E3D3"/><rect x="-36" y="14" width="72" height="11" fill="#E8E3D3"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g></g>
+<g class="album__place" transform="translate(250 148)"><g class="album__neuf"><g class="album__dos"><circle r="36" fill="#15171F"/><circle r="35.5" fill="none" stroke="#FFFFFF" stroke-opacity=".5"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="2"/></g><g class="album__face"><g transform="translate(0 0)"><clipPath id="al-6"><circle r="36"/></clipPath><g clip-path="url(#al-6)"><rect x="-36" y="-36" width="72" height="72" fill="#0F8B7E"/><rect x="-36" y="-30" width="72" height="11" fill="#FF7F66"/><rect x="-36" y="-8" width="72" height="11" fill="#FF7F66"/><rect x="-36" y="14" width="72" height="11" fill="#FF7F66"/></g><circle r="35.5" fill="none" stroke="#0A0B10" stroke-opacity=".35"/><circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/></g><circle r="39" fill="none" stroke="#FFB13D" stroke-width="3.5"/></g></g></g>
+</svg>
+<figcaption id="album-legende">Le sous-bock n°08 se colle dans l’album, parmi les autres. Sous-bocks et clubs inventés.</figcaption>
+</figure>
+</div>
+<!-- Le film n’a pas de son : sa version en mots, « Ce que montre le film », dit ce qu’il montre à l’écran, lu sur
+ses images, et rien d’autre (WCAG 1.2.1). Chaque lecteur cite la note qui le dit. -->
+<figure class="film">
+<div class="film__cadre" id="film-cadre">
+<video class="film__video" id="film" width="540" height="960" playsinline muted loop preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video>
+<noscript><video class="film__video" width="540" height="960" controls playsinline preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video></noscript>
+<button class="film__bouton" id="film-lecture" type="button" hidden aria-label="Mettre le film en pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+</div>
+<figcaption class="film__legende">
+<p class="film__note" id="film-note">Un film sans le son, raconté en mots juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
+<details class="film__texte" id="film-texte">
+<summary>Ce que montre le film</summary>
+<ol>
+<li>Un quartier, la nuit, vu d’en haut&nbsp;: des bars s’allument, chacun avec son verre. «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;» Il est 18:42.</li>
+<li>«&nbsp;Écrans de démonstration&nbsp;». «&nbsp;La Lucarne Lunaire.&nbsp;» L’écran pour garder sa place&nbsp;: «&nbsp;Tu arrives vers&nbsp;» 20:00, 20:30 ou 21:00, et 20:30 est choisi. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» «&nbsp;Au comptoir, tu es @Zephyr&nbsp;». Le bouton «&nbsp;Maintiens pour réserver&nbsp;», et dessous&nbsp;: «&nbsp;Tiens appuyé, le verre se remplit. Lâche avant la fin, rien n’est réservé.&nbsp;» Plus bas, «&nbsp;Réserver sans maintenir&nbsp;».</li>
+<li>«&nbsp;Maintiens.&nbsp;» Le bouton est tenu appuyé et se remplit d’ambre. «&nbsp;Le verre se remplit.&nbsp;»</li>
+<li>L’ambre remplit l’écran&nbsp;: «&nbsp;Place gardée.&nbsp;»</li>
+<li>L’écran «&nbsp;Ta soirée&nbsp;»&nbsp;: «&nbsp;Ce soir · coup d’envoi 21:00&nbsp;», «&nbsp;Place gardée&nbsp;». Alvène – Orvèle, 21:00, au bar La Lucarne Lunaire, pour 1 personne, ton camp&nbsp;: juste le match. Le QR code du pass, et «&nbsp;Ou donne ce code&nbsp;».</li>
+<li>20:37. «&nbsp;Scanne le QR du bar&nbsp;», La Lucarne Lunaire · Alvène – Orvèle. Sur l’écran du bar&nbsp;: «&nbsp;Tu y es. Scanne-moi.&nbsp;» «&nbsp;Ouvre Baromatch, scanne ce code&nbsp;: ta place est validée et ton sous-bock se colle dans ton album.&nbsp;» Dessous, «&nbsp;ou entre son code&nbsp;».</li>
+<li>«&nbsp;Tu y es&nbsp;»&nbsp;: «&nbsp;Arrivée validée à 20:37 à La Lucarne Lunaire. Coup d’envoi dans 23 minutes.&nbsp;» «&nbsp;arrivée · deux vibrations&nbsp;», puis «&nbsp;Sous-bock n°08 collé&nbsp;».</li>
+<li>20:38. «&nbsp;Ta soirée se colle dans ton album.&nbsp;» Le sous-bock n°08, Alvène – Orvèle, à La Lucarne Lunaire, se pose parmi les autres&nbsp;: Alvène – Orvèle, Port-Ambrail – Brisecôte, Hautvergne – Mirebelle, Sablerive – Kerbrume, Lucival – Valbrume. L’album passe de 7 à 8 sous-bocks, et de 4 à 5 bars.</li>
+<li>21:00. Le sous-bock rejoint le verre de Baromatch, qui se remplit. Puis Baromatch&nbsp;: «&nbsp;Ton match. Ton bar. Ce soir.&nbsp;» «&nbsp;baromatch.fr&nbsp;» «&nbsp;Bientôt sur Android, à Paris&nbsp;»</li>
+</ol>
+</details>
+</figcaption>
+</figure>
+</section>
 
 
-  <section class="bars" id="bars" aria-labelledby="titre-bars">
-    <div class="bars__contenu page">
-      <div>
-        <h2 class="titre-section" id="titre-bars">Ton bar diffuse les matchs&nbsp;?</h2>
-        <p class="bars__texte">Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres. Gratuit pendant le lancement, sans engagement.</p>
-        <div class="bars__actions">
-          <a class="bouton-nuit" href="/pour-les-bars.html#proposer">Proposer mon bar</a>
-          <a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>
-        </div>
-      </div>
-      <svg class="bars__verre" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><clipPath id="mono-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#mono-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="#0A0B10"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="#0A0B10" stroke-width="24" stroke-linecap="round"/><circle cx="77" cy="116" r="7.5" fill="#FFB13D"/></svg>
-    </div>
-  </section>
+<section class="bars" id="bars" aria-labelledby="titre-bars">
+<div class="bars__contenu page">
+<div>
+<h2 class="titre-section" id="titre-bars">Ton bar diffuse les matchs&nbsp;?</h2>
+<p class="bars__texte">Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres. Gratuit pendant le lancement, sans engagement.</p>
+<div class="bars__actions">
+<a class="bouton-nuit" href="/pour-les-bars.html#proposer">Proposer mon bar</a>
+<a href="mailto:contact@baromatch.fr">contact@baromatch.fr</a>
+</div>
+</div>
+<svg class="bars__verre" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs><clipPath id="mono-bol"><circle cx="100" cy="100" r="67"/></clipPath></defs><g clip-path="url(#mono-bol)"><path d="M-200 108 q35 -6 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V215 H-200 Z" fill="#0A0B10"/></g><path d="M68.3 28.7 A78 78 0 1 0 131.7 28.7" fill="none" stroke="#0A0B10" stroke-width="24" stroke-linecap="round"/><circle cx="77" cy="116" r="7.5" fill="#FFB13D"/></svg>
+</div>
+</section>
 
-  <section class="en-bref page" aria-labelledby="titre-en-bref">
-    <h2 class="titre-section" id="titre-en-bref">Baromatch en bref</h2>
-    <dl class="faits">
-      <div><dt>Ce que c’est</dt><dd>Une appli gratuite pour les fans de foot&nbsp;: choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir.</dd></div>
-      <div><dt>Où</dt><dd>À Paris, pour commencer. Pas encore de date pour d’autres villes.</dd></div>
-      <div><dt>Quand</dt><dd>L’appli existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</dd></div>
-      <div><dt>Pour qui</dt><dd>Les fans de foot de 18&nbsp;ans et plus, et les bars qui diffusent les matchs.</dd></div>
-      <div><dt>Qui</dt><dd>Baromatch est édité par Skander Kamoun, son fondateur.</dd></div>
-      <div><dt>Contact</dt><dd><a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a></dd></div>
-      <div><dt>Presse</dt><dd><a href="/presse.html">Logos, film, images et contact</a></dd></div>
-    </dl>
-    <p class="en-bref__suite"><a href="/trouver-un-bar-qui-diffuse-le-match.html">Comment trouver un bar qui diffuse le match</a></p>
-  </section>
+<section class="en-bref page" aria-labelledby="titre-en-bref">
+<h2 class="titre-section" id="titre-en-bref">Baromatch en bref</h2>
+<dl class="faits">
+<div><dt>Ce que c’est</dt><dd>Une appli gratuite pour les fans de foot&nbsp;: choisir un match, trouver un bar qui le diffuse, garder sa place, puis garder la soirée en souvenir.</dd></div>
+<div><dt>Où</dt><dd>À Paris, pour commencer. Pas encore de date pour d’autres villes.</dd></div>
+<div><dt>Quand</dt><dd>L’appli existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.</dd></div>
+<div><dt>Pour qui</dt><dd>Les fans de foot de 18&nbsp;ans et plus, et les bars qui diffusent les matchs.</dd></div>
+<div><dt>Qui</dt><dd>Baromatch est édité par Skander Kamoun, son fondateur.</dd></div>
+<div><dt>Contact</dt><dd><a href="mailto:contact@baromatch.fr">contact@<wbr>baromatch.fr</a></dd></div>
+<div><dt>Presse</dt><dd><a href="/presse.html">Logos, film, images et contact</a></dd></div>
+</dl>
+<p class="en-bref__suite"><a href="/trouver-un-bar-qui-diffuse-le-match.html">Comment trouver un bar qui diffuse le match</a></p>
+</section>
 
-  <section class="testeurs-accueil vitrine-accueil page" aria-labelledby="titre-testeurs">
-    <p class="surtitre">Testeurs Android</p>
-    <h2 class="titre-section" id="titre-testeurs">Teste Baromatch avant son ouverture.</h2>
-    <p class="testeurs-accueil__texte">Tu as 18&nbsp;ans ou plus, un téléphone Android et un compte Google&nbsp;? Inscris-toi au test fermé de l’appli sur Google Play&nbsp;: tu restes inscrit au moins 14&nbsp;jours d’affilée, tu t’en sers, et tu nous dis ce que tu en penses. Rien n’est payé.</p>
-    <a class="vitrine-accueil__bouton vitrine-accueil__bouton--verre" href="/testeurs-android.html">Deviens testeur Android</a>
-  </section>
+<section class="testeurs-accueil vitrine-accueil page" aria-labelledby="titre-testeurs">
+<p class="surtitre">Testeurs Android</p>
+<h2 class="titre-section" id="titre-testeurs">Teste Baromatch avant son ouverture.</h2>
+<p class="testeurs-accueil__texte">Tu as 18&nbsp;ans ou plus, un téléphone Android et un compte Google&nbsp;? Inscris-toi au test fermé de l’appli sur Google Play&nbsp;: tu restes inscrit au moins 14&nbsp;jours d’affilée, tu t’en sers, et tu nous dis ce que tu en penses. Rien n’est payé.</p>
+<a class="vitrine-accueil__bouton vitrine-accueil__bouton--verre" href="/testeurs-android.html">Deviens testeur Android</a>
+</section>
 
-  <section class="questions-fans page" id="questions" aria-labelledby="titre-questions-fans">
-    <h2 class="titre-section" id="titre-questions-fans">Tes questions</h2>
-    <details>
-      <summary>Je peux déjà garder une place&nbsp;?</summary>
-      <p>Pas encore. L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play, d’abord à Paris. <a href="#attente">Laisse ton adresse</a>&nbsp;: on te prévient le jour où elle y est.</p>
-    </details>
-    <details>
-      <summary>C’est gratuit&nbsp;?</summary>
-      <p>Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar.</p>
-    </details>
-    <details>
-      <summary>Il faut un compte&nbsp;?</summary>
-      <p>Pour regarder les matchs et les bars, non. Pour garder une place, oui&nbsp;: ton adresse e-mail suffit. Pas de mot de passe&nbsp;: on t’envoie un code de 6&nbsp;chiffres, valable 10&nbsp;minutes. Il faut avoir 18&nbsp;ans ou plus.</p>
-    </details>
-    <details>
-      <summary>Je peux venir avec des potes&nbsp;?</summary>
-      <p>Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée&nbsp;: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass&nbsp;; pour les autres, ton pass compte à la porte.</p>
-    </details>
-    <details>
-      <summary>Ma place est vraiment gardée&nbsp;?</summary>
-      <p>Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch&nbsp;: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde.</p>
-    </details>
-    <details>
-      <summary>Et si j’arrive en retard&nbsp;?</summary>
-      <p>Ta place est gardée jusqu’à 30&nbsp;minutes après le coup d’envoi au plus. Le bar peut choisir moins&nbsp;: 15&nbsp;minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan.</p>
-    </details>
-    <details>
-      <summary>Comment j’annule ma place&nbsp;?</summary>
-      <p>Dans l’appli, ouvre l’onglet «&nbsp;Ta soirée&nbsp;», touche «&nbsp;Je ne viens plus&nbsp;», puis «&nbsp;Libérer&nbsp;». Tu peux le faire jusqu’au dernier moment&nbsp;: ta place repart à quelqu’un d’autre.</p>
-    </details>
-    <details>
-      <summary>Dans quelles villes&nbsp;?</summary>
-      <p>À Paris, pour commencer&nbsp;: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes.</p>
-    </details>
-    <p class="rappel-attente"><a class="capsule" href="#attente">L’appli arrive bientôt&nbsp;: préviens-moi</a></p>
-  </section>
+<section class="questions-fans page" id="questions" aria-labelledby="titre-questions-fans">
+<h2 class="titre-section" id="titre-questions-fans">Tes questions</h2>
+<details>
+<summary>Je peux déjà garder une place&nbsp;?</summary>
+<p>Pas encore. L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play, d’abord à Paris. <a href="#attente">Laisse ton adresse</a>&nbsp;: on te prévient le jour où elle y est.</p>
+</details>
+<details>
+<summary>C’est gratuit&nbsp;?</summary>
+<p>Oui. L’appli est gratuite, et garder ta place ne coûte rien. Ce que tu prends au bar, tu le paies au bar.</p>
+</details>
+<details>
+<summary>Il faut un compte&nbsp;?</summary>
+<p>Pour regarder les matchs et les bars, non. Pour garder une place, oui&nbsp;: ton adresse e-mail suffit. Pas de mot de passe&nbsp;: on t’envoie un code de 6&nbsp;chiffres, valable 10&nbsp;minutes. Il faut avoir 18&nbsp;ans ou plus.</p>
+</details>
+<details>
+<summary>Je peux venir avec des potes&nbsp;?</summary>
+<p>Oui. Tu dis combien vous êtes, de 1 à 8. À partir de 2, c’est une tablée&nbsp;: tu envoies un lien à ta bande. Ceux qui la rejoignent dans l’appli ont leur propre pass&nbsp;; pour les autres, ton pass compte à la porte.</p>
+</details>
+<details>
+<summary>Ma place est vraiment gardée&nbsp;?</summary>
+<p>Oui, jusqu’à l’heure écrite dans l’appli. Les places de l’appli sont celles que le bar met de côté pour Baromatch&nbsp;: dès que tu gardes la tienne, elle n’est plus proposée à personne d’autre. À l’entrée, les règles du bar s’appliquent, comme pour tout le monde.</p>
+</details>
+<details>
+<summary>Et si j’arrive en retard&nbsp;?</summary>
+<p>Ta place est gardée jusqu’à 30&nbsp;minutes après le coup d’envoi au plus. Le bar peut choisir moins&nbsp;: 15&nbsp;minutes après, ou le coup d’envoi lui-même. L’heure exacte est écrite dans l’appli. Passé cette heure, si ton arrivée n’est pas validée, ta place est libérée pour un autre fan.</p>
+</details>
+<details>
+<summary>Comment j’annule ma place&nbsp;?</summary>
+<p>Dans l’appli, ouvre l’onglet «&nbsp;Ta soirée&nbsp;», touche «&nbsp;Je ne viens plus&nbsp;», puis «&nbsp;Libérer&nbsp;». Tu peux le faire jusqu’au dernier moment&nbsp;: ta place repart à quelqu’un d’autre.</p>
+</details>
+<details>
+<summary>Dans quelles villes&nbsp;?</summary>
+<p>À Paris, pour commencer&nbsp;: les bars de l’appli sont à Paris. Pas encore de date pour d’autres villes.</p>
+</details>
+<p class="rappel-attente"><a class="capsule" href="#attente">L’appli arrive bientôt&nbsp;: préviens-moi</a></p>
+</section>
 
 </main>
 <!-- pied:debut -->

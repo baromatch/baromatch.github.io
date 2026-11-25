@@ -247,7 +247,7 @@ test.describe('l’accueil', () => {
     }
     // La carte et la bande reprennent ces dessins (<use>), et nomment les clubs en toutes lettres.
     for (const [, genre, cle] of [...bloc.matchAll(/<use href="#([dp])-([^"]+)"\/>/g)]) expect(symboles.map(([, g, c]) => `${g}${c}`)).toContain(`${genre}${cle}`);
-    expect(bloc).toMatch(/<h3 class="coup__titre"><a href="[^"]+" data-coup-page>[^<]+ <span class="coup__tiret">–<\/span> [^<]+<\/a><\/h3>/);
+    expect(bloc).toMatch(/<h3 class="coup__titre" data-mot="\d+"><a href="[^"]+" data-coup-page>[^<]+ <span class="coup__tiret">–<\/span> [^<]+<\/a><\/h3>/);
   });
 
   test('le téléphone de démo : ses deux clubs inventés sont dessinés par generateur/insigne.mjs (insigneDeFiche), jamais un écusson', () => {

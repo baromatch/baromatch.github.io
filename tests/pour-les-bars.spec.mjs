@@ -25,7 +25,7 @@ const ADRESSE = `${API}/api/public/bar-contact`;
 const TITRE = 'Les soirs de match, ton bar sur Baromatch — Pour les bars';
 // L’image de partage porte ce titre ; un nouveau nom de fichier, pour que les aperçus déjà vus se refassent.
 const IMAGE_OG = '/img/og-bars-2026-10.jpg';
-const DESCRIPTION = 'Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.';
+const DESCRIPTION = 'Baromatch montre ton bar aux fans qui cherchent où regarder le match et garde leurs places. Gratuit pendant le lancement. Propose ton bar.';
 const IMAGE_OG_ALT = 'La Console de Baromatch : pour un match, les places sur Baromatch, l’ouverture des réservations et l’heure jusqu’à laquelle une place est gardée. Exemple.';
 // Le style du premier écran, en ligne dans la tête : la politique ne l’autorise que par son empreinte.
 const SOURCE = readFileSync('pour-les-bars.html', 'utf8');
@@ -527,6 +527,13 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await page.goto(PAGE);
     await expect(page.locator('.conditions__liste li', { hasText: 'Rien sans ton accord' }))
       .toHaveText('Rien sans ton accord. Sur ce site, ton bar n’apparaît qu’avec ton accord écrit.');
+    // Juste après : ce que le patron ne voit jamais, dit en toutes lettres (la question « Que deviennent les données ? » le redit).
+    await expect(page.locator('.conditions__liste li', { hasText: 'Rien sans ton accord' }).locator('+ li'))
+      .toHaveText('Ce que tu ne vois jamais : l’e-mail d’un fan. À la porte, un pseudo et un nombre ; l’Historique ne garde que des totaux.');
+    // La description ne promet pas ce que le produit ne fait pas encore : aucun bar n’apprend « qui a réservé » ; à la porte, un pseudo et un nombre.
+    for (const balise of ['meta[name="description"]', 'meta[property="og:description"]']) {
+      expect(await page.locator(balise).getAttribute('content'), balise).not.toMatch(/qui a réservé|te dit qui/);
+    }
     const ordre = page.locator('.conditions__liste li', { hasText: 'Aucun bar ne paie' });
     await expect(ordre).toHaveText('Aucun bar ne paie pour passer devant un autre. Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Comment on choisit les bars');
     await expect(ordre.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
@@ -998,7 +1005,7 @@ test.describe('sans JavaScript', () => {
     // Ce qu’un robot doit lire est dans le HTML, sans script.
     await expect(page.locator('.ouverture-bars .salle-soir .kpi')).toHaveCount(5);
     await expect(page.locator('.marche__etape')).toHaveCount(3);
-    await expect(page.locator('.conditions__liste li')).toHaveCount(6);
+    await expect(page.locator('.conditions__liste li')).toHaveCount(7);
     await expect(page.locator('.questions details')).toHaveCount(5);
     await expect(page.locator('.formulaire__ailleurs a[href="mailto:contact@baromatch.fr"]')).toBeVisible();
   });

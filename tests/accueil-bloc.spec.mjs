@@ -75,7 +75,7 @@ test.describe('un passage du générateur', () => {
       const hors = (html) => html.slice(0, html.indexOf(REPERES.debut)) + html.slice(html.indexOf(REPERES.fin));
       expect(hors(ecrit)).toBe(hors(ACCUEIL));
       expect(ecrit).toContain(premier.accueil.bloc);
-      expect(premier.accueil.bloc).toContain('<h3 class="coup__titre">');
+      expect(premier.accueil.bloc).toMatch(/<h3 class="coup__titre" data-mot="\d+">/);
       expect(premier.accueil.bloc).toContain('id="donnees-ce-soir"');
       // Chaque lien du bloc mène à un fichier que ce même passage a écrit, et chaque ancre à un id de la page visée.
       const liensDuBloc = [...premier.accueil.bloc.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1]).filter((l) => !l.startsWith('/confidentialite'));

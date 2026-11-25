@@ -22,7 +22,7 @@ import { DUREE_MATCH_MS, MOTS_INTERDITS } from './donnees.mjs';
 import { heureDeParis, isoDeParis, jourDeParis, jourEnLettres, joursEntre } from './heure.mjs';
 import { dessinDe, insigne } from './insigne.mjs';
 import { cheminDuMatch } from './jsonld.mjs';
-import { accorder, echapper as e, insecables } from './texte.mjs';
+import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 
 export const ACCUEIL = 'index.html';
 export const REPERES = { debut: '<!-- semaine:debut -->', fin: '<!-- semaine:fin -->' };
@@ -68,6 +68,13 @@ export const lumiereDe = (club) => {
 const sansLesChamps = (transformer, html) => html.split(/(<textarea[\s\S]*?<\/textarea>)/).map((morceau, i) => (i % 2 ? morceau : transformer(morceau))).join('');
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const nomDe = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
+// Les lettres du mot le plus long d'un nom, par paliers (accueil.css règle la taille du nom sur lui, « data-mot ») ; main.js
+// reçoit le palier dans les données. Les mots se séparent comme le navigateur les sépare : espace, tiret, barre oblique.
+export const PALIERS_DES_MOTS = [9, 11, 13, 15, 18, 24];
+export const motLePlusLong = (nom) => {
+  const plus = Math.max(1, ...String(nom).split(/[\s/\-–]+/).map((mot) => [...mot].length));
+  return PALIERS_DES_MOTS.find((palier) => plus <= palier) ?? PALIERS_DES_MOTS.at(-1);
+};
 // « 2 bars à Paris », ou le nombre seul quand ses bars sont dans plusieurs villes.
 const lesBars = (m) => {
   const villes = [...new Set(m.soirees.map((s) => s.bar.ville.nom))];
@@ -119,10 +126,35 @@ const donneesDuMatch = (m, maintenant) => ({
   b: { cle: m.exterieur.cle, nom: m.exterieur.court, lumiere: lumiereDe(m.exterieur) },
   page: cheminDuMatch(m),
   ics: aSonFichier(m, maintenant),
+  mot: motLePlusLong(nomDe(m)),
   bars: m.soirees.length,
   barsTexte: m.soirees.length ? lesBars(m) : '',
   verbe: m.soirees.length > 1 ? 'diffusent' : 'diffuse',
 });
+
+// « Toute la semaine » : les sept jours de Paris à partir d’aujourd’hui, chacun avec les liens de ses matchs (leur page),
+// en texte simple. L’accueil les garde tous : les pages des matchs de la semaine ne dépendent pas de la carte, qui n’en
+// montre qu’un. Ni reporté ni annulé ; jamais un match fini.
+export const SEMAINE_EN_LIENS_JOURS = 7;
+const semaineEnLiens = ({ donnees, textes, maintenant }) => {
+  const midi = Date.parse(`${jourDeParis(maintenant)}T12:00:00Z`);
+  const jours = Array.from({ length: SEMAINE_EN_LIENS_JOURS }, (_, i) => new Date(midi + i * 86_400_000).toISOString().slice(0, 10));
+  const matchs = donnees.matchs.filter((m) => m.debut + DUREE_MATCH_MS > maintenant && !m.statut && jours.includes(jourDeParis(m.debut)))
+    .sort((a, b) => a.debut - b.debut || a.slug.localeCompare(b.slug));
+  const lignes = jours.flatMap((jour) => {
+    const duJour = matchs.filter((m) => jourDeParis(m.debut) === jour);
+    if (!duJour.length) return [];
+    const liens = duJour.map((m) => `<a href="${cheminDuMatch(m)}">${e(nomDe(m))}</a>`).join(' · ');
+    return [`<li><b>${e(capitale(jourEnLettres(duJour[0].debut)))}</b> ${liens}</li>`];
+  });
+  if (!lignes.length) return '';
+  return `<nav class="jours page" aria-labelledby="jours-titre">
+<p class="jours__titre" id="jours-titre">${e(textes.accueil.semaine)}</p>
+<ul>
+${lignes.join('\n')}
+</ul>
+</nav>`;
+};
 
 // Le bloc entier, pour l’instant « maintenant ».
 export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
@@ -159,7 +191,7 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
       amisMessage: t.amisMessage, barMessage: t.barMessage,
     },
   };
-  const puce = (m) => `<li><a class="puce" href="${cheminDuMatch(m)}">${disque(m.domicile, 'insigne', 'p-')}${disque(m.exterieur, 'insigne', 'p-')}<span class="puce__nom">${e(nomDe(m))}</span>${m.debut <= maintenant
+  const puce = (m) => `<li><a class="puce" href="${cheminDuMatch(m)}">${disque(m.domicile, 'insigne', 'p-')}${disque(m.exterieur, 'insigne', 'p-')}<span class="puce__nom" data-mot="${motLePlusLong(nomDe(m))}">${e(nomDe(m))}</span>${m.debut <= maintenant
     ? `<span class="puce__en-cours">${e(t.enCours)}</span>`
     : `<time class="puce__heure" datetime="${isoDeParis(m.debut)}">${heureDeParis(m.debut)}</time>`}</a></li>`;
   const avecBars = hero.soirees.length > 0;
@@ -175,6 +207,7 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
 </div>`;
   // « Pas de match ce soir » : le prochain est un autre jour, et rien ne se joue aujourd’hui (ni à venir, ni en cours).
   const horsAujourdhui = jourHero !== aujourdhui && !donnees.matchs.some((m) => !m.statut && jourDeParis(m.debut) === aujourdhui && m.debut + DUREE_MATCH_MS > maintenant);
+  const liens = semaineEnLiens({ donnees, textes, maintenant });
   return sansLesChamps(insecables, `<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
 ${planche(grands, petits)}
 <h2 class="prochain__etiquette" id="soir-titre">${e(t.etiquette)} <span class="prochain__quand" data-soir-quand>· ${e(quand)}</span></h2>
@@ -183,7 +216,7 @@ ${planche(grands, petits)}
 <p class="coup__ou"><span data-coup-compet>${e(hero.competition)}</span> · <time data-coup-heure datetime="${isoDeParis(hero.debut)}">${heure}</time></p>
 <div class="coup__clubs">
 ${disque(hero.domicile, 'insigne coup__disque')}
-<h3 class="coup__titre"><a href="${chemin}" data-coup-page>${e(hero.domicile.court)} <span class="coup__tiret">–</span> ${e(hero.exterieur.court)}</a></h3>
+<h3 class="coup__titre" data-mot="${motLePlusLong(nom)}"><a href="${chemin}" data-coup-page>${e(hero.domicile.court)} <span class="coup__tiret">–</span> ${e(hero.exterieur.court)}</a></h3>
 ${disque(hero.exterieur, 'insigne coup__disque')}
 </div>
 <p class="coup__dans" data-dans aria-hidden="true" hidden></p>
@@ -217,7 +250,7 @@ ${bande.map(puce).join('\n')}
 </div>
 <p class="prochain__suite"><a href="${jourHero === aujourdhui ? '/ce-soir/' : '/matchs/'}" data-tous>${e(jourHero === aujourdhui ? t.tous : t.tousSemaine)}</a></p>
 <script type="application/json" id="donnees-ce-soir">${JSON.stringify(donneesJson).replace(/</g, '\\u003c')}</script>
-</section>`);
+</section>${liens ? `\n${liens}` : ''}`);
 };
 
 // Ce que le bloc ne fait jamais : un style en ligne ou un script qui s’exécute (la politique de sécurité de l’accueil les

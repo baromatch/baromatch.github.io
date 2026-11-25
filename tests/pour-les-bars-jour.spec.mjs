@@ -243,7 +243,7 @@ test.describe('le jour posé', () => {
     expect(lu.pied).toBe(NUIT);
     // La carte du formulaire, les conditions et les trois étapes : des cartes blanches sur le crème.
     expect(lu.carte).toBe('rgb(255, 255, 255)');
-    expect(lu.conditions).toEqual(Array(6).fill('rgb(255, 255, 255)'));
+    expect(lu.conditions).toEqual(Array(7).fill('rgb(255, 255, 255)'));
     expect(lu.etapes).toEqual(Array(3).fill('rgb(255, 255, 255)'));
   });
 

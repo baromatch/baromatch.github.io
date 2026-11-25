@@ -228,8 +228,13 @@ test.describe('le prochain match, lu à l’heure du visiteur', () => {
     await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
     await page.locator('.faire__bouton').click();
     const ligne = page.locator('.prevenir__ligne');
-    const [champ, bouton] = await Promise.all([page.locator('#prevenir-mail').boundingBox(), page.locator('.prevenir__bouton').boundingBox()]);
-    expect(Math.abs(champ.y + champ.height / 2 - (bouton.y + bouton.height / 2))).toBeLessThan(4);
+    // Les deux boîtes lues dans le même tour de script : à l’ouverture, la page défile en douceur jusqu’à la réponse (sans « réduire
+    // les animations »), et deux lectures séparées, à deux instants du défilement, les voyaient à 10 px l’une de l’autre sous charge.
+    const ecart = await page.evaluate(() => {
+      const [champ, bouton] = ['#prevenir-mail', '.prevenir__bouton'].map((s) => document.querySelector(s).getBoundingClientRect());
+      return Math.abs(champ.top + champ.height / 2 - (bouton.top + bouton.height / 2));
+    });
+    expect(ecart).toBeLessThan(4);
     await expect(ligne).toBeVisible();
     await page.locator('#prevenir-mail').fill('fan@exemple.fr');
     await page.locator('.prevenir__bouton').click();
@@ -720,7 +725,14 @@ test.describe('le contraste du prochain match, mesuré au pixel', () => {
       await page.waitForLoadState('networkidle');
       const NUIT = '.g-ecran, .pied, .film, .bars, .appli, .testeurs-accueil, .attente__piege, .menu';
       for (const ouverte of [false, true]) {
-        if (ouverte) await page.locator('.faire__bouton').click();
+        if (ouverte) {
+          // L’ouverture fait défiler la page jusqu’à la réponse, dans l’évènement « toggle », qui arrive après le clic : on attend
+          // ce défilement avant de mesurer (sous charge, il tombait au milieu de la mesure : 1,01:1 sur l’étiquette de « Préviens-moi »).
+          const ouverte_ = page.evaluate(() => new Promise((suite) => { document.getElementById('faire').addEventListener('toggle', suite, { once: true }); }));
+          await page.locator('.faire__bouton').click();
+          await ouverte_;
+          await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+        }
         const mesures = (await mesurerAuPixel(page, NUIT)).filter((m) => /geste|prochain|coup|faire|msg|prevenir|puce|bande|etiquette|g-tel/.test(m.quoi) || true);
         expect(mesures.length).toBeGreaterThan(ouverte ? 12 : 6);
         infos.annotations.push({ type: 'contraste peint', description: `${ouverte ? 'ouverte' : 'fermée'} : ${mesures.length} lignes ; les plus faibles : ${decrireLesPlusFaibles(mesures, 6)}` });

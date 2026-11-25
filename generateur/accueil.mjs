@@ -134,7 +134,9 @@ const donneesDuMatch = (m, maintenant) => ({
 
 // « Toute la semaine » : les sept jours de Paris à partir d’aujourd’hui, chacun avec les liens de ses matchs (leur page),
 // en texte simple. L’accueil les garde tous : les pages des matchs de la semaine ne dépendent pas de la carte, qui n’en
-// montre qu’un. Ni reporté ni annulé ; jamais un match fini.
+// montre qu’un. Ni reporté ni annulé ; jamais un match fini. La liste est pliée (un <details> fermé, ses liens restent dans
+// la page) : sa hauteur ne dépend plus du nombre de matchs de la semaine (jusqu’à 770 px au téléphone, avant), donc
+// l’accueil non plus.
 export const SEMAINE_EN_LIENS_JOURS = 7;
 const semaineEnLiens = ({ donnees, textes, maintenant }) => {
   const midi = Date.parse(`${jourDeParis(maintenant)}T12:00:00Z`);
@@ -149,10 +151,12 @@ const semaineEnLiens = ({ donnees, textes, maintenant }) => {
   });
   if (!lignes.length) return '';
   return `<nav class="jours page" aria-labelledby="jours-titre">
-<p class="jours__titre" id="jours-titre">${e(textes.accueil.semaine)}</p>
+<details class="jours__plie">
+<summary class="jours__titre" id="jours-titre">${e(textes.accueil.semaine)}</summary>
 <ul>
 ${lignes.join('\n')}
 </ul>
+</details>
 </nav>`;
 };
 

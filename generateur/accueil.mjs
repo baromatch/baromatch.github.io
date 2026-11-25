@@ -215,7 +215,7 @@ ${message('bar', t.bar, messageBar)}
 ${bande.map(puce).join('\n')}
 </ul>
 </div>
-<p class="prochain__suite"><a href="/ce-soir/" data-tous>${e(t.tous)}</a></p>
+<p class="prochain__suite"><a href="${jourHero === aujourdhui ? '/ce-soir/' : '/matchs/'}" data-tous>${e(jourHero === aujourdhui ? t.tous : t.tousSemaine)}</a></p>
 <script type="application/json" id="donnees-ce-soir">${JSON.stringify(donneesJson).replace(/</g, '\\u003c')}</script>
 </section>`);
 };

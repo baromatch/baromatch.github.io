@@ -26,7 +26,7 @@
 @media (min-width: 960px) {
 .g-tel__pause{ top: 18px; right: calc(50% - 159px - 18px); }
 }
-.g-tel__legende{ margin-top: 8px; color: var(--texte-discret); font-size: 0.875rem; line-height: 1.4; text-align: center; }
+.g-tel__legende{ margin-top: 8px; color: var(--texte-doux); font-size: 0.875rem; line-height: 1.4; text-align: center; }
 @media (min-width: 960px) {
 .g-tel__legende{ margin-top: 18px; }
 }

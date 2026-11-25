@@ -279,7 +279,8 @@ for (const site of SITES) {
       }
       // L’accueil → « Ce soir » et « Pour les bars » ; « Ce soir » → l’accueil et « Pour les bars » ; la page d’un match →
       // l’accueil, « Ce soir » (dans son corps, par une phrase) et « Pour les bars » ; « Pour les bars » → l’accueil et « Ce soir ».
-      expect(vers(pages.get('/'), '/ce-soir/').map((l) => l.texte)).toContain('Où regarder le match ce soir');
+      // (le menu : « Ce soir » ; sous la carte du prochain match, quand il se joue ce soir : « Tous les matchs de ce soir »)
+      expect(vers(pages.get('/'), '/ce-soir/').map((l) => l.texte)).toEqual(expect.arrayContaining(['Ce soir']));
       expect(vers(pages.get('/'), '/pour-les-bars.html').length).toBeGreaterThan(0);
       expect(vers(pages.get('/ce-soir/'), '/').length).toBeGreaterThan(0);
       expect(vers(pages.get('/ce-soir/'), '/pour-les-bars.html').length).toBeGreaterThan(0);

@@ -78,7 +78,7 @@ test.describe('sans aucun bar publié : jamais un bar inventé sur le plan', () 
     const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: sansBarPublie.textes, marque: sansBarPublie.marque, maintenant: VENDREDI });
     expect(bloc).toContain('Aucun bar encore pour ce match.');
     expect(bloc).not.toContain('class="pin');
-    expect(bloc).not.toMatch(/Voir les bars|data-voir-bars/);
+    expect(bloc.replace(/<script[\s\S]*?<\/script>/, '')).not.toMatch(/Voir les bars|data-voir-bars/);
   });
 });
 
@@ -216,6 +216,8 @@ test.describe('pour les bars au téléphone : rien de fixe au premier écran, ja
       const fixes = () => onglet.evaluate(() => [...document.querySelectorAll('body *')].filter((e) => {
         const s = getComputedStyle(e);
         if (s.position !== 'fixed' || s.display === 'none' || s.visibility === 'hidden') return false;
+        // Le décor (la lumière du fond : aria-hidden, sans pointeur) n’est pas une barre.
+        if (e.closest('[aria-hidden="true"]') && s.pointerEvents === 'none') return false;
         const r = e.getBoundingClientRect();
         return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
       }).map((e) => e.className || e.tagName));

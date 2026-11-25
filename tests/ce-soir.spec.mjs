@@ -520,5 +520,5 @@ test('les liens vers « Ce soir » : depuis l’accueil, la semaine et chaque pa
   const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
   expect(accueil).toMatch(/<a href="\/ce-soir\/"[^>]*>(?:Les|Tous les) matchs de ce soir<\/a>/);
   const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant: site.donnees.maintenant });
-  expect(bloc).toContain('<p class="prochain__suite"><a href="/ce-soir/" data-tous>Tous les matchs de ce soir</a></p>');
+  expect(bloc).toMatch(/<p class="prochain__suite"><a href="\/(ce-soir|matchs)\/" data-tous>Tous les matchs (de ce soir|de la semaine)<\/a><\/p>/);
 });

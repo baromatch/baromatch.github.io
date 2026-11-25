@@ -1,6 +1,6 @@
 /* L’accueil. Aucun style en ligne : le script ne pose que des propriétés (CSSOM). */
 /* Le téléphone de démo. Sans script ou avec « réduire les animations » : l'état de fin, immobile. */
-/* L'écran est de nuit même de jour : jetons de nuit de styles.css (jamais --texte ni --verre, qui s'inversent). Son petit texte suit le texte du lecteur jusqu'à 1,33 fois (--u). Sous 960 px, l'étiquette « Démo » est au-dessus de la fenêtre rognée. */
+/* Écran de nuit même de jour (jetons de nuit de styles.css) ; son petit texte suit celui du lecteur jusqu'à 1,33 fois (--u). */
 .g-tel{--g-fenetre:190px;--u:min(1rem,21.3px); --v1:color-mix(in srgb,var(--blanc-nuit) 8%,transparent); --v2:color-mix(in srgb,var(--blanc-nuit) 14%,transparent); --v3:color-mix(in srgb,var(--blanc-nuit) 22%,transparent);position:relative;z-index:1;margin:0;display:flex;flex-direction:column;align-items:center;}
 .g-tel__fenetre{position:relative;width:318px;height:calc(var(--g-fenetre,318px) + 7 * (var(--u) - 16px));overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 52px);mask-image:linear-gradient(to bottom,transparent 0,#000 52px);display:flex;align-items:flex-end;}
 @media (min-width:960px) {
@@ -80,7 +80,7 @@
 .g-pouce__fond{fill:none;stroke:rgba(10,11,16,0.6);stroke-width:8;}
 .g-pouce__anneau{fill:none;stroke:var(--ambre);stroke-width:4.5;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:0;}
 .g-pouce__onde{position:absolute;inset:0;border-radius:50%;border:2px solid var(--ambre);opacity:0;}
-/* La démo : 5,6 s par tour (pouce 0–0,9 s ; remplissage jusqu'à 2,3 s ; « Place gardée. » jusqu'à 4,9 s ; il se vide). */
+/* La démo : 5,6 s par tour. */
 @media (prefers-reduced-motion:no-preference) {
 .g-tel.est-auto .g-verre__liq{animation:g-liq 5.6s infinite;}
 .g-tel.est-auto .g-verre__vague{animation:g-vague 1.6s linear infinite;}
@@ -158,11 +158,11 @@
 .g-tel.est-main .g-verre__contre{animation:none;transform:translateY(calc((1 - var(--p,0)) * -100%));}
 .g-verre__liq{z-index:1;}
 .g-verre__mot--ok{z-index:2;}
-/* ── Le geste : le titre, sa phrase, puis le téléphone (à gauche sur ordinateur) ── */
+/* ── Le geste ── */
 .planche{position:absolute;width:0;height:0;overflow:hidden;}
 .etiquette-demo{display:inline-block;margin:0;padding:1px 8px 0;border:1.5px solid var(--texte);border-radius:6px;background:var(--fond);color:var(--texte);font-size:0.75rem;font-weight:800;letter-spacing:0.08em;line-height:1.5;}
 .geste{position:relative;padding-top:18px;padding-bottom:8px;}
-/* La lumière déborde en douceur ; seul le bord de l'écran la coupe. */
+/* Seul le bord de l'écran coupe la lumière. */
 #contenu{overflow-x:clip;}
 .geste__titre{margin:0;font-size:clamp(2.1rem,9.6vw,2.5rem);font-weight:800;font-stretch:84%;font-variation-settings:"opsz" 96;line-height:0.95;letter-spacing:-0.025em;}
 .geste__titre span{display:inline;}
@@ -190,7 +190,7 @@
 .geste__lumiere i{filter:blur(90px);}
 .geste__lumiere i:nth-child(3){bottom:16%;}
 }
-/* ── Le prochain match : une carte de nuit, éclairée aux couleurs de ses deux clubs ── */
+/* ── Le prochain match ── */
 .prochain{position:relative;z-index:1;padding-top:12px;padding-bottom:8px;}
 .prochain__etiquette{margin:0 0 8px;color:var(--texte-doux);font-size:0.9375rem;font-weight:800;}
 .prochain__quand{white-space:nowrap;}
@@ -209,7 +209,7 @@
 .coup__clubs > .coup__disque:last-child{grid-area:b;justify-self:start;}
 .coup__disque{width:min(22vw,5.5rem);height:min(22vw,5.5rem);filter:drop-shadow(0 12px 24px rgba(0,0,0,0.45));}
 .coup__titre{grid-area:t;--dispo:100cqi;margin:0;font-size:min(clamp(2.25rem,11vw,3.25rem),calc(var(--dispo) / (var(--lettres) * 0.56)));font-weight:800;font-stretch:88%;line-height:1;letter-spacing:-0.02em;text-wrap:balance;overflow-wrap:break-word;}
-/* data-mot : lettres du plus long mot d'un nom ; la taille du nom se règle pour que ce mot tienne. */
+/* data-mot : lettres du plus long mot du nom. */
 [data-mot]{--lettres:9;}
 [data-mot="11"]{--lettres:11;}
 [data-mot="13"]{--lettres:13;}
@@ -227,10 +227,10 @@
 .faire__bouton{list-style:none;gap:8px;max-width:100%;padding:10px 18px;line-height:1.25;text-align:center;text-wrap:balance;white-space:normal;box-shadow:0 0 0 1px rgba(255,213,138,0.6),0 12px 30px rgba(255,140,20,0.25);}
 .faire__bouton::-webkit-details-marker{display:none;}
 @media (max-width:359px){.faire__bouton{font-size:min(1rem,24px);}}
-.faire__bouton::after{content:"";flex:none;width:8px;height:8px;margin-top:-3px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);transition:transform 200ms cubic-bezier(0.2,0.8,0.2,1);}
-.faire[open] .faire__bouton::after{margin-top:3px;transform:rotate(-135deg);}
+.faire__bouton::after,.jours__titre::after{content:"";flex:none;width:8px;height:8px;margin-top:-3px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);transition:transform 200ms cubic-bezier(0.2,0.8,0.2,1);}
+.faire[open] .faire__bouton::after,.jours__plie[open] > .jours__titre::after{margin-top:3px;transform:rotate(-135deg);}
 .faire__bouton:focus-visible{outline:3px solid #F7F7F9;outline-offset:3px;}
-.faire__corps{display:grid;gap:14px;max-width:34rem;margin:16px auto 0;padding:18px 16px;border:1px solid rgba(255,255,255,0.16);border-radius:22px;background:rgba(255,255,255,0.08);text-align:left;}
+.faire__corps{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:34rem;margin:16px auto 0;padding:18px 16px;border:1px solid rgba(255,255,255,0.16);border-radius:22px;background:rgba(255,255,255,0.08);text-align:left;}
 .faire__corps > *{margin:0;}
 .faire__titre{font-size:1.25rem;font-weight:800;line-height:1.2;}
 .faire__texte{color:rgba(247,247,249,0.86);}
@@ -245,12 +245,12 @@
 .msg__envoi:focus-visible,.lien-trait:focus-visible,.faire .lien:focus-visible,.prevenir__bouton:focus-visible{outline:3px solid #F7F7F9;outline-offset:3px;}
 .faire__agenda:empty{display:none;}
 .faire .lien{color:#F7F7F9;text-decoration:underline;text-underline-offset:0.2em;}
-.prevenir{display:grid;gap:6px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.16);}
+.prevenir{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.16);}
 .prevenir__etiquette{font-weight:700;font-size:0.9375rem;}
 .prevenir__ligne{display:flex;flex-wrap:wrap;gap:8px;}
 .prevenir__champ{flex:1 1 7rem;min-width:0;height:48px;padding:0 16px;border:1px solid rgba(255,255,255,0.5);border-radius:999px;background:rgba(255,255,255,0.08);color:#F7F7F9;font:inherit;font-size:1rem;}
 .prevenir__champ::placeholder{color:rgba(247,247,249,0.7);}
-.prevenir__bouton{flex:0 0 auto;min-height:48px;padding:6px 20px;border:0;border-radius:999px;background:#F7F7F9;color:var(--nuit);font:inherit;font-weight:700;line-height:1.2;cursor:pointer;}
+.prevenir__bouton{flex:0 1 auto;max-width:100%;min-height:48px;padding:6px 20px;border:0;border-radius:999px;background:#F7F7F9;color:var(--nuit);font:inherit;font-weight:700;line-height:1.2;cursor:pointer;}
 .prevenir__bouton[aria-disabled="true"]{opacity:0.7;cursor:progress;}
 .prevenir__note{font-size:0.8125rem;color:rgba(247,247,249,0.78);}
 .prevenir__note a,.prevenir .attente__corriger{color:#F7F7F9;}
@@ -276,8 +276,9 @@
 .prochain__suite{margin:10px 0 0;}
 /* « Toute la semaine » : les liens des matchs des sept jours, discrets. */
 .jours{padding-top:6px;padding-bottom:14px;color:var(--texte-doux);}
-.jours__titre{margin:0 0 4px;font-size:0.9375rem;font-weight:800;}
-.jours ul{display:grid;gap:2px;margin:0;padding:0;list-style:none;font-size:0.875rem;line-height:1.9;}
+.jours__titre{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;color:var(--texte);cursor:pointer;font-size:0.9375rem;font-weight:800;}
+.jours__titre::-webkit-details-marker{display:none;}
+.jours ul{display:grid;gap:2px;margin:4px 0 0;padding:0;list-style:none;font-size:0.875rem;line-height:1.9;}
 .jours b{margin-right:0.4em;color:var(--texte);}
 .jours a{color:inherit;text-underline-offset:0.2em;}
 .jours a:hover{color:var(--texte);}
@@ -303,9 +304,9 @@
 .faire__corps{background:#151722;}
 }
 @media (prefers-reduced-motion:reduce) {
-.coup__lumiere i,.faire__bouton::after{transition:none;}
+.coup__lumiere i,.faire__bouton::after,.jours__titre::after{transition:none;}
 }
-/* ── Ce qui reste de la page : l’appli et sa liste d’attente (sur la nuit), les bars, en bref, les questions ── */
+/* ── Le reste de la page ── */
 .lien{display:inline-flex;align-items:center;min-height:44px;font-weight:700;color:var(--texte);text-underline-offset:0.2em}
 .etape{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;margin:0;font-size:1.125rem;font-weight:800;font-stretch:100%;font-variation-settings:"opsz" 24;letter-spacing:-0.01em;line-height:1.2}
 .etape--nuit{color:#F7F7F9}

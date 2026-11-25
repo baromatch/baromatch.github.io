@@ -107,7 +107,7 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
       expect(lu.titres[0].length).toBeLessThanOrEqual(60);
       expect(lu.descriptions).toHaveLength(1);
       expect(lu.descriptions[0].length).toBeGreaterThanOrEqual(70);
-      expect(lu.descriptions[0].length).toBeLessThanOrEqual(160);
+      expect(lu.descriptions[0].length).toBeLessThanOrEqual(155);
       expect(lu.canoniques).toEqual([canoniqueDe(page.chemin)]);
       expect(lu.og['og:url']).toEqual([canoniqueDe(page.chemin)]);
       expect(lu.h1).toBe(1);

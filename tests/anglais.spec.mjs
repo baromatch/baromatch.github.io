@@ -137,7 +137,7 @@ test.describe('le scénario : de vrais bars à Paris et à Lyon', () => {
     expect(en.contenu).toContain('<p class="regarder-note">That’s 8:00 pm in the UK.</p>');
     expect(en.contenu).toContain('<h1 class="regarder-titre">Paris Saint-Germain v FC Barcelona: where to watch it in Paris</h1>');
     expect(en.titre).toBe('Paris Saint-Germain v FC Barcelona: where to watch in Paris');
-    expect(en.description).toBe('Paris Saint-Germain v FC Barcelona, Sat 24 Oct, 9:00 pm (Paris time). 2 bars in Paris on Baromatch are showing it: the addresses, and kick-off in Paris time.');
+    expect(en.description).toBe('Paris Saint-Germain v FC Barcelona, Sat 24 Oct. 2 bars in Paris on Baromatch are showing it: the addresses, and kick-off in Paris time.');
     // Le fil passe par le guide de sa compétition.
     expect(graphe(en).find((n) => n['@type'] === 'BreadcrumbList').itemListElement.map((i) => i.name)).toEqual(['Baromatch', 'Football in Paris', 'Champions League', 'Paris Saint-Germain v FC Barcelona']);
     // L’image de partage de sa jumelle, décrite en anglais.

@@ -4,11 +4,12 @@
 // (« Ce match est passé », sans score, vers le prochain match d’un des deux clubs), un bar qui n’est plus là aussi
 // (vers sa ville). Chaque page dit si elle est indexable ; les règles sont ici, et seulement ici. Chaque page dit aussi
 // quels bars elle nomme (barsNommes, gardé dans l’état) : une page refusée qui nommerait un bar retiré ne reste pas.
+import { DESCRIPTION_MAX, DESCRIPTION_MIN, TITRE_MAX, TITRE_MIN } from './bornes.mjs';
 import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
 import { dateCourte, heureDuJour, jourDeParis, jourEnLettres, heureDeParis } from './heure.mjs';
 import { accorder, capitale, echapper as e, enumerer } from './texte.mjs';
 import {
-  adresseDe, cheminDeLaVille, cheminDuBar, cheminDuMatch, evenementDeLaSoiree, filDAriane, listeDesBars, pageWeb, questions, ancreDeLaSoiree,
+  adresseDe, cheminDeLaVille, cheminDuBar, cheminDuMatch, adresseDuMatch, evenementDeLaSoiree, evenementDuMatch, filDAriane, listeDesBars, pageWeb, questions, ancreDeLaSoiree,
   barOuPub,
 } from './jsonld.mjs';
 import { aSonFichier, blocDuMatch, clubsDeLigue1, lienVersLAgenda } from './agenda.mjs';
@@ -48,7 +49,8 @@ export const couper = (texte, max) => {
   const espace = debut.lastIndexOf(' ');
   return `${(espace > max / 2 ? debut.slice(0, espace) : debut).replace(/[\s,;:.–—-]+$/u, '')}…`;
 };
-// Le premier texte dont la longueur va (un titre de 15 à 60 caractères, une description de 70 à 160). Si aucun ne va
+// Les bornes (bornes.mjs) : un titre de 15 à 60 caractères, une description de 70 à 155.
+// Le premier texte dont la longueur va (un titre ou une description aux bornes ci-dessus). Si aucun ne va
 // (un nom de club ou de bar très long), le dernier, coupé proprement ; trop court, il prend la suite donnée. Le
 // contrôle des pages vérifie ensuite ces bornes.
 const choisir = (candidats, min, max, suite) => {
@@ -57,8 +59,8 @@ const choisir = (candidats, min, max, suite) => {
   const dernier = candidats.at(-1);
   return couper(dernier.length < min ? `${dernier}${suite}` : dernier, max);
 };
-export const titre = (...candidats) => choisir(candidats, 15, 60, ' — Baromatch');
-export const description = (...candidats) => choisir(candidats, 70, 160, ' Les bars qui diffusent le match, sur Baromatch.');
+export const titre = (...candidats) => choisir(candidats, TITRE_MIN, TITRE_MAX, ' — Baromatch');
+export const description = (...candidats) => choisir(candidats, DESCRIPTION_MIN, DESCRIPTION_MAX, ' Les bars qui diffusent le match, sur Baromatch.');
 
 const nomCourt = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
 const quandCourt = (m) => (m.heureConfirmee ? `${jourEnLettres(m.debut)} à ${heureDeParis(m.debut)}` : `${jourEnLettres(m.debut)}, heure à confirmer`);
@@ -210,8 +212,12 @@ ${enTete}
     // Le titre (et donc og:title et le texte envoyé sur WhatsApp) : « où regarder le match » seulement avec de vrais
     // bars (« PSG – OL, 25 octobre : où regarder le match ») ; sans, le match et son jour (« PSG – Barça, mardi 20
     // octobre »). Rien à changer à la main : le passage qui publie un bar pour ce match lui rend son « où ».
+    // Les bars d’une seule ville (Paris, le plus souvent) : le titre reprend ce que les fans tapent, « regarder PSG – OL dans
+    // un bar à Paris » ; sur deux villes ou plus, la forme avec la date, qui n’en nomme aucune.
+    const uneVille = villesDuMatch.length === 1 ? villesDuMatch[0] : null;
     const titrePage = ouRegarder
-      ? titre(`${nom}, ${dateCourte(match.debut)} : où regarder le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : où regarder le match`,
+      ? titre(...(uneVille ? [`Regarder ${nom} dans un bar à ${uneVille} — Baromatch`, `Regarder ${nom} dans un bar à ${uneVille}`] : []),
+        `${nom}, ${dateCourte(match.debut)} : où regarder le match — Baromatch`, `${nom}, ${dateCourte(match.debut)} : où regarder le match`,
         `${nom} : où regarder le match — Baromatch`, `${nom} : où regarder le match`)
       : titre(`${nom}, ${jourEnLettres(match.debut)} — Baromatch`, `${nom}, ${dateCourte(match.debut)} — Baromatch`, `${nom}, ${jourEnLettres(match.debut)}`, nom);
     const desc = soirees.length
@@ -248,19 +254,22 @@ ${places}  ${appel(marque, textes)}
   ${tuTiensUnBar(textes)}
   ${appel(marque, textes)}
 </section>`;
+    // Le SportsEvent du match : seulement avec un stade connu (jsonld.mjs, evenementDuMatch) ; aujourd’hui, jamais.
+    const sportif = evenementDuMatch(match);
     const clubs = `${match.domicile.court} et ${match.exterieur.court}`;
     const sectionProchains = `<section class="regarder-section" aria-labelledby="titre-prochains">
   <h2 id="titre-prochains">${e(remplir(textes.match.prochains, { clubs }))}</h2>
 ${prochains.length ? `  <ul class="regarder-matchs">
 ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m), suite: statutDuMatch(m, textes) })}`).join('\n')}
   </ul>` : `  <p>${e(textes.match.aucunProchain)}</p>`}${suivis(match)}
+  <p class="regarder-suite"><a href="/ce-soir/">${e(lienCeSoir)}</a></p>
 </section>`;
     ajouter({
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
       barsNommes: soirees.map((s) => s.bar.id), evenement: evenement ? match : null, feuilles: [FEUILLE_DU_PLAN],
       partage: { sorte: 'match', match, soirees, maintenant },
-      jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
+      jsonld: [pageWeb({ chemin, titre: titrePage, description: desc, ...(sportif ? { mainEntity: { '@id': adresseDuMatch(match) } } : {}) }), filDAriane(etapes), ...(sportif ? [sportif] : []), ...soirees.map((s) => evenementDeLaSoiree(s, contenu, { matchDansLaPage: Boolean(sportif) }))],
       corps: `${fil(etapes)}
 ${enTete}
 ${match.statut ? '' : `${planDeParis({ matchs: [match], donnees, marque, chemin, maintenant, fixe: true, script: false, aUnePage: () => false })}\n`}${sectionBars}

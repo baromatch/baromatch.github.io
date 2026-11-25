@@ -26,7 +26,7 @@ import { RACINE } from './contenu.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
 import {
-  anciensDe, effacerUnFichier, ecrireUnFichier, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
+  anciensDe, effacerUnFichier, ecrireUnFichier, empreinte, estPermis, FICHIER_ETAT, fichierDuChemin, lireLEtat, nouveauPlan, nouvelEtat, PLAN, texteDeLEtat,
 } from './etat.mjs';
 import { traiterLesRefus } from './refus.mjs';
 import { construireEnMemoire } from './site.mjs';
@@ -141,20 +141,12 @@ export const construire = async ({
   }
 
   const aujourdhui = jourDeParis(maintenant);
-  const etat = nouvelEtat(precedent, fichiers, aujourdhui, gardees, site.donnees.adresses, agendas.evenements);
-  const planActuel = existsSync(path.join(sortie, PLAN)) ? readFileSync(path.join(sortie, PLAN), 'utf8') : readFileSync(path.join(racine, PLAN), 'utf8');
-  const plan = nouveauPlan(planActuel, etat);
-
-  // Chaque chemin vérifié avant d’écrire le moindre fichier : un seul hors de la liste blanche (une adresse vide, des
-  // capitales, « .. »), et rien n’est écrit.
-  const refuses = [...fichiers.map((f) => f.chemin), ...supprimees].filter((chemin) => !estPermis(fichierDuChemin(chemin)));
-  if (refuses.length) throw new Error(`Chemins refusés (hors de la liste blanche du générateur), rien n’est écrit : ${refuses.join(', ')}`);
-
   // L’accueil : son bloc des matchs de la semaine, des mêmes données. Un bloc qui ne se fait pas (des textes sans le
   // sien), un bloc refusé par son contrôle, ou un accueil sans ses repères, laisse l’accueil comme il est (le journal le
   // dit) : les pages des matchs s’écrivent quand même.
   let bloc = null;
   let accueil = null;
+  let blocAccepte = false;
   try {
     bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, marque: site.contenu.marque, maintenant });
     const erreursDuBloc = controlerLaSemaine(bloc);
@@ -162,10 +154,25 @@ export const construire = async ({
       avertissements.push(`accueil : le bloc des matchs de la semaine est refusé (${erreursDuBloc.join(' ; ')}) : l’accueil reste comme il est`);
     } else {
       accueil = preparerLAccueil({ racine, sortie, bloc });
+      blocAccepte = true;
     }
   } catch (erreur) {
     avertissements.push(`accueil : ${erreur.message} : l’accueil reste comme il est`);
   }
+
+  // La date du dernier vrai changement du bloc de l’accueil : celle de son « lastmod » dans le plan du site (l’accueil est
+  // écrit à la main, seul ce bloc bouge de lui-même). Un bloc refusé ou absent garde la date d’avant.
+  const dateDeLAccueil = blocAccepte
+    ? { empreinte: empreinte(bloc), change: precedent.accueil?.empreinte === empreinte(bloc) ? precedent.accueil.change : aujourdhui }
+    : (precedent.accueil ?? null);
+  const etat = nouvelEtat(precedent, fichiers, aujourdhui, gardees, site.donnees.adresses, agendas.evenements, dateDeLAccueil);
+  const planActuel = existsSync(path.join(sortie, PLAN)) ? readFileSync(path.join(sortie, PLAN), 'utf8') : readFileSync(path.join(racine, PLAN), 'utf8');
+  const plan = nouveauPlan(planActuel, etat);
+
+  // Chaque chemin vérifié avant d’écrire le moindre fichier : un seul hors de la liste blanche (une adresse vide, des
+  // capitales, « .. »), et rien n’est écrit.
+  const refuses = [...fichiers.map((f) => f.chemin), ...supprimees].filter((chemin) => !estPermis(fichierDuChemin(chemin)));
+  if (refuses.length) throw new Error(`Chemins refusés (hors de la liste blanche du générateur), rien n’est écrit : ${refuses.join(', ')}`);
 
   // Tout est prêt et contrôlé : seulement maintenant, l’écriture.
   const ecrits = fichiers.filter((f) => f.contenu !== null && ecrireUnFichier(sortie, fichierDuChemin(f.chemin), f.contenu)).map((f) => f.chemin);

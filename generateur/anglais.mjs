@@ -27,6 +27,7 @@ import { DUREE_MATCH_MS, JOUR_MS } from './donnees.mjs';
 import { insignesDeLEnTete, insignesDuMatch, ligneDeListe, page } from './gabarits.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe, cheminDuBar, debutDe, filDAriane, IMAGE, listeDesBars, pageWeb } from './jsonld.mjs';
+import { DESCRIPTION_MAX, DESCRIPTION_MIN, TITRE_MAX, TITRE_MIN } from './bornes.mjs';
 import { couper, SEUILS } from './pages.mjs';
 import { capitale, echapper as e } from './texte.mjs';
 
@@ -84,7 +85,7 @@ const nombreOrdinal = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1
 const quartierDe = (bar) => (bar.arrondissement ? `${nombreOrdinal(bar.arrondissement.numero)} arrondissement` : bar.ville.nom);
 const parLieu = (a, b) => (a.arrondissement?.numero ?? 0) - (b.arrondissement?.numero ?? 0) || a.nom.localeCompare(b.nom, 'fr');
 
-// Le premier texte dont la longueur va (un titre de 15 à 60 caractères, une description de 70 à 160) ; sinon le dernier,
+// Le premier texte dont la longueur va (un titre de 15 à 60 caractères, une description de 70 à 155) ; sinon le dernier,
 // coupé proprement : les bornes que le contrôle vérifie.
 const choisir = (candidats, min, max, suite) => {
   const juste = candidats.find((texte) => texte.length >= min && texte.length <= max);
@@ -92,8 +93,8 @@ const choisir = (candidats, min, max, suite) => {
   const dernier = candidats.at(-1);
   return couper(dernier.length < min ? `${dernier}${suite}` : dernier, max);
 };
-const titre = (...candidats) => choisir(candidats, 15, 60, ' — Baromatch');
-const description = (...candidats) => choisir(candidats, 70, 160, ' Paris bars showing the match, on Baromatch.');
+const titre = (...candidats) => choisir(candidats, TITRE_MIN, TITRE_MAX, ' — Baromatch');
+const description = (...candidats) => choisir(candidats, DESCRIPTION_MIN, DESCRIPTION_MAX, ' Paris bars showing the match, on Baromatch.');
 
 // ---------- Les pages ----------
 

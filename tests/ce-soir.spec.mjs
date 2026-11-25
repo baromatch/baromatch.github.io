@@ -75,7 +75,8 @@ test('un soir avec un vrai bar publié : indexable, le match, le bar, la date en
   expect(p.indexable).toBe(true);
   expect(robotsDe(p)).toBe('max-image-preview:large');
   // Le titre dit le jour : sans la marque quand le jour est long (60 caractères au plus).
-  expect(titreDe(p)).toBe('Où regarder le match ce soir, vendredi 23 octobre');
+  // Les bars sont dans une seule ville : le titre la nomme (« où regarder le match ce soir à Lyon »).
+  expect(titreDe(p)).toBe('Où regarder le match ce soir à Lyon, vendredi 23 octobre');
   expect(p.contenu).toContain('<h1 class="regarder-titre">Où regarder le match ce soir</h1>');
   expect(p.contenu).toContain('<p class="regarder-quand">Vendredi 23 octobre</p>');
   expect(p.contenu).toContain(`<p class="regarder-chapeau">${contenu.textes.ceSoir.chapeau}</p>`);
@@ -101,7 +102,7 @@ test('un soir avec un vrai bar publié : indexable, le match, le bar, la date en
 test('les données structurées : la page, son fil, la liste des matchs de ce soir vers leurs pages ; aucun évènement, aucune offre', async () => {
   const p = await ceSoir();
   const [page] = deType(p, 'CollectionPage');
-  expect(page).toMatchObject({ '@id': 'https://baromatch.fr/ce-soir/', url: 'https://baromatch.fr/ce-soir/', name: 'Où regarder le match ce soir, vendredi 23 octobre', inLanguage: 'fr-FR', publisher: { '@id': 'https://baromatch.fr/#organisation' } });
+  expect(page).toMatchObject({ '@id': 'https://baromatch.fr/ce-soir/', url: 'https://baromatch.fr/ce-soir/', name: 'Où regarder le match ce soir à Lyon, vendredi 23 octobre', inLanguage: 'fr-FR', publisher: { '@id': 'https://baromatch.fr/#organisation' } });
   expect(deType(p, 'BreadcrumbList')[0].itemListElement).toEqual([
     { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://baromatch.fr/' },
     { '@type': 'ListItem', position: 2, name: 'Ce soir', item: 'https://baromatch.fr/ce-soir/' },
@@ -251,7 +252,7 @@ test('la nuit : après minuit, la page passe au nouveau jour ; un match commenc�
   // Samedi, 1 h 15 à Paris (le passage d’après minuit) : le samedi, et le match de 23 h 30 qui se joue encore.
   const nuit = await ceSoir({ source, maintenant: '2026-10-23T23:15:00Z' });
   sansErreur(nuit);
-  expect(titreDe(nuit)).toBe('Où regarder le match ce soir, samedi 24 octobre — Baromatch');
+  expect(titreDe(nuit)).toBe('Où regarder le match ce soir à Paris, samedi 24 octobre');
   expect(nuit.contenu).toContain('<p class="regarder-quand">Samedi 24 octobre</p>');
   const bars = sectionDe(nuit, 'titre-bars');
   expect(bars).toMatch(/^id="titre-bars">Aujourd’hui, dans un bar<\/h2>/);
@@ -266,7 +267,7 @@ test('la nuit : après minuit, la page passe au nouveau jour ; un match commenc�
   // date entière dans le titre et sous lui, et le match de 23 h 30 qui se joue encore.
   const minuit = await ceSoir({ source, maintenant: '2026-10-23T22:05:00Z' });
   sansErreur(minuit);
-  expect(titreDe(minuit)).toBe('Où regarder le match ce soir, samedi 24 octobre — Baromatch');
+  expect(titreDe(minuit)).toBe('Où regarder le match ce soir à Paris, samedi 24 octobre');
   expect(minuit.contenu).toContain('<p class="regarder-quand">Samedi 24 octobre</p>');
   expect(minuit.description).toMatch(/^Samedi 24 octobre : /);
   expect(sectionDe(minuit, 'titre-bars')).toContain('Commencé le <time datetime="2026-10-23T23:30:00+02:00">vendredi 23 octobre · 23:30</time>');

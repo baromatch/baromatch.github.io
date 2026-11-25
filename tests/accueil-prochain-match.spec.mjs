@@ -113,7 +113,7 @@ test.describe('la carte et sa réponse, du générateur', () => {
     expect(html).toContain('data-message="amis"');
     expect(html).toContain('data-message="bar"');
     expect(html).toContain('href="/matchs/psg-rome-2026-11-25/match.ics"');
-    expect(html).toMatch(/<form class="prevenir attente" id="attente-carte" data-attente action="https:\/\/formspree\.io\/f\/mqpeedoj"/);
+    expect(html).toMatch(/<form class="prevenir attente" id="attente-carte" action="https:\/\/formspree\.io\/f\/mqpeedoj" method="POST" data-attente/);
     expect(html).toContain('name="ville" value="Paris"');
   });
 

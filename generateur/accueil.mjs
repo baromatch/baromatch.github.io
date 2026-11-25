@@ -196,7 +196,7 @@ ${entete}
 ${message('amis', t.amis, messageAmis)}
 ${message('bar', t.bar, messageBar)}
 <p class="faire__agenda">${aSonFichier(hero, maintenant) ? `<a class="lien-trait" data-agenda href="${chemin}match.ics" type="text/calendar">${e(t.agenda)}</a>` : ''}</p>
-<form class="prevenir attente" id="attente-carte" data-attente action="https://formspree.io/f/mqpeedoj" method="POST" novalidate>
+<form class="prevenir attente" id="attente-carte" action="https://formspree.io/f/mqpeedoj" method="POST" data-attente novalidate>
 <label class="prevenir__etiquette" for="prevenir-mail">${e(t.prevenirEtiquette)}</label>
 <div class="prevenir__ligne"><input class="prevenir__champ" id="prevenir-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="prevenir-retour prevenir-note"><button class="prevenir__bouton" type="submit">${e(t.prevenir)}</button></div>
 <input type="hidden" name="ville" value="Paris">

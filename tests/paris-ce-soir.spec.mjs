@@ -72,13 +72,13 @@ test.describe('sans aucun bar publié : jamais un bar inventé sur le plan', () 
     for (const p of site.pages) expect(p.contenu, p.chemin).not.toMatch(/Lucarne Lunaire|Poteau Rentrant|Reprise de Volée|Petit Pont|Grand Filet/);
   });
 
-  test('l’accueil : le bloc des matchs de la semaine porte le plan, sans bar posé à un point', async () => {
-    const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
+  test('l’accueil : le bloc du prochain match dit « Aucun bar encore pour ce match. », sans bar posé ni inventé', async () => {
     const site = await fabriquer(sansBarPublie);
+    const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
     const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: sansBarPublie.textes, marque: sansBarPublie.marque, maintenant: VENDREDI });
-    expect(bloc).toContain('class="soir soir--rail"');
-    expect(bloc).not.toMatch(/class="pin |<circle class="dot"/);
-    expect(bloc.replace(/\u00a0/g, ' ')).toContain('Aucun bar publié pour l’instant');
+    expect(bloc).toContain('Aucun bar encore pour ce match.');
+    expect(bloc).not.toContain('class="pin');
+    expect(bloc).not.toMatch(/Voir les bars|data-voir-bars/);
   });
 });
 
@@ -114,19 +114,13 @@ test.describe('ce que le plan ne dit jamais', () => {
     }
   });
 
-  test('« Maintiens pour garder ta place » : le geste (accueil, avec plan.js) ou son lien (sans), la démo, jamais une réservation', async () => {
+  test('« Garder ta place dans l’appli » : le lien de « Ce soir », la démo, jamais une réservation', async () => {
     const site = await fabriquer(sansBarPublie);
-    const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
-    const accueil = blocDeLaSemaine({ donnees: site.donnees, textes: sansBarPublie.textes, marque: sansBarPublie.marque, maintenant: VENDREDI });
-    expect(accueil).toContain('Maintiens pour garder ta place');
-    expect(accueil).toContain('data-hold');
     const ceSoir = pageDe(site, '/ce-soir/').contenu;
     expect(ceSoir).toContain('Garder ta place dans l’appli');
     expect(ceSoir, 'pas de geste sans le script qui le fait').not.toContain('data-hold');
-    for (const plan of [accueil, ceSoir]) {
-      expect(plan.replace(/\u00a0/g, ' ')).toContain('Démo : rien n’est réservé. Pour de vrai, c’est dans l’appli.');
-      for (const bouton of plan.matchAll(/<a class="tenir__btn"[\s\S]*?<\/a>/g)) expect(texteVisible(`<body>${bouton[0]}`)).not.toMatch(MENTION);
-    }
+    expect(ceSoir.replace(/\u00a0/g, ' ')).toContain('Démo : rien n’est réservé. Pour de vrai, c’est dans l’appli.');
+    for (const bouton of ceSoir.matchAll(/<a class="tenir__btn"[\s\S]*?<\/a>/g)) expect(texteVisible(`<body>${bouton[0]}`)).not.toMatch(MENTION);
   });
 
   test('la page d’un match : l’arrondissement le plus proche, jamais une adresse', async () => {
@@ -163,15 +157,6 @@ test.describe('« Ce soir » et la page d’un match : le plan sans plan.js', ()
     expect(controlerLaPage(avecLeScript).join(' ')).toMatch(/un script autre que/);
   });
 
-  test('l’accueil, lui, garde son script : le bloc du plan n’est pas la version sans script', async () => {
-    const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
-    const site = await fabriquer(sansBarPublie);
-    const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: sansBarPublie.textes, marque: sansBarPublie.marque, maintenant: VENDREDI });
-    expect(bloc).not.toContain('soir--sans-script');
-    expect(bloc).toContain('prog__etat');
-    expect(bloc).toContain('plan__heure');
-    expect(lire('index.html')).toContain('<script src="/plan.js" defer></script>');
-  });
 });
 
 test.describe('« Ce soir » servi : le plan allumé sans plan.js', () => {
@@ -218,11 +203,11 @@ test.describe('« Ce soir » servi : le plan allumé sans plan.js', () => {
   }
 });
 
-// ---------- « Proposer mon bar » collé en bas : jamais avec une autre barre fixe ----------
+// ---------- Le bandeau du bas : rien de fixe à l’arrivée, jamais deux barres fixes ----------
 
-test.describe('pour les bars au téléphone : une seule barre fixe en bas, jamais au premier écran', () => {
+test.describe('pour les bars au téléphone : rien de fixe au premier écran, jamais plus d’une barre fixe en bas', () => {
   for (const texte of [100, 200]) {
-    test(`390 × 844, texte à ${texte} % : au plus une barre fixe à chaque pas du défilement, « Proposer mon bar » seulement sous le premier écran`, async ({ browser }) => {
+    test(`390 × 844, texte à ${texte} % : au plus une barre fixe à chaque pas du défilement, aucune à l’arrivée`, async ({ browser }) => {
       const contexte = await browser.newContext({ viewport: { width: 390, height: 844 } });
       const onglet = await contexte.newPage();
       await onglet.goto('/pour-les-bars.html');
@@ -232,21 +217,17 @@ test.describe('pour les bars au téléphone : une seule barre fixe en bas, jamai
         const s = getComputedStyle(e);
         if (s.position !== 'fixed' || s.display === 'none' || s.visibility === 'hidden') return false;
         const r = e.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && !e.closest('.collant') !== !e.matches('.collant');
-      }).map((e) => (e.matches('.collant') ? 'collant' : e.className || e.tagName)));
+        return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+      }).map((e) => e.className || e.tagName));
+      expect(await fixes(), 'à l’arrivée, rien n’est fixe').toEqual([]);
       const pas = await onglet.evaluate(() => Math.ceil(document.documentElement.scrollHeight / 250));
-      let vuLeCollant = false;
       for (let i = 0; i <= pas; i += 1) {
         await onglet.evaluate((y) => window.scrollTo(0, y), i * 250);
         await onglet.waitForTimeout(60);
         const lues = await fixes();
         const y = await onglet.evaluate(() => window.pageYOffset);
         expect(lues.length, `à ${y} px : ${lues.join(', ')}`).toBeLessThanOrEqual(1);
-        const collant = await onglet.evaluate(() => !document.getElementById('collant').hidden && getComputedStyle(document.getElementById('collant')).display !== 'none');
-        if (y < 844) expect(collant, `à ${y} px : sur le premier écran, rien ne colle`).toBe(false);
-        if (collant) vuLeCollant = true;
       }
-      expect(vuLeCollant, 'le bouton colle quelque part sous le premier écran').toBe(true);
       await contexte.close();
     });
   }
@@ -254,20 +235,6 @@ test.describe('pour les bars au téléphone : une seule barre fixe en bas, jamai
 
 // ---------- L'accueil à l'ordinateur : pas de moitié vide au premier écran ----------
 
-test('l’accueil à 1440 × 900 : le texte d’ouverture occupe la moitié gauche du premier écran, à côté du plan', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/');
-  const hero = await page.locator('.une-grille > .ouverture').boundingBox();
-  const plan = await page.locator('.une-grille > .paris').boundingBox();
-  const titre = await page.locator('.ouverture__titre').boundingBox();
-  const cta = await page.locator('.ouverture__cta').boundingBox();
-  expect(hero.x + hero.width, 'le texte à gauche du plan').toBeLessThanOrEqual(plan.x + 1);
-  // Le texte est centré dans le premier écran, en face du plan : ni collé au haut avec un grand vide dessous, ni sous la ligne de flottaison.
-  expect(cta.y + cta.height, 'le bouton est dans le premier écran').toBeLessThanOrEqual(900);
-  const haut = titre.y;
-  const bas = 900 - (cta.y + cta.height);
-  expect(Math.abs((haut - 84) - bas), 'autant de vide au-dessus qu’au-dessous (à 120 px près)').toBeLessThanOrEqual(120);
-});
 
 test('planDeParis : sans match, rien', async () => {
   const site = await fabriquer(sansBarPublie);
@@ -279,32 +246,13 @@ test('planDeParis : sans match, rien', async () => {
 test.describe('l’accueil à 390 × 844', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('le premier écran : la vérité, « Préviens-moi » en ambre, la bande des matchs, « Démo » en grand', async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/');
-    const verite = await page.locator('.soir__verite--haut').boundingBox();
-    expect(verite.y, 'la vérité : haut').toBeGreaterThanOrEqual(0);
-    expect(verite.y + verite.height, 'la vérité : bas').toBeLessThanOrEqual(844);
-    const bande = await page.locator('.soir .prog__l').first().boundingBox();
-    expect(bande.y, 'la bande des matchs sous la vérité').toBeGreaterThan(verite.y + verite.height - 1);
-    expect(bande.y, 'la bande des matchs est dans le premier écran').toBeLessThan(844);
-    const cta = page.locator('.ouverture__cta .capsule');
-    const boite = await cta.boundingBox();
-    expect(boite.y + boite.height).toBeLessThanOrEqual(844);
-    expect(boite.height).toBeGreaterThanOrEqual(44);
-    expect(await cta.evaluate((a) => getComputedStyle(a).backgroundColor)).toBe('rgb(255, 177, 61)');
-    await expect(cta).toHaveAttribute('href', '#attente');
-    const entete = await page.locator('.entete__attente').boundingBox();
-    expect(entete.height, 'le bouton « Préviens-moi » de l’en-tête').toBeGreaterThanOrEqual(44);
-  });
-
   test('chaque étiquette « Démo » fait au moins 12 px, et son contraste est d’au moins 4,5:1', async ({ page }) => {
     await page.goto('/');
-    const etiquettes = await page.$$eval('.etiquette-demo, .plan__demo', (liste) => liste.filter((e) => e.offsetParent !== null).map((e) => {
+    const etiquettes = await page.$$eval('.etiquette-demo', (liste) => liste.filter((e) => e.offsetParent !== null).map((e) => {
       const s = getComputedStyle(e);
       return { taille: parseFloat(s.fontSize), couleur: s.color, fond: s.backgroundColor };
     }));
-    expect(etiquettes.length).toBeGreaterThan(0);
+    expect(etiquettes.length).toBeGreaterThan(1);
     const lum = (c) => {
       const [r, g, b] = c.match(/\d+(\.\d+)?/g).slice(0, 3).map((v) => { const x = Number(v) / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; });
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -314,71 +262,6 @@ test.describe('l’accueil à 390 × 844', () => {
       const [a, b] = [lum(e.couleur), lum(e.fond)].sort((x, y) => y - x);
       expect((a + 0.05) / (b + 0.05)).toBeGreaterThanOrEqual(4.5);
     }
-  });
-
-  test('l’horloge de Paris : « dans 1 h 42 » avant le coup d’envoi, « Le match a commencé. » après, jamais « en cours »', async ({ page }) => {
-    const debut = await page.goto('/').then(() => page.locator('.prog__etat').first().getAttribute('data-debut'));
-    const coup = Date.parse(debut);
-    await page.clock.install({ time: coup - (60 + 42) * 60000 });
-    await page.goto('/');
-    await expect(page.locator('.prog__etat').first()).toHaveText('dans 1 h 42');
-    await page.clock.fastForward((60 + 43) * 60000);
-    await expect(page.locator('.prog__etat').first()).toHaveText('Le match a commencé.');
-    expect(await page.locator('.soir').innerText()).not.toMatch(/en cours/i);
-  });
-
-  test('l’heure avance avec le défilement, du coup d’envoi moins 2 h 18 au coup d’envoi ; elle ne bouge pas seule', async ({ page }) => {
-    await page.goto('/');
-    const heure = page.locator('.scene[data-i="1"] .plan__heure');
-    const avant = await heure.textContent();
-    await page.waitForTimeout(600);
-    expect(await heure.textContent(), 'rien ne bouge seul').toBe(avant);
-    await page.evaluate(() => window.scrollTo(0, 900));
-    await expect.poll(async () => heure.textContent()).not.toBe(avant);
-    const debut = await heure.getAttribute('data-debut');
-    const attendu = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(new Date(Date.parse(debut)));
-    expect(await heure.textContent()).toBe(attendu);
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await expect.poll(async () => heure.textContent()).toBe(avant);
-  });
-
-  test('mouvement réduit : le soir, immobile ; « Maintiens » devient un simple appui', async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/');
-    const debut = await page.locator('.scene[data-i="1"] .plan__heure').getAttribute('data-debut');
-    const attendu = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).format(new Date(Date.parse(debut)));
-    expect(await page.locator('.scene[data-i="1"] .plan__heure').textContent()).toBe(attendu);
-    const essai = page.locator('.essai-place .tenir');
-    await essai.scrollIntoViewIfNeeded();
-    await essai.locator('[data-hold]').click();
-    await expect(essai.locator('.tenir__suite')).toContainText('Place gardée, en démo.');
-    await expect(essai.locator('.tenir__suite a')).toHaveAttribute('href', '#attente');
-  });
-
-  test('« Maintiens » : la barre d’espace tenue jusqu’au bout garde la place, en démo ; rien ne part', async ({ page }) => {
-    const demandes = [];
-    page.on('request', (r) => { if (!r.url().startsWith('http://127.0.0.1')) demandes.push(r.url()); });
-    await page.goto('/');
-    const essai = page.locator('.essai-place .tenir');
-    await essai.scrollIntoViewIfNeeded();
-    const bouton = essai.locator('[data-hold]');
-    await bouton.focus();
-    await page.keyboard.down('Space');
-    await page.waitForTimeout(1400);
-    await page.keyboard.up('Space');
-    await expect(essai.locator('.tenir__suite')).toContainText('Place gardée, en démo. Pour de vrai, l’appli arrive bientôt');
-    expect(demandes).toEqual([]);
-  });
-
-  test('sans JavaScript : le plan s’allume et la liste se lit', async ({ browser }) => {
-    const contexte = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
-    const page = await contexte.newPage();
-    await page.goto('/');
-    await expect(page.locator('.scene[data-i="1"] .plan__svg')).toBeVisible();
-    await expect(page.locator('.scene[data-i="1"] .liste__compte--demo')).toBeVisible();
-    await expect(page.locator('.scene[data-i="1"] .bar')).toHaveCount(0);
-    await expect(page.locator('.tenir__txt').first()).toHaveText('Maintiens pour garder ta place');
-    await contexte.close();
   });
 });
 

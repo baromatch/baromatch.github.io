@@ -216,7 +216,7 @@
     "apercu": "Aperçu du badge : {texte}"
   },
   "accueil": {
-    "_lisezMoi": "Le bloc « Le prochain match » de l’accueil, que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : la carte du prochain match qui n’a pas commencé (la lumière de ses deux clubs, leurs deux insignes à la taille de la carte, le compte à rebours à la minute que main.js tient à jour), une bande des autres matchs du même jour, et « Que faire pour ce match », qui ouvre la réponse honnête : un bar qui diffuse le match, ou « Aucun bar encore pour ce match » et trois gestes qui existent (deux messages WhatsApp que le visiteur écrit, l’agenda du match, « Préviens-moi » sur une ligne). Les matchs sont aussi écrits en JSON dans la page (donnees-ce-soir) : main.js y reprend le prochain match qui n’a pas commencé quand la page est lue plus tard, un autre jour, ou quand tous les matchs du soir ont commencé (alors : demain, ou la date). Les messages ont leurs mots ici ({match}, {quand}, {lien} sont remplacés) ; main.js les lit dans le JSON. Rien n’est gardé sur l’appareil du visiteur : la page ne retient pas son club.",
+    "_lisezMoi": "Le bloc « Le prochain match » de l’accueil, que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : la carte du prochain match qui n’a pas commencé (la lumière de ses deux clubs, leurs deux insignes à la taille de la carte, le compte à rebours à la minute que main.js tient à jour), une bande des autres matchs du même jour, et « Que faire pour ce match », qui ouvre la réponse honnête : un bar qui diffuse le match, ou « Aucun bar encore pour ce match » et trois gestes qui existent (deux messages WhatsApp que le visiteur écrit, l’agenda du match, « Préviens-moi » sur une ligne). Les matchs sont aussi écrits en JSON dans la page (donnees-ce-soir) : main.js y reprend le prochain match qui n’a pas commencé quand la page est lue plus tard, un autre jour, ou quand tous les matchs du soir ont commencé (alors : demain, ou la date). Les messages ont leurs mots ici ({match}, {quand}, {lien} sont remplacés) ; main.js les lit dans le JSON. Rien n’est gardé sur l’appareil du visiteur : la page ne retient pas son club.",
     "etiquette": "Le prochain match",
     "aujourdhui": "aujourd’hui",
     "ceSoir": "ce soir",
@@ -230,9 +230,9 @@
     "avecBars": "{bars} {verbe} ce match.",
     "voirLesBars": "Voir les bars",
     "amis": "Pour tes potes",
-    "amisMessage": "On regarde {match} {quand} ? Le match est là : {lien}",
+    "amisMessage": "On regarde {match} {quand} ? Le match est là : {lien}",
     "bar": "Pour ton bar habituel",
-    "barMessage": "Salut, tu passes {match} {quand} ? Si oui, mets ton bar sur Baromatch pour que les fans te trouvent : {lien}",
+    "barMessage": "Salut, tu passes {match} {quand} ? Si oui, mets ton bar sur Baromatch pour que les fans te trouvent : {lien}",
     "messageEtiquette": "Ton message, tu peux le changer",
     "whatsapp": "Envoyer sur WhatsApp",
     "agenda": "Mettre dans mon agenda",

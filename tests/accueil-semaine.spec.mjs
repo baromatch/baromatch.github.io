@@ -1024,3 +1024,29 @@ test.describe('le jour : le survol, le focus et le pied de page de l’accueil',
     expect(await couleurs('/')).toEqual(await couleurs('/cgu.html'));
   });
 });
+
+// Le numéro d’une étape (1, 2, 3 du plan) : du texte foncé sur un disque clair, jamais du clair sur un disque foncé. Un
+// numéro clair ne se lit que si son disque est peint juste derrière lui ; or le bandeau du bas (blanc, il remplace le
+// menu quand on descend) peut passer par-dessus un numéro au bord de l’écran, et le numéro clair y tombait à 1,01:1 (clair
+// sur le blanc du bandeau). Foncé, il tient 4,5:1 au moins sur son disque, sur la page et sur le bandeau, quel que soit
+// l’instant où l’un ou l’autre est peint.
+test.describe('le numéro d’une étape, sur le clair de l’accueil', () => {
+  test('il est foncé : 4,5:1 au moins sur son disque, sur la page et sur le bandeau du bas', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.goto('/');
+    const numeros = await page.evaluate(() => [...document.querySelectorAll('.etape:not(.etape--nuit) .etape__n')].map((n) => {
+      const s = getComputedStyle(n);
+      return { quoi: `« ${n.textContent} »`, couleur: s.color, disque: s.backgroundColor, page: getComputedStyle(document.body).backgroundColor, bandeau: getComputedStyle(document.querySelector('.menu__liste')).backgroundColor };
+    }));
+    expect(numeros.length).toBeGreaterThanOrEqual(3);
+    for (const n of numeros) {
+      // Le disque est translucide : il se lit posé sur la page.
+      const d = rgb(n.disque);
+      const p = rgb(n.page);
+      const disque = `rgb(${[0, 1, 2].map((i) => Math.round([d.r, d.v, d.b][i] * d.a + [p.r, p.v, p.b][i] * (1 - d.a))).join(', ')})`;
+      expect(contraste(n.couleur, disque), `${n.quoi} sur son disque ${disque}`).toBeGreaterThanOrEqual(4.5);
+      expect(contraste(n.couleur, n.page), `${n.quoi} sur la page`).toBeGreaterThanOrEqual(4.5);
+      expect(contraste(n.couleur, n.bandeau), `${n.quoi} sur le bandeau du bas`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});

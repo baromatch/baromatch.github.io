@@ -6,7 +6,8 @@ import { tete, entete, formulaire, pied, verre, bandeauApercu } from './commun.m
 const IMAGE = { src: 'img/sous-bocks-720.webp', srcset: 'img/sous-bocks-720.webp 720w, img/sous-bocks-1080.webp 1080w', sizes: '(min-width: 960px) 50vw, 100vw' };
 
 // Une pile de sous-bocks : un par match du jour, de la couleur du club qui reçoit, cerclé de la couleur de celui qui
-// se déplace. La hauteur de la pile dit le jour.
+// se déplace, et cerné d’un filet clair (un club sans fiche, à l’encre, ne disparaît pas dans la nuit). La hauteur
+// de la pile dit le jour.
 const pile = (matchs) => {
   const pas = 5;
   const haut = 12 + Math.max(matchs.length, 1) * pas + 8;
@@ -14,7 +15,7 @@ const pile = (matchs) => {
     const y = haut - 10 - i * pas;
     const { a } = couleursDe(m.domicile);
     const { a: b } = couleursDe(m.exterieur);
-    return `<rect x="3" y="${y}" width="38" height="4" rx="1" fill="${a}"/><ellipse cx="22" cy="${y}" rx="19" ry="5.5" fill="${a}"/><ellipse cx="22" cy="${y}" rx="11" ry="3.2" fill="none" stroke="${b}" stroke-width="1.6"/>`;
+    return `<rect x="3" y="${y}" width="38" height="4" rx="1" fill="${a}" stroke="#F7F7F9" stroke-opacity=".3" stroke-width=".6"/><ellipse cx="22" cy="${y}" rx="19" ry="5.5" fill="${a}" stroke="#F7F7F9" stroke-opacity=".3" stroke-width=".6"/><ellipse cx="22" cy="${y}" rx="11" ry="3.2" fill="none" stroke="${b}" stroke-width="1.6"/>`;
   }).join('');
   const vide = matchs.length ? '' : `<ellipse cx="22" cy="${haut - 10}" rx="19" ry="5.5" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 3"/>`;
   return `<svg class="pile__tas" width="44" height="${haut}" viewBox="0 0 44 ${haut}" aria-hidden="true" focusable="false">${couches}${vide}</svg>`;

@@ -7,28 +7,10 @@ import { PAGES } from './outils/pages.mjs';
 import { attendreLaPageFinie } from './outils/attente.mjs';
 import { auJourDeLAccueil } from './outils/horloge.mjs';
 import { couperLAPI, simulerLInvitation } from './outils/invitation.mjs';
+import { lireLesDebordements } from './outils/debordements.mjs';
 
 // Le réglage du navigateur « taille du texte » : par le style de l’élément racine, comme dans tests/entete.spec.mjs.
 const agrandir = (onglet, pourcent) => onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
-
-// Ce qui dépasse à gauche ou à droite de l’écran. Hors jeu : le verre et son halo (coupés exprès par leur section), la
-// lumière du téléphone de démo et ses halos (coupés exprès par leur cadre),
-// les dessins, le lien d’évitement (posé hors de l’écran exprès) et les champs pièges des robots.
-const lireLesDebordements = (onglet) => onglet.evaluate(() => {
-  const largeur = document.documentElement.clientWidth;
-  const dehors = [];
-  for (const e of document.querySelectorAll('body *')) {
-    if (!e.getClientRects().length) continue;
-    // (Et le contenu des deux rangées qui défilent de côté exprès, avec leur propre barre : le programme du soir, et les
-    // moments de la soirée au téléphone ; la page, elle, ne défile pas de côté : `defile`, plus bas.)
-    if (e.closest('.verre, svg, .lien-evitement, .attente__piege, .formulaire__piege, .visuellement-cache, .guide__rail, .instants, .geste__lumiere, .g-ecran__halo, .g-verre__vague')) continue;
-    const r = e.getBoundingClientRect();
-    if (r.right > largeur + 0.5 || r.left < -0.5) {
-      dehors.push(`${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}${e.className && typeof e.className === 'string' ? `.${e.className.split(' ')[0]}` : ''} « ${e.textContent.trim().replace(/\s+/g, ' ').slice(0, 40)} » de ${Math.round(r.left)} à ${Math.round(r.right)} px`);
-    }
-  }
-  return { defile: document.documentElement.scrollWidth > largeur, dehors };
-});
 
 for (const page of PAGES) {
   for (const largeur of [320, 360]) {

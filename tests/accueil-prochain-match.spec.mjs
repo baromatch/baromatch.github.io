@@ -390,7 +390,8 @@ test.describe('axe, avec le bloc du passage', () => {
 // Le contraste de chaque ligne de texte, mesuré sur ce que le navigateur peint : la carte de nuit et sa lumière aux couleurs
 // des deux clubs (des halos flous, des dégradés : aucun n’est une couleur de fond), la réponse ouverte, la bande et le
 // texte d’ouverture. Les écrans du téléphone de démo (une réplique décorative) et les sections de nuit, qui ont leurs
-// propres mesures, sont laissés de côté ; l’étiquette « Démo » et la légende du téléphone, elles, sont mesurées.
+// propres mesures, sont laissés de côté, avec le menu (le bandeau du bas : tests/bandeau-du-bas.spec.mjs) ; l’étiquette « Démo » et
+// la légende du téléphone, elles, sont mesurées.
 test.describe('le contraste du prochain match, mesuré au pixel', () => {
   for (const [largeur, hauteur] of [[390, 844], [1440, 900]]) {
     test(`à ${largeur} × ${hauteur} : chaque ligne de texte à 4,5:1 au moins, la réponse fermée puis ouverte`, async ({ page }, infos) => {
@@ -402,7 +403,7 @@ test.describe('le contraste du prochain match, mesuré au pixel', () => {
       await page.clock.setFixedTime(new Date('2026-11-25T18:30:00Z'));
       await page.goto('/');
       await page.waitForLoadState('networkidle');
-      const NUIT = '.g-ecran, .pied, .film, .bars, .appli, .testeurs-accueil, .attente__piege';
+      const NUIT = '.g-ecran, .pied, .film, .bars, .appli, .testeurs-accueil, .attente__piege, .menu';
       for (const ouverte of [false, true]) {
         if (ouverte) await page.locator('.faire__bouton').click();
         const mesures = (await mesurerAuPixel(page, NUIT)).filter((m) => /geste|prochain|coup|faire|msg|prevenir|puce|bande|etiquette|g-tel/.test(m.quoi) || true);

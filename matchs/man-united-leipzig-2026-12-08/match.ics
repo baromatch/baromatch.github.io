@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbts0x000ei2y6st9cl3mn@baromatch.fr
+DTSTAMP:20261124T235229Z
+SEQUENCE:0
+DTSTART:20261208T200000Z
+DTEND:20261208T220000Z
+SUMMARY:Man United – Leipzig
+DESCRIPTION:Ligue des champions · Manchester United – RB Leipzig\nCoup d
+ ’envoi mardi 8 décembre à 21:00\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/man-united-leipzig-2026-12-08/
+URL:https://baromatch.fr/matchs/man-united-leipzig-2026-12-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

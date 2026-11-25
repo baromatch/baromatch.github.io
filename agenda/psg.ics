@@ -40,13 +40,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmwjbtryy0008i2y6kjno8xu3@baromatch.fr
-DTSTAMP:20261116T215824Z
-SEQUENCE:0
+DTSTAMP:20261124T235229Z
+SEQUENCE:1
 DTSTART:20261208T200000Z
 DTEND:20261208T220000Z
 SUMMARY:Aston Villa – PSG
 DESCRIPTION:Ligue des champions · Aston Villa – Paris Saint-Germain\nCou
- p d’envoi mardi 8 décembre à 21:00\, heure de Paris.
+ p d’envoi mardi 8 décembre à 21:00\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/aston-villa-psg-2026-12-08/
+URL:https://baromatch.fr/matchs/aston-villa-psg-2026-12-08/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

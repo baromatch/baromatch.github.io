@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbtrzs000ai2y6f2tbc7ia@baromatch.fr
+DTSTAMP:20261124T235229Z
+SEQUENCE:0
+DTSTART:20261208T200000Z
+DTEND:20261208T220000Z
+SUMMARY:Barça – Man City
+DESCRIPTION:Ligue des champions · FC Barcelona – Manchester City\nCoup d
+ ’envoi mardi 8 décembre à 21:00\, heure de Paris.\nLa page du match :
+  https://baromatch.fr/matchs/barca-man-city-2026-12-08/
+URL:https://baromatch.fr/matchs/barca-man-city-2026-12-08/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

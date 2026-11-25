@@ -116,6 +116,16 @@ export const insigne = (club, { taille, fond, maintenant, saison = saisonDe(main
   return `${ouvrir('insigne', taille, taille, `0 0 ${BOITE} ${BOITE}`)}${elements(dessin.fiche, { taille, fond, saison })}</svg>`;
 };
 
+// Les deux clubs inventés de la démo de l’accueil (jamais un vrai club) : leurs fiches, dessinées comme celle d’un club de
+// l’appli. Alvène, vert et corail ; Orvèle, indigo et vert tendre.
+export const CLUBS_DE_DEMO = [
+  { cle: 'alvene', fiche: { slug: 'alvene', code: 'ALV', pattern: 'stripes', colours: { primary: '#0F8B7E', secondary: '#FF7F66' } } },
+  { cle: 'orvele', fiche: { slug: 'orvele', code: 'ORV', pattern: 'stripes', colours: { primary: '#3A3FA8', secondary: '#C6E45A' } } },
+];
+
+// Le dessin d’une fiche donnée (un club inventé), comme insigne() dessine celle d’un club.
+export const insigneDeFiche = (fiche, { taille, fond }) => `${ouvrir('insigne', taille, taille, `0 0 ${BOITE} ${BOITE}`)}${elements(fiche, { taille, fond, saison: null })}</svg>`;
+
 // Les deux clubs d’un match, domicile puis extérieur, comme la paire de l’appli.
 export const paireDInsignes = (domicile, exterieur, { taille = TAILLES.liste, fond, maintenant }) => {
   const a = dessinDe(domicile);

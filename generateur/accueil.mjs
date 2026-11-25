@@ -59,6 +59,9 @@ export const lumiereDe = (club) => {
   return hexDe(choisie);
 };
 
+// Les espaces insécables du texte de la page, pas ceux des messages que le visiteur envoie (leurs champs) : un message
+// part avec des espaces ordinaires, comme main.js l’écrit.
+const sansLesChamps = (transformer, html) => html.split(/(<textarea[\s\S]*?<\/textarea>)/).map((morceau, i) => (i % 2 ? morceau : transformer(morceau))).join('');
 const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const nomDe = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
 // « 2 bars à Paris », ou le nombre seul quand ses bars sont dans plusieurs villes.
@@ -77,9 +80,12 @@ export const jourDit = (debut, maintenant, t) => {
 
 // Le prochain match à venir : ni commencé, ni reporté ou annulé, à l’heure confirmée (sans elle, on ne peut dire ni
 // « dans 1 h » ni « avant le coup d’envoi »).
+// À l’heure égale, un club de Paris d’abord (le site est celui de Paris), puis l’ordre des adresses.
+const CLUBS_DE_PARIS = ['psg', 'paris-fc'];
+const rangDeParis = (m) => (CLUBS_DE_PARIS.some((c) => m.domicile.cle === c || m.exterieur.cle === c) ? 0 : 1);
 export const matchsDeLAccueil = (donnees, maintenant) => donnees.matchs
   .filter((m) => m.debut > maintenant && !m.statut && m.heureConfirmee !== false)
-  .sort((a, b) => a.debut - b.debut || a.slug.localeCompare(b.slug))
+  .sort((a, b) => a.debut - b.debut || rangDeParis(a) - rangDeParis(b) || a.slug.localeCompare(b.slug))
   .slice(0, MATCHS_DE_L_ACCUEIL);
 
 const planche = (clubs) => {
@@ -116,7 +122,7 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
   const t = textes.accueil;
   const matchs = matchsDeLAccueil(donnees, maintenant);
   if (!matchs.length) {
-    return insecables(`<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
+    return sansLesChamps(insecables, `<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
 <h2 class="prochain__etiquette" id="soir-titre">${e(t.etiquette)}</h2>
 <p class="prochain__rien">${e(t.rien)} <a href="/matchs/">${e(t.rienLien)}</a></p>
 </section>`);
@@ -144,7 +150,9 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
       amisMessage: t.amisMessage, barMessage: t.barMessage,
     },
   };
-  const puce = (m) => `<li><a class="puce" href="${cheminDuMatch(m)}">${disque(m.domicile)}${disque(m.exterieur)}<span class="puce__nom">${e(nomDe(m))}</span><time class="puce__heure" datetime="${isoDeParis(m.debut)}">${heureDeParis(m.debut)}</time></a></li>`;
+  const puce = (m) => `<li><a class="puce" href="${cheminDuMatch(m)}">${disque(m.domicile)}${disque(m.exterieur)}<span class="puce__nom">${e(nomDe(m))}</span>${m.debut <= maintenant
+    ? `<span class="puce__en-cours">${e(t.enCours)}</span>`
+    : `<time class="puce__heure" datetime="${isoDeParis(m.debut)}">${heureDeParis(m.debut)}</time>`}</a></li>`;
   const avecBars = hero.soirees.length > 0;
   const entete = avecBars
     ? `<p class="faire__titre" data-faire-titre>${e(remplir(t.avecBars, { bars: lesBars(hero), verbe: hero.soirees.length > 1 ? 'diffusent' : 'diffuse' }))}</p>
@@ -158,7 +166,7 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
 </div>`;
   // « Pas de match ce soir » : le prochain est un autre jour, et rien ne se joue aujourd’hui (ni à venir, ni en cours).
   const horsAujourdhui = jourHero !== aujourdhui && !donnees.matchs.some((m) => !m.statut && jourDeParis(m.debut) === aujourdhui && m.debut + DUREE_MATCH_MS > maintenant);
-  return insecables(`<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
+  return sansLesChamps(insecables, `<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
 ${planche(clubs)}
 <h2 class="prochain__etiquette" id="soir-titre">${e(t.etiquette)} <span class="prochain__quand" data-soir-quand>· ${e(quand)}</span></h2>
 <div class="coup" data-coup="${isoDeParis(hero.debut)}">

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La politique, règle par règle : tests/pour-les-bars.spec.mjs (POLITIQUE), qui donne aussi l’empreinte du style. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-Z8CX4x3nMg4mqMAy3gftsg9uCFUU41pYZzf1ucNweNA='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-pVhqSxOZq4xOqVOW7dKokBBLmHaErg5Xl7EEp5CkcI8='; img-src 'self'; font-src 'self'; connect-src 'self' https://api-production-8ce4.up.railway.app; base-uri 'none'; object-src 'none'; form-action 'none'">
 <title>Les soirs de match, ton bar sur Baromatch — Pour les bars</title>
 <meta name="description" content="Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.">
 <meta name="robots" content="max-image-preview:large">
@@ -193,7 +193,8 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
 /* En haut, dans l’ordre d’un patron pressé : ce que Baromatch fait pour lui en deux lignes, gratuit et sans engagement, le bouton et l’affiche, la réponse sous 48 h, puis « Où on en est » (les fans ne réservent pas encore). */
 .ouverture-bars__texte-bloc { display: flex; flex-direction: column; align-items: flex-start; }
 .ouverture-bars__titre { order: 1; }
-.ouverture-bars__texte { order: 2; margin-top: 10px; font-size: 1.0625rem; }
+.ouverture-bars__valeur { order: 2; max-width: 36rem; margin: 12px 0 0; font-size: 1.375rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; }
+.ouverture-bars__texte { order: 2; margin-top: 8px; font-size: 1.0625rem; }
 .ouverture-bars__prix { order: 3; margin-top: 14px; font-weight: 800; line-height: 1.25; }
 .ouverture-bars .actions { order: 4; margin-top: 14px; }
 .ouverture-bars__delai { order: 5; max-width: 36rem; margin: 6px 0 0; color: var(--texte); font-size: 1rem; font-weight: 700; line-height: 1.3; }
@@ -258,9 +259,9 @@ textarea.panier__champ { height: auto; min-height: 100px; padding: 13px 16px; li
   <section class="ouverture-bars page" aria-labelledby="titre">
     <div class="ouverture-bars__texte-bloc">
       <p class="etiquette"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false"><g clip-path="url(#pb-bol)"><use href="#pb-vague"/></g><use href="#pb-contour"/><path d="M22.9 72 A82 82 0 0 1 53 32.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/><circle cx="77" cy="105" r="6" fill="#FFF3DA"/></svg>Pour les bars · Paris</p>
-      <h1 class="ouverture-bars__titre" id="titre">Sache qui vient avant le coup d’envoi.</h1>
-      <p class="ouverture-bars__texte">Tu ouvres des places sur Baromatch. Le reste de ta salle reste à toi.</p>
-      <p class="ouverture-bars__texte">Le soir même, tu vois qui est là, et qui est encore attendu.</p>
+      <h1 class="ouverture-bars__titre" id="titre"><span>Les soirs de match,</span> <span>ton bar sur Baromatch.</span></h1>
+      <p class="ouverture-bars__valeur">Sache qui vient avant le coup d’envoi.</p>
+      <p class="ouverture-bars__texte">Tu ouvres des places sur Baromatch. Le reste de ta salle reste à toi, et le soir même tu vois qui est là.</p>
       <p class="ouverture-bars__prix">Gratuit pendant le lancement, sans engagement.</p>
       <p class="ouverture-bars__etat"><strong>Où on en est&nbsp;:</strong> les fans ne réservent pas encore. On prépare l’ouverture avec les premiers bars, à Paris.</p>
       <div class="actions">

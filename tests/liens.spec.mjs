@@ -10,6 +10,10 @@ import { couperLAPI } from './outils/invitation.mjs';
 import { fichierDe, PAGES } from './outils/pages.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
+// Les ancres que seul le robot écrit : la section « Pour ta story Instagram » de l’affiche de la semaine (#story) n’est dans
+// la page enregistrée qu’après un passage avec le rendu des images (comme l’image de partage). Le test d’un passage
+// (affiche-story.spec.mjs) vérifie que la page construite l’a, et que la page des bars y mène.
+const ANCRES_DU_ROBOT = { '/matchs/affiche/': ['story'] };
 const idsDe = (fichier) => new Set([...readFileSync(fichier, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
 
 // Les adresses d’un srcset, lues comme le navigateur les lit (une adresse va jusqu’au premier blanc, une virgule
@@ -65,7 +69,7 @@ for (const page of [...PAGES.filter((p) => !p.chemin.startsWith('/t/')), ...GENE
         casses.push(lien);
         continue;
       }
-      if (url.hash && fichier.endsWith('.html') && !idsDe(fichier).has(url.hash.slice(1))) casses.push(lien);
+      if (url.hash && fichier.endsWith('.html') && !idsDe(fichier).has(url.hash.slice(1)) && !ANCRES_DU_ROBOT[url.pathname]?.includes(url.hash.slice(1))) casses.push(lien);
     }
     expect(casses).toEqual([]);
   });

@@ -30,6 +30,22 @@
     "adresse": "baromatch.fr",
     "stylo": "À compléter au stylo"
   },
+  "story": {
+    "titre": "Les matchs de la semaine",
+    "titreCourt": "Les prochains matchs",
+    "aConfirmer": "À confirmer",
+    "reste": "Et {n} autres matchs sur baromatch.fr/matchs",
+    "resteUn": "Et 1 autre match sur baromatch.fr/matchs",
+    "prepare": "Programme préparé sur baromatch.fr, à l’heure de Paris.",
+    "alt": "Story Instagram : {titre}, {dates}, à l’heure de Paris. Les matchs sont écrits dans l’affiche, au-dessus.",
+    "titreSection": "Pour ta story Instagram",
+    "chapeau": "La même programmation, en image verticale de 1080 × 1920 : tu la publies en story. Gratuite, même sans Baromatch, et refaite avec les matchs de la semaine.",
+    "apercu": "Aperçu de la story, en petit.",
+    "telecharger": "Télécharger l’image (PNG)",
+    "note": "L’image montre les prochains matchs de la semaine, pas seulement ceux que tu diffuses : ajoute ton texte ou un autocollant pour dire lesquels.",
+    "enregistrer": "Sur téléphone, tu peux aussi garder le doigt sur l’image pour l’enregistrer.",
+    "lien": "La même affiche en story Instagram, gratuite aussi"
+  },
   "format": {
     "legende": "Le papier",
     "a4": "A4",

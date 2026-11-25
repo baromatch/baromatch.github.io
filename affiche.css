@@ -25,6 +25,33 @@
 .affiche-format__choix:has(:checked) { border-color: var(--texte); }
 .affiche-format input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--texte); }
 
+/* ---------- La story Instagram (story.mjs) : son aperçu et son téléchargement, à l’écran seulement ---------- */
+
+.affiche-story__corps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px 32px; align-items: start; margin-top: 20px; }
+.affiche-story__image {
+  display: block;
+  width: min(100%, 240px);
+  height: auto;
+  border: 1px solid var(--verre-bord);
+  border-radius: 20px;
+  background: #0A0B10;
+}
+.affiche-story__texte { min-width: 0; max-width: 34rem; }
+.affiche-story__texte p { margin: 0; }
+.affiche-story__texte .regarder-note { margin-top: 14px; }
+.affiche-story__telecharger {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 20px;
+  border: 1px solid var(--champ-bord);
+  border-radius: 22px;
+  background: var(--verre);
+  font-weight: 650;
+}
+.affiche-story__telecharger:hover { background: var(--fond-releve, var(--verre-fort)); }
+@media (min-width: 640px) { .affiche-story__corps { grid-template-columns: 240px minmax(0, 1fr); } }
+
 /* ---------- La feuille, à l’écran ---------- */
 
 .affiche {

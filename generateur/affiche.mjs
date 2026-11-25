@@ -12,6 +12,9 @@
 // - La feuille à laisser au patron d’un bar (/matchs/affiche/pour-le-patron/), fabriquée par feuille-du-patron.mjs :
 //   quatre lignes de la page des bars, où on en est, et un QR code vers son formulaire ; noindex. Ici, seulement son
 //   adresse, ses textes, quand elle est écrite, et le lien de l’affiche de la semaine qui y mène.
+// - La story de l’affiche de la semaine (story.mjs) : la même programmation en image verticale de 1080 × 1920, pour
+//   Instagram, faite des mêmes matchs et téléchargeable sur la page de l’affiche (#story). Elle n’est écrite, et sa section
+//   n’est sur la page, qu’avec le rendu des images (comme l’image de partage) : sans lui, rien.
 // À l’impression : papier blanc, encre noire, une seule touche d’ambre (le verre de la marque) ; A4 ou A3 au choix (la
 // feuille du patron : A4 ou A5), sans fixer la taille du papier (@page size bloquerait le choix dans la fenêtre
 // d’impression).
@@ -25,8 +28,9 @@ import { paireDInsignes, TAILLES } from './insigne.mjs';
 import { heureDeParis, heureDuJour, jourDeParis, jourEnLettres } from './heure.mjs';
 import { adresseDe, cheminDeLaVille, cheminDuBar, debutDe, filDAriane, pageWeb } from './jsonld.mjs';
 import { description as decrire, SEMAINE_JOURS, titre as intituler } from './pages.mjs';
-import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
+import { carteDessinable, imageDeLaCarte, LONGUEUR_DE_LA_VERSION, lignesDeLaCarte } from './partage.mjs';
 import { svgDuQr } from './qr.mjs';
+import { CHEMIN_DE_L_APERCU, CHEMIN_DE_LA_STORY, donneesDeLaStory, empreinteDeLaStory, HAUTEUR_DE_L_APERCU, LARGEUR_DE_L_APERCU } from './story.mjs';
 import { capitale, echapper as e } from './texte.mjs';
 
 export const CHEMIN_DE_L_AFFICHE = '/matchs/affiche/';
@@ -146,6 +150,28 @@ const avecLaFeuille = (pageDeBase, { cadre, marque, avecPresse }) => ({
 
 // ---------- L’affiche de la semaine, pour tous les bars ----------
 
+// La story de l’affiche, sur la page de l’affiche : son aperçu (celui que montre la page, 360 × 640) et le lien qui donne
+// l’image entière. La version dans l’adresse (« ?v=… ») est le début de l’empreinte du dessin : une autre semaine, une
+// autre adresse (le navigateur et les apps de messagerie gardent les images).
+const NOM_DU_FICHIER_DE_LA_STORY = 'baromatch-affiche-de-la-semaine-story.png';
+const sectionDeLaStory = (story, { verre, signature }) => {
+  const t = TEXTES_DES_AFFICHES.story;
+  const version = (largeur) => empreinteDeLaStory(story, { verre, signature, largeur }).slice(0, LONGUEUR_DE_LA_VERSION);
+  return `<section class="regarder-section affiche-story" aria-labelledby="titre-story" id="story">
+  <h2 id="titre-story">${e(t.titreSection)}</h2>
+  <p>${e(t.chapeau)}</p>
+  <div class="affiche-story__corps">
+    <img class="affiche-story__image" src="${CHEMIN_DE_L_APERCU}?v=${version(LARGEUR_DE_L_APERCU)}" width="${LARGEUR_DE_L_APERCU}" height="${HAUTEUR_DE_L_APERCU}" loading="lazy" decoding="async" alt="${e(story.alt)}">
+    <div class="affiche-story__texte">
+      <p><a class="affiche-story__telecharger" href="${CHEMIN_DE_LA_STORY}?v=${version(1080)}" download="${NOM_DU_FICHIER_DE_LA_STORY}">${e(t.telecharger)}</a></p>
+      <p class="regarder-note">${e(t.note)}</p>
+      <p class="regarder-note">${e(t.enregistrer)}</p>
+    </div>
+  </div>
+</section>`;
+};
+
+
 export const fabriquerLAfficheOuverte = ({ donnees, contenu, cadre, avecPresse = false, qr, images = false }) => {
   const { maintenant } = donnees;
   const t = TEXTES_DES_AFFICHES.ouverte;
@@ -153,6 +179,16 @@ export const fabriquerLAfficheOuverte = ({ donnees, contenu, cadre, avecPresse =
   const chemin = CHEMIN_DE_L_AFFICHE;
   const matchs = matchsDeLAffiche(donnees);
   const etapes = [{ nom: contenu.textes.fil.accueil, chemin: '/' }, { nom: contenu.textes.fil.matchs, chemin: '/matchs/' }, { nom: t.fil, chemin }];
+  // La story de la même semaine : seulement avec le rendu des images (images) et au moins un match à montrer.
+  const nomDuJour = (jour) => {
+    const [nom, numero] = jourEnLettres(midiDe(jour)).split(' ');
+    return `${capitale(nom)} ${numero}`;
+  };
+  const story = images && matchs.length ? donneesDeLaStory({
+    matchs, jourDe: jourDeParis, nomDuJour, heure: heureDeParis, datesDeLaSemaine: lesDates(joursDeLaSemaine(maintenant)),
+    dates: (premier, dernier) => (premier === dernier ? capitale(jourEnLettres(midiDe(premier))) : lesDates([premier, dernier])),
+    textes: TEXTES_DES_AFFICHES.story,
+  }) : null;
   const titrePage = t.titrePage;
   const desc = t.description;
   // La phrase pour les bars inscrits : seulement quand il en existe au moins un vrai, publié. Puis le lien vers la
@@ -175,7 +211,7 @@ ${matchs.length ? lesJours(matchs, { cochable: true }) : `  <p class="affiche-vi
 ${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant) }), svg: svgDuQr(qr.matrice(ADRESSE_DU_QR), { etiquette: f.qr }), adresse: f.adresse, blanc: f.stylo })}
   </div>
 </section>
-<section class="regarder-section" aria-labelledby="titre-apres">
+${story ? `${sectionDeLaStory(story, { verre: cadre.verre, signature: images.signature })}\n` : ''}<section class="regarder-section" aria-labelledby="titre-apres">
   <h2 id="titre-apres">${e(t.titreApres)}</h2>
   <p>${e(t.droits)}</p>
   <p class="regarder-suite"><a href="/pour-les-bars.html#proposer">${e(t.proposer)}</a></p>${inscrits}
@@ -196,7 +232,7 @@ ${piedDeLaFeuille({ phrase: remplir(f.prepare, { jour: jourEnLettres(maintenant)
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes)],
       corps, image,
     }, { cadre, marque: contenu.marque, avecPresse }),
-    carte, ...(image ? { imageDePartage: image } : {}),
+    carte, ...(image ? { imageDePartage: image } : {}), ...(story ? { story } : {}),
   };
 };
 

@@ -22,6 +22,7 @@ import { badgeDuBar } from './badge.mjs';
 import { chargerLeRendu } from './images/rendu.mjs';
 import { chargerLeQr } from './qr.mjs';
 import { cheminDeLImage, empreinteDuDessin, lesPolices, POIDS_MAX, svgDeLaCarte } from './partage.mjs';
+import { CHEMIN_DE_L_APERCU, CHEMIN_DE_LA_STORY, LARGEUR_DE_L_APERCU, LARGEUR_STORY, svgDeLaStory } from './story.mjs';
 import { RACINE } from './contenu.mjs';
 import { jourDeParis } from './heure.mjs';
 import { adresseDe } from './jsonld.mjs';
@@ -123,6 +124,21 @@ export const construire = async ({
       const png = deja ? null : charge.rendu.rendre(svg);
       if (png && png.length > POIDS_MAX) journal(`avertissement : ${chemin} pèse ${Math.round(png.length / 1024)} Ko (plus de ${POIDS_MAX / 1024} Ko)`);
       fichiers.push({ chemin, type: 'partage', cle: p.cle, indexable: false, empreinte: marque, contenu: png });
+    }
+  }
+
+  // La story de l’affiche de la semaine (story.mjs) : son image entière (1080 × 1920, celle qu’on télécharge) et son aperçu
+  // (270 × 480, celui de la page), à côté de l’affiche, du même dessin et de la même empreinte que les images de partage :
+  // un dessin inchangé dont le fichier est là n’est ni refait ni réécrit. Sans match, la page n’a pas de story : ses deux
+  // fichiers ne sont plus dans les nouveaux, et ce passage les supprime.
+  if (charge.rendu) {
+    for (const p of site.pages.filter((x) => x.story)) {
+      for (const [chemin, cle, largeur] of [[CHEMIN_DE_LA_STORY, p.cle, LARGEUR_STORY], [CHEMIN_DE_L_APERCU, `${p.cle}-apercu`, LARGEUR_DE_L_APERCU]]) {
+        const svg = svgDeLaStory(p.story, { verre: site.cadre.verre, largeur });
+        const marque = empreinteDuDessin(svg, charge.rendu.signature);
+        const deja = precedent.pages?.[chemin]?.empreinte === marque && existsSync(path.join(sortie, fichierDuChemin(chemin)));
+        fichiers.push({ chemin, type: 'story', cle, indexable: false, empreinte: marque, contenu: deja ? null : charge.rendu.rendre(svg) });
+      }
     }
   }
 

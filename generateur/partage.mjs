@@ -27,9 +27,9 @@ export const NOM_DU_FICHIER = 'partage.png';
 export const DOSSIER_DES_POLICES = path.join(DOSSIER_GENERATEUR, 'images', 'polices');
 export const TEXTES = JSON.parse(readFileSync(path.join(DOSSIER_GENERATEUR, 'contenu', 'partage.json'), 'utf8'));
 
-const NUIT = '#0A0B10';
-const BLANC = '#F7F7F9';
-const AMBRE = '#FFB13D';
+export const NUIT = '#0A0B10';
+export const BLANC = '#F7F7F9';
+export const AMBRE = '#FFB13D';
 
 // ---------- Les deux polices, et la mesure d’un texte ----------
 
@@ -210,7 +210,7 @@ const INSIGNE = { tailles: [TAILLES.partage, 128, 96], bord: 64, ecart: 32 };
 const placeEntreLesInsignes = (taille) => PLACE - 2 * (taille + INSIGNE.ecart);
 
 // Un texte trop long pour sa place, coupé à la fin d’un mot et terminé par « … ».
-const raccourcir = (police, texte, taille, espacement, place) => {
+export const raccourcir = (police, texte, taille, espacement, place) => {
   if (police.largeur(texte, taille, espacement) <= place) return texte;
   const mots = texte.split(' ');
   while (mots.length > 1) {
@@ -224,7 +224,7 @@ const raccourcir = (police, texte, taille, espacement, place) => {
 };
 
 // Une ligne à la plus grande taille qui tient (de « max » à « min »), puis raccourcie si même « min » ne tient pas.
-const ajuster = (police, texte, { max, min, espacement = 0, place = PLACE }) => {
+export const ajuster = (police, texte, { max, min, espacement = 0, place = PLACE }) => {
   for (let taille = max; taille >= min; taille -= 2) {
     if (police.largeur(texte, taille, espacement * taille) <= place) return { lignes: [texte], taille };
   }
@@ -261,7 +261,7 @@ const ajusterLeTitre = (police, texte, place = PLACE) => {
 };
 
 // Le verre de la marque, ses dégradés renommés pour ce fichier, à la place et à la taille voulues.
-const verreDeLaCarte = (verre, x, y, cote) => verre
+export const verreDeLaCarte = (verre, x, y, cote) => verre
   .replace(/\bpd-/g, 'pg-')
   .replace('<svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">', `<svg x="${x}" y="${y}" width="${cote}" height="${cote}" viewBox="0 0 200 200">`);
 

@@ -167,7 +167,7 @@ const verifierLaPage = async (onglet, chemin, cas) => {
     .filter((e) => e.checkVisibility({ visibilityProperty: true }) && !e.closest('.menu')
       && (e.textContent.replace(/\s+/g, ' ').trim() === 'Proposer mon bar' || (e.closest('form') && e.matches('button, input[type="submit"]'))))
     .map((e, i) => { e.dataset.cibleDuBandeau = String(i); return i; }));
-  if (chemin.startsWith('/pour-les-bars')) expect(cibles.length, '« Proposer mon bar » et le bouton du formulaire').toBeGreaterThanOrEqual(4);
+  if (chemin.startsWith('/pour-les-bars')) expect(cibles.length, '« Proposer mon bar » (un seul en haut de page, un dans le pied) et le bouton du formulaire').toBeGreaterThanOrEqual(3);
   expect(cibles.length, 'au moins « Proposer mon bar » du pied de page').toBeGreaterThan(0);
   for (const i of cibles) {
     for (const facon of ['bas', 'focus']) {
@@ -324,7 +324,7 @@ for (const cas of CAS) {
 
       test(`« Pour les bars », la case oubliée puis l’envoi (${qui}) : la case, son message et le bouton se voient`, async ({ page: onglet }) => {
         await ouvrir(onglet, '/pour-les-bars.html', cas);
-        for (const [id, valeur] of [['demande-bar', 'Le Zinc inventé'], ['demande-ville', 'Paris'], ['demande-nom', 'Camille Exemple'], ['demande-email', 'patron.invente@example.org']]) {
+        for (const [id, valeur] of [['demande-bar', 'Le Zinc inventé'], ['demande-nom', 'Camille'], ['demande-email', 'patron.invente@example.org'], ['demande-ville', 'Paris 11e']]) {
           await onglet.locator(`#${id}`).fill(valeur);
         }
         await onglet.evaluate(() => document.activeElement?.blur());

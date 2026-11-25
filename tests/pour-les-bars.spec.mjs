@@ -25,7 +25,7 @@ const ADRESSE = `${API}/api/public/bar-contact`;
 const TITRE = 'Les soirs de match, ton bar sur Baromatch — Pour les bars';
 // L’image de partage porte ce titre ; un nouveau nom de fichier, pour que les aperçus déjà vus se refassent.
 const IMAGE_OG = '/img/og-bars-2026-10.jpg';
-const DESCRIPTION = 'Baromatch montre ton bar aux fans qui cherchent où regarder le match, garde leurs places et te dit qui a réservé. Propose ton bar.';
+const DESCRIPTION = 'Baromatch montre ton bar aux fans qui cherchent où regarder le match et garde leurs places. Gratuit pendant le lancement. Propose ton bar.';
 const IMAGE_OG_ALT = 'La Console de Baromatch : pour un match, les places sur Baromatch, l’ouverture des réservations et l’heure jusqu’à laquelle une place est gardée. Exemple.';
 // Le style du premier écran, en ligne dans la tête : la politique ne l’autorise que par son empreinte.
 const SOURCE = readFileSync('pour-les-bars.html', 'utf8');
@@ -49,7 +49,6 @@ const POLITIQUE = politiqueAvecLaMesure(`default-src 'self'; script-src 'self'; 
 const CONDITIONS = 'Gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux.';
 const CONDITIONS_COURTES = 'Gratuit pendant le lancement, sans engagement.';
 const COMBIEN = 'Pour ton bar : gratuit pendant le lancement, sans engagement. Aucun paiement tant que tu n’as pas accepté un tarif, et tu arrêtes quand tu veux. Pour tes clients, Baromatch est gratuit : ce qu’ils prennent au bar, ils le paient au bar.';
-const ENGAGEMENT = 'Sans engagement : tu arrêtes quand tu veux. Pendant le lancement, c’est gratuit, et aucun paiement tant que tu n’as pas accepté un tarif.';
 // « Le tarif est à préciser », « tarif à préciser » : ce que la page disait avant ces conditions.
 const TARIF_A_PRECISER = /tarif\s+(?:est\s+)?à\s+préciser/i;
 
@@ -169,7 +168,7 @@ test.describe('ce que la page dit', () => {
 
   // Après la relecture « trois visiteurs » (28 octobre 2026) : les conditions d’abord, puis ce que ça change, comment
   // démarrer, ce que tu vois des fans, les questions et le formulaire. La soirée se raconte une fois, dans la salle.
-  test('les sections dans l’ordre : ouverture (ta salle, ce soir), les conditions, ce que ça change, pour démarrer, ce que tu vois, questions, formulaire', async ({ page }) => {
+  test('les sections dans l’ordre : ouverture (la valeur, ta salle, ce soir en démo), les conditions, pour démarrer, questions, formulaire', async ({ page }) => {
     await page.goto(PAGE);
     const sections = await page.$$eval('main > section', (liste) => liste.map((s) => ({
       id: s.id,
@@ -178,15 +177,13 @@ test.describe('ce que la page dit', () => {
     const ATTENDUES = [
       'Les soirs de match, ton bar sur Baromatch.',
       'Les conditions',
-      'Ce que Baromatch fait pour ton bar',
       'Pour démarrer',
-      'Ce que tu vois des fans. Et ce que tu ne vois jamais.',
       'Les questions des bars',
       'Propose ton bar',
     ];
     expect(sections.map((s) => s.titre).filter((t) => ATTENDUES.includes(t))).toEqual(ATTENDUES);
     expect(sections.find((s) => s.titre === 'Pour démarrer').id).toBe('comment');
-    expect(sections.find((s) => s.titre === 'Ce que Baromatch fait pour ton bar').id).toBe('ce-que-ca-change');
+    expect(sections.map((s) => s.titre)).toHaveLength(5);
     // La soirée n’est plus racontée une deuxième fois heure par heure.
     await expect(page.locator('.horaire')).toHaveCount(0);
     expect(sections.find((s) => s.titre === 'Propose ton bar').id).toBe('proposer');
@@ -230,22 +227,22 @@ test.describe('ce que la page dit', () => {
       question: details.querySelector('summary').textContent,
       reponse: [...details.children].filter((e) => e.tagName !== 'SUMMARY').map((e) => e.textContent).join(' '),
     })));
-    expect(visibles).toHaveLength(13);
+    expect(visibles).toHaveLength(5);
     const espaces = (texte) => texte.replace(/[ \t\r\n]+/g, ' ').trim();
     expect(faq.mainEntity.map((q) => [q['@type'], q.acceptedAnswer['@type'], espaces(q.name), espaces(q.acceptedAnswer.text)]))
       .toEqual(visibles.map((v) => ['Question', 'Answer', espaces(v.question), espaces(v.reponse)]));
   });
 
-  // Les deux endroits qui expliquent l’offre du soir : la carte « Ton offre du soir » et la question « Je peux mettre
+  // Les deux endroits qui expliquent l’offre du soir : la ligne des conditions « Une offre du soir » et la question « Je peux mettre
   // une offre sur une boisson ? ». Chacun cite la mention en entier ; aucun autre texte ne parle d’alcool.
   test('la mention sanitaire, sous l’offre du soir et dans la réponse sur les offres, rien de plus ; aucun mot d’alcool ailleurs, même hors de la vue', async ({ page }) => {
     await page.goto(PAGE);
     const lu = await page.evaluate(() => {
       const offre = (racine) => [...racine.querySelectorAll('.questions details')].filter((d) => /offre sur une boisson/.test(d.querySelector('summary').textContent));
       const corps = document.body.cloneNode(true);
-      const mentions = [...corps.querySelectorAll('.atout__mention')].map((e) => e.textContent);
+      const mentions = [...corps.querySelectorAll('.conditions__mention')].map((e) => e.textContent);
       const reponses = offre(corps).map((d) => d.querySelector('p').textContent);
-      corps.querySelectorAll('.atout__mention').forEach((e) => e.remove());
+      corps.querySelectorAll('.conditions__mention').forEach((e) => e.remove());
       offre(corps).forEach((d) => d.remove());
       const attributs = [...document.querySelectorAll('[alt], [aria-label], [title], meta[content]')]
         .map((e) => [e.getAttribute('alt'), e.getAttribute('aria-label'), e.getAttribute('title'), e.getAttribute('content')].filter(Boolean).join(' '));
@@ -305,7 +302,7 @@ test.describe('ce que la page dit', () => {
       return (clair + 0.05) / (sombre + 0.05);
     };
     const carte = poser(lire(couleurs.carte), lire(couleurs.page));
-    expect(couleurs.bords).toHaveLength(6);
+    expect(couleurs.bords).toHaveLength(4);
     for (const bord of couleurs.bords) expect(rapport(poser(lire(bord), carte), carte), bord).toBeGreaterThanOrEqual(3);
   });
 
@@ -342,37 +339,31 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     reponse: d.querySelector('p').textContent.replace(/\s+/g, ' ').trim(),
   })));
 
-  test('le premier écran, à 360 × 740 : le prix juste sous la phrase d’ouverture, puis où en est Baromatch, le bouton, les pastilles, et le lien du fan égaré en haut', async ({ page }) => {
+  test('le premier écran, à 360 × 740 : la valeur en quatre lignes, le bouton et l’affiche gratuite, puis où en est Baromatch ; un seul bouton « Proposer mon bar »', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto(PAGE);
     const ouverture = page.locator('.ouverture-bars');
-    // Le prix d’abord, juste sous la phrase d’ouverture (gratuit, sans engagement : l’argument d’un premier contact, lu
-    // dans le premier écran d’un iPhone), puis la ligne d’état : tant que l’appli n’est pas ouverte (marque.json), elle
-    // dit que les fans ne réservent pas encore, avant la plateforme. Le jour où l’appli ouvre, ce test échoue tant que la
-    // ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
-    const prix = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix');
-    const etat = ouverture.locator('.ouverture-bars__texte + .ouverture-bars__prix + .ouverture-bars__etat');
-    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
-    await expect(etat).toHaveText('Où on en est : L’appli existe sur iPhone et Android, bientôt sur les stores, à Paris. Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
-    // Les conditions des premiers bars, mot pour mot ; dans les pastilles, celles du bar à côté du gratuit des clients.
-    const bouton = ouverture.locator('.ouverture-bars__etat + .actions .capsule[href="#proposer"]');
-    await expect(prix).toHaveText(CONDITIONS_COURTES);
-    await expect(ouverture.locator('.boutique-promesses li')).toHaveText([
-      'On cherche les premiers bars, à Paris',
-      'Tu choisis combien de places tu ouvres',
-      'Gratuit pour tes clients · pour ton bar, pendant le lancement, sans engagement',
-    ]);
-    // Tout ça sans défiler : le bouton et la phrase du prix sont dans le premier écran.
-    await expect(bouton).toBeInViewport({ ratio: 1 });
-    await expect(prix).toBeInViewport({ ratio: 1 });
-    // Le fan égaré a son lien au-dessus du titre, à côté de « Pour les bars », vers la liste d’attente.
-    const fan = ouverture.locator('a[href="/#attente"]');
-    await expect(fan).toHaveCount(1);
-    await expect(fan).toBeInViewport({ ratio: 1 });
-    // Il dit ce qu’on trouve en le suivant : laisser son e-mail.
-    await expect(fan).toHaveAccessibleName('Fan ? Laisse ton e-mail pour être prévenu du lancement');
-    expect((await fan.boundingBox()).y + 24).toBeLessThan((await page.locator('h1').boundingBox()).y + 1);
-    // Et l’ancienne pastille « Premiers bars à Paris », qui se lisait comme « il y a déjà des bars », est partie.
+    // Le titre du fondateur, puis la valeur : « Sache qui vient avant le coup d’envoi. », ce que le bar ouvre, et le prix.
+    await expect(ouverture.locator('.ouverture-bars__valeur')).toHaveText('Sache qui vient avant le coup d’envoi.');
+    await expect(ouverture.locator('.ouverture-bars__texte')).toHaveText('Tu ouvres des places sur Baromatch. Le reste de ta salle reste à toi, et le soir même tu vois qui est là.');
+    await expect(ouverture.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
+    // Tant que l’appli n’est pas ouverte (marque.json), la page dit que les fans ne réservent pas encore. Le jour où
+    // l’appli ouvre, ce test échoue tant que la ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
+    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Les fans ne réservent pas encore » de pour-les-bars.html').toBe(false);
+    await expect(ouverture.locator('.ouverture-bars__etat')).toHaveText('Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
+    // Un seul bouton « Proposer mon bar » dans la page, et à côté de lui l’affiche gratuite, sans compte.
+    const boutons = page.locator('main a[href="#proposer"]');
+    await expect(boutons).toHaveCount(1);
+    await expect(boutons).toHaveText('Proposer mon bar');
+    const affiche = ouverture.locator('.actions a[href="/matchs/affiche/"]');
+    await expect(affiche).toHaveText('Affiche gratuite pour ton comptoir, sans compte');
+    expect(existsSync('matchs/affiche/index.html') || readFileSync('generateur/affiche.mjs', 'utf8').includes('/matchs/affiche/')).toBe(true);
+    // Tout ça sans défiler : le bouton, l’affiche et la phrase du prix sont dans le premier écran.
+    for (const element of [boutons, affiche, ouverture.locator('.ouverture-bars__prix')]) await expect(element).toBeInViewport({ ratio: 1 });
+    // Plus de lien du fan égaré, ni de pastilles : une seule navigation, celle de l’en-tête.
+    await expect(ouverture.locator('a[href="/#attente"]')).toHaveCount(0);
+    await expect(ouverture.locator('.boutique-promesses')).toHaveCount(0);
+    expect(await page.locator('nav').count()).toBe(await page.locator('header nav, footer nav').count());
     await expect(ouverture).not.toContainText('Premiers bars à Paris');
   });
 
@@ -396,15 +387,6 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
       expect(prix).toEqual({ couleur: 'rgb(10, 11, 16)', gras: true, taille: true });
     });
   }
-
-  test('le lien du fan tient sur la ligne de « Pour les bars » à 360 px, sans pousser le titre', async ({ page }) => {
-    await page.setViewportSize({ width: 360, height: 740 });
-    await page.goto(PAGE);
-    const etiquette = await page.locator('.ouverture-bars .etiquette').boundingBox();
-    const fan = await page.locator('.ouverture-bars a[href="/#attente"]').boundingBox();
-    expect(Math.abs((fan.y + fan.height / 2) - (etiquette.y + etiquette.height / 2))).toBeLessThan(2);
-    expect(fan.height).toBeGreaterThanOrEqual(44);
-  });
 
   // Le titre se coupe comme sur l’image de partage (IMAGE_OG) : deux lignes sur ordinateur, en colonne unique (1024 px)
   // comme dans la colonne de gauche (dès 1100 px). Là, sa taille suit la colonne, min(5rem, 6.6vw) : la seconde ligne
@@ -440,49 +422,27 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     });
   }
 
-  test('l’appli de la porte, sur iPhone et Android, dite sur la carte de la porte et en tête de « De quoi j’ai besoin ? » ; sans l’appli, la page Scan de la Console, pour le seul patron', async ({ page }) => {
-    await page.goto(PAGE);
-    const carte = page.locator('.atout', { has: page.locator('.atout__titre', { hasText: 'La porte, d’un scan' }) });
-    await expect(carte).toContainText('dans l’appli Baromatch : c’est le Mode bar, l’écran de la porte. Il marche sur iPhone et sur Android');
-    // La page Scan de la Console n’est ouverte qu’au compte du patron (un compte de la porte n’y a pas accès), et sa
-    // caméra ne marche pas partout : le code tapé est le chemin sûr. La page ne la promet pas à « ton équipe ».
-    await expect(carte).toContainText('Il marche sur iPhone et sur Android. Sans l’appli, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron : tu tapes le code à 6 chiffres du fan.');
-    const tout = normaliser(await page.locator('main').textContent());
-    for (const phrase of tout.split(/(?<=[.;?])\s/).filter((p) => p.includes('page Scan'))) expect(phrase, phrase).toContain('ton compte de patron');
-    expect(tout).not.toContain('valide aussi un pass, depuis un navigateur');
-    // L’étape 3 renvoie à la réponse pour l’installation, sans répéter le détail.
-    const etape = page.locator('.marche__etape').nth(2);
-    await expect(etape).toContainText('On t’explique comment installer l’appli de la porte.');
-    const besoin = (await questions(page)).find((q) => q.question === 'De quoi j’ai besoin ?');
-    expect(besoin.reponse).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone, iPhone ou Android\./);
-    expect(besoin.reponse).toContain('On t’explique comment installer l’appli quand on te répond.');
-    expect(besoin.reponse).toContain('Sans l’appli, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron, en tapant le code du fan.');
-    // Ni lien vers un store, ni date : rien n’est annoncé.
-    expect(normaliser(await page.locator('main').textContent())).not.toMatch(/bientôt[^.]*\b(20\d\d|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\b/i);
-    await expect(page.locator('a[href*="apps.apple.com"], a[href*="play.google.com"]')).toHaveCount(0);
-  });
-
-  test('les questions : le prix d’abord, ouvert, puis l’engagement ; une réponse franche en tête ; les clients, le délai et l’offre sur une boisson répondus', async ({ page }) => {
+  test('les questions : cinq, le prix d’abord et ouvert ; les clients, la porte, l’offre du soir et les données répondus', async ({ page }) => {
     await page.goto(PAGE);
     const lues = await questions(page);
-    expect(lues.slice(0, 6).map((q) => q.question)).toEqual([
+    expect(lues.map((q) => q.question)).toEqual([
       'Combien ça coûte ?',
-      'Je m’engage pour combien de temps ?',
       'Mes clients doivent télécharger une appli ?',
       'De quoi j’ai besoin ?',
-      'Comment je démarre, et en combien de temps ?',
       'Je peux mettre une offre sur une boisson ?',
+      'Que deviennent les données ?',
     ]);
     expect(lues.filter((q) => q.ouverte).map((q) => q.question)).toEqual(['Combien ça coûte ?']);
     await expect(page.locator('.questions details').first().locator('p')).toBeVisible();
     const reponse = (debut) => lues.find((q) => q.question.startsWith(debut)).reponse;
     expect(reponse('Combien')).toBe(COMBIEN);
-    expect(reponse('Je m’engage')).toBe(ENGAGEMENT);
     expect(reponse('Mes clients')).toMatch(/^Pour garder une place, oui : l’appli Baromatch, gratuite, sur iPhone et Android, bientôt sur l’App Store et Google Play\. Pour entrer, non : /);
-    // Le délai de réponse d’abord (sous 48 h), puis l’ordre des choses, sans autre durée promise : ni mise en place, ni
-    // ouverture.
-    expect(reponse('Comment je démarre')).toMatch(/^On te répond sous 48 h\. Dans l’ordre : tu envoies ta demande/);
-    expect(reponse('Comment je démarre').replace('sous 48 h', '')).not.toMatch(/\d+\s*(jours?|semaines?|heures?|h\b)/);
+    // La porte : l’appli sur un téléphone, ou la page Scan de la Console, pour le seul patron ; ni lien vers un store, ni date.
+    expect(reponse('De quoi')).toMatch(/^Pour la porte, l’appli Baromatch sur un téléphone, iPhone ou Android\./);
+    expect(reponse('De quoi')).toContain('Sans l’appli, tu valides un pass depuis la page Scan de la Console, avec ton compte de patron, en tapant le code du fan.');
+    expect(reponse('De quoi')).toContain('On t’explique comment installer l’appli quand on te répond.');
+    expect(normaliser(await page.locator('main').textContent())).not.toMatch(/bientôt[^.]*\b(20\d\d|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\b/i);
+    await expect(page.locator('a[href*="apps.apple.com"], a[href*="play.google.com"]')).toHaveCount(0);
     // Tant que la question n’est pas tranchée avec un avocat (loi Evin), la réponse ne dit pas « Oui » : elle dit ce
     // qu’est l’offre du soir, et la mention sanitaire sous une offre qui parle d’alcool. Pareil dans la FAQ balisée.
     const boisson = 'L’offre du soir est la tienne : c’est toi qui la décides et qui la sers. Tu écris un titre et un prix : les fans la voient sur la fiche de ton bar, dans l’appli. Sous une offre qui parle d’alcool, l’appli affiche « L’abus d’alcool est dangereux pour la santé, à consommer avec modération. »';
@@ -491,32 +451,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     const balisee = await page.evaluate(() => JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent)['@graph']
       .flatMap((n) => n.mainEntity ?? []).find((q) => q.name.startsWith('Je peux mettre')).acceptedAnswer.text);
     expect(balisee.replace(/\s+/g, ' ')).toBe(boisson);
-    // L’ancienne réponse « On ne peut pas encore te donner de délai. », franche mais vide, est remplacée par l’ordre des choses.
-    expect(lues.map((q) => q.reponse).join(' ')).not.toContain('On ne peut pas encore te donner de délai');
-  });
-
-  // La liste d’attente dit ce que fait le serveur : un bar marqué complet ne donne une place rendue à personne, et
-  // « rouvrir » ne prévient personne ; une place rendue avant le coup d’envoi prévient les premiers de la liste (plusieurs
-  // quand plusieurs places se libèrent), et elle n’est gardée pour aucun d’eux. Les mêmes mots que l’accueil.
-  test('la liste d’attente, vraie : les premiers prévenus, la place pas mise de côté ; marqué complet, une place rendue ne repart pas', async ({ page }) => {
-    await page.goto(PAGE);
-    const moment = page.locator('.moment', { has: page.locator('.atout__titre', { hasText: 'Un retard se prévient' }) });
-    await expect(moment.locator('li', { hasText: 'liste d’attente' })).toHaveText('Toutes tes places en ligne sont prises ? Les fans rejoignent la liste d’attente. Une place rendue avant le coup d’envoi : les premiers de la liste sont prévenus dans l’appli. Elle n’est pas mise de côté : le premier qui la prend la garde.');
-    const plein = (await questions(page)).find((q) => q.question === 'Et quand mon bar est plein ?');
-    expect(plein.reponse).toBe('Tu le marques complet : plus personne ne réserve, et une place rendue ne repart pas. Les fans peuvent rejoindre la liste d’attente, et tu vois combien attendent. Quand tu rouvres, tes places reviennent en ligne pour tous.');
-    const tout = normaliser(await page.locator('main').textContent());
-    for (const promesse of ['le premier de la liste le voit', 'la prend s’il veut', 'tu rouvres des places d’un geste']) expect(tout).not.toContain(promesse);
-  });
-
-  // Trois phrases au plus près de ce que fait l’appli : les pseudos d’une soirée n’arrivent au bar que 3 h avant le coup
-  // d’envoi (avant, des chiffres) ; « Je suis en retard » ne prolonge une place que si le bar la garde 15 minutes après
-  // le coup d’envoi (à 0 ou 30 minutes, le bar est prévenu, la place n’attend pas plus : la règle « gardée jusqu’à » de
-  // l’appli) ; l’affiche QR se pose là où les clients ne la touchent pas.
-  test('ce que le bar sait avant le coup d’envoi, le retard aux trois réglages, l’affiche QR hors de portée des clients', async ({ page }) => {
-    await page.goto(PAGE);
-    await expect(page.locator('.ouverture-bars__texte')).toHaveText('Sur l’appli Baromatch, les fans qui cherchent où voir le match trouvent ton bar et gardent leur place. Avant le coup d’envoi, tu sais combien ont réservé, et dès 3 h avant, qui.');
-    await expect(page.locator('.moment li', { hasText: 'Je suis en retard' })).toHaveText('« Je suis en retard » : le fan prévient qu’il arrive dans 10, 20 ou 30 minutes, et tu le vois dans la Console. Si tu gardes les places 15 minutes après le coup d’envoi, la sienne peut attendre jusqu’à 30 minutes après, pas plus. Si tu les gardes jusqu’au coup d’envoi, ou 30 minutes après, tu es prévenu du retard, mais la place n’attend pas plus.');
-    await expect(page.locator('.moment li', { hasText: 'Personne à la porte' })).toContainText('le QR de ton bar, affiché sur un écran au comptoir que tes clients ne touchent pas (L’affiche QR, dans la Console).');
+    expect(reponse('Que deviennent')).toContain('tu ne vois jamais leur e-mail');
   });
 
   // Rien ne pousse à boire : une gratuité ne se lit jamais près d’une offre ou d’une boisson (le générateur du site ne
@@ -526,7 +461,7 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     // Chaque bloc : un paragraphe, un point de liste, une question avec sa réponse, la carte « Ton offre du soir », et
     // chaque question de la FAQ balisée avec sa réponse.
     const blocs = await page.evaluate(() => [
-      ...[...document.querySelectorAll('main p, main li, main details, main .atout--offre')].map((e) => e.textContent),
+      ...[...document.querySelectorAll('main p, main li, main details, main .conditions__liste li')].map((e) => e.textContent),
       ...JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent)['@graph']
         .flatMap((n) => n.mainEntity ?? []).map((q) => `${q.name} ${q.acceptedAnswer.text}`),
     ]);
@@ -539,26 +474,19 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
   // Les conditions des premiers bars : sous le bouton, dans les pastilles, dans les deux questions et dans la FAQ
   // balisée, les mêmes mots. « Tarif à préciser » ne se lit plus nulle part : ni sur la page, ni dans ce que lisent un
   // lecteur d’écran, un aperçu de partage ou un moteur de recherche.
-  test('les conditions des premiers bars, mot pour mot : sous le bouton, dans « Combien ça coûte ? », dans « Je m’engage pour combien de temps ? » et dans la FAQ balisée ; « tarif à préciser » nulle part', async ({ page }) => {
+  test('les conditions des premiers bars, mot pour mot : sous le bouton, dans « Combien ça coûte ? » et dans la FAQ balisée ; « tarif à préciser » nulle part', async ({ page }) => {
     await page.goto(PAGE);
     expect(CONDITIONS.startsWith(CONDITIONS_COURTES)).toBe(true);
     await expect(page.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
     // En entier dans « Combien ça coûte ? », ouverte d’emblée, après « Pour ton bar : ».
     expect(COMBIEN.toLowerCase()).toContain(`pour ton bar : ${CONDITIONS.toLowerCase()} pour tes clients`);
     expect(normaliser(await page.locator('main').textContent()).toLowerCase()).toContain(CONDITIONS.toLowerCase());
-    // La nouvelle question, juste après le prix, fermée comme les autres (seul le prix est ouvert).
-    const engagement = page.locator('.questions details', { has: page.locator('summary', { hasText: 'Je m’engage pour combien de temps' }) });
-    await expect(engagement).toHaveCount(1);
-    expect(await engagement.evaluate((d) => d.open)).toBe(false);
-    await expect(engagement.locator('summary')).toHaveText('Je m’engage pour combien de temps ?');
-    await expect(engagement.locator('p')).toHaveText(ENGAGEMENT);
     // La FAQ balisée dit les mêmes mots.
     const balisees = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
       .flatMap((s) => JSON.parse(s.textContent)['@graph'] ?? []).flatMap((n) => n.mainEntity ?? [])
       .map((q) => [q.name, q.acceptedAnswer.text]));
     const balisee = (question) => normaliser(balisees.find(([nom]) => normaliser(nom) === question)?.[1] ?? '');
     expect(balisee('Combien ça coûte ?')).toBe(COMBIEN);
-    expect(balisee('Je m’engage pour combien de temps ?')).toBe(ENGAGEMENT);
     // Ce que tout le monde lit de la page : le texte, les attributs, la tête, les données structurées.
     const lu = await page.evaluate(() => [
       document.title,
@@ -580,58 +508,17 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(fichiers.filter((f) => TARIF_A_PRECISER.test(readFileSync(f, 'utf8').replace(/&nbsp;/g, ' ')))).toEqual([]);
   });
 
-  test('les mots de la Console sont dits en clair au premier emploi : la Console, le pass, le Mode bar ; les places sont « libérées », la position « pas envoyée »', async ({ page }) => {
-    await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto(PAGE);
-    await pret(page);
-    const texte = normaliser(await page.locator('main').innerText());
-    const apres = (mot, longueur = 60) => texte.slice(texte.indexOf(mot), texte.indexOf(mot) + longueur);
-    expect(apres('Console')).toContain('Console (ton espace Baromatch');
-    expect(apres('pass ', 50)).toContain('pass du fan (un QR code sur son téléphone)');
-    expect(texte.slice(texte.indexOf('Mode bar') - 12, texte.indexOf('Mode bar') + 40)).toContain('c’est le Mode bar, l’écran de la porte');
-    // Une place sans arrivée validée est libérée : un fan dans la salle mais jamais scanné compte absent.
-    await expect(page.locator('.moment__liste li', { hasText: 'À l’heure que tu choisis' }))
-      .toHaveText('À l’heure que tu choisis, une place dont l’arrivée n’est pas validée est libérée et comptée absente.');
-    expect(texte).not.toMatch(/tombent/);
-    // Mot pour mot : la position n’est pas envoyée avec l’arrivée (l’appli s’en sert sur le téléphone).
-    await expect(page.locator('.regard__liste li', { hasText: 'Sa position' })).toHaveText('Sa position : elle n’est pas envoyée avec son arrivée.');
-  });
-
-  test('« Proposer mon bar » revient à la fin de « Ce que Baromatch fait pour ton bar »', async ({ page }) => {
-    await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto(PAGE);
-    // La mise en page sous le premier écran : avec sa feuille (pret), sinon elle change entre les deux mesures.
-    await pret(page);
-    const bouton = page.locator('.atouts > .actions .capsule[href="#proposer"]');
-    await expect(bouton).toHaveText('Proposer mon bar');
-    const fin = await page.locator('.atouts__grille').boundingBox();
-    expect((await bouton.boundingBox()).y).toBeGreaterThan(fin.y + fin.height);
-  });
-
   // Un seul formulaire, qu’on rejoint depuis chaque moment (la décision du propriétaire) : un bouton principal,
   // « Proposer mon bar », trois fois (en haut, après ce que ça change, dans la bande ambre), et au bout de chacun des
   // quatre moments le même chemin, en lien discret (ni fond ni ambre, une cible de 44 px), pour le patron convaincu en
   // chemin. Puis le formulaire. Le « + » des places de la salle n’est pas ambre : en haut de la page, seul le bouton l’est.
-  test('« Proposer mon bar » : trois boutons (en haut, après ce que ça change, dans la bande ambre), et un lien discret au bout de chaque moment ; en haut, rien d’autre n’est ambre plein', async ({ page }) => {
+  test('« Proposer mon bar » : un seul bouton, ambre plein, en haut ; rien d’autre n’est ambre plein dans l’ouverture', async ({ page }) => {
     await page.goto(PAGE);
     await pret(page);
-    const moment = ['atouts', 'lien-fleche', 'Proposer mon bar'];
     expect(await page.$$eval('main a[href="#proposer"]', (liens) => liens.map((a) => [a.closest('section').className.split(' ')[0], a.className, a.textContent.trim()])))
-      .toEqual([['ouverture-bars', 'capsule', 'Proposer mon bar'], ['conditions', '', 'Propose ton bar'], moment, moment, moment, moment, ['atouts', 'capsule', 'Proposer mon bar'], ['bars', 'bouton-nuit', 'Proposer mon bar']]);
-    // Chaque moment a le sien, à la fin de son texte.
-    expect(await page.$$eval('.moment', (moments) => moments.map((m) => m.querySelector('.moment__texte > :last-child a[href="#proposer"]')?.textContent.trim() ?? null)))
-      .toEqual(Array(4).fill('Proposer mon bar'));
-    const liens = await page.$$eval('.moment .moment__suite a', (liste) => liste.map((a) => {
-      const style = getComputedStyle(a);
-      const boite = a.getBoundingClientRect();
-      return { fond: style.backgroundColor, texte: style.color, hauteur: boite.height >= 44 };
-    }));
-    expect(liens).toEqual(Array(4).fill({ fond: 'rgba(0, 0, 0, 0)', texte: 'rgb(10, 11, 16)', hauteur: true }));
-    // Après les conditions, un simple lien vers le formulaire, sans fond ni ambre : la question du prix réglée, on peut
-    // écrire sans remonter ni descendre six écrans. Le gris de texte du jour (#3D404D, 10:1 sur la carte blanche) : la page
-    // est en clair (<html class="jour">) ; ce lien avait le blanc translucide de la nuit (rgba(247, 247, 249, 0.74)).
-    expect(await page.locator('.conditions a[href="#proposer"]').evaluate((a) => [getComputedStyle(a).color, getComputedStyle(a).backgroundColor]))
-      .toEqual(['rgb(61, 64, 77)', 'rgba(0, 0, 0, 0)']);
+      .toEqual([['ouverture-bars', 'capsule', 'Proposer mon bar']]);
+    // Le formulaire est là, à l’ancre du bouton.
+    await expect(page.locator('#proposer #demande')).toHaveCount(1);
     const fonds = await page.$$eval('.ouverture-bars button, .ouverture-bars a', (cibles) => cibles.map((c) => getComputedStyle(c).backgroundColor));
     expect(fonds.filter((f) => f === 'rgb(255, 177, 61)')).toHaveLength(1);
   });
@@ -640,6 +527,13 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await page.goto(PAGE);
     await expect(page.locator('.conditions__liste li', { hasText: 'Rien sans ton accord' }))
       .toHaveText('Rien sans ton accord. Sur ce site, ton bar n’apparaît qu’avec ton accord écrit.');
+    // Juste après : ce que le patron ne voit jamais, dit en toutes lettres (la question « Que deviennent les données ? » le redit).
+    await expect(page.locator('.conditions__liste li', { hasText: 'Rien sans ton accord' }).locator('+ li'))
+      .toHaveText('Ce que tu ne vois jamais : l’e-mail d’un fan. À la porte, un pseudo et un nombre ; l’Historique ne garde que des totaux.');
+    // La description ne promet pas ce que le produit ne fait pas encore : aucun bar n’apprend « qui a réservé » ; à la porte, un pseudo et un nombre.
+    for (const balise of ['meta[name="description"]', 'meta[property="og:description"]']) {
+      expect(await page.locator(balise).getAttribute('content'), balise).not.toMatch(/qui a réservé|te dit qui/);
+    }
     const ordre = page.locator('.conditions__liste li', { hasText: 'Aucun bar ne paie' });
     await expect(ordre).toHaveText('Aucun bar ne paie pour passer devant un autre. Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Comment on choisit les bars');
     await expect(ordre.locator('a')).toHaveAttribute('href', '/comment-on-choisit-les-bars.html');
@@ -652,32 +546,10 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     expect(choix).toContain('Il n’apparaît sur ce site qu’avec son accord écrit.');
     expect(choix).toContain('Sur ce site, les bars sont rangés par ville, par arrondissement, puis par nom. Aucun bar ne paie pour passer devant un autre.');
   });
-
-  test('sous le formulaire, en fin de page : une ligne pour le fan, une pour le patron qu’il connaît, une pour les partenaires et la presse', async ({ page }) => {
-    await page.goto(PAGE);
-    const ordre = await page.$$eval('main > *', (enfants) => enfants.map((e) => e.className.split(' ')[0]));
-    expect(ordre.at(-1)).toBe('egares');
-    expect(ordre.indexOf('contact')).toBe(ordre.length - 2);
-    const lignes = page.locator('.egares__ligne');
-    await expect(lignes).toHaveText([
-      'Tu cherches un bar pour regarder le match ? Baromatch est en test à Paris. Laisse ton e-mail pour être prévenu.',
-      'Ton bar préféré n’est pas sur Baromatch ? Montre cette page au patron.',
-      'Partenaire, club, ville ou journaliste ? Écris-nous, ou va sur la page Presse.',
-    ]);
-    await expect(lignes.nth(0).locator('a')).toHaveAttribute('href', '/#attente');
-    // L’e-mail des partenaires arrive avec son objet, déjà écrit ; la page Presse existe.
-    expect(await lignes.nth(2).locator('a').evaluateAll((a) => a.map((l) => l.getAttribute('href'))))
-      .toEqual(['mailto:contact@baromatch.fr?subject=Partenariat%20ou%20presse%20%E2%80%93%20Baromatch', '/presse.html']);
-    // « Écris-nous » et « e-mail » ne se coupent pas à leur trait d’union.
-    await expect(page.locator('.egares .insecable')).toHaveCount(2);
-    expect(await page.locator('.egares .insecable').evaluateAll((e) => e.map((x) => getComputedStyle(x).whiteSpace))).toEqual(['nowrap', 'nowrap']);
-    expect(existsSync('presse.html')).toBe(true);
-  });
 });
 
 // Le délai choisi par le fondateur (26 octobre 2026) : une personne répond à chaque demande sous 48 h. Il est dit avant
-// le formulaire, redit dans « C’est envoyé. » et dans « Comment je démarre, et en combien de temps ? », toujours avec les
-// mêmes mots. Rien d’autre n’est promis : ni le temps de mise en place, ni une date d’ouverture.
+// le formulaire, redit dans « C’est envoyé. », toujours avec les mêmes mots. Rien d’autre n’est promis : ni le temps de mise en place, ni une date d’ouverture.
 test.describe('le délai de réponse : sous 48 h', () => {
   const DELAI = 'sous 48 h';
 
@@ -685,22 +557,6 @@ test.describe('le délai de réponse : sous 48 h', () => {
     await page.goto(PAGE);
     await expect(page.locator('#proposer .contact__intro > .chapo').first())
       .toHaveText('Pas de compte à créer : une personne lit chaque demande et te répond sous 48 h.');
-  });
-
-  test('« Comment je démarre, et en combien de temps ? » : la réponse sous 48 h d’abord, la même dans la FAQ balisée ; plus rien « à préciser » sur la page', async ({ page }) => {
-    await page.goto(PAGE);
-    const demarrer = page.locator('.questions details', { has: page.locator('summary', { hasText: 'Comment je démarre' }) });
-    await expect(demarrer.locator('p')).toHaveText('On te répond sous 48 h. Dans l’ordre : tu envoies ta demande, une personne te répond par e-mail ou par téléphone, '
-      + 'puis, si on avance ensemble, Baromatch crée ton bar et ton compte patron (il n’y a pas d’inscription en ligne). Tu te connectes alors à la '
-      + 'Console, tu règles ta salle et tu choisis tes matchs.');
-    const lu = await page.evaluate(() => ({
-      balisee: [...document.querySelectorAll('script[type="application/ld+json"]')].flatMap((s) => JSON.parse(s.textContent)['@graph'] ?? [])
-        .flatMap((n) => n.mainEntity ?? []).find((q) => q.name.startsWith('Comment je démarre')).acceptedAnswer.text,
-      tout: [document.title, document.body.textContent, ...[...document.querySelectorAll('script[type="application/ld+json"]')]
-        .map((s) => JSON.stringify(JSON.parse(s.textContent)))].join(' '),
-    }));
-    expect(normaliser(lu.balisee)).toBe(normaliser(await demarrer.locator('p').textContent()));
-    expect(normaliser(lu.tout)).not.toMatch(/à préciser/i);
   });
 
   test('« C’est envoyé. » : la réponse sous 48 h à l’adresse tapée, et deux choses à faire en attendant, deux liens : l’affiche gratuite, la liste d’attente pour les habitués', async ({ page }) => {
@@ -712,7 +568,7 @@ test.describe('le délai de réponse : sous 48 h', () => {
     const merci = page.locator('#demande-envoyee');
     await expect(merci).toBeVisible();
     await expect(merci.locator('p')).toHaveText([
-      `On te répond sous 48 h à ${SAISIE['#demande-email']}, ou par téléphone si tu as laissé ton numéro. Pas d’e-mail automatique : c’est une personne qui te répond.`,
+      `On te répond sous 48 h à ${SAISIE['#demande-email']}, par une personne. Pas d’e-mail automatique : c’est une personne qui te répond.`,
       'Une erreur dans l’adresse ? Envoie une nouvelle demande',
       'En attendant, imprime l’affiche gratuite des matchs de la semaine pour ton comptoir. Dis aussi à tes habitués de laisser leur e-mail pour être prévenus du lancement.',
     ]);
@@ -727,117 +583,18 @@ test.describe('le délai de réponse : sous 48 h', () => {
   });
 
   // Dans l’ouverture (un des quatre faits du haut), dans les conditions, avant le formulaire, dans « Comment je démarre » et dans « C’est envoyé. ».
-  test('un seul délai, dit cinq fois avec les mêmes mots ; la FAQ balisée le dit aussi', async ({ page }) => {
+  test('un seul délai, dit trois fois avec les mêmes mots (l’ouverture, le formulaire, « C’est envoyé. ») ; la FAQ balisée n’en promet pas d’autre', async ({ page }) => {
     await page.goto(PAGE);
     const texte = normaliser(await page.locator('main').textContent());
-    expect(fois(texte, DELAI)).toBe(5);
-    await expect(page.locator('.conditions__liste li', { hasText: 'Une réponse sous 48' })).toHaveText('Une réponse sous 48 h. Une personne lit chaque demande. Propose ton bar');
+    expect(fois(texte, DELAI)).toBe(3);
+    await expect(page.locator('.ouverture-bars__delai')).toHaveText('Réponse sous 48 h, par une personne.');
     expect(texte).not.toMatch(/48\s*heures|deux jours|2 jours|24 h/i);
     const balisee = normaliser(await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
       .map((s) => JSON.stringify(JSON.parse(s.textContent))).join(' ')));
-    expect(fois(balisee, DELAI)).toBe(1);
+    expect(fois(balisee, DELAI)).toBe(0);
   });
 });
 
-test.describe('les images', () => {
-  for (const largeur of [360, 1280]) {
-    test(`à ${largeur} px : chaque image a son texte, ses tailles et son srcset, se charge, et seules celles sous l’écran attendent`, async ({ page }) => {
-      const demandees = [];
-      const casses = [];
-      page.on('response', (reponse) => {
-        if (reponse.request().resourceType() !== 'image' || reponse.url().startsWith('data:')) return;
-        demandees.push(new URL(reponse.url()).pathname);
-        if (reponse.status() >= 400) casses.push(`${reponse.status()} ${reponse.url()}`);
-      });
-      await page.setViewportSize({ width: largeur, height: 800 });
-      await page.goto(PAGE);
-      await pret(page);
-      const auChargement = await page.$$eval('img', (images) => images.map((image) => ({
-        src: image.getAttribute('src'),
-        alt: image.getAttribute('alt'),
-        largeur: Number(image.getAttribute('width')),
-        hauteur: Number(image.getAttribute('height')),
-        srcset: image.getAttribute('srcset') ?? '',
-        sizes: image.getAttribute('sizes') ?? '',
-        paresseuse: image.getAttribute('loading') === 'lazy',
-        asynchrone: image.getAttribute('decoding') === 'async',
-        prioritaire: image.getAttribute('fetchpriority') === 'high',
-        ouverture: Boolean(image.closest('.ouverture-bars')),
-        affichee: image.getClientRects().length > 0,
-        aLEcran: image.getClientRects().length > 0 && image.getBoundingClientRect().top < window.innerHeight,
-      })));
-      expect(auChargement.length).toBeGreaterThan(5);
-      for (const image of auChargement) {
-        expect(image.alt?.length ?? 0, `${image.src} : alt`).toBeGreaterThan(20);
-        expect(image.largeur, `${image.src} : width`).toBeGreaterThan(0);
-        expect(image.hauteur, `${image.src} : height`).toBeGreaterThan(0);
-        expect(image.srcset.split(',').map((c) => c.trim().split(/\s+/)[1]).every((d) => /^\d+w$/.test(d)), `${image.src} : srcset 1× et 2×`).toBe(true);
-        expect(image.srcset.split(',').length, `${image.src} : srcset 1× et 2×`).toBe(2);
-        expect(image.sizes, `${image.src} : sizes`).not.toBe('');
-        expect(image.src, `${image.src} : WebP`).toMatch(/^\/img\/bars\/[a-z0-9-]+\.webp$/);
-        // L’ouverture se charge tout de suite ; tout le reste attend d’approcher de l’écran, et rien de ce qui est
-        // à l’écran au chargement n’attend.
-        expect(image.paresseuse, `${image.src} : paresseuse`).toBe(!image.ouverture);
-        expect(image.asynchrone, `${image.src} : décodage asynchrone`).toBe(!image.ouverture);
-        expect(image.paresseuse && image.aLEcran, `${image.src} : à l’écran au chargement et paresseuse`).toBe(false);
-        // Aucune image en priorité haute : sur téléphone, le LCP est la phrase d’ouverture, et la Console en
-        // priorité haute lui prenait la bande passante (Lighthouse mobile 93–95 avec, 96–97 sans) ; sur ordinateur,
-        // où la Console est le LCP, elle s’affiche à 0,6 s avec ou sans.
-        expect(image.prioritaire, `${image.src} : priorité haute`).toBe(false);
-      }
-
-      await parcourir(page);
-      const chargees = await page.$$eval('img', (images) => images.filter((image) => image.getClientRects().length > 0).map((image) => ({
-        src: image.getAttribute('src'),
-        chemin: new URL(image.currentSrc).pathname,
-        complete: image.complete,
-        naturelle: image.naturalWidth,
-      })));
-      for (const image of chargees) {
-        expect(image.complete && image.naturelle > 1, `${image.src} : chargée`).toBe(true);
-      }
-      expect(casses).toEqual([]);
-      // Une image cachée à cette largeur n’est pas téléchargée : seules celles qu’on voit le sont.
-      const montrees = new Set(chargees.map((image) => image.chemin));
-      expect([...new Set(demandees)].filter((chemin) => chemin.startsWith('/img/') && !montrees.has(chemin))).toEqual([]);
-    });
-
-    // L’étiquette « Écran de démonstration » est posée sur le bord haut du cadre de l’écran, dans son coin : on la
-    // voit avec l’écran, sans rien cacher de lui. La légende dit le reste (un bar, des clubs, des pseudos inventés).
-    // Ce sont les vrais écrans de l’appli et de la Console : aucune légende ne dit « maquette ».
-    test(`à ${largeur} px : chaque écran porte son étiquette « Écran de démonstration » dans son coin, a sa légende, et aucun ne se dit maquette`, async ({ page }) => {
-      await page.setViewportSize({ width: largeur, height: 800 });
-      await page.goto(PAGE);
-      await pret(page);
-      const figures = await page.$$eval('img', (images) => images.filter((image) => image.getClientRects().length > 0).map((image) => {
-        const figure = image.closest('figure');
-        const affiche = (e) => Boolean(e) && e.getClientRects().length > 0;
-        const legende = figure?.querySelector('figcaption');
-        const etiquettes = [...(figure?.querySelectorAll('.exemple') ?? [])].filter(affiche);
-        // La capture : le premier enfant affiché de la figure qui n’est ni l’étiquette ni la légende.
-        const capture = [...(figure?.children ?? [])].find((e) => affiche(e) && !e.matches('.exemple, figcaption'));
-        const e = etiquettes[0]?.getBoundingClientRect();
-        const c = capture?.getBoundingClientRect();
-        return {
-          src: image.getAttribute('src'),
-          exemple: etiquettes.map((x) => x.textContent),
-          surLaCapture: Boolean(e && c) && e.right > c.left && e.left < c.right && e.bottom > c.top && e.top < c.bottom,
-          dansLeCoin: Boolean(e && c) && e.top >= c.top - 16 && e.top <= c.top + 24 && e.left <= c.left + 40,
-          legende: affiche(legende) ? legende.innerText : '',
-          alt: image.getAttribute('alt'),
-        };
-      }));
-      expect(figures.length).toBeGreaterThan(3);
-      for (const figure of figures) {
-        expect(figure.exemple, `${figure.src} : étiquette « Écran de démonstration »`).toEqual(['Écran de démonstration']);
-        expect(figure.surLaCapture, `${figure.src} : l’étiquette est sur la capture`).toBe(true);
-        expect(figure.dansLeCoin, `${figure.src} : l’étiquette est dans le coin du haut`).toBe(true);
-        expect(figure.legende.length, `${figure.src} : légende`).toBeGreaterThan(20);
-        expect(`${figure.legende} ${figure.alt}`, `${figure.src} : un vrai écran`).not.toMatch(/maquette/i);
-      }
-    });
-  }
-});
 
 test.describe('ce que la page charge', () => {
   test('au chargement, rien d’autre que le site ; la demande ne part qu’à l’envoi, vers le seul serveur Baromatch', async ({ page, baseURL }) => {
@@ -1105,7 +862,7 @@ test.describe('le premier écran d’abord', () => {
     const contexte = await browser.newContext({ baseURL, javaScriptEnabled: false });
     const page = await contexte.newPage();
     await page.goto(PAGE);
-    await expect(page.locator('.regard__carte').first()).toHaveCSS('border-radius', '24px');
+    await expect(page.locator('.marche__etape').first()).toHaveCSS('border-radius', '24px');
     await expect(page.locator('.marche__numero span').first()).toHaveCSS('border-radius', '50%');
     await contexte.close();
   });
@@ -1203,7 +960,7 @@ test.describe('le premier écran d’abord', () => {
 
 // Le chemin e-mail qui remplace le formulaire quand son script ne tourne pas : sans JavaScript, ou quand
 // pour-les-bars.js n’arrive pas (réseau faible, JavaScript actif). Les mots ne parlent pas de JavaScript, et l’e-mail
-// tout prêt a une ligne par information du formulaire, sauf l’adresse e-mail : c’est celle de l’expéditeur.
+// tout prêt a une ligne par information du formulaire.
 async function verifierLeSecours(page) {
   const remplacant = page.locator('.sans-js');
   await expect(remplacant).toBeVisible();
@@ -1217,7 +974,7 @@ async function verifierLeSecours(page) {
   const parametres = Object.fromEntries(requete.split('&').map((paire) => paire.split('=')).map(([cle, valeur]) => [cle, decodeURIComponent(valeur)]));
   expect(destinataire).toBe('contact@baromatch.fr');
   expect(parametres.subject).toBe('Demande d’un bar');
-  expect(parametres.body.split('\r\n')).toEqual(['Bar : ', 'Ville : ', 'Nom : ', 'Téléphone : ', 'Message : ']);
+  expect(parametres.body.split('\r\n')).toEqual(['Bar : ', 'Prénom : ', 'E-mail : ', 'Quartier : ']);
 }
 
 test.describe('quand le formulaire ne vient pas, le chemin e-mail le remplace', () => {
@@ -1246,10 +1003,10 @@ test.describe('sans JavaScript', () => {
     await expect(page.locator('#demande')).toBeHidden();
     await verifierLeSecours(page);
     // Ce qu’un robot doit lire est dans le HTML, sans script.
-    await expect(page.locator('.atout')).toHaveCount(5);
+    await expect(page.locator('.ouverture-bars .salle-soir .kpi')).toHaveCount(5);
     await expect(page.locator('.marche__etape')).toHaveCount(3);
-    await expect(page.locator('.conditions__liste li')).toHaveCount(6);
-    await expect(page.locator('.questions details')).toHaveCount(13);
+    await expect(page.locator('.conditions__liste li')).toHaveCount(7);
+    await expect(page.locator('.questions details')).toHaveCount(5);
     await expect(page.locator('.formulaire__ailleurs a[href="mailto:contact@baromatch.fr"]')).toBeVisible();
   });
 });
@@ -1551,7 +1308,7 @@ test.describe('le mouvement', () => {
     await simulerServeur(page, 'silence');
     await page.clock.install();
     await page.goto(PAGE);
-    for (const selecteur of ['.ouverture-bars .capsule', '.bars .bouton-nuit', '#demande-envoyer']) {
+    for (const selecteur of ['.ouverture-bars .capsule', '#demande-envoyer']) {
       expect(await enfoncee(selecteur), selecteur).toBe('matrix(0.96, 0, 0, 0.96, 0, 0)');
     }
     await envoyerUneDemande(page);
@@ -1560,7 +1317,7 @@ test.describe('le mouvement', () => {
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(PAGE);
-    for (const selecteur of ['.ouverture-bars .capsule', '.bars .bouton-nuit', '#demande-envoyer']) {
+    for (const selecteur of ['.ouverture-bars .capsule', '#demande-envoyer']) {
       expect(await enfoncee(selecteur), selecteur).toBe('none');
     }
   });

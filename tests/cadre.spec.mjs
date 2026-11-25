@@ -505,11 +505,12 @@ test('plus d’ancien cadre : aucune page publiée ne le porte, styles.css ne le
 // ---------- La ligne d’état du pied ----------
 
 test.describe('la ligne d’état du pied de page suit marque.json', () => {
-  test('sur chaque page écrite à la main : celle de l’état de l’appli, la même que la pilule de l’accueil', () => {
+  test('sur chaque page écrite à la main : celle de l’état de l’appli ; l’accueil n’a plus de pastille « Arrive bientôt » en haut', () => {
     const etat = TEXTES.pied.etat[MARQUE.appli.ouverte ? 'ouverte' : 'fermee'];
     expect(etat).toBeTruthy();
     for (const p of PAGES_DU_CADRE) expect(lire(p.fichier).match(PIED)[0], p.fichier).toContain(`<p class="pied__etat">${etat}</p>`);
-    expect(lire('index.html')).toContain(`<p class="ouverture__statut">${etat}</p>`);
+    // Décision du propriétaire : la promesse, puis une ligne honnête dans la phrase d’ouverture, jamais une pastille d’état.
+    expect(lire('index.html')).not.toContain('ouverture__statut');
   });
 
   test('l’appli ouverte : la phrase de l’appli ouverte, et aucune ligne tant qu’elle n’est pas écrite', async () => {

@@ -234,13 +234,15 @@ test.afterAll(async () => {
   sites.length = 0;
 });
 
-test('la semaine pleine : 25 cartes sur ses sept jours, 50 insignes', () => {
+test('la semaine pleine : le bloc de l’accueil ne porte que la carte, sa bande (4 au plus) et 6 matchs, quel que soit le nombre de matchs de la semaine', () => {
   const accueil = readFileSync(path.join(sites[0].plein.dossier, 'index.html'), 'utf8');
   const bloc = accueil.split('<!-- semaine:debut -->')[1].split('<!-- semaine:fin -->')[0];
-  // (Le plan « Paris, ce soir » ouvre le bloc avec ses propres insignes : on compte ceux de la semaine.)
-  const semaine = bloc.slice(bloc.indexOf('<section class="semaine"'));
-  expect((semaine.match(/<li class="carte-match/g) ?? []).length).toBe(25);
-  expect((semaine.match(/<svg class="insignes"/g) ?? []).length * 2 + (semaine.match(/<svg class="insigne"/g) ?? []).length).toBe(50);
+  expect((bloc.match(/<h3 class="coup__titre" data-mot="\d+">/g) ?? []).length).toBe(1);
+  expect((bloc.match(/<a class="puce"/g) ?? []).length).toBeLessThanOrEqual(4);
+  const donnees = JSON.parse(bloc.match(/<script type="application\/json" id="donnees-ce-soir">([\s\S]*?)<\/script>/)[1]);
+  expect(donnees.matchs).toHaveLength(6);
+  // Un grand dessin pour le premier match seulement, un petit pour chaque autre club : la page reste légère.
+  expect((bloc.match(/<symbol id="d-/g) ?? []).length).toBe(2);
 });
 
 for (const [rang, { nom, marque, plus }] of MESURES.entries()) {

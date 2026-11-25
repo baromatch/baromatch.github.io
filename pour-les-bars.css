@@ -31,25 +31,22 @@
      #demande-secours) est en haut de la carte ;
    - les questions, qu’on voit au-dessus de la carte en arrivant par #proposer ;
    - le jour (<html class="jour">) : ce que ce fichier peint en dur pour la nuit, repris en clair dans son dernier bloc. */
-
-
 /* La lumière du match : une boîte fixe derrière la page (sa place est dans le style de la page), et ici ses halos, des
    dégradés radiaux sans flou. ::before, les deux clubs inventés des écrans de démonstration (Alvène, sarcelle, en haut à
    gauche ; Orvèle, indigo, en haut à droite) ; ::after, l’ambre du bar, en bas. Leur force suit --h, que
    pour-les-bars.js fait monter quand on descend : la soirée chauffe vers le coup d’envoi, et les halos montent un peu
    avec elle. Ils ne bougent qu’avec le défilement, jamais d’eux-mêmes (hors leur allumage, moins de 1,5 s) ; avec
    « réduire les animations », seule leur force change. */
-.lumiere { --h: 0.45; }
-.lumiere::before, .lumiere::after { content: ""; position: absolute; inset: -6vmax; }
-.lumiere::before { background: radial-gradient(circle 55vmax at 6vmax -1vmax, rgba(15, 139, 126, 0.55), transparent), radial-gradient(circle 50vmax at calc(100% - 4vmax) 6vmax, rgba(58, 63, 168, 0.6), transparent); opacity: calc(0.4 + 0.4 * var(--h)); }
-.lumiere::after { background: radial-gradient(circle 50vmax at 66vmax calc(100% + 16vmax), rgba(255, 177, 61, 0.42), transparent); opacity: calc(0.15 + 0.5 * var(--h)); }
+.lumiere{ --h: 0.45; }
+.lumiere::before, .lumiere::after{ content: ""; position: absolute; inset: -6vmax; }
+.lumiere::before{ background: radial-gradient(circle 55vmax at 6vmax -1vmax, rgba(15, 139, 126, 0.55), transparent), radial-gradient(circle 50vmax at calc(100% - 4vmax) 6vmax, rgba(58, 63, 168, 0.6), transparent); opacity: calc(0.4 + 0.4 * var(--h)); }
+.lumiere::after{ background: radial-gradient(circle 50vmax at 66vmax calc(100% + 16vmax), rgba(255, 177, 61, 0.42), transparent); opacity: calc(0.15 + 0.5 * var(--h)); }
 @keyframes pb-allumer { from { opacity: 0; } }
 @media (prefers-reduced-motion: no-preference) {
-  .lumiere::before, .lumiere::after { will-change: transform, opacity; }
-  .lumiere::before { transform: translate3d(0, calc(var(--h) * -4vmax), 0); animation: pb-allumer 900ms ease-out; }
-  .lumiere::after { transform: translate3d(0, calc(var(--h) * -7vmax), 0); animation: pb-allumer 1400ms ease-out; }
+.lumiere::before, .lumiere::after{ will-change: transform, opacity; }
+.lumiere::before{ transform: translate3d(0, calc(var(--h) * -4vmax), 0); animation: pb-allumer 900ms ease-out; }
+.lumiere::after{ transform: translate3d(0, calc(var(--h) * -7vmax), 0); animation: pb-allumer 1400ms ease-out; }
 }
-
 /* ---------- Ta salle, ce soir : la scène ---------- */
 /* La boîte de la scène (.salle, sa hauteur) et la légende sont dans le style de la page, et le sol y est caché : la
    scène se dessine ici, quand ce fichier arrive, sans rien pousser (elle est aria-hidden : les chiffres, le récit et
@@ -57,138 +54,118 @@
    rotateZ), le mur se lève (rotateX -90°), les sièges sortent du sol selon leur état (translateZ). Les pastilles de la
    légende, à leur place dès le premier affichage, prennent ici les couleurs des sièges, en même temps qu’eux. À 17:00
    (le script pas encore là), les sièges qui seront pris sont en ligne. */
-.salle { overflow-x: clip; perspective: 1100px; perspective-origin: 50% 10%; }
-.salle__sol { visibility: visible; position: absolute; left: 50%; top: 50%; width: 440px; height: 300px; margin: -150px 0 0 -220px; border-radius: 26px; transform-style: preserve-3d; transform: scale(0.55) rotateX(56deg) rotateZ(-30deg); background: radial-gradient(120% 90% at 30% 20%, rgba(255, 177, 61, 0.12), transparent 60%), linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 0 80px rgba(0, 0, 0, 0.55); }
-@media (min-width: 360px) { .salle__sol { transform: scale(0.6) rotateX(56deg) rotateZ(-30deg); } }
-@media (min-width: 420px) { .salle__sol { transform: scale(0.7) rotateX(56deg) rotateZ(-30deg); } }
-@media (min-width: 720px) { .salle__sol { transform: scale(0.98) rotateX(56deg) rotateZ(-30deg); } }
-@media (min-width: 1100px) { .salle__sol { transform: scale(0.74) rotateX(56deg) rotateZ(-30deg); } }
-.salle__mur { position: absolute; left: 0; right: 0; top: 0; height: 74px; border-radius: 16px 16px 0 0; transform-origin: 50% 0; transform: rotateX(-90deg); background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.08)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
-.salle__ecran { position: absolute; left: 110px; width: 220px; top: 10px; height: 54px; border-radius: 8px; display: grid; place-items: center; background: linear-gradient(110deg, #0F8B7E, #241D3A 52%, #3A3FA8); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12), 0 0 60px rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.92); font-size: 24px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.salle__comptoir { position: absolute; right: 16px; top: 54px; bottom: 22px; width: 22px; border-radius: 11px; transform: translateZ(12px); background: linear-gradient(180deg, rgba(255, 177, 61, 0.4), rgba(255, 177, 61, 0.12)); box-shadow: inset 0 0 0 1px rgba(255, 177, 61, 0.5), 0 0 34px rgba(255, 177, 61, 0.22); }
-.salle__porte { position: absolute; left: -2px; bottom: 28px; width: 5px; height: 54px; border-radius: 3px; background: rgba(255, 255, 255, 0.7); box-shadow: 0 0 16px rgba(255, 255, 255, 0.5); }
-.salle__tables { position: absolute; left: 28px; right: 62px; top: 56px; bottom: 18px; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); transform-style: preserve-3d; }
-.salle__tables b { position: relative; transform-style: preserve-3d; }
-.salle__tables b::before { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
-.salle i { position: absolute; left: 50%; top: 50%; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.24); transform: translateZ(1px); }
-.salle__tables i:nth-child(1) { translate: -19px 0; }
-.salle__tables i:nth-child(2) { translate: 19px 0; }
-.salle__tables i:nth-child(3) { translate: 0 -17px; }
-.salle__tables i:nth-child(4) { translate: 0 17px; }
-.salle i[data-e=e], .salle-soir__legende i[data-e=e] { box-shadow: inset 0 0 0 1.5px rgba(255, 177, 61, 0.9); background: rgba(255, 177, 61, 0.12); }
-.salle i[data-e=g], .salle-soir__legende i[data-e=g] { box-shadow: inset 0 0 0 1.5px var(--ambre); background: linear-gradient(0deg, var(--ambre) 0 52%, rgba(255, 177, 61, 0.14) 52%); }
-.salle i[data-e=g] { transform: translateZ(6px); }
-.salle i[data-e=a], .salle-soir__legende i[data-e=a] { background: radial-gradient(circle at 38% 32%, var(--goutte), var(--ambre) 46%, var(--ambre-fonce)); box-shadow: 0 0 0 2px #7EE2B0, 0 0 16px rgba(255, 177, 61, 0.85); }
-.salle i[data-e=a] { transform: translateZ(13px); }
-.salle i[data-e=s], .salle-soir__legende i[data-e=s] { background: radial-gradient(circle at 38% 32%, #FFFFFF, #C9CEDE 70%); box-shadow: 0 0 12px rgba(255, 255, 255, 0.32); }
-.salle i[data-e=s] { transform: translateZ(9px); }
-.salle-soir__legende i[data-e=l] { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.34); }
+.salle{ overflow-x: clip; perspective: 1100px; perspective-origin: 50% 10%; }
+.salle__sol{ visibility: visible; position: absolute; left: 50%; top: 50%; width: 440px; height: 300px; margin: -150px 0 0 -220px; border-radius: 26px; transform-style: preserve-3d; transform: scale(0.55) rotateX(56deg) rotateZ(-30deg); background: radial-gradient(120% 90% at 30% 20%, rgba(255, 177, 61, 0.12), transparent 60%), linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 0 80px rgba(0, 0, 0, 0.55); }
+@media (min-width: 360px) {
+.salle__sol{ transform: scale(0.6) rotateX(56deg) rotateZ(-30deg); }
+}
+@media (min-width: 420px) {
+.salle__sol{ transform: scale(0.7) rotateX(56deg) rotateZ(-30deg); }
+}
+@media (min-width: 720px) {
+.salle__sol{ transform: scale(0.98) rotateX(56deg) rotateZ(-30deg); }
+}
+@media (min-width: 1100px) {
+.salle__sol{ transform: scale(0.74) rotateX(56deg) rotateZ(-30deg); }
+}
+.salle__mur{ position: absolute; left: 0; right: 0; top: 0; height: 74px; border-radius: 16px 16px 0 0; transform-origin: 50% 0; transform: rotateX(-90deg); background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.08)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.salle__ecran{ position: absolute; left: 110px; width: 220px; top: 10px; height: 54px; border-radius: 8px; display: grid; place-items: center; background: linear-gradient(110deg, #0F8B7E, #241D3A 52%, #3A3FA8); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12), 0 0 60px rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.92); font-size: 24px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.salle__comptoir{ position: absolute; right: 16px; top: 54px; bottom: 22px; width: 22px; border-radius: 11px; transform: translateZ(12px); background: linear-gradient(180deg, rgba(255, 177, 61, 0.4), rgba(255, 177, 61, 0.12)); box-shadow: inset 0 0 0 1px rgba(255, 177, 61, 0.5), 0 0 34px rgba(255, 177, 61, 0.22); }
+.salle__porte{ position: absolute; left: -2px; bottom: 28px; width: 5px; height: 54px; border-radius: 3px; background: rgba(255, 255, 255, 0.7); box-shadow: 0 0 16px rgba(255, 255, 255, 0.5); }
+.salle__tables{ position: absolute; left: 28px; right: 62px; top: 56px; bottom: 18px; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); transform-style: preserve-3d; }
+.salle__tables b{ position: relative; transform-style: preserve-3d; }
+.salle__tables b::before{ content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
+.salle i{ position: absolute; left: 50%; top: 50%; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.24); transform: translateZ(1px); }
+.salle__tables i:nth-child(1){ translate: -19px 0; }
+.salle__tables i:nth-child(2){ translate: 19px 0; }
+.salle__tables i:nth-child(3){ translate: 0 -17px; }
+.salle__tables i:nth-child(4){ translate: 0 17px; }
+.salle i[data-e=e], .salle-soir__legende i[data-e=e]{ box-shadow: inset 0 0 0 1.5px rgba(255, 177, 61, 0.9); background: rgba(255, 177, 61, 0.12); }
+.salle i[data-e=g], .salle-soir__legende i[data-e=g]{ box-shadow: inset 0 0 0 1.5px var(--ambre); background: linear-gradient(0deg, var(--ambre) 0 52%, rgba(255, 177, 61, 0.14) 52%); }
+.salle i[data-e=g]{ transform: translateZ(6px); }
+.salle i[data-e=a], .salle-soir__legende i[data-e=a]{ background: radial-gradient(circle at 38% 32%, var(--goutte), var(--ambre) 46%, var(--ambre-fonce)); box-shadow: 0 0 0 2px #7EE2B0, 0 0 16px rgba(255, 177, 61, 0.85); }
+.salle i[data-e=a]{ transform: translateZ(13px); }
+.salle i[data-e=s], .salle-soir__legende i[data-e=s]{ background: radial-gradient(circle at 38% 32%, #FFFFFF, #C9CEDE 70%); box-shadow: 0 0 12px rgba(255, 255, 255, 0.32); }
+.salle i[data-e=s]{ transform: translateZ(9px); }
+.salle-soir__legende i[data-e=l]{ box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.34); }
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .salle-soir:not([data-vivant]) .salle i:is([data-e=a], [data-e=g]) { box-shadow: inset 0 0 0 1.5px rgba(255, 177, 61, 0.9); background: rgba(255, 177, 61, 0.12); transform: translateZ(1px); }
-  .salle-soir:not([data-vivant]) .salle i[data-e=s] { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.24); background: none; transform: translateZ(1px); }
+.salle-soir:not([data-vivant]) .salle i:is([data-e=a], [data-e=g]){ box-shadow: inset 0 0 0 1.5px rgba(255, 177, 61, 0.9); background: rgba(255, 177, 61, 0.12); transform: translateZ(1px); }
+.salle-soir:not([data-vivant]) .salle i[data-e=s]{ box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.24); background: none; transform: translateZ(1px); }
 }
 @keyframes pb-salle { from { opacity: 0; translate: 0 18px; } }
 @media (prefers-reduced-motion: no-preference) {
-  /* Sur la boîte de la scène, pas sur le sol : une opacité en cours sur le sol l’aplatirait (plus de mur, plus de relief). */
-  .salle { animation: pb-salle 800ms var(--sortie-douce) backwards; }
-  .salle i { transition: transform 700ms cubic-bezier(0.22, 1.3, 0.42, 1), background 400ms ease-out, box-shadow 400ms ease-out; }
+/* Sur la boîte de la scène, pas sur le sol : une opacité en cours sur le sol l’aplatirait (plus de mur, plus de relief). */
+.salle{ animation: pb-salle 800ms var(--sortie-douce) backwards; }
+.salle i{ transition: transform 700ms cubic-bezier(0.22, 1.3, 0.42, 1), background 400ms ease-out, box-shadow 400ms ease-out; }
 }
-
 /* Les survols de ce qu’on voit en arrivant (le style de la page n’a que les états au repos). */
-.capsule--verre:hover { background: rgba(255, 255, 255, 0.15); color: var(--texte); }
-.lien-fleche:hover, .lien-fan:hover { color: var(--ambre); text-decoration-color: currentColor; }
-.formulaire__ailleurs a:hover, .formulaire__confidentialite a:hover { color: var(--ambre); }
-.questions summary:hover { color: var(--goutte); }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) { .lien-fleche:hover svg { transform: translateY(2px); } }
-
+.capsule--verre:hover{ background: rgba(255, 255, 255, 0.15); color: var(--texte); }
+.lien-fleche:hover, .lien-fan:hover{ color: var(--ambre); text-decoration-color: currentColor; }
+.formulaire__ailleurs a:hover, .formulaire__confidentialite a:hover{ color: var(--ambre); }
+.questions summary:hover{ color: var(--goutte); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+.lien-fleche:hover svg{ transform: translateY(2px); }
+}
 /* ---------- Les écrans ---------- */
-
 /* L’étiquette « Écran de démonstration » et le téléphone de verre (bord de 6 px, rayons concentriques 34 = 28 + 6)
    sont dans styles.css : l’accueil les montre aussi. */
-
 /* Un morceau de la Console : un panneau de nuit, ses propres coins. */
-.capture { overflow: hidden; max-width: 360px; border-radius: 24px; background: var(--nuit); outline: 1px solid rgba(255, 255, 255, 0.12); outline-offset: -1px; box-shadow: var(--ombre-scene); }
-.capture img { width: 100%; height: auto; }
-.capture--large { max-width: none; border-radius: 18px; }
 /* Deux téléphones côte à côte, un peu décalés ; deux pages de la Console l’une sous l’autre. */
-.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 520px; }
-.duo .telephone:nth-child(2) { margin-top: 36px; }
-.pile { display: grid; gap: 16px; }
-
 /* ---------- Ce que Baromatch fait pour ton bar : quatre moments, et l’offre du soir ---------- */
-
-.atouts__grille { display: grid; gap: 64px; margin: 40px 0 0; }
-@media (min-width: 720px) { .atouts__grille { gap: 96px; margin-top: 64px; } }
-.moment { display: grid; gap: 28px; align-items: center; }
+.moment{ display: grid; gap: 28px; align-items: center; }
 @media (min-width: 960px) {
-  .moment { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 64px; }
-  .moment--inverse .moment__texte { order: 2; }
+.moment{ grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 64px; }
 }
-.moment__numero { display: grid; place-items: center; width: 40px; height: 40px; margin: 0 0 16px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--verre-bord-fort); color: var(--texte); font-weight: 800; font-variant-numeric: tabular-nums; }
-.atout__titre { margin: 0; font-size: clamp(1.625rem, 5vw, 2.375rem); font-weight: 800; font-stretch: 88%; line-height: 1.04; letter-spacing: -0.015em; }
-.atout__texte { margin: 14px 0 0; color: var(--texte-doux); }
-.moment__liste { display: grid; gap: 12px; margin: 16px 0 0; }
-.moment__liste li { position: relative; padding-left: 22px; color: var(--texte-doux); }
-.moment__liste li::before { content: ""; position: absolute; left: 2px; top: 0.62em; width: 8px; height: 8px; border-radius: 50%; background: var(--texte-discret); }
-.moment__liste strong { color: var(--texte); font-weight: 700; }
+.moment__liste{ display: grid; gap: 12px; margin: 16px 0 0; }
+.moment__liste li{ position: relative; padding-left: 22px; color: var(--texte-doux); }
+.moment__liste li::before{ content: ""; position: absolute; left: 2px; top: 0.62em; width: 8px; height: 8px; border-radius: 50%; background: var(--texte-discret); }
+.moment__liste strong{ color: var(--texte); font-weight: 700; }
 /* Au bout de chaque moment, le même chemin vers le formulaire : un lien, pas un bouton (l’ambre reste aux trois boutons). */
-.moment__suite { margin: 18px 0 0; }
-.moment__visuel { width: 100%; max-width: 360px; margin: 12px auto 0; }
-.moment__visuel--duo { max-width: 520px; }
-.moment__visuel--console { max-width: 640px; }
-@media (min-width: 960px) { .moment__visuel { margin-top: 0; } }
-.atout--offre { max-width: 44rem; padding: 24px; border-radius: 24px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); }
-.atout--offre .atout__titre { font-size: 1.375rem; font-stretch: 100%; }
-.atout__mention { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); color: var(--texte-doux); font-size: 0.875rem; line-height: 1.45; }
-
 /* ---------- Comment ça marche : trois étapes ---------- */
-
-.marche__etapes { display: grid; gap: 14px; margin: 36px 0 0; }
-@media (min-width: 900px) { .marche__etapes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 56px; } }
-.marche__etape { padding: 22px 22px 24px; border-radius: 24px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); }
-.marche__numero { margin: 0 0 14px; }
-.marche__numero span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--nuit); box-shadow: inset 0 0 0 2px var(--verre-bord-fort); color: var(--texte); font-size: 1.125rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-.marche__titre { margin: 0; font-size: 1.375rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
-.marche__etape p:not(.marche__numero) { margin: 10px 0 0; color: var(--texte-doux); font-size: 1rem; }
-
+.marche__etapes{ display: grid; gap: 14px; margin: 36px 0 0; }
+@media (min-width: 900px) {
+.marche__etapes{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 56px; }
+}
+.marche__etape{ padding: 22px 22px 24px; border-radius: 24px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); }
+.marche__numero{ margin: 0 0 14px; }
+.marche__numero span{ display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--nuit); box-shadow: inset 0 0 0 2px var(--verre-bord-fort); color: var(--texte); font-size: 1.125rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.marche__titre{ margin: 0; font-size: 1.375rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
+.marche__etape p:not(.marche__numero){ margin: 10px 0 0; color: var(--texte-doux); font-size: 1rem; }
 /* ---------- Les vraies conditions ---------- */
-
-.conditions__liste { display: grid; gap: 10px; margin: 32px 0 0; }
-@media (min-width: 720px) { .conditions__liste { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 48px; } }
-@media (min-width: 1100px) { .conditions__liste { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.conditions__liste li { padding: 18px 20px; border-radius: 20px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); color: var(--texte-doux); }
-.conditions__liste strong { display: block; margin-bottom: 4px; color: var(--texte); font-size: 1.125rem; font-weight: 800; line-height: 1.25; }
+.conditions__liste{ display: grid; gap: 10px; margin: 32px 0 0; }
+@media (min-width: 720px) {
+.conditions__liste{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 48px; }
+.conditions__liste li:last-child:nth-child(odd){ grid-column: 1 / -1; }
+}
+@media (min-width: 1100px) {
+.conditions__liste{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.conditions__liste li:last-child:nth-child(odd){ grid-column: auto; }
+.conditions__liste li:last-child:nth-child(3n + 1){ grid-column: 1 / -1; }
+}
+.conditions__liste li{ padding: 18px 20px; border-radius: 20px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); color: var(--texte-doux); }
+.conditions__liste strong{ display: block; margin-bottom: 4px; color: var(--texte); font-size: 1.125rem; font-weight: 800; line-height: 1.25; }
 /* Les liens dans le texte (comment on choisit les bars, le formulaire depuis les conditions, l’affiche de la semaine,
    l’e-mail et la Confidentialité des questions) : neutres, soulignés. L’ambre reste aux boutons de la page, et aux
    liens du bas, qui sont l’action du fan et du partenaire. */
-.conditions__liste a, .marche .chapo a, .questions a { color: var(--texte-doux); text-decoration: underline; text-decoration-color: rgba(247, 247, 249, 0.4); text-underline-offset: 0.2em; }
-.conditions__liste a:hover, .marche .chapo a:hover, .questions a:hover { color: var(--texte); text-decoration-color: currentColor; }
-
+.conditions__liste a, .marche .chapo a, .questions a{ color: var(--texte-doux); text-decoration: underline; text-decoration-color: rgba(247, 247, 249, 0.4); text-underline-offset: 0.2em; }
+.conditions__liste a:hover, .marche .chapo a:hover, .questions a:hover{ color: var(--texte); text-decoration-color: currentColor; }
 /* ---------- Ce que tu vois des fans ---------- */
-
-.regard .titre-section { max-width: 10.68em; } /* 20ch en Bricolage, comme .titre-section (styles.css) */
-.regard__colonnes { display: grid; gap: 10px; margin-top: 36px; }
-@media (min-width: 720px) { .regard__colonnes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 56px; } }
-.regard__carte { padding: 18px 18px 6px; border-radius: 24px; background: var(--verre); box-shadow: inset 0 0 0 1px var(--verre-bord), var(--verre-reflet); }
-@media (min-width: 720px) { .regard__carte { padding: 28px 28px 14px; } }
-.regard__titre { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; font-size: 1.1875rem; font-weight: 800; line-height: 1.2; }
-.regard__titre svg { flex: none; width: 24px; height: 24px; color: var(--texte-doux); }
-.regard__liste { margin: 0; padding: 0; list-style: none; }
-.regard__liste li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--trait); color: var(--texte-doux); font-size: 1rem; }
-.regard__liste svg { width: 20px; height: 20px; margin-top: 3px; color: var(--texte-discret); }
-.regard__liste strong { color: var(--texte); font-weight: 600; }
-
+.regard .titre-section{ max-width: 10.68em; }
+/* 20ch en Bricolage, comme .titre-section (styles.css) */
+.regard__liste{ margin: 0; padding: 0; list-style: none; }
+.regard__liste li{ display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--trait); color: var(--texte-doux); font-size: 1rem; }
+.regard__liste svg{ width: 20px; height: 20px; margin-top: 3px; color: var(--texte-discret); }
+.regard__liste strong{ color: var(--texte); font-weight: 600; }
 /* ---------- Propose ton bar : le formulaire ---------- */
-
 /* Les champs reprennent .panier__etiquette et .panier__champ de la boutique (52 px, fond de nuit, rayon 14) ; leur
    grille, les marges, le piège à robots et le bord des champs sont dans le style de la page : le formulaire y prend
    sa place, invisible, et son script l’affiche sans attendre ce fichier. Sur la carte de verre, le fond de nuit du
    champ ne se distingue pas (1,16:1) : son bord seul le dessine, à 3:1 au moins (WCAG 1.4.11 ; 0,18 de la boutique
    donnait 1,78:1 ici), d’où le 0,34 du style de la page. Sur le jour, le bord est --champ-bord (du bleu nuit à 50 %),
    3,7:1 sur la carte blanche : sa règle est dans le style de la page aussi. */
-.formulaire .panier__champ[aria-invalid="true"] { border-color: var(--erreur); box-shadow: 0 0 0 1px var(--erreur); }
-.panier__accord input[aria-invalid="true"] { outline: 2px solid var(--erreur); outline-offset: 2px; }
-.champ__erreur {
+.formulaire .panier__champ[aria-invalid="true"]{ border-color: var(--erreur); box-shadow: 0 0 0 1px var(--erreur); }
+.panier__accord input[aria-invalid="true"]{ outline: 2px solid var(--erreur); outline-offset: 2px; }
+.champ__erreur{
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -198,16 +175,14 @@
   font-weight: 600;
   line-height: 1.35;
 }
-.champ__erreur[hidden] { display: none; }
-.champ__erreur svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
-.formulaire .panier__accord + .champ__erreur { margin: 6px 0 0 30px; }
-
-.formulaire__statut:empty, .formulaire__alerte:empty { display: none; }
-.formulaire__statut, .formulaire__alerte, .courriel { margin-top: 18px; }
+.champ__erreur[hidden]{ display: none; }
+.champ__erreur svg{ flex: none; width: 18px; height: 18px; margin-top: 1px; }
+.formulaire .panier__accord + .champ__erreur{ margin: 6px 0 0 30px; }
+.formulaire__statut:empty, .formulaire__alerte:empty{ display: none; }
+.formulaire__statut, .formulaire__alerte, .courriel{ margin-top: 18px; }
 /* Pendant l'envoi : le bouton garde le focus (aria-disabled), devient une capsule de verre et un petit verre s'y
    remplit, jamais de spinner. */
-.panier__envoyer[aria-disabled="true"],
-.panier__envoyer[aria-disabled="true"]:hover {
+.panier__envoyer[aria-disabled="true"], .panier__envoyer[aria-disabled="true"]:hover{
   gap: 10px;
   background: var(--verre-fort);
   color: var(--texte-doux);
@@ -216,29 +191,26 @@
 }
 /* Le petit verre est dans le bouton dès le HTML (le script ne change que le texte) : caché par le style de la page,
    il ne paraît que pendant l'envoi. */
-.panier__envoyer[aria-disabled="true"] svg { display: block; }
+.panier__envoyer[aria-disabled="true"] svg{ display: block; }
 /* Quand la page ne peut plus envoyer elle-même (l'étape e-mail, un 400 REQUETE_INVALIDE, la page périmée), son script
    efface le bouton d'envoi (hidden ; la règle est dans le style de la page) et l'action qui le remplace est le geste
    principal : le chemin e-mail (ambre), ou « Recharger la page » quand la page est périmée. Après un 429, et après
    « Ouvrir ma messagerie » quand la page pouvait encore envoyer, le chemin e-mail mène aussi, et le bouton d'envoi, qui
    reste, passe en verre. Hors ligne (.courriel--second), c'est l'inverse : la demande part d'elle-même au retour du
    réseau, le chemin e-mail est le second choix. */
-.courriel--second .capsule,
-.courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer {
+.courriel--second .capsule, .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer{
   background: var(--verre-fort);
   color: var(--texte);
   box-shadow: inset 0 0 0 1px var(--verre-bord-fort);
 }
-.courriel--second .capsule:hover,
-.courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover { background: rgba(255, 255, 255, 0.15); color: var(--texte); }
-.courriel .lien-bouton { justify-self: start; }
+.courriel--second .capsule:hover, .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover{ background: rgba(255, 255, 255, 0.15); color: var(--texte); }
+.courriel .lien-bouton{ justify-self: start; }
 /* Sous « C'est envoyé. », l'autre chemin et « Tu nous as déjà écrit ? » n'ont plus lieu d'être. */
-.merci:not([hidden]) ~ .formulaire__ailleurs { display: none; }
-.resume a { color: var(--texte-doux); }
-.resume a:hover { color: var(--ambre); }
-
+.merci:not([hidden]) ~ .formulaire__ailleurs{ display: none; }
+.resume a{ color: var(--texte-doux); }
+.resume a:hover{ color: var(--ambre); }
 /* Les messages : une boîte calme, bord neutre ; bord rouge pâle seulement quand quelque chose est refusé. */
-.message, .resume {
+.message, .resume{
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
   gap: 12px;
@@ -247,34 +219,33 @@
   background: rgba(255, 255, 255, 0.05);
   box-shadow: inset 0 0 0 1px var(--verre-bord);
 }
-.message > svg, .resume > svg { width: 24px; height: 24px; color: var(--texte-doux); }
-.message--erreur, .resume { box-shadow: inset 0 0 0 1px rgba(255, 156, 138, 0.5); }
-.message--erreur > svg, .resume > svg { color: var(--erreur); }
-.message__titre, .resume__titre { margin: 0; color: var(--texte); font-size: 1rem; font-weight: 700; line-height: 1.35; }
-.resume__titre { font-variant-numeric: tabular-nums; }
-.message__texte { margin: 4px 0 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.45; }
-.message__actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
+.message > svg, .resume > svg{ width: 24px; height: 24px; color: var(--texte-doux); }
+.message--erreur, .resume{ box-shadow: inset 0 0 0 1px rgba(255, 156, 138, 0.5); }
+.message--erreur > svg, .resume > svg{ color: var(--erreur); }
+.message__titre, .resume__titre{ margin: 0; color: var(--texte); font-size: 1rem; font-weight: 700; line-height: 1.35; }
+.resume__titre{ font-variant-numeric: tabular-nums; }
+.message__texte{ margin: 4px 0 0; color: var(--texte-doux); font-size: 0.9375rem; line-height: 1.45; }
+.message__actions{ grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
 /* Le texte d’une action passe à la ligne plutôt que de sortir de l’écran (« Recharger la page », à 200 % sur 320 px). */
-.message__actions .capsule { flex: 1 1 auto; max-width: 100%; min-height: 48px; padding: 8px 20px; white-space: normal; text-align: center; }
-.resume { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 16px; }
-.resume[hidden] { display: none; }
-.resume:focus { outline: none; }
+.message__actions .capsule{ flex: 1 1 auto; max-width: 100%; min-height: 48px; padding: 8px 20px; white-space: normal; text-align: center; }
+.resume{ grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 16px; }
+.resume[hidden]{ display: none; }
+.resume:focus{ outline: none; }
 /* Le contour du focus du résumé : celui de tout le site (--focus, styles.css), l’ambre sur la nuit, le bleu nuit sur le clair. */
-.resume:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
-.resume__liste { margin: 6px 0 0; padding: 0 0 0 1.1em; color: var(--texte-doux); font-size: 0.9375rem; }
-.resume__liste li { margin: 4px 0; }
-
+.resume:focus-visible{ outline: 2px solid var(--focus); outline-offset: 3px; }
+.resume__liste{ margin: 6px 0 0; padding: 0 0 0 1.1em; color: var(--texte-doux); font-size: 0.9375rem; }
+.resume__liste li{ margin: 4px 0; }
 /* L'étape e-mail : sous le message (statut, ou alerte après un 429), le moyen d'envoyer, sans seconde boîte. */
 /* Une seule colonne, à la largeur du formulaire et jamais à celle de son contenu : avec le texte agrandi (200 % sur 320
    à 414 px, WCAG 1.4.4), le texte à copier (20 colonnes par défaut) et les capsules sur une ligne poussaient le bloc
    hors de l’écran. Les capsules passent à la ligne. */
-.courriel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
-.courriel .capsule { width: 100%; padding: 0 18px; font-size: 1rem; white-space: normal; }
+.courriel{ display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.courriel .capsule{ width: 100%; padding: 0 18px; font-size: 1rem; white-space: normal; }
 /* Contraste forcé (Windows) : un bord transparent devient visible, le bouton en verre garde sa forme. */
-.capsule--verre { border: 1px solid transparent; }
-.courriel[hidden] { display: none; }
-.courriel__etiquette { display: block; margin: 6px 0 0; color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; line-height: 1.4; }
-.courriel__texte {
+.capsule--verre{ border: 1px solid transparent; }
+.courriel[hidden]{ display: none; }
+.courriel__etiquette{ display: block; margin: 6px 0 0; color: var(--texte-discret); font-size: 0.875rem; font-weight: 600; line-height: 1.4; }
+.courriel__texte{
   display: block;
   width: 100%;
   padding: 12px 14px;
@@ -287,16 +258,15 @@
   line-height: 1.45;
   resize: none;
 }
-
 /* Envoyé : le verre est plein, la carte laisse la place au merci. */
-.merci[hidden] { display: none; }
-.merci { padding-top: 16px; }
-.merci:focus { outline: none; }
-.merci__verre { width: 72px; height: 72px; margin-bottom: 20px; }
-.merci__titre { margin: 0; font-size: 2.25rem; font-weight: 800; font-stretch: 88%; line-height: 1; letter-spacing: -0.02em; }
-.merci p { margin: 14px 0 0; color: var(--texte-doux); }
-.merci strong { color: var(--texte); font-weight: 600; overflow-wrap: anywhere; }
-.lien-bouton {
+.merci[hidden]{ display: none; }
+.merci{ padding-top: 16px; }
+.merci:focus{ outline: none; }
+.merci__verre{ width: 72px; height: 72px; margin-bottom: 20px; }
+.merci__titre{ margin: 0; font-size: 2.25rem; font-weight: 800; font-stretch: 88%; line-height: 1; letter-spacing: -0.02em; }
+.merci p{ margin: 14px 0 0; color: var(--texte-doux); }
+.merci strong{ color: var(--texte); font-weight: 600; overflow-wrap: anywhere; }
+.lien-bouton{
   padding: 10px 0;
   border: 0;
   background: none;
@@ -307,23 +277,19 @@
   text-underline-offset: 0.2em;
   cursor: pointer;
 }
-.lien-bouton:hover { color: var(--ambre); }
+.lien-bouton:hover{ color: var(--ambre); }
 /* Le petit verre qui se remplit pendant l'envoi. */
 @keyframes pb-monter {
   0% { transform: translateY(70px); opacity: 1; }
   80% { transform: translateY(-30px); opacity: 1; }
   100% { transform: translateY(-30px); opacity: 0; }
 }
-.jauge-envoi { animation: pb-monter 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-
+.jauge-envoi{ animation: pb-monter 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
 /* ---------- Mouvement réduit ---------- */
-
 @media (prefers-reduced-motion: reduce) {
-  .jauge-envoi { animation: none; }
+.jauge-envoi{ animation: none; }
 }
-
 /* ---------- Le jour : « Pour les bars » en clair ---------- */
-
 /* <html class="jour"> (styles.css, section « Le jour ») : le fond est crème, le texte bleu nuit, l’ambre n’est plus qu’aux
    boutons « Proposer mon bar ». Les jetons suivent d’eux-mêmes ; ce bloc reprend ce que cette feuille peint en dur pour
    la nuit. Ce qui reste de nuit, sur toute la page : la carte « Ta salle, ce soir » (classe « nuit », dans le style de
@@ -331,55 +297,35 @@
    leur étiquette est une pastille de nuit) et le pied de page. Les règles de ce bloc passent par .jour : elles pèsent
    plus que celles de la nuit, plus haut, qui restent telles quelles. Le premier écran et #proposer ont les leurs dans
    le style de la page (ce qu’ils peignent avant l’arrivée de cette feuille). */
-
 /* La lumière du match, en lavis : ses halos (teal, indigo, ambre) gardent leur allumage et leur montée avec la page,
    mais sur du crème chacun teinte de 7 % au plus (0,6 × 0,8 × 0,14), et de 17 % si les trois se superposaient, ce qu’ils
    ne font pas : un petit texte gris garde plus de 4,5:1 dessous, même ainsi (tests/pour-les-bars-jour.spec.mjs le calcule). */
-.jour .lumiere { opacity: 0.14; }
-
+.jour .lumiere{ opacity: 0.14; }
 /* Les cartes sont blanches sur le crème : un filet et l’ombre douce de l’accueil (--ombre-carte), à la place du reflet de verre,
    qui est blanc sur du blanc. */
-.jour :is(.conditions__liste li, .marche__etape, .regard__carte, .atout--offre) { box-shadow: inset 0 0 0 1px var(--verre-bord), var(--ombre-carte); }
-.jour .atout__mention { background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); }
+.jour :is(.conditions__liste li, .marche__etape, .regard__carte, .atout--offre){ box-shadow: inset 0 0 0 1px var(--verre-bord), var(--ombre-carte); }
 /* Le numéro d’une étape : un disque de nuit, son chiffre clair (il suivait --texte, du bleu nuit sur du bleu nuit). */
-.jour .marche__numero span { color: #F7F7F9; box-shadow: none; }
-
+.jour .marche__numero span{ color: #F7F7F9; box-shadow: none; }
 /* Les liens dans le texte : le même souligné, en bleu nuit. */
-.jour :is(.conditions__liste a, .marche .chapo a, .questions a) { text-decoration-color: rgba(10, 11, 16, 0.4); }
-.jour :is(.conditions__liste a, .marche .chapo a, .questions a):hover { text-decoration-color: currentColor; }
-
+.jour :is(.conditions__liste a, .marche .chapo a, .questions a){ text-decoration-color: rgba(10, 11, 16, 0.4); }
+.jour :is(.conditions__liste a, .marche .chapo a, .questions a):hover{ text-decoration-color: currentColor; }
 /* Les survols : jamais d’ambre ni de blanc translucide sur le clair (l’ambre : 1,7:1 sur le crème) ; le texte passe au bleu nuit un peu plus doux. */
-.jour :is(.lien-fleche, .lien-fan, .formulaire__ailleurs a, .formulaire__confidentialite a, .resume a, .lien-bouton, .questions summary):hover { color: var(--texte-doux); }
-.jour .capsule--verre:hover { background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
-
+.jour :is(.lien-fleche, .lien-fan, .formulaire__ailleurs a, .formulaire__confidentialite a, .resume a, .lien-bouton, .questions summary):hover{ color: var(--texte-doux); }
+.jour .capsule--verre:hover{ background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
 /* Les messages et le résumé : une boîte crème sur la carte blanche, un bord d’erreur plein. */
-.jour .message, .jour .resume { background: var(--fond); }
-.jour .message--erreur, .jour .resume { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--erreur) 55%, transparent); }
+.jour .message, .jour .resume{ background: var(--fond); }
+.jour .message--erreur, .jour .resume{ box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--erreur) 55%, transparent); }
 /* L’étape e-mail : le texte à copier est un champ, il a le bord des champs ; le bouton en verre et le bouton d’envoi
    en attente sont crème sur la carte blanche (du blanc sur du blanc ne se voit pas). */
-.jour .courriel__texte { border-color: var(--champ-bord); background: var(--fond); }
-.jour .capsule--verre,
-.jour .courriel--second .capsule,
-.jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer,
-.jour .panier__envoyer[aria-disabled="true"],
-.jour .panier__envoyer[aria-disabled="true"]:hover { background: var(--fond-releve); }
-.jour .courriel--second .capsule:hover,
-.jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover { background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
-
+.jour .courriel__texte{ border-color: var(--champ-bord); background: var(--fond); }
+.jour .capsule--verre, .jour .courriel--second .capsule, .jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer, .jour .panier__envoyer[aria-disabled="true"], .jour .panier__envoyer[aria-disabled="true"]:hover{ background: var(--fond-releve); }
+.jour .courriel--second .capsule:hover, .jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover{ background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
 /* ---------- Direction B : une page calme, à lire en une minute ---------- */
 /* Les conditions : un bloc plat et clair, sans lueur ni verre (les conditions en mots, une par ligne). */
-.jour .conditions__liste li { background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); color: #2A2D38; }
-.jour .conditions__liste li strong { color: var(--texte); }
-.jour .pour-bars .ouverture-bars__texte, .jour .pour-bars .chapo, .jour .pour-bars .atout__texte, .jour .pour-bars .moment__liste, .jour .pour-bars .marche p, .jour .pour-bars .regard li { color: #2A2D38; }
-/* « Proposer mon bar » colle en bas sur téléphone, une fois le haut de la page passé (pour-les-bars-amorce.js). */
-.collant { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 0 var(--gouttiere) calc(12px + var(--zone-basse, 0px)); background: transparent; pointer-events: none; }
-.collant[hidden] { display: none; }
-.collant .capsule { width: 100%; min-height: 52px; pointer-events: auto; box-shadow: 0 6px 18px rgba(10, 11, 16, 0.28); }
-@media (min-width: 720px) { .collant { display: none; } }
+.jour .conditions__liste li{ background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); color: #2A2D38; }
+.jour .conditions__liste li strong{ color: var(--texte); }
+.jour .pour-bars .ouverture-bars__texte, .jour .pour-bars .chapo, .jour .pour-bars .moment__liste, .jour .pour-bars .marche p, .jour .pour-bars .regard li{ color: #2A2D38; }
 /* Téléphone : les écrans de la Console et de l'appli défilent de côté au lieu de s'empiler. */
 @media (max-width: 959px) {
-  .atouts__grille { gap: 36px; margin-top: 24px; }
-  .moment { gap: 16px; }
-  .moment__visuel { max-width: 100%; }
+.moment{ gap: 16px; }
 }
-@media (prefers-reduced-motion: reduce) { .collant { transition: none; } }

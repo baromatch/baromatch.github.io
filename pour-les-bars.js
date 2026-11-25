@@ -56,23 +56,21 @@
     resumePlusieurs: "{n} informations à corriger",
     requis: {
       barName: "Écris le nom de ton bar.",
-      city: "Écris ta ville.",
-      contactName: "Écris ton nom.",
+      city: "Écris ton quartier.",
+      contactName: "Écris ton prénom.",
       email: "Écris ton adresse e-mail."
     },
     tropCourt: {
       barName: "Écris au moins {min} caractères pour le nom de ton bar.",
-      city: "Écris au moins {min} caractères pour ta ville.",
-      contactName: "Écris au moins {min} caractères pour ton nom."
+      city: "Écris au moins {min} caractères pour ton quartier.",
+      contactName: "Écris au moins {min} caractères pour ton prénom."
     },
     // Les maxlength du HTML empêchent d’en arriver en tapant ; ces phrases couvrent un texte collé ou restauré.
     tropLong: {
       barName: "Raccourcis le nom de ton bar\u00a0: {max} caractères au plus.",
-      city: "Raccourcis le nom de ta ville\u00a0: {max} caractères au plus.",
-      contactName: "Raccourcis ton nom\u00a0: {max} caractères au plus.",
-      email: "Cette adresse e-mail est trop longue\u00a0: {max} caractères au plus.",
-      phone: "Raccourcis ton numéro\u00a0: {max} caractères au plus.",
-      message: "Raccourcis ton message\u00a0: {max} caractères au plus."
+      city: "Raccourcis ton quartier\u00a0: {max} caractères au plus.",
+      contactName: "Raccourcis ton prénom\u00a0: {max} caractères au plus.",
+      email: "Cette adresse e-mail est trop longue\u00a0: {max} caractères au plus."
     },
     emailIncomplet: "Cette adresse e-mail n’est pas complète.",
     emailArobase: "Il manque le @ dans ton adresse e-mail.",
@@ -82,12 +80,9 @@
     // voit n’est jamais retiré en silence.
     signe: {
       barName: "Le nom de ton bar a un émoji ou un signe qui ne passe pas chez nous\u00a0: retire-le.",
-      city: "Le nom de ta ville a un émoji ou un signe qui ne passe pas chez nous\u00a0: retire-le.",
-      contactName: "Ton nom a un émoji ou un signe qui ne passe pas chez nous\u00a0: retire-le.",
-      message: "Ton message a un signe qui ne passe pas chez nous\u00a0: retire-le."
+      city: "Ton quartier a un émoji ou un signe qui ne passe pas chez nous\u00a0: retire-le.",
+      contactName: "Ton prénom a un émoji ou un signe qui ne passe pas chez nous\u00a0: retire-le."
     },
-    telephone: "Écris ton numéro avec des chiffres, ou laisse ce champ vide.",
-    telephoneCourt: "Ton numéro est trop court\u00a0: écris au moins {min} chiffres.",
     accord: "Coche la case pour envoyer ta demande.",
     brouillon: { titre: "Ce que tu avais écrit est là.", texte: "Termine, coche la case, puis envoie ta demande." },
     lent: { titre: "Le réseau est lent.", texte: "Ta demande est toujours en route\u00a0: garde cette page ouverte." },
@@ -100,7 +95,7 @@
     courriel: {
       titre: "Ta demande n’est pas encore partie.",
       texte: "Appuie sur «\u00a0Ouvrir ma messagerie\u00a0» et envoie le mail préparé\u00a0: tout ce que tu as écrit y est déjà. " +
-        "On te répond par e-mail ou par téléphone."
+        "On te répond par e-mail."
     },
     messagerie: {
       titre: "Ta messagerie s’est ouverte\u00a0?",
@@ -143,11 +138,9 @@
     objet: "Objet : ",
     lignes: {
       barName: "Bar : ",
-      city: "Ville : ",
-      contactName: "Nom : ",
+      contactName: "Prénom : ",
       email: "E-mail : ",
-      phone: "Téléphone : ",
-      message: "Message : "
+      city: "Quartier : "
     }
   };
 
@@ -165,18 +158,14 @@
   // (nettoyer) puis débarrassé de ses espaces du bout, en unités UTF-16 (String.length).
   var CHAMPS = [
     { nom: "barName", id: "demande-bar", min: 2, max: 80, requis: true },
-    { nom: "city", id: "demande-ville", min: 2, max: 60, requis: true },
     { nom: "contactName", id: "demande-nom", min: 2, max: 80, requis: true },
     { nom: "email", id: "demande-email", max: 254, requis: true, forme: "email" },
-    { nom: "phone", id: "demande-telephone", max: 20, forme: "telephone" },
-    { nom: "message", id: "demande-message", max: 1000, lignes: true }
+    { nom: "city", id: "demande-ville", min: 2, max: 60, requis: true }
   ];
   // L’adresse que le serveur accepte, ni plus ni moins : un e-mail que la page laisse passer n’est jamais refusé
   // là-bas. La forme seule (quelque chose @ un domaine . une fin) sépare « pas complète » d’« un caractère ».
   var EMAIL = /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-.]*)[A-Z0-9_+\-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
   var FORME_EMAIL = /^[^@]+@[^@]+\.[^@.]{2,}$/;
-  var TELEPHONE = /^[0-9+.()\- ]+$/;
-  var CHIFFRES_MIN = 6;
 
   var resume = document.getElementById("demande-resume");
   var resumeTitre = document.getElementById("demande-resume-titre");
@@ -447,7 +436,7 @@
   // paragraphe un retour à la ligne dans le message et une espace ailleurs, et un caractère de mise en forme
   // invisible disparaît. Ce qui se voit reste, même si le serveur le refuse : resteRefuse le trouve, et la page le
   // dit sous le champ. Le message garde ses retours à la ligne, ses émojis composés et ses drapeaux régionaux.
-  function nettoyer(texte, lignes) {
+  function nettoyer(texte) {
     var points = pointsDe(texte);
     var propre = "";
     for (var i = 0; i < points.length; i++) {
@@ -456,10 +445,9 @@
       if (fin > 0) {
         propre += points.slice(i, fin + 1).map(texteDe).join("");
         i = fin;
-      } else if (code === 0x0A && lignes) propre += "\n";
-      else if (code <= 0x1F || (code >= 0x7F && code <= 0x9F)) propre += " ";
-      else if (dans(SEPARATEURS, code)) propre += lignes ? "\n" : " ";
-      else if (dans(JOINTURES, code)) propre += lignes || emoji(points[i - 1]) || emoji(points[i + 1]) ? texteDe(code) : "";
+      } else if (code <= 0x1F || (code >= 0x7F && code <= 0x9F)) propre += " ";
+      else if (dans(SEPARATEURS, code)) propre += " ";
+      else if (dans(JOINTURES, code)) propre += emoji(points[i - 1]) || emoji(points[i + 1]) ? texteDe(code) : "";
       else if (!dans(FORMAT, code) || dans(SIGNES, code)) propre += texteDe(code);
     }
     return propre;
@@ -467,22 +455,14 @@
 
   // Ce que nettoyer laisse et que le serveur refuse : un signe qui porte un nombre et, hors du message, un émoji
   // composé (ses jointures, ou les lettres d’un drapeau régional).
-  function resteRefuse(valeur, lignes) {
+  function resteRefuse(valeur) {
     return pointsDe(valeur).some(function (code) {
-      return dans(SIGNES, code) || (!lignes && (dans(JOINTURES, code) || dans(ETIQUETTES, code)));
+      return dans(SIGNES, code) || dans(JOINTURES, code) || dans(ETIQUETTES, code);
     });
   }
 
   function valeurDe(c) {
-    var valeur = nettoyer(c.champ.value, c.lignes).trim();
-    return c.forme === "telephone" ? valeur.replace(/\s+/g, " ") : valeur;
-  }
-
-  function erreurTelephone(valeur, c) {
-    if (!TELEPHONE.test(valeur)) return TEXTES.telephone;
-    if (valeur.length > c.max) return remplir(TEXTES.tropLong.phone, "{max}", nombre(c.max));
-    if ((valeur.match(/[0-9]/g) || []).length < CHIFFRES_MIN) return remplir(TEXTES.telephoneCourt, "{min}", nombre(CHIFFRES_MIN));
-    return "";
+    return nettoyer(c.champ.value).trim();
   }
 
   // Ce qui manque, dit en clair : le @, ou la fin de l’adresse (« .fr »). Une adresse qui a la forme mais pas les
@@ -501,8 +481,7 @@
     if (c === laCase) return accord.checked ? "" : TEXTES.accord;
     var valeur = valeurDe(c);
     if (!valeur) return c.requis ? TEXTES.requis[c.nom] : "";
-    if (c.forme === "telephone") return erreurTelephone(valeur, c);
-    if (TEXTES.signe[c.nom] && resteRefuse(valeur, c.lignes)) return TEXTES.signe[c.nom];
+    if (TEXTES.signe[c.nom] && resteRefuse(valeur)) return TEXTES.signe[c.nom];
     if (valeur.length > c.max) return remplir(TEXTES.tropLong[c.nom], "{max}", nombre(c.max));
     if (c.min && valeur.length < c.min) return remplir(TEXTES.tropCourt[c.nom], "{min}", nombre(c.min));
     if (c.forme === "email") return erreurEmail(valeur);
@@ -600,7 +579,7 @@
 
   // ---------- La demande ----------
 
-  // Les champs nettoyés, dans l’ordre du contrat ; un téléphone ou un message vide n’y est pas.
+  // Les champs nettoyés, dans l’ordre du contrat .
   function lireDemande() {
     var demande = {};
     champs.forEach(function (c) {

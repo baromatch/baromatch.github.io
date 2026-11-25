@@ -437,27 +437,29 @@ test.describe('l’ouverture de l’accueil', () => {
     return { zone, fin: Math.round(animation.effect.getComputedTiming().endTime) };
   }));
 
-  test('le titre et la phrase d’ouverture sont peints avant 0,6 s, le verre garde son animation', async ({ page: onglet }) => {
+  test('le titre et la phrase d’ouverture sont peints d’emblée : aucune animation ne les retient ; le téléphone de démo, lui, joue la sienne', async ({ page: onglet }) => {
     await onglet.goto('/');
-    const animations = await lireAnimations(onglet);
-    const texte = animations.filter((a) => a.zone === 'titre' || a.zone === 'suite');
-    expect(texte.filter((a) => a.zone === 'titre')).toHaveLength(3);
-    expect(texte.filter((a) => a.zone === 'suite')).toHaveLength(1);
-    expect(texte.filter((a) => a.fin > 600)).toEqual([]);
-    // Le verre garde les siennes (goutte, remplissage, reflet, halo, vague), qui finissent après 0,6 s.
-    expect(animations.filter((a) => a.zone === 'verre' && Number.isFinite(a.fin) && a.fin > 600).length).toBeGreaterThan(0);
+    const lu = await onglet.evaluate(() => ({
+      titre: [...document.querySelectorAll('.geste__titre, .geste__texte')].flatMap((e) => e.getAnimations({ subtree: true })).length,
+      opacite: getComputedStyle(document.querySelector('.geste__texte')).opacity,
+      decoupes: [...document.querySelectorAll('.geste__titre span')].map((x) => getComputedStyle(x).clipPath),
+    }));
+    expect(lu).toEqual({ titre: 0, opacite: '1', decoupes: ['none', 'none', 'none'] });
+    // Le téléphone joue ses tours (le verre se remplit) : ses animations finissent ou s’arrêtent (3 tours, WCAG 2.2.2).
+    await expect(onglet.locator('.g-tel')).toHaveClass(/est-auto/);
   });
 
-  test('avec « réduire les animations », tout est là d’emblée', async ({ page: onglet }) => {
+  test('avec « réduire les animations », tout est là d’emblée : aucune animation, le téléphone sur l’image fixe de la fin', async ({ page: onglet }) => {
     await onglet.emulateMedia({ reducedMotion: 'reduce' });
     await onglet.goto('/');
-    const animations = await lireAnimations(onglet);
-    expect(animations.filter((a) => a.zone !== 'autre')).toEqual([]);
-    const styles = await onglet.evaluate(() => ({
-      decoupes: [...document.querySelectorAll('.ouverture__titre span')].map((s) => getComputedStyle(s).clipPath),
-      opacite: getComputedStyle(document.querySelector('.ouverture__suite')).opacity,
+    const lu = await onglet.evaluate(() => ({
+      animations: document.getAnimations().filter((a) => a.effect?.target?.closest('.geste, .prochain')).length,
+      decoupes: [...document.querySelectorAll('.geste__titre span')].map((x) => getComputedStyle(x).clipPath),
+      opacite: getComputedStyle(document.querySelector('.geste__texte')).opacity,
+      fin: getComputedStyle(document.querySelector('.g-verre__mot--ok')).opacity,
+      auto: document.querySelector('.g-tel').classList.contains('est-auto'),
     }));
-    expect(styles).toEqual({ decoupes: ['none', 'none', 'none'], opacite: '1' });
+    expect(lu).toEqual({ animations: 0, decoupes: ['none', 'none', 'none'], opacite: '1', fin: '1', auto: false });
   });
 });
 

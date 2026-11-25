@@ -19,19 +19,15 @@ const JOUR = 24 * 60 * 60 * 1000;
 
 const SAISIE = {
   barName: 'Le Zinc des Amis',
-  city: 'Paris',
-  contactName: 'Camille Martin',
+  city: 'Paris 11e',
+  contactName: 'Camille',
   email: 'camille@lezinc.fr',
-  phone: '+33 6 12 34 56 78',
-  message: 'Deux écrans, 60 places.\nSurtout la Ligue 1.',
 };
 const CHAMPS = {
   barName: '#demande-bar',
   city: '#demande-ville',
   contactName: '#demande-nom',
   email: '#demande-email',
-  phone: '#demande-telephone',
-  message: '#demande-message',
 };
 
 // Les textes que le script écrit (pour-les-bars.js, TEXTES), ceux des limites du serveur compris. Un message :
@@ -45,22 +41,18 @@ const TEXTES = {
   copie: 'Texte copié',
   modifier: 'Modifier ma demande',
   accord: 'Coche la case pour envoyer ta demande.',
-  telephone: 'Écris ton numéro avec des chiffres, ou laisse ce champ vide.',
-  telephoneCourt: 'Ton numéro est trop court : écris au moins 6 chiffres.',
-  telephoneLong: 'Raccourcis ton numéro : 20 caractères au plus.',
   emailIncomplet: 'Cette adresse e-mail n’est pas complète.',
   emailArobase: 'Il manque le @ dans ton adresse e-mail.',
   emailFin: 'Il manque la fin de ton adresse e-mail, par exemple .fr ou .com.',
   emailCaractere: 'Cette adresse e-mail a un caractère qui ne passe pas : vérifie les accents, les espaces et les points.',
   signe: {
     barName: 'Le nom de ton bar a un émoji ou un signe qui ne passe pas chez nous : retire-le.',
-    city: 'Le nom de ta ville a un émoji ou un signe qui ne passe pas chez nous : retire-le.',
-    contactName: 'Ton nom a un émoji ou un signe qui ne passe pas chez nous : retire-le.',
-    message: 'Ton message a un signe qui ne passe pas chez nous : retire-le.',
+    city: 'Ton quartier a un émoji ou un signe qui ne passe pas chez nous : retire-le.',
+    contactName: 'Ton prénom a un émoji ou un signe qui ne passe pas chez nous : retire-le.',
   },
   brouillon: ['Ce que tu avais écrit est là.', 'Termine, coche la case, puis envoie ta demande.'],
   lent: ['Le réseau est lent.', 'Ta demande est toujours en route : garde cette page ouverte.'],
-  courriel: ['Ta demande n’est pas encore partie.', 'Appuie sur « Ouvrir ma messagerie » et envoie le mail préparé : tout ce que tu as écrit y est déjà. On te répond par e-mail ou par téléphone.'],
+  courriel: ['Ta demande n’est pas encore partie.', 'Appuie sur « Ouvrir ma messagerie » et envoie le mail préparé : tout ce que tu as écrit y est déjà. On te répond par e-mail.'],
   messagerie: ['Ta messagerie s’est ouverte ?', 'Envoie le mail, et c’est fait. Ce que tu as écrit reste ici jusqu’à ce que tu fermes l’onglet.'],
   horsLigne: ['Pas de réseau.', 'Garde cette page ouverte : ta demande part dès que le réseau revient. Tu peux aussi l’envoyer par e-mail, juste en dessous.'],
   reseauRevenu: ['Le réseau est revenu.', 'Ta demande n’est pas partie : vérifie-la, puis appuie sur « Envoyer ma demande ».'],
@@ -77,8 +69,7 @@ const TEXTES = {
 const AMBRE = 'rgb(255, 177, 61)';
 const fond = (locator) => locator.evaluate((e) => getComputedStyle(e).backgroundColor);
 const INDICES = {
-  '#demande-ville': 'Baromatch commence à Paris. Ailleurs, écris-nous quand même.',
-  '#demande-message': 'Par exemple : tes écrans, la taille de ta salle, les matchs que tu diffuses.',
+  '#demande-ville': 'Par exemple « Paris 11e ». Baromatch commence à Paris ; ailleurs, écris-nous quand même.',
 };
 
 const reponse = (status, json) => ({ status, json });
@@ -207,12 +198,9 @@ async function lireCourriel(page) {
 
 const LIGNES_COMPLETES = [
   'Bar : Le Zinc des Amis',
-  'Ville : Paris',
-  'Nom : Camille Martin',
+  'Prénom : Camille',
   'E-mail : camille@lezinc.fr',
-  'Téléphone : +33 6 12 34 56 78',
-  'Message : Deux écrans, 60 places.',
-  'Surtout la Ligue 1.',
+  'Quartier : Paris 11e',
 ];
 // Le texte à copier commence par l’objet et une ligne vide (le lien mailto: porte l’objet à part).
 const aCopier = (lignes, bar = 'Le Zinc des Amis') => [`Objet : Demande d’un bar — ${bar}`, '', ...lignes].join('\n');
@@ -223,7 +211,7 @@ test.describe('le contrat de la page', () => {
     await expect(page.locator('#demande')).toBeVisible();
     const longueurs = await page.$$eval('#demande [maxlength]', (champs) => Object.fromEntries(champs.map((c) => [c.name, [c.minLength, c.maxLength]])));
     expect(longueurs).toEqual({
-      barName: [2, 80], city: [2, 60], contactName: [2, 80], email: [-1, 254], phone: [6, 20], message: [-1, 1000],
+      barName: [2, 80], contactName: [2, 80], email: [-1, 254], city: [2, 60],
     });
     await expect(page.locator('#demande-statut')).toHaveAttribute('role', 'status');
     await expect(page.locator('#demande-alerte')).toHaveAttribute('role', 'alert');
@@ -318,7 +306,7 @@ test.describe('ce qui part', () => {
     const requete = envois[0];
     expect(requete.method()).toBe('POST');
     const corps = requete.postDataJSON();
-    expect(Object.keys(corps)).toEqual(['barName', 'city', 'contactName', 'email', 'phone', 'message', 'consent', 'website', 'fillMs']);
+    expect(Object.keys(corps)).toEqual(['barName', 'contactName', 'email', 'city', 'consent', 'website', 'fillMs']);
     const { fillMs, ...reste } = corps;
     expect(reste).toEqual({ ...SAISIE, consent: true, website: '' });
     expect(Number.isSafeInteger(fillMs)).toBe(true);
@@ -332,6 +320,34 @@ test.describe('ce qui part', () => {
 
     expect(adresses.filter((a) => !a.startsWith(`${baseURL}/`) && a !== ADRESSE)).toEqual([]);
     expect(erreurs).toEqual([]);
+  });
+
+  // Le formulaire a quatre champs : le bar, le prénom, l’e-mail, le quartier. La demande part comme le serveur l’attend
+  // aujourd’hui (barName, contactName, email, city) : le quartier est dans « city », le prénom dans « contactName ».
+  test('quatre champs : le quartier part dans « city », le prénom dans « contactName » ; ni téléphone ni message', async ({ page }) => {
+    const { envois } = await ouvrir(page);
+    await expect(page.locator('#demande input:not([type="checkbox"]):not(.formulaire__piege input), #demande textarea:not(#demande-courriel-texte)')).toHaveCount(4);
+    expect(await page.$$eval('#demande .formulaire__grille label', (l) => l.map((e) => e.textContent.trim()))).toEqual(['Nom du bar', 'Ton prénom', 'Ton e-mail', 'Quartier']);
+    expect(await page.$$eval('#demande .formulaire__grille [name]', (c) => c.map((e) => e.name))).toEqual(['barName', 'contactName', 'email', 'city']);
+    await expect(page.locator('#demande-telephone, #demande-message')).toHaveCount(0);
+    await envoyerUneDemande(page, { ...SAISIE, city: 'Paris 11e', contactName: 'Camille' });
+    await expect(page.locator('#demande-envoyee')).toBeVisible();
+    const corps = envois[0].postDataJSON();
+    expect(corps).toMatchObject({ barName: 'Le Zinc des Amis', contactName: 'Camille', email: 'camille@lezinc.fr', city: 'Paris 11e', consent: true });
+    expect(corps).not.toHaveProperty('phone');
+    expect(corps).not.toHaveProperty('message');
+  });
+
+  test('la case d’accord se touche du doigt : 44 px de haut au moins, et son étiquette aussi', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await ouvrir(page);
+    const cible = await page.locator('label[for="demande-accord"]').boundingBox();
+    expect(cible.height).toBeGreaterThanOrEqual(44);
+    const case_ = await page.locator('#demande-accord').boundingBox();
+    expect(case_.width).toBeGreaterThanOrEqual(24);
+    // Toucher l’étiquette coche la case.
+    await page.locator('label[for="demande-accord"] span').click();
+    await expect(page.locator('#demande-accord')).toBeChecked();
   });
 
   test('la page ne demande qu’un en-tête, Content-Type, et aucun mode de cache : rien qui puisse entrer dans le pré-vol CORS', async ({ page }) => {
@@ -356,26 +372,16 @@ test.describe('ce qui part', () => {
     expect(entetes.filter((nom) => ['cache-control', 'pragma'].includes(nom))).toEqual([]);
   });
 
-  test('un téléphone et un message laissés vides ne partent pas', async ({ page }) => {
-    const { envois } = await ouvrir(page);
-    await envoyerUneDemande(page, { ...SAISIE, phone: '   ', message: '' });
-    await expect(page.locator('#demande-envoyee')).toBeVisible();
-    const corps = envois[0].postDataJSON();
-    expect(Object.keys(corps)).toEqual(['barName', 'city', 'contactName', 'email', 'consent', 'website', 'fillMs']);
-  });
-
-  test('un caractère de contrôle collé devient une espace, une moitié d’émoji perdue devient « � » ; les retours à la ligne du message restent', async ({ page }) => {
+  test('un caractère de contrôle collé devient une espace, une moitié d’émoji perdue devient « � »', async ({ page }) => {
     const { envois } = await ouvrir(page);
     await envoyerUneDemande(page, SAISIE, { poses: {
       barName: 'Le\tZinc\u0085 des Amis',
       contactName: 'Camille\u007f Martin\uD83D',
-      message: 'Bonjour\tà vous.\nÀ bientôt 🎉',
     } });
     await expect(page.locator('#demande-envoyee')).toBeVisible();
     const corps = envois[0].postDataJSON();
     expect(corps.barName).toBe('Le Zinc  des Amis');
     expect(corps.contactName).toBe('Camille  Martin�');
-    expect(corps.message).toBe('Bonjour à vous.\nÀ bientôt 🎉');
   });
 
   test('jamais avant 3 s après l’affichage du formulaire : la demande attend sous « Envoi… », dit aussi dans la zone de statut', async ({ page }) => {
@@ -471,8 +477,6 @@ const SERVEUR = (() => {
   // Les champs que le serveur refuse dans un corps envoyé par la page (seules leurs règles de caractères et de forme).
   return (corps) => Object.entries(corps).filter(([nom, valeur]) => {
     if (['barName', 'city', 'contactName'].includes(nom)) return !tape(valeur.trim(), false);
-    if (nom === 'message') return !tape(valeur.replace(/\r\n/g, '\n').trim(), true);
-    if (nom === 'phone') return !/^[0-9 +.()-]+$/.test(valeur.trim());
     if (nom === 'email') return !/^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i.test(valeur.trim());
     return false;
   }).map(([nom]) => nom);
@@ -490,36 +494,24 @@ test.describe('les caractères que le serveur refuse', () => {
     test(`${nom(c)} collé dans chaque champ : retiré (ou changé en saut de ligne ou en espace) ; ce qui part passe le serveur`, async ({ page }) => {
       const { envois } = await ouvrir(page);
       const saut = c === ' ' || c === ' ';
-      const jointure = c === '‌' || c === '‍';
       const ligne = saut ? ' ' : '';
       await envoyerUneDemande(page, SAISIE, { poses: {
         barName: `Le Zinc${c}des Amis`,
-        city: `Saint${c}Denis`,
+        city: `Paris${c}11e`,
         contactName: `Camille${c}Martin`,
         email: `camille@lezinc.fr${c}`,
-        phone: `${c}+33 6 12 34 56 78${c}`,
-        message: `Deux écrans${c}60 places`,
       } });
       await expect(page.locator('#demande-envoyee')).toBeVisible();
       const corps = envois[0].postDataJSON();
       expect(SERVEUR(corps)).toEqual([]);
       expect(corps).toMatchObject({
         barName: `Le Zinc${ligne}des Amis`,
-        city: `Saint${ligne}Denis`,
+        city: `Paris${ligne}11e`,
         contactName: `Camille${ligne}Martin`,
         email: 'camille@lezinc.fr',
-        phone: '+33 6 12 34 56 78',
-        message: `Deux écrans${saut ? '\n' : jointure ? c : ''}60 places`,
       });
     });
   }
-
-  test('un numéro copié d’un téléphone, entouré de marques de sens d’écriture, passe tel qu’on le voit', async ({ page }) => {
-    const { envois } = await ouvrir(page);
-    await envoyerUneDemande(page, SAISIE, { poses: { phone: '‭+33 6 12 34 56 78‬' } });
-    await expect(page.locator('#demande-envoyee')).toBeVisible();
-    expect(envois[0].postDataJSON().phone).toBe('+33 6 12 34 56 78');
-  });
 
   test('des invisibles mêlés à une moitié d’émoji, au bord d’un champ : il reste le texte visible, qui passe le serveur', async ({ page }) => {
     const { envois } = await ouvrir(page);
@@ -541,7 +533,7 @@ test.describe('les caractères que le serveur refuse', () => {
       contactName: 'Camille 👨‍👩‍👧',
     } });
     await expect(page.locator('#demande-resume')).toBeFocused();
-    await expect(page.locator('#demande-resume li a')).toHaveText([TEXTES.signe.barName, TEXTES.signe.city, TEXTES.signe.contactName]);
+    await expect(page.locator('#demande-resume li a')).toHaveText([TEXTES.signe.barName, TEXTES.signe.contactName, TEXTES.signe.city]);
     for (const champ of ['barName', 'city', 'contactName']) {
       await expect(page.locator(`${CHAMPS[champ]}-erreur`)).toHaveText(TEXTES.signe[champ]);
     }
@@ -549,19 +541,6 @@ test.describe('les caractères que le serveur refuse', () => {
     await partiesEnTout(page, envois, 0);
   });
 
-  test('dans le message, ces émojis passent tels quels ; un signe qui porte un nombre y est refusé', async ({ page }) => {
-    const { envois } = await ouvrir(page, [CREEE]);
-    const message = 'Deux écrans 👨‍👩‍👧 🏴\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F} 🏳️‍🌈';
-    await envoyerUneDemande(page, SAISIE, { poses: { message: `Prix ؀100` } });
-    await expect(page.locator('#demande-message-erreur')).toHaveText(TEXTES.signe.message);
-    await partiesEnTout(page, envois, 0);
-    await poser(page, CHAMPS.message, message);
-    await envoyer(page);
-    await expect(page.locator('#demande-envoyee')).toBeVisible();
-    const corps = envois[0].postDataJSON();
-    expect(SERVEUR(corps)).toEqual([]);
-    expect(corps.message).toBe(message);
-  });
 });
 
 test.describe('avant d’envoyer, le formulaire vérifie', () => {
@@ -577,9 +556,9 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
     await expect(resume).toHaveAccessibleName(TEXTES.resume(5));
     const attendus = [
       ['#demande-bar', 'Écris le nom de ton bar.'],
-      ['#demande-ville', 'Écris ta ville.'],
-      ['#demande-nom', 'Écris ton nom.'],
+      ['#demande-nom', 'Écris ton prénom.'],
       ['#demande-email', 'Écris ton adresse e-mail.'],
+      ['#demande-ville', 'Écris ton quartier.'],
       ['#demande-accord', TEXTES.accord],
     ];
     await expect(resume.locator('li a')).toHaveText(attendus.map(([, texte]) => texte));
@@ -591,14 +570,9 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
       // L’erreur d’abord, puis l’indice s’il y en a un : l’ordre où on les voit.
       await expect(page.locator(id)).toHaveAccessibleDescription(INDICES[id] ? `${texte} ${INDICES[id]}` : texte);
     }
-    for (const id of ['#demande-telephone', '#demande-message']) {
-      await expect(page.locator(id)).not.toHaveAttribute('aria-invalid');
-      await expect(page.locator(`${id}-erreur`)).toBeHidden();
-    }
-    await expect(page.locator('#demande-message')).toHaveAttribute('aria-describedby', 'demande-message-indice');
     expect(envois).toHaveLength(0);
 
-    await resume.getByRole('link', { name: 'Écris ta ville.' }).click();
+    await resume.getByRole('link', { name: 'Écris ton quartier.' }).click();
     await expect(page.locator('#demande-ville')).toBeFocused();
     await page.keyboard.type('Lyon');
     await expect(page.locator('#demande-ville')).not.toHaveAttribute('aria-invalid');
@@ -610,18 +584,17 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
     await expect(page.locator('#demande-accord')).toBeFocused();
   });
 
-  test('la forme de l’e-mail et du téléphone, la longueur du message ; l’indice du message reste avec l’erreur', async ({ page }) => {
+  test('la forme de l’e-mail ; l’indice du quartier reste avec son erreur', async ({ page }) => {
     const { envois } = await ouvrir(page);
-    await envoyerUneDemande(page, { ...SAISIE, email: 'camille@lezinc', phone: '06 12 34 ab' }, { poses: { message: 'é'.repeat(1001) } });
+    await envoyerUneDemande(page, { ...SAISIE, email: 'camille@lezinc' }, { poses: { city: 'P' } });
     await expect(page.locator('#demande-resume')).toBeFocused();
-    await expect(page.locator('#demande-resume-titre')).toHaveText(TEXTES.resume(3));
+    await expect(page.locator('#demande-resume-titre')).toHaveText(TEXTES.resume(2));
     await expect(page.locator('#demande-email-erreur')).toHaveText(TEXTES.emailFin);
-    await expect(page.locator('#demande-telephone-erreur')).toHaveText(TEXTES.telephone);
-    await expect(page.locator('#demande-message-erreur')).toHaveText('Raccourcis ton message : 1 000 caractères au plus.');
-    await expect(page.locator('#demande-message')).toHaveAttribute('aria-describedby', 'demande-message-erreur demande-message-indice');
-    await expect(page.locator('#demande-message')).toHaveAccessibleDescription(
-      `Raccourcis ton message : 1 000 caractères au plus. ${INDICES['#demande-message']}`);
-    await expect(page.locator('#demande-resume li')).toHaveCount(3);
+    await expect(page.locator('#demande-ville-erreur')).toHaveText('Écris au moins 2 caractères pour ton quartier.');
+    await expect(page.locator('#demande-ville')).toHaveAttribute('aria-describedby', 'demande-ville-erreur demande-ville-indice');
+    await expect(page.locator('#demande-ville')).toHaveAccessibleDescription(
+      `Écris au moins 2 caractères pour ton quartier. ${INDICES['#demande-ville']}`);
+    await expect(page.locator('#demande-resume li')).toHaveCount(2);
     expect(envois).toHaveLength(0);
   });
 
@@ -632,13 +605,13 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
     ['barName', ' Ab ', null],
     ['barName', 'B'.repeat(81), 'Raccourcis le nom de ton bar : 80 caractères au plus.'],
     ['barName', 'B'.repeat(80), null],
-    ['city', 'P', 'Écris au moins 2 caractères pour ta ville.'],
+    ['city', 'P', 'Écris au moins 2 caractères pour ton quartier.'],
     ['city', 'Pa', null],
-    ['city', 'P'.repeat(61), 'Raccourcis le nom de ta ville : 60 caractères au plus.'],
+    ['city', 'P'.repeat(61), 'Raccourcis ton quartier : 60 caractères au plus.'],
     ['city', 'P'.repeat(60), null],
-    ['contactName', 'C', 'Écris au moins 2 caractères pour ton nom.'],
+    ['contactName', 'C', 'Écris au moins 2 caractères pour ton prénom.'],
     ['contactName', 'Al', null],
-    ['contactName', 'C'.repeat(81), 'Raccourcis ton nom : 80 caractères au plus.'],
+    ['contactName', 'C'.repeat(81), 'Raccourcis ton prénom : 80 caractères au plus.'],
     ['contactName', 'C'.repeat(80), null],
     ['email', `${'a'.repeat(242)}@example.test`, 'Cette adresse e-mail est trop longue : 254 caractères au plus.'],
     ['email', `${'a'.repeat(241)}@example.test`, null],
@@ -652,14 +625,6 @@ test.describe('avant d’envoyer, le formulaire vérifie', () => {
     ['email', 'camille..martin@lezinc.fr', TEXTES.emailCaractere],
     ['email', 'camille martin@lezinc.fr', TEXTES.emailCaractere],
     ['email', 'Camille.Martin+bar@le-zinc.paris', null],
-    ['phone', '12345', TEXTES.telephoneCourt],
-    ['phone', '+(12) 34-5.', TEXTES.telephoneCourt],
-    ['phone', '06 12 AB 56 78', TEXTES.telephone],
-    ['phone', '0'.repeat(21), TEXTES.telephoneLong],
-    ['phone', '+33 6 12 34 56 78', null],
-    ['phone', '+33 (0)6.12-34', null],
-    ['message', 'm'.repeat(1001), 'Raccourcis ton message : 1 000 caractères au plus.'],
-    ['message', `${'m'.repeat(998)}\nm`, null],
   ];
   for (const [nom, valeur, erreur] of BORDS) {
     const court = valeur.length > 24 ? `${valeur.slice(0, 12)}… (${valeur.length})` : valeur;
@@ -974,34 +939,34 @@ test.describe('les réponses du serveur', () => {
     });
   }
 
-  test('l’e-mail tout prêt : l’objet, une ligne par champ rempli, rien d’autre ; le même texte à copier, objet en tête ; & ? # % passent intacts', async ({ page }) => {
+  test('l’e-mail tout prêt : l’objet, une ligne par champ, rien d’autre ; le même texte à copier, objet en tête ; & ? # % passent intacts', async ({ page }) => {
     await ouvrir(page, [reponse(404, {})]);
     const bar = 'Le Zinc & Co ? #1 à 100 % $&';
-    const message = 'Écrans : 2 & 1 projecteur ?\nRéduction 10 % #mardi';
-    await envoyerUneDemande(page, { ...SAISIE, barName: bar, message });
+    const quartier = 'Paris 11e & Bastille ? #1 : 10 %';
+    await envoyerUneDemande(page, { ...SAISIE, barName: bar, city: quartier });
     const courriel = await lireCourriel(page);
     expect(courriel.destinataire).toBe('contact@baromatch.fr');
     expect(courriel.lien).not.toMatch(/[ +\n#]/);
     expect(Object.keys(courriel)).toEqual(['lien', 'destinataire', 'subject', 'body']);
     expect(courriel.subject).toBe(`Demande d’un bar — ${bar}`);
-    const lignes = [`Bar : ${bar}`, ...LIGNES_COMPLETES.slice(1, 5), ...message.split('\n').map((l, i) => (i ? l : `Message : ${l}`))];
+    const lignes = [`Bar : ${bar}`, ...LIGNES_COMPLETES.slice(1, 3), `Quartier : ${quartier}`];
     expect(courriel.body.split('\r\n')).toEqual(lignes);
     await expect(page.locator('#demande-courriel-texte')).toHaveValue(aCopier(lignes, bar));
     await expect(page.locator('#demande-courriel-texte')).toHaveAttribute('readonly', '');
   });
 
-  test('l’e-mail tout prêt sans téléphone ni message : aucune ligne vide, et ce qui est corrigé ensuite y passe', async ({ page }) => {
+  test('l’e-mail tout prêt : une ligne par champ, aucune ligne vide, et ce qui est corrigé ensuite y passe', async ({ page }) => {
     await ouvrir(page, [reponse(404, {})]);
-    await envoyerUneDemande(page, { ...SAISIE, phone: '', message: '  ' });
+    await envoyerUneDemande(page, SAISIE);
     let courriel = await lireCourriel(page);
     expect(courriel.body.split('\r\n')).toEqual(LIGNES_COMPLETES.slice(0, 4));
-    expect(courriel.body).not.toMatch(/Téléphone|Message|\r\n\r\n|\r\n$/);
+    expect(courriel.body).not.toMatch(/Téléphone|Message|Ville|\r\n\r\n|\r\n$/);
     await expect(page.locator('#demande-courriel-texte')).toHaveValue(aCopier(LIGNES_COMPLETES.slice(0, 4)));
 
     await page.fill('#demande-email', 'camille@lezinc-paris.fr');
     courriel = await lireCourriel(page);
-    expect(courriel.body.split('\r\n')[3]).toBe('E-mail : camille@lezinc-paris.fr');
-    await expect(page.locator('#demande-courriel-texte')).toHaveValue(/E-mail : camille@lezinc-paris\.fr$/);
+    expect(courriel.body.split('\r\n')[2]).toBe('E-mail : camille@lezinc-paris.fr');
+    await expect(page.locator('#demande-courriel-texte')).toHaveValue(/E-mail : camille@lezinc-paris\.fr\nQuartier : Paris 11e$/);
   });
 
   test('« Copier le texte » copie la demande, dit « Texte copié » pendant 2 s, en gardant son icône', async ({ page, context }) => {
@@ -1272,8 +1237,8 @@ test.describe('pendant et après l’envoi, la page dit où en est la demande', 
     const texte = page.locator('#demande-courriel-texte');
     await expect(texte).toBeVisible();
     expect(await texte.evaluate((t) => t.scrollHeight - t.clientHeight)).toBeLessThanOrEqual(0);
-    await page.fill('#demande-message', 'Deux écrans, 60 places.\nSurtout la Ligue 1.\nEt la Ligue des champions le mardi.');
-    await expect.poll(() => texte.evaluate((t) => t.value.includes('mardi'))).toBe(true);
+    await page.fill('#demande-ville', 'Paris 11e, près du canal Saint-Martin, derrière la gare de l’Est, au coin de la rue du Faubourg-Saint-Denis');
+    await expect.poll(() => texte.evaluate((t) => t.value.includes('canal'))).toBe(true);
     expect(await texte.evaluate((t) => t.scrollHeight - t.clientHeight)).toBeLessThanOrEqual(0);
   });
 });
@@ -1329,19 +1294,19 @@ test.describe('des états qui disent vrai', () => {
     // (une machine chargée), elle faisait passer le délai d’attente de l’envoi, et la première demande échouait.
     await expect(page.locator('#demande-envoyee')).toBeVisible();
     await page.clock.runFor(9 * 60 * 1000);
-    await corriger(page, { phone: '+33 6 99 99 99 99', email: 'Camille@LeZinc.fr', barName: 'LE ZINC DES AMIS' });
+    await corriger(page, { city: 'Lyon 3e', email: 'Camille@LeZinc.fr', barName: 'LE ZINC DES AMIS' });
     const statut = page.locator('#demande-statut');
     await attendreMessage(statut, TEXTES.correction);
     await expect(statut.locator('.message')).toHaveClass(/message--bloque/);
     await expect(page.locator('#demande-envoyer')).toBeHidden();
     await expect(page.locator('#demande-courriel-lien')).toBeFocused();
-    expect((await lireCourriel(page)).body).toContain('Téléphone : +33 6 99 99 99 99');
+    expect((await lireCourriel(page)).body).toContain('Quartier : Lyon 3e');
     await page.clock.runFor(15_000);
     await partiesEnTout(page, envois, 1);
   });
 
   for (const [cas, attente, valeurs] of [
-    ['après 10 minutes', 10 * 60 * 1000, { phone: '+33 6 99 99 99 99' }],
+    ['après 10 minutes', 10 * 60 * 1000, { city: 'Lyon 3e' }],
     ['avec une autre adresse', 0, { email: 'camille@lezinc-paris.fr' }],
     ['avec un autre bar', 0, { barName: 'Le Zinc de la Gare' }],
     ['sans rien changer (le serveur a déjà la première)', 0, {}],
@@ -1366,7 +1331,7 @@ test.describe('des états qui disent vrai', () => {
     await page.reload();
     await expect(page.locator('#demande')).toBeVisible();
     await page.clock.runFor(attente);
-    await envoyerUneDemande(page, { ...SAISIE, phone: '+33 6 99 99 99 99' });
+    await envoyerUneDemande(page, { ...SAISIE, city: 'Lyon 3e' });
   };
 
   test('une correction après un rechargement, dans les 10 minutes, pour la même demande (adresse et bar) : l’e-mail la porte, et la page dit pourquoi', async ({ page }) => {
@@ -1375,7 +1340,7 @@ test.describe('des états qui disent vrai', () => {
     await corrigerApresRechargement(page, 8 * 60 * 1000);
     await attendreMessage(page.locator('#demande-statut'), TEXTES.correction);
     await expect(page.locator('#demande-envoyer')).toBeHidden();
-    expect((await lireCourriel(page)).body).toContain('Téléphone : +33 6 99 99 99 99');
+    expect((await lireCourriel(page)).body).toContain('Quartier : Lyon 3e');
     await page.clock.runFor(15_000);
     // Le compte de la page repart de zéro au rechargement ; le serveur simulé, lui, compte tout.
     expect(await page.evaluate(() => window.demandesParties)).toBe(0);
@@ -1388,7 +1353,7 @@ test.describe('des états qui disent vrai', () => {
     await corrigerApresRechargement(page, 10 * 60 * 1000);
     await expect(page.locator('#demande-envoyee')).toBeVisible();
     await expect.poll(() => envois.length).toBe(2);
-    expect(envois[1].postDataJSON().phone).toBe('+33 6 99 99 99 99');
+    expect(envois[1].postDataJSON().city).toBe('Lyon 3e');
   });
 
   test('après une demande partie, l’onglet ne garde que son adresse et son bar, en minuscules, et son heure ; plus rien 10 minutes après', async ({ page }) => {
@@ -1527,17 +1492,17 @@ test.describe('les espaces insécables des messages du formulaire', () => {
   const lireLeFormulaire = (page) => page.evaluate(() => document.getElementById('demande').textContent
     + document.getElementById('demande-envoyee').textContent);
   const CAS = {
-    'les erreurs de longueur, d’e-mail et de téléphone': async (page) => {
+    'les erreurs de longueur et d’e-mail': async (page) => {
       await ouvrir(page);
       await envoyerUneDemande(page, SAISIE, { poses: { barName: 'B'.repeat(81), city: 'P'.repeat(61), contactName: 'C'.repeat(81),
-        email: 'andré@lezinc.fr', phone: '12345', message: 'm'.repeat(1001) } });
-      await expect(page.locator('#demande-resume li')).toHaveCount(6);
+        email: 'andré@lezinc.fr' } });
+      await expect(page.locator('#demande-resume li')).toHaveCount(4);
     },
-    'les erreurs d’un e-mail et d’un numéro trop longs, et des émojis composés': async (page) => {
+    'les erreurs d’un e-mail trop long, et des émojis composés': async (page) => {
       await ouvrir(page);
-      await envoyerUneDemande(page, SAISIE, { poses: { email: `${'a'.repeat(242)}@example.test`, phone: '0'.repeat(21),
-        barName: 'Le Zinc 🏳️‍🌈', city: 'Londres 🏴\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}', contactName: 'Camille 👨‍👩‍👧', message: 'Prix ؀100' } });
-      await expect(page.locator('#demande-resume li')).toHaveCount(6);
+      await envoyerUneDemande(page, SAISIE, { poses: { email: `${'a'.repeat(242)}@example.test`,
+        barName: 'Le Zinc 🏳️‍🌈', city: 'Londres 🏴\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}', contactName: 'Camille 👨‍👩‍👧' } });
+      await expect(page.locator('#demande-resume li')).toHaveCount(4);
     },
     'l’étape de l’e-mail, puis la messagerie ouverte': async (page) => {
       await ouvrir(page, [reponse(404, {})]);
@@ -1594,7 +1559,7 @@ test.describe('les espaces insécables des messages du formulaire', () => {
       await ouvrir(page, [CREEE]);
       await envoyerUneDemande(page);
       await page.click('#demande-nouvelle');
-      await page.fill('#demande-telephone', '+33 6 99 99 99 99');
+      await page.fill('#demande-ville', 'Lyon 3e');
       await page.check('#demande-accord');
       await envoyer(page);
       await attendreMessage(page.locator('#demande-statut'), TEXTES.correction);
@@ -1719,7 +1684,7 @@ test.describe('accessibilité du formulaire (axe)', () => {
       await ouvrir(page, [CREEE]);
       await envoyerUneDemande(page);
       await page.click('#demande-nouvelle');
-      await page.fill('#demande-telephone', '+33 6 99 99 99 99');
+      await page.fill('#demande-ville', 'Lyon 3e');
       await page.check('#demande-accord');
       await envoyer(page);
       await attendreMessage(page.locator('#demande-statut'), TEXTES.correction);

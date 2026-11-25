@@ -12,11 +12,11 @@ import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFile
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { blocDeLaSemaine, REPERES } from '../generateur/accueil.mjs';
+import { blocDeLaSemaine, REPERES, TAILLE_DE_LA_BANDE, TAILLE_DES_DISQUES } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { clubDe, indexerLesClubs } from '../generateur/donnees.mjs';
 import { chainesNouvelles, declarationsInconnues, ecartsDeLaTable, refusDesNouveautes, TETE_DE_LA_TABLE, USAGE } from '../generateur/outils/insignes/exporter.mjs';
-import { bandesDe, identifiantsUniques, insigne, paireDInsignes, TAILLES } from '../generateur/insigne.mjs';
+import { bandesDe, CLUBS_DE_DEMO, identifiantsUniques, insigne, insigneDeFiche, paireDInsignes, TAILLES } from '../generateur/insigne.mjs';
 import { svgDeLaCarte } from '../generateur/partage.mjs';
 import * as badge from '../generateur/insignes/badge.mjs';
 import * as specs from '../generateur/insignes/specs.mjs';
@@ -233,26 +233,36 @@ test.describe('la copie du générateur de l’appli', () => {
 });
 
 test.describe('l’accueil', () => {
-  test('la carte Le Havre – PSG porte exactement la paire de l’appli à 30 px, sur le fond clair des cartes', async () => {
+  test('la carte du prochain match : chaque club est dessiné une fois, comme l’appli le dessine (generateur/insigne.mjs), à la taille de la carte', async () => {
     const site = await construireEnMemoire({ source: `scenario:${SEMAINE}`, maintenant: JEUDI, racine });
     const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant: JEUDI });
-    const carte = bloc.split('<li class="carte-match').slice(1).find((c) => c.includes('href="/matchs/le-havre-psg-2026-10-30/"'));
-    expect(carte).toBeDefined();
-    const clubs = carte.split('<a class="carte-match__clubs"')[1].split('</a>')[0];
-    const dessin = clubs.slice(clubs.indexOf('<svg'), clubs.lastIndexOf('</svg>') + '</svg>'.length);
-    // La paire de l’appli : un seul dessin de 2 × 30 + 4 px, Le Havre puis le PSG, le second décalé de 200 unités et de
-    // l’écart (4 px, ramenés à l’échelle du dessin).
-    expect(dessin).toBe('<svg class="insignes" width="64" height="30" viewBox="0 0 426.6666666666667 200" aria-hidden="true" focusable="false">'
-      + `<g>${sansRacine(REFERENCES['le-havre-ac@30/light'])}</g>`
-      + `<g transform="translate(226.66666666666666 0)">${sansRacine(REFERENCES['paris-saint-germain@30/light'])}</g></svg>`);
-    // Puis les deux noms, écrits.
-    expect(clubs.slice(clubs.lastIndexOf('</svg>'))).toContain('<span class="carte-match__club">Le Havre</span>');
-    expect(clubs.slice(clubs.lastIndexOf('</svg>'))).toContain('<span class="carte-match__club">PSG</span>');
+    const clubs = new Map(site.donnees.matchs.flatMap((m) => [m.domicile, m.exterieur]).map((c) => [c.cle, c]));
+    const symboles = [...bloc.matchAll(/<symbol id="([dp])-([^"]+)" viewBox="([^"]+)">([\s\S]*?)<\/symbol>/g)];
+    expect(symboles.filter(([, genre]) => genre === 'd')).toHaveLength(2);
+    expect(symboles.length).toBeGreaterThan(4);
+    expect(new Set(symboles.map(([, genre, cle]) => `${genre}${cle}`)).size, 'un club n’est dessiné qu’une fois par taille').toBe(symboles.length);
+    for (const [, genre, cle, boite, contenu] of symboles) {
+      const dessin = insigne(clubs.get(cle), { taille: genre === 'd' ? TAILLE_DES_DISQUES : TAILLE_DE_LA_BANDE, fond: 'night', maintenant: JEUDI });
+      expect(`<symbol viewBox="${boite}">${contenu}</symbol>`, `${genre}-${cle}`).toBe(`<symbol viewBox="${/viewBox="([^"]+)"/.exec(dessin)[1]}">${sansRacine(dessin)}</symbol>`);
+    }
+    // La carte et la bande reprennent ces dessins (<use>), et nomment les clubs en toutes lettres.
+    for (const [, genre, cle] of [...bloc.matchAll(/<use href="#([dp])-([^"]+)"\/>/g)]) expect(symboles.map(([, g, c]) => `${g}${c}`)).toContain(`${genre}${cle}`);
+    expect(bloc).toMatch(/<h3 class="coup__titre" data-mot="\d+"><a href="[^"]+" data-coup-page>[^<]+ <span class="coup__tiret">–<\/span> [^<]+<\/a><\/h3>/);
+  });
+
+  test('le téléphone de démo : ses deux clubs inventés sont dessinés par generateur/insigne.mjs (insigneDeFiche), jamais un écusson', () => {
+    const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
+    for (const { cle, fiche } of CLUBS_DE_DEMO) {
+      const dessin = insigneDeFiche(fiche, { taille: 40, fond: 'night' });
+      const symbole = `<symbol id="d-${cle}" viewBox="${/viewBox="([^"]+)"/.exec(dessin)[1]}">${sansRacine(dessin)}</symbol>`;
+      expect(accueil, cle).toContain(symbole);
+    }
+    expect(accueil).not.toMatch(/<img[^>]*(ecusson|blason|logo-club)/i);
   });
 });
 
 test.describe('le bloc de la semaine de l’accueil', () => {
-  test('un club et une sélection qui jouent deux fois (Monaco, la France) : chaque identifiant n’y sert qu’une fois, chaque renvoi vise le sien', () => {
+  test('un club et une sélection qui jouent deux fois (Monaco, la France) : chacun n’est dessiné qu’une fois dans la planche, chaque identifiant n’y sert qu’une fois, chaque renvoi vise le sien', () => {
     const club = (cle, court, slug) => ({ cle, court, nom: court, slug });
     const match = (slug, debut, domicile, exterieur) => ({ slug, ids: [slug], debut: Date.parse(debut), heureConfirmee: true, statut: null, competition: 'Ligue 1', domicile, exterieur, soirees: [] });
     const monaco = club('monaco', 'Monaco', 'as-monaco');
@@ -265,9 +275,11 @@ test.describe('le bloc de la semaine de l’accueil', () => {
     ];
     const bloc = blocDeLaSemaine({ donnees: { matchs, bars: [] }, textes: chargerLeContenu(racine).textes, maintenant: JEUDI });
     const ids = [...bloc.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
-    // Les insignes de Monaco (30 px) et le drapeau de la France ont leurs identifiants, dessinés deux fois chacun.
+    // Monaco et la France jouent deux fois chacun, et ne sont dessinés qu’une fois : leurs identifiants ne servent qu’une fois.
+    expect(bloc.match(/<symbol id="p-monaco"/g)).toHaveLength(1);
+    expect(bloc.match(/<symbol id="p-france"/g)).toHaveLength(1);
     expect(ids.filter((id) => id.startsWith('ib-f-as-monaco-')).length).toBeGreaterThan(1);
-    expect(ids.filter((id) => id.startsWith('drapeau-fr-')).length).toBe(2);
+    expect(ids.filter((id) => id.startsWith('drapeau-fr-')).length).toBe(1);
     expect(ids.length - new Set(ids).size).toBe(0);
     for (const [, cible] of bloc.matchAll(/url\(#([^)]+)\)/g)) expect(ids).toContain(cible);
   });
@@ -673,26 +685,25 @@ test.describe('plus aucun ancien disque, et jamais un écusson', () => {
     }
   });
 
-  test('sur l’accueil, chaque insigne est décoratif, fait de formes, et suivi du nom écrit du club', async () => {
-    // L’accueil enregistré (une semaine sans match n’a aucune carte, c’est permis), et le bloc de la semaine des planches,
-    // qui en a toujours.
+  test('sur l’accueil, chaque insigne est décoratif, fait de formes, et le nom écrit du club est à côté', async () => {
     const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
     const site = await construireEnMemoire({ source: `scenario:${SEMAINE}`, maintenant: JEUDI, racine });
     const planches = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant: JEUDI });
-    const liensDe = (bloc) => bloc.split('<a class="carte-match__clubs"').slice(1).map((l) => l.split('</a>')[0]);
-    expect(liensDe(planches)).toHaveLength(5);
-    const liens = [...liensDe(accueil.split(REPERES.debut)[1].split(REPERES.fin)[0]), ...liensDe(planches)];
-    for (const lien of liens) {
-      // La paire de l’appli (un seul dessin), ou deux dessins quand une sélection y est (son drapeau), puis les noms.
-      expect(lien).toMatch(/^ href="[^"]+">(?:<svg class="insignes" width="64" height="30" viewBox="0 0 426\.6666666666667 200" aria-hidden="true" focusable="false">(?:(?!<svg)[\s\S])*?<\/svg>|<span class="insignes insignes--drapeau" aria-hidden="true">(?:<svg class="insigne" width="30" height="30" viewBox="[^"]+" aria-hidden="true" focusable="false">(?:(?!<svg)[\s\S])*?<\/svg>){2}<\/span>)<span class="carte-match__club">[^<]+<\/span><span class="visuellement-cache"> – <\/span><span class="carte-match__club">[^<]+<\/span>$/);
-      for (const dessin of lien.match(/<svg[\s\S]*?<\/svg>/g)) expect(dessin).not.toMatch(/<image|href=|<text|<title|style=/);
+    for (const dessin of planches.match(/<symbol[\s\S]*?<\/symbol>/g)) expect(dessin).not.toMatch(/<image|href=|<text|<title|style=/);
+    for (const rappel of planches.match(/<svg class="insigne[^"]*"[^>]*>[\s\S]*?<\/svg>/g)) {
+      expect(rappel).toContain('aria-hidden="true"');
+      expect(rappel).not.toMatch(/<image|<text|<title|style=/);
     }
-    expect(liensDe(planches).filter((lien) => lien.includes('insignes--drapeau'))).toHaveLength(1);
-    // Hors du bloc, aucun insigne écrit à la main : seulement les clubs du pied de page, le cadre de toutes les pages
+    // La bande : chaque pastille a ses deux disques, puis le nom écrit.
+    for (const puce of planches.match(/<a class="puce"[\s\S]*?<\/a>/g) ?? []) expect(puce).toMatch(/<span class="puce__nom">[^<]+ – [^<]+<\/span>/);
+    // Hors du bloc, aucun insigne écrit à la main, sauf la planche des deux clubs inventés du téléphone de démo (vérifiée
+    // ci-dessus : c’est le dessin de generateur/insigne.mjs) et les clubs du pied de page, le cadre de toutes les pages
     // (generateur/cadre.mjs, tests/cadre.spec.mjs), un insigne par club.
     const horsDuBloc = accueil.split(REPERES.debut)[0] + accueil.split(REPERES.fin)[1];
     const piedDeLAccueil = horsDuBloc.match(/<footer class="pied page"[\s\S]*?<\/footer>/)[0];
-    expect(horsDuBloc.replace(piedDeLAccueil, '')).not.toContain('class="insigne');
+    const sansPied = horsDuBloc.replace(piedDeLAccueil, '');
+    expect(sansPied.match(/<svg class="insignes?[ "]/g) ?? []).toHaveLength(4);
+    expect(sansPied.match(/<svg class="insigne g-disque[^"]*" aria-hidden="true" focusable="false"><use href="#d-(alvene|orvele)"\/><\/svg>/g)).toHaveLength(4);
     expect(piedDeLAccueil.match(/<svg class="insignes?"/g)).toHaveLength(piedDeLAccueil.match(/<a class="pied__club"/g).length);
     // Un identifiant n’y sert qu’une fois.
     const ids = [...accueil.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);

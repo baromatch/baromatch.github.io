@@ -1,158 +1,273 @@
-// L’accueil, l’utile d’abord : « Les matchs de la semaine », sous l’ouverture. L’accueil est écrit à la main
+// L’accueil, le prochain match d’abord : « Le prochain match », sous l’ouverture. L’accueil est écrit à la main
 // (index.html) ; le générateur n’y écrit que ce bloc, entre ses deux repères, et rien d’autre : ecrireLAccueil vérifie,
-// avant d’écrire, que tout ce qui est hors des repères est resté identique, octet pour octet.
-// Le bloc : une barre des sept jours de Paris (« Aujourd’hui », « Demain », « sam. 31 »…), des boutons radio qui
-// marchent sans script (styles.css montre le jour choisi), puis une carte par match du jour : l’heure, la compétition,
-// les deux clubs (leurs insignes, comme dans l’appli, jamais un écusson), et une action qui existe. Un match qu’un bar publié
-// diffuse passe en tête de son jour, et sa carte dit combien de bars, avec « Voir les bars » ; les autres, plus
-// discrètes, proposent l’agenda du match, et disent « Pas encore de bar » dès qu’un bar est publié ailleurs : tant
-// qu’aucun ne l’est, la phrase sous le titre le dit une fois pour toutes (comme la semaine, /matchs/). Si le jour
-// choisi n’a aucun match qu’un bar diffuse et qu’un autre jour en a, une ligne sous la phrase nomme le prochain. Les
-// données sont celles des pages des matchs (les mêmes matchs que la semaine), rien d’autre.
-// Les mots « Aujourd’hui » et « Demain » valent pour le jour du passage (data-aujourdhui) : chacun porte sa date sans
-// eux (data-date), que main.js remet, avec les jours passés retirés, si la page est lue un autre jour (un passage
-// manqué).
+// avant d’écrire, que tout ce qui est hors des repères est resté identique, octet pour octet. (Les repères gardent leur
+// ancien nom, « semaine » : l’Action pages-des-matchs.yml les lit.)
+// Le bloc : la carte du prochain match qui n’a pas commencé (la lumière de ses deux clubs, leurs deux insignes à la taille
+// de la carte, l’heure du coup d’envoi, jamais celui d’un match déjà joué), le bouton « Que faire pour ce match » qui
+// ouvre la réponse honnête (des bars qui le diffusent, ou « Aucun bar encore pour ce match » et trois gestes qui
+// existent : deux messages WhatsApp que le visiteur écrit, l’agenda du match, « Préviens-moi » sur une ligne), puis une
+// bande courte des autres matchs du même jour. Un soir sans match, ou quand tous ont commencé, la carte est celle du
+// prochain match à venir, dit honnêtement (« demain », la date). La liste du soir (« Le guide du soir ») est sur la page
+// « Ce soir », pas ici.
+// Les matchs à venir sont aussi écrits en JSON dans la page (#donnees-ce-soir) : main.js y reprend le prochain match qui
+// n’a pas commencé à l’heure où la page est lue (le bloc a au plus quelques heures), et tient le compte à rebours à la
+// minute. Sans script, la page est complète : la carte du passage, avec l’heure du coup d’envoi.
+// Les insignes sont ceux de l’appli (insigne.mjs), jamais un écusson : chaque club est dessiné une fois, dans une
+// planche (<symbol>), et la carte, la bande et le script le reprennent (<use>).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { aSonFichier } from './agenda.mjs';
 import { texteVisible } from './controle.mjs';
-import { DUREE_MATCH_MS, JOUR_MS, MOTS_INTERDITS } from './donnees.mjs';
-import { quand } from './gabarits.mjs';
-import { jourDeParis, jourEnLettres } from './heure.mjs';
-import { identifiantsUniques, paireDInsignes } from './insigne.mjs';
+import { DUREE_MATCH_MS, MOTS_INTERDITS } from './donnees.mjs';
+import { heureDeParis, isoDeParis, jourDeParis, jourEnLettres, joursEntre } from './heure.mjs';
+import { dessinDe, insigne } from './insigne.mjs';
 import { cheminDuMatch } from './jsonld.mjs';
-import { SEMAINE_JOURS } from './pages.mjs';
-import { planDeParis } from './plan.mjs';
 import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 
 export const ACCUEIL = 'index.html';
 export const REPERES = { debut: '<!-- semaine:debut -->', fin: '<!-- semaine:fin -->' };
 
-// Au-delà de ce nombre de matchs, un jour finit par un lien vers lui dans la semaine (/matchs/) : styles.css n’en montre
-// que 4 au téléphone, 6 à partir de 720 px (les autres cartes restent dans la page).
-const CARTES_AU_TELEPHONE = 4;
-const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
-const jourCourt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short', day: 'numeric' });
+// Les matchs que la page porte : le prochain et ses suivants (le premier qui n’a pas commencé quand la page est lue en
+// est l’un d’eux, même quelques heures après le passage). La bande ne montre que les autres matchs du même jour.
+export const MATCHS_DE_L_ACCUEIL = 6;
+export const MATCHS_DE_LA_BANDE = 4;
+// La taille du dessin des insignes de la carte (px) : leur finesse se règle sur elle (insigne.mjs). Seuls les clubs du
+// premier match ont ce grand dessin (d-…, 9 Ko chacun : un match plus loin, que la page prend si le premier a commencé
+// quand elle est lue, a le petit, agrandi) ; la bande, et tout autre club, ont le petit (p-…, 30 px, comme la liste de
+// l’appli) : la page ne porte pas une douzaine de grands insignes.
+export const TAILLE_DES_DISQUES = 112;
+export const TAILLE_DE_LA_BANDE = 30;
+export const MATCHS_AU_GRAND_DESSIN = 1;
 
+const NUIT = [10, 11, 16];
+// La lumière d’un club ne dépasse jamais cette luminance relative : le texte blanc de la carte reste à plus de 4,5:1,
+// même sur la lumière la plus claire.
+const LUMIERE_MAX = 0.12;
+const LUMIERE_MIN = 0.02;
+
+const rvb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const hexDe = (couleur) => `#${couleur.map((c) => Math.round(c).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
+const luminance = (couleur) => {
+  const [r, v, b] = couleur.map((c) => { const x = c / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; });
+  return 0.2126 * r + 0.7152 * v + 0.0722 * b;
+};
+
+// La couleur de lumière d’un club : sa première couleur (ses bandes, pour une sélection) ni trop sombre ni trop claire,
+// foncée vers la nuit jusqu’à la luminance qui garde le texte lisible.
+export const lumiereDe = (club) => {
+  const dessin = dessinDe(club);
+  const couleurs = (dessin.bandes ? dessin.bandes.bands : [dessin.fiche.colours.primary, dessin.fiche.colours.secondary])
+    .filter((c) => /^#[0-9A-Fa-f]{6}$/.test(c)).map(rvb);
+  let choisie = couleurs.find((c) => luminance(c) >= LUMIERE_MIN && luminance(c) <= 0.6) ?? couleurs.find((c) => luminance(c) >= LUMIERE_MIN) ?? [58, 63, 90];
+  for (let pas = 0; luminance(choisie) > LUMIERE_MAX && pas < 40; pas += 1) choisie = choisie.map((c, i) => c * 0.95 + NUIT[i] * 0.05);
+  return hexDe(choisie);
+};
+
+// Les espaces insécables du texte de la page, pas ceux des messages que le visiteur envoie (leurs champs) : un message
+// part avec des espaces ordinaires, comme main.js l’écrit.
+const sansLesChamps = (transformer, html) => html.split(/(<textarea[\s\S]*?<\/textarea>)/).map((morceau, i) => (i % 2 ? morceau : transformer(morceau))).join('');
+const remplir = (texte, valeurs) => texte.replace(/\{(\w+)\}/g, (_, cle) => valeurs[cle] ?? '');
 const nomDe = (m) => `${m.domicile.court} – ${m.exterieur.court}`;
-// « 2 bars à Paris », ou le nombre seul quand ses bars sont dans plusieurs villes : sur la carte, et sur la ligne du
-// prochain match dans un bar.
+// Les lettres du mot le plus long d'un nom, par paliers (accueil.css règle la taille du nom sur lui, « data-mot ») ; main.js
+// reçoit le palier dans les données. Les mots se séparent comme le navigateur les sépare : espace, tiret, barre oblique.
+export const PALIERS_DES_MOTS = [9, 11, 13, 15, 18, 24];
+export const motLePlusLong = (nom) => {
+  const plus = Math.max(1, ...String(nom).split(/[\s/\-–]+/).map((mot) => [...mot].length));
+  return PALIERS_DES_MOTS.find((palier) => plus <= palier) ?? PALIERS_DES_MOTS.at(-1);
+};
+// « 2 bars à Paris », ou le nombre seul quand ses bars sont dans plusieurs villes.
 const lesBars = (m) => {
   const villes = [...new Set(m.soirees.map((s) => s.bar.ville.nom))];
   return `${accorder(m.soirees.length, 'bar')}${villes.length === 1 ? ` à ${villes[0]}` : ''}`;
 };
 
-// Les insignes des cartes : la paire de la liste « Les matchs » de l’appli (30 px), sur le fond clair des cartes.
-const FOND_DES_CARTES = 'light';
+// Le jour d’un match, dit comme on le dit : « ce soir » (à partir de 17 h, « aujourd’hui » avant), « demain », ou la date
+// en toutes lettres. main.js fait la même chose, à l’heure où la page est lue.
+export const jourDit = (debut, maintenant, t) => {
+  const ecart = joursEntre(maintenant, debut);
+  if (ecart <= 0) return Number(heureDeParis(debut).slice(0, 2)) >= 17 ? t.ceSoir : t.aujourdhui;
+  return ecart === 1 ? t.demain : jourEnLettres(debut);
+};
 
-// Une carte : l’heure et la compétition, les deux clubs (le lien vers la page du match : leurs insignes, puis leurs
-// noms), puis ce qu’on peut faire.
-const carte = (m, { textes, maintenant, sansAucunBar }) => {
+// Le prochain match à venir : ni commencé, ni reporté ou annulé, à l’heure confirmée (sans elle, on ne peut dire ni
+// « dans 1 h » ni « avant le coup d’envoi »).
+// À l’heure égale, un club de Paris d’abord (le site est celui de Paris), puis l’ordre des adresses.
+const CLUBS_DE_PARIS = ['psg', 'paris-fc'];
+const rangDeParis = (m) => (CLUBS_DE_PARIS.some((c) => m.domicile.cle === c || m.exterieur.cle === c) ? 0 : 1);
+export const matchsDeLAccueil = (donnees, maintenant) => donnees.matchs
+  .filter((m) => m.debut > maintenant && !m.statut && m.heureConfirmee !== false)
+  .sort((a, b) => a.debut - b.debut || rangDeParis(a) - rangDeParis(b) || a.slug.localeCompare(b.slug))
+  .slice(0, MATCHS_DE_L_ACCUEIL);
+
+// La planche : chaque club n’y est dessiné qu’une fois par taille. grands : les clubs de la carte ; petits : tous les autres.
+const planche = (grands, petits) => {
+  const symboles = new Map();
+  const poser = (club, prefixe, taille) => {
+    if (symboles.has(`${prefixe}${club.cle}`)) return;
+    const svg = insigne(club, { taille, fond: 'night' });
+    const boite = /viewBox="([^"]+)"/.exec(svg)[1];
+    symboles.set(`${prefixe}${club.cle}`, `<symbol id="${prefixe}${club.cle}" viewBox="${boite}">${svg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</symbol>`);
+  };
+  for (const club of grands) poser(club, 'd-', TAILLE_DES_DISQUES);
+  for (const club of petits) poser(club, 'p-', TAILLE_DE_LA_BANDE);
+  return `<svg class="planche" width="0" height="0" aria-hidden="true" focusable="false"><defs>${[...symboles.values()].join('')}</defs></svg>`;
+};
+const disque = (club, classe = 'insigne', prefixe = 'd-') => `<svg class="${classe}" aria-hidden="true" focusable="false"><use href="#${prefixe}${e(club.cle)}"/></svg>`;
+
+const adresse = (chemin) => `https://baromatch.fr${chemin}`;
+const lienWhatsApp = (message) => `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+// Les données du script : un match par entrée, sans dessin (les insignes sont dans la planche).
+const donneesDuMatch = (m, maintenant) => ({
+  id: m.slug,
+  coup: isoDeParis(m.debut),
+  compet: m.competition,
+  a: { cle: m.domicile.cle, nom: m.domicile.court, lumiere: lumiereDe(m.domicile) },
+  b: { cle: m.exterieur.cle, nom: m.exterieur.court, lumiere: lumiereDe(m.exterieur) },
+  page: cheminDuMatch(m),
+  ics: aSonFichier(m, maintenant),
+  mot: motLePlusLong(nomDe(m)),
+  bars: m.soirees.length,
+  barsTexte: m.soirees.length ? lesBars(m) : '',
+  verbe: m.soirees.length > 1 ? 'diffusent' : 'diffuse',
+});
+
+// « Toute la semaine » : les sept jours de Paris à partir d’aujourd’hui, chacun avec les liens de ses matchs (leur page),
+// en texte simple. L’accueil les garde tous : les pages des matchs de la semaine ne dépendent pas de la carte, qui n’en
+// montre qu’un. Ni reporté ni annulé ; jamais un match fini.
+export const SEMAINE_EN_LIENS_JOURS = 7;
+const semaineEnLiens = ({ donnees, textes, maintenant }) => {
+  const midi = Date.parse(`${jourDeParis(maintenant)}T12:00:00Z`);
+  const jours = Array.from({ length: SEMAINE_EN_LIENS_JOURS }, (_, i) => new Date(midi + i * 86_400_000).toISOString().slice(0, 10));
+  const matchs = donnees.matchs.filter((m) => m.debut + DUREE_MATCH_MS > maintenant && !m.statut && jours.includes(jourDeParis(m.debut)))
+    .sort((a, b) => a.debut - b.debut || a.slug.localeCompare(b.slug));
+  const lignes = jours.flatMap((jour) => {
+    const duJour = matchs.filter((m) => jourDeParis(m.debut) === jour);
+    if (!duJour.length) return [];
+    const liens = duJour.map((m) => `<a href="${cheminDuMatch(m)}">${e(nomDe(m))}</a>`).join(' · ');
+    return [`<li><b>${e(capitale(jourEnLettres(duJour[0].debut)))}</b> ${liens}</li>`];
+  });
+  if (!lignes.length) return '';
+  return `<nav class="jours page" aria-labelledby="jours-titre">
+<p class="jours__titre" id="jours-titre">${e(textes.accueil.semaine)}</p>
+<ul>
+${lignes.join('\n')}
+</ul>
+</nav>`;
+};
+
+// Le bloc entier, pour l’instant « maintenant ».
+export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
   const t = textes.accueil;
-  const chemin = cheminDuMatch(m);
-  const nom = nomDe(m);
-  const pour = `<span class="visuellement-cache"> : ${e(nom)}</span>`;
-  let bas;
-  if (m.statut) {
-    bas = `<strong class="carte-match__statut">${e(textes.match[m.statut])}</strong>`;
-  } else if (m.soirees.length) {
-    bas = `<span class="carte-match__bars">${e(lesBars(m))}</span><a class="carte-match__voir" href="${chemin}#titre-bars">${e(t.voirLesBars)}${pour}</a>`;
-  } else {
-    bas = `${sansAucunBar ? '' : `<span class="carte-match__etat">${e(t.pasDeBar)}</span>`}${aSonFichier(m, maintenant) ? `<a class="carte-match__agenda" href="${chemin}match.ics" type="text/calendar">${e(t.agenda)}${pour}</a>` : ''}`;
+  const matchs = matchsDeLAccueil(donnees, maintenant);
+  if (!matchs.length) {
+    return sansLesChamps(insecables, `<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
+<h2 class="prochain__etiquette" id="soir-titre">${e(t.etiquette)}</h2>
+<p class="prochain__rien">${e(t.rien)} <a href="/matchs/">${e(t.rienLien)}</a></p>
+</section>`);
   }
-  const club = (c) => `<span class="carte-match__club">${e(c.court)}</span>`;
-  const insignes = paireDInsignes(m.domicile, m.exterieur, { fond: FOND_DES_CARTES, maintenant });
-  return `<li class="carte-match${m.soirees.length && !m.statut ? ' carte-match--bars' : ''}">
-<p class="carte-match__haut"><span class="carte-match__heure">${quand(m, { heureSeule: true })}</span><span class="carte-match__compet">${e(m.competition)}</span></p>
-<a class="carte-match__clubs" href="${chemin}">${insignes}${club(m.domicile)}<span class="visuellement-cache"> – </span>${club(m.exterieur)}</a>
-${bas ? `<p class="carte-match__bas">${bas}</p>\n` : ''}</li>`;
-};
-
-// Le bloc entier, pour l’instant « maintenant » : le titre, la phrase vraie, la barre des jours et leurs cartes.
-export const blocDeLaSemaine = ({ donnees, textes, marque = { appli: {} }, maintenant }) => {
-  const t = textes.accueil;
+  const hero = matchs[0];
+  const jourHero = jourDeParis(hero.debut);
+  const quand = jourDit(hero.debut, maintenant, t);
   const aujourdhui = jourDeParis(maintenant);
-  // Les sept jours de Paris, comptés sur les dates (comme la semaine, pages.mjs : un jour de changement d’heure dure 23
-  // ou 25 heures).
-  const midi = Date.parse(`${aujourdhui}T12:00:00Z`);
-  const jours = Array.from({ length: SEMAINE_JOURS }, (_, i) => new Date(midi + i * JOUR_MS).toISOString().slice(0, 10));
-  const enCoursOuAVenir = (m) => m.debut + DUREE_MATCH_MS > maintenant;
-  // Dans chaque jour : les matchs qu’un bar diffuse d’abord (ni reportés ni annulés), puis les autres, à l’heure.
-  const avecBars = (m) => Boolean(m.soirees.length && !m.statut);
-  const duJour = (jour) => donnees.matchs.filter((m) => enCoursOuAVenir(m) && jourDeParis(m.debut) === jour)
-    .sort((a, b) => Number(avecBars(b)) - Number(avecBars(a)) || a.debut - b.debut || a.slug.localeCompare(b.slug));
-  const semaine = jours.map((jour, i) => ({ jour, i, matchs: duJour(jour) }));
-  const choisi = semaine.find((j) => j.matchs.length)?.jour ?? aujourdhui;
-  const sansAucunBar = donnees.bars.length === 0;
-  // Sans bar publié : la phrase vraie, puis ce que chacun peut faire, le fan (la liste d’attente) et le bar.
-  const chapo = `<p class="semaine__chapo">${e(sansAucunBar ? t.sansBar : t.avecBars)}</p>${sansAucunBar
-    ? `\n<p class="semaine__liens"><a href="#attente">${e(t.sansBarLien)}</a><a href="/pour-les-bars.html#proposer">${e(t.sansBarProposer)}</a></p>` : ''}`;
-  // Des bars publiés, mais aucun match qu’un bar diffuse le jour choisi : une ligne sous la phrase nomme le prochain,
-  // par sa date (jamais « demain » : lue un autre jour, elle reste vraie ; main.js l’efface une fois ce jour passé),
-  // son heure et ses bars, avec « Voir les bars ». Sans elle, son match restait derrière un jour à deviner. Une espace
-  // insécable avant « · » : la ligne ne se coupe jamais sur « · 20:45 » (à 320 px, texte à 200 %).
-  const prochain = (sansAucunBar || semaine.find((j) => j.jour === choisi)?.matchs.some(avecBars)) ? null : semaine.flatMap((j) => j.matchs).find(avecBars);
-  const ligneDuProchain = prochain ? `\n<p class="semaine__prochain" data-jour="${jourDeParis(prochain.debut)}">${remplir(e(t.prochainDansUnBar), { match: e(nomDe(prochain)), quand: quand(prochain).replace(' · ', '\u00a0· '), bars: e(lesBars(prochain)) })} <a class="semaine__voir" href="${cheminDuMatch(prochain)}#titre-bars">${e(t.voirLesBars)}<span class="visuellement-cache"> : ${e(nomDe(prochain))}</span></a></p>` : '';
-
-  const nomDuJour = ({ jour, i }) => (i === 0 ? t.aujourdhui : i === 1 ? t.demain : jourCourt.format(new Date(`${jour}T12:00:00Z`)));
-  // La puce d’un jour dit combien de matchs ; s’il y en a qu’un bar diffuse, un point devant (de la couleur du texte :
-  // l’ambre est pour l’action), et leur nombre pour le lecteur d’écran.
-  const compte = (j) => {
-    const avec = j.matchs.filter(avecBars).length;
-    if (!j.matchs.length) return e(t.aucunMatch);
-    if (!avec) return e(accorder(j.matchs.length, 'match'));
-    return `<span class="semaine__point" aria-hidden="true"></span>${e(accorder(j.matchs.length, 'match'))}<span class="visuellement-cache">${e(remplir(t.dontAvecBars, { nombre: avec }))}</span>`;
+  const chemin = cheminDuMatch(hero);
+  const heure = heureDeParis(hero.debut);
+  const nom = nomDe(hero);
+  const ceJour = (m) => jourDeParis(m.debut) === jourHero;
+  const bande = donnees.matchs
+    .filter((m) => m !== hero && ceJour(m) && m.debut + DUREE_MATCH_MS > maintenant && !m.statut && m.heureConfirmee !== false)
+    .sort((a, b) => a.debut - b.debut || a.slug.localeCompare(b.slug)).slice(0, MATCHS_DE_LA_BANDE);
+  const clubsDe = (liste) => liste.flatMap((m) => [m.domicile, m.exterieur]);
+  const grands = clubsDe(matchs.slice(0, MATCHS_AU_GRAND_DESSIN));
+  const petits = clubsDe([...matchs, ...bande]);
+  const messageAmis = remplir(t.amisMessage, { match: nom, quand: `${quand} à ${heure}`, lien: adresse(chemin) });
+  const messageBar = remplir(t.barMessage, { match: nom, quand: `${quand} à ${heure}`, lien: adresse('/pour-les-bars.html') });
+  const donneesJson = {
+    maintenant: isoDeParis(maintenant),
+    matchs: matchs.map((m) => donneesDuMatch(m, maintenant)),
+    t: {
+      ceSoir: t.ceSoir, aujourdhui: t.aujourdhui, demain: t.demain, pasDeMatch: t.pasDeMatch, aucunBar: t.aucunBar, aucunBarSuite: t.aucunBarSuite,
+      avecBars: t.avecBars, voirLesBars: t.voirLesBars, agenda: t.agenda, rien: t.rien, rienLien: t.rienLien, autres: t.autres, enCours: t.enCours, tous: t.tous, tousSemaine: t.tousSemaine, heureDeParis: t.heureDeParis,
+      amisMessage: t.amisMessage, barMessage: t.barMessage,
+    },
   };
-  const dates = semaine.map((j) => `<label class="semaine__date"><input type="radio" name="semaine-jour" value="${j.jour}"${j.jour === choisi ? ' checked' : ''}><span><b data-date="${e(jourCourt.format(new Date(`${j.jour}T12:00:00Z`)))}">${e(nomDuJour(j))}</b><small>${compte(j)}</small></span></label>`).join('\n');
-  const enLettres = (jour) => capitale(jourEnLettres(Date.parse(`${jour}T12:00:00Z`)));
-  // Un long jour : son lien vers la semaine, qui ouvre aujourd’hui sous « titre-ce-soir » et chaque autre jour sous
-  // « jour-AAAA-MM-JJ » (pages.mjs). « Aujourd’hui » et « Demain » portent aussi leur date (data-date), pour main.js.
-  const tous = (j) => {
-    if (j.matchs.length <= CARTES_AU_TELEPHONE) return '';
-    const date = remplir(t.tousLesMatchs, { jour: jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`)) });
-    const texte = j.i === 0 ? t.tousLesMatchsAujourdhui : j.i === 1 ? remplir(t.tousLesMatchs, { jour: t.demain.toLowerCase() }) : date;
-    return `\n<p class="semaine__tous"><a href="/matchs/#${j.i === 0 ? 'titre-ce-soir' : `jour-${j.jour}`}"${j.i < 2 ? ` data-date="${e(date)}"` : ''}>${e(texte)}</a></p>`;
-  };
-  const panneaux = semaine.map((j) => `<div class="semaine__jour" data-jour="${j.jour}">
-<h3 class="semaine__titre-jour"${j.i < 2 ? ` data-date="${e(enLettres(j.jour))}">${e(`${nomDuJour(j)}, ${jourEnLettres(Date.parse(`${j.jour}T12:00:00Z`))}`)}` : `>${e(enLettres(j.jour))}`}</h3>
-${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m, { textes, maintenant, sansAucunBar })).join('\n')}\n</ul>${tous(j)}` : `<p class="semaine__rien">${e(t.rienCeJour)}</p>`}
-</div>`).join('\n');
-  const rien = semaine.every((j) => !j.matchs.length);
-  // Le plan « Paris, ce soir » : les matchs du premier jour qui en a (ce soir, sinon le prochain jour), au plus dix.
-  const duPlan = semaine.find((j) => j.matchs.length)?.matchs.filter((m) => !m.statut) ?? [];
-  const jourDuPlan = semaine.find((j) => j.matchs.length);
-  const plan = duPlan.length
-    ? `<section class="paris" id="paris" aria-labelledby="soir-etape1">\n${planDeParis({ matchs: [...duPlan].sort((a, b) => a.debut - b.debut), donnees, marque, chemin: '/', maintenant, jour: jourDuPlan.i === 0 ? 'ce soir' : `le ${jourEnLettres(Date.parse(`${jourDuPlan.jour}T12:00:00Z`))}`, aUnePage: () => true })}\n</section>\n`
-    : '';
-  // Les identifiants des insignes, uniques dans le bloc (le reste de l’accueil n’en dessine pas).
-  return identifiantsUniques(insecables(`${plan}<section class="semaine" id="semaine" aria-labelledby="titre-semaine"><div class="semaine__tete">
-<h2 class="titre-section" id="titre-semaine">${e(t.titre)}</h2>
-<a class="semaine__toute" href="/matchs/">${e(t.toute)}</a>
+  const puce = (m) => `<li><a class="puce" href="${cheminDuMatch(m)}">${disque(m.domicile, 'insigne', 'p-')}${disque(m.exterieur, 'insigne', 'p-')}<span class="puce__nom" data-mot="${motLePlusLong(nomDe(m))}">${e(nomDe(m))}</span>${m.debut <= maintenant
+    ? `<span class="puce__en-cours">${e(t.enCours)}</span>`
+    : `<time class="puce__heure" datetime="${isoDeParis(m.debut)}">${heureDeParis(m.debut)}</time>`}</a></li>`;
+  const avecBars = hero.soirees.length > 0;
+  const entete = avecBars
+    ? `<p class="faire__titre" data-faire-titre>${e(remplir(t.avecBars, { bars: lesBars(hero), verbe: hero.soirees.length > 1 ? 'diffusent' : 'diffuse' }))}</p>
+<p class="faire__texte" data-faire-suite><a class="lien" data-voir-bars href="${chemin}#titre-bars">${e(t.voirLesBars)}<span class="visuellement-cache"> : ${e(nom)}</span></a></p>`
+    : `<p class="faire__titre" data-faire-titre>${e(t.aucunBar)}</p>
+<p class="faire__texte" data-faire-suite>${e(t.aucunBarSuite)}</p>`;
+  const message = (cle, titre, texte) => `<div class="msg">
+<label class="msg__etiquette" for="msg-${cle}"><strong>${e(titre)}</strong> <span>${e(t.messageEtiquette)}</span></label>
+<textarea class="msg__champ" id="msg-${cle}" data-message="${cle}" rows="3" maxlength="500">${e(texte)}</textarea>
+<a class="msg__envoi" data-wa="${cle}" href="${lienWhatsApp(texte)}" rel="noopener">${e(t.whatsapp)}<span class="visuellement-cache"> : ${e(titre.toLowerCase())}</span></a>
+</div>`;
+  // « Pas de match ce soir » : le prochain est un autre jour, et rien ne se joue aujourd’hui (ni à venir, ni en cours).
+  const horsAujourdhui = jourHero !== aujourdhui && !donnees.matchs.some((m) => !m.statut && jourDeParis(m.debut) === aujourdhui && m.debut + DUREE_MATCH_MS > maintenant);
+  const liens = semaineEnLiens({ donnees, textes, maintenant });
+  return sansLesChamps(insecables, `<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
+${planche(grands, petits)}
+<h2 class="prochain__etiquette" id="soir-titre">${e(t.etiquette)} <span class="prochain__quand" data-soir-quand>· ${e(quand)}</span></h2>
+<div class="coup" data-coup="${isoDeParis(hero.debut)}">
+<div class="coup__lumiere" aria-hidden="true"><i></i><i></i><i></i></div>
+<p class="coup__ou"><span data-coup-compet>${e(hero.competition)}</span> · <time data-coup-heure datetime="${isoDeParis(hero.debut)}">${heure}</time></p>
+<div class="coup__clubs">
+${disque(hero.domicile, 'insigne coup__disque')}
+<h3 class="coup__titre" data-mot="${motLePlusLong(nom)}"><a href="${chemin}" data-coup-page>${e(hero.domicile.court)} <span class="coup__tiret">–</span> ${e(hero.exterieur.court)}</a></h3>
+${disque(hero.exterieur, 'insigne coup__disque')}
 </div>
-${chapo}${ligneDuProchain}
-${rien ? `<p class="semaine__rien">${e(t.rienCetteSemaine)}</p>` : `<div class="semaine__jours" data-aujourdhui="${aujourdhui}">
-<fieldset class="semaine__dates">
-<legend class="visuellement-cache">${e(t.jours)}</legend>
-${dates}
-</fieldset>
-${panneaux}
-</div>`}</section>`));
+<p class="coup__dans" data-dans aria-hidden="true" hidden></p>
+<p class="coup__heure"><span data-coup-detail>${e(`${quand.charAt(0).toUpperCase()}${quand.slice(1)}, ${heure}`)}</span> · ${e(t.heureDeParis)}</p>
+<p class="coup__nuit" data-pas-de-match${horsAujourdhui ? '' : ' hidden'}>${e(t.pasDeMatch)}</p>
+<details class="faire" id="faire">
+<summary class="capsule faire__bouton">${e(t.bouton)}<span class="visuellement-cache"> : ${e(nom)}</span></summary>
+<div class="faire__corps">
+${entete}
+${message('amis', t.amis, messageAmis)}
+${message('bar', t.bar, messageBar)}
+<p class="faire__agenda">${aSonFichier(hero, maintenant) ? `<a class="lien-trait" data-agenda href="${chemin}match.ics" type="text/calendar">${e(t.agenda)}</a>` : ''}</p>
+<form class="prevenir attente" id="attente-carte" action="https://formspree.io/f/mqpeedoj" method="POST" data-attente novalidate>
+<label class="prevenir__etiquette" for="prevenir-mail">${e(t.prevenirEtiquette)}</label>
+<div class="prevenir__ligne"><input class="prevenir__champ" id="prevenir-mail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ton@adresse.fr" required aria-describedby="prevenir-retour prevenir-note"><button class="prevenir__bouton" type="submit">${e(t.prevenir)}</button></div>
+<input type="hidden" name="ville" value="Paris">
+<input type="hidden" name="_subject" value="Nouvelle inscription à la liste d’attente Baromatch">
+<div class="attente__piege" aria-hidden="true"><label for="prevenir-piege">Laisse ce champ vide</label><input id="prevenir-piege" type="text" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+<p class="attente__retour" id="prevenir-retour" role="status" aria-live="polite"></p>
+<button class="attente__corriger" type="button" hidden>Corriger l’adresse</button>
+<p class="prevenir__note" id="prevenir-note">${e(t.prevenirNote)} <a href="/confidentialite.html#liste-attente">Ce qu’on garde</a></p>
+</form>
+</div>
+</details>
+</div>
+<div class="bande" data-bande${bande.length ? '' : ' hidden'}>
+<p class="bande__titre" data-bande-titre>${e(remplir(t.autres, { quand }))}</p>
+<ul class="bande__liste" data-bande-liste>
+${bande.map(puce).join('\n')}
+</ul>
+</div>
+<p class="prochain__suite"><a href="${jourHero === aujourdhui ? '/ce-soir/' : '/matchs/'}" data-tous>${e(jourHero === aujourdhui ? t.tous : t.tousSemaine)}</a></p>
+<script type="application/json" id="donnees-ce-soir">${JSON.stringify(donneesJson).replace(/</g, '\\u003c')}</script>
+</section>${liens ? `\n${liens}` : ''}`);
 };
 
-// Ce que le bloc ne fait jamais : un style en ligne ou un script (la politique de sécurité de l’accueil les refuse),
-// un attribut d’évènement, un « ! », un mot que le site ne publie pas, l’ancien nom. Une liste d’erreurs, vide si tout va.
+// Ce que le bloc ne fait jamais : un style en ligne ou un script qui s’exécute (la politique de sécurité de l’accueil les
+// refuse ; le JSON des données n’est pas un script), un attribut d’évènement, un « ! », un mot que le site ne publie pas,
+// l’ancien nom. Une liste d’erreurs, vide si tout va.
 export const controlerLaSemaine = (bloc) => {
   const erreurs = [];
   if (/\sstyle\s*=/i.test(bloc)) erreurs.push('un style en ligne');
-  if (/<script\b/i.test(bloc)) erreurs.push('un script');
+  const sansDonnees = bloc.replace(/<script type="application\/json" id="donnees-ce-soir">[\s\S]*?<\/script>/, '');
+  if (/<script\b/i.test(sansDonnees)) erreurs.push('un script');
   if ([...bloc.matchAll(/<[a-zA-Z][^>]*>/g)].some((m) => /\son[a-z]+\s*=/i.test(m[0].replace(/"[^"]*"/g, '""')))) erreurs.push('un attribut d’évènement');
-  const texte = texteVisible(`<body>${bloc}`);
+  const texte = texteVisible(`<body>${sansDonnees}`);
   if (texte.includes('!')) erreurs.push('un point d’exclamation');
   const interdit = texte.match(MOTS_INTERDITS);
   if (interdit) erreurs.push(`un mot que le site ne publie pas : « ${interdit[0]} »`);
   if (/soir\s+de\s+match/i.test(texte)) erreurs.push('l’ancien nom');
-  // Le plan « Paris, ce soir » a ses étapes (des h2) : le titre attendu est celui de la semaine, seul, hors du plan.
-  if (((bloc.replace(/<section class="paris"[\s\S]*?<\/section>\n?/, '')).match(/<h2[\s>]/g) ?? []).length !== 1) erreurs.push('un seul titre h2 attendu');
+  if ((sansDonnees.match(/<h2[\s>]/g) ?? []).length !== 1) erreurs.push('un seul titre h2 attendu');
   return erreurs;
 };
 
@@ -182,6 +297,6 @@ export const preparerLAccueil = ({ racine, sortie, bloc }) => {
 // L’écriture, la seule que le générateur fasse hors de sa liste blanche (etat.mjs) : index.html, et seulement si tout
 // ce qui est hors du bloc est identique à ce qui était là.
 export const ecrireLAccueil = (sortie, { avant, apres }) => {
-  if (horsDuBloc(apres) !== horsDuBloc(avant)) throw new Error(`${ACCUEIL} : le générateur ne change que le bloc des matchs de la semaine`);
+  if (horsDuBloc(apres) !== horsDuBloc(avant)) throw new Error(`${ACCUEIL} : le générateur ne change que le bloc du prochain match`);
   writeFileSync(path.join(sortie, ACCUEIL), apres);
 };

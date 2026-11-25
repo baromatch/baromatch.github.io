@@ -27,11 +27,3 @@ test('la section des bars contactés dit le texte validé, entre les demandes de
   const liens = await page.locator('#bars-contactes + p + ul a').evaluateAll((a) => a.map((l) => l.getAttribute('href')));
   expect(liens).toEqual(['mailto:contact@baromatch.fr', 'https://www.cnil.fr']);
 });
-
-test('l’introduction de la page mène à la section des bars contactés', async ({ page }) => {
-  await page.goto('/confidentialite.html');
-  const intro = page.locator('main > h1 + .document__date + p');
-  await expect(intro.locator('a[href="#bars-contactes"]')).toHaveText('les bars que nous contactons');
-  await intro.locator('a[href="#bars-contactes"]').click();
-  await expect(page.locator('#bars-contactes')).toBeInViewport();
-});

@@ -231,6 +231,11 @@ for (const site of SITES) {
         expect(validerLaPage(vocabulaire, html), chemin).toEqual([]);
         const lu = tete(html);
         expect(lu.langue, chemin).toBe('fr');
+        expect(lu.h1, `${chemin} : h1`).toBe(1);
+        expect(lu.titresDeLaPage[0], `${chemin} : le premier titre`).toBe(1);
+        lu.titresDeLaPage.forEach((niveau, i) => {
+          if (i > 0) expect(niveau, `${chemin} : h${lu.titresDeLaPage[i - 1]} puis h${niveau}`).toBeLessThanOrEqual(lu.titresDeLaPage[i - 1] + 1);
+        });
         expect(lu.titres[0].length, chemin).toBeLessThanOrEqual(TITRE_MAX);
         expect(lu.descriptions[0].length, chemin).toBeGreaterThanOrEqual(DESCRIPTION_MIN);
         expect(lu.descriptions[0].length, `${chemin} : ${lu.descriptions[0]}`).toBeLessThanOrEqual(DESCRIPTION_MAX);

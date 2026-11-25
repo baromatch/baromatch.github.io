@@ -159,11 +159,11 @@ test('la note de la liste d’attente mène droit à ce qu’on fait de l’adre
   await expect(page.locator('#liste-attente')).toBeInViewport();
 });
 
-test('l’accueil est court : le geste, le prochain match, l’appli, les bars, l’essentiel et les questions ; ni film, ni plan, ni semaine', async ({ page }) => {
+test('l’accueil est court : le geste, le prochain match, l’appli, les bars, l’essentiel et les questions ; ni soirée en huit moments, ni plan, ni semaine', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   expect(await page.$$eval('main > section', (s) => s.map((e) => e.className.split(' ')[0]))).toEqual(['geste', 'prochain', 'appli', 'bars', 'en-bref', 'testeurs-accueil', 'questions-fans']);
-  for (const retire of ['#film', '.soiree', '.semaine', '.paris', '.essai', '.une-grille']) await expect(page.locator(retire), retire).toHaveCount(0);
+  for (const retire of ['.soiree', '.semaine', '.paris', '.essai', '.une-grille']) await expect(page.locator(retire), retire).toHaveCount(0);
   // Au téléphone, moins de 8 écrans (il en avait 11,4).
   expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThan(8 * 844);
 });

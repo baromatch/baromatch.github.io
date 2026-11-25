@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Politique de sécurité (GitHub Pages ne permet pas d’en-tête) : seulement les fichiers du site ; Formspree pour la
-     liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même). Aucun script ni style en ligne. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
+     liste d’attente (envoi par main.js, et sans JavaScript par le formulaire lui-même). L’empreinte du style du noscript : une retouche de ce style change son empreinte (tests/politique-de-securite.spec.mjs donne la nouvelle). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'sha256-Luah/3kMW/T3ZhWpTYhfRkXZEQsOZrPjg7FjPz5V07w='; connect-src 'self' https://formspree.io; base-uri 'none'; object-src 'none'; form-action https://formspree.io">
 <meta name="google-site-verification" content="nBxxD8vbrngLKD1Te1fRcbC8tGC2-gwezW9NG9urIaw" />
 <!-- Bing Webmaster Tools : remplace la ligne suivante par la balise de vérification que Bing donne (elle commence par <meta name="msvalidate.01"). -->
 <!-- BING_SITE_VERIFICATION -->
@@ -20,6 +20,8 @@
 <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/accueil.css">
+<!-- Sans JavaScript, le lecteur de secours (dans #film-cadre, avec ses commandes) prend la place du film, que main.js lance et arrête. -->
+<noscript><style>#film { display: none; }</style></noscript>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Baromatch">
@@ -279,6 +281,32 @@
         <figcaption id="album-legende">Le sous-bock n°08 se colle dans l’album, parmi les autres. Sous-bocks et clubs inventés.</figcaption>
       </figure>
     </div>
+    <!-- Le film n’a pas de son : sa version en mots, « Ce que montre le film », dit ce qu’il montre à l’écran, lu sur
+         ses images, et rien d’autre (WCAG 1.2.1). Chaque lecteur cite la note qui le dit. -->
+    <figure class="film">
+      <div class="film__cadre" id="film-cadre">
+        <video class="film__video" id="film" width="540" height="960" playsinline muted loop preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video>
+        <noscript><video class="film__video" width="540" height="960" controls playsinline preload="none" poster="/baromatch-film.webp" aria-label="Le film de Baromatch, sans le son" aria-describedby="film-note"><source src="/baromatch-film.mp4" type="video/mp4"></video></noscript>
+        <button class="film__bouton" id="film-lecture" type="button" hidden aria-label="Mettre le film en pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+      </div>
+      <figcaption class="film__legende">
+        <p class="film__note" id="film-note">Un film sans le son, raconté en mots juste dessous. Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.</p>
+        <details class="film__texte" id="film-texte">
+          <summary>Ce que montre le film</summary>
+          <ol>
+            <li>Un quartier, la nuit, vu d’en haut&nbsp;: des bars s’allument, chacun avec son verre. «&nbsp;On regarde le match où ce soir&nbsp;?&nbsp;» Il est 18:42.</li>
+            <li>«&nbsp;Écrans de démonstration&nbsp;». «&nbsp;La Lucarne Lunaire.&nbsp;» L’écran pour garder sa place&nbsp;: «&nbsp;Tu arrives vers&nbsp;» 20:00, 20:30 ou 21:00, et 20:30 est choisi. «&nbsp;Ta place est gardée jusqu’à 21:30.&nbsp;» «&nbsp;Au comptoir, tu es @Zephyr&nbsp;». Le bouton «&nbsp;Maintiens pour réserver&nbsp;», et dessous&nbsp;: «&nbsp;Tiens appuyé, le verre se remplit. Lâche avant la fin, rien n’est réservé.&nbsp;» Plus bas, «&nbsp;Réserver sans maintenir&nbsp;».</li>
+            <li>«&nbsp;Maintiens.&nbsp;» Le bouton est tenu appuyé et se remplit d’ambre. «&nbsp;Le verre se remplit.&nbsp;»</li>
+            <li>L’ambre remplit l’écran&nbsp;: «&nbsp;Place gardée.&nbsp;»</li>
+            <li>L’écran «&nbsp;Ta soirée&nbsp;»&nbsp;: «&nbsp;Ce soir · coup d’envoi 21:00&nbsp;», «&nbsp;Place gardée&nbsp;». Alvène – Orvèle, 21:00, au bar La Lucarne Lunaire, pour 1 personne, ton camp&nbsp;: juste le match. Le QR code du pass, et «&nbsp;Ou donne ce code&nbsp;».</li>
+            <li>20:37. «&nbsp;Scanne le QR du bar&nbsp;», La Lucarne Lunaire · Alvène – Orvèle. Sur l’écran du bar&nbsp;: «&nbsp;Tu y es. Scanne-moi.&nbsp;» «&nbsp;Ouvre Baromatch, scanne ce code&nbsp;: ta place est validée et ton sous-bock se colle dans ton album.&nbsp;» Dessous, «&nbsp;ou entre son code&nbsp;».</li>
+            <li>«&nbsp;Tu y es&nbsp;»&nbsp;: «&nbsp;Arrivée validée à 20:37 à La Lucarne Lunaire. Coup d’envoi dans 23 minutes.&nbsp;» «&nbsp;arrivée · deux vibrations&nbsp;», puis «&nbsp;Sous-bock n°08 collé&nbsp;».</li>
+            <li>20:38. «&nbsp;Ta soirée se colle dans ton album.&nbsp;» Le sous-bock n°08, Alvène – Orvèle, à La Lucarne Lunaire, se pose parmi les autres&nbsp;: Alvène – Orvèle, Port-Ambrail – Brisecôte, Hautvergne – Mirebelle, Sablerive – Kerbrume, Lucival – Valbrume. L’album passe de 7 à 8 sous-bocks, et de 4 à 5 bars.</li>
+            <li>21:00. Le sous-bock rejoint le verre de Baromatch, qui se remplit. Puis Baromatch&nbsp;: «&nbsp;Ton match. Ton bar. Ce soir.&nbsp;» «&nbsp;baromatch.fr&nbsp;» «&nbsp;Bientôt sur Android, à Paris&nbsp;»</li>
+          </ol>
+        </details>
+      </figcaption>
+    </figure>
   </section>
 
 

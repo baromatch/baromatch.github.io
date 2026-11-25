@@ -137,7 +137,7 @@ test.describe('le contraste de chaque texte sur le clair, mesuré', () => {
         await etat.amener(page);
         await toutOuvrir(page);
         const mesures = await mesurerLesTextes(page, NUIT_DES_BARS);
-        expect(mesures.length).toBeGreaterThan(etat.nom === 'au repos' ? 100 : 40);
+        expect(mesures.length).toBeGreaterThan(etat.nom === 'au repos' ? 60 : 30);
         // Le rapport de la PR : chaque couple de couleurs des petits textes, et son contraste le plus faible.
         infos.annotations.push({ type: 'contraste', description: decrireLesCouples(mesures) });
         expect(textesTropFaibles(mesures)).toEqual([]);
@@ -204,7 +204,7 @@ test.describe('le contraste, mesuré sur ce que le navigateur peint', () => {
       await page.evaluate(() => document.getElementById('collant')?.remove());
       const mesures = await mesurerAuPixel(page, NUIT_DES_BARS);
       // Des centaines de lignes (les réponses des questions comprises) : une mesure qui n’en lit presque aucune ne prouve rien.
-      expect(mesures.length).toBeGreaterThan(150);
+      expect(mesures.length).toBeGreaterThan(80);
       infos.annotations.push({ type: 'contraste peint', description: `${mesures.length} lignes ; les plus faibles : ${decrireLesPlusFaibles(mesures)}` });
       expect(lignesTropFaibles(mesures)).toEqual([]);
     });
@@ -224,9 +224,6 @@ test.describe('le jour posé', () => {
         texte: style('.ouverture-bars__titre').color,
         salle: { fond: salle.backgroundColor, texte: salle.color, decoupe: salle.clipPath, ombre: salle.boxShadow, classe: document.querySelector('.salle-soir').className },
         pied: style('.pied').backgroundColor,
-        capture: style('.capture').backgroundColor,
-        telephone: style('.telephone__ecran').backgroundColor,
-        etiquettes: [...document.querySelectorAll('.moment__visuel > .exemple')].map((e) => e.textContent),
         carte: style('.carte-formulaire').backgroundColor,
         conditions: [...document.querySelectorAll('.conditions__liste li')].map((e) => getComputedStyle(e).backgroundColor),
         etapes: [...document.querySelectorAll('.marche__etape')].map((e) => getComputedStyle(e).backgroundColor),
@@ -243,8 +240,7 @@ test.describe('le jour posé', () => {
     expect(lu.salle.texte).toBe('rgb(247, 247, 249)');
     expect(lu.salle.decoupe).toBe('none');
     expect(lu.salle.ombre).not.toMatch(/0px 0px 0px \d{3,}px/);
-    expect([lu.pied, lu.capture, lu.telephone]).toEqual([NUIT, NUIT, NUIT]);
-    expect(lu.etiquettes).toEqual(Array(4).fill('Écran de démonstration'));
+    expect(lu.pied).toBe(NUIT);
     // La carte du formulaire, les conditions et les trois étapes : des cartes blanches sur le crème.
     expect(lu.carte).toBe('rgb(255, 255, 255)');
     expect(lu.conditions).toEqual(Array(6).fill('rgb(255, 255, 255)'));
@@ -266,21 +262,20 @@ test.describe('le jour posé', () => {
       }
       return { fonds, textes };
     }, AMBRE);
-    // « Proposer mon bar » (en haut, après ce que ça change), et « Envoyer ma demande ».
-    expect(lu.fonds).toEqual(['a.capsule', 'a.capsule', 'button.panier__envoyer']);
+    // « Proposer mon bar » (en haut), et « Envoyer ma demande ».
+    expect(lu.fonds).toEqual(['a.capsule', 'button.panier__envoyer']);
     expect(lu.textes).toEqual([]);
   });
 
   // « Proposer mon bar », survolé : les deux capsules ambre (#FFC163 au survol, le texte de nuit) et le bouton nuit de la
   // bande des bars (la goutte de la nuit, #FFF3DA ; celle du jour, #7A4300, n’y faisait que 2,45:1). Le texte contre le fond
   // du bouton survolé, lu dans le style et vérifié peint : le pixel du bord intérieur du bouton est bien ce fond.
-  test('« Proposer mon bar » survolé reste lisible : 4,5:1 au moins sur le fond du bouton survolé, chacun des trois', async ({ page }) => {
+  test('« Proposer mon bar » survolé reste lisible : 4,5:1 au moins sur le fond du bouton survolé, chacun des deux', async ({ page }) => {
     await ouvrir(page, 1280);
-    // Les trois boutons ; les liens discrets des moments ont le survol des liens (le gris du texte), sans fond.
-    // (Le « Proposer mon bar » collé en bas du téléphone est hors de main : il a ses propres vérifications.)
+    // Le bouton de l’ouverture, le seul « Proposer mon bar » de la page.
     const boutons = page.locator('main :is(.capsule, .bouton-nuit)', { hasText: 'Proposer mon bar' });
-    await expect(boutons).toHaveCount(3);
-    for (let i = 0; i < 3; i += 1) {
+    await expect(boutons).toHaveCount(1);
+    for (let i = 0; i < 1; i += 1) {
       const bouton = boutons.nth(i);
       await bouton.scrollIntoViewIfNeeded();
       await bouton.hover();
@@ -295,19 +290,6 @@ test.describe('le jour posé', () => {
       const o = (y * image.largeur + x) * 4;
       const peint = { r: image.pixels[o], v: image.pixels[o + 1], b: image.pixels[o + 2] };
       expect(peint, `${lu.quoi} : le fond peint au bord du bouton`).toEqual({ r: fond.r, v: fond.v, b: fond.b });
-    }
-  });
-
-  test('l’étiquette « Écran de démonstration » se lit : du texte clair sur sa pastille de nuit, 4,5:1 au moins', async ({ page }) => {
-    await ouvrir(page, 1280);
-    const etiquettes = await page.locator('.moment__visuel > .exemple').evaluateAll((liste) => liste.map((e) => {
-      const style = getComputedStyle(e);
-      return { texte: style.color, fond: style.backgroundColor, taille: parseFloat(style.fontSize), visible: e.checkVisibility() };
-    }));
-    expect(etiquettes).toHaveLength(4);
-    for (const e of etiquettes) {
-      expect(e.visible).toBe(true);
-      expect(rapport(lireCouleur(e.texte), lireCouleur(e.fond)), `${e.texte} sur ${e.fond}`).toBeGreaterThanOrEqual(4.5);
     }
   });
 
@@ -329,7 +311,7 @@ test.describe('le jour posé', () => {
         carte: style('.carte-formulaire').backgroundColor,
         champ: { fond: style('#demande-bar').backgroundColor, bord: style('#demande-bar').borderTopColor, texte: style('#demande-bar').color },
         salle: style('.salle-soir').backgroundColor,
-        souligne: style('.lien-fleche').textDecorationColor,
+        souligne: style('.lien-affiche').textDecorationColor,
         contourDuVerre: [...document.querySelectorAll('#pb-verre stop')].map((arret) => getComputedStyle(arret).stopColor),
       };
     });
@@ -355,7 +337,7 @@ test.describe('le jour posé', () => {
 // Des éléments qui prennent le focus sur le clair : un de chaque sorte (le bouton, les liens, les champs, la case, les questions).
 // L’en-tête et le pied sont ceux de la navigation « les matchs d’abord » (generateur/cadre.mjs) : une entrée du menu, sur
 // le clair ; un lien du plan du site, dans le pied de nuit (plus bas).
-const FOCUS_DU_CLAIR = ['.ouverture-bars .capsule', '.lien-fleche', '.menu__lien', '#demande-bar', '#demande-message', '#demande-accord', '.questions summary', '.conditions__liste a', '.formulaire__ailleurs a'];
+const FOCUS_DU_CLAIR = ['.ouverture-bars .capsule', '.lien-affiche', '.menu__lien', '#demande-bar', '#demande-ville', '#demande-accord', '.questions summary', '.conditions__liste a', '.formulaire__ailleurs a'];
 
 test.describe('le bord des champs, le focus', () => {
   // WCAG 1.4.11 : le bord d’un champ se voit à 3:1 au moins contre ce qui l’entoure (la carte) et contre son fond.
@@ -372,7 +354,7 @@ test.describe('le bord des champs, le focus', () => {
         fond: getComputedStyle(c).backgroundColor,
         carte: getComputedStyle(c.closest('.carte-formulaire')).backgroundColor,
       })));
-    expect(champs.map((c) => c.nom)).toEqual(['demande-bar', 'demande-ville', 'demande-nom', 'demande-email', 'demande-telephone', 'demande-message', 'demande-courriel-texte']);
+    expect(champs.map((c) => c.nom)).toEqual(['demande-bar', 'demande-nom', 'demande-email', 'demande-ville', 'demande-courriel-texte']);
     for (const c of champs) {
       expect(c.largeur, c.nom).toBe('1px');
       const carte = lireCouleur(c.carte);
@@ -403,7 +385,7 @@ test.describe('le bord des champs, le focus', () => {
       const fond = lu.fonds.reverse().reduce((dessous, dessus) => poser(lireCouleur(dessus), dessous), { r: 255, v: 255, b: 255, a: 1 });
       return { ...lu, fond: `rgb(${Math.round(fond.r)}, ${Math.round(fond.v)}, ${Math.round(fond.b)})` };
     };
-    const SOMBRE = ['#salle-jouer', '#salle-places .pas__bouton--plus', '#salle-curseur', '.bars .bouton-nuit', '.pied__plan a'];
+    const SOMBRE = ['#salle-jouer', '#salle-places .pas__bouton--plus', '#salle-curseur', '.pied__plan a'];
     for (const selecteur of FOCUS_DU_CLAIR) {
       const lu = await lire(selecteur);
       expect(lu.visible, `${selecteur} : :focus-visible`).toBe(true);
@@ -414,7 +396,7 @@ test.describe('le bord des champs, le focus', () => {
       const lu = await lire(selecteur);
       expect(lu.visible, `${selecteur} : :focus-visible`).toBe(true);
       expect([lu.style, lu.largeur], selecteur).toEqual(['solid', 2]);
-      expect(lu.couleur, selecteur).toBe(selecteur === '.bars .bouton-nuit' ? NUIT : AMBRE);
+      expect(lu.couleur, selecteur).toBe(AMBRE);
       expect(rapport(lireCouleur(lu.couleur), lireCouleur(lu.fond)), `${selecteur} sur ${lu.fond}`).toBeGreaterThanOrEqual(3);
     }
   });

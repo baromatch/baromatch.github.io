@@ -587,7 +587,7 @@ test.describe('le délai de réponse : sous 48 h', () => {
     await page.goto(PAGE);
     const texte = normaliser(await page.locator('main').textContent());
     expect(fois(texte, DELAI)).toBe(3);
-    await expect(page.locator('.ouverture-bars__delai')).toHaveText('Réponse sous 48 h, par une personne.');
+    await expect(page.locator('.ouverture-bars__delai:not([lang="en"])')).toHaveText('Réponse sous 48 h, par une personne.');
     expect(texte).not.toMatch(/48\s*heures|deux jours|2 jours|24 h/i);
     const balisee = normaliser(await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
       .map((s) => JSON.stringify(JSON.parse(s.textContent))).join(' ')));

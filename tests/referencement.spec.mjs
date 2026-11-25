@@ -223,7 +223,7 @@ for (const site of SITES) {
         if (generees().some(([c]) => c === chemin) || chemin === '/404.html') continue;
         expect(validerLaPage(vocabulaire, html), chemin).toEqual([]);
         const lu = tete(html);
-        expect(lu.langue, chemin).toBe('fr');
+        expect(lu.langue, chemin).toBe(chemin === '/en/for-bars/' ? 'en' : 'fr');
         expect(lu.h1, `${chemin} : h1`).toBe(1);
         expect(lu.titresDeLaPage[0], `${chemin} : le premier titre`).toBe(1);
         lu.titresDeLaPage.forEach((niveau, i) => {

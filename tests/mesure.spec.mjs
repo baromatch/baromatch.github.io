@@ -77,7 +77,9 @@ test.describe('les pages écrites à la main', () => {
     expect(PAGES).toEqual(expect.arrayContaining([
       'index.html', '404.html', 'confidentialite.html', 'pour-les-bars.html', 'cgu.html', 'presse.html', 'a-propos.html', 'comment-on-choisit-les-bars.html', 'testeurs-android.html',
     ]));
-    expect(PAGES.filter((p) => /^(?:matchs|regarder-le-match|bar|ce-soir|en|agenda|tests|generateur|node_modules)\//.test(p))).toEqual([]);
+    // Une seule page écrite à la main vit dans un dossier du générateur : la page des bars en anglais.
+    expect(PAGES).toContain('en/for-bars/index.html');
+    expect(PAGES.filter((p) => /^(?:matchs|regarder-le-match|bar|ce-soir|en|agenda|tests|generateur|node_modules)\//.test(p))).toEqual(['en/for-bars/index.html']);
   });
 
   test('elles sont déjà dans l’état que dit marque.json : l’Action n’aurait rien à réécrire', () => {

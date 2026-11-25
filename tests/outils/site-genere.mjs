@@ -18,8 +18,9 @@ export const contenuDuScenario = (racineDuSite = racine) => ({ ...chargerLeConte
 
 // Les fichiers du dépôt que le site sert à ses visiteurs, et dont les pages ont besoin (les images du badge et de la
 // presse comprises : « Pour les bars » et « Presse » les montrent).
-const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|(?:fonts|img|badge|presse|\.well-known)\/.+)$/;
-const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|en|tests|generateur|node_modules)\//;
+const SERVI = /^(?:[^/]+\.(?:html|css|js|svg|ico|png|txt|xml|webp)|marque\.json|en\/for-bars\/index\.html|(?:fonts|img|badge|presse|\.well-known)\/.+)$/;
+// Sauf la page des bars en anglais (en/for-bars/), écrite à la main : le plan du site la nomme, et sa page doit y être.
+const ECARTE = /^(?:matchs|regarder-le-match|bar|ce-soir|en(?!\/for-bars\/)|tests|generateur|node_modules)\//;
 
 // options : une autre source et une autre heure (la capture enregistrée, tests/donnees/capture), un autre contenu,
 // ou rendu: null pour se passer des images de partage.

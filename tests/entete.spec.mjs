@@ -21,7 +21,7 @@ const MENU = [['/ce-soir/', 'Ce soir'], ['/matchs/', 'La semaine'], ['/pour-les-
 const ACTION = ['/#attente', 'Préviens-moi quand Baromatch arrive'];
 // Les pages sans « Préviens-moi » dans l’en-tête : « Pour les bars » (son action est
 // « Proposer mon bar »), les pages légales, la page introuvable et le lien de tablée qu’elle sert.
-const SANS_ACTION = new Set(['/pour-les-bars.html', '/mentions-legales.html', '/cgu.html', '/confidentialite.html', '/supprimer-mon-compte.html', '/404.html', '/t/abcdefghjkmn']);
+const SANS_ACTION = new Set(['/pour-les-bars.html', '/en/for-bars/', '/mentions-legales.html', '/cgu.html', '/confidentialite.html', '/supprimer-mon-compte.html', '/404.html', '/t/abcdefghjkmn']);
 
 const ouvrir = async (onglet, chemin, largeur, hauteur = 800) => {
   await couperLAPI(onglet);

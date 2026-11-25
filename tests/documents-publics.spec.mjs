@@ -59,6 +59,17 @@ const EXCEPTIONS = [
   // Leurs copies dans le test du formulaire.
   ['tests/pour-les-bars-formulaire.spec.mjs', 'seuil', 1],
   ['tests/pour-les-bars-formulaire.spec.mjs', 'rejeu', 2],
+  // La page des bars en anglais (/en/for-bars/) : le résumé en anglais de la section « Les demandes des bars » de la page de
+  // confidentialité, point par point (la cadence, la façon dont le serveur compte le réseau, la correction dans les 10
+  // minutes), et la cadence dans le message du formulaire ; leurs copies dans les deux tests de cette page.
+  ['en/for-bars/index.html', 'seuil', 2],
+  ['en/for-bars/index.html', 'reseau', 2],
+  ['en/for-bars/index.html', 'rejeu', 1],
+  ['tests/for-bars-en-formulaire.spec.mjs', 'seuil', 1],
+  ['tests/for-bars-en-formulaire.spec.mjs', 'rejeu', 1],
+  ['tests/for-bars-en.spec.mjs', 'seuil', 4],
+  ['tests/for-bars-en.spec.mjs', 'reseau', 3],
+  ['tests/for-bars-en.spec.mjs', 'rejeu', 1],
   // Le numéro de pass, tel que les règles de l’appli et la page de confidentialité le décrivent au fan : une
   // formulation retenue par empreinte, permise là où le visiteur la lit.
   ['cgu.html', 'empreinte 4:JZkyjmaxHcw', 1],

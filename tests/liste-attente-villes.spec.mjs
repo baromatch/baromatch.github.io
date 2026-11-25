@@ -119,10 +119,10 @@ test.describe('l’accueil', () => {
       await onglet.goto('/');
       await expect(onglet.locator('.attente__date:visible')).toHaveCount(0);
       for (const ville of ['Lyon', 'Marseille', 'Lille', 'Autre']) {
-        await onglet.getByRole('radio', { name: ville }).check();
+        await onglet.getByRole('radio', { name: ville, exact: true }).check();
         await expect(onglet.locator('.attente__date:visible')).toHaveText([PHRASE[ville]]);
       }
-      await onglet.getByRole('radio', { name: 'Paris' }).check();
+      await onglet.getByRole('radio', { name: 'Paris', exact: true }).check();
       await expect(onglet.locator('.attente__date:visible')).toHaveCount(0);
       await contexte.close();
     }

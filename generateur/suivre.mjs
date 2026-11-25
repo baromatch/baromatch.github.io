@@ -15,6 +15,7 @@
 // adresse (aucun lien ne meurt), en noindex, et le dit.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { DESCRIPTION_MAX, DESCRIPTION_MIN, TITRE_MAX } from './bornes.mjs';
 import { cheminDuCalendrier, clubsDeLigue1, lienVersLAgenda, webcalDe } from './agenda.mjs';
 import { DOSSIER_GENERATEUR } from './contenu.mjs';
 import { DUREE_MATCH_MS } from './donnees.mjs';
@@ -144,9 +145,9 @@ ${matchs.map(ligne).join('\n')}
     ? remplir(modele, { n: capitale(accorder(matchs.length, 'match', 'matchs')), jour: jourEnLettres(matchs.at(-1).debut), bars: soirees.length ? t.chapeauBars : '' })
     : t.chapeauSansMatch);
   const ajouter = (p) => sortie.push({ ...p, contenu: page({ cadre, marque, avecPresse, ...p }) });
-  const titreDe = (texte) => (texte.length + ' — Baromatch'.length <= 60 ? `${texte} — Baromatch` : texte);
-  // La première description de 70 à 160 caractères ; sinon la dernière (le contrôle des pages vérifie ces bornes).
-  const description = (...candidats) => candidats.find((d) => d.length >= 70 && d.length <= 160) ?? candidats.at(-1);
+  const titreDe = (texte) => (texte.length + ' — Baromatch'.length <= TITRE_MAX ? `${texte} — Baromatch` : texte);
+  // La première description de 70 à 155 caractères ; sinon la dernière (le contrôle des pages vérifie ces bornes).
+  const description = (...candidats) => candidats.find((d) => d.length >= DESCRIPTION_MIN && d.length <= DESCRIPTION_MAX) ?? candidats.at(-1);
   const nBars = (soirees) => accorder(soirees.length, 'bar');
   const sectionTrouver = (ville) => {
     const guide = ville && villes[ville] ? `  <p>${e(remplir(barsDeLaVille.has(ville) ? t.ville : t.villeSansBar, { ville: villes[ville].nom }))} <a href="${cheminDeLaVille({ cle: ville })}">${e(remplir(textes.ville.titre, { ville: villes[ville].nom }))}</a></p>\n` : '';

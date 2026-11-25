@@ -1,5 +1,5 @@
 // Le contrôle de chaque page avant qu’elle soit écrite : ce qu’un robot y lit (un titre de 15 à 60 caractères, une
-// description de 70 à 160, l’adresse canonique, un seul h1, l’index permis ou non, les aperçus de partage), la
+// description de 70 à 155, l’adresse canonique, un seul h1, l’index permis ou non, les aperçus de partage), la
 // politique de sécurité, aucun script hors du bloc « Partager », des places de « Ce soir » (places.js, sur cette page
 // seulement) et de la mesure d’audience (exactement la balise de /mesure.js quand marque.json l’active, aucune sinon), et ce que la page ne dit jamais (« ! », happy hour, tournée,
 // verre offert, score ; en anglais, aucun mot de boisson). Une page en noindex n’a pas de hreflang. Les mots d’un bar
@@ -9,6 +9,7 @@
 import { MOTS_INTERDITS } from './donnees.mjs';
 import { politiqueDesPages, SCRIPT_DES_PLACES } from './gabarits.mjs';
 import { adresseDe } from './jsonld.mjs';
+import { DESCRIPTION_MAX, DESCRIPTION_MIN, TITRE_MAX, TITRE_MIN } from './bornes.mjs';
 import { baliseDeLaMesure, mesureDuSite } from './mesure.mjs';
 import { SCRIPT_DU_PARTAGE } from './partage.mjs';
 import { controlerLePlan } from './plan.mjs';
@@ -41,10 +42,10 @@ export const controlerLaPage = (p, { motsDesBars = [], mesure = mesureDuSite() }
   exiger(p.indexable || !html.includes('<link rel="alternate" hreflang='), 'hreflang sur une page en noindex');
   const titres = tous(html, /<title>([^<]*)<\/title>/g);
   exiger(titres.length === 1, `${titres.length} titres`);
-  exiger(titres[0]?.length >= 15 && titres[0]?.length <= 60, `titre de ${titres[0]?.length} caractères (15 à 60) : « ${titres[0]} »`);
+  exiger(titres[0]?.length >= TITRE_MIN && titres[0]?.length <= TITRE_MAX, `titre de ${titres[0]?.length} caractères (${TITRE_MIN} à ${TITRE_MAX}) : « ${titres[0]} »`);
   const descriptions = tous(html, /<meta name="description" content="([^"]*)">/g);
   exiger(descriptions.length === 1, `${descriptions.length} descriptions`);
-  exiger(descriptions[0]?.length >= 70 && descriptions[0]?.length <= 160, `description de ${descriptions[0]?.length} caractères (70 à 160) : « ${descriptions[0]} »`);
+  exiger(descriptions[0]?.length >= DESCRIPTION_MIN && descriptions[0]?.length <= DESCRIPTION_MAX, `description de ${descriptions[0]?.length} caractères (${DESCRIPTION_MIN} à ${DESCRIPTION_MAX}) : « ${descriptions[0]} »`);
   exiger(tous(html, /<link rel="canonical" href="([^"]*)">/g).join() === adresseDe(p.chemin), 'adresse canonique');
   exiger(tous(html, /<meta property="og:url" content="([^"]*)">/g).join() === adresseDe(p.chemin), 'og:url');
   exiger(tous(html, /<meta property="og:title" content="([^"]*)">/g).join() === titres[0], 'og:title différent du titre');

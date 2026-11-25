@@ -104,7 +104,8 @@ export const anciensDe = (etat) => {
 // adresses : les adresses de page données aux bars ({ adresse: identifiant }), gardées d’un passage à l’autre.
 // Chaque page dit quels bars elle nomme (bars : leurs identifiants), et si elle est la page neutre (repli).
 // evenements : la mémoire des évènements des agendas (agenda.mjs), gardée telle quelle.
-export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adresses = {}, evenements = null) => {
+// accueil : l’empreinte du bloc des matchs de la semaine de l’accueil et la date de son dernier vrai changement.
+export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adresses = {}, evenements = null, accueil = null) => {
   const pages = {};
   const tous = [...fichiers, ...gardees.map((g) => (typeof g === 'string' ? { chemin: g, garde: true } : { ...g, garde: true }))];
   for (const f of tous.sort((a, b) => a.chemin.localeCompare(b.chemin))) {
@@ -134,6 +135,7 @@ export const nouvelEtat = (precedent, fichiers, aujourdhui, gardees = [], adress
     pages,
     adresses,
     ...(evenements ? { evenements } : {}),
+    ...(accueil ? { accueil } : {}),
   };
 };
 
@@ -147,7 +149,13 @@ export const nouveauPlan = (ancien, etat) => {
   const lignes = ancien.replace(/\r\n/g, '\n').split('\n');
   const fin = lignes.findIndex((l) => l.trim() === '</urlset>');
   if (fin === -1) throw new Error('sitemap.xml illisible : </urlset> introuvable, rien n’est écrit');
-  const gardees = lignes.slice(0, fin).filter((l) => !GENEREE.test(l));
+  // L’accueil est écrit à la main, mais son bloc des matchs de la semaine ne l’est pas : son « lastmod » ne reste pas en
+  // arrière de la date du dernier vrai changement de ce bloc (etat.accueil), sans jamais reculer.
+  const dateDeLAccueil = etat.accueil?.change;
+  const pourLAccueil = (ligne) => (dateDeLAccueil && ligne.includes(`<loc>${ORIGINE}/</loc>`)
+    ? ligne.replace(/<lastmod>([^<]*)<\/lastmod>/, (tout, date) => (date < dateDeLAccueil ? `<lastmod>${dateDeLAccueil}</lastmod>` : tout))
+    : ligne);
+  const gardees = lignes.slice(0, fin).filter((l) => !GENEREE.test(l)).map(pourLAccueil);
   const generees = Object.entries(etat.pages)
     .filter(([chemin, p]) => p.indexable && !p.horsPlan && chemin.endsWith('/'))
     .map(([chemin, p]) => `  <url><loc>${ORIGINE}${chemin}</loc><lastmod>${p.change}</lastmod></url>`);

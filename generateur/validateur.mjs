@@ -4,7 +4,8 @@
 //     propriété accepte, chaque valeur d’énumération (EventScheduled…) est de la bonne énumération ;
 //  2. ce que Google demande pour les résultats enrichis qu’il affiche (documentation de Google Search Central, pages
 //     « Event » et « Breadcrumb », mises à jour le 8 septembre 2026) : pour Event, un nom, une date de début ISO 8601,
-//     un lieu nommé avec son adresse postale (une image, si elle est donnée, en adresse absolue) ; pour BreadcrumbList, des éléments numérotés à partir de 1,
+//     un lieu nommé avec son adresse postale (une image, si elle est donnée, en adresse absolue ; un match, SportsEvent, peut
+//     n’avoir aucun lieu, les données n’ayant pas le stade, mais ses deux équipes sont nommées et son lieu n’est jamais un bar) ; pour BreadcrumbList, des éléments numérotés à partir de 1,
 //     chacun avec son nom et son adresse (sauf le dernier). FAQPage n’est jugé que par schema.org : Google n’affiche
 //     plus ces résultats depuis mai 2026, et le validateur ne prétend suivre aucune règle de Google pour eux.
 // Il existe un validateur npm entretenu (@adobe/structured-data-validator), mais il ne juge pas Event et demande le
@@ -119,7 +120,21 @@ const validerUnEvenement = (vocabulaire, evenement, chemin, erreurs) => {
     erreurs.push(`${chemin} : Event sans startDate ISO 8601 avec son décalage (exigé par Google)`);
   }
   const lieu = evenement.location;
-  if (!estUnObjet(lieu) || !typesDe(lieu).some((t) => vocabulaire.ancetresDe(t)?.has('Place'))) {
+  // Un match (SportsEvent) se joue au stade, que les données ne donnent pas : il peut n’avoir aucun lieu (Google n’en fait
+  // alors pas de résultat enrichi), mais jamais un lieu faux. Avec un lieu, il suit les mêmes règles qu’un Event ; et ce
+  // lieu n’est jamais un bar, où le match se regarde mais ne se joue pas.
+  const sansLieuPermis = typesDe(evenement).includes('SportsEvent');
+  if (sansLieuPermis) {
+    for (const cle of ['homeTeam', 'awayTeam']) {
+      if (!rempli([].concat(evenement[cle] ?? []).find((equipe) => rempli(equipe?.name))?.name)) erreurs.push(`${chemin} : SportsEvent sans ${cle} nommée`);
+    }
+    if (lieu !== undefined && typesDe(lieu).some((t) => ['BarOrPub', 'Restaurant', 'FoodEstablishment'].includes(t))) {
+      erreurs.push(`${chemin}.location : un match ne se joue pas dans un bar`);
+    }
+  }
+  if (lieu === undefined && sansLieuPermis) {
+    // Rien d’autre à vérifier du lieu.
+  } else if (!estUnObjet(lieu) || !typesDe(lieu).some((t) => vocabulaire.ancetresDe(t)?.has('Place'))) {
     erreurs.push(`${chemin} : Event sans location de type Place (exigé par Google)`);
   } else {
     if (!rempli(lieu.name)) erreurs.push(`${chemin}.location : lieu sans name (exigé par Google)`);

@@ -209,8 +209,14 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
 
   // ---------- La tête : le jour entier, dans le titre et la description ----------
   const jour = jourEnLettres(maintenant);
-  const titrePage = titre(`${titreDuSoir}, ${jour} — Baromatch`, `${titreDuSoir}, ${jour}`);
   const villesDesBars = [...new Set([...soirees].sort(parLieu).map((s) => s.bar.ville.nom))];
+  // Des bars dans une seule ville : le titre la nomme, comme les fans cherchent (« où regarder le match ce soir à Paris »),
+  // avec le jour quand il tient dans les 60 caractères.
+  const dansLaVille = avecBars.length && villesDesBars.length === 1 ? ` à ${villesDesBars[0]}` : '';
+  const titrePage = titre(
+    ...(dansLaVille ? [`${titreDuSoir}${dansLaVille}, ${jour} — Baromatch`, `${titreDuSoir}${dansLaVille}, ${jour}`, `${titreDuSoir}${dansLaVille} — Baromatch`] : []),
+    `${titreDuSoir}, ${jour} — Baromatch`, `${titreDuSoir}, ${jour}`,
+  );
   // La description : le jour, puis ce que la page montre ce soir.
   const decrire = () => {
     const debut = `${capitale(jour)} : `;

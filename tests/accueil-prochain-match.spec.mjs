@@ -725,7 +725,14 @@ test.describe('le contraste du prochain match, mesuré au pixel', () => {
       await page.waitForLoadState('networkidle');
       const NUIT = '.g-ecran, .pied, .film, .bars, .appli, .testeurs-accueil, .attente__piege, .menu';
       for (const ouverte of [false, true]) {
-        if (ouverte) await page.locator('.faire__bouton').click();
+        if (ouverte) {
+          // L’ouverture fait défiler la page jusqu’à la réponse, dans l’évènement « toggle », qui arrive après le clic : on attend
+          // ce défilement avant de mesurer (sous charge, il tombait au milieu de la mesure : 1,01:1 sur l’étiquette de « Préviens-moi »).
+          const ouverte_ = page.evaluate(() => new Promise((suite) => { document.getElementById('faire').addEventListener('toggle', suite, { once: true }); }));
+          await page.locator('.faire__bouton').click();
+          await ouverte_;
+          await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+        }
         const mesures = (await mesurerAuPixel(page, NUIT)).filter((m) => /geste|prochain|coup|faire|msg|prevenir|puce|bande|etiquette|g-tel/.test(m.quoi) || true);
         expect(mesures.length).toBeGreaterThan(ouverte ? 12 : 6);
         infos.annotations.push({ type: 'contraste peint', description: `${ouverte ? 'ouverte' : 'fermée'} : ${mesures.length} lignes ; les plus faibles : ${decrireLesPlusFaibles(mesures, 6)}` });

@@ -11,6 +11,7 @@ import { racine } from './outils/environnement.mjs';
 import { lireLesDebordements } from './outils/debordements.mjs';
 import { BLOC_AU_PLUS_PX, ECRANS_A_LA_MAIN, lireLaHauteurDeLAccueil } from './outils/hauteur-accueil.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
+import { lignesTropFaibles, mesurerAuPixel } from './outils/pixels-peints.mjs';
 import { construireLeSiteDExemple } from './outils/site-genere.mjs';
 
 const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.json');
@@ -93,3 +94,43 @@ test('« Toute la semaine » est pliée, et garde un lien vers chaque match de l
   await expect(liste).toHaveAttribute('open', '');
   await expect(page.locator('.jours ul')).toBeVisible();
 });
+
+// La mesure du contraste au pixel (tests/outils/pixels-peints.mjs) lit les rectangles du texte, puis photographie la page. L’ouverture
+// de la réponse fait défiler la page jusqu’à elle (scrollIntoView, dans « toggle ») ; sous charge, ce défilement tombait entre le
+// calcul de ce qui couvre la page (le bandeau du bas, encore à sa place de repos) et la lecture des rectangles : l’étiquette
+// « Préviens-moi quand Baromatch arrive » était lue là où le bandeau la couvre, et la photo la montrait sur lui (1,01:1, au pixel
+// 172,824 : tests/accueil-prochain-match.spec.mjs, CI de la PR 53 et de la PR 51). La mesure refait maintenant un passage dont la page
+// a bougé ; ici, le défilement est provoqué à chacun des trois moments où il pouvait tomber.
+for (const moment of ['avant la lecture', 'pendant la lecture', 'entre la lecture et la photo']) {
+  test(`la mesure au pixel n’est pas trompée par un défilement tardif de la réponse ouverte : ${moment}`, async ({ page }) => {
+    // L’heure fixée mais qui court (setFixedTime) : une horloge arrêtée (arreterLHorloge) arrêterait aussi requestAnimationFrame.
+    await page.route((adresse) => adresse.pathname === '/', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: accueil }));
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.clock.setFixedTime(new Date(INSTANT));
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await page.evaluate((moment) => {
+      const faire = document.getElementById('faire');
+      const defiler = () => HTMLElement.prototype.scrollIntoView.call(faire, { block: 'nearest' });
+      faire.scrollIntoView = () => {};
+      faire.open = true;
+      const animations = document.getAnimations.bind(document);
+      const marcheur = document.createTreeWalker.bind(document);
+      let appels = 0;
+      let lu = false;
+      // 1er getAnimations : l’attente de fin des animations, juste avant la lecture ; 2e : l’arrêt des animations, entre la lecture et la photo.
+      document.getAnimations = () => {
+        appels += 1;
+        if (appels === (moment === 'avant la lecture' ? 1 : moment === 'entre la lecture et la photo' ? 2 : 0)) defiler();
+        return animations();
+      };
+      // createTreeWalker : le premier geste de la lecture des rectangles, après le calcul de ce qui couvre la page.
+      document.createTreeWalker = (...a) => { if (moment === 'pendant la lecture' && !lu && window.scrollY === 0) { lu = true; defiler(); } return marcheur(...a); };
+    }, moment);
+    await page.waitForTimeout(300);
+    const mesures = await mesurerAuPixel(page, '.g-ecran, .pied, .film, .bars, .appli, .testeurs-accueil, .attente__piege, .menu');
+    expect(lignesTropFaibles(mesures)).toEqual([]);
+    expect(mesures.some((m) => m.quoi.startsWith('label.prevenir__etiquette')), 'l’étiquette de « Préviens-moi » est bien mesurée').toBe(true);
+  });
+}

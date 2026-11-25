@@ -13,6 +13,7 @@ import path from 'node:path';
 import { accueilAvecLaSemaine, blocDeLaSemaine, controlerLaSemaine, lumiereDe, matchsDeLAccueil } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { racine } from './outils/environnement.mjs';
+import { violationsAxe } from './outils/axe.mjs';
 import { arreterLHorloge } from './outils/horloge.mjs';
 
 const CONTENU = chargerLeContenu(racine);
@@ -366,4 +367,20 @@ test.describe('à 200 % de texte', () => {
     expect(defaut.coupes).toEqual([]);
     expect(defaut.defile).toBeLessThanOrEqual(0);
   });
+});
+
+test.describe('axe, avec le bloc du passage', () => {
+  for (const [largeur, hauteur] of [[390, 664], [390, 844], [1440, 900]]) {
+    test(`à ${largeur} × ${hauteur} : aucune violation, la carte fermée puis la réponse ouverte`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: hauteur });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+      await page.clock.resume();
+      await page.waitForLoadState('networkidle');
+      expect(await violationsAxe(page)).toEqual([]);
+      await page.locator('.faire__bouton').click();
+      await expect(page.locator('.faire__titre')).toBeVisible();
+      expect(await violationsAxe(page)).toEqual([]);
+    });
+  }
 });

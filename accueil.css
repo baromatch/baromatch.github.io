@@ -28,12 +28,12 @@
 .g-ecran__halo--a { left: -90px; top: -40px; width: 260px; height: 260px; background: #0F8B7E; opacity: 0.6; }
 .g-ecran__halo--b { right: -110px; top: 60px; width: 260px; height: 260px; background: #3A3FA8; opacity: 0.75; }
 .g-ecran__halo--c { left: -40px; bottom: 10px; width: 280px; height: 220px; background: #FFB13D; opacity: 0.2; }
-.g-bar { position: absolute; left: 20px; right: 20px; top: 58px; opacity: 0.5; }
+.g-bar { position: absolute; left: 20px; right: 20px; top: 58px; opacity: 0.78; }
 .g-bar__match { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding: 16px 18px; border-radius: 22px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2); }
 .g-bar__club { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; font-weight: 750; }
 .g-bar__club .g-disque { width: 40px; height: 40px; }
 .g-bar__heure { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.g-bar__lieu { margin: 0; color: rgba(247, 247, 249, 0.75); font-size: 11px; font-weight: 600; }
+.g-bar__lieu { margin: 0; color: #F7F7F9; font-size: 11px; font-weight: 600; }
 .g-bar__nom { margin: 4px 0 10px; font-size: 34px; font-weight: 800; line-height: 0.98; letter-spacing: -0.03em; font-stretch: 92%; }
 .g-bar__puces { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .g-bar__puces li { padding: 5px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); font-size: 10.5px; font-weight: 650; }
@@ -180,12 +180,12 @@
   .geste__titre { grid-area: titre; font-size: clamp(3.6rem, 5.4vw, 5.6rem); line-height: 0.92; }
   .geste__titre span { display: block; }
   .geste__texte { grid-area: texte; margin-top: 22px; font-size: 1.25rem; }
-  .geste__lumiere { inset: 0 -120px 0 -60px; overflow: visible; }
+  .geste__lumiere { inset: 0 -120px 0 -60px; overflow: visible; -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 60%, transparent 92%); mask-image: linear-gradient(to bottom, #000 0, #000 60%, transparent 92%); }
   .geste__lumiere i { filter: blur(90px); }
 }
 
 /* ── Le prochain match : une carte de nuit, éclairée aux couleurs de ses deux clubs ── */
-.prochain { padding-top: 22px; padding-bottom: 8px; }
+.prochain { position: relative; z-index: 1; padding-top: 22px; padding-bottom: 8px; background: var(--fond); }
 .prochain__etiquette { margin: 0 0 10px; color: var(--texte-doux); font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .prochain__quand { white-space: nowrap; }
 .prochain__rien { margin: 0; max-width: 34rem; color: var(--texte-doux); }

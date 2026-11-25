@@ -628,8 +628,13 @@ test.describe('les pages', () => {
       url: 'https://baromatch.fr/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25',
       location: { '@type': 'BarOrPub', name: 'Le Zinc des Amis', address: { streetAddress: '12 Rue Oberkampf', postalCode: '75011', addressLocality: 'Paris', addressCountry: 'FR' } },
       organizer: { '@type': 'BarOrPub', name: 'Le Zinc des Amis' },
-      about: { '@type': 'SportsEvent', homeTeam: { '@type': 'SportsTeam', name: 'Paris Saint-Germain' }, awayTeam: { '@type': 'SportsTeam', name: 'Olympique Lyonnais' } },
+      // Les données n’ont pas le stade : le match n’est pas un SportsEvent de la page (Google en veut un lieu), la soirée le
+      // porte dans « about », avec ses deux équipes.
+      about: { '@type': 'SportsEvent', '@id': 'https://baromatch.fr/matchs/psg-ol-2026-10-25/#match', homeTeam: { '@type': 'SportsTeam', name: 'Paris Saint-Germain' }, awayTeam: { '@type': 'SportsTeam', name: 'Olympique Lyonnais' } },
     });
+    // Aucun SportsEvent à la racine de la page d’un match tant que son stade est inconnu (et jamais le bar pour lieu).
+    expect(blocsDe(match.contenu).flatMap((b) => b['@graph']).filter((n) => n['@type'] === 'SportsEvent')).toEqual([]);
+    expect(deType(match, 'WebPage')[0].mainEntity).toBeUndefined();
     // Le bar est le lieu de la diffusion, jamais celui du match ; pas d’offre tant que l’appli n’est pas ouverte.
     expect(zinc.about.location).toBeUndefined();
     expect(zinc.offers).toBeUndefined();
@@ -813,7 +818,8 @@ test.describe('les pages', () => {
     expect(unBar.pages.find((p) => p.chemin === '/matchs/').titre).toBe(`${contenu.textes.semaine.titre} — Baromatch`);
     expect(unBar.pages.find((p) => p.chemin === '/ce-soir/').titre).toBe('Où regarder le match ce soir, vendredi 23 octobre');
     expect(unBar.pages.find((p) => p.chemin === '/ce-soir/').contenu).not.toMatch(/<\/section>\n\n<section/);
-    expect(unBar.pages.find((p) => p.chemin === '/matchs/psg-ol-2026-10-25/').titre).toBe('PSG – OL, 25 octobre : où regarder le match — Baromatch');
+    // Un seul bar publié, à Paris : le titre dit ce que les fans tapent, « regarder PSG – OL dans un bar à Paris ».
+    expect(unBar.pages.find((p) => p.chemin === '/matchs/psg-ol-2026-10-25/').titre).toBe('Regarder PSG – OL dans un bar à Paris — Baromatch');
     const mardi = await construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: Date.parse('2026-10-27T08:00:00Z'), racine, contenu: { ...chargerLeContenu(racine), publies: ['b-zinc'] } });
     const mardiSoir = mardi.pages.find((p) => p.chemin === '/matchs/').contenu.split('id="titre-ce-soir">')[1].split('</section>')[0];
     expect(mardiSoir).toContain('<p class="regarder-suite"><a href="/ce-soir/">Où regarder le match ce soir</a></p>');
@@ -855,11 +861,13 @@ test.describe('les pages', () => {
     // bar pour un match qui se joue (une page de match reporté ou annulé est hors du plan du site : horsPlan).
     const reel = await construireEnMemoire({ source: `capture:${CAPTURE}`, maintenant: ENREGISTREMENT, racine, contenu: chargerLeContenu(racine) });
     const OU = /(?<!\p{L})où(?!\p{L})/iu;
+    // Le titre d’une page de match à Paris dit « dans un bar à Paris » : la même promesse, la même condition (un vrai bar).
+    const PROMET = /(?<!\p{L})où(?!\p{L})|^Regarder .+ dans un bar à /iu;
     const compte = { avec: 0, sans: 0 };
     for (const p of [...site.pages, ...annule.pages, ...reel.pages].filter((x) => ['club', 'competition'].includes(x.type) || (x.type === 'match' && x.partage))) {
       const montre = p.barsNommes.length > 0 && !p.horsPlan;
       compte[montre ? 'avec' : 'sans'] += 1;
-      expect(OU.test(p.titre), `${p.chemin} : ${p.titre}`).toBe(montre);
+      expect(PROMET.test(p.titre), `${p.chemin} : ${p.titre}`).toBe(montre);
       expect(OU.test(h1De(p)), `${p.chemin} : ${h1De(p)}`).toBe(montre);
     }
     expect(compte.avec).toBeGreaterThanOrEqual(5);
@@ -1001,6 +1009,22 @@ test.describe('le validateur et le contrôle refusent ce qui est faux', () => {
     expect(erreurs(fil([{ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 2, name: 'Paris' }]))).toBe('');
     expect(erreurs(fil([{ position: 1, name: 'Accueil' }, { position: 2, name: 'Paris' }]))).toMatch(/item manque/);
     expect(erreurs(fil([{ position: 2, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 3, name: 'Paris' }]))).toMatch(/position 2, 1 attendu/);
+    // Un match (SportsEvent) suit les règles d’un Event : sans lieu, refusé (le générateur ne l’écrit pas alors) ; avec son
+    // stade, juste ; avec un bar pour lieu, ou sans ses deux équipes, refusé.
+    const stade = { '@type': 'Place', name: 'Stade d’exemple', address: { '@type': 'PostalAddress', streetAddress: '1 Rue du Stade', postalCode: '75016', addressLocality: 'Paris', addressCountry: 'FR' } };
+    const match = {
+      '@type': 'SportsEvent', name: 'PSG – OL', startDate: '2026-10-25T20:45:00+01:00', eventStatus: 'https://schema.org/EventScheduled',
+      homeTeam: { '@type': 'SportsTeam', name: 'PSG' }, awayTeam: { '@type': 'SportsTeam', name: 'OL' }, location: stade,
+    };
+    expect(erreurs(match)).toBe('');
+    const { location: _stade, ...matchSansLieu } = match;
+    expect(erreurs(matchSansLieu)).toMatch(/Event sans location de type Place/);
+    expect(erreurs({ ...match, location: evenement.location })).toMatch(/un match ne se joue pas dans un bar/);
+    expect(erreurs({ ...match, awayTeam: undefined })).toMatch(/sans awayTeam nommée/);
+    expect(erreurs({ ...match, startDate: 'dimanche' })).toMatch(/n’est pas une date ISO 8601/);
+    expect(erreurs({ ...match, eventStatus: 'https://schema.org/EventSoldOut' })).toMatch(/eventStatus/);
+    const { location: _lieu, ...sansLieu } = evenement;
+    expect(erreurs(sansLieu)).toMatch(/Event sans location de type Place/);
     // Une question sans réponse n’est pas une erreur de schema.org, et aucune règle de Google n’est appliquée à une FAQ.
     expect(erreurs({ '@type': 'FAQPage', name: 'FAQ', mainEntity: [{ '@type': 'Question', name: 'Une question ?' }] })).toBe('');
   });
@@ -1183,7 +1207,7 @@ test.describe('d’un passage à l’autre', () => {
     for (const p of [pageDe('/matchs/wolverhampton-wanderers-brighton-hove-albion-'), pageDe('/bar/le-grand-comptoir'), pageDe('/bar/le-spot-onair-1')]) {
       expect(p, 'page publiée').toBeTruthy();
       expect(p.titre.length, p.titre).toBeLessThanOrEqual(60);
-      expect(p.description.length, p.description).toBeLessThanOrEqual(160);
+      expect(p.description.length, p.description).toBeLessThanOrEqual(155);
       expect(controlerLaPage(p)).toEqual([]);
     }
     expect(pageDe('/matchs/wolverhampton').titre).toMatch(/[^\s,:]…$/);

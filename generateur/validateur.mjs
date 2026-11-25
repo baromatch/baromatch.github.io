@@ -4,7 +4,8 @@
 //     propriété accepte, chaque valeur d’énumération (EventScheduled…) est de la bonne énumération ;
 //  2. ce que Google demande pour les résultats enrichis qu’il affiche (documentation de Google Search Central, pages
 //     « Event » et « Breadcrumb », mises à jour le 8 septembre 2026) : pour Event, un nom, une date de début ISO 8601,
-//     un lieu nommé avec son adresse postale (une image, si elle est donnée, en adresse absolue) ; pour BreadcrumbList, des éléments numérotés à partir de 1,
+//     un lieu nommé avec son adresse postale (une image, si elle est donnée, en adresse absolue ; un match, SportsEvent, de même,
+//     avec ses deux équipes nommées, et son lieu n’est jamais un bar) ; pour BreadcrumbList, des éléments numérotés à partir de 1,
 //     chacun avec son nom et son adresse (sauf le dernier). FAQPage n’est jugé que par schema.org : Google n’affiche
 //     plus ces résultats depuis mai 2026, et le validateur ne prétend suivre aucune règle de Google pour eux.
 // Il existe un validateur npm entretenu (@adobe/structured-data-validator), mais il ne juge pas Event et demande le
@@ -119,6 +120,16 @@ const validerUnEvenement = (vocabulaire, evenement, chemin, erreurs) => {
     erreurs.push(`${chemin} : Event sans startDate ISO 8601 avec son décalage (exigé par Google)`);
   }
   const lieu = evenement.location;
+  // Un match (SportsEvent) suit les règles d’un Event, lieu compris (sans lieu, il n’est pas écrit : jsonld.mjs) ; ses deux
+  // équipes sont nommées, et son lieu n’est jamais un bar, où le match se regarde mais ne se joue pas.
+  if (typesDe(evenement).includes('SportsEvent')) {
+    for (const cle of ['homeTeam', 'awayTeam']) {
+      if (!rempli([].concat(evenement[cle] ?? []).find((equipe) => rempli(equipe?.name))?.name)) erreurs.push(`${chemin} : SportsEvent sans ${cle} nommée`);
+    }
+    if (lieu !== undefined && typesDe(lieu).some((t) => ['BarOrPub', 'Restaurant', 'FoodEstablishment'].includes(t))) {
+      erreurs.push(`${chemin}.location : un match ne se joue pas dans un bar`);
+    }
+  }
   if (!estUnObjet(lieu) || !typesDe(lieu).some((t) => vocabulaire.ancetresDe(t)?.has('Place'))) {
     erreurs.push(`${chemin} : Event sans location de type Place (exigé par Google)`);
   } else {

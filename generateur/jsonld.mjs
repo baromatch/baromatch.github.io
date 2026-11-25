@@ -49,8 +49,12 @@ export const barOuPub = (bar) => ({
   ...(bar.lat !== null && bar.lng !== null ? { geo: { '@type': 'GeoCoordinates', latitude: bar.lat, longitude: bar.lng } } : {}),
 });
 
+export const adresseDuMatch = (match) => `${adresseDe(cheminDuMatch(match))}#match`;
+export const statutDuMatchSchema = (match) => `https://schema.org/${{ reporte: 'EventPostponed', annule: 'EventCancelled' }[match.statut] ?? 'EventScheduled'}`;
+
 export const matchDuStade = (match) => ({
   '@type': 'SportsEvent',
+  '@id': adresseDuMatch(match),
   name: `${match.domicile.nom} – ${match.exterieur.nom}`,
   startDate: debutDe(match),
   sport: 'Football',
@@ -58,8 +62,38 @@ export const matchDuStade = (match) => ({
   awayTeam: { '@type': 'SportsTeam', name: match.exterieur.nom },
 });
 
-// Une soirée : la diffusion d’un match dans un vrai bar.
-export const evenementDeLaSoiree = (soiree, { marque }) => {
+// Le match lui-même, sur sa page, en SportsEvent « Équipe A – Équipe B » : seulement quand le stade est connu (match.lieu :
+// { nom, rue, codePostal, ville }). Sans lieu, Google n’en fait aucun résultat enrichi et Search Console le signale en
+// erreur : rien n’est écrit (null), et c’est le cas aujourd’hui, les données n’ont pas de stade. Jamais un bar comme lieu,
+// jamais une adresse inventée, aucune image, aucune note.
+// À venir, quand des bars sont publiés : une soirée dans un bar est déjà un Event par bar (evenementDeLaSoiree), le bar
+// publié en « location » et le match en « about ». Quand le stade sera dans les données, la soirée renverra au match par
+// son @id (matchDansLaPage) au lieu de le recopier.
+export const lieuDuMatch = (match) => {
+  const l = match.lieu;
+  if (!l || ![l.nom, l.rue, l.codePostal, l.ville].every((v) => typeof v === 'string' && v.trim())) return null;
+  return {
+    '@type': 'Place',
+    name: l.nom,
+    address: { '@type': 'PostalAddress', streetAddress: l.rue, postalCode: l.codePostal, addressLocality: l.ville, addressCountry: 'FR' },
+  };
+};
+
+export const evenementDuMatch = (match) => {
+  const location = lieuDuMatch(match);
+  if (!location) return null;
+  return {
+    ...matchDuStade(match),
+    url: adresseDe(cheminDuMatch(match)),
+    description: `${match.competition} : ${match.domicile.nom} – ${match.exterieur.nom}.`,
+    eventStatus: statutDuMatchSchema(match),
+    location,
+  };
+};
+
+// Une soirée : la diffusion d’un match dans un vrai bar. matchDansLaPage : la page porte déjà le match (evenementDuMatch),
+// la soirée n’y renvoie que par son @id.
+export const evenementDeLaSoiree = (soiree, { marque }, { matchDansLaPage = false } = {}) => {
   const { match, bar } = soiree;
   const adresse = adresseDeLaSoiree(soiree);
   const magasins = [marque.appli.android, marque.appli.iphone].filter(Boolean);
@@ -70,11 +104,11 @@ export const evenementDeLaSoiree = (soiree, { marque }) => {
     description: `${match.competition} : ${match.domicile.nom} – ${match.exterieur.nom}, diffusé${auBar(bar.nom)} (${bar.quartier}).`,
     url: adresse,
     startDate: debutDe(match),
-    eventStatus: `https://schema.org/${{ reporte: 'EventPostponed', annule: 'EventCancelled' }[match.statut] ?? 'EventScheduled'}`,
+    eventStatus: statutDuMatchSchema(match),
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: barOuPub(bar),
     organizer: { '@type': 'BarOrPub', name: bar.nom, url: adresseDe(cheminDuBar(bar)) },
-    about: matchDuStade(match),
+    about: matchDansLaPage ? { '@id': adresseDuMatch(match) } : matchDuStade(match),
     ...(marque.appli.ouverte && magasins.length
       ? { offers: { '@type': 'Offer', price: 0, priceCurrency: 'EUR', url: magasins[0] } }
       : {}),

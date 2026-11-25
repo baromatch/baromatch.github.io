@@ -128,7 +128,7 @@ test('des titres, des descriptions et des h1 tous différents, aux bonnes longue
     for (const p of pages) {
       expect(p.titre.length, p.chemin).toBeLessThanOrEqual(60);
       expect(p.description.length, p.chemin).toBeGreaterThanOrEqual(70);
-      expect(p.description.length, p.chemin).toBeLessThanOrEqual(160);
+      expect(p.description.length, p.chemin).toBeLessThanOrEqual(155);
     }
     // Deux pages indexables de la liste ne partagent pas plus de 60 % de leurs suites de cinq mots (le corps, sans
     // l’en-tête ni le pied du site) : le gabarit ne prend pas le pas sur les données.

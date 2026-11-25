@@ -1,0 +1,226 @@
+/* Direction A, « La nuit » : un seul fond (la nuit du bar), une seule lumière (celle de l’image), l’ambre pour ton
+   action et ta place seulement. Pas de cartes : des objets posés dans la nuit, et du texte. */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque.woff2") format("woff2-variations"), url("/fonts/bricolage-grotesque.woff2") format("woff2");
+  font-weight: 200 800; font-stretch: 75% 100%; font-display: swap;
+}
+:root{
+  --nuit: #0A0B10;
+  --nuit-releve: #14161F;
+  --texte: #F7F7F9;
+  --texte-doux: rgba(247, 247, 249, 0.76);
+  --texte-discret: rgba(247, 247, 249, 0.62);
+  --trait: rgba(255, 255, 255, 0.12);
+  --trait-fort: rgba(255, 255, 255, 0.28);
+  --ambre: #FFB13D;
+  --ambre-clair: #FFD58A;
+  --focus: #FFB13D;
+  --gouttiere: 20px;
+  --page: 1180px;
+  --verse: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --vite: 160ms;
+  --lent: 600ms;
+  color-scheme: dark;
+}
+@media (min-width: 760px) { :root{ --gouttiere: 40px; } }
+*, *::before, *::after{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; text-size-adjust: 100%; background: var(--nuit); }
+body{
+  margin: 0; background: var(--nuit); color: var(--texte);
+  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.125rem; line-height: 1.5; font-variation-settings: "opsz" 18;
+  font-variant-numeric: tabular-nums; overflow-wrap: break-word;
+}
+img, svg{ display: block; max-width: 100%; }
+a{ color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+:focus-visible{ outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 8px; }
+.visuellement-cache{ position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.evitement{ position: absolute; left: var(--gouttiere); top: 8px; z-index: 20; padding: 10px 16px; background: var(--ambre); color: var(--nuit); border-radius: 10px; font-weight: 700; text-decoration: none; transform: translateY(-160%); }
+.evitement:focus{ transform: none; }
+.planche{ position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Le texte : une seule famille, trois tailles qui comptent. */
+.titre-1 span{ display: inline-block; white-space: nowrap; }
+.titre-1{
+  margin: 0; font-size: clamp(2.75rem, 1.7rem + 4.6vw, 5.25rem); line-height: 0.98; font-weight: 760;
+  letter-spacing: -0.03em; font-variation-settings: "opsz" 96; text-wrap: balance;
+}
+.titre-2{
+  margin: 0; font-size: clamp(2rem, 1.5rem + 2.2vw, 3.25rem); line-height: 1.02; font-weight: 740;
+  letter-spacing: -0.025em; font-variation-settings: "opsz" 72;
+}
+.chapo{ margin: 16px 0 0; font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.3125rem); line-height: 1.45; color: var(--texte-doux); max-width: 34em; text-wrap: pretty; }
+.chapo--court{ margin-top: 10px; }
+.date{ margin: 6px 0 0; color: var(--texte-discret); font-size: 1rem; }
+
+/* L’en-tête, posé sur l’image. */
+.entete{
+  position: absolute; inset: 0 0 auto; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px;
+  padding: 14px var(--gouttiere); max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto;
+}
+.entete__marque{ display: block; padding: 8px 0; border-radius: 6px; }
+.logo{ width: 116px; height: auto; }
+.entete__nav{ display: flex; gap: 4px; }
+.entete__nav a{ display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-size: 0.9375rem; font-weight: 600; text-decoration: none; color: var(--texte); border-radius: 999px; }
+.entete__nav a:hover{ background: rgba(255, 255, 255, 0.08); }
+
+/* 1. L’ouverture : l’objet, la phrase, l’action. */
+.ouverture{ position: relative; display: grid; }
+.ouverture__image{ position: relative; margin: 0; }
+.ouverture__image img{ width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+.ouverture__image::after{ content: ""; position: absolute; inset: 42% 0 0; background: linear-gradient(to bottom, rgba(10, 11, 16, 0), var(--nuit) 92%); }
+.ouverture__texte{ position: relative; z-index: 2; margin-top: -34vw; padding: 0 var(--gouttiere); }
+.ouverture__legende{ margin: 18px var(--gouttiere) 0; font-size: 0.8125rem; color: var(--texte-discret); }
+@media (min-width: 960px){
+  .ouverture{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; min-height: min(100svh, 920px); max-width: 1440px; margin: 0 auto; }
+  .ouverture__image{ grid-column: 2; grid-row: 1; height: 100%; }
+  .ouverture__image img{ height: 100%; aspect-ratio: auto; min-height: 640px; }
+  .ouverture__image{ margin-left: -18%; -webkit-mask-image: linear-gradient(to right, transparent, #000 34%); mask-image: linear-gradient(to right, transparent, #000 34%); }
+  .ouverture__image::after{ inset: 0; background: linear-gradient(to bottom, rgba(10, 11, 16, 0.55), rgba(10, 11, 16, 0) 16%, rgba(10, 11, 16, 0) 78%, var(--nuit)); }
+  .ouverture__texte{ grid-column: 1; grid-row: 1; margin: 0; padding: 120px 24px 80px max(var(--gouttiere), calc((100vw - var(--page)) / 2)); }
+  .ouverture__legende{ position: absolute; right: var(--gouttiere); bottom: 16px; margin: 0; }
+}
+
+/* La liste d’attente : un champ, un bouton, la seule ambre de la page. */
+.liste{ margin-top: 26px; max-width: 30rem; }
+.liste__ligne{ display: flex; gap: 8px; flex-wrap: wrap; }
+.liste__champ{
+  flex: 1 1 9.5rem; min-width: 0; min-height: 3.2em; padding: 0 18px; border-radius: 999px; font: inherit; font-size: 1.0625rem;
+  color: var(--texte); background: rgba(255, 255, 255, 0.07); border: 1px solid var(--trait-fort);
+}
+.liste__champ::placeholder{ color: var(--texte-discret); }
+.liste__champ:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; border-color: transparent; }
+.liste__champ[aria-invalid="true"]{ border-color: #FF9C8A; }
+.liste__bouton{
+  flex: 0 0 auto; min-height: 3.2em; padding: 0 20px; border: 0; border-radius: 999px; background: var(--ambre); color: var(--nuit);
+  font: inherit; font-size: 1.0625rem; font-weight: 720; cursor: pointer; transition: transform var(--vite) var(--verse);
+}
+.liste__bouton:active{ transform: scale(0.985); }
+.liste__ville{ margin-top: 10px; font-size: 0.9375rem; color: var(--texte-doux); }
+.liste__ville summary{ display: inline-block; padding: 11px 0; cursor: pointer; list-style: none; text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--trait-fort); }
+.liste__ville summary::-webkit-details-marker{ display: none; }
+.liste__ville fieldset{ display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 0; padding: 0; border: 0; }
+.liste__puce{ position: relative; }
+.liste__puce input{ position: absolute; opacity: 0; inset: 0; margin: 0; }
+.liste__puce span{ display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--trait-fort); }
+.liste__puce input:checked + span{ background: var(--texte); color: var(--nuit); border-color: var(--texte); }
+.liste__puce input:focus-visible + span{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.liste__note{ margin: 4px 0 0; font-size: 0.875rem; line-height: 1.45; color: var(--texte-discret); }
+.liste__retour{ margin: 8px 0 0; font-size: 0.9375rem; color: var(--texte); min-height: 0; }
+.liste__retour:empty{ display: none; }
+
+/* Les moments : même gouttière, même rythme. */
+.soir, .semaine, .garde, .bars{ padding: 88px var(--gouttiere) 0; max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; }
+@media (min-width: 960px){ .soir, .semaine, .garde, .bars{ padding-top: 140px; } }
+
+/* 2. Ce soir : le prochain match en grand, les autres en ligne. */
+.soir__tete{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
+.vedette{
+  display: grid; justify-items: center; gap: 6px; margin-top: 32px; padding: 8px 0 4px; text-decoration: none; color: inherit; border-radius: 16px;
+}
+.vedette__disques{ display: flex; align-items: center; gap: 14px; }
+.insigne{ flex: none; border-radius: 50%; }
+.insigne--g{ width: 96px; height: 96px; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55)); }
+.vedette__heure{ font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; min-width: 3.2em; text-align: center; }
+.vedette__titre{ margin-top: 10px; font-size: 1.75rem; line-height: 1.1; font-weight: 720; text-align: center; letter-spacing: -0.015em; }
+.vedette__info{ color: var(--texte-doux); font-size: 1rem; text-align: center; }
+.vedette:hover .vedette__titre{ text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
+.soir__puis{ margin: 44px 0 6px; font-size: 1rem; color: var(--texte-discret); }
+.soir__liste{ list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--trait); }
+.match{ display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 10px 0; border-bottom: 1px solid var(--trait); text-decoration: none; color: inherit; }
+.match__paire{ display: flex; gap: 4px; }
+.match__paire .insigne{ width: 32px; height: 32px; }
+.match__nom{ flex: 1; font-weight: 620; line-height: 1.25; }
+.match__heure{ color: var(--texte-doux); }
+.match:hover .match__nom{ text-decoration: underline; text-underline-offset: 0.18em; }
+.soir__verite{ margin: 16px 0 0; font-size: 0.9375rem; color: var(--texte-discret); }
+@media (min-width: 960px){
+  .soir{ display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: start; }
+  .soir__tete{ grid-column: 1 / -1; }
+  .vedette{ grid-column: 1; grid-row: 2 / span 3; margin-top: 40px; padding: 40px 0; }
+  .insigne--g{ width: 132px; height: 132px; }
+  .vedette__heure{ font-size: 3.25rem; }
+  .vedette__titre{ font-size: 2.25rem; }
+  .soir__puis, .soir__liste, .soir__verite{ grid-column: 2; }
+  .soir__puis{ margin-top: 48px; }
+}
+
+/* 3. La semaine, en piles : une pile par jour, un sous-bock par match. */
+.semaine__choix{ margin-top: 28px; }
+.piles{ display: grid; grid-template-columns: repeat(7, minmax(2.7em, 1fr)); align-items: end; gap: 2px; border-bottom: 1px solid var(--trait); overflow-x: auto; scrollbar-width: none; }
+.pile{ display: grid; justify-items: center; align-content: end; gap: 6px; min-height: 44px; padding: 6px 0 10px; cursor: pointer; border-radius: 12px 12px 0 0; color: var(--texte-doux); position: relative; }
+.pile__tas{ width: 44px; height: auto; max-width: 100%; transition: transform var(--lent) var(--verse); }
+.pile__compte{ font-size: 0.875rem; font-weight: 650; }
+.pile__jour{ font-size: 0.8125rem; line-height: 1.15; text-align: center; }
+.pile__jour span{ display: block; }
+.pile:hover .pile__tas{ transform: translateY(-3px); }
+.pile::after{ content: ""; position: absolute; left: 22%; right: 22%; bottom: -1px; height: 2px; border-radius: 2px; background: transparent; }
+#a-j0:checked ~ .piles [for="a-j0"], #a-j1:checked ~ .piles [for="a-j1"], #a-j2:checked ~ .piles [for="a-j2"], #a-j3:checked ~ .piles [for="a-j3"],
+#a-j4:checked ~ .piles [for="a-j4"], #a-j5:checked ~ .piles [for="a-j5"], #a-j6:checked ~ .piles [for="a-j6"]{ color: var(--texte); background: rgba(255, 255, 255, 0.06); }
+#a-j0:checked ~ .piles [for="a-j0"]::after, #a-j1:checked ~ .piles [for="a-j1"]::after, #a-j2:checked ~ .piles [for="a-j2"]::after, #a-j3:checked ~ .piles [for="a-j3"]::after,
+#a-j4:checked ~ .piles [for="a-j4"]::after, #a-j5:checked ~ .piles [for="a-j5"]::after, #a-j6:checked ~ .piles [for="a-j6"]::after{ background: var(--texte); }
+#a-j0:focus-visible ~ .piles [for="a-j0"], #a-j1:focus-visible ~ .piles [for="a-j1"], #a-j2:focus-visible ~ .piles [for="a-j2"], #a-j3:focus-visible ~ .piles [for="a-j3"],
+#a-j4:focus-visible ~ .piles [for="a-j4"], #a-j5:focus-visible ~ .piles [for="a-j5"], #a-j6:focus-visible ~ .piles [for="a-j6"]{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.jour{ display: none; padding-top: 18px; }
+#a-j0:checked ~ .jours #a-jour-0, #a-j1:checked ~ .jours #a-jour-1, #a-j2:checked ~ .jours #a-jour-2, #a-j3:checked ~ .jours #a-jour-3,
+#a-j4:checked ~ .jours #a-jour-4, #a-j5:checked ~ .jours #a-jour-5, #a-j6:checked ~ .jours #a-jour-6{ display: block; }
+.jour__titre{ margin: 0 0 6px; font-weight: 680; }
+.jour__titre::first-letter{ text-transform: uppercase; }
+.jour__liste{ list-style: none; margin: 0; padding: 0; columns: 1; }
+.jour__liste a{ display: grid; grid-template-columns: 3.4em 1fr; column-gap: 12px; align-items: baseline; min-height: 44px; padding: 8px 0; text-decoration: none; color: inherit; border-bottom: 1px solid var(--trait); break-inside: avoid; }
+.jour__heure{ color: var(--texte-doux); grid-row: span 2; }
+.jour__compet{ grid-column: 2; font-size: 0.875rem; color: var(--texte-discret); }
+.jour__liste a:hover span:nth-child(2){ text-decoration: underline; text-underline-offset: 0.18em; }
+.jour__vide{ margin: 0; color: var(--texte-doux); }
+.semaine__tout{ margin: 22px 0 0; }
+.semaine__tout a{ display: inline-flex; align-items: center; min-height: 44px; font-weight: 640; }
+@media (min-width: 960px){
+  .piles{ gap: 12px; }
+  .pile__tas{ width: 64px; }
+  .jour__liste{ columns: 2; column-gap: 48px; }
+}
+
+/* 4. Garde ta place : le verre de la marque, qu’on remplit en le tenant. */
+.garde{ display: grid; gap: 32px; align-items: center; }
+.garde__suite{ margin: 18px 0 0; color: var(--texte-doux); max-width: 34em; }
+.essai{ display: grid; justify-items: center; gap: 10px; text-align: center; }
+.verre-essai{
+  width: 220px; height: 220px; padding: 0; border: 1px solid var(--trait); border-radius: 50%; background: radial-gradient(circle at 50% 55%, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 70%);
+  color: inherit; cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  transition: transform var(--vite) var(--verse);
+}
+.verre-essai:active{ transform: scale(0.985); }
+.verre-essai{ display: grid; justify-items: center; align-content: center; gap: 6px; }
+.verre-essai svg{ width: 72%; height: auto; overflow: visible; }
+.verre-essai__mot{ font-weight: 700; font-size: 1rem; }
+.plein .verre-essai__mot{ color: var(--ambre); }
+.verre-essai svg g[clip-path] path{ transform: translateY(52px); transition: transform 420ms var(--verse); }
+.verre-essai.se-remplit svg g[clip-path] path{ transform: translateY(-46px); transition: transform 1400ms linear; }
+.verre-essai.plein svg g[clip-path] path{ transform: translateY(-46px); }
+.essai__aide{ margin: 0; max-width: 22em; font-size: 0.9375rem; color: var(--texte-discret); }
+.essai__statut{ margin: 0; min-height: 1.5em; font-weight: 700; font-size: 1.125rem; }
+.place-gardee .essai__statut{ color: var(--ambre); }
+@media (min-width: 960px){ .garde{ grid-template-columns: 1.1fr 0.9fr; gap: 72px; } .verre-essai{ width: 260px; height: 260px; } }
+
+/* 5. Les bars : une phrase, un lien. */
+.bars{ padding-bottom: 96px; }
+.bars__action{ display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 26px 0 0; }
+.bars__action span{ font-size: 0.9375rem; color: var(--texte-discret); }
+.bouton-trait{ display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 999px; border: 1px solid var(--trait-fort); color: var(--texte); font-weight: 680; text-decoration: none; }
+.bouton-trait:hover{ background: rgba(255, 255, 255, 0.08); }
+
+/* Le pied de page, léger : les adresses fixes, rien d’autre. */
+.pied{ max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; padding: 36px var(--gouttiere) 40px; border-top: 1px solid var(--trait); display: grid; gap: 20px; font-size: 0.9375rem; color: var(--texte-doux); }
+.pied__marque p{ margin: 8px 0 0; }
+.pied .logo{ width: 104px; }
+.pied__liens ul{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5em), 1fr)); column-gap: 16px; }
+.pied__liens a, .pied__contact a{ display: inline-flex; align-items: center; min-height: 40px; color: var(--texte-doux); text-decoration: none; }
+.pied__liens a:hover, .pied__contact a:hover{ color: var(--texte); text-decoration: underline; }
+.pied__contact{ margin: 0; color: var(--texte-discret); }
+@media (min-width: 960px){ .pied{ grid-template-columns: 1fr 2fr; } .pied__contact{ grid-column: 2; } }
+.apercu{ margin: 0; padding: 14px var(--gouttiere) 22px; text-align: center; font-size: 0.8125rem; color: var(--texte-discret); }
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ transition-duration: 1ms !important; animation: none !important; }
+}

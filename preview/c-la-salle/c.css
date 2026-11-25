@@ -1,0 +1,190 @@
+/* Direction C, « La salle » : le jour du site (son papier, son encre), et une seule image qui raconte : la salle d’un
+   bar, qui reste à l’écran et se remplit à mesure qu’on descend. La nuit n’entre que dans la salle, au coup d’envoi. */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque.woff2") format("woff2-variations"), url("/fonts/bricolage-grotesque.woff2") format("woff2");
+  font-weight: 200 800; font-stretch: 75% 100%; font-display: swap;
+}
+:root{
+  --fond: #FAF7F1;
+  --fond-releve: #F1ECE2;
+  --texte: #0A0B10;
+  --texte-doux: #3D404D;
+  --texte-discret: #5C5F6B;
+  --trait: rgba(10, 11, 16, 0.12);
+  --trait-fort: rgba(10, 11, 16, 0.3);
+  --nuit: #0A0B10;
+  --ambre: #FFB13D;
+  --focus: #0A0B10;
+  --camp-a: #0F8B7E;
+  --camp-b: #3A3FA8;
+  --gouttiere: 20px;
+  --page: 1180px;
+  --verse: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --vite: 160ms;
+  --lent: 700ms;
+  color-scheme: light;
+}
+@media (min-width: 760px) { :root{ --gouttiere: 40px; } }
+*, *::before, *::after{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; text-size-adjust: 100%; background: var(--fond); scroll-padding-top: 46svh; }
+@media (max-height: 640px), (min-width: 960px){ html{ scroll-padding-top: 0; } }
+body{
+  margin: 0; background: var(--fond); color: var(--texte);
+  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.125rem; line-height: 1.5; font-variation-settings: "opsz" 18; font-variant-numeric: tabular-nums; overflow-wrap: break-word;
+}
+img, svg{ display: block; max-width: 100%; }
+a{ color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1.5px; }
+:focus-visible{ outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.visuellement-cache{ position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.evitement{ position: absolute; left: var(--gouttiere); top: 8px; z-index: 20; padding: 10px 16px; background: var(--texte); color: var(--fond); border-radius: 10px; font-weight: 700; text-decoration: none; transform: translateY(-160%); }
+.evitement:focus{ transform: none; }
+.planche{ position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.titre-1{ margin: 0; font-size: clamp(2.5rem, 1.8rem + 3.2vw, 4.25rem); line-height: 1; font-weight: 740; letter-spacing: -0.03em; font-variation-settings: "opsz" 96; }
+.titre-1 span{ display: inline-block; white-space: nowrap; }
+.titre-2{ margin: 0; font-size: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem); line-height: 1.05; font-weight: 730; letter-spacing: -0.025em; font-variation-settings: "opsz" 72; }
+.chapo{ margin: 12px 0 0; font-size: clamp(1.0625rem, 1.02rem + 0.3vw, 1.25rem); line-height: 1.45; color: var(--texte-doux); max-width: 34em; }
+
+.entete{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; padding: 10px var(--gouttiere); max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; }
+.entete__marque{ display: block; padding: 8px 0; border-radius: 6px; }
+.logo{ width: 116px; height: auto; }
+.logo path[fill="#F7F7F9"]{ fill: var(--texte); }
+.logo stop[stop-color="#FFFFFF"]{ stop-color: var(--texte); }
+.logo path[stroke="#FFFFFF"]{ display: none; }
+.entete__nav{ display: flex; gap: 2px; }
+.entete__nav a{ display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-size: 0.9375rem; font-weight: 620; text-decoration: none; border-radius: 999px; }
+.entete__nav a:hover{ background: var(--fond-releve); }
+
+/* La soirée : la salle reste, les moments passent. */
+.soiree{ max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; padding: 0 var(--gouttiere); }
+.salle{ position: sticky; top: 0; z-index: 3; margin: 0 calc(-1 * var(--gouttiere)); padding: 6px var(--gouttiere) 4px; background: var(--fond); border-bottom: 1px solid var(--trait); }
+.salle__cadre{ position: relative; margin: 0; }
+.salle__dessin{ width: 100%; height: auto; max-height: 38svh; margin: 0 auto; overflow: visible; }
+.salle__heure{ position: absolute; left: 0; top: 2px; margin: 0; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.01em; }
+.salle__heure span{ display: none; }
+.salle[data-etat="1842"] .h1842, .salle[data-etat="1930"] .h1930, .salle[data-etat="2015"] .h2015, .salle[data-etat="2055"] .h2055, .salle[data-etat="2100"] .h2100{ display: inline; }
+.salle__legende{ margin: 0; font-size: 0.75rem; color: var(--texte-discret); text-align: right; }
+@media (max-height: 640px){ .salle{ position: static; } }
+@media (min-width: 960px){
+  .soiree{ display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px; align-items: start; }
+  .salle{ grid-column: 1; grid-row: 1; top: 0; height: 100svh; display: grid; align-items: center; margin: 0; padding: 24px 0; border: 0; }
+  .salle__dessin{ max-height: 70svh; }
+  .salle__heure{ font-size: 2rem; top: 12%; }
+  .moments{ grid-column: 2; grid-row: 1; }
+}
+
+/* Le dessin de la salle. */
+.salle__sol{ fill: #EADFCB; }
+.salle__mur--d{ fill: #E2D8C6; }
+.salle__mur--g{ fill: #D6CBB6; }
+.salle__nuit{ fill: var(--nuit); opacity: 0; transition: opacity var(--lent) var(--verse); }
+.salle__porte{ fill: #CDBFA6; }
+.salle__ecran{ fill: #1B1D27; }
+.salle__match{ opacity: 0; transition: opacity var(--lent) var(--verse); }
+.salle__match--a{ fill: var(--camp-a); }
+.salle__match--b{ fill: var(--camp-b); }
+.salle__lueur{ fill: #7FA8FF; opacity: 0; transition: opacity var(--lent) var(--verse); }
+.salle__comptoir-dessus{ fill: #9A6A43; }
+.salle__comptoir-face{ fill: #6E4A2E; }
+.salle__comptoir-bout{ fill: #5A3C25; }
+.salle__table{ fill: #FFFFFF; stroke: rgba(10, 11, 16, 0.28); stroke-width: 0.8; }
+.salle__pied{ stroke: rgba(10, 11, 16, 0.35); stroke-width: 1.2; }
+.place{ fill: rgba(255, 255, 255, 0.55); stroke: rgba(10, 11, 16, 0.4); stroke-width: 0.9; }
+.plein{ opacity: 0; transition: opacity var(--lent) var(--verse); stroke: rgba(10, 11, 16, 0.35); stroke-width: 0.6; }
+.plein.ca{ fill: var(--camp-a); }
+.plein.cb{ fill: var(--camp-b); }
+.salle[data-etat="1842"] .s1,
+.salle[data-etat="1930"] :is(.s1, .s2),
+.salle[data-etat="2015"] :is(.s1, .s2, .s3),
+.salle[data-etat="2055"] :is(.s1, .s2, .s3, .s4),
+.salle[data-etat="2100"] :is(.s1, .s2, .s3, .s4){ opacity: 1; }
+.salle[data-etat="2055"] .salle__nuit{ opacity: 0.25; }
+.salle[data-etat="2100"] .salle__nuit{ opacity: 0.62; }
+.salle[data-etat="2100"] :is(.salle__match){ opacity: 1; }
+.salle[data-etat="2100"] .salle__lueur{ opacity: 0.16; }
+/* Ta place : en pointillé tant qu’elle n’est pas gardée, à l’ambre quand tu l’as gardée, cochée quand tu es arrivé. */
+.toi{ stroke: var(--texte); stroke-width: 1.1; stroke-dasharray: 2 1.6; fill: rgba(255, 255, 255, 0.8); }
+.toi__plein{ fill: var(--ambre); stroke: #8A5200; stroke-width: 0.7; opacity: 0; transition: opacity var(--lent) var(--verse); }
+.toi__coche{ fill: none; stroke: var(--nuit); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity var(--lent) var(--verse); }
+.place-gardee .toi__plein{ opacity: 1; }
+.place-gardee .salle:is([data-etat="2055"], [data-etat="2100"]) .toi__coche{ opacity: 1; }
+
+/* Les moments. */
+.moment{ padding: 56px 0 8px; }
+.moment--ouverture{ padding-top: 18px; }
+.moment--fin{ padding-bottom: 96px; }
+@media (min-width: 960px){ .moment{ min-height: 72svh; display: flex; flex-direction: column; justify-content: center; padding: 64px 0; } .moment--ouverture{ min-height: calc(100svh - 72px); } }
+.moment__heure{ margin: 0 0 8px; font-size: 0.9375rem; font-weight: 700; color: var(--texte-discret); }
+.moment--ouverture .moment__heure{ display: none; }
+
+.liste{ margin-top: 20px; max-width: 30rem; }
+.liste__ligne{ display: flex; gap: 8px; flex-wrap: wrap; }
+.liste__champ{ flex: 1 1 9.5rem; min-width: 0; min-height: 3.2em; padding: 0 18px; border-radius: 999px; font: inherit; font-size: 1.0625rem; color: var(--texte); background: #FFFFFF; border: 1.5px solid var(--trait-fort); }
+.liste__champ::placeholder{ color: var(--texte-discret); }
+.liste__champ:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.liste__champ[aria-invalid="true"]{ border-color: #B42318; }
+.liste__bouton{ flex: 0 0 auto; min-height: 3.2em; padding: 0 20px; border: 0; border-radius: 999px; background: var(--ambre); color: var(--nuit); font: inherit; font-size: 1.0625rem; font-weight: 720; cursor: pointer; transition: transform var(--vite) var(--verse); }
+.liste__bouton:active{ transform: scale(0.985); }
+.liste__ville{ margin-top: 6px; font-size: 0.9375rem; color: var(--texte-doux); }
+.liste__ville summary{ display: inline-block; padding: 11px 0; cursor: pointer; list-style: none; text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--trait-fort); }
+.liste__ville summary::-webkit-details-marker{ display: none; }
+.liste__ville fieldset{ display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; padding: 0; border: 0; }
+.liste__puce{ position: relative; }
+.liste__puce input{ position: absolute; opacity: 0; inset: 0; margin: 0; }
+.liste__puce span{ display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--trait-fort); }
+.liste__puce input:checked + span{ background: var(--texte); color: var(--fond); border-color: var(--texte); }
+.liste__puce input:focus-visible + span{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.liste__note{ margin: 2px 0 0; font-size: 0.875rem; line-height: 1.45; color: var(--texte-discret); }
+.liste__retour{ margin: 8px 0 0; font-size: 0.9375rem; }
+.liste__retour:empty{ display: none; }
+
+/* 19:30 : ce soir, et la semaine en sept traits. */
+.soir{ list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--trait); }
+.match{ display: grid; grid-template-columns: 3.2em auto 1fr; align-items: center; column-gap: 12px; min-height: 52px; padding: 6px 0; border-bottom: 1px solid var(--trait); text-decoration: none; }
+.match__heure{ color: var(--texte-doux); }
+.match__paire{ display: flex; gap: 3px; }
+.match__paire .insigne{ width: 28px; height: 28px; }
+.match__nom{ font-weight: 640; line-height: 1.2; }
+.match:hover .match__nom{ text-decoration: underline; text-underline-offset: 0.18em; }
+.semaine{ display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px; margin-top: 22px; padding: 12px 0; text-decoration: none; border-radius: 12px; }
+.semaine__jour{ display: grid; justify-items: center; gap: 4px; font-size: 0.75rem; color: var(--texte-discret); }
+.semaine__jour svg{ width: 24px; height: 60px; }
+.semaine__jour rect{ fill: var(--texte); opacity: 0.85; }
+.semaine__jour rect.sol{ fill: var(--trait-fort); opacity: 1; }
+.semaine__texte{ display: grid; margin-left: 10px; padding-bottom: 18px; }
+.semaine__texte b{ font-weight: 700; }
+.semaine__texte span{ font-size: 0.9375rem; color: var(--texte-doux); text-decoration: underline; text-underline-offset: 0.2em; }
+
+/* 20:15 : le geste. */
+.essai{ margin-top: 22px; display: grid; gap: 8px; max-width: 26rem; }
+.tenir{
+  position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 58px; padding: 0 20px;
+  border-radius: 999px; border: 1.5px solid var(--texte); background: #FFFFFF; color: var(--texte); font: inherit; font-weight: 700; font-size: 1.0625rem;
+  cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; transition: transform var(--vite) var(--verse);
+}
+.tenir:active{ transform: scale(0.985); }
+.tenir__niveau{ position: absolute; inset: 0; background: var(--ambre); transform: scaleX(0); transform-origin: left center; transition: transform 380ms var(--verse); }
+.tenir.se-remplit .tenir__niveau{ transform: scaleX(1); transition: transform 1400ms linear; }
+.tenir.plein .tenir__niveau{ transform: scaleX(1); }
+.tenir.plein{ border-color: var(--ambre); }
+.tenir__mot{ position: relative; }
+.essai__aide{ margin: 0; font-size: 0.875rem; color: var(--texte-discret); }
+.essai__statut{ margin: 0; min-height: 1.5em; font-weight: 700; }
+
+.bars__action{ margin: 22px 0 0; }
+.bouton-trait{ display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 999px; border: 1.5px solid var(--texte); font-weight: 680; text-decoration: none; }
+.bouton-trait:hover{ background: var(--texte); color: var(--fond); }
+
+.pied{ max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; padding: 32px var(--gouttiere) 36px; border-top: 1px solid var(--trait); display: grid; gap: 18px; font-size: 0.9375rem; color: var(--texte-doux); }
+.pied .logo{ width: 104px; }
+.pied__marque p{ margin: 8px 0 0; }
+.pied__liens ul{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5em), 1fr)); column-gap: 16px; }
+.pied__liens a, .pied__contact a{ display: inline-flex; align-items: center; min-height: 40px; text-decoration: none; }
+.pied__liens a:hover, .pied__contact a:hover{ text-decoration: underline; }
+.pied__contact{ margin: 0; color: var(--texte-discret); }
+@media (min-width: 960px){ .pied{ grid-template-columns: 1fr 2fr; } .pied__contact{ grid-column: 2; } }
+.apercu{ margin: 0; padding: 14px var(--gouttiere) 22px; text-align: center; font-size: 0.8125rem; color: var(--texte-discret); }
+
+@media (prefers-reduced-motion: reduce){ *, *::before, *::after{ transition-duration: 1ms !important; animation: none !important; } }

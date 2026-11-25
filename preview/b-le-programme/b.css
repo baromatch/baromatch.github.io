@@ -1,0 +1,167 @@
+/* Direction B, « Le programme » : le jour, blanc et net. L’encre pour le texte, les couleurs des clubs pour les
+   données, l’ambre pour ton action seulement. Pas de cartes, pas d’ombres : des filets, de l’air, des chiffres. */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque.woff2") format("woff2-variations"), url("/fonts/bricolage-grotesque.woff2") format("woff2");
+  font-weight: 200 800; font-stretch: 75% 100%; font-display: swap;
+}
+:root{
+  --papier: #FFFFFF;
+  --papier-releve: #F4F4F6;
+  --encre: #0A0B10;
+  --encre-douce: #444754;
+  --encre-discrete: #5F6270;
+  --trait: #E4E4EA;
+  --trait-fort: #C9CAD2;
+  --nuit: #0A0B10;
+  --ambre: #FFB13D;
+  --focus: #0A0B10;
+  --gouttiere: 20px;
+  --page: 1180px;
+  --verse: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --vite: 160ms;
+  color-scheme: light;
+}
+@media (min-width: 760px) { :root{ --gouttiere: 40px; } }
+*, *::before, *::after{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; text-size-adjust: 100%; background: var(--papier); }
+body{
+  margin: 0; background: var(--papier); color: var(--encre);
+  font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.125rem; line-height: 1.5; font-variation-settings: "opsz" 18; font-variant-numeric: tabular-nums; overflow-wrap: break-word;
+}
+img, svg{ display: block; max-width: 100%; }
+a{ color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1.5px; }
+:focus-visible{ outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.visuellement-cache{ position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.evitement{ position: absolute; left: var(--gouttiere); top: 8px; z-index: 20; padding: 10px 16px; background: var(--encre); color: var(--papier); border-radius: 10px; font-weight: 700; text-decoration: none; transform: translateY(-160%); }
+.evitement:focus{ transform: none; }
+.planche{ position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.titre-1{ margin: 0; font-size: clamp(2.5rem, 1.8rem + 3.4vw, 4.5rem); line-height: 1; font-weight: 740; letter-spacing: -0.03em; font-variation-settings: "opsz" 96; }
+.titre-1 span{ display: inline-block; white-space: nowrap; }
+.titre-2{ margin: 0; font-size: clamp(1.875rem, 1.45rem + 2vw, 3rem); line-height: 1.04; font-weight: 730; letter-spacing: -0.025em; font-variation-settings: "opsz" 72; }
+.chapo{ margin: 14px 0 0; font-size: clamp(1.125rem, 1.06rem + 0.3vw, 1.25rem); line-height: 1.45; color: var(--encre-douce); max-width: 34em; }
+
+/* L’en-tête : la marque et deux portes. */
+.entete{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; padding: 12px var(--gouttiere); max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; }
+.entete__marque{ display: block; padding: 8px 0; border-radius: 6px; }
+.logo{ width: 116px; height: auto; }
+.logo path[fill="#F7F7F9"]{ fill: var(--encre); }
+.logo stop[stop-color="#FFFFFF"]{ stop-color: var(--encre); }
+.logo path[stroke="#FFFFFF"]{ display: none; }
+.entete__nav{ display: flex; gap: 2px; }
+.entete__nav a{ display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-size: 0.9375rem; font-weight: 620; text-decoration: none; border-radius: 999px; }
+.entete__nav a:hover{ background: var(--papier-releve); }
+
+/* 1. L’ouverture : la promesse et l’action, puis le programme de ce soir. */
+.ouverture{ padding: 20px var(--gouttiere) 0; max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; }
+@media (min-width: 960px){
+  .ouverture{ display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; padding-top: 72px; }
+}
+.liste{ margin-top: 22px; max-width: 30rem; }
+.liste__ligne{ display: flex; gap: 8px; flex-wrap: wrap; }
+.liste__champ{ flex: 1 1 9.5rem; min-width: 0; min-height: 3.2em; padding: 0 18px; border-radius: 999px; font: inherit; font-size: 1.0625rem; color: var(--encre); background: var(--papier); border: 1.5px solid var(--trait-fort); }
+.liste__champ::placeholder{ color: var(--encre-discrete); }
+.liste__champ:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.liste__champ[aria-invalid="true"]{ border-color: #B42318; }
+.liste__bouton{ flex: 0 0 auto; min-height: 3.2em; padding: 0 20px; border: 0; border-radius: 999px; background: var(--ambre); color: var(--nuit); font: inherit; font-size: 1.0625rem; font-weight: 720; cursor: pointer; transition: transform var(--vite) var(--verse); }
+.liste__bouton:active{ transform: scale(0.985); }
+.liste__ville{ margin-top: 6px; font-size: 0.9375rem; color: var(--encre-douce); }
+.liste__ville summary{ display: inline-block; padding: 11px 0; cursor: pointer; list-style: none; text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--trait-fort); }
+.liste__ville summary::-webkit-details-marker{ display: none; }
+.liste__ville fieldset{ display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; padding: 0; border: 0; }
+.liste__puce{ position: relative; }
+.liste__puce input{ position: absolute; opacity: 0; inset: 0; margin: 0; }
+.liste__puce span{ display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--trait-fort); }
+.liste__puce input:checked + span{ background: var(--encre); color: var(--papier); border-color: var(--encre); }
+.liste__puce input:focus-visible + span{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.liste__note{ margin: 2px 0 0; font-size: 0.875rem; line-height: 1.45; color: var(--encre-discrete); }
+.liste__retour{ margin: 8px 0 0; font-size: 0.9375rem; }
+.liste__retour:empty{ display: none; }
+
+.programme{ margin-top: 40px; border-top: 2px solid var(--encre); }
+@media (min-width: 960px){ .programme{ margin-top: 8px; } }
+.programme__titre{ display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin: 0; padding: 12px 0 4px; font-size: 1.0625rem; font-weight: 720; }
+.programme__titre span{ font-weight: 500; color: var(--encre-douce); }
+.programme__titre span::first-letter{ text-transform: uppercase; }
+.creneau{ display: grid; grid-template-columns: 5.2rem 1fr; gap: 0 8px; padding: 10px 0; border-bottom: 1px solid var(--trait); }
+.creneau__heure{ margin: 0; font-size: 2rem; line-height: 1; font-weight: 640; letter-spacing: -0.02em; padding-top: 10px; }
+.creneau__matchs{ list-style: none; margin: 0; padding: 0; }
+.affiche{ display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: center; min-height: 52px; padding: 6px 0; text-decoration: none; }
+.affiche__paire{ grid-row: span 2; display: flex; gap: 3px; }
+.affiche__paire .insigne{ width: 30px; height: 30px; }
+.affiche__nom{ font-weight: 650; line-height: 1.2; }
+.affiche__compet{ font-size: 0.875rem; color: var(--encre-discrete); }
+.affiche:hover .affiche__nom{ text-decoration: underline; text-underline-offset: 0.18em; }
+.programme__verite{ margin: 12px 0 0; font-size: 0.9375rem; color: var(--encre-discrete); }
+
+/* Les moments suivants. */
+.semaine, .appli, .bars{ padding: 96px var(--gouttiere) 0; max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; }
+@media (min-width: 960px){ .semaine, .appli, .bars{ padding-top: 150px; } }
+
+/* 2. La semaine dessinée : un jour par rangée, chaque match à son heure. */
+.semaine__choix{ margin-top: 28px; }
+.grille{ max-width: 760px; border-top: 1px solid var(--trait); }
+.grille__axe, .rangee{ display: grid; grid-template-columns: 4.6rem 1fr; column-gap: 10px; align-items: center; }
+.grille__axe{ padding: 8px 0 4px; }
+.grille__heures{ width: 100%; height: auto; overflow: visible; }
+.grille__heures text{ font-family: inherit; font-size: 9px; fill: var(--encre-discrete); font-variant-numeric: tabular-nums; }
+.rangee{ min-height: 44px; padding: 4px 0; border-bottom: 1px solid var(--trait); cursor: pointer; border-radius: 6px; }
+.rangee__jour{ display: flex; justify-content: space-between; gap: 6px; padding-left: 6px; font-size: 0.9375rem; color: var(--encre-douce); }
+.rangee__jour b{ font-weight: 650; color: var(--encre); white-space: nowrap; }
+.rangee__axe{ width: 100%; height: auto; overflow: visible; }
+.reperes line{ stroke: var(--trait); stroke-width: 1; }
+.rangee:hover{ background: var(--papier-releve); }
+#b-j0:checked ~ .grille [for="b-j0"], #b-j1:checked ~ .grille [for="b-j1"], #b-j2:checked ~ .grille [for="b-j2"], #b-j3:checked ~ .grille [for="b-j3"],
+#b-j4:checked ~ .grille [for="b-j4"], #b-j5:checked ~ .grille [for="b-j5"], #b-j6:checked ~ .grille [for="b-j6"]{ background: var(--papier-releve); box-shadow: inset 3px 0 0 var(--encre); }
+#b-j0:focus-visible ~ .grille [for="b-j0"], #b-j1:focus-visible ~ .grille [for="b-j1"], #b-j2:focus-visible ~ .grille [for="b-j2"], #b-j3:focus-visible ~ .grille [for="b-j3"],
+#b-j4:focus-visible ~ .grille [for="b-j4"], #b-j5:focus-visible ~ .grille [for="b-j5"], #b-j6:focus-visible ~ .grille [for="b-j6"]{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.jour{ display: none; padding-top: 22px; max-width: 820px; }
+#b-j0:checked ~ .jours #b-jour-0, #b-j1:checked ~ .jours #b-jour-1, #b-j2:checked ~ .jours #b-jour-2, #b-j3:checked ~ .jours #b-jour-3,
+#b-j4:checked ~ .jours #b-jour-4, #b-j5:checked ~ .jours #b-jour-5, #b-j6:checked ~ .jours #b-jour-6{ display: block; }
+.jour__titre{ margin: 0 0 4px; font-weight: 700; }
+.jour__titre::first-letter{ text-transform: uppercase; }
+.jour__liste{ list-style: none; margin: 0; padding: 0; }
+.jour__liste a{ display: grid; grid-template-columns: 3.4em 1fr; column-gap: 12px; align-items: baseline; min-height: 44px; padding: 8px 0; text-decoration: none; border-bottom: 1px solid var(--trait); }
+.jour__heure{ grid-row: span 2; color: var(--encre-douce); }
+.jour__nom{ font-weight: 620; }
+.jour__compet{ grid-column: 2; font-size: 0.875rem; color: var(--encre-discrete); }
+.jour__liste a:hover .jour__nom{ text-decoration: underline; text-underline-offset: 0.18em; }
+.jour__vide{ margin: 0; color: var(--encre-douce); }
+@media (min-width: 960px){ .jour__liste{ columns: 2; column-gap: 48px; } .jour__liste li{ break-inside: avoid; } .grille__axe, .rangee{ grid-template-columns: 6.5rem 1fr; } }
+.semaine__tout{ margin: 20px 0 0; }
+.semaine__tout a{ display: inline-flex; align-items: center; min-height: 44px; font-weight: 640; }
+
+/* 3. Dans l’appli : trois vrais écrans, la nuit dans leurs cadres. */
+.ecrans{ display: grid; grid-auto-flow: column; grid-auto-columns: 62%; gap: 16px; margin: 28px calc(-1 * var(--gouttiere)) 0; padding: 0 var(--gouttiere) 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.ecrans::-webkit-scrollbar{ display: none; }
+.ecran{ margin: 0; scroll-snap-align: start; }
+.ecran__cadre{ position: relative; padding: 7px; border-radius: 34px; background: var(--nuit); box-shadow: 0 1px 0 rgba(10, 11, 16, 0.06), 0 24px 48px -20px rgba(10, 11, 16, 0.45); }
+.ecran__cadre img{ width: 100%; height: auto; border-radius: 27px; }
+.ecran__etiquette{ position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%); padding: 2px 10px; border-radius: 999px; background: var(--papier); border: 1px solid var(--trait-fort); font-size: 0.75rem; font-weight: 600; white-space: nowrap; color: var(--encre-douce); }
+.ecran figcaption{ display: flex; gap: 10px; align-items: baseline; margin-top: 22px; font-weight: 680; font-size: 1.0625rem; }
+.ecran__numero{ font-variant-numeric: tabular-nums; color: var(--encre-discrete); font-weight: 600; }
+@media (min-width: 960px){ .ecrans{ grid-auto-flow: row; grid-template-columns: repeat(3, 260px); gap: 48px; overflow: visible; margin: 40px 0 0; padding: 0; } }
+
+/* 4. Les bars. */
+.bars{ padding-bottom: 96px; }
+.bars__faits{ list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--trait); max-width: 40rem; }
+.bars__faits li{ padding: 12px 0; border-bottom: 1px solid var(--trait); font-weight: 620; }
+@media (min-width: 960px){ .bars__faits{ grid-template-columns: repeat(3, auto); justify-content: start; border: 0; gap: 0 36px; } .bars__faits li{ border: 0; padding: 0; } }
+.bars__action{ margin: 26px 0 0; }
+.bouton-trait{ display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 999px; border: 1.5px solid var(--encre); font-weight: 680; text-decoration: none; }
+.bouton-trait:hover{ background: var(--encre); color: var(--papier); }
+
+/* Le pied, léger. */
+.pied{ max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; padding: 32px var(--gouttiere) 36px; border-top: 1px solid var(--trait); display: grid; gap: 18px; font-size: 0.9375rem; color: var(--encre-douce); }
+.pied .logo{ width: 104px; }
+.pied__marque p{ margin: 8px 0 0; }
+.pied__liens ul{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5em), 1fr)); column-gap: 16px; }
+.pied__liens a, .pied__contact a{ display: inline-flex; align-items: center; min-height: 40px; text-decoration: none; }
+.pied__liens a:hover, .pied__contact a:hover{ text-decoration: underline; }
+.pied__contact{ margin: 0; color: var(--encre-discrete); }
+@media (min-width: 960px){ .pied{ grid-template-columns: 1fr 2fr; } .pied__contact{ grid-column: 2; } }
+.apercu{ margin: 0; padding: 14px var(--gouttiere) 22px; text-align: center; font-size: 0.8125rem; color: var(--encre-discrete); }
+
+@media (prefers-reduced-motion: reduce){ *, *::before, *::after{ transition-duration: 1ms !important; animation: none !important; } .ecrans{ scroll-behavior: auto; } }

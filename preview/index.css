@@ -1,0 +1,11 @@
+@font-face { font-family: "Bricolage Grotesque"; src: url("/fonts/bricolage-grotesque.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+:root{ --fond: #FAF7F1; --texte: #0A0B10; --texte-doux: #3D404D; --trait: rgba(10, 11, 16, 0.12); color-scheme: light; }
+body{ margin: 0; background: var(--fond); color: var(--texte); font: 1.125rem/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+main{ max-width: 40rem; margin: 0 auto; padding: 48px 20px; }
+h1{ margin: 0; font-size: 2.5rem; line-height: 1.05; letter-spacing: -0.02em; }
+p{ color: var(--texte-doux); }
+ul{ list-style: none; margin: 32px 0 0; padding: 0; border-top: 1px solid var(--trait); }
+a{ display: grid; gap: 2px; padding: 16px 0; border-bottom: 1px solid var(--trait); color: inherit; text-decoration: none; }
+a:hover b{ text-decoration: underline; }
+a span{ color: var(--texte-doux); }
+:focus-visible{ outline: 2px solid var(--texte); outline-offset: 3px; }

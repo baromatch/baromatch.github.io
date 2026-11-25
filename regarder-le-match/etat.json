@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "xH6pgLZg32JZerurOlpbnQ",
+   "empreinte": "3-haGaox5vXTHS4xjIrl5w",
    "change": "2026-11-25",
    "indexable": false,
    "bars": []
@@ -638,7 +638,7 @@
    "type": "match-en",
    "cle": "sabah-barca-2026-11-25",
    "date": "2026-11-25T17:45:00.000Z",
-   "empreinte": "Y1k9SvZUJy_614jPjQRiAA",
+   "empreinte": "VqjV48dFdQLL_ZBfaqOamA",
    "change": "2026-11-25",
    "indexable": false,
    "bars": []
@@ -681,7 +681,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "-hE5Hg72MJxhECR260mG9Q",
+   "empreinte": "khf11Wz3P_PG0CPAhN0I7Q",
    "change": "2026-11-25",
    "indexable": false,
    "bars": []
@@ -4589,7 +4589,7 @@
    "type": "match",
    "cle": "sabah-barca-2026-11-25",
    "date": "2026-11-25T17:45:00.000Z",
-   "empreinte": "m4-UNCwBBBjMnZyaqQrBBw",
+   "empreinte": "qbHH62gVQ5cSV-fw70ZyaA",
    "change": "2026-11-25",
    "indexable": false,
    "bars": [],
@@ -4614,13 +4614,6 @@
      "slug": "fc-barcelona"
     }
    }
-  },
-  "/matchs/sabah-barca-2026-11-25/match.ics": {
-   "type": "evenement",
-   "cle": "sabah-barca-2026-11-25",
-   "empreinte": "SEWJ70c8O98fxwU6wYBnpw",
-   "change": "2026-11-11",
-   "indexable": false
   },
   "/matchs/sabah-barca-2026-11-25/partage.png": {
    "type": "partage",
@@ -5713,28 +5706,6 @@
    "empreinte": "m9txYB-9f1bmMiVzI1TkWQ",
    "sequence": 0,
    "modifie": "2026-11-22T19:33:24Z"
-  },
-  "cmvxrat6q000ig7uuwishk793@baromatch.fr": {
-   "ids": [
-    "cmvxrat6q000ig7uuwishk793"
-   ],
-   "slug": "sabah-barca-2026-11-25",
-   "debut": "2026-11-25T17:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Ligue des champions",
-   "domicile": {
-    "cle": "sabah",
-    "court": "Sabah",
-    "nom": "Sabah FC"
-   },
-   "exterieur": {
-    "cle": "barca",
-    "court": "Barça",
-    "nom": "FC Barcelona"
-   },
-   "empreinte": "xZYwk_nwHsgV_TMIy4RVEA",
-   "sequence": 0,
-   "modifie": "2026-11-11T21:55:06Z"
   },
   "cmvxrat7a000kg7uud2wscduq@baromatch.fr": {
    "ids": [
@@ -7058,7 +7029,7 @@
   }
  },
  "accueil": {
-  "empreinte": "xp8KYp__CpoQAgWQsdAAvA",
+  "empreinte": "W7SMVKjN0d7NXEESCemUsw",
   "change": "2026-11-25"
  }
 }

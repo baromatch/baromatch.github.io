@@ -5,7 +5,7 @@
 // - un titre de 15 à 60 caractères, une description de 70 à 155, une adresse canonique, un seul h1, des titres dans l’ordre,
 //   la langue de la page, un texte alternatif à chaque image, des titres et des descriptions tous différents ;
 // - des données structurées qui se lisent, que le vocabulaire de schema.org accepte, avec un fil d’Ariane partout et, sur la
-//   page d’un match, un SportsEvent « Équipe A – Équipe B » sans lieu inventé ni note ; une FAQ balisée seulement si elle est
+//   page d’un match, un SportsEvent seulement si son stade est connu (aujourd’hui, jamais) ; une FAQ balisée seulement si elle est
 //   visible ;
 // - des aperçus de partage complets (Open Graph et X) ;
 // - un plan du site qui liste chaque page indexable, une fois, avec la date de son dernier vrai changement, et qui oublie un
@@ -24,7 +24,8 @@ import { construire } from '../generateur/construire.mjs';
 import { DESCRIPTION_MAX, DESCRIPTION_MIN, TITRE_MAX, TITRE_MIN } from '../generateur/bornes.mjs';
 import { JOUR_MS } from '../generateur/donnees.mjs';
 import { jourDeParis } from '../generateur/heure.mjs';
-import { blocsDe, chargerLeVocabulaire, validerLaPage } from '../generateur/validateur.mjs';
+import { evenementDuMatch } from '../generateur/jsonld.mjs';
+import { blocsDe, chargerLeVocabulaire, validerLaPage, validerUnBloc } from '../generateur/validateur.mjs';
 
 const ORIGINE = 'https://baromatch.fr';
 const vocabulaire = chargerLeVocabulaire();
@@ -189,35 +190,27 @@ for (const site of SITES) {
       expect(faq).toBeGreaterThan(0);
     });
 
-    test('la page d’un match à venir : un SportsEvent « Équipe A – Équipe B », son jour, son statut, sans lieu inventé', () => {
-      const matchs = resultat.fichiers.filter((f) => f.type === 'match' && f.chemin.endsWith('/') && deType(f.contenu, 'SportsEvent').length);
+    test('la page d’un match à venir : aucun SportsEvent sans stade connu ; ses soirées portent le match, avec un bar publié pour lieu', () => {
+      const matchs = resultat.fichiers.filter((f) => f.type === 'match' && f.chemin.endsWith('/') && /<h2 id="titre-(?:bars|premiers)"/.test(f.contenu));
       expect(matchs.length).toBeGreaterThan(5);
       const barsPublies = new Set((resultat.donnees.bars ?? []).map((b) => b.nom));
       for (const f of matchs) {
-        const [sport, ...autres] = deType(f.contenu, 'SportsEvent');
-        expect(autres, f.chemin).toEqual([]);
-        expect(sport['@id'], f.chemin).toBe(`${ORIGINE}${f.chemin}#match`);
-        const m = f.contenu.match(/<p class="regarder-affiche">([^<]*)<\/p>/);
-        expect(sport.name, f.chemin).toBe(normaliser(m[1]));
-        expect(sport.name, f.chemin).toMatch(/^.+ – .+$/);
-        expect(sport.homeTeam.name, f.chemin).toBeTruthy();
-        expect(sport.awayTeam.name, f.chemin).toBeTruthy();
-        // Le jour et l’heure avec le décalage de Paris ; le jour seul tant que l’heure n’est pas confirmée.
-        expect(sport.startDate, f.chemin).toMatch(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}\+0[12]:00)?$/);
-        const lisible = f.contenu.match(/<time datetime="([^"]*)"/)[1];
-        expect(sport.startDate, f.chemin).toBe(lisible);
-        expect(['https://schema.org/EventScheduled', 'https://schema.org/EventPostponed', 'https://schema.org/EventCancelled'], f.chemin).toContain(sport.eventStatus);
-        // Les données n’ont pas le stade : aucun lieu, aucune adresse, aucune image, aucune note ; jamais un bar.
-        for (const cle of ['location', 'address', 'image', 'aggregateRating', 'review', 'offers', 'organizer', 'performer']) expect(sport[cle], `${f.chemin} : ${cle}`).toBeUndefined();
-        // La page du match est ce dont elle parle, et son fil d’Ariane mène à l’accueil et à la semaine.
-        const page = deType(f.contenu, 'WebPage')[0];
-        expect(page.mainEntity, f.chemin).toEqual({ '@id': sport['@id'] });
+        // Les données n’ont pas le stade : aucun SportsEvent à la racine de la page, donc aucun lieu inventé.
+        const racines = blocsDe(f.contenu).flatMap((b) => b['@graph']);
+        expect(racines.filter((n) => typesDe(n).includes('SportsEvent')), f.chemin).toEqual([]);
+        expect(deType(f.contenu, 'WebPage')[0].mainEntity, f.chemin).toBeUndefined();
+        // Le fil d’Ariane mène à l’accueil et à la semaine.
         const fil = deType(f.contenu, 'BreadcrumbList')[0].itemListElement;
         expect(fil.map((i) => i.item ?? null), f.chemin).toEqual([`${ORIGINE}/`, `${ORIGINE}/matchs/`, `${ORIGINE}${f.chemin}`]);
-        // Les soirées d’un bar : le lieu est un bar publié, jamais un autre ; elles renvoient au match par son @id.
+        // Chaque soirée : le lieu est un bar publié, jamais un autre ; le match est son « about », avec son nom, son jour
+        // (le décalage de Paris) et ses deux équipes, sans lieu.
         for (const soiree of deType(f.contenu, 'Event')) {
           expect(barsPublies.has(soiree.location.name), `${f.chemin} : ${soiree.location.name}`).toBe(true);
-          expect(soiree.about, f.chemin).toEqual({ '@id': sport['@id'] });
+          expect(soiree.about.name, f.chemin).toMatch(/^.+ – .+$/);
+          expect(soiree.about.startDate, f.chemin).toMatch(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}\+0[12]:00)?$/);
+          expect(soiree.about.homeTeam.name, f.chemin).toBeTruthy();
+          expect(soiree.about.awayTeam.name, f.chemin).toBeTruthy();
+          expect(soiree.about.location, f.chemin).toBeUndefined();
         }
       }
     });
@@ -368,4 +361,27 @@ test.describe('le plan du site au fil des passages', () => {
     await passer(heure('2026-10-29T08:00:00Z'));
     expect(accueil()).toBe('2026-10-30');
   });
+});
+
+// Le SportsEvent d’un match : seulement avec un stade connu (match.lieu), jamais sans. Aucune donnée n’en a un aujourd’hui :
+// ce test le prouve avec un match d’exemple.
+test('un match avec un stade (exemple) : un SportsEvent juste ; sans stade, ou avec un faux stade : rien', () => {
+  const match = {
+    slug: 'psg-ol-2026-10-25', competition: 'Ligue 1', statut: null, heureConfirmee: true, debut: Date.parse('2026-10-25T19:45:00Z'),
+    domicile: { nom: 'Paris Saint-Germain', court: 'PSG' }, exterieur: { nom: 'Olympique Lyonnais', court: 'OL' },
+  };
+  expect(evenementDuMatch(match)).toBeNull();
+  expect(evenementDuMatch({ ...match, lieu: { nom: 'Stade d’exemple' } })).toBeNull();
+  const sportif = evenementDuMatch({ ...match, lieu: { nom: 'Stade d’exemple', rue: '1 Rue du Stade', codePostal: '75016', ville: 'Paris' } });
+  expect(sportif).toMatchObject({
+    '@type': 'SportsEvent',
+    '@id': `${ORIGINE}/matchs/psg-ol-2026-10-25/#match`,
+    name: 'Paris Saint-Germain – Olympique Lyonnais',
+    startDate: '2026-10-25T20:45:00+01:00',
+    eventStatus: 'https://schema.org/EventScheduled',
+    location: { '@type': 'Place', name: 'Stade d’exemple', address: { postalCode: '75016', addressLocality: 'Paris', addressCountry: 'FR' } },
+  });
+  expect(sportif.image).toBeUndefined();
+  expect(validerUnBloc(vocabulaire, { '@context': 'https://schema.org', '@graph': [sportif] })).toEqual([]);
+  expect(evenementDuMatch({ ...match, statut: 'reporte', lieu: { nom: 'S', rue: 'R', codePostal: '1', ville: 'V' } }).eventStatus).toBe('https://schema.org/EventPostponed');
 });

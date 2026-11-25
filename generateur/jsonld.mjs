@@ -62,16 +62,34 @@ export const matchDuStade = (match) => ({
   awayTeam: { '@type': 'SportsTeam', name: match.exterieur.nom },
 });
 
-// Le match lui-même, sur sa page : un SportsEvent « Équipe A – Équipe B », son jour (et son heure, avec le décalage de
-// Paris, quand elle est confirmée), son statut, ses deux équipes. Les données ne donnent pas le stade : aucun « location »
-// (jamais un bar, jamais une adresse inventée), aucune image, aucune note. Sans lieu, Google n’en fait pas de résultat
-// enrichi ; la donnée reste vraie et lisible pour qui la lit (validateur.mjs ne l’exige que des Event qui ont un lieu).
-export const evenementDuMatch = (match) => ({
-  ...matchDuStade(match),
-  url: adresseDe(cheminDuMatch(match)),
-  description: `${match.competition} : ${match.domicile.nom} – ${match.exterieur.nom}.`,
-  eventStatus: statutDuMatchSchema(match),
-});
+// Le match lui-même, sur sa page, en SportsEvent « Équipe A – Équipe B » : seulement quand le stade est connu (match.lieu :
+// { nom, rue, codePostal, ville }). Sans lieu, Google n’en fait aucun résultat enrichi et Search Console le signale en
+// erreur : rien n’est écrit (null), et c’est le cas aujourd’hui, les données n’ont pas de stade. Jamais un bar comme lieu,
+// jamais une adresse inventée, aucune image, aucune note.
+// À venir, quand des bars sont publiés : une soirée dans un bar est déjà un Event par bar (evenementDeLaSoiree), le bar
+// publié en « location » et le match en « about ». Quand le stade sera dans les données, la soirée renverra au match par
+// son @id (matchDansLaPage) au lieu de le recopier.
+export const lieuDuMatch = (match) => {
+  const l = match.lieu;
+  if (!l || ![l.nom, l.rue, l.codePostal, l.ville].every((v) => typeof v === 'string' && v.trim())) return null;
+  return {
+    '@type': 'Place',
+    name: l.nom,
+    address: { '@type': 'PostalAddress', streetAddress: l.rue, postalCode: l.codePostal, addressLocality: l.ville, addressCountry: 'FR' },
+  };
+};
+
+export const evenementDuMatch = (match) => {
+  const location = lieuDuMatch(match);
+  if (!location) return null;
+  return {
+    ...matchDuStade(match),
+    url: adresseDe(cheminDuMatch(match)),
+    description: `${match.competition} : ${match.domicile.nom} – ${match.exterieur.nom}.`,
+    eventStatus: statutDuMatchSchema(match),
+    location,
+  };
+};
 
 // Une soirée : la diffusion d’un match dans un vrai bar. matchDansLaPage : la page porte déjà le match (evenementDuMatch),
 // la soirée n’y renvoie que par son @id.

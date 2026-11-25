@@ -628,26 +628,13 @@ test.describe('les pages', () => {
       url: 'https://baromatch.fr/bar/le-zinc-des-amis-paris-11/#soiree-psg-ol-2026-10-25',
       location: { '@type': 'BarOrPub', name: 'Le Zinc des Amis', address: { streetAddress: '12 Rue Oberkampf', postalCode: '75011', addressLocality: 'Paris', addressCountry: 'FR' } },
       organizer: { '@type': 'BarOrPub', name: 'Le Zinc des Amis' },
-      // Le match est déjà dans la page (son SportsEvent) : la soirée y renvoie par son @id, sans le recopier.
-      about: { '@id': 'https://baromatch.fr/matchs/psg-ol-2026-10-25/#match' },
+      // Les données n’ont pas le stade : le match n’est pas un SportsEvent de la page (Google en veut un lieu), la soirée le
+      // porte dans « about », avec ses deux équipes.
+      about: { '@type': 'SportsEvent', '@id': 'https://baromatch.fr/matchs/psg-ol-2026-10-25/#match', homeTeam: { '@type': 'SportsTeam', name: 'Paris Saint-Germain' }, awayTeam: { '@type': 'SportsTeam', name: 'Olympique Lyonnais' } },
     });
-    // Le match lui-même : un SportsEvent « Équipe A – Équipe B », son jour avec le décalage de Paris, son statut, ses
-    // équipes ; pas de lieu (les données n’ont pas le stade, et le bar n’est jamais le lieu du match), pas d’image,
-    // aucune note.
-    const [sport, ...autres] = deType(match, 'SportsEvent');
-    expect(autres).toEqual([]);
-    expect(sport).toEqual({
-      '@type': 'SportsEvent',
-      '@id': 'https://baromatch.fr/matchs/psg-ol-2026-10-25/#match',
-      name: 'Paris Saint-Germain – Olympique Lyonnais',
-      startDate: '2026-10-25T20:45:00+01:00',
-      sport: 'Football',
-      homeTeam: { '@type': 'SportsTeam', name: 'Paris Saint-Germain' },
-      awayTeam: { '@type': 'SportsTeam', name: 'Olympique Lyonnais' },
-      url: 'https://baromatch.fr/matchs/psg-ol-2026-10-25/',
-      description: insecables('Ligue 1 : Paris Saint-Germain – Olympique Lyonnais.'),
-      eventStatus: 'https://schema.org/EventScheduled',
-    });
+    // Aucun SportsEvent à la racine de la page d’un match tant que son stade est inconnu (et jamais le bar pour lieu).
+    expect(blocsDe(match.contenu).flatMap((b) => b['@graph']).filter((n) => n['@type'] === 'SportsEvent')).toEqual([]);
+    expect(deType(match, 'WebPage')[0].mainEntity).toBeUndefined();
     // Le bar est le lieu de la diffusion, jamais celui du match ; pas d’offre tant que l’appli n’est pas ouverte.
     expect(zinc.about.location).toBeUndefined();
     expect(zinc.offers).toBeUndefined();
@@ -1022,13 +1009,16 @@ test.describe('le validateur et le contrôle refusent ce qui est faux', () => {
     expect(erreurs(fil([{ position: 1, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 2, name: 'Paris' }]))).toBe('');
     expect(erreurs(fil([{ position: 1, name: 'Accueil' }, { position: 2, name: 'Paris' }]))).toMatch(/item manque/);
     expect(erreurs(fil([{ position: 2, name: 'Accueil', item: 'https://baromatch.fr/' }, { position: 3, name: 'Paris' }]))).toMatch(/position 2, 1 attendu/);
-    // Un match (SportsEvent) n’a pas toujours de lieu : les données n’ont pas le stade. Sans lieu, il passe ; avec un faux
-    // lieu (un bar) ou sans ses deux équipes, non ; un Event ordinaire sans lieu reste refusé.
+    // Un match (SportsEvent) suit les règles d’un Event : sans lieu, refusé (le générateur ne l’écrit pas alors) ; avec son
+    // stade, juste ; avec un bar pour lieu, ou sans ses deux équipes, refusé.
+    const stade = { '@type': 'Place', name: 'Stade d’exemple', address: { '@type': 'PostalAddress', streetAddress: '1 Rue du Stade', postalCode: '75016', addressLocality: 'Paris', addressCountry: 'FR' } };
     const match = {
       '@type': 'SportsEvent', name: 'PSG – OL', startDate: '2026-10-25T20:45:00+01:00', eventStatus: 'https://schema.org/EventScheduled',
-      homeTeam: { '@type': 'SportsTeam', name: 'PSG' }, awayTeam: { '@type': 'SportsTeam', name: 'OL' },
+      homeTeam: { '@type': 'SportsTeam', name: 'PSG' }, awayTeam: { '@type': 'SportsTeam', name: 'OL' }, location: stade,
     };
     expect(erreurs(match)).toBe('');
+    const { location: _stade, ...matchSansLieu } = match;
+    expect(erreurs(matchSansLieu)).toMatch(/Event sans location de type Place/);
     expect(erreurs({ ...match, location: evenement.location })).toMatch(/un match ne se joue pas dans un bar/);
     expect(erreurs({ ...match, awayTeam: undefined })).toMatch(/sans awayTeam nommée/);
     expect(erreurs({ ...match, startDate: 'dimanche' })).toMatch(/n’est pas une date ISO 8601/);

@@ -254,6 +254,8 @@ ${places}  ${appel(marque, textes)}
   ${tuTiensUnBar(textes)}
   ${appel(marque, textes)}
 </section>`;
+    // Le SportsEvent du match : seulement avec un stade connu (jsonld.mjs, evenementDuMatch) ; aujourd’hui, jamais.
+    const sportif = evenementDuMatch(match);
     const clubs = `${match.domicile.court} et ${match.exterieur.court}`;
     const sectionProchains = `<section class="regarder-section" aria-labelledby="titre-prochains">
   <h2 id="titre-prochains">${e(remplir(textes.match.prochains, { clubs }))}</h2>
@@ -267,7 +269,7 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
       barsNommes: soirees.map((s) => s.bar.id), evenement: evenement ? match : null, feuilles: [FEUILLE_DU_PLAN],
       partage: { sorte: 'match', match, soirees, maintenant },
-      jsonld: [pageWeb({ chemin, titre: titrePage, description: desc, mainEntity: { '@id': adresseDuMatch(match) } }), filDAriane(etapes), evenementDuMatch(match), ...soirees.map((s) => evenementDeLaSoiree(s, contenu, { matchDansLaPage: true }))],
+      jsonld: [pageWeb({ chemin, titre: titrePage, description: desc, ...(sportif ? { mainEntity: { '@id': adresseDuMatch(match) } } : {}) }), filDAriane(etapes), ...(sportif ? [sportif] : []), ...soirees.map((s) => evenementDeLaSoiree(s, contenu, { matchDansLaPage: Boolean(sportif) }))],
       corps: `${fil(etapes)}
 ${enTete}
 ${match.statut ? '' : `${planDeParis({ matchs: [match], donnees, marque, chemin, maintenant, fixe: true, script: false, aUnePage: () => false })}\n`}${sectionBars}

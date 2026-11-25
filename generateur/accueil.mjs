@@ -22,6 +22,7 @@ import { jourDeParis, jourEnLettres } from './heure.mjs';
 import { identifiantsUniques, paireDInsignes } from './insigne.mjs';
 import { cheminDuMatch } from './jsonld.mjs';
 import { SEMAINE_JOURS } from './pages.mjs';
+import { planDeParis } from './plan.mjs';
 import { accorder, capitale, echapper as e, insecables } from './texte.mjs';
 
 export const ACCUEIL = 'index.html';
@@ -68,7 +69,7 @@ ${bas ? `<p class="carte-match__bas">${bas}</p>\n` : ''}</li>`;
 };
 
 // Le bloc entier, pour l’instant « maintenant » : le titre, la phrase vraie, la barre des jours et leurs cartes.
-export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
+export const blocDeLaSemaine = ({ donnees, textes, marque = { appli: {} }, maintenant }) => {
   const t = textes.accueil;
   const aujourdhui = jourDeParis(maintenant);
   // Les sept jours de Paris, comptés sur les dates (comme la semaine, pages.mjs : un jour de changement d’heure dure 23
@@ -117,8 +118,14 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
 ${j.matchs.length ? `<ul class="semaine__cartes">\n${j.matchs.map((m) => carte(m, { textes, maintenant, sansAucunBar })).join('\n')}\n</ul>${tous(j)}` : `<p class="semaine__rien">${e(t.rienCeJour)}</p>`}
 </div>`).join('\n');
   const rien = semaine.every((j) => !j.matchs.length);
+  // Le plan « Paris, ce soir » : les matchs du premier jour qui en a (ce soir, sinon le prochain jour), au plus dix.
+  const duPlan = semaine.find((j) => j.matchs.length)?.matchs.filter((m) => !m.statut) ?? [];
+  const jourDuPlan = semaine.find((j) => j.matchs.length);
+  const plan = duPlan.length
+    ? `<section class="paris" id="paris" aria-labelledby="soir-etape1">\n${planDeParis({ matchs: [...duPlan].sort((a, b) => a.debut - b.debut), donnees, marque, chemin: '/', maintenant, jour: jourDuPlan.i === 0 ? 'ce soir' : `le ${jourEnLettres(Date.parse(`${jourDuPlan.jour}T12:00:00Z`))}`, aUnePage: () => true })}\n</section>\n`
+    : '';
   // Les identifiants des insignes, uniques dans le bloc (le reste de l’accueil n’en dessine pas).
-  return identifiantsUniques(insecables(`<div class="semaine__tete">
+  return identifiantsUniques(insecables(`${plan}<section class="semaine" id="semaine" aria-labelledby="titre-semaine"><div class="semaine__tete">
 <h2 class="titre-section" id="titre-semaine">${e(t.titre)}</h2>
 <a class="semaine__toute" href="/matchs/">${e(t.toute)}</a>
 </div>
@@ -129,7 +136,7 @@ ${rien ? `<p class="semaine__rien">${e(t.rienCetteSemaine)}</p>` : `<div class="
 ${dates}
 </fieldset>
 ${panneaux}
-</div>`}`));
+</div>`}</section>`));
 };
 
 // Ce que le bloc ne fait jamais : un style en ligne ou un script (la politique de sécurité de l’accueil les refuse),
@@ -144,7 +151,8 @@ export const controlerLaSemaine = (bloc) => {
   const interdit = texte.match(MOTS_INTERDITS);
   if (interdit) erreurs.push(`un mot que le site ne publie pas : « ${interdit[0]} »`);
   if (/soir\s+de\s+match/i.test(texte)) erreurs.push('l’ancien nom');
-  if ((bloc.match(/<h2[\s>]/g) ?? []).length !== 1) erreurs.push('un seul titre h2 attendu');
+  // Le plan « Paris, ce soir » a ses étapes (des h2) : le titre attendu est celui de la semaine, seul, hors du plan.
+  if (((bloc.replace(/<section class="paris"[\s\S]*?<\/section>\n?/, '')).match(/<h2[\s>]/g) ?? []).length !== 1) erreurs.push('un seul titre h2 attendu');
   return erreurs;
 };
 

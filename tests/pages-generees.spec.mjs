@@ -126,6 +126,9 @@ for (const page of PAGES) {
         // Le bloc « Partager » est le seul que JavaScript change (tests/partage.spec.mjs le suit avec et sans).
         expect(await onglet.locator('.partage').count()).toBe(page.partage ? 1 : 0);
         await onglet.locator('.partage').evaluateAll((blocs) => blocs.forEach((bloc) => bloc.remove()));
+        // Le plan de « Ce soir » et de la page d’un match se lit sans script : ni état d’horloge (« dans 1 h 42 »), ni heure
+        // qui avance, ni geste ; la page ne charge pas plan.js (budget de vitesse), seul l’accueil le charge.
+        expect(await onglet.locator('.prog__etat, .plan__heure').count(), 'rien de ce que plan.js écrit').toBe(0);
         const texte = await onglet.locator('main').innerText();
         const titre = await onglet.locator('h1').innerText();
         await contexte.close();

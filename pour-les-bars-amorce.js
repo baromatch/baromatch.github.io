@@ -37,6 +37,25 @@
     return;
   }
 
+  // « Proposer mon bar », collé en bas du téléphone sous le premier écran (le bouton du haut est alors passé), et tant
+  // que le formulaire n’est pas à l’écran (le bouton du haut, ou le formulaire, est alors sous les yeux). Il ne vient
+  // jamais avec une autre barre fixe : le bandeau du bas lui laisse la place (body.avec-barre, comme sur la boutique) et
+  // revient quand il s’efface. Sans script, il reste caché.
+  var collant = document.getElementById("collant");
+  var haut = document.querySelector(".ouverture-bars .actions");
+  var carte = document.getElementById("proposer");
+  if (collant && haut && carte) {
+    var majCollant = function () {
+      var cache = window.pageYOffset < window.innerHeight || haut.getBoundingClientRect().bottom > 0 || carte.getBoundingClientRect().top < window.innerHeight * 0.9;
+      if (collant.hidden !== cache) collant.hidden = cache;
+      // Seulement quand il est vraiment peint (au large, la feuille le cache et le bandeau n’est plus en bas).
+      document.body.classList.toggle("avec-barre", !cache && window.getComputedStyle(collant).display !== "none");
+    };
+    window.addEventListener("scroll", majCollant, { passive: true });
+    window.addEventListener("resize", majCollant);
+    majCollant();
+  }
+
   var FEUILLE = "/pour-les-bars.css";
   var SCRIPT = "/pour-les-bars.js";
   // Le formulaire s’affiche en 3 s environ sur une 4G lente (2,95 s mesurés) : au-delà de 12 s après que l’amorce lui a

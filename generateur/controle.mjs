@@ -11,6 +11,7 @@ import { politiqueDesPages, SCRIPT_DES_PLACES } from './gabarits.mjs';
 import { adresseDe } from './jsonld.mjs';
 import { baliseDeLaMesure, mesureDuSite } from './mesure.mjs';
 import { SCRIPT_DU_PARTAGE } from './partage.mjs';
+import { controlerLePlan } from './plan.mjs';
 
 const ENTITES = { amp: '&', lt: '<', gt: '>', quot: '"', nbsp: ' ', '#39': '\'' };
 const decoder = (texte) => texte.replace(/&(amp|lt|gt|quot|nbsp|#39);/g, (_, nom) => ENTITES[nom]);

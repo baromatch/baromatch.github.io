@@ -236,7 +236,7 @@ test.describe('l’accueil', () => {
   test('la carte Le Havre – PSG porte exactement la paire de l’appli à 30 px, sur le fond clair des cartes', async () => {
     const site = await construireEnMemoire({ source: `scenario:${SEMAINE}`, maintenant: JEUDI, racine });
     const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant: JEUDI });
-    const carte = bloc.split('<li class="carte-match').find((c) => c.includes('href="/matchs/le-havre-psg-2026-10-30/"'));
+    const carte = bloc.split('<li class="carte-match').slice(1).find((c) => c.includes('href="/matchs/le-havre-psg-2026-10-30/"'));
     expect(carte).toBeDefined();
     const clubs = carte.split('<a class="carte-match__clubs"')[1].split('</a>')[0];
     const dessin = clubs.slice(clubs.indexOf('<svg'), clubs.lastIndexOf('</svg>') + '</svg>'.length);

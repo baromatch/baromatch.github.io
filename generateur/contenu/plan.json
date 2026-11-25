@@ -1,0 +1,65 @@
+{
+  "_lisezMoi": "Les mots du plan « Paris, ce soir » (plan.mjs), sur l’accueil, « Ce soir » et la page d’un match. Tant qu’aucun bar n’est publié, le plan montre une démo à l’échelle des arrondissements (marquée « Démo »), jamais un bar posé à une adresse : PLAN_DEMO dans plan.mjs, « arrondissements » ou « aucune » (le plan reste vide, avec la phrase vraie). Un match commencé dit « Le match a commencé. » (l’appli connaît l’heure, pas l’état du match).",
+  "etape1": "Ton match",
+  "etape1Suite": "{moment}",
+  "etape2": "Ton bar",
+  "etape2Suite": "sur le plan",
+  "etape3": "Ta place",
+  "etape4": "L’appli",
+  "coup": "Coup d’envoi à {heure}",
+  "heureAConfirmer": "heure à confirmer",
+  "pres": "Près de",
+  "toutParis": "Tout Paris",
+  "exemple": "Démo",
+  "pageDuMatch": "La page du match",
+  "plan": {
+    "legendeDemo": "Plan de Paris, par arrondissement. La démo allume des arrondissements, jamais une adresse. La liste dit la même chose en mots.",
+    "legendeBars": "Plan de Paris, par arrondissement, avec les bars qui passent ce match. La liste dit la même chose en mots.",
+    "legendeVide": "Plan de Paris, par arrondissement. Aucun bar ne l’annonce encore pour ce match.",
+    "credit": "Plan schématique des vingt arrondissements, dessiné pour Baromatch à partir de repères publics (centres arrondis) : aucune carte ni donnée d’un autre site."
+  },
+  "verite": {
+    "sansBar": "Aucun bar ne l’annonce encore sur Baromatch.",
+    "haut": "Aucun bar publié pour l’instant : on cherche les premiers, à Paris. Le plan est une démo.",
+    "demoScene": "La démo allume {arrondissements}. Rien n’est posé à une adresse. Les bars publiés s’afficheront ici.",
+    "ailleurs": "Les bars d’autres villes sont sur la page du match."
+  },
+  "compte": {
+    "bars": "{bars} à Paris pour {match}"
+  },
+  "atouts": {
+    "ecran": "Grand écran",
+    "ecrans": "5 écrans",
+    "son": "Son du match",
+    "camps": "Les deux camps",
+    "terrasse": "Terrasse",
+    "debout": "Debout"
+  },
+  "fiche": {
+    "diffuse": "Diffuse ce soir",
+    "tenir": "Maintiens pour garder ta place",
+    "tenirSansScript": "Garder ta place dans l’appli",
+    "tenirNom": "Maintiens pour garder ta place, en démo",
+    "ok": "Place gardée.",
+    "demo": "Démo : rien n’est réservé. Pour de vrai, c’est dans l’appli.",
+    "suite": "Place gardée, en démo. Pour de vrai, l’appli arrive bientôt : <a href=\"#attente\">préviens-moi</a>.",
+    "suiteAilleurs": "Place gardée, en démo. Pour de vrai, l’appli arrive bientôt : <a href=\"/#attente\">préviens-moi</a>.",
+    "partage": "Envoie-le à ta bande",
+    "partageTexte": "On regarde le match ici ?",
+    "voirLeBar": "La page du bar"
+  },
+  "liste": {
+    "titre": "Les bars qui passent le match, par arrondissement",
+    "aucun": "Aucun bar ne l’annonce encore sur Baromatch.",
+    "vide": "Aucun bar publié à Paris pour ce match."
+  },
+  "etat": {
+    "avenir": "dans {duree}",
+    "commence": "Le match a commencé."
+  },
+  "essai": {
+    "titre": "Maintiens à l’essai",
+    "texte": "Le geste de l’appli : tu maintiens, le verre monte, ta place est gardée."
+  },
+  "programme": "Le programme du soir, à faire défiler"
+}

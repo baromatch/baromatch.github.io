@@ -365,3 +365,21 @@
 .jour .panier__envoyer[aria-disabled="true"]:hover { background: var(--fond-releve); }
 .jour .courriel--second .capsule:hover,
 .jour .courriel:not([hidden]):not(.courriel--second) ~ .panier__envoyer:not([aria-disabled="true"]):hover { background: color-mix(in srgb, var(--fond-releve) 82%, var(--texte)); color: var(--texte); }
+
+/* ---------- Direction B : une page calme, à lire en une minute ---------- */
+/* Les conditions : un bloc plat et clair, sans lueur ni verre (les conditions en mots, une par ligne). */
+.jour .conditions__liste li { background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); color: #2A2D38; }
+.jour .conditions__liste li strong { color: var(--texte); }
+.jour .pour-bars .ouverture-bars__texte, .jour .pour-bars .chapo, .jour .pour-bars .atout__texte, .jour .pour-bars .moment__liste, .jour .pour-bars .marche p, .jour .pour-bars .regard li { color: #2A2D38; }
+/* « Proposer mon bar » colle en bas sur téléphone, une fois le haut de la page passé (pour-les-bars-amorce.js). */
+.collant { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 0 var(--gouttiere) calc(12px + var(--zone-basse, 0px)); background: transparent; pointer-events: none; }
+.collant[hidden] { display: none; }
+.collant .capsule { width: 100%; min-height: 52px; pointer-events: auto; box-shadow: 0 6px 18px rgba(10, 11, 16, 0.28); }
+@media (min-width: 720px) { .collant { display: none; } }
+/* Téléphone : les écrans de la Console et de l'appli défilent de côté au lieu de s'empiler. */
+@media (max-width: 959px) {
+  .atouts__grille { gap: 36px; margin-top: 24px; }
+  .moment { gap: 16px; }
+  .moment__visuel { max-width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .collant { transition: none; } }

@@ -16,6 +16,7 @@ import { lignesDuBadge } from './badge.mjs';
 import { listeDAttente } from './attente.mjs';
 import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDeLEnTete, insignesDuMatch, ligneDeListe, ligneDeMatch, offre, page, quand, statutDuMatch, tuTiensUnBar, atouts } from './gabarits.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
+import { FEUILLE_DU_PLAN, planDeParis } from './plan.mjs';
 import { clubAvecBars, competitionAvecBars, lienDeLaCompetition, lienDuClub, sectionDesPagesSuivies } from './suivre.mjs';
 
 export const FENETRE_MS = 14 * JOUR_MS;
@@ -257,12 +258,12 @@ ${prochains.slice(0, 6).map((m) => `    ${ligneDeMatch(m, { avecPage: aUnePage(m
     ajouter({
       // Reporté ou annulé : la page reste lisible (pas de noindex forcé si des bars l’annonçaient), hors du plan du site.
       type: 'match', cle: match.slug, date: memoire.debut, memoire, chemin, indexable, horsPlan: Boolean(match.statut), titre: titrePage, description: desc,
-      barsNommes: soirees.map((s) => s.bar.id), evenement: evenement ? match : null,
+      barsNommes: soirees.map((s) => s.bar.id), evenement: evenement ? match : null, feuilles: [FEUILLE_DU_PLAN],
       partage: { sorte: 'match', match, soirees, maintenant },
       jsonld: [pageWeb({ chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...soirees.map((s) => evenementDeLaSoiree(s, contenu))],
       corps: `${fil(etapes)}
 ${enTete}
-${sectionBars}
+${match.statut ? '' : `${planDeParis({ matchs: [match], donnees, marque, chemin, maintenant, fixe: true, script: false, aUnePage: () => false })}\n`}${sectionBars}
 ${sectionProchains}
 ${commentCaMarche(textes, marque)}`,
     });

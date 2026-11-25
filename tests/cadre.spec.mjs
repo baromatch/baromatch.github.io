@@ -21,6 +21,7 @@ import {
 } from '../generateur/cadre.mjs';
 import { insigne } from '../generateur/insigne.mjs';
 import { pagesEcritesALaMain } from '../generateur/mesure.mjs';
+import { aLePlan } from '../generateur/plan.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { echapper } from '../generateur/texte.mjs';
@@ -39,9 +40,9 @@ const ENTETE = /<header class="entete page"[^>]*>[\s\S]*?<\/header>/;
 const PIED = /<footer class="pied page"[^>]*>[\s\S]*?<\/footer>/;
 const MENU = ['/ce-soir/', '/matchs/', '/pour-les-bars.html', '/a-propos.html'];
 const AMBRE = 'rgb(255, 177, 61)';
-// Les pages écrites à la main qui portent « Préviens-moi » (décidé le 29 octobre) ; les autres n’en ont pas : l’accueil,
-// « Pour les bars », les pages légales, la page introuvable.
-const AVEC_L_ACTION = ['/a-propos.html', '/presse.html', '/comment-on-choisit-les-bars.html', '/trouver-un-bar-qui-diffuse-le-match.html', '/testeurs-android.html', '/boutique.html'];
+// Les pages écrites à la main qui portent « Préviens-moi » (décidé le 29 octobre, et l’accueil depuis le plan « Paris, ce
+// soir » : son formulaire est plus bas) ; les autres n’en ont pas : « Pour les bars », les pages légales, la page introuvable.
+const AVEC_L_ACTION = ['/', '/a-propos.html', '/presse.html', '/comment-on-choisit-les-bars.html', '/trouver-un-bar-qui-diffuse-le-match.html', '/testeurs-android.html', '/boutique.html'];
 
 // Le scénario inventé, en mémoire, avec l’encodeur des QR codes (les affiches à imprimer et la feuille du patron).
 const { qr } = chargerLeQr();
@@ -100,7 +101,8 @@ test.describe('une seule source pour l’en-tête et le pied', () => {
     for (const p of generees) {
       const langue = p.langue ?? 'fr';
       const corps = p.contenu.slice(p.contenu.indexOf('<main'), p.contenu.indexOf('</main>'));
-      const action = pageDuGenerateurAvecLAction(p.chemin) ? actionDeLaPage(corps) : null;
+      // Une page qui porte le plan (aLePlan) a « Préviens-moi » en ambre dès l’en-tête.
+      const action = pageDuGenerateurAvecLAction(p.chemin) ? (aLePlan(p.contenu) ? 'ambre' : actionDeLaPage(corps)) : null;
       expect(p.contenu.match(ENTETE)[0], p.chemin).toBe(entete(cadre, { chemin: p.chemin, action, cible: cibleDeLAction(corps), langue }));
       expect(p.contenu.match(PIED)[0], p.chemin).toBe(pied(cadre, { marque: MARQUE, chemin: p.chemin, langue }));
     }
@@ -265,6 +267,8 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
 
   // Tel qu’il est peint : une page qui montre un bouton ambre (hors de l’en-tête et du pied) a « Préviens-moi » en
   // contour, sinon en ambre ; le contour se voit à 3:1, son texte à 4,5:1.
+  // Les pages qui portent le plan : « Préviens-moi » y est ambre dès l’en-tête, le premier écran ; l’appel du bas reste le second.
+  const AVEC_LE_PLAN = ['/ce-soir/', '/matchs/psg-ol-2026-10-25/'];
   const CHEMINS_GENERES = ['/matchs/', '/ce-soir/', '/matchs/psg-ol-2026-10-25/', '/regarder-le-match/paris/', '/matchs/club/psg/', '/agenda/'];
   for (const largeur of [390, 1280]) {
     for (const chemin of [...AVEC_L_ACTION, ...CHEMINS_GENERES]) {
@@ -288,7 +292,7 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
           return { ambres: ambres.map((e) => e.className || e.tagName), classe: a.className, fond: s.backgroundColor, couleur: s.color, bord: s.borderTopColor, largeurDuBord: s.borderTopWidth, fonds };
         }, AMBRE);
         const page_ = lu.fonds.map(lireCouleur).filter((c) => c.a > 0).reverse().reduce((dessous, couche) => poser(couche, dessous));
-        if (lu.ambres.length) {
+        if (lu.ambres.length && !AVEC_LE_PLAN.includes(chemin)) {
           expect(lu.classe, `la page a déjà ${lu.ambres.join(', ')}`).toBe('entete__attente entete__attente--contour');
           expect(lu.fond).toBe('rgba(0, 0, 0, 0)');
           expect(lu.largeurDuBord).toBe('1px');
@@ -639,11 +643,17 @@ test.describe('les bords de l’en-tête, tels qu’ils sont peints', () => {
       let lus = 0;
       for (let y = debut; y < total - ecran / 2; y += Math.round(ecran / 2)) {
         await page.evaluate((haut) => window.scrollTo({ top: haut, behavior: 'instant' }), y);
-        const fixe = await page.evaluate(async () => {
+        const { fixe, avecCollant } = await page.evaluate(async () => {
           await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
-          return getComputedStyle(document.querySelector('.menu__liste')).position === 'fixed';
+          // « Proposer mon bar » collé en bas (« Pour les bars ») : jamais avec une autre barre fixe, le bandeau lui laisse la place.
+          const collant = document.getElementById('collant');
+          return {
+            fixe: getComputedStyle(document.querySelector('.menu__liste')).position === 'fixed',
+            avecCollant: Boolean(collant) && !collant.hidden && getComputedStyle(collant).display !== 'none',
+          };
         });
-        expect(fixe, `la page à ${y} px : le bandeau du bas`).toBe(true);
+        expect(fixe, `la page à ${y} px : le bandeau du bas${avecCollant ? ' (laisse la place à « Proposer mon bar »)' : ''}`).toBe(!avecCollant);
+        if (avecCollant) continue;
         lus += 1;
         faibles.push(...bordsTropFaibles(await mesurerLesBords(page, '.menu__liste'), 3, `le bandeau, la page à ${y} px : `));
       }

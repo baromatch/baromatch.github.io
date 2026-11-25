@@ -32,7 +32,8 @@ test('le premier écran dit « iPhone et Android », « gratuite pour les fans �
   expect(await statut.evaluate((e) => e.nextElementSibling?.tagName)).toBe('H1');
   const texte = normaliser(await ouverture.locator('.ouverture__texte').innerText());
   expect(texte).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Bientôt sur les stores : rien à réserver ce soir.');
-  expect(normaliser(await ouverture.innerText())).toContain(PLATEFORMES);
+  // La phrase des plateformes suit le formulaire, dans l’étape 4 (« L’appli ») : le formulaire n’est plus dans l’ouverture.
+  expect(normaliser(await page.locator('.attente__plateformes').innerText())).toBe(PLATEFORMES);
   // Aucune date de lancement (rien n’est annoncé), ni lien vers un store, texte du film compris (son image de fin dit
   // « Bientôt sur Android, à Paris »).
   await page.locator('#film-texte summary').click();
@@ -70,7 +71,8 @@ for (const largeur of [320, 360, 1280]) {
   });
 }
 
-// Sur téléphone, de 640 px de haut (barre du navigateur ôtée) à plus : le statut, le champ et le bouton. Sur ordinateur,
+// Sur téléphone, de 640 px de haut (barre du navigateur ôtée) à plus : le statut et « Préviens-moi », en ambre ; le
+// formulaire de la liste d’attente est plus bas (étape 4), la bande des matchs et le plan occupent le premier écran. Sur ordinateur,
 // des écrans courts (1 280 × 720, 1 366 × 768, barre du navigateur ôtée) aux grands (900 px de haut), le titre reste
 // très grand : le statut, le titre et la phrase « gratuite pour les fans… bientôt sur les stores » sont dans le premier
 // écran, le formulaire juste dessous.
@@ -78,16 +80,17 @@ for (const ecran of [
   { largeur: 360, hauteur: 640, formulaire: true },
   { largeur: 360, hauteur: 740, formulaire: true },
   { largeur: 390, hauteur: 800, formulaire: true },
+  { largeur: 390, hauteur: 844, formulaire: true },
   { largeur: 1280, hauteur: 720, formulaire: false },
   { largeur: 1366, hauteur: 768, formulaire: false },
   { largeur: 1280, hauteur: 800, formulaire: false },
   { largeur: 1440, hauteur: 900, formulaire: false },
 ]) {
-  test(`à ${ecran.largeur} × ${ecran.hauteur} : le statut${ecran.formulaire ? ', le champ et le bouton de la liste d’attente sont' : ', le titre et la phrase « gratuite… bientôt sur les stores » sont'} dans le premier écran`, async ({ page }) => {
+  test(`à ${ecran.largeur} × ${ecran.hauteur} : le statut${ecran.formulaire ? ' et « Préviens-moi » (ambre, vers la liste d’attente) sont' : ', le titre et la phrase « gratuite… bientôt sur les stores » sont'} dans le premier écran`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: ecran.largeur, height: ecran.hauteur });
     await page.goto('/');
-    const selecteurs = ecran.formulaire ? ['.ouverture__statut', '#attente-mail', '#attente button[type="submit"]'] : ['.ouverture__statut', '#titre', '.ouverture__texte'];
+    const selecteurs = ecran.formulaire ? ['.ouverture__statut', '.ouverture__cta .capsule'] : ['.ouverture__statut', '#titre', '.ouverture__texte'];
     for (const selecteur of selecteurs) {
       const boite = await page.locator(selecteur).boundingBox();
       expect(boite.y, `${selecteur} : haut`).toBeGreaterThanOrEqual(0);
@@ -118,8 +121,9 @@ test('« préviens-moi » revient après la soirée et après les questions ; l�
   expect(await page.$$eval('main .rappel-attente', (p) => p.map((e) => e.closest('section').className.split(' ')[0])))
     .toEqual(['soiree', 'questions-fans']);
   const testeurs = page.locator('main a[href="/testeurs-android.html"]');
-  await expect(testeurs).toHaveCount(1);
-  expect(await testeurs.evaluate((a) => getComputedStyle(a).backgroundColor)).not.toBe('rgb(255, 177, 61)');
+  // Deux liens, tous deux discrets : à côté de « Préviens-moi » dans l’ouverture, et dans sa section.
+  await expect(testeurs).toHaveCount(2);
+  expect(await testeurs.evaluateAll((liens) => liens.map((a) => getComputedStyle(a).backgroundColor))).not.toContain('rgb(255, 177, 61)');
   await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
   expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
   await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(0);
@@ -220,7 +224,7 @@ test('le lien /#attente arrive sur le formulaire avec son étiquette et la phras
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto('/#attente');
   await page.waitForFunction(() => window.scrollY > 0);
-  for (const selecteur of ['.ouverture__texte', '.attente__etiquette', '#attente-mail']) {
+  for (const selecteur of ['.attente__etiquette', '#attente-mail']) {
     const boite = await page.locator(selecteur).boundingBox();
     expect(boite.y, `${selecteur} : haut`).toBeGreaterThanOrEqual(0);
     expect(boite.y + boite.height, `${selecteur} : bas`).toBeLessThanOrEqual(640);
@@ -255,12 +259,11 @@ const lireLeFilm = (page) => page.locator('#film').evaluate((v) => ({ enPause: v
 // Deux images peintes : l’observateur de défilement a parlé.
 const deuxImages = (page) => page.evaluate(() => new Promise((suite) => requestAnimationFrame(() => requestAnimationFrame(suite))));
 
-// L’ordre du clavier est celui du HTML, choisi pour le téléphone : l’inscription, les matchs de la semaine, puis le
-// film. Sur ordinateur, le film est affiché à droite, au-dessus des matchs (styles.css, .ouverture > .semaine) : il vient
-// quand même au clavier après eux. Le test garde cet ordre voulu aux deux largeurs, chacune sous son nom.
+// L’ordre du clavier est celui du HTML : « Préviens-moi », le plan, les matchs de la semaine, la soirée, puis l’étape 4
+// (« L’appli ») : la liste d’attente, son partage, puis le film, dessous. Le test garde cet ordre aux deux largeurs.
 for (const [largeur, nom] of [
-  [360, 'au téléphone (360 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, affichés au-dessus de lui'],
-  [1280, 'sur ordinateur (1280 px) : le bouton du film l’arrête au clavier juste après les matchs de la semaine, bien que le film soit affiché au-dessus d’eux (l’ordre suit le téléphone)'],
+  [360, 'au téléphone (360 px) : le bouton du film l’arrête au clavier juste après le partage de la liste d’attente, affiché au-dessus de lui'],
+  [1280, 'sur ordinateur (1280 px) : le bouton du film l’arrête au clavier juste après le partage de la liste d’attente, affiché au-dessus de lui'],
 ]) {
   test(`${nom} ; la pause tient en revenant au film`, async ({ page }) => {
     await simulerUnLecteur(page);
@@ -275,13 +278,14 @@ for (const [largeur, nom] of [
     await expect(lecture).toHaveAccessibleName('Mettre le film en pause');
     await expect(lecture).not.toHaveAttribute('aria-pressed', /.*/);
     // Au clavier : juste après le dernier lien des matchs du jour choisi, dans le cadre du film.
-    await page.locator('#semaine').locator('a:visible, input:checked').last().focus();
+    await page.locator('.appli .partage-site').locator('a:visible, button:visible').last().focus();
     await page.keyboard.press('Tab');
     await expect(lecture).toBeFocused();
     // Ce que chaque largeur affiche : au téléphone, le film sous les matchs ; sur ordinateur, au-dessus d’eux.
-    const [film, matchs] = await Promise.all([page.locator('#film-cadre').boundingBox(), page.locator('#semaine').boundingBox()]);
-    if (largeur < 960) expect(film.y).toBeGreaterThan(matchs.y + matchs.height);
-    else expect(film.y + film.height).toBeLessThan(matchs.y);
+    const [film, formulaire] = await Promise.all([page.locator('#film-cadre').boundingBox(), page.locator('#attente').boundingBox()]);
+    // Au téléphone, sous la liste d’attente ; sur ordinateur (dès 960 px), à sa droite, dans la même étape.
+    if (largeur < 960) expect(film.y).toBeGreaterThan(formulaire.y + formulaire.height);
+    else expect(film.x).toBeGreaterThanOrEqual(formulaire.x + formulaire.width);
     const [boite, cadre] = await Promise.all([lecture.boundingBox(), page.locator('#film-cadre').boundingBox()]);
     expect(boite.width).toBeGreaterThanOrEqual(44);
     expect(boite.height).toBeGreaterThanOrEqual(44);
@@ -448,20 +452,17 @@ test('la note du film, citée par chaque lecteur, avec ou sans JavaScript', asyn
   }
 });
 
-// Le film est en portrait, jamais étiré : son cadre garde le 9:16 du fichier, au téléphone sous la liste d’attente, sur
-// ordinateur à droite du titre.
+// Le film est en portrait, jamais étiré : son cadre garde le 9:16 du fichier, sous la liste d’attente (étape 4).
 for (const [largeur, hauteur] of [[360, 800], [1280, 720], [1440, 900], [2560, 1440]]) {
-  test(`à ${largeur}×${hauteur}, le film garde son 9:16, ${largeur < 960 ? 'sous la liste d’attente' : 'à droite du titre'}`, async ({ page }) => {
+  test(`à ${largeur}×${hauteur}, le film garde son 9:16, sous la liste d’attente (à sa droite dès 960 px)`, async ({ page }) => {
     await page.setViewportSize({ width: largeur, height: hauteur });
     await page.goto('/');
-    const [video, titre, bouton] = await Promise.all([page.locator('#film').boundingBox(), page.locator('#titre').boundingBox(), page.locator('#attente button[type="submit"]').boundingBox()]);
+    const [video, bouton] = await Promise.all([page.locator('#film').boundingBox(), page.locator('#attente button[type="submit"]').boundingBox()]);
     // Le cadre est un peu tourné sur ordinateur : la boîte vue garde le rapport à 5 % près.
     expect(Math.abs(video.height / video.width - 16 / 9) / (16 / 9)).toBeLessThan(0.05);
+    // Dans l’étape 4 (« L’appli ») : sous la liste d’attente au téléphone, à sa droite dès 960 px.
     if (largeur < 960) expect(video.y).toBeGreaterThan(bouton.y + bouton.height);
-    else {
-      expect(video.x).toBeGreaterThan(titre.x + titre.width);
-      expect(video.y + video.height).toBeLessThanOrEqual(hauteur + 120);
-    }
+    else expect(video.x).toBeGreaterThanOrEqual(bouton.x + bouton.width);
   });
 }
 

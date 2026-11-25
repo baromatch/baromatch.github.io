@@ -21,6 +21,7 @@ import { adresseDe, ancreDeLaSoiree, cheminDuBar, cheminDuMatch, filDAriane, pag
 import { appel, carteDuBar, commentCaMarche, enAttenteDesBars, fil, insignesDuMatch, ligneDeListe, ligneDeMatch, page, quand, SCRIPT_DES_PLACES, tuTiensUnBar } from './gabarits.mjs';
 import { barsParVille, description, titre } from './pages.mjs';
 import { carteDessinable, imageDeLaCarte, lignesDeLaCarte } from './partage.mjs';
+import { FEUILLE_DU_PLAN, planDeParis } from './plan.mjs';
 
 // La vie d’une page « Ce soir » : l’écart le plus long entre deux passages qui refont les pages (celui des 3 heures,
 // pages-des-matchs.yml).
@@ -246,9 +247,12 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
   // Les bars que la page nomme (leurs cartes, et ceux des prochains soirs au bar), gardés dans l’état comme pour toute
   // page qui nomme des bars : refusée au passage où l’un d’eux est retiré, sa version précédente ne reste pas (refus.mjs).
   const barsNommes = [...new Set([...soirees, ...soirsAuBar.flatMap(nommeesDu)].map((s) => s.bar.id))].sort();
+  const programme = ceSoir.filter((m) => !m.statut);
+  const planDuSoir = programme.length ? `${planDeParis({ matchs: programme, donnees, marque, chemin, maintenant, jour: moment.moment, guide: true, script: false, aUnePage })}\n` : '';
   const p = {
     type: 'ce-soir', cle: 'ce-soir', date: null, chemin, indexable, titre: titrePage, description: desc, partage, barsNommes,
-    scripts: soirees.some((s) => placesDe(s)?.jusqua) ? [SCRIPT_DES_PLACES] : [],
+    scripts: [...(soirees.some((s) => placesDe(s)?.jusqua) ? [SCRIPT_DES_PLACES] : [])],
+    feuilles: planDuSoir ? [FEUILLE_DU_PLAN] : [],
     jsonld: [pageWeb({ type: 'CollectionPage', chemin, titre: titrePage, description: desc }), filDAriane(etapes), ...listes.filter((l) => l.numberOfItems > 0)],
     corps: `${fil(etapes)}
 <header class="regarder-tete">
@@ -256,7 +260,7 @@ ${villes.map((v) => `    ${ligneDeListe(e(remplir(textes.ville.titre, { ville: v
   <p class="regarder-quand">${e(capitale(jour))}</p>
   <p class="regarder-chapeau">${e(sansAucunBar ? textes.premiersBars.ceSoirChapeau : avecBars.length ? t.chapeau : aVenirAvecBars.length ? t.chapeauProchainsSoirs : t.chapeauSansBar)}</p>
 </header>
-${sectionDuSoir}
+${planDuSoir}${sectionDuSoir}
 ${sansAucunBar ? `${enAttenteDesBars(marque, textes)}\n` : ''}${sectionSoirsAuBar}${sectionProchains}
 ${sectionVilles}
 ${appel(marque, textes, { sansBar: sansAucunBar })}

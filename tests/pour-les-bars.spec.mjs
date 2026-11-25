@@ -349,8 +349,8 @@ test.describe('ce qu’un patron pressé lit sans chercher', () => {
     await expect(ouverture.locator('.ouverture-bars__prix')).toHaveText(CONDITIONS_COURTES);
     // Tant que l’appli n’est pas ouverte (marque.json), la page dit que les fans ne réservent pas encore. Le jour où
     // l’appli ouvre, ce test échoue tant que la ligne n’a pas changé : la page ne dit jamais « pas encore » d’une appli ouverte.
-    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Où on en est » de pour-les-bars.html').toBe(false);
-    await expect(ouverture.locator('.ouverture-bars__etat')).toHaveText('Où on en est : les fans ne réservent pas encore. On prépare l’ouverture, à Paris.');
+    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : réécrire la ligne « Les fans ne réservent pas encore » de pour-les-bars.html').toBe(false);
+    await expect(ouverture.locator('.ouverture-bars__etat')).toHaveText('Les fans ne réservent pas encore : on prépare l’ouverture avec les premiers bars.');
     // Un seul bouton « Proposer mon bar » dans la page, et à côté de lui l’affiche gratuite, sans compte.
     const boutons = page.locator('main a[href="#proposer"]');
     await expect(boutons).toHaveCount(1);

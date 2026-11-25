@@ -116,11 +116,11 @@ test.describe('le bord des champs du formulaire des bars', () => {
   });
 
   for (const largeur of [360, 1280]) {
-    test(`à ${largeur} px : le bord de chacun des six champs contraste 3:1 avec la carte`, async ({ page }) => {
+    test(`à ${largeur} px : le bord de chacun des quatre champs contraste 3:1 avec la carte`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto('/pour-les-bars.html');
       const bords = await mesurerLesBords(page, '.formulaire .panier__champ');
-      expect(bords.map((b) => b.champ)).toEqual(['demande-bar', 'demande-ville', 'demande-nom', 'demande-email', 'demande-telephone', 'demande-message']);
+      expect(bords.map((b) => b.champ)).toEqual(['demande-bar', 'demande-nom', 'demande-email', 'demande-ville']);
       for (const bord of bords) expect(bord.rapport, `${bord.champ} : bord ${bord.bord}`).toBeGreaterThanOrEqual(SEUIL);
     });
   }

@@ -11,7 +11,8 @@ import { couperLAPI, simulerLInvitation } from './outils/invitation.mjs';
 // Le réglage du navigateur « taille du texte » : par le style de l’élément racine, comme dans tests/entete.spec.mjs.
 const agrandir = (onglet, pourcent) => onglet.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
 
-// Ce qui dépasse à gauche ou à droite de l’écran. Hors jeu : le verre et son halo (coupés exprès par leur section),
+// Ce qui dépasse à gauche ou à droite de l’écran. Hors jeu : le verre et son halo (coupés exprès par leur section), la
+// lumière du téléphone de démo et ses halos (coupés exprès par leur cadre),
 // les dessins, le lien d’évitement (posé hors de l’écran exprès) et les champs pièges des robots.
 const lireLesDebordements = (onglet) => onglet.evaluate(() => {
   const largeur = document.documentElement.clientWidth;
@@ -84,18 +85,18 @@ for (const largeur of [320, 360]) {
   });
 }
 
-// L’étiquette « Écran de démonstration », posée à cheval sur le haut d’un écran : à 200 %, elle passe sur deux lignes.
-// Son texte doit rester dans sa pilule nuit (sinon sa première ligne, claire, sort sur le crème de l’accueil : 1:1).
+// L’étiquette « Démo » (le téléphone de l’accueil, la salle de « Pour les bars ») : à 200 %, son texte reste dans sa pastille
+// (sinon une ligne claire sortirait sur le crème de la page : 1:1).
 for (const chemin of ['/', '/pour-les-bars.html']) {
   for (const largeur of [320, 1280]) {
-    test(`${chemin} à ${largeur} px, texte à 200 % : le texte de chaque « Écran de démonstration » reste dans sa pilule`, async ({ page: onglet }) => {
+    test(`${chemin} à ${largeur} px, texte à 200 % : le texte de chaque étiquette « Démo » reste dans sa pastille`, async ({ page: onglet }) => {
       await couperLAPI(onglet);
       await onglet.emulateMedia({ reducedMotion: 'reduce' });
       await onglet.setViewportSize({ width: largeur, height: 800 });
       await onglet.goto(chemin);
       await attendreLaPageFinie(onglet);
       await agrandir(onglet, 200);
-      const lu = await onglet.evaluate(() => [...document.querySelectorAll('.exemple')].filter((e) => e.checkVisibility()).map((e) => {
+      const lu = await onglet.evaluate(() => [...document.querySelectorAll('.etiquette-demo, .salle-soir__exemple')].filter((e) => e.checkVisibility()).map((e) => {
         const boite = e.getBoundingClientRect();
         const plage = document.createRange();
         plage.selectNodeContents(e);

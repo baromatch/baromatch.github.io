@@ -30,10 +30,14 @@ export const REPERES = { debut: '<!-- semaine:debut -->', fin: '<!-- semaine:fin
 // Les matchs que la page porte : le prochain et ses suivants (le premier qui n’a pas commencé quand la page est lue en
 // est l’un d’eux, même quelques heures après le passage). La bande ne montre que les autres matchs du même jour.
 export const MATCHS_DE_L_ACCUEIL = 6;
-export const MATCHS_DE_LA_BANDE = 5;
-// La taille du dessin des insignes de la carte (px) : leur finesse se règle sur elle (insigne.mjs) ; la bande les reprend
-// plus petits.
+export const MATCHS_DE_LA_BANDE = 4;
+// La taille du dessin des insignes de la carte (px) : leur finesse se règle sur elle (insigne.mjs). Seuls les clubs du
+// premier match ont ce grand dessin (d-…, 9 Ko chacun : un match plus loin, que la page prend si le premier a commencé
+// quand elle est lue, a le petit, agrandi) ; la bande, et tout autre club, ont le petit (p-…, 30 px, comme la liste de
+// l’appli) : la page ne porte pas une douzaine de grands insignes.
 export const TAILLE_DES_DISQUES = 112;
+export const TAILLE_DE_LA_BANDE = 30;
+export const MATCHS_AU_GRAND_DESSIN = 1;
 
 const NUIT = [10, 11, 16];
 // La lumière d’un club ne dépasse jamais cette luminance relative : le texte blanc de la carte reste à plus de 4,5:1,
@@ -88,17 +92,20 @@ export const matchsDeLAccueil = (donnees, maintenant) => donnees.matchs
   .sort((a, b) => a.debut - b.debut || rangDeParis(a) - rangDeParis(b) || a.slug.localeCompare(b.slug))
   .slice(0, MATCHS_DE_L_ACCUEIL);
 
-const planche = (clubs) => {
-  const vus = new Map();
-  for (const club of clubs) {
-    if (vus.has(club.cle)) continue;
-    const svg = insigne(club, { taille: TAILLE_DES_DISQUES, fond: 'night' });
+// La planche : chaque club n’y est dessiné qu’une fois par taille. grands : les clubs de la carte ; petits : tous les autres.
+const planche = (grands, petits) => {
+  const symboles = new Map();
+  const poser = (club, prefixe, taille) => {
+    if (symboles.has(`${prefixe}${club.cle}`)) return;
+    const svg = insigne(club, { taille, fond: 'night' });
     const boite = /viewBox="([^"]+)"/.exec(svg)[1];
-    vus.set(club.cle, `<symbol id="d-${club.cle}" viewBox="${boite}">${svg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</symbol>`);
-  }
-  return `<svg class="planche" width="0" height="0" aria-hidden="true" focusable="false"><defs>${[...vus.values()].join('')}</defs></svg>`;
+    symboles.set(`${prefixe}${club.cle}`, `<symbol id="${prefixe}${club.cle}" viewBox="${boite}">${svg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</symbol>`);
+  };
+  for (const club of grands) poser(club, 'd-', TAILLE_DES_DISQUES);
+  for (const club of petits) poser(club, 'p-', TAILLE_DE_LA_BANDE);
+  return `<svg class="planche" width="0" height="0" aria-hidden="true" focusable="false"><defs>${[...symboles.values()].join('')}</defs></svg>`;
 };
-const disque = (club, classe = 'insigne') => `<svg class="${classe}" aria-hidden="true" focusable="false"><use href="#d-${e(club.cle)}"/></svg>`;
+const disque = (club, classe = 'insigne', prefixe = 'd-') => `<svg class="${classe}" aria-hidden="true" focusable="false"><use href="#${prefixe}${e(club.cle)}"/></svg>`;
 
 const adresse = (chemin) => `https://baromatch.fr${chemin}`;
 const lienWhatsApp = (message) => `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -138,7 +145,9 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
   const bande = donnees.matchs
     .filter((m) => m !== hero && ceJour(m) && m.debut + DUREE_MATCH_MS > maintenant && !m.statut && m.heureConfirmee !== false)
     .sort((a, b) => a.debut - b.debut || a.slug.localeCompare(b.slug)).slice(0, MATCHS_DE_LA_BANDE);
-  const clubs = [...matchs, ...bande].flatMap((m) => [m.domicile, m.exterieur]);
+  const clubsDe = (liste) => liste.flatMap((m) => [m.domicile, m.exterieur]);
+  const grands = clubsDe(matchs.slice(0, MATCHS_AU_GRAND_DESSIN));
+  const petits = clubsDe([...matchs, ...bande]);
   const messageAmis = remplir(t.amisMessage, { match: nom, quand: `${quand} à ${heure}`, lien: adresse(chemin) });
   const messageBar = remplir(t.barMessage, { match: nom, quand: `${quand} à ${heure}`, lien: adresse('/pour-les-bars.html') });
   const donneesJson = {
@@ -150,7 +159,7 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
       amisMessage: t.amisMessage, barMessage: t.barMessage,
     },
   };
-  const puce = (m) => `<li><a class="puce" href="${cheminDuMatch(m)}">${disque(m.domicile)}${disque(m.exterieur)}<span class="puce__nom">${e(nomDe(m))}</span>${m.debut <= maintenant
+  const puce = (m) => `<li><a class="puce" href="${cheminDuMatch(m)}">${disque(m.domicile, 'insigne', 'p-')}${disque(m.exterieur, 'insigne', 'p-')}<span class="puce__nom">${e(nomDe(m))}</span>${m.debut <= maintenant
     ? `<span class="puce__en-cours">${e(t.enCours)}</span>`
     : `<time class="puce__heure" datetime="${isoDeParis(m.debut)}">${heureDeParis(m.debut)}</time>`}</a></li>`;
   const avecBars = hero.soirees.length > 0;
@@ -167,7 +176,7 @@ export const blocDeLaSemaine = ({ donnees, textes, maintenant }) => {
   // « Pas de match ce soir » : le prochain est un autre jour, et rien ne se joue aujourd’hui (ni à venir, ni en cours).
   const horsAujourdhui = jourHero !== aujourdhui && !donnees.matchs.some((m) => !m.statut && jourDeParis(m.debut) === aujourdhui && m.debut + DUREE_MATCH_MS > maintenant);
   return sansLesChamps(insecables, `<section class="prochain page" id="ce-soir" aria-labelledby="soir-titre">
-${planche(clubs)}
+${planche(grands, petits)}
 <h2 class="prochain__etiquette" id="soir-titre">${e(t.etiquette)} <span class="prochain__quand" data-soir-quand>· ${e(quand)}</span></h2>
 <div class="coup" data-coup="${isoDeParis(hero.debut)}">
 <div class="coup__lumiere" aria-hidden="true"><i></i><i></i><i></i></div>

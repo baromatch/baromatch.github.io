@@ -396,17 +396,16 @@ test('la semaine (/matchs/) mène à l’affiche de ses matchs, par un lien seul
   expect(pageDe(await enMemoire({ avec: sansBarPublie }), '/matchs/').contenu).toContain(`<a href="${OUVERTE}">`);
 });
 
-// Sans « Partager mon badge » (retiré tant qu’aucun bar n’est publié : tests/badge.spec.mjs), la phrase de l’affiche
-// clôt « Pour démarrer » : ce qu’un bar peut faire tout de suite, même avant de nous écrire. Après l’envoi, « C’est
-// envoyé. » y renvoie aussi (tests/pour-les-bars.spec.mjs, le délai de réponse) : avant le formulaire, le lien n’est
-// qu’une fois.
-test('la page des bars mène à l’affiche de la semaine, une fois avant le formulaire, à la fin de « Pour démarrer »', () => {
+// Sans « Partager mon badge » (retiré tant qu’aucun bar n’est publié : tests/badge.spec.mjs), le lien de l’affiche est en
+// haut de la page, à côté de « Proposer mon bar » : ce qu’un bar peut faire tout de suite, sans compte, même avant de
+// nous écrire. Après l’envoi, « C’est envoyé. » y renvoie aussi (tests/pour-les-bars.spec.mjs) : avant le formulaire,
+// le lien n’est qu’une fois.
+test('la page des bars mène à l’affiche de la semaine, une fois avant le formulaire, à côté de « Proposer mon bar » en haut de page', () => {
   const html = readFileSync(path.join(racine, 'pour-les-bars.html'), 'utf8');
-  const phrase = '<p class="chapo"><a href="/matchs/affiche/">Une affiche des matchs de la semaine, gratuite, pour ton comptoir</a>. Même sans être sur Baromatch&nbsp;: tu coches les matchs que tu diffuses, tu imprimes.</p>';
+  const lien = '<a class="lien-affiche" href="/matchs/affiche/">Affiche gratuite pour ton comptoir, sans compte</a>';
   expect(html.slice(0, html.indexOf('id="proposer"')).split('href="/matchs/affiche/"')).toHaveLength(2);
-  expect(html).toContain(`${phrase}\n  </section>\n\n  <section class="bars"`);
-  expect(html.indexOf(phrase)).toBeGreaterThan(html.indexOf('id="titre-marche"'));
-  expect(html.indexOf(phrase)).toBeLessThan(html.indexOf('id="proposer"'));
+  expect(html).toContain(`<a class="capsule" href="#proposer">Proposer mon bar</a>\n        ${lien}`);
+  expect(html.indexOf(lien)).toBeLessThan(html.indexOf('id="titre-marche"'));
 });
 
 // ---------- Dans le navigateur ----------

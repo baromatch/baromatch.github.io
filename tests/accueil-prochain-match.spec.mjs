@@ -141,8 +141,9 @@ test.describe('la carte et sa réponse, du générateur', () => {
 
   test('les insignes viennent de generateur/insigne.mjs : une planche de symboles, jamais une image', () => {
     const html = bloc();
-    expect(html).toContain('<symbol id="d-sabah"');
-    expect(html).toContain('<use href="#d-sabah"/>');
+    expect(html).toContain('<symbol id="d-psg"');
+    expect(html).toContain('<symbol id="p-lille"');
+    expect(html).toContain('<use href="#d-psg"/>');
     expect(html).not.toMatch(/<img\b/);
   });
 

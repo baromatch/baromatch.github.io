@@ -19,7 +19,6 @@ forme: "Vérifie ton adresse mail : elle doit ressembler à prenom@exemple.fr.",
 incomplete: "Il manque la fin de ton adresse, par exemple .fr ou .com.",
 refusee: "Cette adresse ne semble pas valide. Vérifie-la : elle doit ressembler à prenom@exemple.fr. Si elle est juste, écris à " + CONTACT + ".",
 panne: "L’inscription n’est pas passée. Réessaie dans un instant, ou écris à " + CONTACT + ".",
-messagerie: "Ta messagerie s’ouvre : envoie le mail et on te préviendra au lancement.",
 envoi: "Envoi…",
 note: "C’est noté",
 inscrite: function (courriel, ville) {
@@ -102,13 +101,6 @@ function villeChoisie() {
 var choix = form.querySelector('input[name="ville"]:checked, input[type="hidden"][name="ville"]');
 return choix ? choix.value : "";
 }
-function ouvrirLaMessagerie(courriel, ville) {
-var sujet = encodeURIComponent("Préviens-moi au lancement");
-var corps = encodeURIComponent("Mon adresse : " + courriel + (ville ? "\nMa ville : " + ville : ""));
-window.location.href = "mailto:" + CONTACT + "?subject=" + sujet + "&body=" + corps;
-afficher(TEXTES.messagerie, "ok");
-montrerLeRetour();
-}
 function inscrire(courriel, ville) {
 inscrite = courriel;
 villeInscrite = ville;
@@ -126,7 +118,6 @@ if (!ADRESSE_COMPLETE.test(courriel)) return signaler(TEXTES.incomplete);
 champ.removeAttribute("aria-invalid");
 var urlEnvoi = form.getAttribute("action") || "";
 var ville = villeChoisie();
-if (urlEnvoi.indexOf("TON-ID-FORMSPREE") !== -1 || urlEnvoi === "") return ouvrirLaMessagerie(courriel, ville);
 var donnees = new FormData(form);
 if (inscrite && (inscrite !== courriel || villeInscrite !== ville)) donnees.append("remplace", inscrite);
 aller("envoi");
@@ -193,14 +184,14 @@ return e === 1 ? T.demain : enLettres(ms);
 var remplir = function (texte, valeurs) { return texte.replace(/\{(\w+)\}/g, function (_, k) { return valeurs[k] || ""; }); };
 var capitale = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
 var matchs = D.matchs.map(function (m) { m.ms = Date.parse(m.coup); return m; });
-var disque = function (cle, classe) {
+var disque = function (cle, classe, prefixe) {
 var ns = "http://www.w3.org/2000/svg";
 var svg = doc.createElementNS(ns, "svg");
 svg.setAttribute("class", classe);
 svg.setAttribute("aria-hidden", "true");
 svg.setAttribute("focusable", "false");
 var use = doc.createElementNS(ns, "use");
-use.setAttribute("href", "#d-" + cle);
+use.setAttribute("href", "#" + prefixe + cle);
 svg.appendChild(use);
 return svg;
 };
@@ -254,8 +245,7 @@ lien.firstChild.textContent = m.a.nom + " ";
 var fin = lien.lastChild;
 fin.textContent = " " + m.b.nom;
 var ds = coup.querySelectorAll(".coup__disque use");
-ds[0].setAttribute("href", "#d-" + m.a.cle);
-ds[1].setAttribute("href", "#d-" + m.b.cle);
+[m.a.cle, m.b.cle].forEach(function (c, i) { ds[i].setAttribute("href", "#" + (doc.getElementById("d-" + c) ? "d-" : "p-") + c); });
 $("[data-coup-detail]").textContent = capitale(quand) + ", " + heure(m.ms);
 var nuit = $("[data-pas-de-match]");
 if (nuit) nuit.hidden = !(ecartDeJours(maintenant, m.ms) > 0 && !matchs.some(function (x) { return jour(x.ms) === jour(maintenant) && x.ms + FIN > maintenant; }));
@@ -312,8 +302,8 @@ var li = doc.createElement("li");
 var a = doc.createElement("a");
 a.className = "puce";
 a.href = m.page;
-a.appendChild(disque(m.a.cle, "insigne"));
-a.appendChild(disque(m.b.cle, "insigne"));
+a.appendChild(disque(m.a.cle, "insigne", "p-"));
+a.appendChild(disque(m.b.cle, "insigne", "p-"));
 var nom = doc.createElement("span");
 nom.className = "puce__nom";
 nom.textContent = m.a.nom + " – " + m.b.nom;
@@ -504,7 +494,7 @@ verre.addEventListener("contextmenu", function (e) { e.preventDefault(); });
 if (!calme) window.requestAnimationFrame(function () { window.setTimeout(lancer, 250); });
 })();
 
-/* L'album : le sous-bock se colle quand il arrive à l'écran ; « Copier le lien » quand le navigateur sait copier. */
+/* L'album : le sous-bock se colle quand il arrive à l'écran. */
 (function () {
 var album = doc.querySelector(".album");
 if (album) {
@@ -516,69 +506,25 @@ if (es.some(function (x) { return x.isIntersecting; })) { album.classList.add("e
 o.observe(album);
 }
 }
-Array.prototype.forEach.call(doc.querySelectorAll("[data-copier]"), function (b) {
-if (!(navigator.clipboard && navigator.clipboard.writeText)) return;
-var statut = doc.querySelector(".partage-site__statut");
-b.hidden = false;
-b.addEventListener("click", function () {
-navigator.clipboard.writeText("https://baromatch.fr/").then(function () {
-if (statut) statut.textContent = "Lien copié.";
-}, function () {
-if (statut) statut.textContent = "Copie impossible : l’adresse est baromatch.fr.";
-});
-});
-});
 })();
+/* Le film : son script (film.js) ne vient qu’à son approche. */
 (function () {
-var video = doc.getElementById("film");
-var lecture = doc.getElementById("film-lecture");
-if (!video || !lecture) return;
-var icone = lecture.querySelector("path");
-var calme = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-var econome = navigator.connection && navigator.connection.saveData;
-var arreteParToi = false;
-var observateur = null;
-function lecteurClassique() {
-var avaitLeFocus = document.activeElement === lecture;
-if (observateur) observateur.disconnect();
-video.controls = true;
-lecture.hidden = true;
-if (avaitLeFocus) video.focus();
+var cadre = doc.getElementById("film-cadre");
+if (!cadre) return;
+var charge = false;
+function venir() {
+if (charge) return;
+charge = true;
+var s = doc.createElement("script");
+s.src = "/film.js";
+s.defer = true;
+doc.head.appendChild(s);
 }
-function lire() {
-var essai = video.play();
-if (essai && essai.catch) {
-essai.catch(function (erreur) {
-if (!erreur || erreur.name !== "AbortError") lecteurClassique();
-});
-}
-}
-function direLaLecture() {
-lecture.setAttribute("aria-label", video.paused ? "Lire le film" : "Mettre le film en pause");
-icone.setAttribute("d", video.paused ? "M7 4.5v15l12-7.5z" : "M7 5h3.5v14H7zM13.5 5H17v14h-3.5z");
-}
-if (calme || econome) {
-lecteurClassique();
-return;
-}
-lecture.hidden = false;
-direLaLecture();
-video.addEventListener("play", direLaLecture);
-video.addEventListener("pause", direLaLecture);
-if ("IntersectionObserver" in window) {
-observateur = new IntersectionObserver(function (entrees) {
-entrees.forEach(function (entree) {
-if (!entree.isIntersecting) video.pause();
-else if (!arreteParToi) lire();
-});
-}, { threshold: 0.35 });
-observateur.observe(video);
-}
-lecture.addEventListener("click", function () {
-arreteParToi = !video.paused;
-if (arreteParToi) video.pause();
-else lire();
-});
+if (!("IntersectionObserver" in window)) return venir();
+var o = new IntersectionObserver(function (es) {
+if (es.some(function (x) { return x.isIntersecting; })) { o.disconnect(); venir(); }
+}, { rootMargin: "800px 0px" });
+o.observe(cadre);
 })();
 (function () {
 var texte = doc.getElementById("film-texte");

@@ -347,9 +347,132 @@ test.describe('sans JavaScript', () => {
     await expect(page.locator('.g-tel__pause')).toBeHidden();
     await expect(page.locator('.coup__titre')).toContainText('PSG');
     await expect(page.locator('.coup__heure')).toContainText('21:00');
+    // La légende décrit l’image fixe, et ne propose aucun geste qu’on ne peut pas faire sans script.
+    await expect(page.locator('.g-tel__fixe')).toBeVisible();
+    await expect(page.locator('.g-tel__fixe')).toContainText('Image fixe');
+    await expect(page.locator('.g-tel__aide')).toBeHidden();
+    expect(await page.locator('.g-tel__legende').innerText()).not.toMatch(/Maintiens/);
     await page.locator('.faire__bouton').click();
     await expect(page.locator('.faire__titre')).toHaveText('Aucun bar encore pour ce match.');
     await expect(page.locator('[data-wa="amis"]')).toHaveAttribute('href', /^https:\/\/wa\.me\/\?text=/);
+  });
+});
+
+// La carte du prochain match montre ses deux noms dès le premier écran d’un téléphone (390 × 664), sous le titre, sa phrase
+// et le téléphone de démo (la fenêtre du téléphone est basse : le bouton qu’on maintient y est toujours).
+test.describe('le premier écran d’un téléphone', () => {
+  for (const [largeur, hauteur] of [[390, 664], [390, 844]]) {
+    test(`à ${largeur} × ${hauteur} : le titre, sa phrase, le bouton de la démo et les deux noms de la carte du prochain match`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: hauteur });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+      await page.evaluate(() => document.fonts.ready);
+      for (const selecteur of ['#titre', '.geste__texte', '.g-verre', '.coup__ou', '.coup__titre']) {
+        const boite = await page.locator(selecteur).boundingBox();
+        expect(boite.y, `${selecteur} : haut`).toBeGreaterThanOrEqual(0);
+        expect(boite.y + boite.height, `${selecteur} : bas`).toBeLessThanOrEqual(hauteur);
+      }
+      await expect(page.locator('.coup__titre')).toHaveText('PSG – Rome');
+    });
+  }
+});
+
+// « Toute la semaine » : les liens des matchs des sept jours, en texte simple, écrits par le générateur dans le bloc.
+test.describe('« Toute la semaine », du générateur', () => {
+  test('un lien vers la page de chaque match des sept jours, rangés par jour ; ni reporté, ni passé, ni au-delà de sept jours', () => {
+    const lointain = unMatch({ slug: 'metz-brest-2026-12-05', debut: '2026-12-05T19:45:00Z', domicile: club('metz', 'Metz'), exterieur: club('brest', 'Brest') });
+    const html = bloc({ matchs: [...TOUS, lointain] });
+    const liste = html.match(/<nav class="jours page"[^>]*>([\s\S]*?)<\/nav>/)[1];
+    const liens = [...liste.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map((m) => m[1]);
+    // Aujourd’hui (PSG – Rome, Lille – Bayern ; Sabah – Barça a commencé il y a plus de trois heures : fini), demain, samedi.
+    expect(liens).toEqual(expect.arrayContaining(['/matchs/psg-rome-2026-11-25/', '/matchs/lille-bayern-2026-11-25/', '/matchs/lens-nice-2026-11-26/', '/matchs/ol-om-2026-11-28/']));
+    expect(liens).not.toContain('/matchs/angers-lorient-2026-11-25/');
+    expect(liens).not.toContain('/matchs/metz-brest-2026-12-05/');
+    expect(liste).toMatch(/<b>Mercredi 25 novembre<\/b>/);
+    expect(liste).toMatch(/<b>Samedi 28 novembre<\/b>/);
+    expect(texteDe(liste)).toContain('Toute la semaine');
+    // Du texte simple : aucun insigne, aucun style en ligne, un seul titre h2 dans le bloc (celui de la carte).
+    expect(liste).not.toMatch(/<svg|style=|<h[1-6]/);
+    expect(controlerLaSemaine(html)).toEqual([]);
+  });
+
+  test('aucun match à venir : pas de liste', () => {
+    expect(bloc({ matchs: [] })).not.toContain('class="jours');
+  });
+});
+
+// Le téléphone de démo : sa lumière n’est coupée par aucun rectangle, son petit texte suit la taille du texte du lecteur,
+// ses couleurs viennent des jetons de styles.css, et il dit « le bouton », jamais « le verre » (pas un geste de boisson).
+test.describe('le téléphone de démo, ses finitions', () => {
+  const FEUILLE = readFileSync(path.join(racine, 'accueil.css'), 'utf8');
+
+  test('la lumière du téléphone n’est ni masquée ni rognée à son cadre, et aucun ancêtre ne la coupe', async ({ page }) => {
+    for (const [largeur, hauteur] of [[390, 844], [1440, 900]]) {
+      await page.setViewportSize({ width: largeur, height: hauteur });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+      const lu = await page.evaluate(() => {
+        const dessus = [];
+        for (let e = document.querySelector('.geste__lumiere'); e && e !== document.body; e = e.parentElement) {
+          const c = getComputedStyle(e);
+          // Seul « main », large comme l’écran, rogne le côté (la page ne défile pas de côté) ; le haut et le bas restent libres.
+          if (c.overflowY !== 'visible' || c.maskImage !== 'none' || c.clipPath !== 'none') dessus.push(`${e.tagName.toLowerCase()}.${e.className} : overflow-y ${c.overflowY}, mask ${c.maskImage}, clip-path ${c.clipPath}`);
+        }
+        return { dessus, defile: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+      });
+      expect(lu.dessus, `${largeur} px`).toEqual([]);
+      expect(lu.defile, `${largeur} px`).toBeLessThanOrEqual(0);
+    }
+  });
+
+  test('le petit texte de l’écran grandit avec le texte du lecteur, sans dépasser 1,4 fois', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+    const taille = (selecteur) => page.evaluate((s) => parseFloat(getComputedStyle(document.querySelector(s)).fontSize), selecteur);
+    const petits = ['.g-feuille__note', '.g-feuille__etiq', '.g-bar__puces li', '.g-heures span'];
+    const avant = {};
+    for (const s of petits) avant[s] = await taille(s);
+    expect(avant['.g-feuille__note']).toBeCloseTo(10.5, 1);
+    expect(avant['.g-feuille__etiq']).toBeCloseTo(9.5, 1);
+    await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+    for (const s of petits) {
+      const apres = await taille(s);
+      expect(apres, `${s} grandit`).toBeGreaterThan(avant[s] * 1.25);
+      expect(apres, `${s} reste dans l’écran`).toBeLessThanOrEqual(avant[s] * 1.4);
+    }
+    // Le téléphone reste entier : rien ne déborde de son écran, la page ne défile pas de côté.
+    const lu = await page.evaluate(() => {
+      const ecran = document.querySelector('.g-ecran').getBoundingClientRect();
+      const dehors = [...document.querySelectorAll('.g-ecran *')].filter((e) => e.getClientRects().length && !e.closest('.g-pouce, .g-ecran__halo, .g-lueur, .g-verre__vague'))
+        .filter((e) => { const r = e.getBoundingClientRect(); return r.right > ecran.right + 0.5 || r.left < ecran.left - 0.5; }).map((e) => e.className);
+      return { dehors, defile: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+    });
+    expect(lu.dehors).toEqual([]);
+    expect(lu.defile).toBeLessThanOrEqual(0);
+  });
+
+  test('l’écran du téléphone prend ses couleurs dans styles.css : aucune des trois couleurs de la marque écrite en dur dans ses règles', () => {
+    const debut = FEUILLE.indexOf('.g-ecran{');
+    const fin = FEUILLE.indexOf('/* ── Le geste');
+    const regles = FEUILLE.slice(debut, fin);
+    expect(regles.length).toBeGreaterThan(2000);
+    expect(regles).not.toMatch(/#0A0B10|#F7F7F9|#FFB13D|#151722/i);
+    expect(regles).toContain('var(--nuit)');
+    expect(regles).toContain('var(--ambre)');
+    expect(regles).toContain('var(--blanc-nuit)');
+  });
+
+  test('« le bouton », jamais « le verre » : la légende, ses descriptions parlées et le geste', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+    const lu = await page.evaluate(() => ({
+      legende: document.querySelector('.g-tel__legende').innerText,
+      label: document.querySelector('.g-verre').getAttribute('aria-label'),
+    }));
+    expect(`${lu.legende} ${lu.label}`).not.toMatch(/\bverre\b/i);
+    expect(lu.legende).toContain('Maintiens le bouton');
+    expect(lu.legende).not.toContain('Image fixe');
   });
 });
 

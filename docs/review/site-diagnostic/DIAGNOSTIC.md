@@ -133,7 +133,7 @@ La page de Paris aligne près de 900 mots, aucune image, et « Pas de soirée an
 
 Lighthouse au téléphone, sur la même machine chargée et dans la même heure (les notes absolues varient avec la
 charge ; l’écart, lui, compte) : l’accueil en ligne 75 à 84 (temps de blocage 610 à 1 220 ms, 181 Kio), contre 99 à
-100 pour les trois pistes proposées (temps de blocage 0 ms, 125 à 155 Kio au premier affichage). Le site reste rapide
+100 pour les trois pistes proposées (temps de blocage 0 ms, 125 à 217 Kio en tout). Le site reste rapide
 pour un visiteur ; ce n’est pas la vitesse qui fait « pas pro ».
 
 ## Ce qui est bien, et qu’il faut garder

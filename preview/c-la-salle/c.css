@@ -42,9 +42,9 @@ a{ color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1.5p
 .evitement:focus{ transform: none; }
 .planche{ position: absolute; width: 0; height: 0; overflow: hidden; }
 
-.titre-1{ margin: 0; font-size: clamp(2.5rem, 1.8rem + 3.2vw, 4.25rem); line-height: 1; font-weight: 740; letter-spacing: -0.03em; font-variation-settings: "opsz" 96; }
+.titre-1{ margin: 0; font-size: clamp(2.5rem, 1.8rem + 3.2vw, 4.25rem); line-height: 1; font-weight: 740; letter-spacing: -0.035em; font-variation-settings: "opsz" 36; }
 .titre-1 span{ display: inline-block; white-space: nowrap; }
-.titre-2{ margin: 0; font-size: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem); line-height: 1.05; font-weight: 730; letter-spacing: -0.025em; font-variation-settings: "opsz" 72; }
+.titre-2{ margin: 0; font-size: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem); line-height: 1.05; font-weight: 730; letter-spacing: -0.03em; font-variation-settings: "opsz" 30; }
 .chapo{ margin: 12px 0 0; font-size: clamp(1.0625rem, 1.02rem + 0.3vw, 1.25rem); line-height: 1.45; color: var(--texte-doux); max-width: 34em; }
 
 .entete{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; padding: 10px var(--gouttiere); max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; }

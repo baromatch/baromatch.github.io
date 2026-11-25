@@ -44,11 +44,11 @@ a{ color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px;
 .titre-1 span{ display: inline-block; white-space: nowrap; }
 .titre-1{
   margin: 0; font-size: clamp(2.75rem, 1.7rem + 4.6vw, 5.25rem); line-height: 0.98; font-weight: 760;
-  letter-spacing: -0.03em; font-variation-settings: "opsz" 96; text-wrap: balance;
+  letter-spacing: -0.035em; font-variation-settings: "opsz" 36; text-wrap: balance;
 }
 .titre-2{
   margin: 0; font-size: clamp(2rem, 1.5rem + 2.2vw, 3.25rem); line-height: 1.02; font-weight: 740;
-  letter-spacing: -0.025em; font-variation-settings: "opsz" 72;
+  letter-spacing: -0.03em; font-variation-settings: "opsz" 30;
 }
 .chapo{ margin: 16px 0 0; font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.3125rem); line-height: 1.45; color: var(--texte-doux); max-width: 34em; text-wrap: pretty; }
 .chapo--court{ margin-top: 10px; }

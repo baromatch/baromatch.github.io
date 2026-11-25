@@ -377,6 +377,101 @@ test.describe('le premier écran d’un téléphone', () => {
   }
 });
 
+// Le polish d’avant la mise en ligne : « Toute la semaine » a la gouttière de l’accueil, l’étiquette « Démo » et le bouton pause
+// ne cachent aucun texte du téléphone (dont la fenêtre est rognée au téléphone), « Que faire pour ce match » passe à la ligne
+// proprement (deux lignes au plus, équilibrées) à 320 px avec le texte à 200 %.
+test.describe('les finitions de l’accueil sur téléphone', () => {
+  const agrandir = (page, pourcent) => page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+
+  for (const largeur of [320, 390]) {
+    test(`à ${largeur} px : « Toute la semaine » a la même gouttière de 16 px que le reste de l’accueil`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 700 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+      await page.evaluate(() => document.fonts.ready);
+      const lu = await page.evaluate(() => {
+        const gauche = (s) => document.querySelector(s).getBoundingClientRect().left;
+        const droite = (s) => Math.max(...[...document.querySelectorAll(s)].map((e) => e.getBoundingClientRect().right));
+        return { titre: gauche('.jours__titre'), liste: gauche('.jours ul'), etiquette: gauche('.prochain__etiquette'), droite: droite('.jours ul'), gouttiere: parseFloat(getComputedStyle(document.querySelector('.jours')).paddingLeft) };
+      });
+      expect(lu.titre).toBeGreaterThanOrEqual(16);
+      expect(lu.titre).toBeCloseTo(lu.etiquette, 0);
+      expect(lu.liste).toBeCloseTo(lu.etiquette, 0);
+      expect(lu.droite).toBeLessThanOrEqual(largeur - 16 + 0.5);
+      expect(lu.gouttiere).toBeGreaterThanOrEqual(16);
+    });
+  }
+
+  // Le texte de l’écran du téléphone qui se voit dans sa fenêtre (rognée), croisé avec l’étiquette « Démo » et le bouton pause.
+  const texteSousLesPuces = (page) => page.evaluate(() => {
+    const fenetre = document.querySelector('.g-tel__fenetre').getBoundingClientRect();
+    const puces = ['.g-tel .etiquette-demo', '.g-tel__pause'].map((s) => document.querySelector(s)).filter((e) => e && e.getClientRects().length);
+    const cache = [];
+    const parcours = document.createTreeWalker(document.querySelector('.g-ecran'), NodeFilter.SHOW_TEXT);
+    for (let noeud = parcours.nextNode(); noeud; noeud = parcours.nextNode()) {
+      if (!noeud.textContent.trim()) continue;
+      const etendue = document.createRange();
+      etendue.selectNodeContents(noeud);
+      for (const r of etendue.getClientRects()) {
+        // Ce qui est rogné par la fenêtre n’est pas vu : on garde la part visible.
+        const vu = { left: Math.max(r.left, fenetre.left), right: Math.min(r.right, fenetre.right), top: Math.max(r.top, fenetre.top), bottom: Math.min(r.bottom, fenetre.bottom) };
+        if (vu.right <= vu.left || vu.bottom <= vu.top) continue;
+        for (const puce of puces) {
+          const p = puce.getBoundingClientRect();
+          if (vu.left < p.right && vu.right > p.left && vu.top < p.bottom && vu.bottom > p.top) cache.push(`${noeud.textContent.trim()} sous ${puce.className.split(' ').at(-1)}`);
+        }
+      }
+    }
+    return { cache, puces: puces.length, bas: document.querySelector('.g-tel .etiquette-demo').getBoundingClientRect().bottom, haut: fenetre.top };
+  });
+
+  for (const [largeur, hauteur] of [[390, 664], [390, 844]]) {
+    for (const pourcent of [100, 200]) {
+      for (const mouvement of ['reduce', 'no-preference']) {
+        test(`à ${largeur} × ${hauteur}, texte à ${pourcent} %${mouvement === 'reduce' ? '' : ', animations'} : l’étiquette « Démo » et le bouton pause ne cachent aucun texte du téléphone`, async ({ page }) => {
+          await page.setViewportSize({ width: largeur, height: hauteur });
+          await page.emulateMedia({ reducedMotion: mouvement });
+          await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+          await page.evaluate(() => document.fonts.ready);
+          await agrandir(page, pourcent);
+          const lu = await texteSousLesPuces(page);
+          expect(lu.puces).toBeGreaterThan(0);
+          expect(lu.cache).toEqual([]);
+          // L’étiquette est au-dessus de la fenêtre du téléphone, pas dessus.
+          expect(lu.bas).toBeLessThanOrEqual(lu.haut + 0.5);
+        });
+      }
+    }
+  }
+
+  for (const [largeur, pourcent] of [[320, 200], [360, 200], [390, 200], [320, 100]]) {
+    test(`à ${largeur} px, texte à ${pourcent} % : « Que faire pour ce match » tient en deux lignes équilibrées au plus, sur une cible d’au moins 44 px`, async ({ page }) => {
+      await page.setViewportSize({ width: largeur, height: 700 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await ouvrirLAccueil(page, { instant: Date.parse('2026-11-25T18:30:00Z') });
+      await page.evaluate(() => document.fonts.ready);
+      await agrandir(page, pourcent);
+      const lu = await page.evaluate(() => {
+        const bouton = document.querySelector('.faire__bouton');
+        const texte = [...bouton.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim());
+        const etendue = document.createRange();
+        etendue.selectNodeContents(texte);
+        const lignes = new Map();
+        for (const r of etendue.getClientRects()) lignes.set(Math.round(r.top), (lignes.get(Math.round(r.top)) ?? 0) + r.width);
+        const b = bouton.getBoundingClientRect();
+        const carte = bouton.closest('.coup').getBoundingClientRect();
+        return { largeurs: [...lignes.values()], hauteur: b.height, largeur: b.width, dedans: b.left >= carte.left - 0.5 && b.right <= carte.right + 0.5 };
+      });
+      expect(lu.largeurs.length, `lignes : ${lu.largeurs.map(Math.round)}`).toBeLessThanOrEqual(2);
+      // Équilibrées : la ligne courte fait au moins la moitié de la longue (jamais un mot seul sur sa ligne).
+      if (lu.largeurs.length === 2) expect(Math.min(...lu.largeurs)).toBeGreaterThanOrEqual(Math.max(...lu.largeurs) / 2);
+      expect(lu.hauteur).toBeGreaterThanOrEqual(44);
+      expect(lu.largeur).toBeGreaterThanOrEqual(44);
+      expect(lu.dedans).toBe(true);
+    });
+  }
+});
+
 // « Toute la semaine » : les liens des matchs des sept jours, en texte simple, écrits par le générateur dans le bloc.
 test.describe('« Toute la semaine », du générateur', () => {
   test('un lien vers la page de chaque match des sept jours, rangés par jour ; ni reporté, ni passé, ni au-delà de sept jours', () => {

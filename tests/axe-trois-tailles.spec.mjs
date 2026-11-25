@@ -52,3 +52,21 @@ for (const chemin of PAGES) {
     });
   }
 }
+
+// Le plus petit téléphone (320 px), texte à 100 puis à 200 % : l’accueil, sa carte fermée puis ouverte, sans violation axe.
+for (const pourcent of [100, 200]) {
+  test(`/ à 320 × 700, texte à ${pourcent} % : aucune violation axe`, async ({ page }) => {
+    await couperLAPI(page);
+    await page.clock.setFixedTime(new Date(MAINTENANT_DU_SCENARIO));
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(`${site.serveur.adresse}/`);
+    await page.waitForLoadState('networkidle');
+    await attendreLaPageFinie(page);
+    await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
+    expect(await violationsAxe(page)).toEqual([]);
+    await page.locator('.faire__bouton').click();
+    await expect(page.locator('.faire__titre')).toBeVisible();
+    expect(await violationsAxe(page)).toEqual([]);
+  });
+}

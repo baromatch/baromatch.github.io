@@ -643,11 +643,17 @@ test.describe('les bords de l’en-tête, tels qu’ils sont peints', () => {
       let lus = 0;
       for (let y = debut; y < total - ecran / 2; y += Math.round(ecran / 2)) {
         await page.evaluate((haut) => window.scrollTo({ top: haut, behavior: 'instant' }), y);
-        const fixe = await page.evaluate(async () => {
+        const { fixe, avecCollant } = await page.evaluate(async () => {
           await new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); });
-          return getComputedStyle(document.querySelector('.menu__liste')).position === 'fixed';
+          // « Proposer mon bar » collé en bas (« Pour les bars ») : jamais avec une autre barre fixe, le bandeau lui laisse la place.
+          const collant = document.getElementById('collant');
+          return {
+            fixe: getComputedStyle(document.querySelector('.menu__liste')).position === 'fixed',
+            avecCollant: Boolean(collant) && !collant.hidden && getComputedStyle(collant).display !== 'none',
+          };
         });
-        expect(fixe, `la page à ${y} px : le bandeau du bas`).toBe(true);
+        expect(fixe, `la page à ${y} px : le bandeau du bas${avecCollant ? ' (laisse la place à « Proposer mon bar »)' : ''}`).toBe(!avecCollant);
+        if (avecCollant) continue;
         lus += 1;
         faibles.push(...bordsTropFaibles(await mesurerLesBords(page, '.menu__liste'), 3, `le bandeau, la page à ${y} px : `));
       }

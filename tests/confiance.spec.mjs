@@ -311,13 +311,16 @@ test.describe('accueil : la FAQ des fans', () => {
       'Je peux déjà garder une place ?',
       'C’est gratuit ?',
       'Il faut un compte ?',
+      'Je peux venir avec des potes ?',
       'Ma place est vraiment gardée ?',
       'Et si j’arrive en retard ?',
+      'Comment j’annule ma place ?',
+      'Dans quelles villes ?',
     ]);
     for (const [, reponse] of visibles) expect(reponse).not.toContain('!');
   });
 
-  test('les réponses disent les règles de l’appli : gratuit, code de 6 chiffres, 30 minutes au plus', async ({ page }) => {
+  test('les réponses disent les règles de l’appli : gratuit, code de 6 chiffres, 1 à 8, 30 minutes au plus, Paris', async ({ page }) => {
     const { visibles } = await lireLaFaq(page);
     const reponse = (debut) => visibles.find(([question]) => question.startsWith(debut))[1];
     if (!MARQUE.appli.ouverte) {
@@ -328,8 +331,11 @@ test.describe('accueil : la FAQ des fans', () => {
     expect(reponse('C’est gratuit')).toMatch(/^Oui\..*Ce que tu prends au bar, tu le paies au bar\.$/);
     expect(reponse('Il faut un compte')).toContain('code de 6 chiffres, valable 10 minutes');
     expect(reponse('Il faut un compte')).toContain('18 ans ou plus');
+    expect(reponse('Je peux venir')).toContain('de 1 à 8');
     expect(reponse('Et si j’arrive')).toContain('jusqu’à 30 minutes après le coup d’envoi au plus');
     expect(reponse('Et si j’arrive')).toContain('15 minutes après, ou le coup d’envoi lui-même');
+    expect(reponse('Comment j’annule')).toContain('« Je ne viens plus », puis « Libérer »');
+    expect(reponse('Dans quelles villes')).toMatch(/^À Paris/);
   });
 
   test('les questions se déplient au clavier, et la réponse se lit', async ({ page }) => {

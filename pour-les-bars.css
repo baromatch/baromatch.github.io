@@ -372,7 +372,7 @@
 .jour .conditions__liste li strong { color: var(--texte); }
 .jour .pour-bars .ouverture-bars__texte, .jour .pour-bars .chapo, .jour .pour-bars .atout__texte, .jour .pour-bars .moment__liste, .jour .pour-bars .marche p, .jour .pour-bars .regard li { color: #2A2D38; }
 /* « Proposer mon bar » colle en bas sur téléphone, une fois le haut de la page passé (pour-les-bars-amorce.js). */
-.collant { position: fixed; left: 0; right: 0; bottom: var(--bandeau, 0px); z-index: 30; padding: 0 var(--gouttiere) 12px; background: transparent; pointer-events: none; }
+.collant { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 0 var(--gouttiere) calc(12px + var(--zone-basse, 0px)); background: transparent; pointer-events: none; }
 .collant[hidden] { display: none; }
 .collant .capsule { width: 100%; min-height: 52px; pointer-events: auto; box-shadow: 0 6px 18px rgba(10, 11, 16, 0.28); }
 @media (min-width: 720px) { .collant { display: none; } }

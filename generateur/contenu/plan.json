@@ -21,7 +21,7 @@
   "verite": {
     "sansBar": "Aucun bar ne l’annonce encore sur Baromatch.",
     "haut": "Aucun bar publié pour l’instant : on cherche les premiers, à Paris. Le plan est une démo.",
-    "demoScene": "La démo allume {arrondissements}. Rien n’est posé à une adresse.",
+    "demoScene": "La démo allume {arrondissements}. Rien n’est posé à une adresse. Les bars publiés s’afficheront ici.",
     "ailleurs": "Les bars d’autres villes sont sur la page du match."
   },
   "compte": {
@@ -51,7 +51,6 @@
   "liste": {
     "titre": "Les bars qui passent le match, par arrondissement",
     "aucun": "Aucun bar ne l’annonce encore sur Baromatch.",
-    "demoLigne": "Les bars publiés s’afficheront ici.",
     "vide": "Aucun bar publié à Paris pour ce match."
   },
   "etat": {

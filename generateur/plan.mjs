@@ -152,8 +152,8 @@ const scene = (match, k, { donnees, T, avecPage, fixe, script }) => {
   if (vrais.length) {
     liste = `<p class="liste__compte">${e(remplir(T.compte.bars, { bars: accorder(vrais.length, 'bar'), match: nom }))}</p>\n<ol class="bars">\n${vrais.map((b) => ligneDuBar(b, k, T)).join('\n')}\n</ol>\n`;
   } else if (demo) {
-    const lignes = allumes.map((a) => `<li class="bar bar--demo" id="b${k}-a${a}" data-arr="${a}"><span class="bar__ligne">${jauge('jauge bar__jauge')}<span class="bar__nom">${arr(a)}</span><span class="bar__statut">${e(T.liste.demoLigne)}</span></span></li>`).join('\n');
-    liste = `<p class="liste__compte">${e(remplir(T.verite.demoScene, { arrondissements: enumerer(allumes.map(arr)) }))}</p>\n<ol class="bars bars--demo">\n${lignes}\n</ol>\n`;
+    // Une seule ligne, honnête : les arrondissements allumés et ce qui viendra, jamais une rangée de lignes toutes pareilles.
+    liste = `<p class="liste__compte liste__compte--demo">${e(remplir(T.verite.demoScene, { arrondissements: enumerer(allumes.map(arr)) }))}</p>\n`;
   } else {
     liste = `<p class="liste__compte">${e(T.liste.aucun)}</p>\n`;
   }

@@ -54,8 +54,16 @@ test.describe('sans aucun bar publié : jamais un bar inventé sur le plan', () 
       if (PLAN_DEMO === 'arrondissements') {
         expect(plan, p.chemin).toContain('class="plan__demo">Démo<');
         expect(plan, `${p.chemin} : des arrondissements entiers`).toMatch(/<use class="allume" href="#pl-a\d+"\/>/);
-        const lignes = [...plan.matchAll(/class="bar bar--demo"/g)];
-        expect(lignes.length, `${p.chemin} : une ligne par arrondissement allumé`).toBeGreaterThanOrEqual(5);
+        // Par scène (un match) : une seule ligne honnête qui nomme les arrondissements allumés, jamais une rangée de lignes
+        // toutes pareilles.
+        expect(plan, `${p.chemin} : plus de rangée de bars de démonstration`).not.toMatch(/bar--demo|bars--demo/);
+        const scenes = plan.split('<div class="scene"').slice(1);
+        expect(scenes.length, `${p.chemin} : des scènes`).toBeGreaterThan(0);
+        for (const scene of scenes) {
+          expect([...scene.matchAll(/class="liste__compte liste__compte--demo"/g)].length, `${p.chemin} : une seule ligne de démo`).toBe(1);
+          expect(scene.match(/<p class="liste__compte liste__compte--demo">([^<]*)<\/p>/)[1], p.chemin).toContain('Les bars publiés s’afficheront ici.');
+          expect([...scene.matchAll(/<use class="allume" href="#pl-a\d+"\/>/g)].length, `${p.chemin} : des arrondissements allumés`).toBeGreaterThanOrEqual(5);
+        }
       } else {
         expect(plan, p.chemin).not.toContain('class="allume"');
       }
@@ -210,6 +218,57 @@ test.describe('« Ce soir » servi : le plan allumé sans plan.js', () => {
   }
 });
 
+// ---------- « Proposer mon bar » collé en bas : jamais avec une autre barre fixe ----------
+
+test.describe('pour les bars au téléphone : une seule barre fixe en bas, jamais au premier écran', () => {
+  for (const texte of [100, 200]) {
+    test(`390 × 844, texte à ${texte} % : au plus une barre fixe à chaque pas du défilement, « Proposer mon bar » seulement sous le premier écran`, async ({ browser }) => {
+      const contexte = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      const onglet = await contexte.newPage();
+      await onglet.goto('/pour-les-bars.html');
+      await onglet.waitForLoadState('networkidle');
+      await onglet.evaluate((pc) => { document.documentElement.style.fontSize = `${pc}%`; }, texte);
+      const fixes = () => onglet.evaluate(() => [...document.querySelectorAll('body *')].filter((e) => {
+        const s = getComputedStyle(e);
+        if (s.position !== 'fixed' || s.display === 'none' || s.visibility === 'hidden') return false;
+        const r = e.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && !e.closest('.collant') !== !e.matches('.collant');
+      }).map((e) => (e.matches('.collant') ? 'collant' : e.className || e.tagName)));
+      const pas = await onglet.evaluate(() => Math.ceil(document.documentElement.scrollHeight / 250));
+      let vuLeCollant = false;
+      for (let i = 0; i <= pas; i += 1) {
+        await onglet.evaluate((y) => window.scrollTo(0, y), i * 250);
+        await onglet.waitForTimeout(60);
+        const lues = await fixes();
+        const y = await onglet.evaluate(() => window.pageYOffset);
+        expect(lues.length, `à ${y} px : ${lues.join(', ')}`).toBeLessThanOrEqual(1);
+        const collant = await onglet.evaluate(() => !document.getElementById('collant').hidden && getComputedStyle(document.getElementById('collant')).display !== 'none');
+        if (y < 844) expect(collant, `à ${y} px : sur le premier écran, rien ne colle`).toBe(false);
+        if (collant) vuLeCollant = true;
+      }
+      expect(vuLeCollant, 'le bouton colle quelque part sous le premier écran').toBe(true);
+      await contexte.close();
+    });
+  }
+});
+
+// ---------- L'accueil à l'ordinateur : pas de moitié vide au premier écran ----------
+
+test('l’accueil à 1440 × 900 : le texte d’ouverture occupe la moitié gauche du premier écran, à côté du plan', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const hero = await page.locator('.une-grille > .ouverture').boundingBox();
+  const plan = await page.locator('.une-grille > .paris').boundingBox();
+  const titre = await page.locator('.ouverture__titre').boundingBox();
+  const cta = await page.locator('.ouverture__cta').boundingBox();
+  expect(hero.x + hero.width, 'le texte à gauche du plan').toBeLessThanOrEqual(plan.x + 1);
+  // Le texte est centré dans le premier écran, en face du plan : ni collé au haut avec un grand vide dessous, ni sous la ligne de flottaison.
+  expect(cta.y + cta.height, 'le bouton est dans le premier écran').toBeLessThanOrEqual(900);
+  const haut = titre.y;
+  const bas = 900 - (cta.y + cta.height);
+  expect(Math.abs((haut - 84) - bas), 'autant de vide au-dessus qu’au-dessous (à 120 px près)').toBeLessThanOrEqual(120);
+});
+
 test('planDeParis : sans match, rien', async () => {
   const site = await fabriquer(sansBarPublie);
   expect(planDeParis({ matchs: [], donnees: site.donnees, marque: sansBarPublie.marque, chemin: '/ce-soir/', maintenant: VENDREDI })).toBe('');
@@ -316,7 +375,8 @@ test.describe('l’accueil à 390 × 844', () => {
     const page = await contexte.newPage();
     await page.goto('/');
     await expect(page.locator('.scene[data-i="1"] .plan__svg')).toBeVisible();
-    await expect(page.locator('.scene[data-i="1"] .bars--demo li').first()).toBeVisible();
+    await expect(page.locator('.scene[data-i="1"] .liste__compte--demo')).toBeVisible();
+    await expect(page.locator('.scene[data-i="1"] .bar')).toHaveCount(0);
     await expect(page.locator('.tenir__txt').first()).toHaveText('Maintiens pour garder ta place');
     await contexte.close();
   });

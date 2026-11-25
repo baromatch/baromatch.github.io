@@ -5,7 +5,7 @@
 // Le plan du site (sitemap.xml) : chaque entrée qui n’est pas une page générée est gardée telle quelle ; les pages
 // générées indexables y sont, avec la date de leur dernier vrai changement.
 // La liste blanche : le générateur n’écrit et n’efface que dans matchs/, regarder-le-match/ et bar/ (des pages, des
-// badges, des images de partage), et ne touche en dehors qu’à ce-soir/ (sa page et son image), à en/ (les pages en
+// badges, des images de partage, la story de l’affiche de la semaine : matchs/affiche/story.png et story-apercu.png), et ne touche en dehors qu’à ce-soir/ (sa page et son image), à en/ (les pages en
 // anglais, rien d’autre) et à sitemap.xml. Tout autre chemin est refusé, avant toute écriture. Les agendas
 // (agenda.mjs) : agenda/ (sa page et l’agenda de chaque club) et le fichier d’agenda de chaque match, à côté de sa page
 // (matchs/<match>/match.ics).
@@ -19,7 +19,7 @@ import { ORIGINE } from './jsonld.mjs';
 export const FICHIER_ETAT = 'regarder-le-match/etat.json';
 export const PLAN = 'sitemap.xml';
 const DOSSIERS = ['matchs', 'regarder-le-match', 'bar', 'en'];
-const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)|ce-soir\/(?:index\.html|partage\.png)|matchs\/[a-z0-9-]+\/match\.ics|agenda\/(?:index\.html|[a-z0-9-]+\.ics)|en\/(?:[a-z0-9-]+\/)*index\.html)$/;
+const PERMIS = /^(?:(?:matchs|regarder-le-match|bar)\/(?:[a-z0-9-]+\/)*(?:index\.html|badge\.svg|partage\.png)|ce-soir\/(?:index\.html|partage\.png)|matchs\/affiche\/story(?:-apercu)?\.png|matchs\/[a-z0-9-]+\/match\.ics|agenda\/(?:index\.html|[a-z0-9-]+\.ics)|en\/(?:[a-z0-9-]+\/)*index\.html)$/;
 
 export const estPermis = (relatif) => relatif === PLAN || relatif === FICHIER_ETAT || (PERMIS.test(relatif) && !relatif.split('/').includes('..'));
 

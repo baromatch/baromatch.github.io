@@ -803,7 +803,6 @@ html:has(form:target, section:target form) .pied{ padding-bottom: 40px; }
 @media (min-width: 720px) {
 .vitrine-accueil{ padding-top: 120px; padding-bottom: 128px; }
 }
-.testeurs-accueil__texte{ max-width: 36rem; margin: 22px 0 0; color: var(--texte-doux); }
 .vitrine-accueil__bouton, .inscription__bouton, .boutique-produit__ajouter, .boutique-barre__bouton, .panier__envoyer, .tablee__bouton, .capsule{
   display: inline-flex;
   align-items: center;

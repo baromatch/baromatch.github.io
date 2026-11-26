@@ -65,10 +65,9 @@ test('« préviens-moi » revient après les questions ; l’ambre ne mène qu�
   await expect(rappels).toHaveText(['L’appli arrive bientôt : préviens-moi']);
   await expect(rappels.first()).toHaveAttribute('href', '#attente');
   expect(await page.$$eval('main .rappel-attente', (p) => p.map((e) => e.closest('section').className.split(' ')[0]))).toEqual(['questions-fans']);
-  // Un seul lien « testeur » dans le contenu : sa section, en verre.
-  const testeurs = page.locator('main a[href="/testeurs-android.html"]');
-  await expect(testeurs).toHaveCount(1);
-  expect(await testeurs.evaluateAll((liens) => liens.map((a) => getComputedStyle(a).backgroundColor))).not.toContain('rgb(255, 177, 61)');
+  // Aucun lien « testeur » dans le contenu : le bloc des testeurs est sorti de l’accueil (26 nov. 2026) ; le pied de page y mène.
+  await expect(page.locator('main a[href="/testeurs-android.html"]')).toHaveCount(0);
+  await expect(page.locator('footer a[href="/testeurs-android.html"]')).toHaveCount(1);
   await expect(page.locator('main a[href*="boutique"]')).toHaveCount(0);
   expect(normaliser(await page.locator('main').innerText())).not.toMatch(/boutique/i);
   await expect(page.locator('header a[href="/boutique.html"]')).toHaveCount(0);
@@ -163,7 +162,7 @@ test('la note de la liste d’attente mène droit à ce qu’on fait de l’adre
 test('l’accueil est court : le geste, le prochain match, l’appli, les bars, l’essentiel et les questions ; ni soirée en huit moments, ni plan, ni semaine', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  expect(await page.$$eval('main > section', (s) => s.map((e) => e.className.split(' ')[0]))).toEqual(['geste', 'prochain', 'appli', 'bars', 'en-bref', 'testeurs-accueil', 'questions-fans']);
+  expect(await page.$$eval('main > section', (s) => s.map((e) => e.className.split(' ')[0]))).toEqual(['geste', 'prochain', 'appli', 'bars', 'en-bref', 'questions-fans']);
   for (const retire of ['.soiree', '.semaine', '.paris', '.essai', '.une-grille']) await expect(page.locator(retire), retire).toHaveCount(0);
   // Au téléphone : ce qui est écrit à la main tient en moins de 8 écrans (il en avait 11,4) ; le bloc du générateur (la carte,
   // sa bande, la semaine pliée), qui suit les matchs du jour, tient en moins d’un écran, quelle que soit leur semaine : la

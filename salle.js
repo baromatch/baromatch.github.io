@@ -24,6 +24,8 @@ if (moments.length && salle) {
 window.addEventListener("scroll", demander, { passive: true });
 window.addEventListener("resize", demander);
 placer();
+/* Les transitions ne commencent qu'une fois la salle à son premier état : à l'arrivée, rien ne bouge. */
+window.requestAnimationFrame(function () { window.requestAnimationFrame(function () { soiree.classList.add("pret"); }); });
 }
 
 /* Le geste : maintenir 1,4 s remplit le bouton ; lâché avant, il se vide. Doigt, souris, barre d'espace ou Entrée.

@@ -63,6 +63,7 @@ body:not(.js) .salle__heure{ display: none; }
 .s-jeu-b{ fill: var(--camp-b); }
 .s-jeu-b2{ fill: var(--camp-b2); }
 .s-jeu-ligne{ fill: #FFFFFF; opacity: 0.9; }
+.s-halo{ opacity: 0; }
 .s-coule{ opacity: 0; }
 .s-contre{ opacity: 0; }
 /* Ta place : en pointillé tant qu'elle n'est pas gardée, à l'ambre quand tu l'as gardée, cochée quand tu es arrivé. */
@@ -72,6 +73,7 @@ body:not(.js) .salle__heure{ display: none; }
 .place-gardee .toi-plein{ opacity: 1; }
 .place-gardee .veillee:is([data-etat="2055"], [data-etat="2100"]) .toi-coche{ opacity: 1; }
 
+/* Les transitions ne jouent qu'une fois la salle à son premier état (salle.js pose « pret ») : à l'arrivée, rien ne bouge. */
 /* Les gens se posent : ils arrivent d'un cran plus haut, sans glisser. À chaque heure, ceux de son heure et des heures d'avant. */
 .gens{ opacity: 0; transform: translateY(-3px); }
 .veillee[data-etat="1842"] .s1,
@@ -88,12 +90,13 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .veillee[data-etat="2100"] :is(.s-lueur, .s-flaque){ opacity: 0.1; }
 .veillee[data-etat="2100"] .s-jeu{ opacity: 1; }
 .veillee[data-etat="2100"] .s-coule{ opacity: 0.62; }
+.veillee[data-etat="2100"] .s-halo{ opacity: 0.7; }
 .veillee[data-etat="2100"] .s-contre{ opacity: 1; }
 .veillee[data-etat="2100"] .s-reflet{ opacity: 0; }
-.js .gens{ transition: opacity var(--pose) var(--sortie-douce), transform var(--pose) var(--sortie-douce); }
-.js :is(.s-nuits, .s-jeu, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-coche, .s-reflet){ transition: opacity var(--pose) var(--sortie-douce); }
-.js .gens.r2{ transition-delay: 90ms; }
-.js .gens.r3{ transition-delay: 200ms; }
+.pret .gens{ transition: opacity var(--pose) var(--sortie-douce), transform var(--pose) var(--sortie-douce); }
+.pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-coche, .s-reflet){ transition: opacity var(--pose) var(--sortie-douce); }
+.pret .gens.r2{ transition-delay: 90ms; }
+.pret .gens.r3{ transition-delay: 200ms; }
 
 /* Les moments. */
 .moment{ padding: 56px 0 8px; }
@@ -168,7 +171,7 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .sousbock__face, .sousbock__dos{ position: absolute; inset: 0; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .sousbock__dos{ transform: rotateY(180deg); }
 .veillee[data-etat="2055"] .sousbock__tour, .veillee[data-etat="2100"] .sousbock__tour, body:not(.js) .sousbock__tour{ transform: rotateY(0) rotateZ(-6deg); }
-.js .sousbock__tour{ transition: transform 900ms var(--sortie-douce); }
+.pret .sousbock__tour{ transition: transform 900ms var(--sortie-douce); }
 .sousbock__ombre{ position: absolute; left: 22px; right: 22px; bottom: -2px; height: 12px; border-radius: 50%; background: rgba(10, 11, 16, 0.18); filter: blur(5px); }
 .sousbock figcaption{ margin: 12px 0 0; font-size: 0.875rem; color: var(--texte-discret); max-width: 28em; }
 .sb-carton{ fill: #E9DFC8; stroke: #CDBF9E; stroke-width: 1.2; }
@@ -190,6 +193,6 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 
 /* Réduire les animations : les états changent sans fondu ni pose, le sous-bock se retourne d'un coup. */
 @media (prefers-reduced-motion: reduce){
-  .js .gens, .js :is(.s-nuits, .s-jeu, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-coche, .s-reflet), .js .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
+  .pret .gens, .pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-coche, .s-reflet), .pret .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
   .gens{ transform: none; }
 }

@@ -68,6 +68,8 @@ const PERSONNES = `<symbol id="gens" viewBox="0 0 12 17"><path d="M.8 17C.8 11.2
   + `<symbol id="liseret-debout" viewBox="0 0 12 30"><path d="M.8 22C.8 11.4 3 8.6 6 8.6s5.2 2.8 5.2 13.4M2.7 4.3a3.3 3.3 0 0 1 6.6 0" class="g-liseret"/></symbol>`;
 
 const LUMIERES = `<radialGradient id="s-chaud"><stop offset="0" stop-color="#FFF4DC" stop-opacity=".95"/><stop offset=".45" stop-color="#FFF1D2" stop-opacity=".4"/><stop offset="1" stop-color="#FFF1D2" stop-opacity="0"/></radialGradient>`
+  + `<radialGradient id="s-halo-a"><stop offset="0" stop-color="#37D2BE" stop-opacity=".75"/><stop offset="1" stop-color="#37D2BE" stop-opacity="0"/></radialGradient>`
+  + `<radialGradient id="s-halo-b"><stop offset="0" stop-color="#8F96FF" stop-opacity=".75"/><stop offset="1" stop-color="#8F96FF" stop-opacity="0"/></radialGradient>`
   + `<linearGradient id="s-coule-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#37D2BE" stop-opacity=".85"/><stop offset="1" stop-color="#37D2BE" stop-opacity="0"/></linearGradient>`
   + `<linearGradient id="s-coule-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8F96FF" stop-opacity=".85"/><stop offset="1" stop-color="#8F96FF" stop-opacity="0"/></linearGradient>`;
 
@@ -127,6 +129,10 @@ export const salle = () => {
   const noir = [poly([p(0, 0), p(U, 0), p(U, 0, HAUTEUR), p(0, 0, HAUTEUR)], 'class="s-nuit"'), poly([p(0, 0), p(0, V), p(0, V, HAUTEUR), p(0, 0, HAUTEUR)], 'class="s-nuit"'), poly([p(0, 0), p(U, 0), p(U, V), p(0, V)], 'class="s-nuit"')].join('');
 
   // L’écran du fond : éteint, puis aux couleurs des deux clubs (Alvène à gauche, Orvèle à droite).
+  // La lumière de l'écran sur les murs, avant l'écran lui-même : un halo vert d'un côté, indigo de l'autre.
+  const [ax, ay] = p(4.2, 0, 2);
+  const [bx, by] = p(6.0, 0, 2);
+  const halo = `<clipPath id="s-mur-clip"><path d="M${[p(0, 0), p(U, 0), p(U, 0, HAUTEUR), p(0, 0, HAUTEUR)].map(pt).join('L')}Z"/></clipPath><g class="s-halo" clip-path="url(#s-mur-clip)"><ellipse cx="${f(ax)}" cy="${f(ay)}" rx="46" ry="30" fill="url(#s-halo-a)"/><ellipse cx="${f(bx)}" cy="${f(by)}" rx="46" ry="30" fill="url(#s-halo-b)"/></g>`;
   const ecran = poly([p(3.3, 0, 1.25), p(6.9, 0, 1.25), p(6.9, 0, 2.75), p(3.3, 0, 2.75)], 'class="s-ecran"');
   const reflet = poly([p(3.4, 0, 1.3), p(4.3, 0, 1.3), p(3.9, 0, 2.7), p(3.4, 0, 2.7)], 'class="s-reflet"');
   const moitie = (u0, u1, classe) => poly([p(u0, 0, 1.38), p(u1, 0, 1.38), p(u1, 0, 2.62), p(u0, 0, 2.62)], `class="${classe}"`);
@@ -138,7 +144,7 @@ export const salle = () => {
   const [tx, ty] = p(toi.u, toi.v, 0.5);
   const maPlace = `<g class="s-toi"><ellipse class="toi" cx="${f(tx)}" cy="${f(ty)}" rx="6.6" ry="4"/><ellipse class="toi-plein" cx="${f(tx)}" cy="${f(ty)}" rx="6.6" ry="4"/><path class="toi-coche" d="M${f(tx - 3.2)} ${f(ty + 0.2)}l2.1 2 4.3-4.4"/></g>`;
 
-  return `<svg class="salle__dessin" viewBox="46 -12 286 224" width="286" height="224" aria-hidden="true" focusable="false"><defs>${PERSONNES}${LUMIERES}</defs>${murD}${murG}${sol}${sousLeSol}${plinthe}${lampes}${porte}${comptoir}${objets}<g class="s-nuits">${noir}</g>${ecran}${reflet}<g class="s-jeu">${match}</g>${coule}<g class="s-contre">${contreJour}</g>${maPlace}</svg>`;
+  return `<svg class="salle__dessin" viewBox="46 -12 286 224" width="286" height="224" aria-hidden="true" focusable="false"><defs>${PERSONNES}${LUMIERES}</defs>${murD}${murG}${sol}${sousLeSol}${plinthe}${lampes}${porte}${comptoir}${objets}<g class="s-nuits">${noir}</g>${halo}${ecran}${reflet}<g class="s-jeu">${match}</g>${coule}<g class="s-contre">${contreJour}</g>${maPlace}</svg>`;
 };
 
 // Le dessin tel qu’il s’écrit dans la page, entre ses repères.

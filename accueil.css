@@ -163,9 +163,9 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 
 /* 20:55 : le sous-bock, un disque de carton qui se retourne. */
 .sousbock{ margin: 26px 0 0; }
-.sousbock__scene{ position: relative; width: 176px; height: 176px; perspective: 800px; }
-.sousbock__tour{ position: absolute; inset: 8px; transform-style: preserve-3d; transform: rotateY(180deg) rotateZ(-6deg); }
-.sousbock__face, .sousbock__dos{ position: absolute; inset: 0; width: 160px; height: 160px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.sousbock__scene{ position: relative; width: min(176px, 100%); aspect-ratio: 1; perspective: 800px; }
+.sousbock__tour{ position: absolute; inset: 4.5%; transform-style: preserve-3d; transform: rotateY(180deg) rotateZ(-6deg); }
+.sousbock__face, .sousbock__dos{ position: absolute; inset: 0; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .sousbock__dos{ transform: rotateY(180deg); }
 .veillee[data-etat="2055"] .sousbock__tour, .veillee[data-etat="2100"] .sousbock__tour, body:not(.js) .sousbock__tour{ transform: rotateY(0) rotateZ(-6deg); }
 .js .sousbock__tour{ transition: transform 900ms var(--sortie-douce); }

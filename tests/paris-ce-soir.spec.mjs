@@ -248,13 +248,13 @@ test('planDeParis : sans match, rien', async () => {
 test.describe('l’accueil à 390 × 844', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('chaque étiquette « Démo » fait au moins 12 px, et son contraste est d’au moins 4,5:1', async ({ page }) => {
+  test('chaque mention « Exemple » et « Démo » (la salle, le sous-bock, le geste) fait au moins 12 px, et son contraste est d’au moins 4,5:1', async ({ page }) => {
     await page.goto('/');
-    const etiquettes = await page.$$eval('.etiquette-demo', (liste) => liste.filter((e) => e.offsetParent !== null).map((e) => {
+    const etiquettes = await page.$$eval('.salle__legende, .sousbock figcaption, .maintien__aide', (liste) => liste.filter((e) => e.offsetParent !== null).map((e) => {
       const s = getComputedStyle(e);
-      return { taille: parseFloat(s.fontSize), couleur: s.color, fond: s.backgroundColor };
+      return { taille: parseFloat(s.fontSize), couleur: s.color, fond: getComputedStyle(document.body).backgroundColor };
     }));
-    expect(etiquettes.length).toBeGreaterThan(1);
+    expect(etiquettes).toHaveLength(3);
     const lum = (c) => {
       const [r, g, b] = c.match(/\d+(\.\d+)?/g).slice(0, 3).map((v) => { const x = Number(v) / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; });
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;

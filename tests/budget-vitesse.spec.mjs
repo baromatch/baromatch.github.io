@@ -143,9 +143,14 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // agrandi) ; styles.css (87 127) la marge des pilules qui grandit avec leur texte. Mesuré : les pages générées 104,08 Ko
 // (106 573 octets) : seuil 104 inchangé ; les affiches 121,96 Ko (124 885 octets) : leur seuil de CSS monte de 121 à
 // 122. Les transférés tiennent leurs seuils, comme l’accueil (85,08 Ko de CSS) et les pages écrites à la main.
+// 26 novembre 2026, l'accueil « La salle » (piste C) : plus de film, d'écrans en WebP, de téléphone de démo ni de grands insignes ;
+// une salle dessinée en SVG (une trentaine de gens en <use>), un script de plus (salle.js, 2,7 Ko ; main.js n'a plus que la liste
+// d'attente, 5,6 Ko), une feuille de style de moins (accueil.css de 28 à 12 Ko). Mesuré (Ko) : 7 requêtes, 138 transférés, JS 9, CSS 61,
+// images 0 (avant : 6, 173,8, 18,8, 86,1, 19,2) ; sa semaine pleine (dix matchs un samedi, six en liste, sept piles) 146 transférés
+// (avant : 191,9). Seuils : 7, 140, 9, 62, 0 et, pour la semaine pleine, 148.
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 8, transfere: 175, js: 19, css: 87, images: 24 } },
-  { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 8, transfere: 193, js: 19, css: 87, images: 24 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 7, transfere: 140, js: 9, css: 62, images: 0 } },
+  { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 7, transfere: 148, js: 9, css: 62, images: 0 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 87, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 87, images: 0 } },
   { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 99, images: 42 } },
@@ -213,11 +218,11 @@ test.beforeAll(async () => {
     sites.push({ dossier });
     await construireLeSiteDExemple(dossier, { rendu: null, marque });
     sites.at(-1).serveur = await demarrerServeur(await portLibre(), -1, { dossier });
-    // L’accueil d’une vraie semaine : les 25 matchs de l’accueil du vendredi 30 octobre 2026 (tests/donnees/semaine-pleine.json),
-    // lus à 8 h à Paris ce jour-là.
+    // L’accueil d’une vraie semaine : les 25 matchs de la semaine du vendredi 30 octobre 2026 (tests/donnees/semaine-pleine.json),
+    // lus le samedi 31 octobre à 8 h à Paris, le jour le plus chargé (dix matchs : la liste en montre six).
     const plein = mkdtempSync(path.join(tmpdir(), 'budget-vitesse-'));
     sites.at(-1).plein = { dossier: plein };
-    await construireLeSiteDExemple(plein, { source: `scenario:${SEMAINE_PLEINE}`, maintenant: Date.parse('2026-10-30T07:00:00Z'), rendu: null, marque });
+    await construireLeSiteDExemple(plein, { source: `scenario:${SEMAINE_PLEINE}`, maintenant: Date.parse('2026-10-31T07:00:00Z'), rendu: null, marque });
     sites.at(-1).plein.serveur = await demarrerServeur(await portLibre(), -1, { dossier: plein });
   }
 });
@@ -234,15 +239,17 @@ test.afterAll(async () => {
   sites.length = 0;
 });
 
-test('la semaine pleine : le bloc de l’accueil ne porte que la carte, sa bande (4 au plus) et 6 matchs, quel que soit le nombre de matchs de la semaine', () => {
+test('la semaine pleine : le bloc de l’accueil ne porte que six matchs et sept piles de quatre insignes au plus, quel que soit le nombre de matchs de la semaine', () => {
   const accueil = readFileSync(path.join(sites[0].plein.dossier, 'index.html'), 'utf8');
   const bloc = accueil.split('<!-- semaine:debut -->')[1].split('<!-- semaine:fin -->')[0];
-  expect((bloc.match(/<h3 class="coup__titre" data-mot="\d+">/g) ?? []).length).toBe(1);
-  expect((bloc.match(/<a class="puce"/g) ?? []).length).toBeLessThanOrEqual(4);
-  const donnees = JSON.parse(bloc.match(/<script type="application\/json" id="donnees-ce-soir">([\s\S]*?)<\/script>/)[1]);
-  expect(donnees.matchs).toHaveLength(6);
-  // Un grand dessin pour le premier match seulement, un petit pour chaque autre club : la page reste légère.
-  expect((bloc.match(/<symbol id="d-/g) ?? []).length).toBe(2);
+  expect((bloc.match(/<a class="match"/g) ?? []).length).toBe(6);
+  expect((bloc.match(/<span class="sept__jour[ "]/g) ?? []).length).toBe(7);
+  expect((bloc.match(/<use href="#p-[^"]+" x="2"/g) ?? []).length).toBeLessThanOrEqual(7 * 4);
+  // Un seul petit dessin par club (30 px, comme la liste de l’appli), jamais un grand : la page reste légère.
+  const symboles = bloc.match(/<symbol id="[dp]-/g) ?? [];
+  expect(symboles.filter((s) => s.includes('"d-'))).toHaveLength(0);
+  expect(symboles.length).toBeLessThanOrEqual(12 + 7 * 4);
+  expect(bloc.length, 'octets du bloc').toBeLessThan(75_000);
 });
 
 for (const [rang, { nom, marque, plus }] of MESURES.entries()) {

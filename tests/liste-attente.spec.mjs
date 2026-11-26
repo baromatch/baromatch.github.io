@@ -44,7 +44,7 @@ for (const largeur of [360, 1280]) {
     await sInscrire(page, 'paul@gmail');
     await expect(champ(page)).toHaveAttribute('aria-invalid', 'true');
     // L’accueil est au jour (styles.css, .jour) : l’erreur y est rouge foncé (#B42318, 6:1 sur le crème) ; la nuit, #FF9C8A.
-    expect(await cadre.evaluate((e) => [getComputedStyle(e).borderTopColor, getComputedStyle(e).borderTopWidth])).toEqual(['rgb(255, 156, 138)', '2px']); // (le formulaire est dans l’étape 4, de nuit : le rouge de la nuit)
+    expect(await cadre.evaluate((e) => [getComputedStyle(e).borderTopColor, getComputedStyle(e).borderTopWidth])).toEqual(['rgb(180, 35, 24)', '2px']); // (le formulaire est dans le premier moment, au jour : le rouge foncé du jour)
     expect(await place()).toEqual(avant);
   });
 }

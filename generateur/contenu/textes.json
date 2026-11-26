@@ -216,18 +216,18 @@
     "apercu": "Aperçu du badge : {texte}"
   },
   "accueil": {
-    "_lisezMoi": "Le moment de 19:30, « Choisis ton match », de l’accueil « La salle », que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : une phrase qui dit le jour (« Ce soir », « Aujourd’hui », « Demain », ou la date du prochain jour de matchs) et ce qui est vrai des bars, la liste des matchs du jour (leur heure, leurs deux insignes, le lien de leur page), puis la semaine dessinée, qui mène à tous les matchs. Aujourd’hui aucun bar n’est publié : « aucunBar » est la phrase vraie ; dès qu’un match a un bar, « barsUn » ou « barsPlusieurs » prennent le relais ({n} est le nombre de matchs du jour qui en ont). Rien n’est gardé sur l’appareil du visiteur.",
+    "_lisezMoi": "Le moment de 19:30, « Choisis ton match », de l’accueil « La salle », que le générateur écrit dans index.html toutes les 3 heures (et juste après minuit), entre ses deux repères, et nulle part ailleurs : une phrase qui dit le jour (« Ce soir », « Aujourd’hui », « Demain », ou la date du prochain jour de matchs) et ce qui est vrai des bars, la liste des matchs du jour (leur heure, leurs deux insignes, le lien de leur page), puis la semaine dessinée, qui mène à tous les matchs. Aujourd’hui aucun bar n’est publié : « aucunBar » est la phrase vraie ; dès qu’un match a un bar, « barsUn » ou « barsPlusieurs » prennent le relais ({n} est le nombre de matchs du jour qui en ont). Rien n’est gardé sur l’appareil du visiteur.",
     "aujourdhui": "aujourd’hui",
     "ceSoir": "ce soir",
     "demain": "demain",
-    "aucunBar": "Aucun bar ne les annonce encore sur Baromatch : chaque match a déjà sa page.",
+    "aucunBar": "Aucun bar ne les annonce encore sur Baromatch : chaque match a déjà sa page.",
     "barsUn": "Un de ces matchs a déjà un bar sur Baromatch. Chaque match a sa page.",
     "barsPlusieurs": "{n} de ces matchs ont déjà un bar sur Baromatch. Chaque match a sa page.",
     "rien": "Aucun match annoncé pour l’instant. Les prochains arrivent dans la semaine.",
     "rienLien": "Voir la semaine",
     "tous": "Tous les matchs de ce soir",
     "tousSemaine": "Tous les matchs de la semaine",
-    "semaineTitre": "La semaine : {matchs}",
+    "semaineTitre": "La semaine : {matchs}",
     "semaineLien": "Tous les matchs, clubs et villes"
   }
 }

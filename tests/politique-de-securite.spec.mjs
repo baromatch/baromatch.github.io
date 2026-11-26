@@ -85,22 +85,21 @@ const ecouter = async (onglet) => {
 };
 
 test.describe('rien ne viole la politique en parcourant les pages', () => {
-  test('l’accueil : la liste d’attente (refus, inscription, correction) et le film', async ({ page }) => {
+  test('l’accueil : la liste d’attente (refus, inscription, correction), la salle qui suit l’heure et le geste « Maintiens »', async ({ page }) => {
     const violations = await ecouter(page);
     await simulerFormspree(page);
-    // Le film se charge dès qu’il est visible au tiers (main.js) : parfois déjà pendant la liste d’attente, au-dessus.
-    // Sa requête est donc attendue dès l’ouverture de la page, pas seulement après le défilement.
-    const film = page.waitForRequest(/baromatch-film\.mp4$/);
     await page.goto('/');
     await page.locator('#attente-mail').fill('paul@gmail');
     await page.locator('#attente button[type="submit"]').click();
     await page.locator('#attente-mail').fill('paul@gmail.com');
     await page.locator('#attente button[type="submit"]').click();
     await page.locator('#attente-corriger').click();
-    await page.locator('#film').scrollIntoViewIfNeeded();
-    await film;
-    await page.locator('#film-lecture').click();
-    await expect(page.locator('#film-lecture')).toHaveAccessibleName('Lire le film');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.reload();
+    await page.locator('[data-maintiens]').click();
+    await expect(page.locator('[data-statut]')).toHaveText('Place gardée.');
+    await page.locator('#bars').scrollIntoViewIfNeeded();
+    await expect(page.locator('.veillee')).toHaveAttribute('data-etat', '2100');
     expect(await violations()).toEqual([]);
   });
 

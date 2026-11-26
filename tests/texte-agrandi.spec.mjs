@@ -67,9 +67,10 @@ for (const largeur of [320, 360]) {
   });
 }
 
-// L’étiquette « Démo » (le téléphone de l’accueil, la salle de « Pour les bars ») : à 200 %, son texte reste dans sa pastille
-// (sinon une ligne claire sortirait sur le crème de la page : 1:1).
-for (const chemin of ['/', '/pour-les-bars.html']) {
+// L’étiquette « Démo » (la salle de « Pour les bars ») : à 200 %, son texte reste dans sa pastille (sinon une ligne claire
+// sortirait sur le crème de la page : 1:1). L’accueil n’a plus de pastille : ses mentions « Exemple » et « Démo » sont du texte
+// courant, que tests/accueil-semaine.spec.mjs garde dans l’écran à 200 %.
+for (const chemin of ['/pour-les-bars.html']) {
   for (const largeur of [320, 1280]) {
     test(`${chemin} à ${largeur} px, texte à 200 % : le texte de chaque étiquette « Démo » reste dans sa pastille`, async ({ page: onglet }) => {
       await couperLAPI(onglet);

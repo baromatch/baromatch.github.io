@@ -277,7 +277,7 @@ test.describe('le bloc de la semaine de l’accueil', () => {
     // Monaco et la France jouent deux fois chacun, et ne sont dessinés qu’une fois : leurs identifiants ne servent qu’une fois.
     expect(bloc.match(/<symbol id="p-monaco"/g)).toHaveLength(1);
     expect(bloc.match(/<symbol id="p-france"/g)).toHaveLength(1);
-    expect(ids.filter((id) => id.startsWith('ib-f-as-monaco-')).length).toBeGreaterThan(1);
+    expect(ids.filter((id) => id.startsWith('ib-f-as-monaco-')), 'Monaco est dessiné une seule fois, malgré ses deux matchs et sa pile').toHaveLength(1);
     expect(ids.filter((id) => id.startsWith('drapeau-fr-')).length).toBe(1);
     expect(ids.length - new Set(ids).size).toBe(0);
     for (const [, cible] of bloc.matchAll(/url\(#([^)]+)\)/g)) expect(ids).toContain(cible);

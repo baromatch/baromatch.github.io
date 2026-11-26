@@ -26,7 +26,7 @@ const TITRES_CHOISIS = {
 };
 const PAGES_MAISON = ['/', '/boutique.html', '/cgu.html', '/confidentialite.html', '/mentions-legales.html', '/supprimer-mon-compte.html', '/presse.html', '/a-propos.html', '/comment-on-choisit-les-bars.html', '/trouver-un-bar-qui-diffuse-le-match.html', '/testeurs-android.html'];
 const TYPES_ATTENDUS = {
-  '/': ['Organization', 'WebSite', 'MobileApplication', 'FAQPage'],
+  '/': ['Organization', 'WebSite', 'MobileApplication'],
   '/boutique.html': ['FAQPage'],
   '/cgu.html': ['WebPage'],
   '/confidentialite.html': ['WebPage'],
@@ -418,7 +418,7 @@ test('robots.txt : les outils de vérification hors de l’index, le site et ses
   const fermes = [...fichiersSous('tests'), '/package.json', '/package-lock.json', '/playwright.config.mjs'];
   expect(fermes.filter((chemin) => permis(chemin))).toEqual([]);
   const ouverts = [
-    ...INDEXABLES.map((p) => p.chemin), '/t/abcdefghjkmn', '/.well-known/assetlinks.json', '/styles.css', '/main.js', '/places.js',
+    ...INDEXABLES.map((p) => p.chemin), '/t/abcdefghjkmn', '/.well-known/assetlinks.json', '/styles.css', '/main.js', '/salle.js', '/places.js',
     '/tablee.js', '/boutique.js', '/boutique.css', '/fonts/bricolage-grotesque.woff2', '/img/og-image.jpg', '/favicon.svg', '/favicon.ico',
     '/apple-touch-icon.png', '/sitemap.xml', '/pour-les-bars.css', '/pour-les-bars.js', '/pour-les-bars-amorce.js',
     '/img/og-bars-2026-10.jpg', ...fichiersSous('img/bars'), '/llms.txt', ...fichiersSous('presse'), ...fichiersSous('badge'),
@@ -427,43 +427,34 @@ test('robots.txt : les outils de vérification hors de l’index, le site et ses
 });
 
 test.describe('l’ouverture de l’accueil', () => {
-  // Les animations du titre et de la phrase d’ouverture, et celles du verre, avec leur fin en millisecondes.
-  const lireAnimations = (onglet) => onglet.evaluate(() => document.getAnimations().map((animation) => {
-    const cible = animation.effect.target;
-    let zone = 'autre';
-    if (cible.closest('.ouverture__titre')) zone = 'titre';
-    else if (cible.closest('.ouverture__suite')) zone = 'suite';
-    else if (cible.closest('.verre')) zone = 'verre';
-    return { zone, fin: Math.round(animation.effect.getComputedTiming().endTime) };
-  }));
-
-  test('le titre et la phrase d’ouverture sont peints d’emblée : aucune animation ne les retient ; le téléphone de démo, lui, joue la sienne', async ({ page: onglet }) => {
+  test('le titre et la phrase d’ouverture sont peints d’emblée : aucune animation ne les retient', async ({ page: onglet }) => {
     await onglet.goto('/');
     const lu = await onglet.evaluate(() => ({
-      titre: [...document.querySelectorAll('.geste__titre, .geste__texte')].flatMap((e) => e.getAnimations({ subtree: true })).length,
-      opacite: getComputedStyle(document.querySelector('.geste__texte')).opacity,
-      decoupes: [...document.querySelectorAll('.geste__titre span')].map((x) => getComputedStyle(x).clipPath),
+      titre: [...document.querySelectorAll('.moment--ouverture h1, .moment--ouverture .chapo')].flatMap((e) => e.getAnimations({ subtree: true })).length,
+      opacite: getComputedStyle(document.querySelector('.moment--ouverture .chapo')).opacity,
+      decoupes: [...document.querySelectorAll('.moment--ouverture h1 span')].map((x) => getComputedStyle(x).clipPath),
+      transformes: [...document.querySelectorAll('.moment--ouverture h1, .moment--ouverture h1 span')].map((x) => getComputedStyle(x).transform),
     }));
-    expect(lu).toEqual({ titre: 0, opacite: '1', decoupes: ['none', 'none', 'none'] });
-    // Le téléphone joue ses tours (le verre se remplit) : ses animations finissent ou s’arrêtent (3 tours, WCAG 2.2.2).
-    await expect(onglet.locator('.g-tel')).toHaveClass(/est-auto/);
+    expect(lu).toEqual({ titre: 0, opacite: '1', decoupes: ['none', 'none', 'none'], transformes: ['none', 'none', 'none', 'none'] });
+    // La page ne joue aucune animation par elle-même : la salle change d’état par transition, quand un moment entre à l’écran.
+    await onglet.waitForTimeout(800);
+    expect(await onglet.evaluate(() => document.getAnimations().length)).toBe(0);
   });
 
-  test('avec « réduire les animations », tout est là d’emblée : aucune animation, le téléphone sur l’image fixe de la fin', async ({ page: onglet }) => {
+  test('avec « réduire les animations », tout est là d’emblée : aucune animation, le sous-bock face visible dès qu’on y arrive, la salle change sans fondu', async ({ page: onglet }) => {
     await onglet.emulateMedia({ reducedMotion: 'reduce' });
     await onglet.goto('/');
     const lu = await onglet.evaluate(() => ({
-      animations: document.getAnimations().filter((a) => a.effect?.target?.closest('.geste, .prochain')).length,
-      decoupes: [...document.querySelectorAll('.geste__titre span')].map((x) => getComputedStyle(x).clipPath),
-      opacite: getComputedStyle(document.querySelector('.geste__texte')).opacity,
-      fin: getComputedStyle(document.querySelector('.g-verre__mot--ok')).opacity,
-      auto: document.querySelector('.g-tel').classList.contains('est-auto'),
+      animations: document.getAnimations().length,
+      decoupes: [...document.querySelectorAll('.moment--ouverture h1 span')].map((x) => getComputedStyle(x).clipPath),
+      opacite: getComputedStyle(document.querySelector('.moment--ouverture .chapo')).opacity,
+      fondus: [...document.querySelectorAll('.gens, .s-nuits, .sousbock__tour')].every((e) => parseFloat(getComputedStyle(e).transitionDuration) === 0),
     }));
-    expect(lu).toEqual({ animations: 0, decoupes: ['none', 'none', 'none'], opacite: '1', fin: '1', auto: false });
+    expect(lu).toEqual({ animations: 0, decoupes: ['none', 'none', 'none'], opacite: '1', fondus: true });
   });
 });
 
-test.describe('le film de l’accueil', () => {
+test.describe('le film (affiche et fichier de la page Presse)', () => {
   const ffmpeg = (() => { try { execFileSync('ffmpeg', ['-version']); return true; } catch { return false; } })();
 
   test('son affiche n’est pas l’image de fin, qui annonce la plateforme ; il est sans son, en portrait, léger', () => {
@@ -485,56 +476,6 @@ test.describe('le film de l’accueil', () => {
     expect(pistes).toEqual(['video,720,1280']);
     expect(statSync(duDepot('baromatch-film.mp4')).size).toBeLessThan(1.2 * 1024 * 1024);
     expect(statSync(duDepot('baromatch-film.webp')).size).toBeLessThan(30 * 1024);
-  });
-
-  test('sans JavaScript, le cadre du film montre son affiche et se lit, sans bouton qui ne marche pas', async ({ browser, baseURL }) => {
-    for (const largeur of [360, 1280]) {
-      const contexte = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: largeur, height: 800 } });
-      // L’affiche servie comme GitHub Pages la sert (max-age=600), pas comme le serveur des tests (no-store). Sans
-      // JavaScript, deux lecteurs portent la même affiche (#film, caché, et celui du noscript) : le second reprend celle
-      // du premier, sauf si elle est « no-store » et déjà arrivée (Chromium avant 147), ce qui dépend du moment où
-      // l’analyseur de la page fait une pause entre les deux. Le site n’envoie jamais no-store.
-      await contexte.route('**/baromatch-film.webp', async (route) => {
-        const reponse = await route.fetch();
-        await route.fulfill({ response: reponse, headers: { ...reponse.headers(), 'cache-control': 'max-age=600' } });
-      });
-      const onglet = await contexte.newPage();
-      const demandees = [];
-      onglet.on('request', (requete) => {
-        const chemin = new URL(requete.url()).pathname;
-        if (/^\/baromatch-film[^/]*\.(jpe?g|png|webp)$/.test(chemin)) demandees.push(chemin);
-      });
-      await onglet.goto('/');
-      const cadre = onglet.locator('#film-cadre');
-      await cadre.scrollIntoViewIfNeeded();
-      const boite = await cadre.boundingBox();
-      expect(boite.height, `cadre en portrait à ${largeur} px`).toBeGreaterThan(boite.width);
-      await expect(onglet.locator('#film')).toBeHidden();
-      const lecteur = cadre.locator('video:visible');
-      await expect(lecteur).toHaveCount(1);
-      await expect(lecteur).toHaveAttribute('poster', '/baromatch-film.webp');
-      await expect(lecteur).toHaveAttribute('controls', '');
-      await expect.poll(() => demandees, { timeout: 5000 }).toEqual(['/baromatch-film.webp']);
-      await expect(onglet.locator('#film-lecture')).toBeHidden();
-      await contexte.close();
-    }
-  });
-
-  for (const [largeur, hauteur] of [[360, 800], [412, 823]]) test(`au téléphone (${largeur}×${hauteur}), le film ne se charge qu’en arrivant à l’écran ; une seule affiche, en WebP`, async ({ page: onglet }) => {
-    const films = [];
-    const affiches = [];
-    onglet.on('request', (requete) => {
-      const chemin = new URL(requete.url()).pathname;
-      if (chemin.endsWith('.mp4') && !films.includes(chemin)) films.push(chemin);
-      if (/^\/baromatch-film[^/]*\.(jpe?g|png|webp)$/.test(chemin)) affiches.push(chemin);
-    });
-    await onglet.setViewportSize({ width: largeur, height: hauteur });
-    await onglet.goto('/');
-    await onglet.waitForLoadState('networkidle');
-    expect(films).toEqual([]);
-    expect(affiches).toEqual(['/baromatch-film.webp']);
-    await onglet.locator('#film').scrollIntoViewIfNeeded();
-    await expect.poll(() => films, { timeout: 5000 }).toEqual(['/baromatch-film.mp4']);
   });
 });
 

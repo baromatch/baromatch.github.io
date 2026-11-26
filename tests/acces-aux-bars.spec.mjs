@@ -42,7 +42,7 @@ test.describe('la bande « bars » de l’accueil', () => {
   test('elle arrive juste après « L’appli », avant « Baromatch en bref » ; les questions ferment la page (la boutique est dans le pied de page)', async ({ page }) => {
     await page.goto('/');
     const ordre = await page.$$eval('main > section', (sections) => sections.map((s) => s.id || s.className.split(' ')[0]));
-    expect(ordre).toEqual(['geste', 'ce-soir', 'appli', 'bars', 'en-bref', 'testeurs-accueil', 'questions']);
+    expect(ordre).toEqual(['geste', 'ce-soir', 'appli', 'bars', 'en-bref', 'questions']);
   });
 
   test('aucune phrase de la bande ne promet ce que Baromatch ne tient pas', async ({ page }) => {

@@ -723,7 +723,7 @@ test.describe('le contraste du prochain match, mesuré au pixel', () => {
       await page.clock.setFixedTime(new Date('2026-11-25T18:30:00Z'));
       await page.goto('/');
       await page.waitForLoadState('networkidle');
-      const NUIT = '.g-ecran, .pied, .film, .bars, .appli, .testeurs-accueil, .attente__piege, .menu';
+      const NUIT = '.g-ecran, .pied, .film, .bars, .appli, .attente__piege, .menu';
       for (const ouverte of [false, true]) {
         if (ouverte) {
           // L’ouverture fait défiler la page jusqu’à la réponse, dans l’évènement « toggle », qui arrive après le clic : on attend

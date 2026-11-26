@@ -345,15 +345,11 @@
 .en-bref{padding-top:32px;padding-bottom:24px}
 .faits{margin-top:12px}
 .faits>div{padding:8px 0}
-.testeurs-accueil{padding-top:28px;padding-bottom:28px}
 }
 @media (max-width:959px){
-.testeurs-accueil{padding-top:20px;padding-bottom:20px}
 .faits dt, .faits dd{font-size:0.875rem;line-height:1.4}
 .bars__contenu{padding-top:28px;padding-bottom:28px}
 .bars__texte{font-size:0.9375rem}
-.testeurs-accueil__texte{font-size:0.9375rem}
-.vitrine-accueil__bouton{margin-top:16px}
 }
 .album__face{opacity:1}
 .album__dos{opacity:0}

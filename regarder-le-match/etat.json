@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "YceoT53-Od5U2VF0EThM8w",
+   "empreinte": "OhlLM5toWy65ABYXxDAgWA",
    "change": "2026-11-26",
    "indexable": false,
    "bars": []
@@ -735,7 +735,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "IkxpIaz1aiRvWYx9lCSFBQ",
+   "empreinte": "18z9mpjey2I6RjKJ5oQD2w",
    "change": "2026-11-26",
    "indexable": false,
    "bars": []
@@ -7262,7 +7262,7 @@
   }
  },
  "accueil": {
-  "empreinte": "7DYss1IKAB66zIoj9exdjA",
+  "empreinte": "bixWOPFOYor5_OIFjeNZWw",
   "change": "2026-11-26"
  }
 }

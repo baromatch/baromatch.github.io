@@ -7,7 +7,7 @@ Mis à jour à chaque étape (la session peut s’arrêter d’un coup).
 - [x] « L’appli est en anglais si le téléphone l’est » : retirée (pas prouvable depuis ce dépôt ; le dépôt de l’appli n’a pas pu être attaché).
 - [x] Aucun mot de boisson, aucun « ! » sur la page anglaise (relu, et confirmé par la relecture à froid).
 - [ ] Lighthouse téléphone (98+, accessibilité 100, CLS 0).
-- [ ] Captures 390 px et 1440 px, texte à 200 %.
+- [x] Captures 390 px et 1440 px, texte à 200 % : `captures/`, français à gauche, anglais à droite ; aucun défilement de côté.
 - [x] Relecture « trois visiteurs » (agent à froid) : « prête avec de petites corrections » ; corrections faites (le haut de page dit ce qu’est Baromatch, un lien pour le fan, l’ancre de « Les bars que nous contactons », des tournures moins traduites).
 - [x] Les phrases juridiques en anglais, pour le propriétaire (la note `juridique`, dans ce dossier), avec deux points à trancher.
 - [ ] PR en brouillon vers `main` (le maestro fusionne après le oui du propriétaire).

@@ -4,7 +4,7 @@ Mis à jour à chaque étape (la session peut s’arrêter d’un coup).
 
 - [x] `main` fusionné dans la branche (26/11, conflit du plan du site résolu, mesure : rien à réécrire).
 - [ ] La suite entière, trois fois de suite.
-- [x] « L’appli est en anglais si le téléphone l’est » : retirée (pas prouvable depuis ce dépôt ; le dépôt de l’appli n’a pas pu être attaché).
+- [x] « L’appli est en anglais si le téléphone l’est » : retirée (pas prouvable depuis ce dépôt).
 - [x] Aucun mot de boisson, aucun « ! » sur la page anglaise (relu, et confirmé par la relecture à froid).
 - [x] Lighthouse téléphone, trois passages : vitesse 99, accessibilité 100, bonnes pratiques 100, SEO 100, CLS 0, LCP 2,1 s, 319 Kio (la page française : 99, 100, 100, 100, CLS 0, 315 Kio).
 - [x] Captures 390 px et 1440 px, texte à 200 % : `captures/`, français à gauche, anglais à droite ; aucun défilement de côté.

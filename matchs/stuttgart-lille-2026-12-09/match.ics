@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbts47000qi2y6lsj4bukh@baromatch.fr
+DTSTAMP:20261125T200020Z
+SEQUENCE:1
+DTSTART:20261209T200000Z
+DTEND:20261209T220000Z
+SUMMARY:Stuttgart – Lille
+DESCRIPTION:Ligue des champions · VfB Stuttgart – LOSC Lille\nCoup d’e
+ nvoi mercredi 9 décembre à 21:00\, heure de Paris.\nLa page du match : 
+ https://baromatch.fr/matchs/stuttgart-lille-2026-12-09/
+URL:https://baromatch.fr/matchs/stuttgart-lille-2026-12-09/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

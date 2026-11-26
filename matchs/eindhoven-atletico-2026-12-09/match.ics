@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbts35000mi2y6u9w3wp0o@baromatch.fr
+DTSTAMP:20261125T200020Z
+SEQUENCE:0
+DTSTART:20261209T200000Z
+DTEND:20261209T220000Z
+SUMMARY:Eindhoven – Atlético
+DESCRIPTION:Ligue des champions · PSV Eindhoven – Atlético de Madrid\nC
+ oup d’envoi mercredi 9 décembre à 21:00\, heure de Paris.\nLa page du 
+ match : https://baromatch.fr/matchs/eindhoven-atletico-2026-12-09/
+URL:https://baromatch.fr/matchs/eindhoven-atletico-2026-12-09/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

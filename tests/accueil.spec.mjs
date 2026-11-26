@@ -3,6 +3,7 @@
 // de garder sa place sur un téléphone « Démo ». Juste dessous, le prochain match (accueil-prochain-match.spec.mjs). La liste
 // d’attente (« Préviens-moi ») garde son formulaire et ses mots ; aucune pastille « Arrive bientôt » en haut de page.
 import { test, expect } from '@playwright/test';
+import { BLOC_AU_PLUS_PX, ECRANS_A_LA_MAIN, lireLaHauteurDeLAccueil } from './outils/hauteur-accueil.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 const PLATEFORMES = 'L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.';
@@ -164,6 +165,10 @@ test('l’accueil est court : le geste, le prochain match, l’appli, les bars, 
   await page.goto('/');
   expect(await page.$$eval('main > section', (s) => s.map((e) => e.className.split(' ')[0]))).toEqual(['geste', 'prochain', 'appli', 'bars', 'en-bref', 'testeurs-accueil', 'questions-fans']);
   for (const retire of ['.soiree', '.semaine', '.paris', '.essai', '.une-grille']) await expect(page.locator(retire), retire).toHaveCount(0);
-  // Au téléphone, moins de 8 écrans (il en avait 11,4).
-  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThan(8 * 844);
+  // Au téléphone : ce qui est écrit à la main tient en moins de 8 écrans (il en avait 11,4) ; le bloc du générateur (la carte,
+  // sa bande, la semaine pliée), qui suit les matchs du jour, tient en moins d’un écran, quelle que soit leur semaine : la
+  // hauteur de l’accueil ne dépend pas des données (tests/accueil-sans-bar.spec.mjs la mesure dans une semaine pleine).
+  const { horsDuBloc, bloc } = await lireLaHauteurDeLAccueil(page);
+  expect(horsDuBloc, 'l’accueil écrit à la main').toBeLessThan(ECRANS_A_LA_MAIN * 844);
+  expect(bloc, 'le bloc du prochain match, au plus').toBeLessThanOrEqual(BLOC_AU_PLUS_PX);
 });

@@ -26,13 +26,15 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmwjbts3o000oi2y6so6oyvin@baromatch.fr
-DTSTAMP:20261116T215824Z
-SEQUENCE:0
+DTSTAMP:20261125T200020Z
+SEQUENCE:1
 DTSTART:20261209T200000Z
 DTEND:20261209T220000Z
 SUMMARY:Lens – Bodø/Glimt
 DESCRIPTION:Ligue des champions · RC Lens – FK Bodø/Glimt\nCoup d’env
- oi mercredi 9 décembre à 21:00\, heure de Paris.
+ oi mercredi 9 décembre à 21:00\, heure de Paris.\nLa page du match : ht
+ tps://baromatch.fr/matchs/lens-bodo-glimt-2026-12-09/
+URL:https://baromatch.fr/matchs/lens-bodo-glimt-2026-12-09/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

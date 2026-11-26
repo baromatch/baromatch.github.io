@@ -113,7 +113,8 @@ const lireLesLignes = (nuit) => {
       });
     });
   }
-  return lignes;
+  // Où la page est défilée à l’instant de la lecture (le même tour de script que les rectangles) et jusqu’où elle peut l’être.
+  return { lignes, haut: window.scrollY, maximum: document.documentElement.scrollHeight - window.innerHeight };
 };
 
 // La luminance relative de WCAG pour chaque valeur de canal, une fois pour toutes.
@@ -171,26 +172,42 @@ export const mesurerAuPixel = async (page, nuit) => {
   const lignes = new Map();
   for (let y = 0; ; y += pas) {
     const defilement = Math.min(y, Math.max(0, total - hauteur));
-    await page.evaluate((haut) => window.scrollTo({ top: haut, behavior: 'instant' }), defilement);
-    // Deux images, pour que ce qui suit le défilement (la lumière du match, ses halos) ait fini de se poser, et la fin des
-    // transitions et des animations qui ne tournent pas sans fin (une couleur lue à mi-chemin du texte qui reparaît serait un gris).
-    // Celles qui suivent le défilement (le menu qui devient le bandeau du bas) ne finissent pas avec le temps : pas d’attente.
-    await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
-    await page.evaluate(() => Promise.all(document.getAnimations()
-      .filter((animation) => animation.timeline === document.timeline && animation.effect?.getComputedTiming().endTime !== Infinity)
-      .map((animation) => animation.finished.catch(() => {}))));
-    const vues = await page.evaluate(lireLesLignes, `${nuit}, ${TOUJOURS_HORS_JEU}`);
-    await cacher(true);
-    // La photo, les animations arrêtées comme le fait « animations: 'disabled' » (celles qui tournent sans fin ramenées à
-    // leur début ; les autres sont déjà finies) ; sauf celles qui suivent le défilement : le menu devenu le bandeau du bas
-    // reste là où le visiteur le voit (« disabled » le renverrait dans son rang, en haut de la page).
-    await page.evaluate(() => {
-      window.animationsArretees = document.getAnimations().filter((animation) => animation.timeline === document.timeline && animation.playState === 'running');
-      for (const animation of window.animationsArretees) animation.cancel();
-    });
-    const image = lirePng(await page.screenshot());
-    await page.evaluate(() => { for (const animation of window.animationsArretees) animation.play(); });
-    await cacher(false);
+    // Un passage n’est pris que si la page est restée là où on l’a mise, de la lecture des rectangles à la photo. Un défilement qui
+    // arrive entre les deux (celui d’une réponse qui s’ouvre : `toggle` puis scrollIntoView, après coup quand la machine est chargée)
+    // met les rectangles à un endroit et la photo à un autre, et un texte se mesure alors sur ce qui n’est pas derrière lui (le
+    // bandeau du bas, le fond de la page : 1,01:1). Le passage est refait, jusqu’à 5 fois.
+    let vues = null;
+    let image = null;
+    for (let essai = 1; !image; essai += 1) {
+      if (essai > 5) throw new Error(`mesurerAuPixel : la page défile toute seule (visée : ${defilement} px), la mesure n’est pas fiable`);
+      await page.evaluate((haut) => window.scrollTo({ top: haut, behavior: 'instant' }), defilement);
+      // Deux images, pour que ce qui suit le défilement (la lumière du match, ses halos) ait fini de se poser, et la fin des
+      // transitions et des animations qui ne tournent pas sans fin (une couleur lue à mi-chemin du texte qui reparaît serait un gris).
+      // Celles qui suivent le défilement (le menu qui devient le bandeau du bas) ne finissent pas avec le temps : pas d’attente.
+      await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+      await page.evaluate(() => Promise.all(document.getAnimations()
+        .filter((animation) => animation.timeline === document.timeline && animation.effect?.getComputedTiming().endTime !== Infinity)
+        .map((animation) => animation.finished.catch(() => {}))));
+      const lu = await page.evaluate(lireLesLignes, `${nuit}, ${TOUJOURS_HORS_JEU}`);
+      const visee = Math.min(defilement, Math.max(0, lu.maximum));
+      const aLaBonnePlace = (haut) => Math.abs(haut - visee) < 1;
+      if (!aLaBonnePlace(lu.haut)) continue;
+      await cacher(true);
+      // La photo, les animations arrêtées comme le fait « animations: 'disabled' » (celles qui tournent sans fin ramenées à
+      // leur début ; les autres sont déjà finies) ; sauf celles qui suivent le défilement : le menu devenu le bandeau du bas
+      // reste là où le visiteur le voit (« disabled » le renverrait dans son rang, en haut de la page).
+      await page.evaluate(() => {
+        window.animationsArretees = document.getAnimations().filter((animation) => animation.timeline === document.timeline && animation.playState === 'running');
+        for (const animation of window.animationsArretees) animation.cancel();
+      });
+      const photo = lirePng(await page.screenshot());
+      const apres = await page.evaluate(() => window.scrollY);
+      await page.evaluate(() => { for (const animation of window.animationsArretees) animation.play(); });
+      await cacher(false);
+      if (!aLaBonnePlace(apres)) continue;
+      vues = lu.lignes;
+      image = photo;
+    }
     if (image.largeur !== largeur) throw new Error(`mesurerAuPixel : la capture fait ${image.largeur} px de large, la page ${largeur}`);
     for (const ligne of vues) {
       const pire = pireDerriere(image, ligne);

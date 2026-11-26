@@ -24,7 +24,7 @@ const API = 'https://api-production-8ce4.up.railway.app';
 const ADRESSE = `${API}/api/public/bar-contact`;
 
 const TITRE = 'Match nights, your bar on Baromatch — For bars';
-const DESCRIPTION = 'Baromatch shows your bar to fans looking for where to watch the match, and holds their places. Free during the launch. Request to join.';
+const DESCRIPTION = 'Baromatch shows your bar to fans looking for where to watch the match, and holds their places. Free while we launch. Request to join.';
 const IMAGE_OG = '/img/og-bars-2026-10.jpg';
 
 const lire = (fichier) => readFileSync(`${racine}/${fichier}`, 'utf8');
@@ -114,6 +114,21 @@ test.describe('the head, and the two languages', () => {
     const versAnglais = page.locator('.ouverture-bars a[hreflang="en"]');
     await expect(versAnglais).toHaveAttribute('href', PAGE);
     await expect(page.locator('.ouverture-bars__delai[lang="en"]', { has: page.locator('a[hreflang="en"]') })).toHaveText('Running a pub in Paris? This page is also in English.');
+  });
+
+  // Un fan arrivé ici par erreur : une phrase du haut de page lui dit où aller, en anglais. Et la page ne promet pas
+  // que l’appli suit la langue du téléphone : ce n’est pas vérifiable depuis ce dépôt (la page dit seulement ce que
+  // les autres pages en anglais disent déjà).
+  test('a fan who lands here: the hero says what Baromatch is, and sends them to the English match pages', async ({ page }) => {
+    await page.goto(PAGE);
+    await expect(page.locator('.ouverture-bars__texte')).toHaveText('Fans find your bar on the Baromatch app and hold a place. You choose how many places you open: the rest of your bar stays as it is.');
+    const versLesMatchs = page.locator('.ouverture-bars__delai a[href="/en/"]');
+    await expect(versLesMatchs).toHaveText('Where to watch, in English');
+    await expect(page.locator('.ouverture-bars__delai', { has: page.locator('a[href="/en/"]') })).toHaveText('A fan looking for a match? Where to watch, in English.');
+    expect(SOURCE).not.toMatch(/set to English|language of (?:the|your) phone/);
+  });
+
+  test('the French page keeps its address', async () => {
     // L’adresse française reste la sienne : son canonique, son titre, son plan.
     expect(SOURCE_FR).toContain(`<link rel="canonical" href="${CANONIQUE_FR}">`);
     expect(readFileSync(`${racine}/sitemap.xml`, 'utf8')).toContain(`<loc>${CANONIQUE_FR}</loc>`);
@@ -242,7 +257,7 @@ test.describe('what the page says', () => {
     const sections = await page.$$eval('main > section', (liste) => liste.map((s) => s.getAttribute('aria-labelledby')));
     expect(sections).toEqual(['titre', 'titre-conditions', 'titre-marche', 'titre-questions', 'titre-privacy', 'titre-contact']);
     expect(await page.$$eval('main h2', (h) => h.map((e) => e.textContent))).toEqual([
-      'The conditions', 'How to start', 'Bars’ questions', 'Privacy: what we do with your details', 'Request to join',
+      'The conditions', 'How to start', 'Questions from bars', 'Privacy: what we do with your details', 'Request to join',
     ]);
   });
 
@@ -276,11 +291,11 @@ test.describe('what the page says', () => {
     await page.goto(PAGE);
     const lignes = await page.$$eval('#titre-conditions ~ .conditions__liste li', (li) => li.map((e) => e.textContent.replace(/\s+/g, ' ').trim()));
     expect(lignes).toHaveLength(7);
-    expect(lignes[0]).toBe('Free during the launch. If it becomes paid, we offer you a price: you accept, or you stop.');
+    expect(lignes[0]).toBe('Free while we launch. If it becomes paid, we offer you a price: you accept, or you stop.');
     expect(lignes[1]).toBe('No commitment. You stop whenever you want.');
-    expect(lignes[2]).toBe('Free for your customers. What they have at the bar, they pay at the bar. Without the app, they walk in as usual.');
-    expect(lignes[3]).toBe('Nothing without your OK. On this site, your bar appears only with your written consent.');
-    expect(lignes[4]).toBe('What you never see: a fan’s e-mail. At the door, a nickname and a number; the History only keeps totals.');
+    expect(lignes[2]).toBe('Free for your customers. They pay you for what they order, as usual. Without the app, they walk in as usual.');
+    expect(lignes[3]).toBe('Nothing without your say-so. On this site, your bar appears only with your written consent.');
+    expect(lignes[4]).toBe('Never shown to you: a fan’s e-mail address. At the door, a nickname and a number; the History only keeps totals.');
     // Ce que la page française dit, la page anglaise le dit aussi (la même règle, avec ses mots) : l’accord écrit, aucun bar qui paie.
     const francais = texteDe(principal(SOURCE_FR));
     expect(francais).toContain('Gratuit pendant le lancement. Si ça devient payant, on te propose un tarif : tu acceptes, ou tu arrêtes.');
@@ -297,16 +312,17 @@ test.describe('what the page says', () => {
     await page.goto(PAGE);
     await expect(page.locator('.ouverture-bars__delai').first()).toHaveText('A reply within 48 hours, from a person.');
     await expect(page.locator('#titre-contact ~ .chapo')).toHaveText('No account to create: a person reads every request and replies within 48 hours.');
-    await expect(page.locator('#demande-envoyee')).toContainText('We’ll reply within 48 hours to');
+    await expect(page.locator('#demande-envoyee')).toContainText('A person will reply to');
+    await expect(page.locator('#demande-envoyee')).toContainText('within 48 hours. No automated e-mail.');
     const faq = await page.$$eval('.questions details p', (p) => p.map((e) => e.textContent).join(' '));
     expect(faq).not.toMatch(/\b\d+\s*(?:hours?|h)\b/i);
   });
 
-  test('where the app stands, as on the French page: fans cannot book yet, the app is coming to the stores, Paris only', async ({ page }) => {
+  test('where the app stands, as on the French page: fans cannot book yet, the app will be on the stores soon, Paris first', async ({ page }) => {
     await page.goto(PAGE);
     await expect(page.locator('.ouverture-bars__etat')).toHaveText('Fans can’t book yet: we’re preparing the opening with the first bars.');
     const resume = await page.locator('.marche__resume').textContent();
-    expect(resume).toContain('coming soon to the stores, in Paris');
+    expect(resume).toContain('will be on the App Store and Google Play soon, starting in Paris');
     expect(resume).toContain('looking for its first bars in Paris');
     const francais = texteDe(principal(SOURCE_FR));
     expect(francais).toContain('Les fans ne réservent pas encore');
@@ -356,13 +372,13 @@ test.describe('the privacy summary, in English', () => {
   const SECTION = SOURCE.match(/<section class="conditions bloc page" id="privacy"[\s\S]*?<\/section>/)[0];
   const demandes = SECTION.slice(SECTION.indexOf('id="privacy-requests"'), SECTION.indexOf('id="privacy-contacted"'));
   const contactes = SECTION.slice(SECTION.indexOf('id="privacy-contacted"'));
-  const FR_DEMANDES = CONFIDENTIALITE.slice(CONFIDENTIALITE.indexOf('<h2 id="bars">'), CONFIDENTIALITE.indexOf('<h2 id="droits">'));
+  const FR_DEMANDES = CONFIDENTIALITE.slice(CONFIDENTIALITE.indexOf('<h2 id="bars">'), CONFIDENTIALITE.indexOf(CONFIDENTIALITE.includes('<h2 id="bars-contactes">') ? '<h2 id="bars-contactes">' : '<h2 id="droits">'));
   const dit = (html) => texteDe(html);
 
   test('it links to the French privacy page, which is the reference, from the section, the form and the explanation of each part', () => {
     expect(SECTION).toContain('<a href="/confidentialite.html" hreflang="fr" lang="fr">Confidentialité</a>');
     expect(SECTION).toContain('<a href="/confidentialite.html#bars" hreflang="fr" lang="fr">Les demandes des bars</a>');
-    expect(SECTION).toContain('<a href="/confidentialite.html" hreflang="fr" lang="fr">Les bars que nous contactons</a>');
+    expect(SECTION).toContain('<a href="/confidentialite.html#bars-contactes" hreflang="fr" lang="fr">Les bars que nous contactons</a>');
     expect(dit(SECTION)).toContain('The full page is in French, and it is the reference');
   });
 
@@ -451,7 +467,7 @@ test.describe('what a busy owner reads without looking', () => {
     const bouton = ouverture.getByRole('link', { name: 'Request to join' });
     await expect(bouton).toHaveAttribute('href', '#proposer');
     for (const element of [bouton, ouverture.locator('.ouverture-bars__prix'), ouverture.locator('.ouverture-bars__valeur')]) await expect(element).toBeInViewport({ ratio: 1 });
-    await expect(page.locator('.ouverture-bars__prix')).toHaveText('Free during the launch, no commitment.');
+    await expect(page.locator('.ouverture-bars__prix')).toHaveText('Free while we launch, no commitment.');
     const ambres = await ouverture.locator('.capsule, .panier__envoyer, .bouton-nuit').evaluateAll((els) => els.filter((e) => e.getClientRects().length && getComputedStyle(e).backgroundColor === 'rgb(255, 177, 61)').map((e) => e.textContent.trim()));
     expect(ambres).toEqual(['Request to join']);
     const boite = await bouton.boundingBox();

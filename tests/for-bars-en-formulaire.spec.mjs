@@ -44,7 +44,7 @@ const TEXTES = {
   accord: 'Tick the box to send your request.',
   emailIncomplet: 'This e-mail address is not complete.',
   emailArobase: 'Your e-mail address is missing the @.',
-  emailFin: 'Your e-mail address is missing its ending, for example .com or .fr.',
+  emailFin: 'Your e-mail address is missing its ending, such as .com or .fr.',
   emailCaractere: 'This e-mail address has a character that is not accepted: check accents, spaces and dots.',
   signe: {
     barName: 'The name of your bar has an emoji or a sign we can\'t accept: remove it.',
@@ -53,16 +53,16 @@ const TEXTES = {
   },
   brouillon: ['What you had written is here.', 'Finish, tick the box, then send your request.'],
   lent: ['The network is slow.', 'Your request is still on its way: keep this page open.'],
-  courriel: ['Your request has not gone yet.', 'Press “Open my e-mail app” and send the prepared e-mail: everything you wrote is already in it. We reply by e-mail.'],
+  courriel: ['Your request hasn’t been sent yet.', 'Press “Open my e-mail app” and send the prepared e-mail: everything you wrote is already in it. We reply by e-mail.'],
   messagerie: ['Did your e-mail app open?', 'Send the e-mail, and you\'re done. What you wrote stays here until you close the tab.'],
   horsLigne: ['No network.', 'Keep this page open: your request goes as soon as the network is back. You can also send it by e-mail, just below.'],
-  reseauRevenu: ['The network is back.', 'Your request has not gone: check it, then press “Send my request”.'],
+  reseauRevenu: ['The network is back.', 'Your request wasn’t sent: check it, then press “Send my request”.'],
   expiree: ['This page has been open for more than a day.', 'Reload it to send your request: what you wrote stays.'],
   expireeSansBrouillon: ['This page has been open for more than a day.', 'Send your request by e-mail: everything you wrote is already in it. If you reload the page, what you wrote may be erased.'],
   messagerieSansBrouillon: ['Did your e-mail app open?', 'Send the e-mail, and you\'re done.'],
   copieImpossible: ['Copy the text yourself.', 'Your browser doesn\'t let us copy it: it is selected, ready to copy. Paste it into an e-mail to contact@baromatch.fr.'],
   correction: ['Your first request has already gone.', 'Send this correction by e-mail: less than 10 minutes after the first, with the same address and the same bar, our server keeps only the first.'],
-  invalide: ['Some of your details are not accepted.', 'Send your request by e-mail: everything you wrote is already in it.'],
+  invalide: ['We couldn’t accept some of your details.', 'Send your request by e-mail: everything you wrote is already in it.'],
   tropDEnvois: ['Many requests from this connection.', 'We accept 5 per hour from the same network. Send your request by e-mail, or try again in an hour.'],
 };
 // La capsule ambre est le geste principal ; une capsule de verre, le second choix.
@@ -431,7 +431,7 @@ test.describe('before sending, the form checks', () => {
     await partiesEnTout(page, envois, 0);
   });
 
-  test('the trap field filled: “It’s sent.” shows, nothing is sent, and the draft stays in the tab; one space only: a person, and the request goes', async ({ page }) => {
+  test('the trap field filled: “Request sent.” shows, nothing is sent, and the draft stays in the tab; one space only: a person, and the request goes', async ({ page }) => {
     const { envois } = await ouvrir(page);
     await remplir(page);
     await page.locator(PIEGE).evaluate((champ) => { champ.value = 'https://example.com'; });
@@ -484,13 +484,13 @@ test.describe('before sending, the form checks', () => {
 });
 
 test.describe('the server’s answers', () => {
-  test('201: “It’s sent.” takes the focus, with the typed address; the form is emptied and the draft erased; “Send a new request” brings it back', async ({ page }) => {
+  test('201: “Request sent.” takes the focus, with the typed address; the form is emptied and the draft erased; “Send a new request” brings it back', async ({ page }) => {
     const { erreurs } = await ouvrir(page);
     await envoyerUneDemande(page);
     const envoyee = page.locator('#demande-envoyee');
     await expect(envoyee).toBeVisible();
     await expect(envoyee).toBeFocused();
-    await expect(envoyee.locator('.merci__titre')).toHaveText('It’s sent.');
+    await expect(envoyee.locator('.merci__titre')).toHaveText('Request sent.');
     await expect(page.locator('#demande-envoyee-email')).toHaveText(SAISIE.email);
     await expect(page.locator('#demande')).toBeHidden();
     await expect(page.locator('.formulaire__ailleurs')).toBeHidden();
@@ -585,7 +585,7 @@ test.describe('the server’s answers', () => {
     await partiesEnTout(page, envois, 2);
   });
 
-  test('a server error (500) then 201 on the new try: “It’s sent.”', async ({ page }) => {
+  test('a server error (500) then 201 on the new try: “Request sent.”', async ({ page }) => {
     const { envois } = await ouvrir(page, [reponse(500, {}), CREEE]);
     await envoyerUneDemande(page);
     await attendreEnvois(page, envois, 2);
@@ -733,7 +733,7 @@ test.describe('the commands, at 360 px and at 200 % text', () => {
     expect(debordent).toEqual([]);
   });
 
-  test('sent at 200 %: “It’s sent.” reads at the top of the screen, the thank-you has the focus', async ({ page }) => {
+  test('sent at 200 %: “Request sent.” reads at the top of the screen, the thank-you has the focus', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
     await ouvrir(page);
     await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });

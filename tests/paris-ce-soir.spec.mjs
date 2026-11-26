@@ -72,13 +72,13 @@ test.describe('sans aucun bar publié : jamais un bar inventé sur le plan', () 
     for (const p of site.pages) expect(p.contenu, p.chemin).not.toMatch(/Lucarne Lunaire|Poteau Rentrant|Reprise de Volée|Petit Pont|Grand Filet/);
   });
 
-  test('l’accueil : le bloc du prochain match dit « Aucun bar encore pour ce match. », sans bar posé ni inventé', async () => {
+  test('l’accueil : le bloc des matchs dit « Aucun bar ne les annonce encore sur Baromatch », sans bar posé ni inventé', async () => {
     const site = await fabriquer(sansBarPublie);
     const { blocDeLaSemaine } = await import('../generateur/accueil.mjs');
     const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: sansBarPublie.textes, marque: sansBarPublie.marque, maintenant: VENDREDI });
-    expect(bloc).toContain('Aucun bar encore pour ce match.');
+    expect(bloc).toContain('Aucun bar ne les annonce encore sur Baromatch');
     expect(bloc).not.toContain('class="pin');
-    expect(bloc.replace(/<script[\s\S]*?<\/script>/, '')).not.toMatch(/Voir les bars|data-voir-bars/);
+    expect(bloc).not.toMatch(/match__bars|Voir les bars|data-voir-bars/);
   });
 });
 

@@ -12,7 +12,7 @@ import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFile
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { blocDeLaSemaine, REPERES, TAILLE_DE_LA_BANDE, TAILLE_DES_DISQUES } from '../generateur/accueil.mjs';
+import { blocDeLaSemaine, REPERES, TAILLE_DES_INSIGNES } from '../generateur/accueil.mjs';
 import { chargerLeContenu } from '../generateur/contenu.mjs';
 import { clubDe, indexerLesClubs } from '../generateur/donnees.mjs';
 import { chainesNouvelles, declarationsInconnues, ecartsDeLaTable, refusDesNouveautes, TETE_DE_LA_TABLE, USAGE } from '../generateur/outils/insignes/exporter.mjs';
@@ -233,31 +233,30 @@ test.describe('la copie du générateur de l’appli', () => {
 });
 
 test.describe('l’accueil', () => {
-  test('la carte du prochain match : chaque club est dessiné une fois, comme l’appli le dessine (generateur/insigne.mjs), à la taille de la carte', async () => {
+  test('les matchs du jour et la semaine : chaque club est dessiné une fois, comme l’appli le dessine (generateur/insigne.mjs), sur fond clair', async () => {
     const site = await construireEnMemoire({ source: `scenario:${SEMAINE}`, maintenant: JEUDI, racine });
     const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant: JEUDI });
     const clubs = new Map(site.donnees.matchs.flatMap((m) => [m.domicile, m.exterieur]).map((c) => [c.cle, c]));
-    const symboles = [...bloc.matchAll(/<symbol id="([dp])-([^"]+)" viewBox="([^"]+)">([\s\S]*?)<\/symbol>/g)];
-    expect(symboles.filter(([, genre]) => genre === 'd')).toHaveLength(2);
+    const symboles = [...bloc.matchAll(/<symbol id="p-([^"]+)" viewBox="([^"]+)">([\s\S]*?)<\/symbol>/g)];
     expect(symboles.length).toBeGreaterThan(4);
-    expect(new Set(symboles.map(([, genre, cle]) => `${genre}${cle}`)).size, 'un club n’est dessiné qu’une fois par taille').toBe(symboles.length);
-    for (const [, genre, cle, boite, contenu] of symboles) {
-      const dessin = insigne(clubs.get(cle), { taille: genre === 'd' ? TAILLE_DES_DISQUES : TAILLE_DE_LA_BANDE, fond: 'night', maintenant: JEUDI });
-      expect(`<symbol viewBox="${boite}">${contenu}</symbol>`, `${genre}-${cle}`).toBe(`<symbol viewBox="${/viewBox="([^"]+)"/.exec(dessin)[1]}">${sansRacine(dessin)}</symbol>`);
+    expect(new Set(symboles.map(([, cle]) => cle)).size, 'un club n’est dessiné qu’une fois').toBe(symboles.length);
+    for (const [, cle, boite, contenu] of symboles) {
+      const dessin = insigne(clubs.get(cle), { taille: TAILLE_DES_INSIGNES, fond: 'light', maintenant: JEUDI });
+      expect(`<symbol viewBox="${boite}">${contenu}</symbol>`, cle).toBe(`<symbol viewBox="${/viewBox="([^"]+)"/.exec(dessin)[1]}">${sansRacine(dessin)}</symbol>`);
     }
-    // La carte et la bande reprennent ces dessins (<use>), et nomment les clubs en toutes lettres.
-    for (const [, genre, cle] of [...bloc.matchAll(/<use href="#([dp])-([^"]+)"\/>/g)]) expect(symboles.map(([, g, c]) => `${g}${c}`)).toContain(`${genre}${cle}`);
-    expect(bloc).toMatch(/<h3 class="coup__titre" data-mot="\d+"><a href="[^"]+" data-coup-page>[^<]+ <span class="coup__tiret">–<\/span> [^<]+<\/a><\/h3>/);
+    // La liste et la semaine reprennent ces dessins (<use>), et la liste nomme les clubs en toutes lettres.
+    const renvois = [...bloc.matchAll(/<use href="#p-([^"]+)"/g)];
+    expect(renvois.length).toBeGreaterThan(symboles.length);
+    for (const [, cle] of renvois) expect(symboles.map(([, c]) => c)).toContain(cle);
+    expect(bloc).toMatch(/<span class="match__nom">[^<]+ – [^<]+<\/span>/);
   });
 
-  test('le téléphone de démo : ses deux clubs inventés sont dessinés par generateur/insigne.mjs (insigneDeFiche), jamais un écusson', () => {
+  test('le téléphone de démo a disparu : l’accueil n’a plus d’insigne écrit à la main, et jamais un écusson', () => {
     const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
-    for (const { cle, fiche } of CLUBS_DE_DEMO) {
-      const dessin = insigneDeFiche(fiche, { taille: 40, fond: 'night' });
-      const symbole = `<symbol id="d-${cle}" viewBox="${/viewBox="([^"]+)"/.exec(dessin)[1]}">${sansRacine(dessin)}</symbol>`;
-      expect(accueil, cle).toContain(symbole);
-    }
+    expect(accueil).not.toContain('id="d-alvene"');
     expect(accueil).not.toMatch(/<img[^>]*(ecusson|blason|logo-club)/i);
+    // Les deux clubs inventés de la salle sont des couleurs, dessinées par le style (tests/accueil.spec.mjs), jamais un fichier image.
+    expect(accueil).not.toMatch(/<img\b/);
   });
 });
 
@@ -694,16 +693,14 @@ test.describe('plus aucun ancien disque, et jamais un écusson', () => {
       expect(rappel).toContain('aria-hidden="true"');
       expect(rappel).not.toMatch(/<image|<text|<title|style=/);
     }
-    // La bande : chaque pastille a ses deux disques, puis le nom écrit.
-    for (const puce of planches.match(/<a class="puce"[\s\S]*?<\/a>/g) ?? []) expect(puce).toMatch(/<span class="puce__nom">[^<]+ – [^<]+<\/span>/);
-    // Hors du bloc, aucun insigne écrit à la main, sauf la planche des deux clubs inventés du téléphone de démo (vérifiée
-    // ci-dessus : c’est le dessin de generateur/insigne.mjs) et les clubs du pied de page, le cadre de toutes les pages
+    // La liste : chaque match a ses deux disques, puis le nom écrit.
+    for (const ligne of planches.match(/<a class="match"[\s\S]*?<\/a>/g) ?? []) expect(ligne).toMatch(/<span class="match__nom">[^<]+ – [^<]+<\/span>/);
+    // Hors du bloc, aucun insigne écrit à la main, sauf les clubs du pied de page, le cadre de toutes les pages
     // (generateur/cadre.mjs, tests/cadre.spec.mjs), un insigne par club.
     const horsDuBloc = accueil.split(REPERES.debut)[0] + accueil.split(REPERES.fin)[1];
     const piedDeLAccueil = horsDuBloc.match(/<footer class="pied page"[\s\S]*?<\/footer>/)[0];
     const sansPied = horsDuBloc.replace(piedDeLAccueil, '');
-    expect(sansPied.match(/<svg class="insignes?[ "]/g) ?? []).toHaveLength(4);
-    expect(sansPied.match(/<svg class="insigne g-disque[^"]*" aria-hidden="true" focusable="false"><use href="#d-(alvene|orvele)"\/><\/svg>/g)).toHaveLength(4);
+    expect(sansPied.match(/<svg class="insignes?[ "]/g) ?? []).toHaveLength(0);
     expect(piedDeLAccueil.match(/<svg class="insignes?"/g)).toHaveLength(piedDeLAccueil.match(/<a class="pied__club"/g).length);
     // Un identifiant n’y sert qu’une fois.
     const ids = [...accueil.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);

@@ -1,53 +1,48 @@
-// Les chemins qui mènent à « Pour les bars » depuis le reste du site : la bande ambre de l’accueil (en « tu », avec la
-// capsule de nuit vers la page et l’e-mail en lien second) et le lien des règles de l’appli, au texte qui dit où l’on
+// Les chemins qui mènent à « Pour les bars » depuis le reste du site : le moment « coup d’envoi » de l’accueil (en « tu »,
+// avec son lien vers le formulaire de la page) et le lien des règles de l’appli, au texte qui dit où l’on
 // va (un lien interne descriptif aide aussi le référencement de la page).
 import { test, expect } from '@playwright/test';
 import { MARQUE } from './outils/marque.mjs';
 
 const normaliser = (texte) => texte.replace(/\s+/g, ' ').trim();
 
-test.describe('la bande « bars » de l’accueil', () => {
-  test('elle garde son ancre #bars et parle « tu », sans « vous »', async ({ page }) => {
+test.describe('le moment « bars » de l’accueil, au coup d’envoi', () => {
+  test('il garde son ancre #bars et parle « tu », sans « vous »', async ({ page }) => {
     await page.goto('/#bars');
-    const bande = page.locator('section#bars');
-    await expect(bande).toHaveCount(1);
-    await expect(bande).toHaveAttribute('aria-labelledby', 'titre-bars');
-    await expect(bande.locator('h2#titre-bars')).toHaveText('Ton bar diffuse les matchs ?');
-    const texte = normaliser(await bande.innerText());
-    expect(texte).not.toMatch(/\b(vous|vos|votre|nous)\b/i);
+    const fin = page.locator('section#bars');
+    await expect(fin).toHaveCount(1);
+    await expect(fin).toHaveAttribute('aria-labelledby', 'titre-bars');
+    await expect(fin.locator('h2#titre-bars')).toHaveText('Cette salle, c’est peut-être la tienne');
+    const texte = normaliser(await fin.innerText());
+    expect(texte).not.toMatch(/\b(vous|vos|votre)\b|(?<!-)\bnous\b/i);
     // La phrase vraie de la page des bars, tant que l’appli n’est pas ouverte : aucun fan ne voit encore les soirées
     // d’un bar sur Baromatch.
-    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : relire la phrase de la bande des bars').toBe(false);
-    expect(texte).toContain('Baromatch cherche ses premiers bars à Paris. Tu choisis combien de places tu ouvres.');
+    expect(MARQUE.appli.ouverte, 'l’appli est ouverte : relire la phrase du moment des bars').toBe(false);
+    expect(texte).toContain('Baromatch cherche ses premiers bars à Paris');
     // Les conditions de la page des bars, dans ses mots : un patron sait tout de suite ce que ça coûte.
     expect(texte).toContain('Gratuit pendant le lancement, sans engagement.');
-    expect(texte).not.toMatch(/aux fans qui cherchent|qui a réservé/);
+    expect(texte).not.toMatch(/aux fans qui cherchent|qui a réservé|les fans te trouvent/i);
   });
 
-  test('la capsule de nuit mène droit au formulaire de la page Pour les bars ; l’e-mail reste un lien second', async ({ page }) => {
+  test('« Proposer mon bar » mène droit au formulaire de la page Pour les bars, comme chaque « Proposer mon bar » du site', async ({ page }) => {
     await page.goto('/');
-    const bande = page.locator('section#bars');
-    const capsule = bande.locator('a.bouton-nuit');
-    await expect(capsule).toHaveCount(1);
-    // Comme chaque « Proposer mon bar » du site : droit au formulaire (#proposer), pas en haut de la page.
-    await expect(capsule).toHaveAttribute('href', '/pour-les-bars.html#proposer');
-    await expect(capsule).toHaveText('Proposer mon bar');
-    const liens = await bande.locator('a').evaluateAll((a) => a.map((l) => [l.getAttribute('href'), l.className]));
-    expect(liens).toEqual([
-      ['/pour-les-bars.html#proposer', 'bouton-nuit'],
-      ['mailto:contact@baromatch.fr', ''],
-    ]);
+    const lien = page.locator('section#bars a.bouton-trait');
+    await expect(lien).toHaveCount(1);
+    await expect(lien).toHaveAttribute('href', '/pour-les-bars.html#proposer');
+    await expect(lien).toHaveText('Proposer mon bar');
+    await expect(page.locator('section#bars a')).toHaveCount(1);
   });
 
-  test('elle arrive juste après « L’appli », avant « Baromatch en bref » ; les questions ferment la page (la boutique est dans le pied de page)', async ({ page }) => {
+  test('il ferme la page : après l’inscription, les matchs, le geste et le sous-bock', async ({ page }) => {
     await page.goto('/');
-    const ordre = await page.$$eval('main > section', (sections) => sections.map((s) => s.id || s.className.split(' ')[0]));
-    expect(ordre).toEqual(['geste', 'ce-soir', 'appli', 'bars', 'en-bref', 'questions']);
+    const ordre = await page.$$eval('main .moment', (sections) => sections.map((s) => s.dataset.heure));
+    expect(ordre).toEqual(['1842', '1930', '2015', '2055', '2100']);
+    expect(await page.$eval('main .moment:last-child', (s) => s.id)).toBe('bars');
   });
 
-  test('aucune phrase de la bande ne promet ce que Baromatch ne tient pas', async ({ page }) => {
+  test('aucune phrase du moment ne promet ce que Baromatch ne tient pas', async ({ page }) => {
     await page.goto('/');
-    const texte = normaliser(await page.locator('section#bars').innerText());
+    const texte = normaliser(await page.locator('section#bars .chapo').innerText());
     // Pas de chiffre, de prix, de partenaire cité ni de promesse de résultat : rien n’est encore mesuré. Seule la
     // condition du lancement, celle de la page des bars, dit « gratuit ».
     expect(texte).not.toMatch(/\d/);
@@ -56,23 +51,23 @@ test.describe('la bande « bars » de l’accueil', () => {
   });
 
   for (const largeur of [320, 360, 1280]) {
-    test(`à ${largeur} px : le titre, le texte et la capsule tiennent dans la bande`, async ({ page }) => {
+    test(`à ${largeur} px : le titre, le texte et le lien tiennent dans le moment, le lien se touche du doigt`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto('/');
       const r = await page.evaluate(() => {
-        const bande = document.querySelector('section#bars');
-        const cadre = bande.getBoundingClientRect();
-        const capsule = bande.querySelector('a.bouton-nuit');
-        const c = capsule.getBoundingClientRect();
+        const moment = document.querySelector('section#bars');
+        const cadre = moment.getBoundingClientRect();
+        const lien = moment.querySelector('a.bouton-trait');
+        const c = lien.getBoundingClientRect();
         return {
-          capsuleDansLaBande: c.left >= cadre.left && c.right <= cadre.right && c.bottom <= cadre.bottom,
-          capsuleLigneUnique: capsule.scrollHeight <= capsule.clientHeight && capsule.scrollWidth <= capsule.clientWidth,
+          lienDansLeMoment: c.left >= cadre.left && c.right <= cadre.right && c.bottom <= cadre.bottom,
+          lienLigneUnique: lien.scrollHeight <= lien.clientHeight && lien.scrollWidth <= lien.clientWidth,
           defileDeCote: document.documentElement.scrollWidth > document.documentElement.clientWidth,
           hauteur: c.height,
         };
       });
-      expect(r.capsuleDansLaBande).toBe(true);
-      expect(r.capsuleLigneUnique).toBe(true);
+      expect(r.lienDansLeMoment).toBe(true);
+      expect(r.lienLigneUnique).toBe(true);
       expect(r.defileDeCote).toBe(false);
       expect(r.hauteur).toBeGreaterThanOrEqual(44);
     });

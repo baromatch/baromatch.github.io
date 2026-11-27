@@ -55,7 +55,7 @@ body:not(.js) .salle__heure{ display: none; }
 .salle-libre .salle{ position: static; }
 /* Sous la salle collée, le texte qui passe dessous s'efface en douceur au lieu d'une ligne coupée net. */
 @media (max-width: 959.98px) and (min-height: 641px){
-  html:not(.salle-libre) .salle::after{ content: ""; position: absolute; left: 0; right: 0; top: calc(100% + 1px); height: 18px; background: linear-gradient(var(--fond), rgba(250, 247, 241, 0)); pointer-events: none; }
+  html:not(.salle-libre) .salle::after{ content: ""; position: absolute; left: 0; right: 0; top: calc(100% + 1px); height: 32px; background: linear-gradient(var(--fond) 35%, rgba(250, 247, 241, 0)); pointer-events: none; }
 }
 @media (min-width: 960px){
   .veillee{ display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px; align-items: start; }

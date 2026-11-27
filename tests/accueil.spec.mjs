@@ -218,6 +218,22 @@ test.describe('la page', () => {
     }
   });
 
+  test('sous la salle collée, le texte s’efface en douceur : jamais une ligne coupée net au bord', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await expect(page.locator('.veillee')).toHaveClass(/pret/);
+    await aller(page, '2100');
+    const fondu = await page.locator('.salle').evaluate((e) => {
+      const s = getComputedStyle(e, '::after');
+      return { hauteur: parseFloat(s.height), fond: s.backgroundImage, opacite: Number(s.opacity) };
+    });
+    // Plus haut qu'une ligne de texte courant (26 px), plein de papier en haut, transparent en bas, et visible une fois posée.
+    const ligne = await page.locator('.moment--fin .chapo').evaluate((e) => parseFloat(getComputedStyle(e).lineHeight));
+    expect(fondu.hauteur).toBeGreaterThan(ligne);
+    expect(fondu.fond).toMatch(/^linear-gradient\(rgb\(250, 247, 241\) 35%, rgba\(250, 247, 241, 0\)\)$/);
+    expect(fondu.opacite).toBe(1);
+  });
+
   test('« réduire les animations » : la salle reste à sa taille de lecture, sans pose ; elle reste le héros', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: 390, height: 844 });

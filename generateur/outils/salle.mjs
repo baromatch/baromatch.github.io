@@ -9,7 +9,7 @@
 // - une salle du soir posée sur le papier comme une maquette : des murs sombres et chauds, un plancher de bois, un socle
 //   et une ombre douce ; c’est le seul point fort du premier écran ;
 // - la lumière : des appliques au blanc chaud (jamais l’ambre, réservé à l’action et à la place du visiteur), dont la
-//   lueur reste sur les murs et les flaques sur le sol ; au coup d’envoi les lumières baissent, celles du comptoir
+//   lueur reste sur les murs et les flaques sur le sol ; l’écran du fond passe l’avant-match dès 18:42 ; au coup d’envoi les lumières baissent, celles du comptoir
 //   restent en veilleuse (une lumière chaude à gauche, celle de l’écran, froide, à droite), l’écran du fond s’allume aux couleurs des deux clubs, sa lumière coule sur le sol,
 //   douce et sans mélange (chaque club garde sa teinte, de son côté), et découpe les silhouettes d’un liseré blanc
 //   chaud (le « contre-jour ») ;
@@ -56,8 +56,8 @@ export const places = () => {
   liste.forEach((q, i) => {
     const procheEcran = q.v < 3.4;
     const r = hasard();
-    // À 18:42 la salle a déjà ses habitués (une dizaine, au comptoir et aux tables du fond) : elle vit avant de se remplir.
-    q.pas = q.debout ? (r < 0.55 ? 1 : 2) : procheEcran ? (r < 0.12 ? 1 : r < 0.35 ? 2 : r < 0.8 ? 3 : 4) : (r < 0.26 ? 1 : r < 0.4 ? 2 : r < 0.66 ? 3 : r < 0.92 ? 4 : 0);
+    // À 18:42 la salle a déjà ses habitués (une quinzaine, au comptoir et aux tables) : elle vit avant de se remplir.
+    q.pas = q.debout ? (r < 0.7 ? 1 : 2) : procheEcran ? (r < 0.25 ? 1 : r < 0.42 ? 2 : r < 0.8 ? 3 : 4) : (r < 0.4 ? 1 : r < 0.5 ? 2 : r < 0.7 ? 3 : r < 0.92 ? 4 : 0);
     // Le club se lit sur la place : à gauche de l’écran Alvène, à droite Orvèle, et un voisin sur quatre de l’autre côté.
     const cote = (q.table ? q.table[0] : 5.1 + (hasard() - 0.5)) < 5.1 ? 'a' : 'b';
     q.camp = hasard() < 0.22 ? (cote === 'a' ? 'b' : 'a') : cote;

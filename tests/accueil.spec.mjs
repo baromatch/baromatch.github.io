@@ -260,7 +260,7 @@ test.describe('la salle suit l’heure', () => {
     expect(await visibles(page)).toBe(gens[0]);
   });
 
-  test('18:42 : éclairée chaud, pas ambre ; 21:00 : les lumières baissent, l’écran du fond s’allume aux couleurs des deux clubs, sa lumière coule sur le sol et découpe les silhouettes', async ({ page }) => {
+  test('18:42 : éclairée chaud, pas ambre, l’avant-match à l’écran ; 21:00 : les lumières baissent, l’écran du fond éclaire seul, aux couleurs des deux clubs, sa lumière coule sur le sol et découpe les silhouettes', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     const lire = () => page.evaluate(() => {
@@ -269,7 +269,10 @@ test.describe('la salle suit l’heure', () => {
     });
     await page.waitForTimeout(900);
     const tot = await lire();
-    expect(tot).toMatchObject({ nuit: 0, jeu: 0, coule: 0, contre: 0 });
+    expect(tot).toMatchObject({ nuit: 0, coule: 0, contre: 0 });
+    // Dès 18:42, l'écran du fond passe l'avant-match (la salle attend un match), moins fort qu'au coup d'envoi.
+    expect(tot.jeu).toBeGreaterThan(0.6);
+    expect(tot.jeu).toBeLessThan(1);
     expect(await page.evaluate(() => Number(getComputedStyle(document.querySelector('.s-veilleuse')).opacity))).toBe(0);
     expect(tot.lueur).toBeGreaterThan(0.5);
     // Les appliques : un blanc chaud, jamais l’ambre de la marque.
@@ -281,7 +284,7 @@ test.describe('la salle suit l’heure', () => {
     const avant = await lire();
     expect(avant.nuit).toBeGreaterThan(0.1);
     expect(avant.nuit).toBeLessThan(0.4);
-    expect(avant.jeu).toBe(0);
+    expect(avant.jeu).toBeCloseTo(tot.jeu);
     await aller(page, '2100');
     await page.waitForTimeout(900);
     const nuit = await lire();

@@ -8,7 +8,7 @@
 // L’en-tête : le logo, quatre entrées (« Ce soir » et « La semaine » en paire, « Pour les bars », « À propos »), sans
 // chiffre ni script, la page où l’on est marquée (aria-current), puis « Préviens-moi » sur les pages qui le portent :
 // ambre si la page n’a pas déjà son bouton ambre, en contour sinon (actionDeLaPage).
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DOSSIER_GENERATEUR, RACINE } from './contenu.mjs';
@@ -165,6 +165,9 @@ export const PAGES_DU_CADRE = [
   { fichier: 'trouver-un-bar-qui-diffuse-le-match.html', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', action: true },
   { fichier: 'testeurs-android.html', chemin: '/testeurs-android.html', action: true },
   { fichier: 'boutique.html', chemin: '/boutique.html', action: true },
+  // La page des bars en anglais, écrite à la main dans en/ (que le générateur écrit pour le reste) : l’en-tête et le pied en
+  // français, avec leur ligne en anglais (langue: 'en', comme les pages en anglais du générateur).
+  { fichier: 'en/for-bars/index.html', chemin: '/en/for-bars/', action: false, langue: 'en' },
 ];
 
 export const REPERES_DU_CADRE = {
@@ -182,12 +185,12 @@ const entre = (html, { debut, fin }) => {
 
 // La page avec son cadre : l’en-tête et le pied écrits entre leurs repères, rien d’autre de changé. Le style de
 // « Préviens-moi » et sa cible se lisent dans le reste de la page (hors de l’en-tête et du pied).
-export const pageAvecLeCadre = (html, { chemin, action }, { cadre = lireLeCadre(), marque, avecPresse = true } = {}) => {
+export const pageAvecLeCadre = (html, { chemin, action, langue = 'fr' }, { cadre = lireLeCadre(), marque, avecPresse = true } = {}) => {
   const haut = entre(html, REPERES_DU_CADRE.entete);
   const bas = entre(haut.apres, REPERES_DU_CADRE.pied);
   const reste = `${haut.avant}${bas.avant}${bas.apres}`;
   const style = action && !appliOuverte(marque) ? actionDeLaPage(reste) : null;
-  return `${haut.avant}\n${entete(cadre, { chemin, action: style, cible: cibleDeLAction(reste) })}\n${bas.avant}\n${pied(cadre, { marque, chemin, avecPresse })}\n${bas.apres}`;
+  return `${haut.avant}\n${entete(cadre, { chemin, action: style, cible: cibleDeLAction(reste), langue })}\n${bas.avant}\n${pied(cadre, { marque, chemin, avecPresse, langue })}\n${bas.apres}`;
 };
 
 // Réécrit le cadre de chaque page écrite à la main (toutes contrôlées avant d’en écrire une seule) ; verifier : n’écrit
@@ -202,6 +205,8 @@ export const ecrireLeCadre = ({ racine = RACINE, verifier = false } = {}) => {
   const erreurs = [];
   for (const p of PAGES_DU_CADRE) {
     const fichier = path.join(racine, p.fichier);
+    // Une copie du site sans la page des bars en anglais (les pages de en/ n’y sont pas) : rien à réécrire.
+    if (!existsSync(fichier)) continue;
     const avant = readFileSync(fichier, 'utf8');
     try {
       const apres = pageAvecLeCadre(avant, p, { cadre, marque });

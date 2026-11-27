@@ -143,7 +143,8 @@ export const texteDeLEtat = (etat) => `${JSON.stringify(etat, null, 1)}\n`;
 
 // ---------- Le plan du site ----------
 
-const GENEREE = new RegExp(`<loc>${ORIGINE.replace(/\./g, '\\.')}/(?:matchs|regarder-le-match|bar|ce-soir|agenda|en)/`);
+// La page des bars en anglais (/en/for-bars/) est écrite à la main : sa ligne n’est pas celle d’une page générée, le plan la garde.
+const GENEREE = new RegExp(`<loc>${ORIGINE.replace(/\./g, '\\.')}/(?:matchs|regarder-le-match|bar|ce-soir|agenda|en(?!/for-bars/))/`);
 
 export const nouveauPlan = (ancien, etat) => {
   const lignes = ancien.replace(/\r\n/g, '\n').split('\n');

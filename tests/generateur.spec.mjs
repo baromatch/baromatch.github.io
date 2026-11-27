@@ -1508,7 +1508,7 @@ test.describe('d’un passage à l’autre', () => {
     const xml = plan(sortie);
     const lignes = (texte) => texte.split('\n').filter((l) => l.includes('<url>'));
     // Les pages fixes : toutes les lignes qui ne sont pas des pages générées (etat.mjs, GENEREE), agenda/ compris.
-    const fixes = lignes(fixe).filter((l) => !/<loc>https:\/\/baromatch\.fr\/(?:matchs|regarder-le-match|bar|ce-soir|agenda|en)\//.test(l));
+    const fixes = lignes(fixe).filter((l) => !/<loc>https:\/\/baromatch\.fr\/(?:matchs|regarder-le-match|bar|ce-soir|agenda|en(?!\/for-bars\/))\//.test(l));
     expect(lignes(xml).slice(0, fixes.length)).toEqual(fixes);
     expect(xml).not.toContain('vieux-match');
     const etat = etatDe(sortie);

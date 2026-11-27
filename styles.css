@@ -540,7 +540,7 @@ a:hover{ color: var(--goutte); }
    --bandeau : la place gardée pour ce rang (une ligne tant que les mots tiennent, --seuil étant la taille du texte où ils
    passent à deux lignes, puis deux, trois rangs). */
 @media screen and (min-width: 22.5em) and (max-width: 44.99em) {
-:root{ --seuil: calc(6.71vw - 5.85px); --bandeau: clamp(max(44px, 1.2rem + 18px), 44px + (1rem - var(--seuil)) * 1000, max(108px, 11.5rem - 262px)); }
+:root{ --seuil: calc(6.71vw - 5.5px); --bandeau: clamp(max(44px, 1.2rem + 18px), 44px + (1rem - var(--seuil)) * 1000, max(108px, 11.5rem - 262px)); }
 .entete{ row-gap: 6px; padding-top: 12px; padding-bottom: 0; }
 .entete__logo{ padding: 12px 0 9px; margin: -12px 0 -6px; }
 .entete__attente{ margin-top: 3px; }

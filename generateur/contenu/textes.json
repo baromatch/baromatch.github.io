@@ -4,7 +4,7 @@
     "fermee": {
       "texte": "L’appli arrive bientôt : préviens-moi",
       "adresse": "/#attente",
-      "note": "L’appli Baromatch existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play. Laisse ton adresse : on te prévient le jour où elle y est."
+      "note": "L’appli tourne déjà en test sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play. Laisse ton adresse : on te prévient le jour où elle y est."
     },
     "ouverte": {
       "texte": "Réserve ta place dans l’appli",
@@ -20,7 +20,7 @@
     "villes": "Ta ville",
     "pasDeDate": "Pas de date pour {ville}. On t’écrit seulement si Baromatch y arrive.",
     "pasDeDateAutre": "Pas de date pour les autres villes. On t’écrit seulement si Baromatch ouvre dans une nouvelle ville.",
-    "plateformes": "L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.",
+    "plateformes": "L’appli tourne déjà en test sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.",
     "note": "On t’écrit seulement quand Baromatch ouvre dans ta ville, et pour les premiers tests.",
     "lienNote": "Ce qu’on garde, et combien de temps",
     "sujet": "Nouvelle inscription à la liste d’attente Baromatch"
@@ -192,7 +192,7 @@
     "estIciOui": "Oui. {bars} de {ville} diffuse le match sur Baromatch.",
     "estIciOuiPluriel": "Oui. {bars} de {ville} diffusent le match sur Baromatch.",
     "estIciNon": "Pas encore de bar à {ville} sur Baromatch.",
-    "appliFermee": "L’appli, elle, existe sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play : laisse ton adresse dans le formulaire de cette page, on te prévient le jour où elle y est.",
+    "appliFermee": "L’appli, elle, tourne déjà en test sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play : laisse ton adresse dans le formulaire de cette page, on te prévient le jour où elle y est.",
     "appliOuverte": "L’appli est ouverte : tu y trouves les bars et tu gardes ta place."
   },
   "bar": {

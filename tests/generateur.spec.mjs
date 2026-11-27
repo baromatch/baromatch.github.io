@@ -574,7 +574,7 @@ test.describe('les pages', () => {
       expect(p.titre).toMatch(/^Où regarder le match à (Marseille|Lille) — Baromatch$/);
       expect(robotsDe(p)).toBe('noindex');
       expect(p.contenu).toMatch(/Aucun bar de (Marseille|Lille) n’est encore sur Baromatch\./);
-      expect(deType(p, 'FAQPage')[0].mainEntity[0].acceptedAnswer.text).toMatch(/^Pas encore de bar à (Marseille|Lille) sur Baromatch\. L’appli, elle, existe sur iPhone et Android/);
+      expect(deType(p, 'FAQPage')[0].mainEntity[0].acceptedAnswer.text).toMatch(/^Pas encore de bar à (Marseille|Lille) sur Baromatch\. L’appli, elle, tourne déjà en test sur iPhone et Android/);
       expect(deType(p, 'ItemList')).toEqual([]);
     }
   });

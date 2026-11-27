@@ -1,0 +1,53 @@
+// Les captures de l'accueil « La salle » pour le propriétaire : iPhone 13 et Pixel 7 (le haut de page « avant », les cinq
+// moments, le geste réussi, le texte à 200 %), l'ordinateur à 1440 px, et un film de 10 s du défilement au téléphone.
+// Usage : node tests/outils/captures-accueil.cjs <adresse de la branche> <adresse de main> <dossier de sortie>
+// (deux serveurs locaux, par exemple npx http-server . et un worktree de origin/main ; Formspree et GoatCounter bloqués).
+const { chromium, devices } = require('playwright');
+const [,, URL_B, URL_M, OUT] = process.argv;
+const fs = require('fs'); fs.mkdirSync(OUT, { recursive: true });
+const MOMENTS = ['1842', '1930', '2015', '2055', '2100'];
+const aller = (page, h) => page.evaluate((h) => {
+  const m = document.querySelector(`[data-heure="${h}"]`);
+  const salle = document.querySelector('.salle').getBoundingClientRect();
+  const grand = window.matchMedia('(min-width: 960px)').matches;
+  window.scrollTo({ top: h === '1842' ? 0 : m.getBoundingClientRect().top + window.scrollY - (grand ? window.innerHeight * 0.4 : salle.height + 24), behavior: 'instant' });
+}, h);
+const bloquer = (ctx) => ctx.route(/formspree|goatcounter/, (r) => r.abort());
+(async () => {
+  const b = await chromium.launch();
+  const appareils = [['iphone', devices['iPhone 13']], ['android', devices['Pixel 7']]];
+  for (const [nom, d] of appareils) {
+    const ctx = await b.newContext({ ...d }); await bloquer(ctx);
+    const page = await ctx.newPage();
+    await page.goto(URL_M, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(800);
+    await page.screenshot({ path: `${OUT}/${nom}-avant-haut.png` });
+    await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready);
+    for (const h of MOMENTS) { await aller(page, h); await page.waitForTimeout(1400); await page.screenshot({ path: `${OUT}/${nom}-${h}.png` }); }
+    // le geste réussi, à 20:15
+    await aller(page, '2015'); await page.waitForTimeout(600);
+    const bt = page.locator('[data-maintiens]'); await bt.scrollIntoViewIfNeeded(); await aller(page, '2015');
+    const box = await bt.boundingBox();
+    if (box) { await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down(); await page.waitForTimeout(1700); await page.mouse.up(); await page.waitForTimeout(800); await page.screenshot({ path: `${OUT}/${nom}-2015-place-gardee.png` }); }
+    // texte à 200 %
+    await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; return document.fonts.ready; }); await page.waitForTimeout(800);
+    await page.screenshot({ path: `${OUT}/${nom}-texte-200-haut.png` });
+    await aller(page, '2015'); await page.waitForTimeout(1200); await page.screenshot({ path: `${OUT}/${nom}-texte-200-2015.png` });
+    await ctx.close();
+  }
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }); await bloquer(ctx);
+  const page = await ctx.newPage();
+  await page.goto(URL_M, { waitUntil: 'load' }); await page.waitForTimeout(800); await page.screenshot({ path: `${OUT}/ordinateur-avant-haut.png` });
+  await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready);
+  for (const h of MOMENTS) { await aller(page, h); await page.waitForTimeout(1400); await page.screenshot({ path: `${OUT}/ordinateur-${h}.png` }); }
+  await ctx.close();
+  // le film : 10 s de défilement au téléphone
+  const fctx = await b.newContext({ ...devices['iPhone 13'], recordVideo: { dir: `${OUT}/film-tmp`, size: { width: 390, height: 844 } } }); await bloquer(fctx);
+  const fp = await fctx.newPage();
+  await fp.goto(URL_B, { waitUntil: 'load' }); await fp.evaluate(() => document.fonts.ready); await fp.waitForTimeout(900);
+  const fin = await fp.evaluate(() => document.querySelector('[data-heure="2100"]').getBoundingClientRect().top + scrollY - 300);
+  const t0 = Date.now();
+  while (Date.now() - t0 < 8200) { const k = (Date.now() - t0) / 8200; const e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k+2, 2)/2; await fp.evaluate((y) => window.scrollTo(0, y), fin * e); await fp.waitForTimeout(30); }
+  await fp.waitForTimeout(1200);
+  const v = fp.video(); await fctx.close(); fs.renameSync(await v.path(), `${OUT}/film-defilement-iphone.webm`); fs.rmSync(`${OUT}/film-tmp`, { recursive: true, force: true });
+  await b.close();
+})();

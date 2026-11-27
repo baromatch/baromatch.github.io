@@ -27,6 +27,24 @@ body:not(.js) .salle__heure{ display: none; }
   html:not(.salle-libre) .veillee .attente{ scroll-margin-top: 12px; }
 }
 @media (max-height: 640px){ .salle{ position: static; } }
+/* En haut de page, au téléphone, la salle est le héros : un peu plus grande (toute la largeur), elle se pose à sa taille
+   de lecture pendant les premiers pixels de défilement (transform seulement, lié au défilement, rien ne bouge seul). La
+   place qu'elle prend en plus est réservée au-dessus du titre : rien ne saute. Sans défilement lié (navigateurs qui ne
+   le savent pas) ou avec « réduire les animations », elle reste à sa taille de lecture, tout aussi complète. */
+@media (max-width: 959.98px) and (min-height: 641px) and (prefers-reduced-motion: no-preference){
+  @supports (animation-timeline: scroll()){
+    .veillee{ --pose-en-plus: 7svh; }
+    .veillee .moment--ouverture{ padding-top: calc(14px + var(--pose-en-plus)); }
+    .salle{ border-bottom-color: transparent; }
+    .salle__dessin{ transform-origin: 50% 0; animation: salle-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
+    .salle__legende{ animation: legende-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
+    .salle::before{ content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--trait); animation: salle-trait linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
+    html:not(.salle-libre) .salle::after{ animation: salle-trait linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
+  }
+}
+@keyframes salle-pose{ from{ transform: scale(1.18); } to{ transform: none; } }
+@keyframes legende-pose{ from{ transform: translateY(5.04svh); } to{ transform: none; } }
+@keyframes salle-trait{ from{ opacity: 0; } to{ opacity: 1; } }
 .salle-libre .salle{ position: static; }
 /* Sous la salle collée, le texte qui passe dessous s'efface en douceur au lieu d'une ligne coupée net. */
 @media (max-width: 959.98px) and (min-height: 641px){
@@ -40,18 +58,22 @@ body:not(.js) .salle__heure{ display: none; }
   .moments{ grid-column: 2; grid-row: 1; }
 }
 
-/* Le dessin de la salle : la lumière d'abord (des appliques au blanc chaud), les gens ensuite. */
-.s-sol{ fill: #E4D7BF; }
-.s-mur-d{ fill: #D9CEBA; }
-.s-mur-g{ fill: #C9BEA7; }
-.s-plinthe{ fill: #C9BDA5; }
-.s-porte{ fill: #C7B99F; }
+/* Le dessin de la salle : une salle du soir, posée sur le papier comme une maquette. Des murs sombres et chauds, un
+   plancher de bois, et la lumière d'abord : des appliques au blanc chaud, dont la lueur reste sur les murs et les
+   flaques sur le sol. C'est le seul point fort du premier écran : rien d'autre n'y est aussi sombre ni aussi grand. */
+.s-sol{ fill: #A57A55; }
+.s-mur-d{ fill: #5B3A2E; }
+.s-mur-g{ fill: #472C23; }
+.s-plinthe{ fill: #3A241C; }
+.s-porte{ fill: #3C261E; }
+.s-socle-d{ fill: #5E3F2B; }
+.s-socle-g{ fill: #74503A; }
 .s-lampe{ fill: #FFF8E8; stroke: rgba(10, 11, 16, 0.25); stroke-width: 0.5; }
-.s-lueur, .s-flaque{ opacity: 0.9; }
-.s-flaque{ opacity: 0.45; }
-.s-comptoir-dessus{ fill: #9A6A43; }
-.s-comptoir-face{ fill: #6E4A2E; }
-.s-comptoir-bout{ fill: #5A3C25; }
+.s-lueur{ opacity: 1; }
+.s-flaque{ opacity: 0.55; }
+.s-comptoir-dessus{ fill: #C99766; }
+.s-comptoir-face{ fill: #7E5234; }
+.s-comptoir-bout{ fill: #6A4329; }
 .s-table{ fill: #FFFFFF; stroke: rgba(10, 11, 16, 0.28); stroke-width: 0.8; }
 .s-pied{ stroke: rgba(10, 11, 16, 0.35); stroke-width: 1.2; }
 .s-chaise{ fill: rgba(255, 255, 255, 0.55); stroke: rgba(10, 11, 16, 0.4); stroke-width: 0.9; }
@@ -67,7 +89,7 @@ body:not(.js) .salle__heure{ display: none; }
 .g-liseret{ fill: none; stroke: #F4ECD9; stroke-opacity: 0.5; stroke-width: 0.85; stroke-linecap: round; }
 .s-nuit{ fill: var(--nuit); }
 .s-nuits{ opacity: 0; }
-.s-ecran{ fill: #1B1D27; stroke: #0A0B10; stroke-width: 1; }
+.s-ecran{ fill: #15161D; stroke: #0A0B10; stroke-width: 1; }
 .s-reflet{ fill: #FFFFFF; opacity: 0.08; }
 .s-jeu{ opacity: 0; }
 .s-jeu-a{ fill: var(--camp-a); }
@@ -76,6 +98,7 @@ body:not(.js) .salle__heure{ display: none; }
 .s-jeu-b2{ fill: var(--camp-b2); }
 .s-jeu-ligne{ fill: #FFFFFF; opacity: 0.9; }
 .s-halo{ opacity: 0; }
+.s-veilleuse{ opacity: 0; }
 .s-coule{ opacity: 0; }
 .s-contre{ opacity: 0; }
 /* Ta place : en pointillé tant qu'elle n'est pas gardée, à l'ambre et cerclée d'ambre quand tu l'as gardée, cochée quand
@@ -101,8 +124,9 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 /* Les lumières : de 18:42 à 20:15 la salle est pleine de lumière chaude ; elle baisse à 20:55, et au coup d'envoi l'écran
    du fond s'allume aux couleurs des deux clubs, sa lumière coule sur le sol et découpe les silhouettes. */
 .veillee[data-etat="2055"] .s-nuits{ opacity: 0.22; }
-.veillee[data-etat="2100"] .s-nuits{ opacity: 0.74; }
-.veillee[data-etat="2055"] :is(.s-lueur, .s-flaque){ opacity: 0.6; }
+.veillee[data-etat="2100"] .s-nuits{ opacity: 0.84; }
+.veillee[data-etat="2100"] .s-veilleuse{ opacity: 0.6; }
+.veillee[data-etat="2055"] :is(.s-lueur, .s-flaque){ opacity: 0.55; }
 .veillee[data-etat="2100"] :is(.s-lueur, .s-flaque){ opacity: 0.1; }
 .veillee[data-etat="2100"] .s-jeu{ opacity: 1; }
 .veillee[data-etat="2100"] .s-coule{ opacity: 0.35; }
@@ -110,7 +134,7 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .veillee[data-etat="2100"] .s-contre{ opacity: 1; }
 .veillee[data-etat="2100"] .s-reflet{ opacity: 0; }
 .pret .gens{ transition: opacity var(--pose) var(--sortie-douce), transform var(--pose) var(--sortie-douce); }
-.pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet){ transition: opacity var(--pose) var(--sortie-douce); }
+.pret :is(.s-nuits, .s-veilleuse, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet){ transition: opacity var(--pose) var(--sortie-douce); }
 .pret .gens.r2{ transition-delay: 90ms; }
 .pret .gens.r3{ transition-delay: 200ms; }
 
@@ -125,7 +149,8 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .moment__heure{ margin: 0 0 8px; font-size: 0.9375rem; font-weight: 700; color: var(--texte-discret); }
 .moment--ouverture .moment__heure{ display: none; }
 .moment__titre{ margin: 0; font-size: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem); line-height: 1.05; font-weight: 730; letter-spacing: -0.03em; font-variation-settings: "opsz" 30; text-wrap: balance; }
-.moment__titre--un{ font-size: clamp(2.5rem, 1.8rem + 3.2vw, 4.25rem); line-height: 1; font-weight: 740; letter-spacing: -0.035em; font-variation-settings: "opsz" 36; }
+/* Le titre se tait devant la salle : franc, mais à la taille d'un titre de moment, pas d'une affiche. */
+.moment__titre--un{ font-size: clamp(1.75rem, 1.3rem + 2vw, 3rem); line-height: 1.02; font-weight: 740; letter-spacing: -0.03em; font-variation-settings: "opsz" 32; }
 .moment__titre--un span{ display: inline-block; }
 .chapo{ margin: 10px 0 0; font-size: clamp(1.0625rem, 1.02rem + 0.3vw, 1.25rem); line-height: 1.45; color: var(--texte-doux); max-width: 34em; }
 
@@ -137,6 +162,11 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 @media (max-width: 559.98px){
   .moment--ouverture .attente__ligne{ gap: 8px; }
   .moment--ouverture .attente__champ, .moment--ouverture .attente__bouton{ height: 52px; }
+  /* Le bouton à côté du champ, à sa taille : une pastille ambre, pas une bande qui disputerait la salle au regard. Trop
+     étroit (texte agrandi, petit écran), il passe à la ligne, toujours à sa taille. */
+  .moment--ouverture .attente__ligne{ flex-direction: row; flex-wrap: wrap; }
+  .moment--ouverture .attente__champ{ flex: 1 1 11rem; width: auto; }
+  .moment--ouverture .attente__bouton{ flex: 0 0 auto; padding: 0 22px; }
 }
 
 /* 19:30 : ce soir, et la semaine en sept piles. */
@@ -214,6 +244,6 @@ body:not(.js) .maintien__sans{ display: inline; }
 
 /* Réduire les animations : les états changent sans fondu ni pose, le sous-bock se retourne d'un coup. */
 @media (prefers-reduced-motion: reduce){
-  .pret .gens, .pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet), .pret .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
+  .pret .gens, .pret :is(.s-nuits, .s-veilleuse, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet), .pret .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
   .gens{ transform: none; }
 }

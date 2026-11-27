@@ -115,6 +115,66 @@ test.describe('la page', () => {
     expect(ACCUEIL).not.toMatch(/<(video|img)\b/);
   });
 
+  // Un seul héros au premier écran : la salle du soir. Le titre se tait devant elle, le bouton ambre est à sa taille
+  // (une pastille à côté du champ, pas une bande), et la salle est de loin la plus grande chose sombre de l'écran.
+  for (const ecran of [{ largeur: 390, hauteur: 844 }, { largeur: 412, hauteur: 839 }, { largeur: 1440, hauteur: 900 }]) {
+    test(`à ${ecran.largeur} × ${ecran.hauteur} : un seul héros, la salle ; le titre et le bouton se taisent devant elle`, async ({ page }) => {
+      await page.setViewportSize({ width: ecran.largeur, height: ecran.hauteur });
+      await page.goto('/');
+      await page.evaluate(() => document.fonts.ready);
+      await expect(page.locator('.veillee')).toHaveClass(/pret/);
+      const boite = (sel) => page.locator(sel).evaluate((e) => { const r = e.getBoundingClientRect(); return { haut: r.top, bas: r.bottom, gauche: r.left, droite: r.right, aire: r.width * r.height }; });
+      const salle = await boite('.salle__dessin');
+      const titre = await page.locator('h1 span').evaluateAll((l) => l.reduce((n, e) => { const r = e.getBoundingClientRect(); return n + r.width * r.height; }, 0));
+      const bouton = await boite('.attente__bouton');
+      expect(salle.aire, 'la salle prend au moins trois fois la place du titre').toBeGreaterThan(3 * titre);
+      expect(salle.aire, 'et au moins douze fois celle du bouton').toBeGreaterThan(12 * bouton.aire);
+      // Le titre est un titre, pas une affiche : plus petit que celui d'un moment sur ordinateur, jamais plus grand que 48 px.
+      expect(await page.locator('h1').evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeLessThanOrEqual(48);
+      if (ecran.largeur < 560) expect(bouton.droite - bouton.gauche, 'le bouton à sa taille, à côté du champ').toBeLessThan(ecran.largeur * 0.45);
+      // La salle est sombre et chaude (murs, sol), le papier clair : un contraste fort, le seul de cette taille.
+      const fond = (sel) => page.locator(sel).first().evaluate((e) => getComputedStyle(e).fill.match(/\d+/g).map(Number));
+      const lum = ([r, g, b]) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      expect(lum(await fond('.s-mur-d'))).toBeLessThan(90);
+      expect(lum(await fond('.s-mur-g'))).toBeLessThan(70);
+      expect(lum(await fond('.s-sol'))).toBeLessThan(140);
+      // La salle et sa légende ne passent jamais sur le titre.
+      if (ecran.largeur < 960) {
+        expect(salle.bas).toBeLessThanOrEqual((await boite('h1')).haut);
+        expect((await boite('.salle__legende')).bas).toBeLessThanOrEqual((await boite('h1')).haut);
+      }
+    });
+  }
+
+  test('au téléphone, en haut de page, la salle est plus grande et se pose à sa taille de lecture en quelques pixels de défilement ; rien ne saute', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await expect(page.locator('.veillee')).toHaveClass(/pret/);
+    const echelle = () => page.locator('.salle__dessin').evaluate((e) => new DOMMatrix(getComputedStyle(e).transform).a);
+    const titre = () => page.locator('h1').evaluate((e) => e.getBoundingClientRect().top + window.scrollY);
+    const haut = await titre();
+    expect(await echelle()).toBeCloseTo(1.18, 2);
+    // La place prise en plus est réservée au-dessus du titre : le titre ne bouge pas dans la page quand la salle se pose.
+    const pose = await page.evaluate(() => window.innerHeight * 0.07);
+    await page.evaluate((y) => window.scrollTo({ top: y / 2, behavior: 'instant' }), pose);
+    await expect.poll(echelle).toBeLessThan(1.18);
+    await page.evaluate((y) => window.scrollTo({ top: y + 20, behavior: 'instant' }), pose);
+    await expect.poll(echelle).toBe(1);
+    expect(await titre()).toBeCloseTo(haut, 0);
+    // Le trait sous la salle et le fondu du texte n'apparaissent qu'une fois la salle posée.
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await expect.poll(() => page.locator('.salle').evaluate((e) => Number(getComputedStyle(e, '::before').opacity))).toBe(0);
+  });
+
+  test('« réduire les animations » : la salle reste à sa taille de lecture, sans pose ; elle reste le héros', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    expect(await page.locator('.salle__dessin').evaluate((e) => getComputedStyle(e).transform)).toBe('none');
+    expect(await page.evaluate(() => document.querySelector('.salle').getAnimations({ subtree: true }).length)).toBe(0);
+    await expect(page.locator('.attente__bouton')).toBeInViewport({ ratio: 1 });
+  });
+
   test('la salle de la page est celle que l’outil dessine (generateur/outils/salle.mjs) : rien à la main, et jamais l’ambre dans la lumière', () => {
     expect(ACCUEIL).toContain(salleDeLaPage());
     const dessin = salleDeLaPage();
@@ -210,6 +270,7 @@ test.describe('la salle suit l’heure', () => {
     await page.waitForTimeout(900);
     const tot = await lire();
     expect(tot).toMatchObject({ nuit: 0, jeu: 0, coule: 0, contre: 0 });
+    expect(await page.evaluate(() => Number(getComputedStyle(document.querySelector('.s-veilleuse')).opacity))).toBe(0);
     expect(tot.lueur).toBeGreaterThan(0.5);
     // Les appliques : un blanc chaud, jamais l’ambre de la marque.
     const chaud = await page.evaluate(() => [...document.querySelectorAll('#s-chaud stop')].map((s) => s.getAttribute('stop-color')));
@@ -251,6 +312,11 @@ test.describe('la salle suit l’heure', () => {
     expect(recouvrement.dans).toBeGreaterThan(500);
     expect(recouvrement.deux).toBeLessThanOrEqual(3);
     expect(nuit.lueur).toBeLessThan(0.2);
+    // Seules les deux appliques du comptoir restent en veilleuse : une lumière chaude à gauche, celle de l'écran à droite.
+    const veilleuse = () => page.evaluate(() => Number(getComputedStyle(document.querySelector('.s-veilleuse')).opacity));
+    expect(await veilleuse()).toBeGreaterThan(0.4);
+    expect(await veilleuse()).toBeLessThanOrEqual(0.7);
+    expect(await page.locator('.s-veilleuse ellipse').count()).toBe(2);
     expect(nuit.reflet).toBe(0);
     // L’écran a les couleurs des deux clubs.
     const couleurs = await page.evaluate(() => ['.s-jeu-a', '.s-jeu-a2', '.s-jeu-b', '.s-jeu-b2'].map((s) => getComputedStyle(document.querySelector(s)).fill));
@@ -258,12 +324,24 @@ test.describe('la salle suit l’heure', () => {
   });
 
   test('les gens se posent (transform et opacité seulement), rien ne glisse ni ne bouge seul', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForTimeout(1200);
-    expect(await page.evaluate(() => document.getAnimations().length), 'aucune animation au repos').toBe(0);
+    for (const ecran of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+      await page.setViewportSize(ecran);
+      await page.goto('/');
+      await page.waitForTimeout(1200);
+      // Au repos, rien ne tourne : les seules animations sont liées au défilement (la salle qui se pose, au téléphone),
+      // elles n'avancent que si le doigt fait défiler la page.
+      const animations = await page.evaluate(() => document.getAnimations().map((a) => ({ defilement: typeof ScrollTimeline !== 'undefined' && a.timeline instanceof ScrollTimeline, nom: a.animationName })));
+      for (const a of animations) expect(a.defilement, `${a.nom} doit suivre le défilement`).toBe(true);
+      if (ecran.width > 960) expect(animations).toEqual([]);
+    }
     const proprietes = await page.evaluate(() => [...new Set([...document.querySelectorAll('.salle .gens, .salle .s-nuits, .salle .s-jeu, .sousbock__tour')].map((e) => getComputedStyle(e).transitionProperty))]);
     for (const p of proprietes) expect(p).toMatch(/^(opacity, transform|opacity|transform)$/);
-    expect(CSS).not.toMatch(/@keyframes|animation\s*:/);
+    // Dans le style : chaque animation suit le défilement (animation-timeline: scroll), chaque image clé ne touche que
+    // transform et opacity.
+    for (const [regle] of CSS.matchAll(/[^{}]*\{[^{}]*animation\s*:[^{}]*\}/g)) expect(regle, regle).toMatch(/animation-timeline:\s*scroll\(/);
+    const cles = [...CSS.matchAll(/@keyframes\s+[\w-]+\{((?:[^{}]*\{[^{}]*\})*)\s*\}/g)];
+    expect(cles.length).toBeGreaterThan(0);
+    for (const [, corps] of cles) for (const [, decl] of corps.matchAll(/\{([^{}]*)\}/g)) for (const d of decl.split(';').map((x) => x.trim()).filter(Boolean)) expect(d.split(':')[0].trim(), d).toMatch(/^(transform|opacity)$/);
     // Seuls transform et opacité bougent : aucune règle ne fait transitionner autre chose.
     for (const [, valeur] of CSS.matchAll(/transition:\s*([^;}]+)/g)) {
       for (const part of valeur.split(',')) expect(part.trim().split(/\s+/)[0], valeur).toMatch(/^(opacity|transform|none)$/);
@@ -274,7 +352,7 @@ test.describe('la salle suit l’heure', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
-    const durees = await page.evaluate(() => ['.gens', '.s-nuits', '.s-jeu', '.sousbock__tour', '.toi-plein', '.toi-anneau'].map((s) => getComputedStyle(document.querySelector(s)).transitionDuration));
+    const durees = await page.evaluate(() => ['.gens', '.s-nuits', '.s-veilleuse', '.s-jeu', '.sousbock__tour', '.toi-plein', '.toi-anneau'].map((s) => getComputedStyle(document.querySelector(s)).transitionDuration));
     for (const d of durees) expect(d.split(',').every((x) => parseFloat(x) === 0), d).toBe(true);
     // Ta place n’est pas ambre avant le geste, même sans fondu.
     expect(await page.evaluate(() => ['.toi-plein', '.toi-anneau'].map((s) => Number(getComputedStyle(document.querySelector(s)).opacity)))).toEqual([0, 0]);

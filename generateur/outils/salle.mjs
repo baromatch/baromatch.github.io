@@ -6,8 +6,11 @@
 // Ce qui se voit, et l’heure où cela se voit (le style de la page, accueil.css, lit l’état de la soirée) :
 // - des gens, tête et épaules, assis aux tables ou debout au comptoir, aux couleurs de leur club (maillot, écharpe) ;
 //   chacun se pose à son heure (s1 à s4), de 18:42 au coup d’envoi ;
-// - la lumière : des appliques au blanc chaud (jamais l’ambre, réservé à l’action et à la place du visiteur) ; au coup
-//   d’envoi les lumières baissent, l’écran du fond s’allume aux couleurs des deux clubs, sa lumière coule sur le sol,
+// - une salle du soir posée sur le papier comme une maquette : des murs sombres et chauds, un plancher de bois, un socle
+//   et une ombre douce ; c’est le seul point fort du premier écran ;
+// - la lumière : des appliques au blanc chaud (jamais l’ambre, réservé à l’action et à la place du visiteur), dont la
+//   lueur reste sur les murs et les flaques sur le sol ; au coup d’envoi les lumières baissent, celles du comptoir
+//   restent en veilleuse (une lumière chaude à gauche, celle de l’écran, froide, à droite), l’écran du fond s’allume aux couleurs des deux clubs, sa lumière coule sur le sol,
 //   douce et sans mélange (chaque club garde sa teinte, de son côté), et découpe les silhouettes d’un liseré blanc
 //   chaud (le « contre-jour ») ;
 // - ta place : plus grande qu’une chaise, en pointillé tant qu’elle n’est pas gardée ; à l’ambre et cerclée d’ambre
@@ -71,10 +74,11 @@ const PERSONNES = `<symbol id="gens" viewBox="0 0 12 17"><path d="M.8 17C.8 11.2
   + `<symbol id="liseret-debout" viewBox="0 0 12 30"><path d="M.8 22C.8 11.4 3 8.6 6 8.6s5.2 2.8 5.2 13.4M2.7 4.3a3.3 3.3 0 0 1 6.6 0" class="g-liseret"/></symbol>`;
 
 const LUMIERES = `<radialGradient id="s-chaud"><stop offset="0" stop-color="#FFF4DC" stop-opacity=".95"/><stop offset=".45" stop-color="#FFF1D2" stop-opacity=".4"/><stop offset="1" stop-color="#FFF1D2" stop-opacity="0"/></radialGradient>`
-  + `<radialGradient id="s-halo-a"><stop offset="0" stop-color="#7DB5AC" stop-opacity=".75"/><stop offset="1" stop-color="#7DB5AC" stop-opacity="0"/></radialGradient>`
-  + `<radialGradient id="s-halo-b"><stop offset="0" stop-color="#9A9CC8" stop-opacity=".75"/><stop offset="1" stop-color="#9A9CC8" stop-opacity="0"/></radialGradient>`
-  + `<linearGradient id="s-coule-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7DB5AC" stop-opacity=".7"/><stop offset="1" stop-color="#7DB5AC" stop-opacity="0"/></linearGradient>`
-  + `<linearGradient id="s-coule-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A9CC8" stop-opacity=".7"/><stop offset="1" stop-color="#9A9CC8" stop-opacity="0"/></linearGradient>`;
+  + `<radialGradient id="s-halo-a"><stop offset="0" stop-color="#7DB5AC" stop-opacity=".95"/><stop offset="1" stop-color="#7DB5AC" stop-opacity="0"/></radialGradient>`
+  + `<radialGradient id="s-halo-b"><stop offset="0" stop-color="#9A9CC8" stop-opacity=".95"/><stop offset="1" stop-color="#9A9CC8" stop-opacity="0"/></radialGradient>`
+  + `<linearGradient id="s-coule-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7DB5AC" stop-opacity=".9"/><stop offset="1" stop-color="#7DB5AC" stop-opacity="0"/></linearGradient>`
+  + `<radialGradient id="s-ombre-sol"><stop offset="0" stop-color="#0A0B10" stop-opacity=".34"/><stop offset=".6" stop-color="#0A0B10" stop-opacity=".12"/><stop offset="1" stop-color="#0A0B10" stop-opacity="0"/></radialGradient>`
+  + `<linearGradient id="s-coule-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A9CC8" stop-opacity=".9"/><stop offset="1" stop-color="#9A9CC8" stop-opacity="0"/></linearGradient>`;
 
 export const salle = () => {
   const sol = poly([p(0, 0), p(U, 0), p(U, V), p(0, V)], 'class="s-sol"');
@@ -84,14 +88,26 @@ export const salle = () => {
   const porte = poly([p(U - 1.7, 0, 0), p(U - 0.6, 0, 0), p(U - 0.6, 0, 2.2), p(U - 1.7, 0, 2.2)], 'class="s-porte"');
 
   // Les appliques : une lampe blanc chaud sur chaque mur, et sa lueur.
-  const lampes = [[1.7, 0, 2.15], [8.7, 0, 2.15], [0, 1.6, 2.15], [0, 5.6, 2.15]].map(([u, v, z]) => {
-    const [x, y] = p(u, v, z);
-    return `<ellipse class="s-lueur" cx="${f(x)}" cy="${f(y)}" rx="27" ry="21" fill="url(#s-chaud)"/><rect class="s-lampe" x="${f(x - 2)}" y="${f(y - 3)}" width="4" height="6" rx="1.6"/>`;
-  }).join('');
-  const sousLeSol = [[2.6, 3.4], [7.4, 3.4], [3.2, 6.2], [7.6, 6.2]].map(([u, v]) => {
+  // La lumière reste dans la salle : la lueur des appliques ne déborde pas des murs, ni les flaques du sol.
+  const coin = (pts) => `M${pts.map(pt).join('L')}Z`;
+  const lieux = [[1.7, 0, 2.15], [8.7, 0, 2.15], [0, 1.6, 2.15], [0, 5.6, 2.15]].map(([u, v, z]) => p(u, v, z));
+  const lampes = `<clipPath id="s-murs-clip"><path d="${coin([p(0, 0), p(U, 0), p(U, 0, HAUTEUR), p(0, 0, HAUTEUR)])}"/><path d="${coin([p(0, 0), p(0, V), p(0, V, HAUTEUR), p(0, 0, HAUTEUR)])}"/></clipPath>`
+    + `<g clip-path="url(#s-murs-clip)">${lieux.map(([x, y]) => `<ellipse class="s-lueur" cx="${f(x)}" cy="${f(y + 4)}" rx="40" ry="32" fill="url(#s-chaud)"/>`).join('')}</g>`
+    + lieux.map(([x, y]) => `<rect class="s-lampe" x="${f(x - 2)}" y="${f(y - 3)}" width="4" height="6" rx="1.6"/>`).join('');
+  const sousLeSol = `<clipPath id="s-sol-clip"><path d="${coin([p(0, 0), p(U, 0), p(U, V), p(0, V)])}"/></clipPath><g clip-path="url(#s-sol-clip)">${[[2.6, 3.4], [7.4, 3.4], [3.2, 6.2], [7.6, 6.2]].map(([u, v]) => {
     const [x, y] = p(u, v);
     return `<ellipse class="s-flaque" cx="${f(x)}" cy="${f(y)}" rx="46" ry="23" fill="url(#s-chaud)"/>`;
-  }).join('');
+  }).join('')}</g>`;
+  // Le socle : la salle est posée sur le papier comme une maquette, avec l’épaisseur de son plancher et une ombre douce.
+  // La veilleuse du comptoir : au coup d’envoi, quand la salle s’éteint, les deux appliques du comptoir restent en
+  // veilleuse. Un calque posé sur la nuit : une lumière chaude à gauche, celle de l’écran, froide, à droite.
+  const veilleuse = `<g class="s-veilleuse"><g clip-path="url(#s-murs-clip)">${lieux.slice(2).map(([x, y]) => `<ellipse cx="${f(x)}" cy="${f(y + 4)}" rx="40" ry="32" fill="url(#s-chaud)"/>`).join('')}</g>`
+    + lieux.slice(2).map(([x, y]) => `<rect class="s-lampe" x="${f(x - 2)}" y="${f(y - 3)}" width="4" height="6" rx="1.6"/>`).join('') + '</g>';
+  const EP = 0.32;
+  const [ox, oy] = p(U * 0.55, V * 0.6);
+  const socle = `<ellipse class="s-ombre" cx="${f(ox)}" cy="${f(oy + 4)}" rx="150" ry="64" fill="url(#s-ombre-sol)"/>`
+    + poly([p(U, 0), p(U, V), p(U, V, -EP), p(U, 0, -EP)], 'class="s-socle-d"')
+    + poly([p(0, V), p(U, V), p(U, V, -EP), p(0, V, -EP)], 'class="s-socle-g"');
 
   // Le comptoir, le long du mur de gauche : un plan de bois, rien dessus.
   const comptoir = [
@@ -147,7 +163,7 @@ export const salle = () => {
   const [tx, ty] = p(toi.u, toi.v, 0.5);
   const maPlace = `<g class="s-toi"><ellipse class="toi-anneau" cx="${f(tx)}" cy="${f(ty)}" rx="12.2" ry="7.6"/><ellipse class="toi" cx="${f(tx)}" cy="${f(ty)}" rx="9.4" ry="5.7"/><ellipse class="toi-plein" cx="${f(tx)}" cy="${f(ty)}" rx="9.4" ry="5.7"/><path class="toi-coche" d="M${f(tx - 4.4)} ${f(ty + 0.3)}l2.9 2.7 5.9-6"/></g>`;
 
-  return `<svg class="salle__dessin" viewBox="46 -12 286 224" width="286" height="224" aria-hidden="true" focusable="false"><defs>${PERSONNES}${LUMIERES}</defs>${murD}${murG}${sol}${sousLeSol}${plinthe}${lampes}${porte}${comptoir}${objets}<g class="s-nuits">${noir}</g>${halo}${ecran}${reflet}<g class="s-jeu">${match}</g>${coule}<g class="s-contre">${contreJour}</g>${maPlace}</svg>`;
+  return `<svg class="salle__dessin" viewBox="40 -12 298 232" width="298" height="232" aria-hidden="true" focusable="false"><defs>${PERSONNES}${LUMIERES}</defs>${socle}${murD}${murG}${sol}${sousLeSol}${plinthe}${lampes}${porte}${comptoir}${objets}<g class="s-nuits">${noir}</g>${veilleuse}${halo}${ecran}${reflet}<g class="s-jeu">${match}</g>${coule}<g class="s-contre">${contreJour}</g>${maPlace}</svg>`;
 };
 
 // Le dessin tel qu’il s’écrit dans la page, entre ses repères.

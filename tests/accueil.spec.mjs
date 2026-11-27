@@ -156,6 +156,14 @@ test.describe('la page', () => {
     expect(await echelle()).toBeCloseTo(1.18, 2);
     // La place prise en plus est réservée au-dessus du titre : le titre ne bouge pas dans la page quand la salle se pose.
     const pose = await page.evaluate(() => window.innerHeight * 0.07);
+    // À chaque pas de la pose, la salle (dessin et légende) reste au-dessus du titre : rien ne passe dessus.
+    for (const k of [0, 0.25, 0.5, 0.75]) {
+      await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), pose * k);
+      if (k) await expect.poll(echelle).toBeLessThan(1.18);
+      const [dessin, legende, h1] = await page.evaluate(() => ['.salle__dessin', '.salle__legende', 'h1'].map((s) => document.querySelector(s).getBoundingClientRect()));
+      expect(dessin.bottom, `pose à ${k}`).toBeLessThanOrEqual(h1.top);
+      expect(legende.bottom, `pose à ${k}`).toBeLessThanOrEqual(h1.top);
+    }
     await page.evaluate((y) => window.scrollTo({ top: y / 2, behavior: 'instant' }), pose);
     await expect.poll(echelle).toBeLessThan(1.18);
     await page.evaluate((y) => window.scrollTo({ top: y + 20, behavior: 'instant' }), pose);
@@ -177,15 +185,20 @@ test.describe('la page', () => {
       const ecart = () => page.evaluate(() => {
         const t = document.querySelector('.salle__toi').getBoundingClientRect();
         const p = document.querySelector('.toi').getBoundingClientRect();
-        // Le pied du trait : sous l'étiquette, à sa gauche ; il doit tomber sur la chaise.
-        return { dx: (t.left - 2) - (p.left + p.width / 2), dy: (t.bottom + 12) - (p.top + p.height / 2), largeur: p.width };
+        // Le pied du trait, tel qu'il est dessiné (::after, 22 px, tourné de 35° autour de son haut), tombe sur la chaise.
+        const trait = getComputedStyle(document.querySelector('.salle__toi'), '::after');
+        const haut = t.bottom - parseFloat(trait.bottom) - parseFloat(trait.height);
+        const long = parseFloat(trait.height);
+        const a = 35 * Math.PI / 180;
+        const pied = { x: t.left + parseFloat(trait.left) + parseFloat(trait.width) / 2 - long * Math.sin(a), y: haut + long * Math.cos(a) };
+        return { dx: pied.x - (p.left + p.width / 2), dy: pied.y - (p.top + p.height / 2), largeur: p.width };
       });
       for (const heure of ['1842', '2015', '2100']) {
         if (heure !== '1842') await aller(page, heure);
         await page.waitForTimeout(100);
         const e = await ecart();
-        expect(Math.abs(e.dx), `à ${heure}`).toBeLessThan(e.largeur * 0.8);
-        expect(Math.abs(e.dy), `à ${heure}`).toBeLessThan(e.largeur * 0.8);
+        expect(Math.abs(e.dx), `à ${heure}`).toBeLessThan(e.largeur * 0.5);
+        expect(Math.abs(e.dy), `à ${heure}`).toBeLessThan(e.largeur * 0.5);
       }
       const couleurs = await page.locator('.salle__toi').evaluate((e) => [getComputedStyle(e).backgroundColor, getComputedStyle(e).color]);
       expect(couleurs).not.toContain('rgb(255, 177, 61)');
@@ -291,7 +304,7 @@ test.describe('la salle suit l’heure', () => {
     await page.goto('/');
     const lire = () => page.evaluate(() => {
       const o = (s) => Number(getComputedStyle(document.querySelector(s)).opacity);
-      return { nuit: o('.s-nuits'), jeu: o('.s-jeu'), coule: o('.s-coule'), halo: o('.s-halo'), contre: o('.s-contre'), lueur: o('.s-lueur'), reflet: o('.s-reflet') };
+      return { nuit: o('.s-nuits'), jeu: o('.s-jeu'), coule: o('.s-coule'), halo: o('.s-halo'), contre: o('.s-contre'), lueur: o('.s-lueur') };
     });
     await page.waitForTimeout(900);
     const tot = await lire();
@@ -346,7 +359,6 @@ test.describe('la salle suit l’heure', () => {
     expect(await veilleuse()).toBeGreaterThan(0.4);
     expect(await veilleuse()).toBeLessThanOrEqual(0.7);
     expect(await page.locator('.s-veilleuse ellipse').count()).toBe(2);
-    expect(nuit.reflet).toBe(0);
     // L’écran a les couleurs des deux clubs.
     const couleurs = await page.evaluate(() => ['.s-jeu-a', '.s-jeu-a2', '.s-jeu-b', '.s-jeu-b2'].map((s) => getComputedStyle(document.querySelector(s)).fill));
     expect(couleurs).toEqual(['rgb(15, 139, 126)', 'rgb(255, 127, 102)', 'rgb(58, 63, 168)', 'rgb(198, 228, 90)']);
@@ -368,7 +380,7 @@ test.describe('la salle suit l’heure', () => {
     // Dans le style : chaque animation suit le défilement (animation-timeline: scroll), chaque image clé ne touche que
     // transform et opacity.
     for (const [regle] of CSS.matchAll(/[^{}]*\{[^{}]*animation\s*:[^{}]*\}/g)) expect(regle, regle).toMatch(/animation-timeline:\s*scroll\(/);
-    const cles = [...CSS.matchAll(/@keyframes\s+[\w-]+\{((?:[^{}]*\{[^{}]*\})*)\s*\}/g)];
+    const cles = [...CSS.matchAll(/@keyframes\s+[\w-]+\s*\{((?:[^{}]*\{[^{}]*\})*)\s*\}/g)];
     expect(cles.length).toBeGreaterThan(0);
     for (const [, corps] of cles) for (const [, decl] of corps.matchAll(/\{([^{}]*)\}/g)) for (const d of decl.split(';').map((x) => x.trim()).filter(Boolean)) expect(d.split(':')[0].trim(), d).toMatch(/^(transform|opacity)$/);
     // Seuls transform et opacité bougent : aucune règle ne fait transitionner autre chose.

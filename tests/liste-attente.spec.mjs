@@ -26,16 +26,18 @@ const sInscrire = async (page, adresse = 'paul@exemple.fr') => {
 };
 
 // Le champ dit où l’on tape et ce qui ne va pas, pas seulement par la couleur d’un bord : au clavier, un contour de
-// 2 px (à partir de 560 px, sur la pilule : le champ n’a plus de bord) ; une adresse refusée, un bord de 2 px à la
-// couleur de l’erreur, sans que le champ bouge.
-for (const largeur of [360, 1280]) {
+// 2 px (sur la pilule quand le bouton loge dans le champ : sur l’accueil dès 352 px d’écran, ailleurs dès 560 px ; le
+// champ n’a plus de bord) ; une adresse refusée, un bord de 2 px à la couleur de l’erreur, sans que le champ bouge.
+const pilule = (largeur) => largeur >= 352;
+for (const largeur of [320, 360, 1280]) {
   test(`à ${largeur} px : un contour au clavier, et un bord d’erreur quand l’adresse est refusée, sans rien déplacer`, async ({ page }) => {
     await simulerFormspree(page);
     await page.setViewportSize({ width: largeur, height: 800 });
     // Sans l’animation d’ouverture de l’accueil, qui déplace encore le formulaire pendant ses premières secondes.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
-    const cadre = largeur >= 560 ? page.locator('#attente .attente__ligne') : champ(page);
+    const cadre = pilule(largeur) ? page.locator('#attente .attente__ligne') : champ(page);
+    expect(await page.locator('#attente .attente__ligne').evaluate((e) => getComputedStyle(e).flexDirection)).toBe(pilule(largeur) ? 'row' : 'column');
     await champ(page).focus();
     expect(await cadre.evaluate((e) => [getComputedStyle(e).outlineStyle, getComputedStyle(e).outlineWidth])).toEqual(['solid', '2px']);
     // La place du champ dans la page (pas dans l’écran, qui peut défiler quand le message arrive).
@@ -59,13 +61,13 @@ test('en contraste élevé (Windows), à 1280 px : la pilule garde son contour a
 
 // En couleurs forcées, la couleur de l’erreur disparaît : le bord d’erreur se distingue par sa forme (3 px, en tirets),
 // toujours sans déplacer le champ.
-for (const largeur of [360, 1280]) {
+for (const largeur of [320, 360, 1280]) {
   test(`en contraste élevé (Windows), à ${largeur} px : une adresse refusée se voit à la forme du bord`, async ({ page }) => {
     await simulerFormspree(page);
     await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
     await page.setViewportSize({ width: largeur, height: 800 });
     await page.goto('/');
-    const cadre = largeur >= 560 ? page.locator('#attente .attente__ligne') : champ(page);
+    const cadre = pilule(largeur) ? page.locator('#attente .attente__ligne') : champ(page);
     expect(await cadre.evaluate((e) => getComputedStyle(e).borderTopStyle)).toBe('solid');
     const place = () => champ(page).evaluate((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top + window.scrollY, r.width, r.height]; });
     const avant = await place();

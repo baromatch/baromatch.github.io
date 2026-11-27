@@ -98,11 +98,11 @@ export const salle = () => {
     const [x, y] = p(u, v);
     return `<ellipse class="s-flaque" cx="${f(x)}" cy="${f(y)}" rx="46" ry="23" fill="url(#s-chaud)"/>`;
   }).join('')}</g>`;
-  // Le socle : la salle est posée sur le papier comme une maquette, avec l’épaisseur de son plancher et une ombre douce.
   // La veilleuse du comptoir : au coup d’envoi, quand la salle s’éteint, les deux appliques du comptoir restent en
   // veilleuse. Un calque posé sur la nuit : une lumière chaude à gauche, celle de l’écran, froide, à droite.
   const veilleuse = `<g class="s-veilleuse"><g clip-path="url(#s-murs-clip)">${lieux.slice(2).map(([x, y]) => `<ellipse cx="${f(x)}" cy="${f(y + 4)}" rx="40" ry="32" fill="url(#s-chaud)"/>`).join('')}</g>`
     + lieux.slice(2).map(([x, y]) => `<rect class="s-lampe" x="${f(x - 2)}" y="${f(y - 3)}" width="4" height="6" rx="1.6"/>`).join('') + '</g>';
+  // Le socle : la salle est posée sur le papier comme une maquette, avec l’épaisseur de son plancher et une ombre douce.
   const EP = 0.32;
   const [ox, oy] = p(U * 0.55, V * 0.6);
   const socle = `<ellipse class="s-ombre" cx="${f(ox)}" cy="${f(oy + 4)}" rx="150" ry="64" fill="url(#s-ombre-sol)"/>`
@@ -153,7 +153,6 @@ export const salle = () => {
   const [bx, by] = p(6.0, 0, 2);
   const halo = `<clipPath id="s-mur-clip"><path d="M${[p(0, 0), p(U, 0), p(U, 0, HAUTEUR), p(0, 0, HAUTEUR)].map(pt).join('L')}Z"/></clipPath><g class="s-halo" clip-path="url(#s-mur-clip)"><ellipse cx="${f(ax)}" cy="${f(ay)}" rx="46" ry="30" fill="url(#s-halo-a)"/><ellipse cx="${f(bx)}" cy="${f(by)}" rx="46" ry="30" fill="url(#s-halo-b)"/></g>`;
   const ecran = poly([p(3.3, 0, 1.25), p(6.9, 0, 1.25), p(6.9, 0, 2.75), p(3.3, 0, 2.75)], 'class="s-ecran"');
-  const reflet = poly([p(3.4, 0, 1.3), p(4.3, 0, 1.3), p(3.9, 0, 2.7), p(3.4, 0, 2.7)], 'class="s-reflet"');
   const moitie = (u0, u1, classe) => poly([p(u0, 0, 1.38), p(u1, 0, 1.38), p(u1, 0, 2.62), p(u0, 0, 2.62)], `class="${classe}"`);
   const bandes = (u0, classe) => [0, 1].map((k) => { const d = u0 + 0.3 + k * 0.5; return poly([p(d, 0, 1.38), p(d + 0.22, 0, 1.38), p(d + 0.22, 0, 2.62), p(d, 0, 2.62)], `class="${classe}"`); }).join('');
   const match = `${moitie(3.45, 5.1, 's-jeu-a')}${bandes(3.45, 's-jeu-a2')}${moitie(5.1, 6.75, 's-jeu-b')}${bandes(5.1, 's-jeu-b2')}${poly([p(5.08, 0, 1.38), p(5.12, 0, 1.38), p(5.12, 0, 2.62), p(5.08, 0, 2.62)], 'class="s-jeu-ligne"')}`;
@@ -163,7 +162,7 @@ export const salle = () => {
   const [tx, ty] = p(toi.u, toi.v, 0.5);
   const maPlace = `<g class="s-toi"><ellipse class="toi-anneau" cx="${f(tx)}" cy="${f(ty)}" rx="12.2" ry="7.6"/><ellipse class="toi" cx="${f(tx)}" cy="${f(ty)}" rx="9.4" ry="5.7"/><ellipse class="toi-plein" cx="${f(tx)}" cy="${f(ty)}" rx="9.4" ry="5.7"/><path class="toi-coche" d="M${f(tx - 4.4)} ${f(ty + 0.3)}l2.9 2.7 5.9-6"/></g>`;
 
-  return `<svg class="salle__dessin" viewBox="40 -12 298 232" width="298" height="232" aria-hidden="true" focusable="false"><defs>${PERSONNES}${LUMIERES}</defs>${socle}${murD}${murG}${sol}${sousLeSol}${plinthe}${lampes}${porte}${comptoir}${objets}<g class="s-nuits">${noir}</g>${veilleuse}${halo}${ecran}${reflet}<g class="s-jeu">${match}</g>${coule}<g class="s-contre">${contreJour}</g>${maPlace}</svg>`;
+  return `<svg class="salle__dessin" viewBox="40 -12 298 232" width="298" height="232" aria-hidden="true" focusable="false"><defs>${PERSONNES}${LUMIERES}</defs>${socle}${murD}${murG}${sol}${sousLeSol}${plinthe}${lampes}${porte}${comptoir}${objets}<g class="s-nuits">${noir}</g>${veilleuse}${halo}${ecran}<g class="s-jeu">${match}</g>${coule}<g class="s-contre">${contreJour}</g>${maPlace}</svg>`;
 };
 
 // Le dessin tel qu’il s’écrit dans la page, entre ses repères.

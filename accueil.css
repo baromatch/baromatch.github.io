@@ -15,10 +15,10 @@
 .salle__scene{ --haut: 28svh; position: relative; width: min(100%, var(--haut) * 298 / 232); margin: 0 auto; }
 .salle__dessin{ display: block; width: 100%; height: auto; max-height: 28svh; overflow: visible; }
 /* « ta place » : une étiquette de papier sur la chaise en pointillé, jamais l'ambre (il vient quand tu la gardes). */
-.salle__toi{ position: absolute; left: 54.4%; top: 62.3%; transform: translate(12px, -38px); padding: 3px 9px; border-radius: 999px; background: var(--fond); color: var(--texte); font-size: 0.75rem; font-weight: 700; line-height: 1.2; white-space: nowrap; box-shadow: 0 2px 6px rgba(10, 11, 16, 0.25); pointer-events: none; }
+.salle__toi{ position: absolute; left: 54.4%; top: 62.3%; transform: translate(13px, -34px); padding: 3px 9px; border-radius: 999px; background: var(--fond); color: var(--texte); font-size: 0.75rem; font-weight: 700; line-height: 1.2; white-space: nowrap; box-shadow: 0 2px 6px rgba(10, 11, 16, 0.25); pointer-events: none; }
 .salle__toi::after{ content: ""; position: absolute; left: -2px; bottom: -14px; width: 1.5px; height: 22px; background: var(--fond); transform: rotate(35deg); transform-origin: top; }
 /* L'heure de la salle et ce qu'elle attend, discrètes. */
-.salle__heure{ position: absolute; left: 0; top: 2px; margin: 0; font-size: 1.25rem; line-height: 1.1; font-weight: 680; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: var(--texte-doux); }
+.salle__heure{ position: absolute; left: 0; top: 2px; z-index: 1; margin: 0; padding: 0 8px 3px 0; border-radius: 0 10px 10px 0; background: var(--fond); font-size: 1.25rem; line-height: 1.1; font-weight: 680; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: var(--texte-doux); }
 .salle__envoi{ display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0; color: var(--texte-discret); }
 .veillee[data-etat="2100"] .salle__envoi{ display: none; }
 .salle__heure span{ display: none; }
@@ -41,16 +41,17 @@ body:not(.js) .salle__heure{ display: none; }
   @supports (animation-timeline: scroll()){
     .veillee{ --pose-en-plus: 7svh; }
     .veillee .moment--ouverture{ padding-top: calc(14px + var(--pose-en-plus)); }
-    .salle{ border-bottom-color: transparent; }
+    html:not(.salle-libre) .salle{ border-bottom-color: transparent; }
     .salle__scene{ transform-origin: 50% 0; animation: salle-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
     .salle__legende{ animation: legende-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
-    .salle::before{ content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--trait); animation: salle-trait linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
+    html:not(.salle-libre) .salle::before{ content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--trait); animation: salle-trait linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
     html:not(.salle-libre) .salle::after{ animation: salle-trait linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
   }
 }
 @keyframes salle-pose{ from{ transform: scale(1.18); } to{ transform: none; } }
 @keyframes legende-pose{ from{ transform: translateY(5.04svh); } to{ transform: none; } }
 @keyframes salle-trait{ from{ opacity: 0; } to{ opacity: 1; } }
+@media (forced-colors: active){ .salle::before{ background: CanvasText; } }
 .salle-libre .salle{ position: static; }
 /* Sous la salle collée, le texte qui passe dessous s'efface en douceur au lieu d'une ligne coupée net. */
 @media (max-width: 959.98px) and (min-height: 641px){
@@ -96,7 +97,6 @@ body:not(.js) .salle__heure{ display: none; }
 .s-nuit{ fill: var(--nuit); }
 .s-nuits{ opacity: 0; }
 .s-ecran{ fill: #15161D; stroke: #0A0B10; stroke-width: 1; }
-.s-reflet{ fill: #FFFFFF; opacity: 0; }
 /* L'écran passe l'avant-match dès 18:42 ; au coup d'envoi, il éclaire seul. */
 .s-jeu{ opacity: 0.8; }
 .s-jeu-a{ fill: var(--camp-a); }
@@ -112,7 +112,7 @@ body:not(.js) .salle__heure{ display: none; }
    tu es arrivé. À 20:55 et 21:00 sans geste, elle s'efface (un trait léger, sans fond) : elle n'est jamais le point le
    plus clair d'une salle sombre. */
 .toi{ fill: rgba(255, 255, 255, 0.85); stroke: var(--texte); stroke-width: 1.2; stroke-dasharray: 2.4 1.8; }
-.veillee:is([data-etat="2055"], [data-etat="2100"]) .toi{ fill: none; stroke-opacity: 0.5; }
+.veillee:is([data-etat="2055"], [data-etat="2100"]) .toi{ fill: none; stroke: #F4ECD9; stroke-opacity: 0.5; }
 .toi-plein{ fill: var(--ambre); stroke: var(--goutte); stroke-width: 0.8; opacity: 0; }
 .toi-anneau{ fill: none; stroke: var(--ambre); stroke-width: 1.6; opacity: 0; }
 .toi-coche{ fill: none; stroke: var(--nuit); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
@@ -140,7 +140,7 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .veillee[data-etat="2100"] .s-halo{ opacity: 0.35; }
 .veillee[data-etat="2100"] .s-contre{ opacity: 1; }
 .pret .gens{ transition: opacity var(--pose) var(--sortie-douce), transform var(--pose) var(--sortie-douce); }
-.pret :is(.s-nuits, .s-veilleuse, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet){ transition: opacity var(--pose) var(--sortie-douce); }
+.pret :is(.s-nuits, .s-veilleuse, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche){ transition: opacity var(--pose) var(--sortie-douce); }
 .pret .gens.r2{ transition-delay: 90ms; }
 .pret .gens.r3{ transition-delay: 200ms; }
 
@@ -150,7 +150,8 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .moment--fin{ padding-bottom: 96px; }
 @media (min-width: 960px){
   .moment{ min-height: 72svh; display: flex; flex-direction: column; justify-content: center; padding: 64px 0; }
-  .moment--ouverture{ min-height: calc(100svh - 72px); }
+  /* Ancré en haut, pas centré : un message sous le champ ne fait pas remonter le formulaire. */
+  .moment--ouverture{ min-height: calc(100svh - 72px); justify-content: flex-start; padding-top: max(64px, 18svh); }
 }
 .moment__heure{ margin: 0 0 8px; font-size: 0.9375rem; font-weight: 700; color: var(--texte-discret); }
 .moment--ouverture .moment__heure{ display: none; }
@@ -171,13 +172,19 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 }
 /* Au téléphone, le bouton loge dans le champ (une pastille, pas une bande) ; trop étroit (texte agrandi), ils s'empilent. */
 .moment--ouverture .attente{ container-type: inline-size; }
-@container (min-width: 20rem) and (max-width: 559.98px){
-  .moment--ouverture .attente__ligne{ flex-direction: row; gap: 0; padding: 4px; border-radius: 999px; background: var(--carte); border: 1px solid var(--champ-bord); box-shadow: var(--ombre-carte); }
-  .moment--ouverture .attente__ligne .attente__champ{ height: 44px; min-width: 0; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; }
-  .moment--ouverture .attente__ligne .attente__champ:focus-visible{ outline: none; }
-  .moment--ouverture .attente__ligne:has(.attente__champ:focus-visible){ outline: 2px solid var(--focus); outline-offset: 2px; }
-  .moment--ouverture .attente__ligne:has(.attente__champ[aria-invalid="true"]){ padding: 3px; border: 2px solid var(--erreur); }
-  .moment--ouverture .attente__ligne .attente__bouton{ flex: 0 0 auto; height: 44px; padding: 0 20px; border-radius: 999px; }
+/* La pilule fait comme sur ordinateur : le contour de focus et le bord d'erreur (en tirets en couleurs forcées) sont les siens. */
+@media (max-width: 559.98px){
+  @container (min-width: 20rem){
+    .moment--ouverture .attente__ligne{ flex-direction: row; gap: 0; padding: 4px; border-radius: 999px; background: var(--carte); border: 1px solid var(--champ-bord); box-shadow: var(--ombre-carte); }
+    .moment--ouverture .attente__ligne .attente__champ{ height: 44px; min-width: 0; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; }
+    .moment--ouverture .attente__ligne .attente__champ:focus-visible{ outline: none; }
+    .moment--ouverture .attente__ligne:has(.attente__champ:focus-visible){ outline: 2px solid var(--focus); outline-offset: 2px; }
+    .moment--ouverture .attente__ligne:has(.attente__champ[aria-invalid="true"]){ padding: 3px; border: 2px solid var(--erreur); }
+    .moment--ouverture .attente__ligne .attente__bouton{ flex: 0 0 auto; height: 44px; padding: 0 20px; border-radius: 999px; }
+  }
+  @container (min-width: 20rem){ @media (forced-colors: active){
+    .moment--ouverture .attente__ligne:has(.attente__champ[aria-invalid="true"]){ padding: 2px; border: 3px dashed CanvasText; }
+  } }
 }
 
 /* 19:30 : ce soir, et la semaine en sept piles. */
@@ -255,6 +262,6 @@ body:not(.js) .maintien__sans{ display: inline; }
 
 /* Réduire les animations : les états changent sans fondu ni pose, le sous-bock se retourne d'un coup. */
 @media (prefers-reduced-motion: reduce){
-  .pret .gens, .pret :is(.s-nuits, .s-veilleuse, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet), .pret .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
+  .pret .gens, .pret :is(.s-nuits, .s-veilleuse, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche), .pret .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
   .gens{ transform: none; }
 }

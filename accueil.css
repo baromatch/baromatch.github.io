@@ -17,7 +17,17 @@
 .veillee[data-etat="1842"] .h1842, .veillee[data-etat="1930"] .h1930, .veillee[data-etat="2015"] .h2015, .veillee[data-etat="2055"] .h2055, .veillee[data-etat="2100"] .h2100{ display: inline; }
 body:not(.js) .salle__heure{ display: none; }
 .salle__legende{ margin: 0; font-size: 0.75rem; line-height: 1.4; color: var(--texte-discret); text-align: right; }
+/* Au téléphone, la salle colle en haut : ce qui reçoit le focus, ou une ancre, s'arrête sous elle (WCAG 2.4.11). Elle
+   ne colle plus sous 641 px de haut, ni quand elle prendrait plus du tiers de l'écran (texte agrandi : salle.js pose
+   « salle-libre » après la première image). */
+@media (max-width: 959.98px) and (min-height: 641px){
+  html:not(.salle-libre){ scroll-padding-top: calc(28svh + 2.2rem + 14px); }
+  /* La barre du menu passe en bas quand elle sort par le haut de l'écran : cette marge ne la concerne pas. */
+  html:not(.salle-libre) .menu{ view-timeline-inset: 0 auto; }
+  html:not(.salle-libre) .veillee .attente{ scroll-margin-top: 12px; }
+}
 @media (max-height: 640px){ .salle{ position: static; } }
+.salle-libre .salle{ position: static; }
 @media (min-width: 960px){
   .veillee{ display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px; align-items: start; }
   .salle{ grid-column: 1; grid-row: 1; height: 100svh; display: grid; align-items: center; margin: 0; padding: 24px 0; border: 0; }
@@ -50,9 +60,7 @@ body:not(.js) .salle__heure{ display: none; }
 .gens.t1{ --tete: #2E2723; }
 .gens.t2{ --tete: #7A5238; }
 .gens.t3{ --tete: #C69C7B; }
-.g-liseret{ fill: none; stroke: var(--rim); stroke-width: 0.85; stroke-linecap: round; }
-.s-contre .a{ --rim: #7FF0DE; }
-.s-contre .b{ --rim: #B4B8FF; }
+.g-liseret{ fill: none; stroke: #F4ECD9; stroke-opacity: 0.5; stroke-width: 0.85; stroke-linecap: round; }
 .s-nuit{ fill: var(--nuit); }
 .s-nuits{ opacity: 0; }
 .s-ecran{ fill: #1B1D27; stroke: #0A0B10; stroke-width: 1; }
@@ -66,11 +74,15 @@ body:not(.js) .salle__heure{ display: none; }
 .s-halo{ opacity: 0; }
 .s-coule{ opacity: 0; }
 .s-contre{ opacity: 0; }
-/* Ta place : en pointillé tant qu'elle n'est pas gardée, à l'ambre quand tu l'as gardée, cochée quand tu es arrivé. */
-.toi{ fill: rgba(255, 255, 255, 0.85); stroke: var(--texte); stroke-width: 1.1; stroke-dasharray: 2 1.6; }
+/* Ta place : en pointillé tant qu'elle n'est pas gardée, à l'ambre et cerclée d'ambre quand tu l'as gardée, cochée quand
+   tu es arrivé. À 20:55 et 21:00 sans geste, elle s'efface (un trait léger, sans fond) : elle n'est jamais le point le
+   plus clair d'une salle sombre. */
+.toi{ fill: rgba(255, 255, 255, 0.85); stroke: var(--texte); stroke-width: 1.2; stroke-dasharray: 2.4 1.8; }
+.veillee:is([data-etat="2055"], [data-etat="2100"]) .toi{ fill: none; stroke-opacity: 0.5; }
 .toi-plein{ fill: var(--ambre); stroke: var(--goutte); stroke-width: 0.8; opacity: 0; }
+.toi-anneau{ fill: none; stroke: var(--ambre); stroke-width: 1.6; opacity: 0; }
 .toi-coche{ fill: none; stroke: var(--nuit); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
-.place-gardee .toi-plein{ opacity: 1; }
+.place-gardee :is(.toi-plein, .toi-anneau){ opacity: 1; }
 .place-gardee .veillee:is([data-etat="2055"], [data-etat="2100"]) .toi-coche{ opacity: 1; }
 
 /* Les transitions ne jouent qu'une fois la salle à son premier état (salle.js pose « pret ») : à l'arrivée, rien ne bouge. */
@@ -89,12 +101,12 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .veillee[data-etat="2055"] :is(.s-lueur, .s-flaque){ opacity: 0.6; }
 .veillee[data-etat="2100"] :is(.s-lueur, .s-flaque){ opacity: 0.1; }
 .veillee[data-etat="2100"] .s-jeu{ opacity: 1; }
-.veillee[data-etat="2100"] .s-coule{ opacity: 0.62; }
-.veillee[data-etat="2100"] .s-halo{ opacity: 0.7; }
+.veillee[data-etat="2100"] .s-coule{ opacity: 0.35; }
+.veillee[data-etat="2100"] .s-halo{ opacity: 0.35; }
 .veillee[data-etat="2100"] .s-contre{ opacity: 1; }
 .veillee[data-etat="2100"] .s-reflet{ opacity: 0; }
 .pret .gens{ transition: opacity var(--pose) var(--sortie-douce), transform var(--pose) var(--sortie-douce); }
-.pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-coche, .s-reflet){ transition: opacity var(--pose) var(--sortie-douce); }
+.pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet){ transition: opacity var(--pose) var(--sortie-douce); }
 .pret .gens.r2{ transition-delay: 90ms; }
 .pret .gens.r3{ transition-delay: 200ms; }
 
@@ -153,7 +165,7 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .tenir{
   position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 58px; padding: 0 20px;
   border-radius: 999px; border: 1.5px solid var(--texte); background: var(--carte); color: var(--texte); font: inherit; font-weight: 700; font-size: 1.0625rem;
-  cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; transition: transform var(--lever) var(--sortie-douce);
+  cursor: pointer; touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; transition: transform var(--lever) var(--sortie-douce);
 }
 .tenir:active{ transform: scale(0.985); }
 .tenir__niveau{ position: absolute; inset: 0; background: var(--ambre); transform: scaleX(0); transform-origin: left center; transition: transform 380ms var(--sortie-douce); }
@@ -163,6 +175,11 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .tenir__mot{ position: relative; color: var(--nuit); }
 .maintien__aide{ margin: 0; font-size: 0.875rem; color: var(--texte-discret); }
 .maintien__statut{ margin: 0; min-height: 1.5em; font-weight: 700; }
+/* Sans script, le geste ne fait rien : le bouton s'atténue et l'aide le dit, au lieu de promettre le doigt et la souris. */
+.maintien__sans{ display: none; }
+body:not(.js) .tenir{ cursor: default; opacity: 0.6; }
+body:not(.js) .maintien__avec{ display: none; }
+body:not(.js) .maintien__sans{ display: inline; }
 
 /* 20:55 : le sous-bock, un disque de carton qui se retourne. */
 .sousbock{ margin: 26px 0 0; }
@@ -193,6 +210,6 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 
 /* Réduire les animations : les états changent sans fondu ni pose, le sous-bock se retourne d'un coup. */
 @media (prefers-reduced-motion: reduce){
-  .pret .gens, .pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-coche, .s-reflet), .pret .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
+  .pret .gens, .pret :is(.s-nuits, .s-jeu, .s-halo, .s-coule, .s-contre, .s-lueur, .s-flaque, .toi-plein, .toi-anneau, .toi-coche, .s-reflet), .pret .sousbock__tour, .tenir__niveau, .tenir.se-remplit .tenir__niveau{ transition: none !important; }
   .gens{ transform: none; }
 }

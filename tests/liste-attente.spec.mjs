@@ -100,7 +100,7 @@ test('après l’inscription, l’adresse est rappelée et on peut la corriger',
   await expect(retour(page)).toHaveText(INSCRITE('paul.martin@gmail.co'));
   await expect(champ(page)).toHaveValue('paul.martin@gmail.co');
   await expect(champ(page)).not.toHaveAttribute('aria-invalid', 'true');
-  await expect(bouton(page)).toHaveText('C’est noté');
+  await expect(bouton(page)).toHaveText('Inscrit');
   await expect(bouton(page)).toBeDisabled();
   await expect(corriger(page)).toBeVisible();
   await expect(corriger(page)).toHaveText('Corriger l’adresse');
@@ -132,7 +132,7 @@ test('taper dans le champ après l’inscription rouvre l’envoi', async ({ pag
   // L’inscription faite, pas seulement partie : pendant « Envoi… », le bouton est déjà inactif, et ce qu’on tape alors
   // ne rouvre rien.
   await expect(retour(page)).toHaveText(INSCRITE('paul@gmail.com'));
-  await expect(bouton(page)).toHaveText('C’est noté');
+  await expect(bouton(page)).toHaveText('Inscrit');
   await expect(bouton(page)).toBeDisabled();
   await champ(page).press('End');
   await champ(page).pressSequentially('x');

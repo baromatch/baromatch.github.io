@@ -95,8 +95,9 @@ for (const chemin of ['/pour-les-bars.html']) {
 
 // Un titre très grand, texte à 200 % sur un petit écran : il passe à la ligne entre deux mots, jamais au milieu d’un
 // mot (« Baromatc / h », qu’un titre de 72 px coupait à 320 px). Chaque mot de chaque titre h1 et h2 visible de
-// l’accueil et de « Pour les bars » reste sur une seule ligne.
-for (const [nom, chemin] of [['l’accueil', '/'], ['« Pour les bars »', '/pour-les-bars.html']]) for (const largeur of [320, 360]) {
+// l’accueil et de « Pour les bars » reste sur une seule ligne, du petit téléphone à l’ordinateur (« peut-être » se coupait
+// au trait d’union à 390 et 1280 px).
+for (const [nom, chemin] of [['l’accueil', '/'], ['« Pour les bars »', '/pour-les-bars.html']]) for (const largeur of [320, 360, 390, 1280]) {
   test(`${nom} à ${largeur} px, texte à 200 % : aucun mot d’un titre h1 ou h2 n’est coupé sur deux lignes`, async ({ page: onglet }) => {
     await auJourDeLAccueil(onglet);
     await couperLAPI(onglet);

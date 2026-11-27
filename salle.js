@@ -19,6 +19,12 @@ var heure = moments[0].dataset.heure;
 Array.prototype.forEach.call(moments, function (m) { if (m.getBoundingClientRect().top <= ligne) heure = m.dataset.heure; });
 if (soiree.dataset.etat !== heure) soiree.dataset.etat = heure;
 }
+/* Au téléphone, la salle colle en haut tant qu'elle prend au plus un tiers de l'écran ; plus grande (texte agrandi, écran
+   bas), elle reste en haut de la page et laisse la place au texte. La règle se relit quand la salle change de taille. */
+function libre() {
+var trop = !window.matchMedia("(min-width: 960px)").matches && salle.offsetHeight > window.innerHeight / 3;
+doc.documentElement.classList.toggle("salle-libre", trop);
+}
 function demander() { if (!attend) { attend = true; window.requestAnimationFrame(placer); } }
 if (moments.length && salle) {
 window.addEventListener("scroll", demander, { passive: true });
@@ -27,8 +33,11 @@ window.addEventListener("resize", demander);
    retarderait l'affichage. En haut de page, la salle est déjà à 18:42 sans script. Les transitions ne commencent
    qu'une fois la salle à son premier état : à l'arrivée, rien ne bouge. */
 window.requestAnimationFrame(function () { setTimeout(function () {
+libre();
 placer();
 window.requestAnimationFrame(function () { window.requestAnimationFrame(function () { soiree.classList.add("pret"); }); });
+if (window.ResizeObserver) new ResizeObserver(function () { libre(); demander(); }).observe(salle);
+window.addEventListener("resize", libre);
 }, 0); });
 }
 
@@ -45,7 +54,7 @@ tenu = false;
 bouton.classList.remove("se-remplit");
 bouton.classList.add("plein");
 doc.documentElement.classList.add("place-gardee");
-statut.textContent = "Place gardée.";
+statut.textContent = "Place gardée. Ton rond ambre est dans la salle.";
 };
 var commencer = function () {
 if (tenu || bouton.classList.contains("plein")) return;
@@ -54,14 +63,16 @@ tenu = true;
 bouton.classList.add("se-remplit");
 minuteur = setTimeout(fini, DUREE);
 };
-var lacher = function () {
+/* Lâché trop tôt, le bouton se vide et le dit ; un doigt qui fait défiler la page (pointercancel) le vide sans un mot. */
+var lacher = function (e) {
 if (!tenu) return;
 tenu = false;
 clearTimeout(minuteur);
 bouton.classList.remove("se-remplit");
-statut.textContent = "Trop tôt : maintiens jusqu’en haut.";
+if (!e || e.type !== "pointercancel") statut.textContent = "Trop tôt. Maintiens jusqu’au bout.";
 };
 bouton.addEventListener("pointerdown", function (e) {
+if (e.pointerType === "mouse" && e.button !== 0) return;
 e.preventDefault();
 if (bouton.setPointerCapture) bouton.setPointerCapture(e.pointerId);
 commencer();
@@ -73,7 +84,7 @@ bouton.addEventListener("contextmenu", function (e) { e.preventDefault(); });
 bouton.addEventListener("keydown", function (e) {
 if ((e.key === " " || e.key === "Enter") && !e.repeat) { e.preventDefault(); commencer(); }
 });
-bouton.addEventListener("keyup", function (e) { if (e.key === " " || e.key === "Enter") lacher(); });
+bouton.addEventListener("keyup", function (e) { if (e.key === " " || e.key === "Enter") lacher(e); });
 bouton.addEventListener("blur", lacher);
 }
 

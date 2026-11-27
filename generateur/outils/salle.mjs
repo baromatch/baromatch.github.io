@@ -1,15 +1,17 @@
 // La salle de l’accueil, dessinée en axonométrie : l’exemple d’un bar de 42 places (neuf tables rondes de quatre, six
 // places debout au comptoir) et de deux clubs inventés, Alvène et Orvèle. Le dessin est écrit dans index.html entre
-// <!-- salle:debut --> et <!-- salle:fin --> ; ce fichier le fabrique, tests/accueil-salle.spec.mjs vérifie que la page
+// <!-- salle:debut --> et <!-- salle:fin --> ; ce fichier le fabrique, tests/accueil.spec.mjs vérifie que la page
 // porte exactement ce qu’il écrit. Pour le refaire : node generateur/outils/salle.mjs --ecrire
 //
 // Ce qui se voit, et l’heure où cela se voit (le style de la page, accueil.css, lit l’état de la soirée) :
 // - des gens, tête et épaules, assis aux tables ou debout au comptoir, aux couleurs de leur club (maillot, écharpe) ;
 //   chacun se pose à son heure (s1 à s4), de 18:42 au coup d’envoi ;
 // - la lumière : des appliques au blanc chaud (jamais l’ambre, réservé à l’action et à la place du visiteur) ; au coup
-//   d’envoi les lumières baissent, l’écran du fond s’allume aux couleurs des deux clubs, sa lumière coule sur le sol et
-//   découpe les silhouettes (le liseré « contre-jour ») ;
-// - ta place : en pointillé tant qu’elle n’est pas gardée, à l’ambre quand tu la gardes, cochée quand tu es arrivé.
+//   d’envoi les lumières baissent, l’écran du fond s’allume aux couleurs des deux clubs, sa lumière coule sur le sol,
+//   douce et sans mélange (chaque club garde sa teinte, de son côté), et découpe les silhouettes d’un liseré blanc
+//   chaud (le « contre-jour ») ;
+// - ta place : plus grande qu’une chaise, en pointillé tant qu’elle n’est pas gardée ; à l’ambre et cerclée d’ambre
+//   quand tu la gardes, cochée quand tu es arrivé.
 // Rien d’un verre ni d’une bouteille : le comptoir est un plan de bois, des gens y sont debout.
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -68,10 +70,10 @@ const PERSONNES = `<symbol id="gens" viewBox="0 0 12 17"><path d="M.8 17C.8 11.2
   + `<symbol id="liseret-debout" viewBox="0 0 12 30"><path d="M.8 22C.8 11.4 3 8.6 6 8.6s5.2 2.8 5.2 13.4M2.7 4.3a3.3 3.3 0 0 1 6.6 0" class="g-liseret"/></symbol>`;
 
 const LUMIERES = `<radialGradient id="s-chaud"><stop offset="0" stop-color="#FFF4DC" stop-opacity=".95"/><stop offset=".45" stop-color="#FFF1D2" stop-opacity=".4"/><stop offset="1" stop-color="#FFF1D2" stop-opacity="0"/></radialGradient>`
-  + `<radialGradient id="s-halo-a"><stop offset="0" stop-color="#37D2BE" stop-opacity=".75"/><stop offset="1" stop-color="#37D2BE" stop-opacity="0"/></radialGradient>`
-  + `<radialGradient id="s-halo-b"><stop offset="0" stop-color="#8F96FF" stop-opacity=".75"/><stop offset="1" stop-color="#8F96FF" stop-opacity="0"/></radialGradient>`
-  + `<linearGradient id="s-coule-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#37D2BE" stop-opacity=".85"/><stop offset="1" stop-color="#37D2BE" stop-opacity="0"/></linearGradient>`
-  + `<linearGradient id="s-coule-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8F96FF" stop-opacity=".85"/><stop offset="1" stop-color="#8F96FF" stop-opacity="0"/></linearGradient>`;
+  + `<radialGradient id="s-halo-a"><stop offset="0" stop-color="#7DB5AC" stop-opacity=".75"/><stop offset="1" stop-color="#7DB5AC" stop-opacity="0"/></radialGradient>`
+  + `<radialGradient id="s-halo-b"><stop offset="0" stop-color="#9A9CC8" stop-opacity=".75"/><stop offset="1" stop-color="#9A9CC8" stop-opacity="0"/></radialGradient>`
+  + `<linearGradient id="s-coule-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7DB5AC" stop-opacity=".7"/><stop offset="1" stop-color="#7DB5AC" stop-opacity="0"/></linearGradient>`
+  + `<linearGradient id="s-coule-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A9CC8" stop-opacity=".7"/><stop offset="1" stop-color="#9A9CC8" stop-opacity="0"/></linearGradient>`;
 
 export const salle = () => {
   const sol = poly([p(0, 0), p(U, 0), p(U, V), p(0, V)], 'class="s-sol"');
@@ -138,11 +140,11 @@ export const salle = () => {
   const moitie = (u0, u1, classe) => poly([p(u0, 0, 1.38), p(u1, 0, 1.38), p(u1, 0, 2.62), p(u0, 0, 2.62)], `class="${classe}"`);
   const bandes = (u0, classe) => [0, 1].map((k) => { const d = u0 + 0.3 + k * 0.5; return poly([p(d, 0, 1.38), p(d + 0.22, 0, 1.38), p(d + 0.22, 0, 2.62), p(d, 0, 2.62)], `class="${classe}"`); }).join('');
   const match = `${moitie(3.45, 5.1, 's-jeu-a')}${bandes(3.45, 's-jeu-a2')}${moitie(5.1, 6.75, 's-jeu-b')}${bandes(5.1, 's-jeu-b2')}${poly([p(5.08, 0, 1.38), p(5.12, 0, 1.38), p(5.12, 0, 2.62), p(5.08, 0, 2.62)], 'class="s-jeu-ligne"')}`;
-  const coule = `${poly([p(3.1, 0), p(5.1, 0), p(5.8, 4.4), p(2.0, 4.4)], 'class="s-coule" fill="url(#s-coule-a)"')}${poly([p(5.1, 0), p(7.1, 0), p(8.4, 4.4), p(4.6, 4.4)], 'class="s-coule" fill="url(#s-coule-b)"')}`;
+  const coule = `${poly([p(3.1, 0), p(5.1, 0), p(5.2, 4.4), p(2.0, 4.4)], 'class="s-coule" fill="url(#s-coule-a)"')}${poly([p(5.1, 0), p(7.1, 0), p(8.4, 4.4), p(5.2, 4.4)], 'class="s-coule" fill="url(#s-coule-b)"')}`;
 
-  // Ta place : une chaise de plus, la seule à l’ambre.
+  // Ta place : une chaise de plus, plus grande que les autres, la seule à l’ambre ; un anneau d’ambre quand elle est gardée.
   const [tx, ty] = p(toi.u, toi.v, 0.5);
-  const maPlace = `<g class="s-toi"><ellipse class="toi" cx="${f(tx)}" cy="${f(ty)}" rx="6.6" ry="4"/><ellipse class="toi-plein" cx="${f(tx)}" cy="${f(ty)}" rx="6.6" ry="4"/><path class="toi-coche" d="M${f(tx - 3.2)} ${f(ty + 0.2)}l2.1 2 4.3-4.4"/></g>`;
+  const maPlace = `<g class="s-toi"><ellipse class="toi-anneau" cx="${f(tx)}" cy="${f(ty)}" rx="12.2" ry="7.6"/><ellipse class="toi" cx="${f(tx)}" cy="${f(ty)}" rx="9.4" ry="5.7"/><ellipse class="toi-plein" cx="${f(tx)}" cy="${f(ty)}" rx="9.4" ry="5.7"/><path class="toi-coche" d="M${f(tx - 4.4)} ${f(ty + 0.3)}l2.9 2.7 5.9-6"/></g>`;
 
   return `<svg class="salle__dessin" viewBox="46 -12 286 224" width="286" height="224" aria-hidden="true" focusable="false"><defs>${PERSONNES}${LUMIERES}</defs>${murD}${murG}${sol}${sousLeSol}${plinthe}${lampes}${porte}${comptoir}${objets}<g class="s-nuits">${noir}</g>${halo}${ecran}${reflet}<g class="s-jeu">${match}</g>${coule}<g class="s-contre">${contreJour}</g>${maPlace}</svg>`;
 };

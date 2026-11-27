@@ -20,7 +20,7 @@ incomplete: "Il manque la fin de ton adresse, par exemple .fr ou .com.",
 refusee: "Cette adresse ne semble pas valide. Vérifie-la : elle doit ressembler à prenom@exemple.fr. Si elle est juste, écris à " + CONTACT + ".",
 panne: "L’inscription n’est pas passée. Réessaie dans un instant, ou écris à " + CONTACT + ".",
 envoi: "Envoi…",
-note: "C’est noté",
+note: "Inscrit",
 inscrite: function (courriel, ville) {
 var quand = ville === "Paris" || !ville ? "au lancement et pour les premiers tests"
 : ville === "Autre" ? "si Baromatch ouvre dans une nouvelle ville" : "si Baromatch arrive à " + ville;

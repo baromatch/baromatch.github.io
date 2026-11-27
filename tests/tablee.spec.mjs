@@ -81,10 +81,10 @@ test('invitation ouverte : la carte, puis « tu peux venir sans l’appli », pu
   // Juste sous la carte, avant ce qui parle de l’appli.
   expect(await page.evaluate(() => document.getElementById('tablee-carte').nextElementSibling.id)).toBe('tablee-venir');
 
-  // Comment avoir l’appli : iPhone et Android, bientôt sur les stores ; le test fermé sur Android, sinon la liste
+  // Comment avoir l’appli : en test sur iPhone et Android, bientôt sur les stores ; le test fermé sur Android, sinon la liste
   // d’attente. « Ouvrir dans l’appli » est pour Android.
   const appli = page.locator('#tablee-appli');
-  await expect(appli).toContainText('L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
+  await expect(appli).toContainText('L’appli tourne déjà en test sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
   await expect(appli).toContainText('Tu as un téléphone Android ? Deviens testeur pour installer l’appli avant tout le monde. Sinon, laisse ton adresse : on te prévient au lancement.');
   await expect(appli.getByRole('link', { name: 'Deviens testeur' })).toHaveAttribute('href', '/testeurs-android.html');
   await expect(appli.getByRole('link', { name: 'Me prévenir au lancement' })).toHaveAttribute('href', '/#attente');
@@ -123,7 +123,7 @@ test('table pleine : demander à la personne qui t’invite, sans la note sur so
   expect((await visibles(page)).join(' ')).not.toMatch(/pass compte|regarde dans l’appli/);
 });
 
-// « Ouvrir dans l’appli », sur Android seulement (l’appli n’existe pas ailleurs) : pour qui a l’appli et voit quand même
+// « Ouvrir dans l’appli », sur Android seulement (un « intent » de Chrome n’existe pas ailleurs) : pour qui a l’appli et voit quand même
 // cette page. Un « intent » de Chrome ouvre baromatch://t/‹code› dans fr.baromatch.app ; sans l’appli, le navigateur va
 // à la page des testeurs Android. Seulement quand l’invitation est là (ouverte ou pleine).
 const INTENT = 'intent://t/abcdefghjkmn#Intent;scheme=baromatch;package=fr.baromatch.app;S.browser_fallback_url=';

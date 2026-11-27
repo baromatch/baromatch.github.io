@@ -173,7 +173,7 @@ test('où en est l’appli : une phrase vraie sans mois, avant comme pendant le 
   for (const fichier of ['index.html', 'a-propos.html', 'llms.txt']) {
     const texte = lire(fichier);
     expect(texte, fichier).not.toMatch(datee);
-    expect(texte, fichier).toContain('existe sur iPhone et Android');
+    expect(texte, fichier).toContain('tourne déjà en test sur iPhone et Android');
     expect(texte, fichier).toContain('bientôt sur l’App Store et Google Play');
     // Vrai aussi pendant le test fermé : ses testeurs (et les équipes des bars) s’en servent, le public pas encore.
     expect(texte, fichier).not.toContain('on ne peut pas encore y garder de place');
@@ -181,9 +181,9 @@ test('où en est l’appli : une phrase vraie sans mois, avant comme pendant le 
     expect(texte, fichier).not.toContain('seuls ses testeurs');
   }
   await page.goto('/');
-  expect(normaliser(await page.locator('.attente__plateformes').innerText())).toBe('L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
+  expect(normaliser(await page.locator('.attente__plateformes').innerText())).toBe('L’appli tourne déjà en test sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
   await page.goto('/a-propos.html');
-  expect(normaliser(await page.locator('#aujourd-hui + p').innerText())).toBe('L’appli existe sur iPhone et Android, d’abord à Paris. Elle arrive bientôt sur l’App Store et Google Play.');
+  expect(normaliser(await page.locator('#aujourd-hui + p').innerText())).toBe('L’appli tourne déjà en test sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
 });
 
 test('le plan du site et llms.txt donnent la page', () => {

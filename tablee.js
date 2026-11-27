@@ -27,8 +27,8 @@
   // Dès cette heure (de Paris), un match du jour se dit « Ce soir » plutôt que « Aujourd’hui ».
   var HEURE_DU_SOIR = 18;
   var CARTE = "https://www.google.com/maps/search/?api=1&query=";
-  // L’appli n’existe que sur Android : ailleurs, « Ouvrir dans l’appli » ne mènerait nulle part. Le lien est un
-  // « intent » de Chrome : il ouvre baromatch://t/‹code› dans l’appli (son propre schéma, qui ouvre l’invitation même
+  // « Ouvrir dans l’appli » passe par un « intent » de Chrome, qui n’existe que sur Android : ailleurs, le lien ne
+  // mènerait nulle part. Il ouvre baromatch://t/‹code› dans l’appli (son propre schéma, qui ouvre l’invitation même
   // sans assetlinks.json) ; sans l’appli, le navigateur va à SANS_L_APPLI au lieu de ne rien faire.
   var ANDROID = /Android/i.test(navigator.userAgent || "");
   var PAQUET = "fr.baromatch.app";

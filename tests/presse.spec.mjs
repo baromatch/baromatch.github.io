@@ -25,12 +25,12 @@ test('Baromatch en bref : le slogan, la phrase et la description de marque.json,
   for (const cle of ['slogan', 'uneLigne', 'description']) expect(texte, cle).toContain(normaliser(MARQUE[cle]));
   // Vrai aujourd’hui : iPhone et Android, d’abord Paris, bientôt sur les stores ; l’appli ne coûte rien au fan (la boutique, elle,
   // vend des pièces : jamais « tu ne paies rien à Baromatch »).
-  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle arrive bientôt sur l’App Store et Google Play.');
+  if (!MARQUE.appli.ouverte) expect(texte).toContain('Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
   // « bientôt sur l’App Store » tient tant que marque.json n’a pas de lien iPhone : le jour où il en a un, ce test tombe.
   if (texte.includes('bientôt sur l’App Store')) expect(MARQUE.appli.iphone, 'un lien iPhone dans marque.json : relire « bientôt sur l’App Store » (Presse, À propos), l’accueil et llms.txt').toBe('');
   const fait = async (nom) => normaliser(await page.locator('.presse__faits > div').filter({ has: page.locator('dt', { hasText: nom }) }).locator('dd').textContent());
   expect(await fait('Pour les fans')).toBe('L’appli ne te coûte rien. Ce que tu prends au bar, tu le paies au bar.');
-  expect(await fait('Aujourd’hui')).toBe('L’appli existe sur iPhone et Android, d’abord à Paris. Elle arrive bientôt sur l’App Store et Google Play.');
+  expect(await fait('Aujourd’hui')).toBe('L’appli tourne déjà en test sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
   // Qui publie : le nom, puis les mentions légales pour le reste.
   expect(await fait('Qui publie')).toBe('Skander Kamoun, fondateur. Détails dans les mentions légales.');
   expect(texte).not.toMatch(/Tu ne paies rien|Gratuit\. Ce qu’ils/);

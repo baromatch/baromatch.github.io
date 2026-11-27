@@ -18,14 +18,14 @@ Mis à jour à chaque étape (la session peut s’arrêter d’un coup).
 nouvelle section de `main` ; le dossier de relecture refusé par le test des documents publics) : corrigés. Les 115
 autres échouaient aussi sur `main` seul, dans cette machine : le rendu des images et l’encodeur des QR codes
 (`generateur/images`) n’y étaient pas installés. Installés comme la CI le fait (`npm ci --ignore-scripts` dans
-`generateur/images`), ils passent. Trois suites suivantes : 3 613 passées et 2 échecs du test des documents publics (l’état renvoyait au dépôt de
-l’appli ; le chemin de la note juridique écrit en clair dans le test) ; corrigés à leur cause, puis trois suites vertes.
+`generateur/images`), ils passent. Trois suites suivantes : 3 613 passées et 2 échecs du test des documents publics (l’état renvoyait à
+l’appli privée ; le chemin de la note juridique écrit en clair dans le test) ; corrigés à leur cause, puis trois suites vertes.
 
 ## Arrêt demandé (27/11, matin) : où reprendre
 
 Tout est poussé. Reste seulement :
 
-1. Fusionner `origin/main` dans la branche (jamais de rebase), puis la suite entière trois fois si `main` a bougé
+1. Fusionner `main` dans la branche (jamais de rebase), puis la suite entière trois fois si `main` a bougé
    ailleurs que dans les pages des matchs. Sur une machine neuve : `npm ci`, et `npm ci --ignore-scripts` dans
    `generateur/images` (sans lui, 115 tests des affiches et des images échouent, sur `main` aussi).
 2. Ouvrir la PR en brouillon vers `main` : son texte est prêt, dans `pr.md` (ce dossier). Le maestro fusionne après le

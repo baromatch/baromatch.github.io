@@ -28,14 +28,18 @@ const MARQUE = JSON.parse(lire('marque.json'));
 const FR = 'L’appli tourne déjà en test sur iPhone et Android.';
 const FR_COMPLETE = `${FR} Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.`;
 const EN = 'The app is already in testing on iPhone and Android';
-// L’ancienne phrase et ses variantes : « existe » puis « sur iPhone » (avec ou sans « déjà », « l’iPhone »), et en anglais
-// « the app is on / is ready on / is available on iPhone ». Écrites avec des \s, pour que ce fichier ne se trouve pas
-// lui-même.
+// L’ancienne phrase et ses variantes : « existe » puis « sur iPhone » ou « sur Android » (avec ou sans « déjà »,
+// « l’iPhone »), et en anglais « the app is on / is ready on / is available on » iPhone ou Android. Écrites avec des \s,
+// pour que ce fichier ne se trouve pas lui-même. Les espaces insécables écrites « \u00a0 » dans les données
+// structurées sont lues comme des espaces.
 const ANCIENNES = [
-  /existe\s+(?:d[ée]j[àa]\s+)?sur\s+(?:l[’']\s*)?iPhone/iu,
-  /\bapp\s+is\s+(?:already\s+)?(?:on|ready\s+on|available\s+on)\s+(?:the\s+)?iPhone/iu,
+  /existe\s+(?:d[ée]j[àa]\s+)?sur\s+(?:l[’']\s*)?(?:iPhone|Android)/iu,
+  /\bapp\s+is\s+(?:already\s+)?(?:on|ready\s+on|available\s+on)\s+(?:the\s+)?(?:iPhone|Android)/iu,
 ];
-const ancienne = (texte) => ANCIENNES.map((forme) => normaliser(texte).match(forme)?.[0]).find(Boolean) ?? null;
+const ancienne = (texte) => {
+  const lu = normaliser(texte.replace(/\\u00a0|\\u202f/gi, ' '));
+  return ANCIENNES.map((forme) => lu.match(forme)?.[0]).find(Boolean) ?? null;
+};
 
 // Les fichiers texte que git suit, ou suivrait : tout ce que GitHub Pages servirait.
 const BINAIRE = /\.(?:png|jpe?g|webp|gif|ico|mp4|webm|woff2?|pdf|ttf|otf)$/i;
@@ -46,18 +50,22 @@ const A_LA_MAIN = [...new Set(execFileSync('git', ['ls-files', '-z', '--cached',
     && !fichier.startsWith('docs/') && !ECRITES_PAR_LE_GENERATEUR(fichier) && existsSync(path.join(racine, fichier)))
   .sort();
 
-test.describe('tant que l’appli n’est pas sur les stores', () => {
-  test.skip(MARQUE.appli.ouverte, 'L’appli est ouverte au public : les pages disent alors « Réserve ta place dans l’appli ».');
+// Le jour où l’appli ouvre au public (marque.json), chacune de ces phrases change : les tests de la nouvelle phrase
+// tombent, pour qu’on les relise toutes dans la même PR (l’ancienne, elle, reste refusée).
+const OUVERTE = 'marque.json dit l’appli ouverte : relire chaque phrase « tourne déjà en test » (pages, textes du générateur)';
 
+test.describe('où en est l’appli', () => {
   test('la nouvelle phrase, sur chaque page écrite à la main qui dit où en est l’appli', () => {
+    expect(MARQUE.appli.ouverte, OUVERTE).toBe(false);
     for (const fichier of ['index.html', '404.html', 'a-propos.html', 'presse.html', 'llms.txt']) {
       expect(normaliser(lire(fichier)), fichier).toContain(FR_COMPLETE.replace(/\.$/, ''));
     }
-    expect(normaliser(lire('pour-les-bars.html'))).toContain(`${FR.replace(/\.$/, '')}, bientôt sur les stores, à Paris.`);
+    expect(normaliser(lire('pour-les-bars.html'))).toContain(`${FR} Elle arrive bientôt sur les stores, d’abord à Paris.`);
     expect(normaliser(lire('en/for-bars/index.html'))).toContain(`${EN} and will be on the App Store and Google Play soon, starting in Paris.`);
   });
 
   test('la nouvelle phrase, dans les textes du générateur', () => {
+    expect(MARQUE.appli.ouverte, OUVERTE).toBe(false);
     const textes = JSON.parse(lire('generateur/contenu/textes.json'));
     expect(textes.attente.plateformes).toBe(FR_COMPLETE);
     expect(textes.appel.fermee.note).toMatch(/^L’appli tourne déjà en test sur iPhone et Android, et arrive bientôt sur l’App Store et Google Play\./);
@@ -85,6 +93,7 @@ test.describe('tant que l’appli n’est pas sur les stores', () => {
       expect(site.pages.length).toBeGreaterThan(20);
       const trouvees = site.pages.map((p) => [p.chemin, ancienne(p.contenu)]).filter(([, phrase]) => phrase);
       expect(trouvees).toEqual([]);
+      expect(MARQUE.appli.ouverte, OUVERTE).toBe(false);
       // Les pages des villes : la liste d’attente et leur question « Baromatch est-il à … ? ».
       const villes = site.pages.filter((p) => /^\/regarder-le-match\/[a-z-]+\/$/.test(p.chemin));
       expect(villes.length).toBeGreaterThanOrEqual(4);

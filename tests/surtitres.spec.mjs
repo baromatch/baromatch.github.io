@@ -21,7 +21,7 @@ import { couperLAPI } from './outils/invitation.mjs';
 
 // Les surtitres des pages de cette navigation, tels qu’ils sont écrits (la boutique écrit ses pièces par son script).
 const SURTITRES = [
-  { chemin: '/', selecteur: '.surtitre', textes: ['Testeurs Android'] },
+  { chemin: '/', selecteur: '.surtitre', textes: [] },
   { chemin: '/pour-les-bars.html', selecteur: '.etiquette', textes: ['Pour les bars'] },
   { chemin: '/boutique.html', selecteur: '.boutique-sur', textes: ['La boutique'] },
   { chemin: '/boutique.html', selecteur: '#boutique-grille .boutique-produit__type', textes: ['T-shirt', 'Sweat à capuche', 'Casquette brodée', 'Écharpe tricotée', 'Tote bag', 'Lot de 6'] },

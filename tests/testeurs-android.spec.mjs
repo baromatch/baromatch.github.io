@@ -155,12 +155,14 @@ test('la page dit la même durée que Confidentialité, et y mène', async ({ pa
   await expect(page.locator('#tes-donnees + p a')).toHaveAttribute('href', '/confidentialite.html#testeurs-android');
 });
 
-test('l’accueil mène à la page, avec ce qu’il faut pour être testeur', async ({ page }) => {
+test('l’accueil n’a plus de bloc des testeurs ; son pied de page et À propos mènent toujours à la page', async ({ page }) => {
+  // Décision du propriétaire (26 nov. 2026) : avant l’envoi de l’appli à Apple, l’accueil perd le bloc « Testeurs Android ».
+  // La page reste : une adresse publiée ne disparaît jamais.
   await page.goto('/');
-  const bloc = page.locator('section.testeurs-accueil');
-  await expect(bloc.locator('h2')).toHaveText('Teste Baromatch avant son ouverture.');
-  expect(normaliser(await bloc.locator('.testeurs-accueil__texte').innerText())).toBe('Tu as 18 ans ou plus, un téléphone Android et un compte Google ? Inscris-toi au test fermé de l’appli sur Google Play : tu restes inscrit au moins 14 jours d’affilée, tu t’en sers, et tu nous dis ce que tu en penses. Rien n’est payé.');
-  await expect(bloc.getByRole('link', { name: 'Deviens testeur Android' })).toHaveAttribute('href', CHEMIN);
+  await expect(page.locator('section.testeurs-accueil')).toHaveCount(0);
+  await expect(page.getByText('Teste Baromatch avant son ouverture.')).toHaveCount(0);
+  await expect(page.locator('main a[href="/testeurs-android.html"]')).toHaveCount(0);
+  await expect(page.locator('footer.pied').getByRole('link', { name: 'Deviens testeur Android' })).toHaveAttribute('href', CHEMIN);
   // À propos y mène aussi.
   await page.goto('/a-propos.html');
   await expect(page.locator('#aujourd-hui ~ p a[href="/testeurs-android.html"]')).toHaveText('Deviens testeur');

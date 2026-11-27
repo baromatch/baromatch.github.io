@@ -129,7 +129,7 @@ for (const moment of ['avant la lecture', 'pendant la lecture', 'entre la lectur
       document.createTreeWalker = (...a) => { if (moment === 'pendant la lecture' && !lu && window.scrollY === 0) { lu = true; defiler(); } return marcheur(...a); };
     }, moment);
     await page.waitForTimeout(300);
-    const mesures = await mesurerAuPixel(page, '.g-ecran, .pied, .film, .bars, .appli, .testeurs-accueil, .attente__piege, .menu');
+    const mesures = await mesurerAuPixel(page, '.g-ecran, .pied, .film, .bars, .appli, .attente__piege, .menu');
     expect(lignesTropFaibles(mesures)).toEqual([]);
     expect(mesures.some((m) => m.quoi.startsWith('label.prevenir__etiquette')), 'l’étiquette de « Préviens-moi » est bien mesurée').toBe(true);
   });

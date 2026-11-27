@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbts4q000si2y6cap15p3d@baromatch.fr
+DTSTAMP:20261127T014226Z
+SEQUENCE:1
+DTSTART:20261210T174500Z
+DTEND:20261210T194500Z
+SUMMARY:OM – Celta de Vigo
+DESCRIPTION:Ligue Europa · Olympique de Marseille – RC Celta de Vigo\nCo
+ up d’envoi jeudi 10 décembre à 18:45\, heure de Paris.\nLa page du mat
+ ch : https://baromatch.fr/matchs/om-celta-de-vigo-2026-12-10/
+URL:https://baromatch.fr/matchs/om-celta-de-vigo-2026-12-10/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

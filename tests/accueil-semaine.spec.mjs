@@ -122,6 +122,18 @@ test.describe('la semaine dessinée', () => {
     expect(semaine).toContain('<span class="sept__jours" aria-hidden="true">');
   });
 
+  test('après le dernier jour que les données connaissent, un jour dit « — », pas « 0 » : on ne sait pas encore', () => {
+    // Les données s’arrêtent au lundi 2 novembre : mardi, mercredi et jeudi ne sont pas « sans match », ils sont inconnus.
+    const jusquAuLundi = { ...site.donnees, matchs: site.donnees.matchs.filter((m) => new Date(m.debut).toISOString() < '2026-11-02T23:00:00Z') };
+    const semaine = bloc('2026-10-30T07:00:00Z', jusquAuLundi).match(/<a class="sept" href="\/matchs\/">[\s\S]*?<\/a>/)[0];
+    expect(semaine.match(/<span class="sept__n">([^<]+)<\/span>/g).map((x) => x.replace(/<[^>]+>/g, ''))).toEqual(['2', '10', '5', '1', '—', '—', '—']);
+    expect(semaine.match(/sept__jour--inconnu/g)).toHaveLength(3);
+    // Un jour connu sans match dit bien « 0 ».
+    const sansLeLundi = { ...site.donnees, matchs: site.donnees.matchs.filter((m) => !new Date(m.debut).toISOString().startsWith('2026-11-02')) };
+    const autre = bloc('2026-10-30T07:00:00Z', sansLeLundi).match(/<a class="sept" href="\/matchs\/">[\s\S]*?<\/a>/)[0];
+    expect(autre.match(/<span class="sept__n">([^<]+)<\/span>/g).map((x) => x.replace(/<[^>]+>/g, ''))[3]).toBe('0');
+  });
+
   test('le bloc passe son contrôle, n’écrit aucun titre et aucun mot qui pousse à boire, et son texte est celui des données', () => {
     for (const maintenant of ['2026-10-30T07:00:00Z', '2026-10-31T07:00:00Z', '2026-11-02T10:00:00Z', '2026-12-30T10:00:00Z']) {
       const b = bloc(maintenant);

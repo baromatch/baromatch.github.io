@@ -75,24 +75,28 @@ const planche = (clubs) => {
 const disque = (club) => `<svg class="insigne" aria-hidden="true" focusable="false"><use href="#p-${e(club.cle)}"/></svg>`;
 
 // La semaine : les sept jours de Paris à partir d’aujourd’hui, chacun en pile de ses matchs (leur club qui reçoit), au plus
-// INSIGNES_PAR_PILE ; le jour de la semaine et le nombre de matchs dessous. Un seul lien, vers tous les matchs.
+// INSIGNES_PAR_PILE ; le jour de la semaine et le nombre de matchs dessous. Un seul lien, vers tous les matchs. Après le
+// dernier jour que les données connaissent (leur horizon), un jour ne dit pas « 0 », qu’on lirait « aucun match » : il
+// dit « — », on ne sait pas encore.
 const PAS = 13;
 const semaine = ({ donnees, t, maintenant }) => {
   const midi = Date.parse(`${jourDeParis(maintenant)}T12:00:00Z`);
   const jours = Array.from({ length: SEMAINE_EN_JOURS }, (_, i) => new Date(midi + i * 86_400_000).toISOString().slice(0, 10));
   const matchs = donnees.matchs.filter((m) => aVenir(m, maintenant) && jours.includes(jourDeParis(m.debut))).sort(dansLOrdre);
   if (!matchs.length) return { html: '', clubs: [] };
+  const horizon = donnees.matchs.reduce((dernier, m) => (jourDeParis(m.debut) > dernier ? jourDeParis(m.debut) : dernier), '');
   const colonnes = jours.map((jour) => {
     const duJour = matchs.filter((m) => jourDeParis(m.debut) === jour);
+    const inconnu = jour > horizon;
     const date = new Date(`${jour}T12:00:00Z`);
     const nom = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', timeZone: 'UTC' }).format(date).replace('.', '');
     const lettres = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(date);
-    return { jour, duJour, nom, lettres };
+    return { jour, duJour, nom, lettres, inconnu };
   });
   const clubs = colonnes.flatMap((c) => c.duJour.slice(0, INSIGNES_PAR_PILE).map((m) => m.domicile));
   const hauteur = 20 + (INSIGNES_PAR_PILE - 1) * PAS + 2;
   const html = `<a class="sept" href="/matchs/">
-<span class="sept__jours" aria-hidden="true">${colonnes.map((c) => `<span class="sept__jour${c.duJour.length ? '' : ' sept__jour--vide'}"><svg class="sept__pile" viewBox="0 0 24 ${hauteur}" width="24" height="${hauteur}" focusable="false">${c.duJour.slice(0, INSIGNES_PAR_PILE).map((m, k) => `<use href="#p-${e(m.domicile.cle)}" x="2" y="${hauteur - 22 - k * PAS}" width="20" height="20"/>`).join('')}<rect class="sept__sol" x="0" y="${hauteur - 1.4}" width="24" height="1.4"/></svg><span class="sept__nom">${e(c.nom)}</span><span class="sept__n">${c.duJour.length}</span></span>`).join('')}</span>
+<span class="sept__jours" aria-hidden="true">${colonnes.map((c) => `<span class="sept__jour${c.duJour.length ? '' : c.inconnu ? ' sept__jour--vide sept__jour--inconnu' : ' sept__jour--vide'}"><svg class="sept__pile" viewBox="0 0 24 ${hauteur}" width="24" height="${hauteur}" focusable="false">${c.duJour.slice(0, INSIGNES_PAR_PILE).map((m, k) => `<use href="#p-${e(m.domicile.cle)}" x="2" y="${hauteur - 22 - k * PAS}" width="20" height="20"/>`).join('')}<rect class="sept__sol" x="0" y="${hauteur - 1.4}" width="24" height="1.4"/></svg><span class="sept__nom">${e(c.nom)}</span><span class="sept__n">${c.inconnu ? '—' : c.duJour.length}</span></span>`).join('')}</span>
 <span class="sept__texte"><b>${e(remplir(t.semaineTitre, { matchs: accorder(matchs.length, 'match') }))}</b><span class="sept__lien">${e(t.semaineLien)}</span></span>
 <span class="visuellement-cache">${e(colonnes.filter((c) => c.duJour.length).map((c) => `${capitale(c.lettres)} : ${accorder(c.duJour.length, 'match')}`).join(' ; '))}.</span>
 </a>`;

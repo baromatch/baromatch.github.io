@@ -96,7 +96,7 @@ test.describe('la page', () => {
 
   test('la vérité : « Exemple » sur la salle et sur le sous-bock, « Démo » sur le geste ; aucun écusson, aucun mot qui pousse à boire', async ({ page }) => {
     await page.goto('/');
-    expect(normaliser(await page.locator('.salle__legende').innerText())).toBe('Exemple : une soirée de match, 42 places, deux clubs inventés.');
+    expect(normaliser(await page.locator('.salle__legende').innerText())).toBe('Exemple : soirée de match, 42 places, clubs inventés.');
     expect(normaliser(await page.locator('.sousbock figcaption').innerText())).toMatch(/^Exemple : le sous-bock d’une soirée, aux couleurs de deux clubs inventés/);
     expect(normaliser(await page.locator('.maintien__aide').innerText())).toContain('Démo : rien n’est réservé.');
     // 42 places : 36 chaises autour de neuf tables, six places debout au comptoir ; la tienne est l’une d’elles.
@@ -232,8 +232,22 @@ test.describe('la salle suit l’heure', () => {
     expect(CSS).toMatch(/\.g-liseret\{[^}]*stroke: #F4ECD9; stroke-opacity: 0\.5;/);
     expect(CSS).not.toMatch(/#7FF0DE|#B4B8FF/i);
     // Les deux lumières de l’écran sur le sol ne se recouvrent pas : chaque club garde sa teinte, sans mélange violet.
-    const coulees = await page.evaluate(() => [...document.querySelectorAll('.s-coule')].map((e) => { const r = e.getBBox(); return [r.x, r.x + r.width]; }));
-    expect(coulees).toHaveLength(2);
+    // Une grille de points sur le sol : aucun n’est dans les deux lumières à la fois (le bord commun mis à part).
+    const recouvrement = await page.evaluate(() => {
+      const [a, b] = document.querySelectorAll('.s-coule');
+      const ra = a.getBBox(); const rb = b.getBBox();
+      const x0 = Math.min(ra.x, rb.x); const x1 = Math.max(ra.x + ra.width, rb.x + rb.width);
+      const y0 = Math.min(ra.y, rb.y); const y1 = Math.max(ra.y + ra.height, rb.y + rb.height);
+      let dans = 0; let deux = 0;
+      for (let x = x0 + 0.13; x < x1; x += 0.5) for (let y = y0 + 0.11; y < y1; y += 0.5) {
+        const pa = a.isPointInFill(new DOMPoint(x, y)); const pb = b.isPointInFill(new DOMPoint(x, y));
+        if (pa || pb) dans += 1;
+        if (pa && pb) deux += 1;
+      }
+      return { dans, deux };
+    });
+    expect(recouvrement.dans).toBeGreaterThan(500);
+    expect(recouvrement.deux).toBeLessThanOrEqual(3);
     expect(nuit.lueur).toBeLessThan(0.2);
     expect(nuit.reflet).toBe(0);
     // L’écran a les couleurs des deux clubs.
@@ -318,6 +332,7 @@ test.describe('le geste « Maintiens »', () => {
     await page.clock.runFor(1);
     await expect(statut(page)).toHaveText(GARDEE);
     await expect(bouton).toHaveClass(/plein/);
+    expect(normaliser(await bouton.innerText())).toBe('Place gardée jusqu’à 21:30');
     await page.mouse.up();
     await expect(statut(page)).toHaveText(GARDEE);
     await page.clock.resume();
@@ -501,6 +516,8 @@ test.describe('la salle collée en haut, au téléphone', () => {
     await page.goto('/');
     await expect(page.locator('.veillee')).toHaveClass(/pret/);
     const position = () => page.locator('.salle').evaluate((e) => getComputedStyle(e).position);
+    // La légende tient sur une ligne : la salle ne grandit pas à cause d’elle.
+    expect(await page.locator('.salle__legende').evaluate((e) => Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)))).toBe(1);
     expect(await position()).toBe('sticky');
     expect(await page.locator('.salle').evaluate((e) => e.offsetHeight / window.innerHeight)).toBeLessThanOrEqual(1 / 3);
     await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
@@ -510,5 +527,48 @@ test.describe('la salle collée en haut, au téléphone', () => {
     expect(await page.locator('.salle').evaluate((e) => e.getBoundingClientRect().bottom)).toBeLessThanOrEqual(0);
     await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
     await expect.poll(position).toBe('sticky');
+  });
+});
+
+test.describe('la salle collée sur les téléphones Android étroits', () => {
+  for (const ecran of [{ width: 360, height: 740 }, { width: 360, height: 780 }, { width: 360, height: 800 }]) {
+    test(`à ${ecran.width} × ${ecran.height}, texte normal : la salle colle, sa légende tient sur une ligne`, async ({ page }) => {
+      await page.setViewportSize(ecran);
+      await page.goto('/');
+      await expect(page.locator('.veillee')).toHaveClass(/pret/);
+      expect(await page.locator('.salle').evaluate((e) => getComputedStyle(e).position)).toBe('sticky');
+      expect(await page.locator('.salle__legende').evaluate((e) => Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)))).toBe(1);
+    });
+  }
+  test('la barre du navigateur qui se cache en défilant (l’écran grandit, pas le petit écran svh) ne décolle ni ne recolle la salle', async ({ page }) => {
+    // À 360 × 780, texte à 120 %, la salle est juste au-dessus du tiers de l’écran : là où une règle sur innerHeight basculerait.
+    for (const [hauteur, texte] of [[700, ''], [780, '120%']]) {
+      await page.setViewportSize({ width: 360, height: hauteur });
+      await page.goto('/');
+      await expect(page.locator('.veillee')).toHaveClass(/pret/);
+      await page.evaluate((t) => { document.documentElement.style.fontSize = t; }, texte);
+      await page.waitForTimeout(150);
+      if (texte) expect(await page.locator('.salle').evaluate((e) => [e.offsetHeight > 780 / 3, e.offsetHeight < 836 / 3])).toEqual([true, true]);
+      const libre = () => page.evaluate(() => document.documentElement.classList.contains('salle-libre'));
+      const avant = await libre();
+      // La barre se cache : innerHeight grandit de 56 px, puis revient ; svh ne change pas.
+      for (const plus of [56, 0, 56, 0]) {
+        await page.evaluate(([h, p]) => { Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => h + p }); window.dispatchEvent(new Event('resize')); }, [hauteur, plus]);
+        await page.waitForTimeout(80);
+        expect(await libre()).toBe(avant);
+      }
+    }
+  });
+});
+
+test.describe('ta place sans geste, quand la salle s’assombrit', () => {
+  test('à 20:15 un rond blanc en pointillé ; à 20:55 et 21:00, sans geste, un trait léger sans fond', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    const toi = () => page.evaluate(() => { const c = getComputedStyle(document.querySelector('.toi')); return [c.fill, c.strokeOpacity]; });
+    await aller(page, '2015');
+    expect(await toi()).toEqual(['rgba(255, 255, 255, 0.85)', '1']);
+    for (const h of ['2055', '2100']) { await aller(page, h); expect(await toi()).toEqual(['none', '0.5']); }
   });
 });

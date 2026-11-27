@@ -20,9 +20,14 @@ Array.prototype.forEach.call(moments, function (m) { if (m.getBoundingClientRect
 if (soiree.dataset.etat !== heure) soiree.dataset.etat = heure;
 }
 /* Au téléphone, la salle colle en haut tant qu'elle prend au plus un tiers de l'écran ; plus grande (texte agrandi, écran
-   bas), elle reste en haut de la page et laisse la place au texte. La règle se relit quand la salle change de taille. */
+   bas), elle reste en haut de la page et laisse la place au texte. La règle se relit quand la salle change de taille.
+   L'écran compté est le petit écran (svh, la barre du navigateur affichée), lu dans le dessin, haut au plus de 28svh
+   (accueil.css) : quand la barre se cache en défilant, la salle ne se décolle pas et ne se recolle pas. */
+var dessin = salle && salle.querySelector(".salle__dessin");
 function libre() {
-var trop = !window.matchMedia("(min-width: 960px)").matches && salle.offsetHeight > window.innerHeight / 3;
+var vue = dessin ? parseFloat(getComputedStyle(dessin).maxHeight) / 0.28 : NaN;
+if (!(vue > 0)) vue = window.innerHeight;
+var trop = !window.matchMedia("(min-width: 960px)").matches && salle.offsetHeight > vue / 3;
 doc.documentElement.classList.toggle("salle-libre", trop);
 }
 function demander() { if (!attend) { attend = true; window.requestAnimationFrame(placer); } }
@@ -47,6 +52,7 @@ var DUREE = 1400;
 var bouton = doc.querySelector("[data-maintiens]");
 if (bouton) {
 var statut = doc.querySelector("[data-statut]");
+var mot = bouton.querySelector(".tenir__mot");
 var minuteur = 0;
 var tenu = false;
 var fini = function () {
@@ -55,6 +61,7 @@ bouton.classList.remove("se-remplit");
 bouton.classList.add("plein");
 doc.documentElement.classList.add("place-gardee");
 statut.textContent = "Place gardée. Ton rond ambre est dans la salle.";
+if (mot) mot.textContent = "Place gardée jusqu’à 21:30";
 };
 var commencer = function () {
 if (tenu || bouton.classList.contains("plein")) return;

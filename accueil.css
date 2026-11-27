@@ -97,7 +97,7 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 /* Les lumières : de 18:42 à 20:15 la salle est pleine de lumière chaude ; elle baisse à 20:55, et au coup d'envoi l'écran
    du fond s'allume aux couleurs des deux clubs, sa lumière coule sur le sol et découpe les silhouettes. */
 .veillee[data-etat="2055"] .s-nuits{ opacity: 0.22; }
-.veillee[data-etat="2100"] .s-nuits{ opacity: 0.66; }
+.veillee[data-etat="2100"] .s-nuits{ opacity: 0.74; }
 .veillee[data-etat="2055"] :is(.s-lueur, .s-flaque){ opacity: 0.6; }
 .veillee[data-etat="2100"] :is(.s-lueur, .s-flaque){ opacity: 0.1; }
 .veillee[data-etat="2100"] .s-jeu{ opacity: 1; }

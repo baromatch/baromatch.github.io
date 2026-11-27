@@ -23,8 +23,8 @@
   "/agenda/auxerre.ics": {
    "type": "calendrier",
    "cle": "auxerre",
-   "empreinte": "d5zJlRTaVAFz1WN8mnN38g",
-   "change": "2026-11-22",
+   "empreinte": "xW5oIEE-veFwvj-g5z4qSQ",
+   "change": "2026-11-27",
    "indexable": false,
    "memoire": {
     "court": "Auxerre",
@@ -188,8 +188,8 @@
   "/agenda/toulouse.ics": {
    "type": "calendrier",
    "cle": "toulouse",
-   "empreinte": "tJpzQJqTAlEkH7dT_LDRng",
-   "change": "2026-11-22",
+   "empreinte": "gxzR2H8siLFPTWosTKojeg",
+   "change": "2026-11-27",
    "indexable": false,
    "memoire": {
     "court": "Toulouse",
@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "Md6dR9hDlUmoJlxbYQfK8Q",
+   "empreinte": "MwQ0E_zXnXnVdnoFqNJFDw",
    "change": "2026-11-27",
    "indexable": false,
    "bars": []
@@ -602,8 +602,8 @@
    "type": "match-en",
    "cle": "nottingham-forest-chelsea-2026-11-27",
    "date": "2026-11-27T20:00:00.000Z",
-   "empreinte": "La2BcrYFpY9Ur87ABKXzSw",
-   "change": "2026-11-25",
+   "empreinte": "yZ984b3O6GgeIHKrQteZLw",
+   "change": "2026-11-27",
    "indexable": false,
    "bars": []
   },
@@ -771,7 +771,7 @@
   "/matchs/": {
    "type": "semaine",
    "cle": "semaine",
-   "empreinte": "g9uBfGzVUzsEWXBUhaIxHg",
+   "empreinte": "EmQZujqanBGlo8Xtx86w-g",
    "change": "2026-11-27",
    "indexable": false,
    "bars": []
@@ -1201,7 +1201,7 @@
    "type": "match",
    "cle": "auxerre-om-2026-11-29",
    "date": "2026-11-29T14:00:00.000Z",
-   "empreinte": "gyM7S5NDOjgR67v25lM0zQ",
+   "empreinte": "aoTRVklhwSKtLTn6NoWUSA",
    "change": "2026-11-27",
    "indexable": false,
    "bars": [],
@@ -1270,6 +1270,50 @@
      "slug": "paris-fc"
     }
    }
+  },
+  "/matchs/auxerre-toulouse-2026-12-11/": {
+   "type": "match",
+   "cle": "auxerre-toulouse-2026-12-11",
+   "date": "2026-12-11T19:45:00.000Z",
+   "empreinte": "5I_FumV6iDSON9PhStg5yw",
+   "change": "2026-11-27",
+   "indexable": false,
+   "bars": [],
+   "memoire": {
+    "slug": "auxerre-toulouse-2026-12-11",
+    "ids": [
+     "cmwjbts780010i2y6c3wmzsww"
+    ],
+    "debut": "2026-12-11T19:45:00.000Z",
+    "heureConfirmee": true,
+    "competition": "Ligue 1",
+    "domicile": {
+     "cle": "auxerre",
+     "court": "Auxerre",
+     "nom": "AJ Auxerre",
+     "slug": "aj-auxerre"
+    },
+    "exterieur": {
+     "cle": "toulouse",
+     "court": "Toulouse",
+     "nom": "Toulouse FC",
+     "slug": "toulouse-fc"
+    }
+   }
+  },
+  "/matchs/auxerre-toulouse-2026-12-11/match.ics": {
+   "type": "evenement",
+   "cle": "auxerre-toulouse-2026-12-11",
+   "empreinte": "eqyEKdT22tvfW0dt6W9HTg",
+   "change": "2026-11-27",
+   "indexable": false
+  },
+  "/matchs/auxerre-toulouse-2026-12-11/partage.png": {
+   "type": "partage",
+   "cle": "auxerre-toulouse-2026-12-11",
+   "empreinte": "0YjX-NHEiZ7bf5gYfWWvtA",
+   "change": "2026-11-27",
+   "indexable": false
   },
   "/matchs/barca-deportivo-alaves-2026-10-31/": {
    "type": "match",
@@ -1557,8 +1601,8 @@
    "type": "match",
    "cle": "brest-paris-fc-2026-11-27",
    "date": "2026-11-27T19:45:00.000Z",
-   "empreinte": "nbHKBreYSE4zAz2dHS7YOw",
-   "change": "2026-11-25",
+   "empreinte": "gA0voX6uUxFOHH1fEBPDSQ",
+   "change": "2026-11-27",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1582,13 +1626,6 @@
      "slug": "paris-fc"
     }
    }
-  },
-  "/matchs/brest-paris-fc-2026-11-27/match.ics": {
-   "type": "evenement",
-   "cle": "brest-paris-fc-2026-11-27",
-   "empreinte": "M0GKLqNhYlwHhUfGWk-VpQ",
-   "change": "2026-11-14",
-   "indexable": false
   },
   "/matchs/brest-paris-fc-2026-11-27/partage.png": {
    "type": "partage",
@@ -1872,8 +1909,8 @@
   "/matchs/competition/ligue-1/": {
    "type": "competition",
    "cle": "ligue-1",
-   "empreinte": "WjveAmhn-odYBT0hktUVMg",
-   "change": "2026-11-25",
+   "empreinte": "CA__CKRAOf7HCtdIN3aJfg",
+   "change": "2026-11-27",
    "indexable": true,
    "bars": []
   },
@@ -3267,8 +3304,8 @@
    "type": "match",
    "cle": "levante-real-racing-club-de-santander-2026-11-27",
    "date": "2026-11-27T20:00:00.000Z",
-   "empreinte": "U05gFeMWFR51fk59q0ed2A",
-   "change": "2026-11-25",
+   "empreinte": "LUri-_sNpuN8NO8DZQ990g",
+   "change": "2026-11-27",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3292,13 +3329,6 @@
      "slug": "real-racing-club-de-santander"
     }
    }
-  },
-  "/matchs/levante-real-racing-club-de-santander-2026-11-27/match.ics": {
-   "type": "evenement",
-   "cle": "levante-real-racing-club-de-santander-2026-11-27",
-   "empreinte": "ijG8fU-PsFkxmVs8_X-rxw",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/levante-real-racing-club-de-santander-2026-11-27/partage.png": {
    "type": "partage",
@@ -4117,8 +4147,8 @@
    "type": "match",
    "cle": "nottingham-forest-chelsea-2026-11-27",
    "date": "2026-11-27T20:00:00.000Z",
-   "empreinte": "e_ZXC_vE4pbmIa9qwi53cA",
-   "change": "2026-11-25",
+   "empreinte": "AyswheTdNyjkojcyKZqmOQ",
+   "change": "2026-11-27",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4142,13 +4172,6 @@
      "slug": "chelsea-fc"
     }
    }
-  },
-  "/matchs/nottingham-forest-chelsea-2026-11-27/match.ics": {
-   "type": "evenement",
-   "cle": "nottingham-forest-chelsea-2026-11-27",
-   "empreinte": "_DF5GBSajZ3ohMXKGs7luw",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/nottingham-forest-chelsea-2026-11-27/partage.png": {
    "type": "partage",
@@ -5273,7 +5296,7 @@
    "type": "match",
    "cle": "toulouse-rennes-2026-11-29",
    "date": "2026-11-29T16:15:00.000Z",
-   "empreinte": "Txwx-yGAQAqLQfdNeEA6Pw",
+   "empreinte": "ht6Z1g_3-yKfT9Ie7j0S7w",
    "change": "2026-11-27",
    "indexable": false,
    "bars": [],
@@ -5481,8 +5504,8 @@
    "type": "match",
    "cle": "venezia-bologna-1909-2026-11-27",
    "date": "2026-11-27T19:45:00.000Z",
-   "empreinte": "puI5ZhRgtlIGmaYfYuuSSQ",
-   "change": "2026-11-25",
+   "empreinte": "d_teUxOHjq35nj3PedBPaw",
+   "change": "2026-11-27",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -5506,13 +5529,6 @@
      "slug": "bologna-fc-1909"
     }
    }
-  },
-  "/matchs/venezia-bologna-1909-2026-11-27/match.ics": {
-   "type": "evenement",
-   "cle": "venezia-bologna-1909-2026-11-27",
-   "empreinte": "7Q_YHqwvde1-GeVbZB2i6g",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/venezia-bologna-1909-2026-11-27/partage.png": {
    "type": "partage",
@@ -5555,8 +5571,8 @@
    "type": "match",
    "cle": "werder-bremen-borussia-monchengladbach-2026-11-27",
    "date": "2026-11-27T19:30:00.000Z",
-   "empreinte": "P-AJX3AYoHz2dnKuPzy6DQ",
-   "change": "2026-11-25",
+   "empreinte": "-lezkYgqGU6EPqoHUhjNcA",
+   "change": "2026-11-27",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -5580,13 +5596,6 @@
      "slug": "borussia-monchengladbach"
     }
    }
-  },
-  "/matchs/werder-bremen-borussia-monchengladbach-2026-11-27/match.ics": {
-   "type": "evenement",
-   "cle": "werder-bremen-borussia-monchengladbach-2026-11-27",
-   "empreinte": "nGm7WPkpijeyzMGqHXp7Dw",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/werder-bremen-borussia-monchengladbach-2026-11-27/partage.png": {
    "type": "partage",
@@ -6334,9 +6343,9 @@
     "court": "Toulouse",
     "nom": "Toulouse FC"
    },
-   "empreinte": "HozKHkWp877O6dR7oXdQkA",
-   "sequence": 0,
-   "modifie": "2026-11-16T21:58:24Z"
+   "empreinte": "Jrt-cPpxMxEA0jhZq_BN2g",
+   "sequence": 1,
+   "modifie": "2026-11-27T20:24:49Z"
   },
   "cmwjbts7z0012i2y60nujcwiz@baromatch.fr": {
    "ids": [
@@ -6734,28 +6743,6 @@
    "sequence": 0,
    "modifie": "2026-11-16T21:58:24Z"
   },
-  "cmwt6doqi000vrcsss7mih6bc@baromatch.fr": {
-   "ids": [
-    "cmwt6doqi000vrcsss7mih6bc"
-   ],
-   "slug": "werder-bremen-borussia-monchengladbach-2026-11-27",
-   "debut": "2026-11-27T19:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Bundesliga",
-   "domicile": {
-    "cle": "werder-bremen",
-    "court": "Werder Bremen",
-    "nom": "SV Werder Bremen"
-   },
-   "exterieur": {
-    "cle": "borussia-monchengladbach",
-    "court": "Borussia Mönchengladbach",
-    "nom": "Borussia Mönchengladbach"
-   },
-   "empreinte": "CdzT1ay5PCfSlPb3x0Pt4Q",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
   "cmwt6dorn000xrcsst29lrvqr@baromatch.fr": {
    "ids": [
     "cmwt6dorn000xrcsst29lrvqr"
@@ -6888,28 +6875,6 @@
    "sequence": 0,
    "modifie": "2026-11-23T12:28:14Z"
   },
-  "cmwt6dov40019rcssvayjktii@baromatch.fr": {
-   "ids": [
-    "cmwt6dov40019rcssvayjktii"
-   ],
-   "slug": "levante-real-racing-club-de-santander-2026-11-27",
-   "debut": "2026-11-27T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "LaLiga",
-   "domicile": {
-    "cle": "levante",
-    "court": "Levante",
-    "nom": "Levante UD"
-   },
-   "exterieur": {
-    "cle": "real-racing-club-de-santander",
-    "court": "Real Racing Club de Santander",
-    "nom": "Real Racing Club de Santander"
-   },
-   "empreinte": "Mpm3bxQtJq_p4A4Nc4NupQ",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
   "cmwt6dovo001brcsst5nmk0rj@baromatch.fr": {
    "ids": [
     "cmwt6dovo001brcsst5nmk0rj"
@@ -6995,28 +6960,6 @@
     "nom": "FC Barcelona"
    },
    "empreinte": "2chSdFTp1rnnYo3dOhzJ2w",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6doy1001jrcss8xb2eyac@baromatch.fr": {
-   "ids": [
-    "cmwt6doy1001jrcss8xb2eyac"
-   ],
-   "slug": "nottingham-forest-chelsea-2026-11-27",
-   "debut": "2026-11-27T20:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "nottingham-forest",
-    "court": "Nottingham Forest",
-    "nom": "Nottingham Forest FC"
-   },
-   "exterieur": {
-    "cle": "chelsea",
-    "court": "Chelsea",
-    "nom": "Chelsea FC"
-   },
-   "empreinte": "Mze-rK4dQEcLXqF-qUrncg",
    "sequence": 0,
    "modifie": "2026-11-23T12:28:14Z"
   },
@@ -7174,28 +7117,6 @@
    "sequence": 0,
    "modifie": "2026-11-23T12:28:14Z"
   },
-  "cmwt6dp3e001zrcssbl26jytb@baromatch.fr": {
-   "ids": [
-    "cmwt6dp3e001zrcssbl26jytb"
-   ],
-   "slug": "venezia-bologna-1909-2026-11-27",
-   "debut": "2026-11-27T19:45:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Serie A",
-   "domicile": {
-    "cle": "venezia",
-    "court": "Venezia",
-    "nom": "Venezia FC"
-   },
-   "exterieur": {
-    "cle": "bologna-1909",
-    "court": "Bologna 1909",
-    "nom": "Bologna FC 1909"
-   },
-   "empreinte": "eei0glqOZXvgRDAVHLjo1Q",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
   "cmwt6dp3y0021rcssfw3u5tq1@baromatch.fr": {
    "ids": [
     "cmwt6dp3y0021rcssfw3u5tq1"
@@ -7330,7 +7251,7 @@
   }
  },
  "accueil": {
-  "empreinte": "vbgaSvM6_C8JlabnYg-F8A",
+  "empreinte": "PzH8GtjCoLPOV6Zmv9E5ag",
   "change": "2026-11-27"
  }
 }

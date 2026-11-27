@@ -11,14 +11,13 @@
 }
 .salle{ position: sticky; top: 0; z-index: 3; margin: 0 calc(-1 * var(--gouttiere)); padding: 6px var(--gouttiere) 4px; background: var(--fond); border-bottom: 1px solid var(--trait); }
 .salle__cadre{ position: relative; margin: 0; }
-/* La scène a exactement la taille du dessin (sans bandes de côté) : l'étiquette « ta place » se pose en pour cent. */
+/* La scène a la taille du dessin : « ta place » s'y pose en pour cent. */
 .salle__scene{ --haut: 28svh; position: relative; width: min(100%, var(--haut) * 298 / 232); margin: 0 auto; }
 .salle__dessin{ display: block; width: 100%; height: auto; max-height: 28svh; overflow: visible; }
-/* « ta place » : une étiquette de papier, posée au-dessus de la chaise en pointillé, un trait qui y descend. Jamais
-   l'ambre : la place ne passe à l'ambre que quand tu la gardes. */
+/* « ta place » : une étiquette de papier sur la chaise en pointillé, jamais l'ambre (il vient quand tu la gardes). */
 .salle__toi{ position: absolute; left: 54.4%; top: 62.3%; transform: translate(12px, -38px); padding: 3px 9px; border-radius: 999px; background: var(--fond); color: var(--texte); font-size: 0.75rem; font-weight: 700; line-height: 1.2; white-space: nowrap; box-shadow: 0 2px 6px rgba(10, 11, 16, 0.25); pointer-events: none; }
 .salle__toi::after{ content: ""; position: absolute; left: -2px; bottom: -14px; width: 1.5px; height: 22px; background: var(--fond); transform: rotate(35deg); transform-origin: top; }
-/* L'heure de la salle, et ce qu'elle attend : elle appartient au dessin, discrète, jamais une horloge seule. */
+/* L'heure de la salle et ce qu'elle attend, discrètes. */
 .salle__heure{ position: absolute; left: 0; top: 2px; margin: 0; font-size: 1.25rem; line-height: 1.1; font-weight: 680; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: var(--texte-doux); }
 .salle__envoi{ display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0; color: var(--texte-discret); }
 .veillee[data-etat="2100"] .salle__envoi{ display: none; }
@@ -36,10 +35,8 @@ body:not(.js) .salle__heure{ display: none; }
   html:not(.salle-libre) .veillee .attente{ scroll-margin-top: 12px; }
 }
 @media (max-height: 640px){ .salle{ position: static; } }
-/* En haut de page, au téléphone, la salle est le héros : un peu plus grande (toute la largeur), elle se pose à sa taille
-   de lecture pendant les premiers pixels de défilement (transform seulement, lié au défilement, rien ne bouge seul). La
-   place qu'elle prend en plus est réservée au-dessus du titre : rien ne saute. Sans défilement lié (navigateurs qui ne
-   le savent pas) ou avec « réduire les animations », elle reste à sa taille de lecture, tout aussi complète. */
+/* Au téléphone, en haut de page, la salle (le héros) est plus grande et se pose à sa taille de lecture en défilant
+   (transform lié au défilement, place réservée : rien ne saute). Sinon, ou avec « réduire », elle est à sa taille. */
 @media (max-width: 959.98px) and (min-height: 641px) and (prefers-reduced-motion: no-preference){
   @supports (animation-timeline: scroll()){
     .veillee{ --pose-en-plus: 7svh; }
@@ -68,9 +65,8 @@ body:not(.js) .salle__heure{ display: none; }
   .moments{ grid-column: 2; grid-row: 1; }
 }
 
-/* Le dessin de la salle : une salle du soir, posée sur le papier comme une maquette. Des murs sombres et chauds, un
-   plancher de bois, et la lumière d'abord : des appliques au blanc chaud, dont la lueur reste sur les murs et les
-   flaques sur le sol. C'est le seul point fort du premier écran : rien d'autre n'y est aussi sombre ni aussi grand. */
+/* La salle du soir, une maquette sur le papier : murs sombres et chauds, plancher de bois, appliques au blanc chaud.
+   Le seul point fort du premier écran. */
 .s-sol{ fill: #A57A55; }
 .s-mur-d{ fill: #5B3A2E; }
 .s-mur-g{ fill: #472C23; }
@@ -101,7 +97,7 @@ body:not(.js) .salle__heure{ display: none; }
 .s-nuits{ opacity: 0; }
 .s-ecran{ fill: #15161D; stroke: #0A0B10; stroke-width: 1; }
 .s-reflet{ fill: #FFFFFF; opacity: 0; }
-/* L'écran du fond passe l'avant-match dès 18:42 : la salle attend un match. Au coup d'envoi, il est seul à éclairer. */
+/* L'écran passe l'avant-match dès 18:42 ; au coup d'envoi, il éclaire seul. */
 .s-jeu{ opacity: 0.8; }
 .s-jeu-a{ fill: var(--camp-a); }
 .s-jeu-a2{ fill: var(--camp-a2); }
@@ -159,7 +155,7 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
 .moment__heure{ margin: 0 0 8px; font-size: 0.9375rem; font-weight: 700; color: var(--texte-discret); }
 .moment--ouverture .moment__heure{ display: none; }
 .moment__titre{ margin: 0; font-size: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem); line-height: 1.05; font-weight: 730; letter-spacing: -0.03em; font-variation-settings: "opsz" 30; text-wrap: balance; }
-/* Le titre se tait devant la salle : franc, mais à la taille d'un titre de moment, pas d'une affiche. */
+/* Le titre se tait devant la salle. */
 .moment__titre--un{ font-size: clamp(1.75rem, 1.3rem + 2vw, 3rem); line-height: 1.02; font-weight: 700; letter-spacing: -0.03em; font-variation-settings: "opsz" 32; }
 .moment__titre--un span{ display: inline-block; }
 .chapo{ margin: 10px 0 0; font-size: clamp(1.0625rem, 1.02rem + 0.3vw, 1.25rem); line-height: 1.45; color: var(--texte-doux); max-width: 34em; }
@@ -173,8 +169,7 @@ body:not(.js) :is(.s1, .s2, .s3){ opacity: 1; transform: none; }
   .moment--ouverture .attente__ligne{ gap: 8px; }
   .moment--ouverture .attente__champ, .moment--ouverture .attente__bouton{ height: 52px; }
 }
-/* Au téléphone, le bouton loge dans le champ, comme sur ordinateur : une pastille ambre à sa taille, pas une bande qui
-   disputerait la salle au regard. Quand la ligne est trop étroite pour les deux (texte agrandi), ils s'empilent. */
+/* Au téléphone, le bouton loge dans le champ (une pastille, pas une bande) ; trop étroit (texte agrandi), ils s'empilent. */
 .moment--ouverture .attente{ container-type: inline-size; }
 @container (min-width: 20rem) and (max-width: 559.98px){
   .moment--ouverture .attente__ligne{ flex-direction: row; gap: 0; padding: 4px; border-radius: 999px; background: var(--carte); border: 1px solid var(--champ-bord); box-shadow: var(--ombre-carte); }

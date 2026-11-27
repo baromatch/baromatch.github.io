@@ -153,9 +153,13 @@ const SEMAINE_PLEINE = path.join(racine, 'tests', 'donnees', 'semaine-pleine.jso
 // accueil.css de 12,8 à 14,1 Ko (la marge du focus sous la salle collée, ta place cerclée d'ambre, l'aide sans script).
 // Mesuré (Ko) : 7 requêtes, 139 transférés, JS 10,7, CSS 62,8. Seuils du JS de 9 à 11, du CSS de 62 à 63 ; le transfert
 // reste à 140 (148 pour la semaine pleine). Le plafond du site (16 Ko de JS pour l'accueil) tient.
+// 27 novembre 2026, un seul héros au premier écran (la salle du soir, sa pose en haut de page, « ta place », le bouton
+// dans le champ, la veilleuse du comptoir) : accueil.css de 14,1 à 18,4 Ko, index.html de 88,8 à 90,0 Ko (le dessin).
+// Mesuré (Ko) : 7 requêtes, 141 transférés (149 la semaine pleine), JS 10,7, CSS 67. Seuils du CSS de 63 à 67, du
+// transfert de 140 à 142 (148 à 150) ; JS inchangé. Servi compressé comme GitHub Pages : 150 Ko (main : 176).
 const PAGES = [
-  { nom: 'accueil', chemin: '/', budget: { requetes: 7, transfere: 140, js: 11, css: 63, images: 0 } },
-  { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 7, transfere: 148, js: 11, css: 63, images: 0 } },
+  { nom: 'accueil', chemin: '/', budget: { requetes: 7, transfere: 142, js: 11, css: 67, images: 0 } },
+  { nom: 'accueil, une semaine pleine (25 matchs)', chemin: '/', semainePleine: true, budget: { requetes: 7, transfere: 150, js: 11, css: 67, images: 0 } },
   { nom: 'page fixe (CGU)', chemin: '/cgu.html', budget: { requetes: 6, transfere: 143, js: 0, css: 87, images: 0 } },
   { nom: 'le guide (trouver un bar)', chemin: '/trouver-un-bar-qui-diffuse-le-match.html', budget: { requetes: 6, transfere: 143, js: 0, css: 87, images: 0 } },
   { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 99, images: 42 } },

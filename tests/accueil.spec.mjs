@@ -150,7 +150,7 @@ test.describe('la page', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     await expect(page.locator('.veillee')).toHaveClass(/pret/);
-    const echelle = () => page.locator('.salle__dessin').evaluate((e) => new DOMMatrix(getComputedStyle(e).transform).a);
+    const echelle = () => page.locator('.salle__scene').evaluate((e) => new DOMMatrix(getComputedStyle(e).transform).a);
     const titre = () => page.locator('h1').evaluate((e) => e.getBoundingClientRect().top + window.scrollY);
     const haut = await titre();
     expect(await echelle()).toBeCloseTo(1.18, 2);
@@ -166,11 +166,37 @@ test.describe('la page', () => {
     await expect.poll(() => page.locator('.salle').evaluate((e) => Number(getComputedStyle(e, '::before').opacity))).toBe(0);
   });
 
+  // L'image dit son sens : « ta place », une étiquette de papier (jamais l'ambre), au-dessus de la chaise en pointillé,
+  // à chaque heure, au téléphone comme sur ordinateur, même pendant que la salle se pose.
+  for (const ecran of [{ width: 390, height: 844 }, { width: 360, height: 640 }, { width: 1440, height: 900 }]) {
+    test(`à ${ecran.width} × ${ecran.height} : « ta place » est posée au-dessus de ta chaise, à chaque heure`, async ({ page }) => {
+      await page.setViewportSize(ecran);
+      await page.goto('/');
+      await expect(page.locator('.veillee')).toHaveClass(/pret/);
+      await expect(page.locator('.salle__toi')).toHaveText('ta place');
+      const ecart = () => page.evaluate(() => {
+        const t = document.querySelector('.salle__toi').getBoundingClientRect();
+        const p = document.querySelector('.toi').getBoundingClientRect();
+        // Le pied du trait : sous l'étiquette, à sa gauche ; il doit tomber sur la chaise.
+        return { dx: (t.left - 2) - (p.left + p.width / 2), dy: (t.bottom + 12) - (p.top + p.height / 2), largeur: p.width };
+      });
+      for (const heure of ['1842', '2015', '2100']) {
+        if (heure !== '1842') await aller(page, heure);
+        await page.waitForTimeout(100);
+        const e = await ecart();
+        expect(Math.abs(e.dx), `à ${heure}`).toBeLessThan(e.largeur * 0.8);
+        expect(Math.abs(e.dy), `à ${heure}`).toBeLessThan(e.largeur * 0.8);
+      }
+      const couleurs = await page.locator('.salle__toi').evaluate((e) => [getComputedStyle(e).backgroundColor, getComputedStyle(e).color]);
+      expect(couleurs).not.toContain('rgb(255, 177, 61)');
+    });
+  }
+
   test('« réduire les animations » : la salle reste à sa taille de lecture, sans pose ; elle reste le héros', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
-    expect(await page.locator('.salle__dessin').evaluate((e) => getComputedStyle(e).transform)).toBe('none');
+    expect(await page.locator('.salle__scene').evaluate((e) => getComputedStyle(e).transform)).toBe('none');
     expect(await page.evaluate(() => document.querySelector('.salle').getAnimations({ subtree: true }).length)).toBe(0);
     await expect(page.locator('.attente__bouton')).toBeInViewport({ ratio: 1 });
   });

@@ -11,7 +11,13 @@
 }
 .salle{ position: sticky; top: 0; z-index: 3; margin: 0 calc(-1 * var(--gouttiere)); padding: 6px var(--gouttiere) 4px; background: var(--fond); border-bottom: 1px solid var(--trait); }
 .salle__cadre{ position: relative; margin: 0; }
-.salle__dessin{ width: 100%; height: auto; max-height: 28svh; margin: 0 auto; overflow: visible; }
+/* La scène a exactement la taille du dessin (sans bandes de côté) : l'étiquette « ta place » se pose en pour cent. */
+.salle__scene{ --haut: 28svh; position: relative; width: min(100%, var(--haut) * 298 / 232); margin: 0 auto; }
+.salle__dessin{ display: block; width: 100%; height: auto; max-height: 28svh; overflow: visible; }
+/* « ta place » : une étiquette de papier, posée au-dessus de la chaise en pointillé, un trait qui y descend. Jamais
+   l'ambre : la place ne passe à l'ambre que quand tu la gardes. */
+.salle__toi{ position: absolute; left: 54.4%; top: 62.3%; transform: translate(12px, -38px); padding: 3px 9px; border-radius: 999px; background: var(--fond); color: var(--texte); font-size: 0.75rem; font-weight: 700; line-height: 1.2; white-space: nowrap; box-shadow: 0 2px 6px rgba(10, 11, 16, 0.25); pointer-events: none; }
+.salle__toi::after{ content: ""; position: absolute; left: -2px; bottom: -14px; width: 1.5px; height: 22px; background: var(--fond); transform: rotate(35deg); transform-origin: top; }
 /* L'heure de la salle, et ce qu'elle attend : elle appartient au dessin, discrète, jamais une horloge seule. */
 .salle__heure{ position: absolute; left: 0; top: 2px; margin: 0; font-size: 1.25rem; line-height: 1.1; font-weight: 680; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: var(--texte-doux); }
 .salle__envoi{ display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0; color: var(--texte-discret); }
@@ -39,7 +45,7 @@ body:not(.js) .salle__heure{ display: none; }
     .veillee{ --pose-en-plus: 7svh; }
     .veillee .moment--ouverture{ padding-top: calc(14px + var(--pose-en-plus)); }
     .salle{ border-bottom-color: transparent; }
-    .salle__dessin{ transform-origin: 50% 0; animation: salle-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
+    .salle__scene{ transform-origin: 50% 0; animation: salle-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
     .salle__legende{ animation: legende-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
     .salle::before{ content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--trait); animation: salle-trait linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
     html:not(.salle-libre) .salle::after{ animation: salle-trait linear both; animation-timeline: scroll(root); animation-range: 0 var(--pose-en-plus); }
@@ -56,6 +62,7 @@ body:not(.js) .salle__heure{ display: none; }
 @media (min-width: 960px){
   .veillee{ display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px; align-items: start; }
   .salle{ grid-column: 1; grid-row: 1; height: 100svh; display: grid; align-items: center; margin: 0; padding: 24px 0; border: 0; }
+  .salle__scene{ --haut: 72svh; }
   .salle__dessin{ max-height: 72svh; }
   .salle__heure{ font-size: 2rem; top: 12%; }
   .moments{ grid-column: 2; grid-row: 1; }

@@ -21,6 +21,7 @@ La page « Pour les bars » en anglais, à `/en/for-bars/` : écrite à la main,
 - `main` fusionné de nouveau le 27/11 (l’accueil sans « Testeurs Android », #54, et les pages des matchs ; un conflit du plan du site, les deux côtés gardés), par un commit de fusion.
 - Après cette fusion, la suite entière une fois : 3 622 passées, 2 échouées (le test des documents publics, sur deux notes de ce dossier de relecture) ; corrigées dans les notes, le test n’est pas touché ; ce test seul ensuite : 545 passées, 0 échouée.
 - Puis les 17 fichiers de tests que la branche et #54 touchent, trois fois de suite : 2 041 passées, 0 échouée, trois fois.
+- La CI : sur une même tête, un passage vert et un rouge (1 échoué, 3 623 passés) : le test des commandes à 360 px de la page anglaise mesurait les commandes de la messagerie avant qu’elles paraissent. Corrigé à sa cause (il attend le message et chaque commande visible, comme son jumeau français ; le seuil de 44 px est inchangé). Ce fichier ensuite trois fois de suite : 64 passées, 0 échouée, trois fois ; puis `--repeat-each=5` : 320 passées, 0 échouée.
 - Lighthouse téléphone, trois passages : vitesse 99, accessibilité 100, bonnes pratiques 100, SEO 100, CLS 0, LCP 2,1 s (la page française : les mêmes notes).
 - Relecture « trois visiteurs » par un agent à froid (patron de pub anglophone à Paris, fan, journaliste) : « prête avec de petites corrections », corrections faites.
 - Aucun défilement de côté à 390 px, 1440 px et texte à 200 %.

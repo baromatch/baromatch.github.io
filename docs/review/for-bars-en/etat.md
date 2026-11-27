@@ -43,3 +43,13 @@ Tout est poussé. Reste seulement :
   2 041 passées, 0 échouée, trois fois.
 - Pas refaite après la correction : la suite entière (les deux échecs étaient dans le seul test des documents publics,
   repassé à part puis trois fois).
+
+## La CI de la PR #55 (27/11, midi) : un test qui courait
+
+Deux passages de la CI sur la même tête : un vert, un rouge (1 échoué, 3 623 passés). L’échec :
+`tests/for-bars-en-formulaire.spec.mjs`, « the commands, at 360 px… » : la hauteur des commandes de la messagerie était
+mesurée juste après l’envoi, avant que la page les montre (pas encore de boîte). Corrigé à sa cause, comme le fait
+déjà le test jumeau en français : le test attend le message « Your request hasn’t been sent yet. » et chaque commande
+visible, puis mesure ; le seuil de 44 px n’est pas touché. Les autres mesures des deux tests de la page anglaise et du
+jumeau français : aucune ne mesure juste après un envoi sans attendre. Ensuite, ce fichier trois fois de suite :
+64 passées, 0 échouée, trois fois ; puis avec `--repeat-each=5` : 320 passées, 0 échouée.

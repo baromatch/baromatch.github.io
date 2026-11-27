@@ -717,7 +717,13 @@ test.describe('the commands, at 360 px and at 200 % text', () => {
     const hauteur = async (selecteur) => (await page.locator(selecteur).boundingBox()).height;
     expect(await hauteur('#demande-envoyer')).toBeGreaterThanOrEqual(43.5);
     await envoyerUneDemande(page);
-    for (const selecteur of ['#demande-courriel-lien', '#demande-courriel-copier', '#demande-modifier']) expect(await hauteur(selecteur), selecteur).toBeGreaterThanOrEqual(43.5);
+    // Le serveur répond 404 : la page montre le chemin par la messagerie, avec ses commandes. On les mesure une fois
+    // ce message posé et chacune visible, pas pendant l’envoi (sans boîte encore, boundingBox() rend null).
+    await attendreMessage(page.locator('#demande-statut'), TEXTES.courriel);
+    for (const selecteur of ['#demande-courriel-lien', '#demande-courriel-copier', '#demande-modifier']) {
+      await expect(page.locator(selecteur), selecteur).toBeVisible();
+      expect(await hauteur(selecteur), selecteur).toBeGreaterThanOrEqual(43.5);
+    }
   });
 
   test('at 200 % on 320 × 568: the summary has the focus and reads by its title; nothing leaves the width', async ({ page }) => {

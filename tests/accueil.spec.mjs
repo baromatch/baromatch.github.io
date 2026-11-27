@@ -205,6 +205,19 @@ test.describe('la page', () => {
     });
   }
 
+  test('à 320 × 800, la salle agrandie n’aurait pas la place : elle reste à sa taille, et la page ne défile jamais de côté', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto('/');
+    await expect(page.locator('.veillee')).toHaveClass(/pret/);
+    expect(await page.locator('.salle__scene').evaluate((e) => getComputedStyle(e).transform)).toBe('none');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
+    for (const largeur of [360, 390, 412]) {
+      await page.setViewportSize({ width: largeur, height: 800 });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), `à ${largeur} px`).toBe(false);
+    }
+  });
+
   test('« réduire les animations » : la salle reste à sa taille de lecture, sans pose ; elle reste le héros', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: 390, height: 844 });

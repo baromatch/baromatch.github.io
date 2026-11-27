@@ -9,7 +9,7 @@
   --pose: 700ms; --lever: 160ms;
   max-width: calc(var(--page) + 2 * var(--gouttiere)); margin: 0 auto; padding: 0 var(--gouttiere);
 }
-.salle{ position: sticky; top: 0; z-index: 3; margin: 0 calc(-1 * var(--gouttiere)); padding: 6px var(--gouttiere) 4px; background: var(--fond); border-bottom: 1px solid var(--trait); }
+.salle{ position: sticky; top: 0; z-index: 3; margin: 0 calc(-1 * var(--gouttiere)); padding: 6px var(--gouttiere) 4px; overflow-x: clip; background: var(--fond); border-bottom: 1px solid var(--trait); }
 .salle__cadre{ position: relative; margin: 0; }
 /* La scène a la taille du dessin : « ta place » s'y pose en pour cent. */
 .salle__scene{ --haut: 28svh; position: relative; width: min(100%, var(--haut) * 298 / 232); margin: 0 auto; }
@@ -36,8 +36,8 @@ body:not(.js) .salle__heure{ display: none; }
 }
 @media (max-height: 640px){ .salle{ position: static; } }
 /* Au téléphone, en haut de page, la salle (le héros) est plus grande et se pose à sa taille de lecture en défilant
-   (transform lié au défilement, place réservée : rien ne saute). Sinon, ou avec « réduire », elle est à sa taille. */
-@media (max-width: 959.98px) and (min-height: 641px) and (prefers-reduced-motion: no-preference){
+   (transform lié au défilement, place réservée : rien ne saute). Écran trop étroit pour elle, ou « réduire » : sa taille. */
+@media (max-width: 959.98px) and (min-height: 641px) and (min-aspect-ratio: 9/20) and (prefers-reduced-motion: no-preference){
   @supports (animation-timeline: scroll()){
     .veillee{ --pose-en-plus: 7svh; }
     .veillee .moment--ouverture{ padding-top: calc(14px + var(--pose-en-plus)); }

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbts5a000ui2y6gc05ojhw@baromatch.fr
+DTSTAMP:20261127T014226Z
+SEQUENCE:1
+DTSTART:20261210T174500Z
+DTEND:20261210T194500Z
+SUMMARY:Rennes – Dinamo
+DESCRIPTION:Ligue Europa · Stade Rennais FC – GNK Dinamo\nCoup d’envoi
+  jeudi 10 décembre à 18:45\, heure de Paris.\nLa page du match : https:
+ //baromatch.fr/matchs/rennes-dinamo-2026-12-10/
+URL:https://baromatch.fr/matchs/rennes-dinamo-2026-12-10/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

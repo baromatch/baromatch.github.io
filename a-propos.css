@@ -51,13 +51,14 @@
 @container apropos (min-width: 47.5rem) { .apropos__entrees a { flex-direction: column; justify-content: flex-start; } }
 /* Sous 360 px, chaque entrée tient sur deux lignes quelle que soit la police : celle de secours (plus étroite) et
    Bricolage Grotesque, arrivée après, ne la font plus passer d’une à deux lignes (le décalage mesuré sur un iPhone SE).
-   L’ouverture se resserre : la première entrée se voit dans le premier écran (320 × 568). */
+   L’ouverture se resserre : la première entrée se voit dans le premier écran (320 × 568). Le chapô à 16 px, sa largeur
+   au pas de 0,75 rem : de 320 à 359 px, à 100 et 200 %, les deux polices le coupent pareil (six lignes à 320 px). */
 @media (max-width: 359px) {
   .apropos__entrees a { flex-direction: column; justify-content: flex-start; }
   .apropos__ouverture { padding-top: 12px; }
   .apropos__ouverture .surtitre { margin-bottom: 10px; }
   .apropos__titre { font-size: 1.875rem; }
-  .apropos__chapo { margin-top: 16px; font-size: 1.0625rem; line-height: 1.4; }
+  .apropos__chapo { max-width: round(down, 100%, .75rem); margin-top: 16px; font-size: 1rem; line-height: 1.4; }
   .apropos__entrees { margin-top: 14px; }
 }
 

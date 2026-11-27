@@ -542,6 +542,6 @@ test('aucune page ne demande viewport-fit=cover, et le bandeau ne se règle sur 
   const bloc = css.slice(debut, css.indexOf('/* Le contraste élevé de Windows', debut));
   expect(bloc).toContain('@keyframes bandeau-du-bas');
   expect(bloc).not.toMatch(/\d(?:s|d|l)?vh\b/);
-  expect(bloc).toContain('bottom: 0; padding: 0 max(8px, 50vw - 16rem) var(--zone-basse);');
+  expect(bloc).toContain('bottom: 0; padding: 0 max(8px, 50vw - 16rem) max(4px, var(--zone-basse));');
   expect(css).toContain('--zone-basse: env(safe-area-inset-bottom, 0px);');
 });

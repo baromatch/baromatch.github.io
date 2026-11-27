@@ -11,20 +11,6 @@ X-WR-CALDESC:OL : les matchs au programme de Baromatch (Ligue 1 et Ligue E
 X-PUBLISHED-TTL:PT6H
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 BEGIN:VEVENT
-UID:cmvxran890016z71ofg7ywdgx@baromatch.fr
-DTSTAMP:20261112T233535Z
-SEQUENCE:1
-DTSTART:20261126T200000Z
-DTEND:20261126T220000Z
-SUMMARY:OL – Lillestrøm
-DESCRIPTION:Ligue Europa · Olympique Lyonnais – Lillestrøm SK\nCoup d
- ’envoi jeudi 26 novembre à 21:00\, heure de Paris.\nLa page du match :
-  https://baromatch.fr/matchs/ol-lillestrom-2026-11-26/
-URL:https://baromatch.fr/matchs/ol-lillestrom-2026-11-26/
-STATUS:CONFIRMED
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:cmvxranfq001wz71o28as23h1@baromatch.fr
 DTSTAMP:20261116T005918Z
 SEQUENCE:1
@@ -40,13 +26,16 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:cmwjbts6g000yi2y6pvgz5sin@baromatch.fr
-DTSTAMP:20261116T215824Z
-SEQUENCE:0
+DTSTAMP:20261127T014226Z
+SEQUENCE:1
 DTSTART:20261210T200000Z
 DTEND:20261210T220000Z
 SUMMARY:OL – Royale Union Saint-Gilloise
 DESCRIPTION:Ligue Europa · Olympique Lyonnais – Royale Union Saint-Gillo
- ise\nCoup d’envoi jeudi 10 décembre à 21:00\, heure de Paris.
+ ise\nCoup d’envoi jeudi 10 décembre à 21:00\, heure de Paris.\nLa page
+  du match : https://baromatch.fr/matchs/ol-royale-union-saint-gilloise-20
+ 26-12-10/
+URL:https://baromatch.fr/matchs/ol-royale-union-saint-gilloise-2026-12-10/
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
 END:VEVENT

@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbts5v000wi2y6bbopa3ol@baromatch.fr
+DTSTAMP:20261127T014226Z
+SEQUENCE:1
+DTSTART:20261210T200000Z
+DTEND:20261210T220000Z
+SUMMARY:Brighton & Hove Albion – Monaco
+DESCRIPTION:Ligue Conférence · Brighton & Hove Albion – AS Monaco\nCoup
+  d’envoi jeudi 10 décembre à 21:00\, heure de Paris.\nLa page du match
+  : https://baromatch.fr/matchs/brighton-hove-albion-monaco-2026-12-10/
+URL:https://baromatch.fr/matchs/brighton-hove-albion-monaco-2026-12-10/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

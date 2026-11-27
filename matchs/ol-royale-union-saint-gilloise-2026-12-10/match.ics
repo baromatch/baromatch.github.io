@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Baromatch//Ton club dans ton agenda//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:cmwjbts6g000yi2y6pvgz5sin@baromatch.fr
+DTSTAMP:20261127T014226Z
+SEQUENCE:1
+DTSTART:20261210T200000Z
+DTEND:20261210T220000Z
+SUMMARY:OL – Royale Union Saint-Gilloise
+DESCRIPTION:Ligue Europa · Olympique Lyonnais – Royale Union Saint-Gillo
+ ise\nCoup d’envoi jeudi 10 décembre à 21:00\, heure de Paris.\nLa page
+  du match : https://baromatch.fr/matchs/ol-royale-union-saint-gilloise-20
+ 26-12-10/
+URL:https://baromatch.fr/matchs/ol-royale-union-saint-gilloise-2026-12-10/
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

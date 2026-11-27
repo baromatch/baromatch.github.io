@@ -1,10 +1,12 @@
 // Les captures de l'accueil « La salle » pour le propriétaire : iPhone 13 et Pixel 7 (le haut de page « avant », les cinq
 // moments, le geste réussi, le texte à 200 %, « réduire les animations »), l'ordinateur à 1440 px (les cinq moments et le
 // texte à 200 %), et un film de 10 s du défilement au téléphone (WebM, et MP4 si ffmpeg est là, pour l'iPhone).
-// Usage : node tests/outils/captures-accueil.cjs <adresse de la branche> <adresse de main> <dossier de sortie>
-// (deux serveurs locaux, par exemple npx http-server . et une copie de la version en ligne ; Formspree et GoatCounter bloqués).
+// Avec une quatrième adresse (la branche avant le travail du jour), le haut de page « avant aujourd'hui » ; et pour le
+// regard plissé, le premier écran de l'iPhone flouté à 12 px (premier-ecran-flou-12px.png).
+// Usage : node tests/outils/captures-accueil.cjs <adresse de la branche> <adresse de main> <dossier de sortie> [<adresse d'avant>]
+// (des serveurs locaux, par exemple npx http-server . et une copie de la version en ligne ; Formspree et GoatCounter bloqués).
 const { chromium, devices } = require('playwright');
-const [,, URL_B, URL_M, OUT] = process.argv;
+const [,, URL_B, URL_M, OUT, URL_AVANT] = process.argv;
 const fs = require('fs'); fs.mkdirSync(OUT, { recursive: true });
 const MOMENTS = ['1842', '1930', '2015', '2055', '2100'];
 const aller = (page, h) => page.evaluate((h) => {
@@ -24,7 +26,21 @@ const bloquer = (ctx) => ctx.route(/formspree|goatcounter/, (r) => r.abort());
     const page = await ctx.newPage();
     await page.goto(URL_M, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(800);
     await page.screenshot({ path: `${OUT}/${nom}-avant-haut.png` });
+    if (URL_AVANT) {
+      await page.goto(URL_AVANT, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(800);
+      await page.screenshot({ path: `${OUT}/${nom}-avant-aujourd-hui-haut.png` });
+    }
     await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(900);
+    if (nom === 'iphone') {
+      // Le regard plissé : le premier écran, flouté de 12 px (CSS), à la même densité.
+      const image = (await page.screenshot()).toString('base64');
+      const flou = await ctx.newPage();
+      await flou.setContent(`<body style="margin:0;overflow:hidden"><img src="data:image/png;base64,${image}" style="display:block;width:100vw;filter:blur(12px)"></body>`);
+      await flou.waitForTimeout(300);
+      await flou.screenshot({ path: `${OUT}/premier-ecran-flou-12px.png` });
+      await flou.close();
+    }
     for (const h of MOMENTS) { await aller(page, h); await page.waitForTimeout(1400); await page.screenshot({ path: `${OUT}/${nom}-${h}.png` }); }
     // le geste réussi, à 20:15
     await aller(page, '2015'); await page.waitForTimeout(600);
@@ -46,6 +62,7 @@ const bloquer = (ctx) => ctx.route(/formspree|goatcounter/, (r) => r.abort());
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }); await bloquer(ctx);
   const page = await ctx.newPage();
   await page.goto(URL_M, { waitUntil: 'load' }); await page.waitForTimeout(800); await page.screenshot({ path: `${OUT}/ordinateur-avant-haut.png` });
+  if (URL_AVANT) { await page.goto(URL_AVANT, { waitUntil: 'load' }); await page.waitForTimeout(800); await page.screenshot({ path: `${OUT}/ordinateur-avant-aujourd-hui-haut.png` }); }
   await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready);
   for (const h of MOMENTS) { await aller(page, h); await page.waitForTimeout(1400); await page.screenshot({ path: `${OUT}/ordinateur-${h}.png` }); }
   await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; return document.fonts.ready; }); await page.waitForTimeout(800);

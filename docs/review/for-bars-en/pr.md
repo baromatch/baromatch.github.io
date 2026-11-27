@@ -9,9 +9,10 @@ La page « Pour les bars » en anglais, à `/en/for-bars/` : écrite à la main,
 - Aucun mot de boisson, aucun « ! » (relu, et par la relecture à froid).
 - `main` fusionné (jamais de rebase) ; l’accueil n’est pas touché.
 
-## À valider par le propriétaire
+## Validé par le propriétaire (27/11)
 
-- `docs/review/for-bars-en/juridique.md` : les phrases juridiques en anglais, avec la phrase française sous chacune, et deux points qui viennent de la page française (le téléphone et le message, que le formulaire ne demande pas ; le texte de la case à cocher).
+- `docs/review/for-bars-en/juridique.md` : les phrases juridiques en anglais, avec la phrase française sous chacune. Les deux points sont tranchés : la phrase « ton téléphone et ton message si tu les donnes » reste dans les deux langues (le serveur accepte ces champs et les garde quand ils sont donnés) ; la case anglaise « I have read how Baromatch uses this information to reply to me » est approuvée.
+- La mise en ligne est approuvée une fois les contrôles verts ; le maestro fusionne.
 - `docs/review/for-bars-en/captures/` : français et anglais côte à côte (téléphone 390 px, ordinateur 1440 px, texte à 200 %).
 
 ## Preuves

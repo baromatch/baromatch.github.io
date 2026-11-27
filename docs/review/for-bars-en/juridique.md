@@ -76,7 +76,11 @@ La page `/en/for-bars/` résume en anglais deux parties de la page Confidentiali
 
   *FR : Tes droits : voir, corriger ou effacer ces données, à la même adresse. Si tu estimes que tes droits ne sont pas respectés, tu peux saisir la CNIL sur cnil.fr.*
 
-## Deux points à trancher (ils viennent de la page française, pas de la traduction)
+## Deux points tranchés par le propriétaire (27/11, « oui à tout », transmis par le maestro)
+
+Ils venaient de la page française, pas de la traduction.
 
 1. **Le téléphone et le message.** La Confidentialité dit qu’on garde « ton téléphone et ton message si tu les donnes », mais le formulaire de « Pour les bars » (en français comme en anglais) ne demande ni téléphone ni message : seulement le nom du bar, le prénom, l’adresse mail et la ville. Soit on garde la phrase (le serveur les accepte peut-être), soit on la corrige dans les deux langues.
 2. **La case à cocher.** La Confidentialité parle de « la case qui dit que tu as lu cette page » ; sur la page anglaise, la case dit « I have read how Baromatch uses this information to reply to me » et renvoie au résumé anglais. Le sens est le même ; à confirmer.
+
+**Décidé (27/11) :** (1) la phrase « ton téléphone et ton message si tu les donnes » reste dans la Confidentialité, dans les deux langues (le serveur accepte les deux champs et les garde quand ils sont donnés) ; (2) la case anglaise « I have read how Baromatch uses this information to reply to me » est approuvée. Rien à changer dans les pages.

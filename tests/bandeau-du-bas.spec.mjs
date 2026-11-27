@@ -94,7 +94,9 @@ const OUTILS = () => {
     const r = liste.getBoundingClientRect();
     // Le bas de ses entrées : au-dessus de la zone basse (la barre des gestes de l’iPhone ne couvre aucune entrée).
     const entrees = Math.max(...[...liste.querySelectorAll('.menu__lien')].map((a) => a.getBoundingClientRect().bottom));
-    return { fixe: s.position === 'fixed', visible: s.visibility !== 'hidden', haut: r.top, bas: r.bottom, entrees, ecran: innerHeight };
+    // Son haut : celui de la bande de papier de 3 px posée au-dessus de son trait (box-shadow), qui couvre aussi.
+    const fixe = s.position === 'fixed';
+    return { fixe, visible: s.visibility !== 'hidden', haut: r.top - (fixe ? 3 : 0), bas: r.bottom, entrees, ecran: innerHeight };
   };
   window.boiteDuBandeau = (e) => {
     const cible = e.getBoundingClientRect().width < 2 ? (e.closest('label') ?? e.parentElement) : e;

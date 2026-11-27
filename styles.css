@@ -134,7 +134,7 @@ a:hover{ color: var(--goutte); }
 .entete__logo svg{ width: 100%; height: auto; }
 .menu{ flex: 1 0 100%; order: 2; min-width: 0; }
 .menu__liste, .menu__matchs{ display: flex; flex-wrap: wrap; gap: 2px; margin: 0; padding: 0; list-style: none; }
-.menu__liste{ padding: 0; border: 0; border-radius: 0; box-shadow: inset 0 -1px 0 var(--trait); }
+.menu__liste{ padding: 0; box-shadow: inset 0 -1px 0 var(--trait); }
 .menu__liste > li{ display: flex; flex: 1 1 8rem; min-width: 0; }
 .menu__liste > .menu__groupe{ flex: 2 1 16rem; }
 .menu__matchs{ flex: 1; min-width: 0; }
@@ -143,10 +143,8 @@ a:hover{ color: var(--goutte); }
   position: relative;
   display: flex;
   flex: 1;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 4px 8px;
   min-height: 48px;
   padding: 6px 10px;
   border-radius: 6px;
@@ -162,9 +160,10 @@ a:hover{ color: var(--goutte); }
 @media (hover: hover) {
 .menu__lien:hover{ background: var(--menu-survol); color: var(--texte); }
 }
-.menu__lien[aria-current="page"], .menu__lien[aria-current="page"]:hover{ color: var(--texte); font-weight: 800; }
+/* La page où l’on est : un trait sous le mot, de la couleur du texte ; le mot garde sa graisse (sa largeur ne change pas
+   d’une page à l’autre, et la place gardée pour le rang non plus). */
 .menu__lien[aria-current="page"]::before{ content: ""; position: absolute; left: 50%; bottom: 0; width: min(100% - 12px, 3.5rem); height: 3px; border-radius: 3px 3px 0 0; background: currentColor; transform: translateX(-50%); }
-.menu__lien:focus-visible{ z-index: 1; }
+.menu__lien:focus-visible{ z-index: 1; outline-offset: -3px; }
 .entete__attente{
   display: inline-flex;
   flex: none;
@@ -546,10 +545,9 @@ a:hover{ color: var(--goutte); }
 .entete__logo{ padding: 12px 0 9px; margin: -12px 0 -6px; }
 .entete__attente{ margin-top: 3px; }
 .menu{ min-height: var(--bandeau); }
-.menu__liste{ margin-inline: auto; }
 .menu__liste > li, .menu__matchs > li{ flex: 1 1 auto; }
 .menu__liste > .menu__groupe{ flex: 1.7 1 auto; }
-.menu__lien{ gap: 6px; padding-inline: 5px; }
+.menu__lien{ padding-inline: 5px; }
 }
 @media screen and (max-width: 22.49em) {
 .entete{ padding-top: 12px; padding-bottom: 0; }
@@ -566,6 +564,8 @@ a:hover{ color: var(--goutte); }
 }
 @supports (animation-timeline: view()) {
 @media screen and (min-width: 22.5em) and (max-width: 44.99em) and (min-height: 25em) {
+/* Le bandeau prend --bandeau + --zone-basse + 4 px (son trait et sa bande de papier) : 14 px d’air au-dessus de lui pour
+   ce qui prend le focus, 46 px pour la fin du pied. */
 html{ scroll-padding-bottom: calc(var(--bandeau) + var(--zone-basse) + 18px); }
 .pied{ padding-bottom: calc(40px + var(--bandeau) + var(--zone-basse) + 10px); }
 .menu{ view-timeline: --menu block; }
@@ -585,7 +585,8 @@ html:has(form:target, section:target form) .pied{ padding-bottom: 40px; }
    ses entrées au-dessus de la zone basse de l’iPhone. Le trait garde 3 px de papier au-dessus de lui, quoi qui passe
    dessous. */
 @keyframes bandeau-du-bas {
-  0%, 99.9% { position: static; }
+  /* Tant que le rang sort de l’écran, il garde ses valeurs de rang : rien ne grandit ni ne bouge pendant le défilement. */
+  0%, 99.9% { position: static; padding: 0; border-top: 0 none transparent; background: transparent; box-shadow: inset 0 -1px 0 var(--trait); }
   100% { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; padding: 0 max(8px, 50vw - 16rem) var(--zone-basse); border-top: 1px solid var(--menu-bord); background: var(--fond, var(--nuit)); box-shadow: 0 -3px 0 var(--fond, var(--nuit)); }
 }
 /* Le contraste élevé de Windows : la page où l’on est soulignée (le contour reste au focus), les pilules des clubs */

@@ -48,7 +48,9 @@ const AVEC_L_ACTION = ['/', '/a-propos.html', '/presse.html', '/comment-on-chois
 const { qr } = chargerLeQr();
 const scenario = () => construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario(), qr });
 // « Préviens-moi » dans l’en-tête : un seul dessin (plus d’ambre plein ni de contour selon la page).
-const actionDe = (html) => (/<a class="entete__attente" href=/.test(html.match(ENTETE)[0]) ? 'action' : null);
+// Sa présence se lit à sa classe, quelle que soit la suite de l’attribut ; son dessin unique, à part (« sur les pages
+// décidées »).
+const actionDe = (html) => (/<a class="entete__attente[\s"]/.test(html.match(ENTETE)[0]) ? 'action' : null);
 // Des couches de fond (de l’élément vers la page) posées l’une sur l’autre : la couleur que l’œil voit derrière.
 const composer = (couches) => couches.map(lireCouleur).filter((c) => c.a > 0).reverse().reduce((dessous, couche) => poser(couche, dessous));
 const pagesHtml = (pages) => pages.filter((p) => typeof p.contenu === 'string' && p.contenu.includes('<header class="entete page"'));
@@ -133,7 +135,7 @@ test.describe('la page où l’on est', () => {
   });
 
   for (const largeur of [390, 1280]) {
-    test(`à ${largeur} px, un trait sous le mot et le mot en gras, de la couleur du texte (pas l’ambre de l’action), la nuit comme au jour`, async ({ page }) => {
+    test(`à ${largeur} px, un trait sous le mot, de la couleur du texte (pas l’ambre de l’action), la nuit comme au jour`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto('/a-propos.html');
       const lireLaPage = () => page.evaluate(() => {
@@ -147,9 +149,9 @@ test.describe('la page où l’on est', () => {
         }
         const autres = [...document.querySelectorAll('.menu__lien:not([aria-current])')];
         return {
-          texte: a.textContent, couleur: s.color, graisse: Number(s.fontWeight), fonds,
+          texte: a.textContent, couleur: s.color, graisse: s.fontWeight, fonds,
           trait: { couleur: t.backgroundColor, hauteur: parseFloat(t.height), largeur: parseFloat(t.width), contenu: t.content },
-          autres: autres.map((l) => ({ graisse: Number(getComputedStyle(l).fontWeight), trait: getComputedStyle(l, '::before').content })),
+          autres: autres.map((l) => ({ graisse: getComputedStyle(l).fontWeight, trait: getComputedStyle(l, '::before').content })),
         };
       });
       for (const jour of [false, true]) {
@@ -165,10 +167,11 @@ test.describe('la page où l’on est', () => {
         expect(lu.trait.largeur).toBeGreaterThanOrEqual(24);
         expect(rapport(poser(lireCouleur(lu.trait.couleur), fond), fond), 'le trait, à 3:1').toBeGreaterThanOrEqual(3);
         expect(rapport(poser(lireCouleur(lu.couleur), fond), fond), 'le mot, à 4,5:1').toBeGreaterThanOrEqual(4.5);
-        // Les autres entrées : sans trait, moins grasses (la page où l’on est se lit sans la couleur).
+        // Les autres entrées : sans trait (la page où l’on est se lit sans la couleur) ; la même graisse (le mot ne
+        // change pas de largeur d’une page à l’autre, ni la place gardée pour le rang).
         for (const autre of lu.autres) {
           expect(autre.trait).toBe('none');
-          expect(autre.graisse).toBeLessThan(lu.graisse);
+          expect(autre.graisse).toBe(lu.graisse);
         }
       }
     });
@@ -244,6 +247,10 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
     const avecUnEntete = pagesHtml(pages);
     expect(avecUnEntete.some((p) => p.chemin.includes('/affiche/'))).toBe(true);
     for (const p of avecUnEntete) expect(actionDe(p.contenu) !== null, p.chemin).toBe(!p.chemin.includes('/affiche/') && !p.chemin.startsWith('/en/'));
+    // Un seul dessin : plus de variante (l’ancienne « en contour ») sur aucune page.
+    for (const html of [...PAGES_DU_CADRE.map((p) => lire(p.fichier)), ...avecUnEntete.map((p) => p.contenu)]) {
+      for (const [, classe] of html.match(ENTETE)[0].matchAll(/<a class="(entete__attente[^"]*)"/g)) expect(classe).toBe('entete__attente');
+    }
   });
 
   // Une page en anglais a sa liste d’attente en anglais (« Notify me ») : l’en-tête, resté en français, n’y ajoute pas
@@ -637,8 +644,8 @@ for (const [nom, chemin] of [['la nuit (CGU)', '/cgu.html'], ['le jour (accueil)
 // Le seul bord du menu, celui du bandeau du bas (son haut, contre la page), lu au pixel (tests/outils/bords-peints.mjs),
 // à 3:1 au moins contre ce qui le touche, dehors et dedans, au jour (l’accueil, « Pour les bars ») comme la nuit (les
 // CGU) ; le rang sous le logo et la paire des matchs n’en ont aucun. Le bandeau se lit à chaque demi-écran, du rang sorti
-// jusqu’au bas de la page : sous lui passent le crème, les halos, les cartes, les bandes de nuit et les images, et le
-// fondu de son haut se pose sur eux.
+// jusqu’au bas de la page : sous lui passent le crème, les halos, les cartes, les bandes de nuit et les images ; la bande
+// de papier de 3 px au-dessus de son trait le garde lisible sur eux.
 test.describe('les bords de l’en-tête, tels qu’ils sont peints', () => {
   test.use({ deviceScaleFactor: 3 });
   const ouvrir = async (page, chemin, largeur, hauteur) => {

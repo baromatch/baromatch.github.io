@@ -3,7 +3,8 @@
 // bandeau du bas) et dedans (le fond de l’élément). Les couleurs du style, posées l’une sur l’autre, ne voient ni une
 // ombre, ni un halo, ni ce qui passe sous un élément fixe.
 //
-// mesurerLesBords(page, selecteur) : chaque élément visible du sélecteur, entièrement dans l’écran ; chaque côté qui a un
+// mesurerLesBords(page, selecteur) : chaque élément visible du sélecteur, entièrement dans l’écran (il peut en toucher le
+// bord, pas par un côté qui a un bord) ; chaque côté qui a un
 // bord (1 px au moins) est lu sur sa partie droite (hors des arrondis), en une trentaine de points, le texte de la page
 // caché le temps de la photo (un trait de lettre n’est pas un fond). Rend, par côté, le pire rapport contre le dehors et
 // contre le dedans, et leurs couleurs. La page s’ouvre avec deviceScaleFactor: 3 (un iPhone) : un bord de 1 px y fait
@@ -39,7 +40,10 @@ export const mesurerLesBords = async (page, selecteur) => {
         gauche: r.left, haut: r.top, droite: r.right, bas: r.bottom,
         bords: { haut: parseFloat(st.borderTopWidth), bas: parseFloat(st.borderBottomWidth), gauche: parseFloat(st.borderLeftWidth), droite: parseFloat(st.borderRightWidth) },
         rayons: { hautGauche: rayon('TopLeft'), hautDroite: rayon('TopRight'), basGauche: rayon('BottomLeft'), basDroite: rayon('BottomRight') },
-        dansLEcran: r.top >= 1 && r.left >= 1 && r.bottom <= innerHeight - 1 && r.right <= innerWidth - 1,
+        // Entier dans l’écran ; il peut en toucher le bord (le bandeau du bas, posé au bas de l’écran) : ce côté-là n’a pas
+        // de dehors, et la photo s’arrête à l’écran.
+        dansLEcran: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth,
+        ecran: { largeur: innerWidth, hauteur: innerHeight },
       };
     }), selecteur);
   const { dsf } = await page.evaluate(() => ({ dsf: window.devicePixelRatio }));
@@ -54,9 +58,9 @@ export const mesurerLesBords = async (page, selecteur) => {
     for (const e of elements) {
       if (!e.dansLEcran) throw new Error(`mesurerLesBords : ${e.quoi} n’est pas entier dans l’écran`);
       // La photo de l’élément et de 4 px autour, en pixels de l’écran (×3).
-      const clip = { x: Math.floor(e.gauche) - 4, y: Math.floor(e.haut) - 4 };
-      clip.width = Math.ceil(e.droite) + 4 - clip.x;
-      clip.height = Math.ceil(e.bas) + 4 - clip.y;
+      const clip = { x: Math.max(0, Math.floor(e.gauche) - 4), y: Math.max(0, Math.floor(e.haut) - 4) };
+      clip.width = Math.min(e.ecran.largeur, Math.ceil(e.droite) + 4) - clip.x;
+      clip.height = Math.min(e.ecran.hauteur, Math.ceil(e.bas) + 4) - clip.y;
       const image = lirePng(await page.screenshot({ clip }));
       const pixel = (x, y) => {
         const d = (y * image.largeur + x) * 4;
@@ -66,6 +70,8 @@ export const mesurerLesBords = async (page, selecteur) => {
       for (const cote of ['haut', 'bas', 'gauche', 'droite']) {
         const largeur = e.bords[cote];
         if (largeur < 1) continue;
+        // Un bord posé sur le bord de l’écran n’a rien dehors à quoi se mesurer.
+        if ((cote === 'haut' && e.haut < 3) || (cote === 'gauche' && e.gauche < 3) || (cote === 'bas' && e.bas > e.ecran.hauteur - 3) || (cote === 'droite' && e.droite > e.ecran.largeur - 3)) throw new Error(`mesurerLesBords : ${e.quoi}, son bord ${cote} est sur le bord de l’écran`);
         const epaisseur = Math.round(largeur * dsf);
         const horizontal = cote === 'haut' || cote === 'bas';
         // Le long du côté, hors des arrondis (et 2 px de plus).

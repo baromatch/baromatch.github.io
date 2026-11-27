@@ -176,7 +176,7 @@ for (const { nom, largeur, hauteur, reglage } of ZOOMS) {
 }
 
 // Au téléphone debout (400 px de haut au moins), une fois le rang sorti de l’écran par le haut, il devient le bandeau du
-// bas (10 px au-dessus du bord) ; revenu en haut, il redevient le rang. La page ne bouge pas : la place du rang reste
+// bas (posé au bord de l’écran) ; revenu en haut, il redevient le rang. La page ne bouge pas : la place du rang reste
 // gardée sous le logo. Ailleurs (une tablette, l’ordinateur, le téléphone couché), rien ne devient fixe.
 for (const [largeur, hauteur] of [[360, 740], [375, 548], [390, 844], [412, 915], [600, 900], [719, 800], [720, 900], [768, 1024], [1280, 800], [844, 390], [667, 375]]) {
   const bandeau = largeur >= 360 && largeur < 720 && hauteur >= 400;
@@ -193,7 +193,7 @@ for (const [largeur, hauteur] of [[360, 740], [375, 548], [390, 844], [412, 915]
     await onglet.evaluate(() => window.scrollTo(0, document.querySelector('.menu').getBoundingClientRect().bottom + scrollY + 40));
     const loin = await lire();
     expect(loin.position).toBe(bandeau ? 'fixed' : 'static');
-    if (bandeau) expect(loin.ecran - loin.bas, 'à 10 px du bas de l’écran').toBeCloseTo(10, 0);
+    if (bandeau) expect(loin.ecran - loin.bas, 'posé au bas de l’écran').toBeCloseTo(0, 0);
     expect(loin.main, 'la page ne bouge pas').toBeCloseTo(arrivee.main, 0);
     await onglet.evaluate(() => window.scrollTo(0, 0));
     expect((await lire()).position).toBe('static');
@@ -201,7 +201,7 @@ for (const [largeur, hauteur] of [[360, 740], [375, 548], [390, 844], [412, 915]
 }
 
 // En cours de lecture, les barres du navigateur qui reviennent (la hauteur passe de 659 à 548 px, puis à 480) : le
-// bandeau reste en bas, à 10 px du bord.
+// bandeau reste posé en bas de l’écran.
 test('les barres du navigateur qui reviennent en cours de lecture : le bandeau reste en bas', async ({ page: onglet }) => {
   await ouvrir(onglet, '/a-propos.html', 393, 659);
   await onglet.evaluate(() => window.scrollTo(0, document.querySelector('.menu').getBoundingClientRect().bottom + scrollY + 40));
@@ -213,7 +213,7 @@ test('les barres du navigateur qui reviennent en cours de lecture : le bandeau r
       return { position: getComputedStyle(liste).position, bas: innerHeight - liste.getBoundingClientRect().bottom };
     });
     expect(lu.position, `${hauteur} px`).toBe('fixed');
-    expect(lu.bas, `${hauteur} px`).toBeCloseTo(10, 0);
+    expect(lu.bas, `${hauteur} px`).toBeCloseTo(0, 0);
   }
 });
 

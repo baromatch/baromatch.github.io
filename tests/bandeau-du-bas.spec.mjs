@@ -17,7 +17,7 @@
 //   - sur la boutique, il laisse la barre de sélection seule en bas, et reste dans son rang, au clavier ;
 // - arrivé par un lien vers un formulaire (#attente, #proposer), que le navigateur amène en haut de l’écran, texte à
 //   125 et 200 % dès le chargement : aucun champ ni bouton du formulaire n’est sous le bandeau (il reste dans son rang) ;
-//   - il est à 10 px du bord, plus --zone-basse : sans viewport-fit=cover, Chromium donne 0 à
+//   - il est posé au bord, ses entrées au-dessus de --zone-basse : sans viewport-fit=cover, Chromium donne 0 à
 //     env(safe-area-inset-bottom) (Safari aussi, d’après sa documentation : à vérifier sur un vrai iPhone) ; la zone
 //     basse d’un iPhone à encoche est aussi simulée, à 34 px.
 // Avec le vrai réglage du navigateur (la taille du texte à 200 %, que les media queries voient), rien n’est fixe. Le
@@ -36,7 +36,9 @@ import { construireLeSiteDExemple } from './outils/site-genere.mjs';
 
 // La zone basse d’un iPhone à encoche, simulée (sans viewport-fit=cover, Safari la garde hors de la page).
 const ZONE_BASSE = 34;
-const BORD = 10;
+// Le bandeau est posé au bord de l’écran (une bande, plus une pilule qui flotte : le texte qui passe dessous ne se voit
+// plus à côté d’elle) ; ses entrées restent au-dessus de la zone basse.
+const BORD = 0;
 // Deux iPhone (15 et SE), deux Android (Pixel 7, et le plus étroit, 360 px, où le bandeau commence) ; la zone basse
 // simulée partout (plus dur qu’Android, dont la barre des gestes est hors de la page).
 const CAS = [
@@ -90,7 +92,9 @@ const OUTILS = () => {
     const liste = document.querySelector('.menu__liste');
     const s = getComputedStyle(liste);
     const r = liste.getBoundingClientRect();
-    return { fixe: s.position === 'fixed', visible: s.visibility !== 'hidden', haut: r.top, bas: r.bottom, ecran: innerHeight };
+    // Le bas de ses entrées : au-dessus de la zone basse (la barre des gestes de l’iPhone ne couvre aucune entrée).
+    const entrees = Math.max(...[...liste.querySelectorAll('.menu__lien')].map((a) => a.getBoundingClientRect().bottom));
+    return { fixe: s.position === 'fixed', visible: s.visibility !== 'hidden', haut: r.top, bas: r.bottom, entrees, ecran: innerHeight };
   };
   window.boiteDuBandeau = (e) => {
     const cible = e.getBoundingClientRect().width < 2 ? (e.closest('label') ?? e.parentElement) : e;
@@ -133,11 +137,14 @@ const auDessus = (boite, bandeau) => {
 const dire = (boite, vu, facon = '') => `« ${boite.quoi} »${facon ? ` (${facon})` : ''} : ${Math.round(boite.haut)}–${Math.round(boite.bas)} px, bandeau ${vu.fixe ? `dès ${Math.round(vu.haut)} px` : 'dans son rang'}`;
 
 const verifierLaPage = async (onglet, chemin, cas) => {
-  // Le rang sorti par le haut : le bandeau en bas, à 10 px au-dessus de la zone basse.
+  // Le rang sorti par le haut : le bandeau posé au bas de l’écran, ses entrées au-dessus de la zone basse.
   const longue = await sortirLeRang(onglet);
   const bandeau = await lireLeBandeau(onglet);
   expect(bandeau.fixe, 'le rang sorti de l’écran devient le bandeau du bas').toBe(longue);
-  if (bandeau.fixe) expect(bandeau.ecran - bandeau.bas, 'le bas du bandeau, au-dessus du bord et de la zone basse').toBeCloseTo(BORD + ZONE_BASSE, 0);
+  if (bandeau.fixe) {
+    expect(bandeau.ecran - bandeau.bas, 'le bandeau, posé au bord de l’écran').toBeCloseTo(BORD, 0);
+    expect(bandeau.ecran - bandeau.entrees, 'ses entrées, au-dessus de la zone basse').toBeGreaterThanOrEqual(ZONE_BASSE - 0.5);
+  }
 
   // La fin de la page : tout en bas, le dernier élément peint remonte au-dessus du bandeau.
   const fin = await onglet.evaluate(async () => {
@@ -488,8 +495,8 @@ for (const [largeur, hauteur] of [[390, 844], [360, 640]]) {
 
 // Sans la valeur simulée : --zone-basse vaut ce que donne env(safe-area-inset-bottom) (écrit ainsi dans styles.css, le
 // dernier test le lit), 0 ici (sans viewport-fit=cover, Safari donne 0 lui aussi, d’après sa documentation), et le
-// bandeau est à 10 px du bord.
-test('sans simulation, la zone basse vaut env(safe-area-inset-bottom) : le bandeau est à 10 px du bord', async ({ page: onglet }) => {
+// bandeau est posé au bord.
+test('sans simulation, la zone basse vaut env(safe-area-inset-bottom) : le bandeau est posé au bord', async ({ page: onglet }) => {
   await ouvrir(onglet, '/cgu.html', { largeur: 390, hauteur: 844, texte: 100 }, null);
   expect(await onglet.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--zone-basse').trim())).toBe('0px');
   await sortirLeRang(onglet);
@@ -533,6 +540,6 @@ test('aucune page ne demande viewport-fit=cover, et le bandeau ne se règle sur 
   const bloc = css.slice(debut, css.indexOf('/* Le contraste élevé de Windows', debut));
   expect(bloc).toContain('@keyframes bandeau-du-bas');
   expect(bloc).not.toMatch(/\d(?:s|d|l)?vh\b/);
-  expect(bloc).toContain('bottom: calc(10px + var(--zone-basse))');
+  expect(bloc).toContain('bottom: 0; padding: 0 max(8px, 50vw - 16rem) var(--zone-basse);');
   expect(css).toContain('--zone-basse: env(safe-area-inset-bottom, 0px);');
 });

@@ -1,0 +1,55 @@
+# « For bars », la page des bars en anglais : où en est la mission
+
+Mis à jour à chaque étape (la session peut s’arrêter d’un coup).
+
+- [x] `main` fusionné dans la branche (26/11, conflit du plan du site résolu, mesure : rien à réécrire).
+- [x] La suite entière, trois fois de suite (27/11) : 3 615 passées, 0 échouée, trois fois.
+- [x] « L’appli est en anglais si le téléphone l’est » : retirée (pas prouvable depuis ce dépôt).
+- [x] Aucun mot de boisson, aucun « ! » sur la page anglaise (relu, et confirmé par la relecture à froid).
+- [x] Lighthouse téléphone, trois passages : vitesse 99, accessibilité 100, bonnes pratiques 100, SEO 100, CLS 0, LCP 2,1 s, 319 Kio (la page française : 99, 100, 100, 100, CLS 0, 315 Kio).
+- [x] Captures 390 px et 1440 px, texte à 200 % : `captures/`, français à gauche, anglais à droite ; aucun défilement de côté.
+- [x] Relecture « trois visiteurs » (agent à froid) : « prête avec de petites corrections » ; corrections faites (le haut de page dit ce qu’est Baromatch, un lien pour le fan, l’ancre de « Les bars que nous contactons », des tournures moins traduites).
+- [x] Les phrases juridiques en anglais, pour le propriétaire (la note `juridique`, dans ce dossier), avec deux points à trancher.
+- [x] `main` fusionné de nouveau (27/11 : l’accueil sans « Testeurs Android » (#54) et les pages des matchs ; conflit du plan du site, les deux côtés gardés).
+- [x] Les deux points juridiques tranchés par le propriétaire (27/11) : notés dans la note `juridique.md`.
+- [x] PR en brouillon vers `main` : #55 (le maestro fusionne après le oui du propriétaire).
+
+## La première suite entière (26/11, après la fusion de `main`)
+
+3 494 passées, 118 échouées. Deux échecs venaient de cette branche (le résumé de confidentialité, à cause de la
+nouvelle section de `main` ; le dossier de relecture refusé par le test des documents publics) : corrigés. Les 115
+autres échouaient aussi sur `main` seul, dans cette machine : le rendu des images et l’encodeur des QR codes
+(`generateur/images`) n’y étaient pas installés. Installés comme la CI le fait (`npm ci --ignore-scripts` dans
+`generateur/images`), ils passent. Trois suites suivantes : 3 613 passées et 2 échecs du test des documents publics (l’état renvoyait à
+l’appli privée ; le chemin de la note juridique écrit en clair dans le test) ; corrigés à leur cause, puis trois suites vertes.
+
+## Arrêt demandé (27/11, matin) : où reprendre
+
+Tout est poussé. Reste seulement :
+
+1. Fusionner `main` dans la branche (jamais de rebase), puis la suite entière trois fois si `main` a bougé
+   ailleurs que dans les pages des matchs. Sur une machine neuve : `npm ci`, et `npm ci --ignore-scripts` dans
+   `generateur/images` (sans lui, 115 tests des affiches et des images échouent, sur `main` aussi).
+2. Ouvrir la PR en brouillon vers `main` : son texte est prêt, dans `pr.md` (ce dossier). Le maestro fusionne après le
+   oui du propriétaire.
+3. Pour le propriétaire : la note `juridique` (les phrases en anglais, et deux points à trancher) et les captures.
+
+## Reprise (27/11, fin de matinée) : fusion de `main`, contrôles, PR
+
+- La suite entière, une fois, après la fusion : 3 622 passées, 2 échouées, toutes deux du test des documents publics,
+  sur l’état et le texte de la PR (des chemins du dossier des documents, une branche distante, le renvoi à l’appli
+  privée). Corrigé dans ces notes ; le test n’est pas touché. Le test seul ensuite : 545 passées, 0 échouée.
+- Les 17 fichiers de tests que la branche et #54 touchent (dont celui des documents publics), trois fois de suite :
+  2 041 passées, 0 échouée, trois fois.
+- Pas refaite après la correction : la suite entière (les deux échecs étaient dans le seul test des documents publics,
+  repassé à part puis trois fois).
+
+## La CI de la PR #55 (27/11, midi) : un test qui courait
+
+Deux passages de la CI sur la même tête : un vert, un rouge (1 échoué, 3 623 passés). L’échec :
+`tests/for-bars-en-formulaire.spec.mjs`, « the commands, at 360 px… » : la hauteur des commandes de la messagerie était
+mesurée juste après l’envoi, avant que la page les montre (pas encore de boîte). Corrigé à sa cause, comme le fait
+déjà le test jumeau en français : le test attend le message « Your request hasn’t been sent yet. » et chaque commande
+visible, puis mesure ; le seuil de 44 px n’est pas touché. Les autres mesures des deux tests de la page anglaise et du
+jumeau français : aucune ne mesure juste après un envoi sans attendre. Ensuite, ce fichier trois fois de suite :
+64 passées, 0 échouée, trois fois ; puis avec `--repeat-each=5` : 320 passées, 0 échouée.

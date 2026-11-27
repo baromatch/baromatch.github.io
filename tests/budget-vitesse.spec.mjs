@@ -165,6 +165,7 @@ const PAGES = [
   { nom: 'À propos', chemin: '/a-propos.html', budget: { requetes: 8, transfere: 176, js: 0, css: 99, images: 42 } },
   { nom: 'Presse et partenariats', chemin: '/presse.html', budget: { requetes: 11, transfere: 226, js: 0, css: 102, images: 96 } },
   { nom: 'pour les bars', chemin: '/pour-les-bars.html', budget: { requetes: 8, transfere: 180, js: 67, css: 116, images: 4 } },
+  { nom: 'pour les bars, en anglais', chemin: '/en/for-bars/', budget: { requetes: 8, transfere: 180, js: 67, css: 116, images: 4 } },
   { nom: '« Ce soir »', chemin: '/ce-soir/', genere: true, budget: { requetes: 8, transfere: 148, js: 4, css: 104, images: 4 } },
   { nom: 'page de match', chemin: '/matchs/psg-ol-2026-10-25/', genere: true, budget: { requetes: 8, transfere: 148, js: 4, css: 104, images: 4 } },
   { nom: 'page d’un club', chemin: '/matchs/club/psg/', genere: true, budget: { requetes: 8, transfere: 148, js: 4, css: 104, images: 4 } },

@@ -144,6 +144,14 @@
     }
   };
 
+  // La page en anglais (/en/for-bars/) a la même page, le même formulaire, le même serveur : seuls les mots changent. Elle
+  // les porte dans un bloc JSON de sa page (#textes-en), de la forme de TEXTES ; sans lui, ou illisible, les mots
+  // français restent (tests/for-bars-en.spec.mjs : même clés, mêmes limites).
+  var textesEn = document.getElementById("textes-en");
+  if (textesEn) {
+    try { TEXTES = JSON.parse(textesEn.textContent); } catch (e) { /* les mots français restent */ }
+  }
+
   // Les icônes des messages et des erreurs, celles de la maquette (24 × 24, au trait).
   var ICONES = {
     erreur: [["circle", { cx: "12", cy: "12", r: "9" }], ["path", { d: "M12 7.5v5.5M12 16.5v.01" }]],
@@ -213,9 +221,9 @@
     return modele.replace(cle, function () { return String(valeur); });
   }
 
-  // « 1 000 » : le nombre écrit en français ; un navigateur sans les données de langue l’écrit tel quel.
+  // « 1 000 » : le nombre écrit dans la langue de la page (« 1,000 » en anglais) ; un navigateur sans les données de langue l’écrit tel quel.
   function nombre(n) {
-    try { return n.toLocaleString("fr-FR"); } catch (e) { return String(n); }
+    try { return n.toLocaleString(document.documentElement.lang === "en" ? "en-GB" : "fr-FR"); } catch (e) { return String(n); }
   }
 
   function aCle(objet, cle) {

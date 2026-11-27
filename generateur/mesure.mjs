@@ -139,14 +139,19 @@ export const appliquerAUnePage = (html, mesure) => {
 // Les pages écrites à la main que le site sert : chaque fichier .html du dépôt, hors des pages que le générateur écrit
 // (matchs/, regarder-le-match/, bar/, ce-soir/, en/, agenda/), des outils et de ce qui n’est pas servi.
 const ECARTES = new Set(['matchs', 'regarder-le-match', 'bar', 'ce-soir', 'en', 'agenda', 'tests', 'generateur', 'node_modules', 'lighthouse', 'apercu', 'test-results', 'playwright-report']);
-export const pagesEcritesALaMain = (racine = RACINE, dossier = '') => readdirSync(path.join(racine, dossier), { withFileTypes: true })
-  .filter((entree) => !entree.name.startsWith('.') && !(dossier === '' && ECARTES.has(entree.name)))
-  .flatMap((entree) => {
-    const relatif = dossier ? `${dossier}/${entree.name}` : entree.name;
-    if (entree.isDirectory()) return pagesEcritesALaMain(racine, relatif);
-    return entree.isFile() && entree.name.endsWith('.html') ? [relatif] : [];
-  })
-  .sort();
+// Une seule page écrite à la main vit dans un dossier du générateur : la page des bars en anglais (en/for-bars/), que le
+// générateur ne touche pas (il n’écrit que /en/, ses guides et ses pages de match) et que le plan du site garde (etat.mjs).
+export const PAGES_A_LA_MAIN_DANS_LE_GENERATEUR = ['en/for-bars/index.html'];
+export const pagesEcritesALaMain = (racine = RACINE, dossier = '') => [
+  ...readdirSync(path.join(racine, dossier), { withFileTypes: true })
+    .filter((entree) => !entree.name.startsWith('.') && !(dossier === '' && ECARTES.has(entree.name)))
+    .flatMap((entree) => {
+      const relatif = dossier ? `${dossier}/${entree.name}` : entree.name;
+      if (entree.isDirectory()) return pagesEcritesALaMain(racine, relatif);
+      return entree.isFile() && entree.name.endsWith('.html') ? [relatif] : [];
+    }),
+  ...(dossier === '' ? PAGES_A_LA_MAIN_DANS_LE_GENERATEUR.filter((f) => existsSync(path.join(racine, f))) : []),
+].sort();
 
 // Chaque page écrite à la main, avec la mesure de marque.json : toutes contrôlées avant d’en écrire une seule. Une page
 // dont le bloc de la mesure change (Confidentialité, quand la mesure démarre ou s’arrête) prend la date du jour à Paris,

@@ -122,7 +122,7 @@ test.describe('ce qu’un robot lit sans JavaScript', () => {
         expect(og[cle], cle).toHaveLength(1);
         expect(og[cle][0].trim(), cle).not.toBe('');
       }
-      expect(og['og:locale'][0]).toBe('fr_FR');
+      expect(og['og:locale'][0]).toBe(page.chemin.startsWith('/en/') ? 'en_GB' : 'fr_FR');
       expect(og['og:site_name'][0]).toBe('Baromatch');
       expect(og['twitter:card'][0]).toBe('summary_large_image');
       expect(og['twitter:site'][0]).toBe('@baromatchapp');

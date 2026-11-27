@@ -41,6 +41,13 @@ const PLAN_DU_SITE = ['d', 'ocs/NIVEAU_SUPERIEUR_SITE_2026-10.m', 'd'].join('');
 const LIENS_ANDROID = ['d', 'ocs/ANDROID-OUVRIR-L-APPLI.m', 'd'].join('');
 const PLAN_SITE_V2 = ['d', 'ocs/SITE_V2_2026-10.m', 'd'].join('');
 const DOCUMENTS_DU_SITE = [AUDIT_SEO, A_FAIRE_SEO, PLAN_DU_SITE, LIENS_ANDROID, PLAN_SITE_V2];
+// Le dossier de relecture des PR (un sous-dossier par page) : l’état de la mission, les textes à faire valider au
+// propriétaire, les captures. Leur chemin est permis (comme celui des documents du site) ; leur texte est vérifié
+// comme celui de tout autre fichier.
+const RELECTURE = ['d', 'ocs/review/'].join('');
+// La note juridique de la page des bars en anglais (son chemin, en morceaux, comme ceux des documents du site).
+const NOTE_JURIDIQUE = [RELECTURE, 'for', '-bars', '-en', '/juridique', '.m', 'd'].join('');
+const permisDansDocs = (fichier) => DOCUMENTS_DU_SITE.includes(fichier) || fichier.startsWith(RELECTURE);
 
 // Le texte que le visiteur lit exprès, et ses copies mot pour mot dans les tests. [fichier, motif, nombre] : le motif y
 // est permis exactement ce nombre de fois. Une occurrence de plus est une fuite ; une de moins, une exception à retirer.
@@ -59,6 +66,22 @@ const EXCEPTIONS = [
   // Leurs copies dans le test du formulaire.
   ['tests/pour-les-bars-formulaire.spec.mjs', 'seuil', 1],
   ['tests/pour-les-bars-formulaire.spec.mjs', 'rejeu', 2],
+  // La page des bars en anglais (/en/for-bars/) : le résumé en anglais de la section « Les demandes des bars » de la page de
+  // confidentialité, point par point (la cadence, la façon dont le serveur compte le réseau, la correction dans les 10
+  // minutes), et la cadence dans le message du formulaire ; leurs copies dans les deux tests de cette page.
+  ['en/for-bars/index.html', 'seuil', 2],
+  ['en/for-bars/index.html', 'reseau', 2],
+  ['en/for-bars/index.html', 'rejeu', 1],
+  ['tests/for-bars-en-formulaire.spec.mjs', 'seuil', 1],
+  ['tests/for-bars-en-formulaire.spec.mjs', 'rejeu', 1],
+  ['tests/for-bars-en.spec.mjs', 'seuil', 4],
+  ['tests/for-bars-en.spec.mjs', 'reseau', 3],
+  ['tests/for-bars-en.spec.mjs', 'rejeu', 1],
+  // La note pour le propriétaire (le dossier de relecture de la page) : ces deux sections, en anglais et en français,
+  // côte à côte, telles que la page et la Confidentialité les publient.
+  [NOTE_JURIDIQUE, 'seuil', 2],
+  [NOTE_JURIDIQUE, 'reseau', 3],
+  [NOTE_JURIDIQUE, 'rejeu', 1],
   // Le numéro de pass, tel que les règles de l’appli et la page de confidentialité le décrivent au fan : une
   // formulation retenue par empreinte, permise là où le visiteur la lit.
   ['cgu.html', 'empreinte 4:JZkyjmaxHcw', 1],
@@ -103,8 +126,8 @@ test('chaque exception vise un fichier publié, et un motif ou une empreinte de 
 });
 
 test('aucun chemin de fichier publié n’a la forme d’un renvoi au dépôt privé', () => {
-  expect(FICHIERS.filter((fichier) => fichier.split('/')[0] === AUDIT_SEO.split('/')[0] && !DOCUMENTS_DU_SITE.includes(fichier))).toEqual([]);
-  expect(FICHIERS.filter((fichier) => !DOCUMENTS_DU_SITE.includes(fichier)).flatMap((fichier) => fuites(fichier, fichier, { motifs: FORMES, exceptions: [] })
+  expect(FICHIERS.filter((fichier) => fichier.split('/')[0] === AUDIT_SEO.split('/')[0] && !permisDansDocs(fichier))).toEqual([]);
+  expect(FICHIERS.filter((fichier) => !permisDansDocs(fichier)).flatMap((fichier) => fuites(fichier, fichier, { motifs: FORMES, exceptions: [] })
     .map((fuite) => `${fichier} : ${fuite}`))).toEqual([]);
 });
 

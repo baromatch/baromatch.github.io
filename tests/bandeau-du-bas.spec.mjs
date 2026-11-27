@@ -30,7 +30,7 @@ import path from 'node:path';
 import { attendreLaPageFinie } from './outils/attente.mjs';
 import { racine } from './outils/environnement.mjs';
 import { couperLAPI } from './outils/invitation.mjs';
-import { PAGES } from './outils/pages.mjs';
+import { fichierDe, PAGES } from './outils/pages.mjs';
 import { demarrerServeur } from './outils/serveur.mjs';
 import { construireLeSiteDExemple } from './outils/site-genere.mjs';
 
@@ -524,7 +524,7 @@ for (const page of PAGES.filter((p) => ['/', '/pour-les-bars.html', '/cgu.html',
 
 test('aucune page ne demande viewport-fit=cover, et le bandeau ne se règle sur aucune hauteur d’écran', () => {
   for (const page of PAGES.filter((p) => !p.chemin.startsWith('/t/'))) {
-    const fichier = path.join(racine, page.chemin === '/' ? 'index.html' : page.chemin.slice(1));
+    const fichier = fichierDe(page.chemin);
     expect(readFileSync(fichier, 'utf8'), page.chemin).toContain('<meta name="viewport" content="width=device-width, initial-scale=1">');
   }
   expect(readFileSync(path.join(racine, 'generateur', 'gabarits.mjs'), 'utf8')).toContain('<meta name="viewport" content="width=device-width, initial-scale=1">');

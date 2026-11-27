@@ -9,6 +9,7 @@ import { racine } from './environnement.mjs';
 export const PAGES = [
   { chemin: '/', nom: 'accueil' },
   { chemin: '/pour-les-bars.html', nom: 'pour-les-bars' },
+  { chemin: '/en/for-bars/', nom: 'for-bars-en' },
   { chemin: '/boutique.html', nom: 'boutique' },
   { chemin: '/cgu.html', nom: 'cgu' },
   { chemin: '/confidentialite.html', nom: 'confidentialite' },

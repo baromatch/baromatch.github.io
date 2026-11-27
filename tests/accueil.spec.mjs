@@ -142,6 +142,27 @@ test.describe('la salle suit l’heure', () => {
     expect(moments).toBeGreaterThan(boite.droite - 1);
   });
 
+  test('la salle ne mesure la page qu’après la première image (rien ne retarde l’affichage), et une page ouverte plus bas prend tout de suite l’heure de l’endroit', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    // Avant la première image, aucun script ne lit la mise en page : la lire forcerait la mise en page entière de la
+    // page avant son premier affichage (mesuré par Lighthouse : une tâche longue de salle.js juste avant le LCP).
+    await page.addInitScript(() => {
+      window.__mesuresAvantImage = 0;
+      let peint = false;
+      requestAnimationFrame(() => { peint = true; });
+      const lire = Element.prototype.getBoundingClientRect;
+      Element.prototype.getBoundingClientRect = function () { if (!peint) window.__mesuresAvantImage += 1; return lire.call(this); };
+    });
+    await page.goto('/');
+    await expect(page.locator('.veillee')).toHaveClass(/pret/);
+    expect(await page.evaluate(() => window.__mesuresAvantImage)).toBe(0);
+    expect(await etat(page)).toBe('1842');
+    // Ouverte à l’ancre du coup d’envoi, la salle y est, sans qu’on bouge.
+    await page.goto('/#bars');
+    await expect(page.locator('.veillee')).toHaveAttribute('data-etat', '2100');
+    await expect(page.locator('.veillee')).toHaveClass(/pret/);
+  });
+
   test('chaque moment qui entre à l’écran donne son heure à la salle ; la salle se remplit des deux camps, puis les lumières baissent', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');

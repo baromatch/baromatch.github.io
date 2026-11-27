@@ -17,15 +17,19 @@ var grand = window.matchMedia("(min-width: 960px)").matches;
 var ligne = grand ? window.innerHeight * 0.5 : Math.max(salle.getBoundingClientRect().bottom, 0) + window.innerHeight * 0.14;
 var heure = moments[0].dataset.heure;
 Array.prototype.forEach.call(moments, function (m) { if (m.getBoundingClientRect().top <= ligne) heure = m.dataset.heure; });
-soiree.dataset.etat = heure;
+if (soiree.dataset.etat !== heure) soiree.dataset.etat = heure;
 }
 function demander() { if (!attend) { attend = true; window.requestAnimationFrame(placer); } }
 if (moments.length && salle) {
 window.addEventListener("scroll", demander, { passive: true });
 window.addEventListener("resize", demander);
+/* Le premier état se calcule après la première image : mesurer la page avant forcerait sa mise en page entière et
+   retarderait l'affichage. En haut de page, la salle est déjà à 18:42 sans script. Les transitions ne commencent
+   qu'une fois la salle à son premier état : à l'arrivée, rien ne bouge. */
+window.requestAnimationFrame(function () { setTimeout(function () {
 placer();
-/* Les transitions ne commencent qu'une fois la salle à son premier état : à l'arrivée, rien ne bouge. */
 window.requestAnimationFrame(function () { window.requestAnimationFrame(function () { soiree.classList.add("pret"); }); });
+}, 0); });
 }
 
 /* Le geste : maintenir 1,4 s remplit le bouton ; lâché avant, il se vide. Doigt, souris, barre d'espace ou Entrée.

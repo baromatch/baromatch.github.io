@@ -62,7 +62,7 @@ body:not(.js) .salle__heure{ display: none; }
   .salle{ grid-column: 1; grid-row: 1; height: 100svh; display: grid; align-items: center; margin: 0; padding: 24px 0; border: 0; }
   .salle__scene{ --haut: 72svh; }
   .salle__dessin{ max-height: 72svh; }
-  .salle__heure{ font-size: 2rem; top: 12%; }
+  .salle__heure{ font-size: 2rem; top: 0; }
   .moments{ grid-column: 2; grid-row: 1; }
 }
 

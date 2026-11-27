@@ -1,5 +1,6 @@
 // Les captures de l'en-tête et du pied de page pour le propriétaire, sur les pages qui comptent : l'accueil, « Pour les
-// bars », un match, Ce soir, La semaine, À propos, Presse, la Confidentialité, une ville, la page introuvable, « For bars ».
+// bars », un match, Ce soir, La semaine, À propos, Presse, la Confidentialité, les CGU (de nuit), une ville, la page
+// introuvable, « For bars ».
 // Au téléphone (iPhone 13, 390 px ; Pixel 7, 412 px) : le premier écran, le milieu de la page (la barre du bas) et le pied ;
 // à l'ordinateur (1440 px) : le premier écran et le pied. Puis, à 390 px, le texte à 200 % (premier écran, milieu, pied),
 // « réduire les animations » (premier écran et milieu), et le premier écran flouté de 12 px (le regard plissé).
@@ -18,6 +19,7 @@ const TOUTES = {
   'a-propos': '/a-propos.html',
   presse: '/presse.html',
   confidentialite: '/confidentialite.html',
+  cgu: '/cgu.html',
   ville: '/regarder-le-match/paris/',
   introuvable: '/404.html',
   'for-bars': '/en/for-bars/',

@@ -15,7 +15,9 @@ const aller = (page, h) => page.evaluate((h) => {
 }, h);
 const bloquer = (ctx) => ctx.route(/formspree|goatcounter/, (r) => r.abort());
 (async () => {
-  const b = await chromium.launch();
+  // Le Chromium de la machine quand il est là (celui des tests, tests/outils/environnement.mjs), sinon celui de Playwright.
+  const installe = '/opt/pw-browsers/chromium';
+  const b = await chromium.launch(fs.existsSync(installe) ? { executablePath: installe } : {});
   const appareils = [['iphone', devices['iPhone 13']], ['android', devices['Pixel 7']]];
   for (const [nom, d] of appareils) {
     const ctx = await b.newContext({ ...d }); await bloquer(ctx);

@@ -47,7 +47,7 @@ for (const chemin of PAGES) {
       if (chemin === '/') {
         // La salle à 20:15 (ta place gardée, au geste) puis au coup d’envoi (les lumières baissées) : sans violation axe non plus.
         await page.locator('[data-maintiens]').click();
-        await expect(page.locator('[data-statut]')).toHaveText('Place gardée.');
+        await expect(page.locator('[data-statut]')).toHaveText('Place gardée. Ton rond ambre est dans la salle.');
         expect(await violationsAxe(page)).toEqual([]);
         await page.locator('#bars').scrollIntoViewIfNeeded();
         await expect(page.locator('.veillee')).toHaveAttribute('data-etat', '2100');
@@ -70,7 +70,7 @@ for (const pourcent of [100, 200]) {
     await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
     expect(await violationsAxe(page)).toEqual([]);
     await page.locator('[data-maintiens]').click();
-    await expect(page.locator('[data-statut]')).toHaveText('Place gardée.');
+    await expect(page.locator('[data-statut]')).toHaveText('Place gardée. Ton rond ambre est dans la salle.');
     expect(await violationsAxe(page)).toEqual([]);
     await page.locator('#bars').scrollIntoViewIfNeeded();
     await expect(page.locator('.veillee')).toHaveAttribute('data-etat', '2100');

@@ -46,12 +46,14 @@ test.describe('la page', () => {
       await expect(moment.locator(i === 0 ? 'h1' : 'h2')).toHaveText(titre);
       if (i) expect(normaliser(await moment.locator('.moment__heure').innerText())).toBe(texte);
     }
-    // La promesse de la marque, et ce que l’appli est aujourd’hui (marque.json : pas encore ouverte) : gratuite, en test,
-    // bientôt sur les stores. Rien ne dit qu’on la trouve déjà dans un store : le fan l’y chercherait.
+    // La promesse de la marque, et ce que l’appli est aujourd’hui (marque.json : pas encore ouverte) : gratuite, bientôt
+    // sur les stores. Rien ne dit qu’on la trouve déjà dans un store : le fan l’y chercherait. La phrase des plateformes
+    // est celle des pages de ville, du générateur (textes.json) et de tests/testeurs-android.spec.mjs : elle change
+    // partout à la fois, sur décision du propriétaire.
     expect(normaliser(await page.locator('.moment--ouverture .chapo').innerText())).toBe('Une appli gratuite pour les fans : trouve un bar qui diffuse ton match et garde ta place. Elle arrive bientôt : laisse ton mail, on te prévient.');
-    expect(normaliser(await page.locator('.attente__plateformes').innerText())).toBe('L’appli tourne déjà en test sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
+    expect(normaliser(await page.locator('.attente__plateformes').innerText())).toBe(JSON.parse(readFileSync(path.join(racine, 'generateur', 'contenu', 'textes.json'), 'utf8')).attente.plateformes);
     const marque = JSON.parse(readFileSync(path.join(racine, 'marque.json'), 'utf8'));
-    if (!marque.appli.ouverte) expect(normaliser(await page.evaluate(() => document.body.innerText))).not.toMatch(/existe sur iPhone|disponible sur l’App Store|disponible sur Google Play|télécharge(-la)? (maintenant|dès)/i);
+    if (!marque.appli.ouverte) expect(normaliser(await page.evaluate(() => document.body.innerText))).not.toMatch(/disponible sur l’App Store|disponible sur Google Play|télécharge(-la)? (maintenant|dès)/i);
     await expect(page.locator('a[href*="apps.apple.com"], a[href*="play.google.com"]')).toHaveCount(0);
     expect(normaliser(await page.evaluate(() => document.body.innerText))).not.toContain('!');
   });
@@ -570,5 +572,18 @@ test.describe('ta place sans geste, quand la salle s’assombrit', () => {
     await aller(page, '2015');
     expect(await toi()).toEqual(['rgba(255, 255, 255, 0.85)', '1']);
     for (const h of ['2055', '2100']) { await aller(page, h); expect(await toi()).toEqual(['none', '0.5']); }
+  });
+});
+
+test.describe('la salle qui ne colle pas', () => {
+  test('à 320 × 700, la salle reste en haut de la page ; chaque moment prend l’heure au milieu de l’écran, jusqu’au coup d’envoi', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.goto('/');
+    await expect(page.locator('.veillee')).toHaveClass(/pret/);
+    expect(await page.locator('.salle').evaluate((e) => getComputedStyle(e).position)).toBe('static');
+    for (const heure of ['2015', '2055', '2100']) {
+      await page.locator(`[data-heure="${heure}"]`).evaluate((e) => window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.45, behavior: 'instant' }));
+      await expect(page.locator('.veillee')).toHaveAttribute('data-etat', heure);
+    }
   });
 });

@@ -7,14 +7,14 @@ var soiree = doc.querySelector(".veillee");
 if (!soiree) return;
 
 /* Les moments : le dernier qui a passé la ligne donne son heure à la salle. Sur téléphone, la ligne est un peu sous la
-   salle (qui reste en haut) ; sur ordinateur, au milieu de l'écran. */
+   salle collée en haut ; sur ordinateur, ou quand la salle ne colle pas, au milieu de l'écran. */
 var moments = doc.querySelectorAll("[data-heure]");
 var salle = doc.querySelector(".salle");
 var attend = false;
 function placer() {
 attend = false;
-var grand = window.matchMedia("(min-width: 960px)").matches;
-var ligne = grand ? window.innerHeight * 0.5 : Math.max(salle.getBoundingClientRect().bottom, 0) + window.innerHeight * 0.14;
+var milieu = window.matchMedia("(min-width: 960px)").matches || getComputedStyle(salle).position !== "sticky";
+var ligne = milieu ? window.innerHeight * 0.5 : Math.max(salle.getBoundingClientRect().bottom, 0) + window.innerHeight * 0.14;
 var heure = moments[0].dataset.heure;
 Array.prototype.forEach.call(moments, function (m) { if (m.getBoundingClientRect().top <= ligne) heure = m.dataset.heure; });
 if (soiree.dataset.etat !== heure) soiree.dataset.etat = heure;

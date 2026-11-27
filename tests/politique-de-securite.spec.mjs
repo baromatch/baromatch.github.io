@@ -97,7 +97,7 @@ test.describe('rien ne viole la politique en parcourant les pages', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.reload();
     await page.locator('[data-maintiens]').click();
-    await expect(page.locator('[data-statut]')).toHaveText('Place gardée.');
+    await expect(page.locator('[data-statut]')).toHaveText('Place gardée. Ton rond ambre est dans la salle.');
     await page.locator('#bars').scrollIntoViewIfNeeded();
     await expect(page.locator('.veillee')).toHaveAttribute('data-etat', '2100');
     expect(await violations()).toEqual([]);

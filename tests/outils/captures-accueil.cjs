@@ -2,7 +2,7 @@
 // moments, le geste réussi, le texte à 200 %, « réduire les animations »), l'ordinateur à 1440 px (les cinq moments et le
 // texte à 200 %), et un film de 10 s du défilement au téléphone (WebM, et MP4 si ffmpeg est là, pour l'iPhone).
 // Usage : node tests/outils/captures-accueil.cjs <adresse de la branche> <adresse de main> <dossier de sortie>
-// (deux serveurs locaux, par exemple npx http-server . et un worktree de origin/main ; Formspree et GoatCounter bloqués).
+// (deux serveurs locaux, par exemple npx http-server . et une copie de la version en ligne ; Formspree et GoatCounter bloqués).
 const { chromium, devices } = require('playwright');
 const [,, URL_B, URL_M, OUT] = process.argv;
 const fs = require('fs'); fs.mkdirSync(OUT, { recursive: true });

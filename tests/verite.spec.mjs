@@ -41,7 +41,7 @@ test('avant l’ouverture, la page presse ne dit pas que des fans trouvent les b
 
 test('la salle et le sous-bock de l’accueil disent qu’ils sont des exemples, aux clubs inventés', async ({ page }) => {
   await page.goto('/');
-  expect(normaliser(await page.locator('.salle__legende').innerText())).toBe('Exemple : une salle de 42 places, deux clubs inventés.');
+  expect(normaliser(await page.locator('.salle__legende').innerText())).toBe('Exemple : soirée de match, 42 places, clubs inventés.');
   expect(normaliser(await page.locator('.sousbock figcaption').innerText())).toContain('Exemple : le sous-bock d’une soirée, aux couleurs de deux clubs inventés');
   expect(normaliser(await page.locator('.maintien__aide').innerText())).toContain('Démo : rien n’est réservé.');
   // La page de confiance le promet pour chaque capture de l’appli.

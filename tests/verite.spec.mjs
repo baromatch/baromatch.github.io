@@ -39,10 +39,11 @@ test('avant l’ouverture, la page presse ne dit pas que des fans trouvent les b
   await expect(bars.locator('a')).toHaveAttribute('href', '/pour-les-bars.html');
 });
 
-test('le film de l’accueil dit que ses bars, ses clubs, ses pseudos et ses chiffres sont inventés', async ({ page }) => {
+test('la salle et le sous-bock de l’accueil disent qu’ils sont des exemples, aux clubs inventés', async ({ page }) => {
   await page.goto('/');
-  const note = normaliser(await page.locator('#film-note').innerText());
-  expect(note).toContain('Ses bars, ses clubs, ses pseudos et ses chiffres sont inventés.');
+  expect(normaliser(await page.locator('.salle__legende').innerText())).toBe('Exemple : soirée de match, 42 places, clubs inventés.');
+  expect(normaliser(await page.locator('.sousbock figcaption').innerText())).toContain('Exemple : le sous-bock d’une soirée, aux couleurs de deux clubs inventés');
+  expect(normaliser(await page.locator('.maintien__aide').innerText())).toContain('Démo : rien n’est réservé.');
   // La page de confiance le promet pour chaque capture de l’appli.
   await page.goto(CONFIANCE);
   expect(normaliser(await page.locator('#accord + ul').textContent())).toContain('utilisent des bars, des clubs, des pseudos et des chiffres inventés, et le disent');

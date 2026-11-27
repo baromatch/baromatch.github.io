@@ -240,7 +240,7 @@ test('données structurées : une page « à propos » de l’Organization de l�
 
 test('le film en texte, les droits des visuels, et une adresse qui passe à la ligne à 200 %', async ({ page }) => {
   await page.goto(PAGE);
-  await expect(page.locator('#film ~ .presse__liens-film a[href="/#film-texte"]')).toHaveText('Ce que montre le film, en texte');
+  await expect(page.locator('#film ~ .presse__liens-film a[href="#film-texte"]')).toHaveText('Ce que montre le film, en texte');
   // Le film reste à regarder, et la page le dit : un lien pour le voir, aucun pour le télécharger ; l’affiche, elle,
   // se télécharge, et c’est elle que la description de la page nomme.
   await expect(page.locator('#film ~ p.presse__film-droits')).toHaveText('Le film se regarde, il ne se reprend pas. Seule son affiche peut être utilisée.');
@@ -393,21 +393,21 @@ test('partenariats et contact : une phrase et son bouton, deux objets déjà éc
   expect(objets.sort()).toEqual(['Partenariat – Baromatch', 'Presse – Baromatch']);
 });
 
-// « Ce que montre le film, en texte » mène au texte du film sur l’accueil : il s’ouvre en arrivant (main.js), au lieu
-// d’un résumé fermé. Sans JavaScript, le résumé reste visible et s’ouvre au toucher.
-test.describe('le film en texte, depuis la page Presse', () => {
-  test.use({ javaScriptEnabled: true });
-  test('le lien ouvre le texte du film sur l’accueil, et le texte se lit', async ({ page }) => {
+// « Ce que montre le film, en texte » mène au texte du film, sur la page Presse même (il était sur l’accueil, qui n’a plus le
+// film) : le résumé est replié, il s’ouvre au toucher, et chaque scène du film y est dite en mots.
+test.describe('le film en texte, sur la page Presse', () => {
+  test('le lien mène au texte du film, replié ; il s’ouvre au toucher et se lit', async ({ page }) => {
     await page.goto(PAGE);
-    await page.locator('#film ~ .presse__liens-film a[href="/#film-texte"]').click();
-    await expect(page).toHaveURL(/\/#film-texte$/);
+    await page.locator('#film ~ .presse__liens-film a[href="#film-texte"]').click();
+    await expect(page).toHaveURL(/\/presse\.html#film-texte$/);
+    await expect(page.locator('#film-texte')).not.toHaveAttribute('open', '');
+    await page.locator('#film-texte summary').click();
     await expect(page.locator('#film-texte')).toHaveAttribute('open', '');
+    await expect(page.locator('#film-texte ol li')).toHaveCount(9);
     await expect(page.locator('#film-texte ol li').first()).toBeVisible();
   });
-  test('sur l’accueil, un lien vers #film-texte l’ouvre aussi en cours de route', async ({ page }) => {
+  test('l’accueil n’a plus le film ni son texte : l’ancre #film-texte n’y est plus', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#film-texte')).not.toHaveAttribute('open', '');
-    await page.evaluate(() => { location.hash = 'film-texte'; });
-    await expect(page.locator('#film-texte')).toHaveAttribute('open', '');
+    await expect(page.locator('#film-texte, #film, video')).toHaveCount(0);
   });
 });

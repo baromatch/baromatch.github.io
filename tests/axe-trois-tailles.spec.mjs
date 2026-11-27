@@ -45,15 +45,19 @@ for (const chemin of PAGES) {
       await attendreLaPageFinie(page);
       expect(await violationsAxe(page)).toEqual([]);
       if (chemin === '/') {
-        await page.locator('.faire__bouton').click();
-        await expect(page.locator('.faire__titre')).toBeVisible();
+        // La salle à 20:15 (ta place gardée, au geste) puis au coup d’envoi (les lumières baissées) : sans violation axe non plus.
+        await page.locator('[data-maintiens]').click();
+        await expect(page.locator('[data-statut]')).toHaveText('Place gardée. Ton rond ambre est dans la salle.');
+        expect(await violationsAxe(page)).toEqual([]);
+        await page.locator('#bars').scrollIntoViewIfNeeded();
+        await expect(page.locator('.veillee')).toHaveAttribute('data-etat', '2100');
         expect(await violationsAxe(page)).toEqual([]);
       }
     });
   }
 }
 
-// Le plus petit téléphone (320 px), texte à 100 puis à 200 % : l’accueil, sa carte fermée puis ouverte, sans violation axe.
+// Le plus petit téléphone (320 px), texte à 100 puis à 200 % : l’accueil, la salle au repos, ta place gardée puis le coup d’envoi, sans violation axe.
 for (const pourcent of [100, 200]) {
   test(`/ à 320 × 700, texte à ${pourcent} % : aucune violation axe`, async ({ page }) => {
     await couperLAPI(page);
@@ -65,8 +69,11 @@ for (const pourcent of [100, 200]) {
     await attendreLaPageFinie(page);
     await page.evaluate((p) => { document.documentElement.style.fontSize = `${p}%`; }, pourcent);
     expect(await violationsAxe(page)).toEqual([]);
-    await page.locator('.faire__bouton').click();
-    await expect(page.locator('.faire__titre')).toBeVisible();
+    await page.locator('[data-maintiens]').click();
+    await expect(page.locator('[data-statut]')).toHaveText('Place gardée. Ton rond ambre est dans la salle.');
+    expect(await violationsAxe(page)).toEqual([]);
+    await page.locator('#bars').scrollIntoViewIfNeeded();
+    await expect(page.locator('.veillee')).toHaveAttribute('data-etat', '2100');
     expect(await violationsAxe(page)).toEqual([]);
   });
 }

@@ -66,7 +66,9 @@ test.describe('le bord des champs de la liste d’attente (accueil)', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
-  for (const largeur of [360, 559]) {
+  // Sur l'accueil, la pilule (le bouton dans le champ) vient dès que la ligne a 20rem (352 px d'écran) ; plus étroit,
+  // le champ et le bouton s'empilent et le champ porte son bord.
+  for (const largeur of [320]) {
     test(`à ${largeur} px : le bord du champ e-mail contraste 3:1 avec la page`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto('/');
@@ -76,7 +78,7 @@ test.describe('le bord des champs de la liste d’attente (accueil)', () => {
     });
   }
 
-  for (const largeur of [560, 1280]) {
+  for (const largeur of [360, 559, 560, 1280]) {
     test(`à ${largeur} px : le bord de la pilule contraste 3:1 avec la page`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto('/');

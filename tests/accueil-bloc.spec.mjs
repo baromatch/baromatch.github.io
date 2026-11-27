@@ -20,23 +20,21 @@ test.describe('le bloc, entre ses repères', () => {
     expect(ACCUEIL.split(REPERES.fin)).toHaveLength(2);
     const dedans = ACCUEIL.split(REPERES.debut)[1].split(REPERES.fin)[0];
     expect(controlerLaSemaine(dedans)).toEqual([]);
-    // Le bloc suit l’ouverture (le téléphone de démo), avant l’appli : « Le prochain match » est juste sous le geste.
-    expect(ACCUEIL.indexOf(REPERES.debut)).toBeGreaterThan(ACCUEIL.indexOf('<section class="geste page"'));
-    expect(ACCUEIL.indexOf(REPERES.fin)).toBeLessThan(ACCUEIL.indexOf('<section class="appli'));
+    // Le bloc est le moment de 19:30, « Choisis ton match » : sous son titre (écrit à la main), avant le moment de 20:15.
+    expect(ACCUEIL.indexOf(REPERES.debut)).toBeGreaterThan(ACCUEIL.indexOf('id="titre-choisis"'));
+    expect(ACCUEIL.indexOf(REPERES.fin)).toBeLessThan(ACCUEIL.indexOf('data-heure="2015"'));
     // Le programme du soir (« Le guide du soir ») est sur la page « Ce soir », pas sur l’accueil.
     expect(ACCUEIL).not.toContain('class="paris"');
-    expect(ACCUEIL).not.toContain('semaine__jour');
   });
 
-  test('le bloc passe son contrôle : ni style en ligne, ni script qui s’exécute, ni « ! », ni mot interdit, et un seul titre h2', () => {
-    const donnees = '<script type="application/json" id="donnees-ce-soir">{"matchs":[]}</script>';
-    expect(controlerLaSemaine(`<h2>Titre</h2>${donnees}`)).toEqual([]);
-    expect(controlerLaSemaine('<h2>Titre</h2><p style="color:red">x</p>')).toEqual(['un style en ligne']);
-    expect(controlerLaSemaine('<h2>Titre</h2><p>Quel match !</p>')).toEqual(['un point d’exclamation']);
-    expect(controlerLaSemaine('<h2>Titre</h2><p>Happy hour</p>')).toEqual(['un mot que le site ne publie pas : « Happy hour »']);
-    expect(controlerLaSemaine('<h2>Titre</h2><a href="#" onclick="x()">x</a><script>x</script>')).toEqual(['un script', 'un attribut d’évènement']);
-    expect(controlerLaSemaine('<h2>Titre</h2><script type="text/javascript">x()</script>')).toEqual(['un script']);
-    expect(controlerLaSemaine('<p>Sans titre</p>')).toEqual(['un seul titre h2 attendu']);
+  test('le bloc passe son contrôle : ni style en ligne, ni script, ni « ! », ni mot interdit, ni titre (le titre du moment est écrit à la main)', () => {
+    expect(controlerLaSemaine('<p class="chapo">Ce soir : 4 matchs.</p>')).toEqual([]);
+    expect(controlerLaSemaine('<p style="color:red">x</p>')).toEqual(['un style en ligne']);
+    expect(controlerLaSemaine('<p>Quel match !</p>')).toEqual(['un point d’exclamation']);
+    expect(controlerLaSemaine('<p>Happy hour</p>')).toEqual(['un mot que le site ne publie pas : « Happy hour »']);
+    expect(controlerLaSemaine('<a href="#" onclick="x()">x</a><script>x</script>')).toEqual(['un script', 'un attribut d’évènement']);
+    expect(controlerLaSemaine('<script type="text/javascript">x()</script>')).toEqual(['un script']);
+    expect(controlerLaSemaine('<h2>Titre</h2>')).toEqual(['aucun titre : le titre « Choisis ton match » est écrit à la main']);
   });
 
   test('accueilAvecLaSemaine remplace ce qui est entre les repères, et seulement cela ; des repères absents ou doublés arrêtent tout', () => {
@@ -75,11 +73,11 @@ test.describe('un passage du générateur', () => {
       const hors = (html) => html.slice(0, html.indexOf(REPERES.debut)) + html.slice(html.indexOf(REPERES.fin));
       expect(hors(ecrit)).toBe(hors(ACCUEIL));
       expect(ecrit).toContain(premier.accueil.bloc);
-      expect(premier.accueil.bloc).toMatch(/<h3 class="coup__titre" data-mot="\d+">/);
-      expect(premier.accueil.bloc).toContain('id="donnees-ce-soir"');
+      expect(premier.accueil.bloc).toMatch(/<ul class="soir">\s*<li><a class="match" href="\/matchs\//);
+      expect(premier.accueil.bloc).toContain('<a class="sept" href="/matchs/">');
       // Chaque lien du bloc mène à un fichier que ce même passage a écrit, et chaque ancre à un id de la page visée.
       const liensDuBloc = [...premier.accueil.bloc.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1]).filter((l) => !l.startsWith('/confidentialite'));
-      expect(liensDuBloc.length).toBeGreaterThan(3);
+      expect(liensDuBloc.length).toBeGreaterThan(1);
       for (const lien of liensDuBloc) {
         const [chemin, ancre] = lien.split('#');
         const fichier = path.join(dossier, chemin.endsWith('/') ? `${chemin}index.html` : chemin);

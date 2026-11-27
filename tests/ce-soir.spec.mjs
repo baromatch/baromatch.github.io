@@ -6,7 +6,7 @@
 // Le scénario inventé (tests/donnees/scenario.json) et la copie réduite des listes publiques (tests/donnees/capture),
 // lus à l’heure qu’on leur donne.
 import { test, expect } from '@playwright/test';
-import { blocDeLaSemaine } from '../generateur/accueil.mjs';
+import { blocDeLaSemaine, matchsDeLAccueil, MATCHS_DE_L_ACCUEIL } from '../generateur/accueil.mjs';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -516,9 +516,11 @@ test('les liens vers « Ce soir » : depuis l’accueil, la semaine et chaque pa
   const villes = site.pages.filter((x) => x.type === 'ville');
   expect(villes.length).toBeGreaterThan(3);
   for (const ville of villes) expect(ville.contenu, ville.chemin).toContain(lien);
-  // L’accueil : sous la carte du prochain match, un lien seul vers « Ce soir » (le fichier existe : tests/liens.spec.mjs le suit).
+  // L’accueil : « Ce soir » est dans le menu, et la liste du jour y mène quand elle ne dit pas tout (le fichier existe : tests/liens.spec.mjs le suit).
   const accueil = readFileSync(path.join(racine, 'index.html'), 'utf8');
-  expect(accueil).toMatch(/<a href="\/ce-soir\/"[^>]*>(?:Les|Tous les) matchs de ce soir<\/a>/);
+  expect(accueil).toContain('<a class="menu__lien" href="/ce-soir/">Ce soir</a>');
   const bloc = blocDeLaSemaine({ donnees: site.donnees, textes: site.contenu.textes, maintenant: site.donnees.maintenant });
-  expect(bloc).toMatch(/<p class="prochain__suite"><a href="\/(ce-soir|matchs)\/" data-tous>Tous les matchs (de ce soir|de la semaine)<\/a><\/p>/);
+  const duJour = matchsDeLAccueil(site.donnees, site.donnees.maintenant);
+  if (duJour.length > MATCHS_DE_L_ACCUEIL) expect(bloc).toMatch(/<p class="soir__suite"><a class="lien-trait" href="\/(ce-soir|matchs)\/">Tous les matchs (de ce soir|de la semaine)<\/a><\/p>/);
+  else expect(bloc).not.toContain('soir__suite');
 });

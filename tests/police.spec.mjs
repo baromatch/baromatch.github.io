@@ -259,7 +259,7 @@ test('la boîte d’un titre est la même avec Bricolage Grotesque et avec la po
       await onglet.goto(chemin);
       await attendreLaPageFinie(onglet);
       if (!sansLaPolice) await onglet.waitForFunction(laPoliceEstLa);
-      largeurs[chemin] = await onglet.evaluate(() => [...document.querySelectorAll('.titre-section, .regarder-titre')]
+      largeurs[chemin] = await onglet.evaluate(() => [...document.querySelectorAll('.titre-section, .regarder-titre, .moment__titre')]
         .filter((titre) => titre.getClientRects().length > 0).map((titre) => Math.round(titre.getBoundingClientRect().width * 10) / 10));
     }
     await contexte.close();
@@ -350,7 +350,12 @@ test('les textes que les scripts du site et le générateur écrivent plus tard 
   // Les textes fixes du bloc des matchs de la semaine de l’accueil (que le test des pages écrites à la main ne lit pas)
   // en sont : textes.json, section « accueil ».
   expect(contenus).toContain('textes.json');
-  expect(textesDuJson(JSON.parse(readFileSync(path.join(racine, 'generateur', 'contenu', 'textes.json'), 'utf8')).accueil).length).toBeGreaterThan(15);
+  // Chaque texte que generateur/accueil.mjs lit (t.ceSoir, t.semaineTitre…) est dans cette section : rien d’écrit par le
+  // bloc n’échappe à ce relevé.
+  const accueil = JSON.parse(readFileSync(path.join(racine, 'generateur', 'contenu', 'textes.json'), 'utf8')).accueil;
+  const lus = [...new Set([...readFileSync(path.join(racine, 'generateur', 'accueil.mjs'), 'utf8').matchAll(/(?<![\w./])t\.(\w+)/g)].map((m) => m[1]))];
+  expect(lus.length).toBeGreaterThanOrEqual(12);
+  expect(lus.filter((cle) => typeof accueil[cle] !== 'string')).toEqual([]);
   for (const fichier of contenus) {
     const json = JSON.parse(readFileSync(path.join(racine, 'generateur', 'contenu', fichier), 'utf8'));
     for (const texte of textesDuJson(json)) for (const c of texte) relever(releve, c, `generateur/contenu/${fichier}`);

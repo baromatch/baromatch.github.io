@@ -181,7 +181,7 @@ test('où en est l’appli : une phrase vraie sans mois, avant comme pendant le 
     expect(texte, fichier).not.toContain('seuls ses testeurs');
   }
   await page.goto('/');
-  expect(normaliser(await page.locator('.faits dt:has-text("Quand") + dd').innerText())).toBe('L’appli existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
+  expect(normaliser(await page.locator('.attente__plateformes').innerText())).toBe('L’appli Baromatch existe sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris.');
   await page.goto('/a-propos.html');
   expect(normaliser(await page.locator('#aujourd-hui + p').innerText())).toBe('L’appli existe sur iPhone et Android, d’abord à Paris. Elle arrive bientôt sur l’App Store et Google Play.');
 });

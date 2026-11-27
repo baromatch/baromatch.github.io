@@ -28,6 +28,10 @@ body:not(.js) .salle__heure{ display: none; }
 }
 @media (max-height: 640px){ .salle{ position: static; } }
 .salle-libre .salle{ position: static; }
+/* Sous la salle collée, le texte qui passe dessous s'efface en douceur au lieu d'une ligne coupée net. */
+@media (max-width: 959.98px) and (min-height: 641px){
+  html:not(.salle-libre) .salle::after{ content: ""; position: absolute; left: 0; right: 0; top: calc(100% + 1px); height: 18px; background: linear-gradient(var(--fond), rgba(250, 247, 241, 0)); pointer-events: none; }
+}
 @media (min-width: 960px){
   .veillee{ display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px; align-items: start; }
   .salle{ grid-column: 1; grid-row: 1; height: 100svh; display: grid; align-items: center; margin: 0; padding: 24px 0; border: 0; }

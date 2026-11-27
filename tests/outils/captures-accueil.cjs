@@ -1,5 +1,6 @@
 // Les captures de l'accueil « La salle » pour le propriétaire : iPhone 13 et Pixel 7 (le haut de page « avant », les cinq
-// moments, le geste réussi, le texte à 200 %), l'ordinateur à 1440 px, et un film de 10 s du défilement au téléphone.
+// moments, le geste réussi, le texte à 200 %, « réduire les animations »), l'ordinateur à 1440 px (les cinq moments et le
+// texte à 200 %), et un film de 10 s du défilement au téléphone (WebM, et MP4 si ffmpeg est là, pour l'iPhone).
 // Usage : node tests/outils/captures-accueil.cjs <adresse de la branche> <adresse de main> <dossier de sortie>
 // (deux serveurs locaux, par exemple npx http-server . et un worktree de origin/main ; Formspree et GoatCounter bloqués).
 const { chromium, devices } = require('playwright');
@@ -33,12 +34,20 @@ const bloquer = (ctx) => ctx.route(/formspree|goatcounter/, (r) => r.abort());
     await page.screenshot({ path: `${OUT}/${nom}-texte-200-haut.png` });
     await aller(page, '2015'); await page.waitForTimeout(1200); await page.screenshot({ path: `${OUT}/${nom}-texte-200-2015.png` });
     await ctx.close();
+    // « réduire les animations » : chaque arrêt est une image fixe
+    const rctx = await b.newContext({ ...d, reducedMotion: 'reduce' }); await bloquer(rctx);
+    const rp = await rctx.newPage();
+    await rp.goto(URL_B, { waitUntil: 'load' }); await rp.evaluate(() => document.fonts.ready);
+    for (const h of ['1842', '2100']) { await aller(rp, h); await rp.waitForTimeout(600); await rp.screenshot({ path: `${OUT}/${nom}-reduit-${h}.png` }); }
+    await rctx.close();
   }
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }); await bloquer(ctx);
   const page = await ctx.newPage();
   await page.goto(URL_M, { waitUntil: 'load' }); await page.waitForTimeout(800); await page.screenshot({ path: `${OUT}/ordinateur-avant-haut.png` });
   await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => document.fonts.ready);
   for (const h of MOMENTS) { await aller(page, h); await page.waitForTimeout(1400); await page.screenshot({ path: `${OUT}/ordinateur-${h}.png` }); }
+  await page.goto(URL_B, { waitUntil: 'load' }); await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; return document.fonts.ready; }); await page.waitForTimeout(800);
+  await page.screenshot({ path: `${OUT}/ordinateur-texte-200-haut.png` });
   await ctx.close();
   // le film : 10 s de défilement au téléphone
   const fctx = await b.newContext({ ...devices['iPhone 13'], recordVideo: { dir: `${OUT}/film-tmp`, size: { width: 390, height: 844 } } }); await bloquer(fctx);
@@ -49,5 +58,8 @@ const bloquer = (ctx) => ctx.route(/formspree|goatcounter/, (r) => r.abort());
   while (Date.now() - t0 < 8200) { const k = (Date.now() - t0) / 8200; const e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k+2, 2)/2; await fp.evaluate((y) => window.scrollTo(0, y), fin * e); await fp.waitForTimeout(30); }
   await fp.waitForTimeout(1200);
   const v = fp.video(); await fctx.close(); fs.renameSync(await v.path(), `${OUT}/film-defilement-iphone.webm`); fs.rmSync(`${OUT}/film-tmp`, { recursive: true, force: true });
+  try {
+    require('child_process').execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', `${OUT}/film-defilement-iphone.webm`, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '23', '-movflags', '+faststart', `${OUT}/film-defilement-iphone.mp4`]);
+  } catch (e) { console.log('ffmpeg absent ou en échec : le film reste en WebM'); }
   await b.close();
 })();

@@ -7,7 +7,7 @@ Ton match. Ton bar. Ce soir. Les bars qui diffusent ton match, une place qui t�
 Les faits, pour ne pas se tromper :
 
 - Baromatch est une appli mobile française pour les fans de football. Elle montre les bars qui diffusent un match, garde une place au bar, puis garde la soirée en souvenir : un « sous-bock » dans un album.
-- L’appli Baromatch existe sur iPhone et Android, d’abord à Paris. Elle arrive bientôt sur l’App Store et Google Play : le public ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site et sur chaque page de ville.
+- L’appli tourne déjà en test sur iPhone et Android. Elle arrive bientôt sur l’App Store et Google Play, d’abord à Paris : le public ne peut pas encore y réserver de place. La liste d’attente est sur l’accueil du site et sur chaque page de ville.
 - Où : à Paris, pour commencer. Pas encore de date pour d’autres villes.
 - Pour qui : les fans de foot de 18 ans et plus, et les bars qui diffusent les matchs.
 - Qui : Baromatch est édité par Skander Kamoun, son fondateur, à titre personnel pour le moment ; la société qui exploitera l’appli est en cours de création.

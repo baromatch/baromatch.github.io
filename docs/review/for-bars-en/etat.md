@@ -12,7 +12,7 @@ Mis à jour à chaque étape (la session peut s’arrêter d’un coup).
 - [x] Les phrases juridiques en anglais, pour le propriétaire (la note `juridique`, dans ce dossier), avec deux points à trancher.
 - [x] `main` fusionné de nouveau (27/11 : l’accueil sans « Testeurs Android » (#54) et les pages des matchs ; conflit du plan du site, les deux côtés gardés).
 - [x] Les deux points juridiques tranchés par le propriétaire (27/11) : notés dans la note `juridique.md`.
-- [x] PR en brouillon vers `main` (le maestro fusionne après le oui du propriétaire).
+- [x] PR en brouillon vers `main` : #55 (le maestro fusionne après le oui du propriétaire).
 
 ## La première suite entière (26/11, après la fusion de `main`)
 

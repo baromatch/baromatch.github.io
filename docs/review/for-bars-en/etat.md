@@ -10,7 +10,9 @@ Mis à jour à chaque étape (la session peut s’arrêter d’un coup).
 - [x] Captures 390 px et 1440 px, texte à 200 % : `captures/`, français à gauche, anglais à droite ; aucun défilement de côté.
 - [x] Relecture « trois visiteurs » (agent à froid) : « prête avec de petites corrections » ; corrections faites (le haut de page dit ce qu’est Baromatch, un lien pour le fan, l’ancre de « Les bars que nous contactons », des tournures moins traduites).
 - [x] Les phrases juridiques en anglais, pour le propriétaire (la note `juridique`, dans ce dossier), avec deux points à trancher.
-- [ ] PR en brouillon vers `main` (le maestro fusionne après le oui du propriétaire).
+- [x] `main` fusionné de nouveau (27/11 : l’accueil sans « Testeurs Android » (#54) et les pages des matchs ; conflit du plan du site, les deux côtés gardés).
+- [x] Les deux points juridiques tranchés par le propriétaire (27/11) : notés dans la note `juridique.md`.
+- [x] PR en brouillon vers `main` (le maestro fusionne après le oui du propriétaire).
 
 ## La première suite entière (26/11, après la fusion de `main`)
 
@@ -31,3 +33,13 @@ Tout est poussé. Reste seulement :
 2. Ouvrir la PR en brouillon vers `main` : son texte est prêt, dans `pr.md` (ce dossier). Le maestro fusionne après le
    oui du propriétaire.
 3. Pour le propriétaire : la note `juridique` (les phrases en anglais, et deux points à trancher) et les captures.
+
+## Reprise (27/11, fin de matinée) : fusion de `main`, contrôles, PR
+
+- La suite entière, une fois, après la fusion : 3 622 passées, 2 échouées, toutes deux du test des documents publics,
+  sur l’état et le texte de la PR (des chemins du dossier des documents, une branche distante, le renvoi à l’appli
+  privée). Corrigé dans ces notes ; le test n’est pas touché. Le test seul ensuite : 545 passées, 0 échouée.
+- Les 17 fichiers de tests que la branche et #54 touchent (dont celui des documents publics), trois fois de suite :
+  2 041 passées, 0 échouée, trois fois.
+- Pas refaite après la correction : la suite entière (les deux échecs étaient dans le seul test des documents publics,
+  repassé à part puis trois fois).

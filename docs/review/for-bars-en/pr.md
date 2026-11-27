@@ -17,7 +17,10 @@ La page « Pour les bars » en anglais, à `/en/for-bars/` : écrite à la main,
 
 ## Preuves
 
-- La suite entière, trois fois de suite : 3 615 passées, 0 échouée, trois fois de suite (27/11).
+- La suite entière, trois fois de suite : 3 615 passées, 0 échouée, trois fois de suite (27/11, avant la dernière fusion).
+- `main` fusionné de nouveau le 27/11 (l’accueil sans « Testeurs Android », #54, et les pages des matchs ; un conflit du plan du site, les deux côtés gardés), par un commit de fusion.
+- Après cette fusion, la suite entière une fois : 3 622 passées, 2 échouées (le test des documents publics, sur deux notes de ce dossier de relecture) ; corrigées dans les notes, le test n’est pas touché ; ce test seul ensuite : 545 passées, 0 échouée.
+- Puis les 17 fichiers de tests que la branche et #54 touchent, trois fois de suite : 2 041 passées, 0 échouée, trois fois.
 - Lighthouse téléphone, trois passages : vitesse 99, accessibilité 100, bonnes pratiques 100, SEO 100, CLS 0, LCP 2,1 s (la page française : les mêmes notes).
 - Relecture « trois visiteurs » par un agent à froid (patron de pub anglophone à Paris, fan, journaliste) : « prête avec de petites corrections », corrections faites.
 - Aucun défilement de côté à 390 px, 1440 px et texte à 200 %.

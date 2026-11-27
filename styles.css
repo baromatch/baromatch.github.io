@@ -151,7 +151,7 @@ a:hover{ color: var(--goutte); }
   color: var(--texte);
   font-size: 0.9375rem;
   font-stretch: 92%;
-  font-weight: 650;
+  font-weight: var(--graisse-du-menu, 650);
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
@@ -564,8 +564,8 @@ a:hover{ color: var(--goutte); }
 }
 @supports (animation-timeline: view()) {
 @media screen and (min-width: 22.5em) and (max-width: 44.99em) and (min-height: 25em) {
-/* Le bandeau prend --bandeau + --zone-basse + 4 px (son trait et sa bande de papier) : 14 px d’air au-dessus de lui pour
-   ce qui prend le focus, 46 px pour la fin du pied. */
+/* Le bandeau prend --bandeau + la zone basse (4 px au moins) + 4 px (son trait et sa bande de papier) : 10 px d’air
+   au moins au-dessus de lui pour ce qui prend le focus, 42 px pour la fin du pied. */
 html{ scroll-padding-bottom: calc(var(--bandeau) + var(--zone-basse) + 18px); }
 .pied{ padding-bottom: calc(40px + var(--bandeau) + var(--zone-basse) + 10px); }
 .menu{ view-timeline: --menu block; }
@@ -582,12 +582,13 @@ html:has(form:target, section:target form) .pied{ padding-bottom: 40px; }
 }
 }
 /* Le bandeau du bas : posé au bord de l’écran, une bande de papier (de nuit sur une page de nuit) sous un trait à 3:1 ;
-   ses entrées au-dessus de la zone basse de l’iPhone. Le trait garde 3 px de papier au-dessus de lui, quoi qui passe
-   dessous. */
+   ses entrées au-dessus de la zone basse de l’iPhone (4 px au moins : le trait de la page où l’on est ne touche pas le
+   bord), d’une graisse plus légère que le rang (il ne devient pas un second point fort). Le trait garde 3 px de papier
+   au-dessus de lui, quoi qui passe dessous. */
 @keyframes bandeau-du-bas {
   /* Tant que le rang sort de l’écran, il garde ses valeurs de rang : rien ne grandit ni ne bouge pendant le défilement. */
   0%, 99.9% { position: static; padding: 0; border-top: 0 none transparent; background: transparent; box-shadow: inset 0 -1px 0 var(--trait); }
-  100% { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; padding: 0 max(8px, 50vw - 16rem) var(--zone-basse); border-top: 1px solid var(--menu-bord); background: var(--fond, var(--nuit)); box-shadow: 0 -3px 0 var(--fond, var(--nuit)); }
+  100% { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; padding: 0 max(8px, 50vw - 16rem) max(4px, var(--zone-basse)); border-top: 1px solid var(--menu-bord); background: var(--fond, var(--nuit)); box-shadow: 0 -3px 0 var(--fond, var(--nuit)); --graisse-du-menu: 550; }
 }
 /* Le contraste élevé de Windows : la page où l’on est soulignée (le contour reste au focus), les pilules des clubs */
 @media (forced-colors: active) {

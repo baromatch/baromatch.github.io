@@ -123,7 +123,7 @@ test('table pleine : demander à la personne qui t’invite, sans la note sur so
   expect((await visibles(page)).join(' ')).not.toMatch(/pass compte|regarde dans l’appli/);
 });
 
-// « Ouvrir dans l’appli », sur Android seulement (l’appli n’existe pas ailleurs) : pour qui a l’appli et voit quand même
+// « Ouvrir dans l’appli », sur Android seulement (un « intent » de Chrome n’existe pas ailleurs) : pour qui a l’appli et voit quand même
 // cette page. Un « intent » de Chrome ouvre baromatch://t/‹code› dans fr.baromatch.app ; sans l’appli, le navigateur va
 // à la page des testeurs Android. Seulement quand l’invitation est là (ouverte ou pleine).
 const INTENT = 'intent://t/abcdefghjkmn#Intent;scheme=baromatch;package=fr.baromatch.app;S.browser_fallback_url=';

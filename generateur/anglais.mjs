@@ -179,7 +179,7 @@ ${matchs.filter((m) => jourDeParis(m.debut) === jour).map((m) => `    ${ligneDuM
     numberOfItems: matchs.length,
     itemListElement: matchs.map((m, i) => ({ '@type': 'ListItem', position: i + 1, name: nomDuMatch(m), url: adresseDe(cheminEnAnglais(m.slug)) })),
   });
-  // L’état de l’appli, dès la tête de la page : en test, Android seulement, à Paris (marque.json).
+  // L’état de l’appli, dès la tête de la page : en test sur iPhone et Android, à Paris (marque.json).
   const plateformes = [marque.appli?.android && 'Android', marque.appli?.iphone && 'iPhone'].filter(Boolean).join(' and ');
   const noteDeLAppli = `  <p class="regarder-note">${e(ouverte ? remplir(t.appli.ouverte, { plateformes }) : t.appli.fermee)}</p>`;
   // Être prévenu : tant que l’appli n’est pas ouverte, la liste d’attente de Paris (l’adresse et la ville, comme sur

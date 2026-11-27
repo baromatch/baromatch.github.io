@@ -326,7 +326,7 @@ test.describe('what the page says', () => {
     expect(resume).toContain('looking for its first bars in Paris');
     const francais = texteDe(principal(SOURCE_FR));
     expect(francais).toContain('Les fans ne réservent pas encore');
-    expect(francais).toContain('bientôt sur les stores, à Paris');
+    expect(francais).toContain('bientôt sur les stores, d’abord à Paris');
     expect(francais).toContain('Baromatch cherche ses premiers bars à Paris');
   });
 

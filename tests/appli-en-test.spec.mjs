@@ -109,3 +109,25 @@ test.describe('où en est l’appli', () => {
     });
   }
 });
+
+// La description de marque.json, la carte d’identité, recopiée à la main dans les données de l’organisation et les
+// chapôs (décision du propriétaire, 27 novembre 2026) : « En test sur iPhone et Android, bientôt sur les stores. »
+// L’ancienne fin, « Sur iPhone et Android, bientôt sur les stores. », se lisait « disponible ».
+const DESCRIPTION_FIN = 'En test sur iPhone et Android, bientôt sur les stores.';
+const COPIES_DE_LA_DESCRIPTION = {
+  'index.html': 1, 'a-propos.html': 2, 'presse.html': 3, 'comment-on-choisit-les-bars.html': 1,
+  'trouver-un-bar-qui-diffuse-le-match.html': 2, 'testeurs-android.html': 1, 'llms.txt': 1,
+};
+const sansBalises = (texte) => normaliser(texte.replace(/&nbsp;/g, ' ').replace(/\\u00a0/gi, ' '));
+
+test('la description de marque.json dit l’appli en test, et chaque copie écrite à la main la reprend mot pour mot', () => {
+  expect(MARQUE.appli.ouverte, OUVERTE).toBe(false);
+  expect(MARQUE.description.endsWith(` ${DESCRIPTION_FIN}`)).toBe(true);
+  const description = normaliser(MARQUE.description);
+  for (const [fichier, fois] of Object.entries(COPIES_DE_LA_DESCRIPTION)) {
+    expect(sansBalises(lire(fichier)).split(description).length - 1, fichier).toBe(fois);
+  }
+  // L’ancienne fin n’est plus dans aucun fichier publié écrit à la main (les documents gardent l’histoire).
+  const anciennes = A_LA_MAIN.filter((fichier) => /(?:^|[.:>"]\s*)Sur\s+iPhone\s+et\s+Android,\s+bientôt\s+sur\s+les\s+stores/u.test(sansBalises(lire(fichier))));
+  expect(anciennes).toEqual([]);
+});

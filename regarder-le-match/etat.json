@@ -210,7 +210,7 @@
   "/ce-soir/": {
    "type": "ce-soir",
    "cle": "ce-soir",
-   "empreinte": "fhKrlDSGqdkm47gB8ZaSxA",
+   "empreinte": "A8YKlLIBHlesn5wCW0o9yg",
    "change": "2026-11-28",
    "indexable": false,
    "bars": []
@@ -440,8 +440,8 @@
    "type": "match-en",
    "cle": "leeds-united-coventry-city-2026-11-28",
    "date": "2026-11-28T15:00:00.000Z",
-   "empreinte": "aw66-5rcKeLPJBPJCQiSpg",
-   "change": "2026-11-27",
+   "empreinte": "R2l4QAW1NT7e3p-xwBjPlA",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": []
   },
@@ -539,8 +539,8 @@
    "type": "match-en",
    "cle": "man-united-brentford-2026-11-28",
    "date": "2026-11-28T15:00:00.000Z",
-   "empreinte": "zGU9F_QSK4WiUNPxjsTdkA",
-   "change": "2026-11-27",
+   "empreinte": "CClzYaZJZefejXZd5a6ktA",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": []
   },
@@ -780,8 +780,8 @@
    "type": "match",
    "cle": "1-koln-07-elversberg-2026-11-28",
    "date": "2026-11-28T14:30:00.000Z",
-   "empreinte": "nDKY6Q-YXjTT9fe82MAAgA",
-   "change": "2026-11-27",
+   "empreinte": "w1rFV3uKGDw0C4kSIH6ruw",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -806,13 +806,6 @@
     }
    }
   },
-  "/matchs/1-koln-07-elversberg-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "1-koln-07-elversberg-2026-11-28",
-   "empreinte": "cQ7wogFy8RLPvKAKdTfw1w",
-   "change": "2026-11-23",
-   "indexable": false
-  },
   "/matchs/1-koln-07-elversberg-2026-11-28/partage.png": {
    "type": "partage",
    "cle": "1-koln-07-elversberg-2026-11-28",
@@ -824,8 +817,8 @@
    "type": "match",
    "cle": "1-mainz-05-1-union-berlin-2026-11-28",
    "date": "2026-11-28T14:30:00.000Z",
-   "empreinte": "7HvXD11xVktZQOpSiKm27A",
-   "change": "2026-11-27",
+   "empreinte": "sDsSMBmzTAg20dGRDE2sGQ",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -849,13 +842,6 @@
      "slug": "1-fc-union-berlin"
     }
    }
-  },
-  "/matchs/1-mainz-05-1-union-berlin-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "1-mainz-05-1-union-berlin-2026-11-28",
-   "empreinte": "4LsQVn6nDmBtGi3mMKUDQg",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/1-mainz-05-1-union-berlin-2026-11-28/partage.png": {
    "type": "partage",
@@ -1467,8 +1453,8 @@
    "type": "match",
    "cle": "betis-rayo-vallecano-2026-11-28",
    "date": "2026-11-28T13:00:00.000Z",
-   "empreinte": "vjRN7f7tLJj2lqotMNUsCg",
-   "change": "2026-11-27",
+   "empreinte": "2ytUCbl4xuqvOVtKnLR51g",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -1492,13 +1478,6 @@
      "slug": "rayo-vallecano"
     }
    }
-  },
-  "/matchs/betis-rayo-vallecano-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "betis-rayo-vallecano-2026-11-28",
-   "empreinte": "ReQHdDAVS2ZdDlSMvHP7uA",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/betis-rayo-vallecano-2026-11-28/partage.png": {
    "type": "partage",
@@ -2393,8 +2372,8 @@
    "type": "match",
    "cle": "frosinone-calcio-parma-calcio-1913-2026-11-28",
    "date": "2026-11-28T14:00:00.000Z",
-   "empreinte": "P8n6SD9dok2uEzLMYfi3Fw",
-   "change": "2026-11-27",
+   "empreinte": "HWWw994QMPhjgINXjpoevQ",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2418,13 +2397,6 @@
      "slug": "parma-calcio-1913"
     }
    }
-  },
-  "/matchs/frosinone-calcio-parma-calcio-1913-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "frosinone-calcio-parma-calcio-1913-2026-11-28",
-   "empreinte": "-eUQ822ezPtRdJ_VqUekww",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/frosinone-calcio-parma-calcio-1913-2026-11-28/partage.png": {
    "type": "partage",
@@ -2511,8 +2483,8 @@
    "type": "match",
    "cle": "hamburger-bayern-2026-11-28",
    "date": "2026-11-28T14:30:00.000Z",
-   "empreinte": "ekPP7DsCVy2V3HYlyCxRww",
-   "change": "2026-11-27",
+   "empreinte": "DAkbKjmgsYg-fGgySVCIMw",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -2536,13 +2508,6 @@
      "slug": "fc-bayern-munchen"
     }
    }
-  },
-  "/matchs/hamburger-bayern-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "hamburger-bayern-2026-11-28",
-   "empreinte": "Uhn0XUl4SGGtQfWkA5EJdw",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/hamburger-bayern-2026-11-28/partage.png": {
    "type": "partage",
@@ -3029,8 +2994,8 @@
    "type": "match",
    "cle": "leeds-united-coventry-city-2026-11-28",
    "date": "2026-11-28T15:00:00.000Z",
-   "empreinte": "yxkjtRd1FipzGAuZzBsCVQ",
-   "change": "2026-11-27",
+   "empreinte": "NKSplg8kF5VYkGvRPj-4Og",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3054,13 +3019,6 @@
      "slug": "coventry-city-fc"
     }
    }
-  },
-  "/matchs/leeds-united-coventry-city-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "leeds-united-coventry-city-2026-11-28",
-   "empreinte": "Ot4m5DAaZI6iYigVSgTyZA",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/leeds-united-coventry-city-2026-11-28/partage.png": {
    "type": "partage",
@@ -3701,8 +3659,8 @@
    "type": "match",
    "cle": "man-united-brentford-2026-11-28",
    "date": "2026-11-28T15:00:00.000Z",
-   "empreinte": "PNiN5xfbZab_TVwsSCfaaw",
-   "change": "2026-11-27",
+   "empreinte": "x1ZDx2EA3YLXEJ641ZNefw",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -3726,13 +3684,6 @@
      "slug": "brentford-fc"
     }
    }
-  },
-  "/matchs/man-united-brentford-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "man-united-brentford-2026-11-28",
-   "empreinte": "oLE-W3TM2BKFtXRStjcxIg",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/man-united-brentford-2026-11-28/partage.png": {
    "type": "partage",
@@ -4445,8 +4396,8 @@
    "type": "match",
    "cle": "paderborn-07-schalke-04-2026-11-28",
    "date": "2026-11-28T14:30:00.000Z",
-   "empreinte": "UQ8u9bqlVQZNm-KNQVxM0g",
-   "change": "2026-11-27",
+   "empreinte": "xCw5JNaq3rbkI77Tw1ZuoQ",
+   "change": "2026-11-28",
    "indexable": false,
    "bars": [],
    "memoire": {
@@ -4470,13 +4421,6 @@
      "slug": "fc-schalke-04"
     }
    }
-  },
-  "/matchs/paderborn-07-schalke-04-2026-11-28/match.ics": {
-   "type": "evenement",
-   "cle": "paderborn-07-schalke-04-2026-11-28",
-   "empreinte": "tnUAKpXUWpwQtfju20dtsA",
-   "change": "2026-11-23",
-   "indexable": false
   },
   "/matchs/paderborn-07-schalke-04-2026-11-28/partage.png": {
    "type": "partage",
@@ -6686,94 +6630,6 @@
    "sequence": 0,
    "modifie": "2026-11-16T21:58:24Z"
   },
-  "cmwt6dorn000xrcsst29lrvqr@baromatch.fr": {
-   "ids": [
-    "cmwt6dorn000xrcsst29lrvqr"
-   ],
-   "slug": "1-koln-07-elversberg-2026-11-28",
-   "debut": "2026-11-28T14:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Bundesliga",
-   "domicile": {
-    "cle": "1-koln",
-    "court": "1. Köln",
-    "nom": "1. FC Köln"
-   },
-   "exterieur": {
-    "cle": "07-elversberg",
-    "court": "07 Elversberg",
-    "nom": "SV 07 Elversberg"
-   },
-   "empreinte": "B5iv79jJE2FdGt9ovxQmJQ",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6dos9000zrcssfq5hbc0b@baromatch.fr": {
-   "ids": [
-    "cmwt6dos9000zrcssfq5hbc0b"
-   ],
-   "slug": "1-mainz-05-1-union-berlin-2026-11-28",
-   "debut": "2026-11-28T14:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Bundesliga",
-   "domicile": {
-    "cle": "1-mainz-05",
-    "court": "1. Mainz 05",
-    "nom": "1. FSV Mainz 05"
-   },
-   "exterieur": {
-    "cle": "1-union-berlin",
-    "court": "1. Union Berlin",
-    "nom": "1. FC Union Berlin"
-   },
-   "empreinte": "CXCamVR9BJoCpZQ74wXRYQ",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6dosv0011rcsso08pz7iw@baromatch.fr": {
-   "ids": [
-    "cmwt6dosv0011rcsso08pz7iw"
-   ],
-   "slug": "hamburger-bayern-2026-11-28",
-   "debut": "2026-11-28T14:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Bundesliga",
-   "domicile": {
-    "cle": "hamburger",
-    "court": "Hamburger",
-    "nom": "Hamburger SV"
-   },
-   "exterieur": {
-    "cle": "bayern",
-    "court": "Bayern",
-    "nom": "FC Bayern München"
-   },
-   "empreinte": "ALX-GydrcxgGZfTeIFi_YA",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6dotg0013rcssdbwnknbq@baromatch.fr": {
-   "ids": [
-    "cmwt6dotg0013rcssdbwnknbq"
-   ],
-   "slug": "paderborn-07-schalke-04-2026-11-28",
-   "debut": "2026-11-28T14:30:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Bundesliga",
-   "domicile": {
-    "cle": "paderborn-07",
-    "court": "Paderborn 07",
-    "nom": "SC Paderborn 07"
-   },
-   "exterieur": {
-    "cle": "schalke-04",
-    "court": "Schalke 04",
-    "nom": "FC Schalke 04"
-   },
-   "empreinte": "vINLIaCWiHqqy9O4Z3ID5A",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
   "cmwt6dou00015rcssq2kjzlr6@baromatch.fr": {
    "ids": [
     "cmwt6dou00015rcssq2kjzlr6"
@@ -6840,28 +6696,6 @@
    "sequence": 0,
    "modifie": "2026-11-23T12:28:14Z"
   },
-  "cmwt6dow9001drcssny86gqx6@baromatch.fr": {
-   "ids": [
-    "cmwt6dow9001drcssny86gqx6"
-   ],
-   "slug": "betis-rayo-vallecano-2026-11-28",
-   "debut": "2026-11-28T13:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "LaLiga",
-   "domicile": {
-    "cle": "betis",
-    "court": "Betis",
-    "nom": "Real Betis Balompié"
-   },
-   "exterieur": {
-    "cle": "rayo-vallecano",
-    "court": "Rayo Vallecano",
-    "nom": "Rayo Vallecano"
-   },
-   "empreinte": "j9MsuJ6LBHOeDXwEkragHg",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
   "cmwt6dowu001frcssg9kmkwlk@baromatch.fr": {
    "ids": [
     "cmwt6dowu001frcssg9kmkwlk"
@@ -6925,50 +6759,6 @@
     "nom": "Aston Villa"
    },
    "empreinte": "E2rVLxxmhAgUNJZ10OFr-Q",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6dozs001nrcsslj54gdb2@baromatch.fr": {
-   "ids": [
-    "cmwt6dozs001nrcsslj54gdb2"
-   ],
-   "slug": "leeds-united-coventry-city-2026-11-28",
-   "debut": "2026-11-28T15:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "leeds-united",
-    "court": "Leeds United",
-    "nom": "Leeds United FC"
-   },
-   "exterieur": {
-    "cle": "coventry-city",
-    "court": "Coventry City",
-    "nom": "Coventry City FC"
-   },
-   "empreinte": "ApsILPASSlCKAxw7gQm-fQ",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6dp0e001prcssmmi1quf7@baromatch.fr": {
-   "ids": [
-    "cmwt6dp0e001prcssmmi1quf7"
-   ],
-   "slug": "man-united-brentford-2026-11-28",
-   "debut": "2026-11-28T15:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Premier League",
-   "domicile": {
-    "cle": "man-united",
-    "court": "Man United",
-    "nom": "Manchester United"
-   },
-   "exterieur": {
-    "cle": "brentford",
-    "court": "Brentford",
-    "nom": "Brentford FC"
-   },
-   "empreinte": "C_Rg3NRpwNwyMDH_pTnPXg",
    "sequence": 0,
    "modifie": "2026-11-23T12:28:14Z"
   },
@@ -7079,28 +6869,6 @@
     "nom": "Genoa CFC"
    },
    "empreinte": "H_6PYSzOViLD748cwY9zJg",
-   "sequence": 0,
-   "modifie": "2026-11-23T12:28:14Z"
-  },
-  "cmwt6dp4h0023rcssxlvgmzx3@baromatch.fr": {
-   "ids": [
-    "cmwt6dp4h0023rcssxlvgmzx3"
-   ],
-   "slug": "frosinone-calcio-parma-calcio-1913-2026-11-28",
-   "debut": "2026-11-28T14:00:00.000Z",
-   "heureConfirmee": true,
-   "competition": "Serie A",
-   "domicile": {
-    "cle": "frosinone-calcio",
-    "court": "Frosinone Calcio",
-    "nom": "Frosinone Calcio"
-   },
-   "exterieur": {
-    "cle": "parma-calcio-1913",
-    "court": "Parma Calcio 1913",
-    "nom": "Parma Calcio 1913"
-   },
-   "empreinte": "9hU2drwU-8askeEceI7wgg",
    "sequence": 0,
    "modifie": "2026-11-23T12:28:14Z"
   },

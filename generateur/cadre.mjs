@@ -7,7 +7,8 @@
 // pages existent toujours, chaque club avec son insigne de l’appli (insigne.mjs) ; l’état de l’appli : marque.json.
 // L’en-tête : le logo, quatre entrées (« Ce soir » et « La semaine » en paire, « Pour les bars », « À propos »), sans
 // chiffre ni script, la page où l’on est marquée (aria-current), puis « Préviens-moi » sur les pages qui le portent :
-// ambre si la page n’a pas déjà son bouton ambre, en contour sinon (actionDeLaPage).
+// un lien calme, marqué d’un point ambre, jamais une surface ambre (l’en-tête ne vole pas le héros de la page ; le seul
+// bouton ambre plein d’une page est le sien).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,17 +49,17 @@ export const lireLeCadre = () => {
 // contenu : du HTML déjà échappé.
 const lien = (href, contenu, chemin, classe = '') => `<a${classe ? ` class="${classe}"` : ''} href="${href}"${href === chemin ? ' aria-current="page"' : ''}>${contenu}</a>`;
 
-// L’en-tête. action : null (l’accueil, « Pour les bars », les pages légales, la page introuvable, les affiches, les pages
-// en anglais), « ambre » ou « contour ». cible : où mène « Préviens-moi » (la liste d’attente de l’accueil, ou celle de
+// L’en-tête. action : faux (« Pour les bars », les pages légales, la page introuvable, les affiches, les pages en
+// anglais) ou vrai. cible : où mène « Préviens-moi » (la liste d’attente de l’accueil, ou celle de
 // la page quand elle a la sienne). Dans le HTML, « Préviens-moi » vient avant le menu : au téléphone, il est en haut, à
 // côté du logo, et le menu en dessous ; à l’ordinateur, styles.css le met au bout de la ligne. Une page en anglais garde
 // l’en-tête en français, et le dit.
-export const entete = (cadre, { chemin = '', action = null, cible = '/#attente', langue = 'fr' } = {}) => {
+export const entete = (cadre, { chemin = '', action = false, cible = '/#attente', langue = 'fr' } = {}) => {
   const m = cadre.textes.menu;
   const entree = (href, texte) => `<li>${lien(href, e(texte), chemin, 'menu__lien')}</li>`;
   return `<header class="entete page"${langue === 'en' ? ' lang="fr"' : ''}>
 <a class="entete__logo" href="/" aria-label="Baromatch, accueil">${cadre.logo}</a>${action ? `
-<a class="entete__attente${action === 'contour' ? ' entete__attente--contour' : ''}" href="${cible}">${e(cadre.textes.action)}<span class="visuellement-cache">${e(cadre.textes.actionSuite)}</span></a>` : ''}
+<a class="entete__attente" href="${cible}">${e(cadre.textes.action)}<span class="visuellement-cache">${e(cadre.textes.actionSuite)}</span></a>` : ''}
 <nav class="menu" aria-label="${e(m.nom)}">
 <ul class="menu__liste">
 <li class="menu__groupe">
@@ -74,15 +75,6 @@ ${entree('/a-propos.html', m.aPropos)}
 </header>`;
 };
 
-// Les boutons ambre du site (styles.css, regarder.css) : une page qui en montre un a « Préviens-moi » en contour, pour
-// qu’un seul ambre plein appelle à l’action. Une capsule de verre n’est pas ambre.
-const AMBRES = new Set(['capsule', 'attente__bouton', 'carte-match__voir', 'inscription__bouton', 'panier__envoyer', 'boutique-produit__ajouter',
-  'boutique-barre__bouton', 'tablee__bouton', 'vitrine-accueil__bouton', 'perdu__accueil']);
-const DE_VERRE = new Set(['capsule--verre', 'vitrine-accueil__bouton--verre']);
-export const aUnBoutonAmbre = (html) => [...html.matchAll(/\sclass="([^"]*)"/g)]
-  .map(([, classes]) => classes.split(/\s+/))
-  .some((classes) => classes.some((c) => AMBRES.has(c)) && !classes.some((c) => DE_VERRE.has(c)));
-export const actionDeLaPage = (contenu) => (aUnBoutonAmbre(contenu) ? 'contour' : 'ambre');
 // L’appli ouverte au public (marque.json) : chaque page dit « Réserve ta place dans l’appli » ; le cadre ne dit alors
 // plus « Préviens-moi quand Baromatch arrive » (ni l’en-tête, ni le pied), en attendant les mots du propriétaire.
 const appliOuverte = (marque) => Boolean(marque?.appli?.ouverte);
@@ -183,14 +175,13 @@ const entre = (html, { debut, fin }) => {
   return { avant: html.slice(0, i + debut.length), dedans: html.slice(i + debut.length, j), apres: html.slice(j) };
 };
 
-// La page avec son cadre : l’en-tête et le pied écrits entre leurs repères, rien d’autre de changé. Le style de
-// « Préviens-moi » et sa cible se lisent dans le reste de la page (hors de l’en-tête et du pied).
+// La page avec son cadre : l’en-tête et le pied écrits entre leurs repères, rien d’autre de changé. La cible de
+// « Préviens-moi » se lit dans le reste de la page (hors de l’en-tête et du pied).
 export const pageAvecLeCadre = (html, { chemin, action, langue = 'fr' }, { cadre = lireLeCadre(), marque, avecPresse = true } = {}) => {
   const haut = entre(html, REPERES_DU_CADRE.entete);
   const bas = entre(haut.apres, REPERES_DU_CADRE.pied);
   const reste = `${haut.avant}${bas.avant}${bas.apres}`;
-  const style = action && !appliOuverte(marque) ? actionDeLaPage(reste) : null;
-  return `${haut.avant}\n${entete(cadre, { chemin, action: style, cible: cibleDeLAction(reste), langue })}\n${bas.avant}\n${pied(cadre, { marque, chemin, avecPresse, langue })}\n${bas.apres}`;
+  return `${haut.avant}\n${entete(cadre, { chemin, action: Boolean(action) && !appliOuverte(marque), cible: cibleDeLAction(reste), langue })}\n${bas.avant}\n${pied(cadre, { marque, chemin, avecPresse, langue })}\n${bas.apres}`;
 };
 
 // Réécrit le cadre de chaque page écrite à la main (toutes contrôlées avant d’en écrire une seule) ; verifier : n’écrit

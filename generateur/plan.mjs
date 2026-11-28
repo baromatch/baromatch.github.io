@@ -26,8 +26,6 @@ export const GEO = lire('plan-paris.json');
 export const TEXTES_DU_PLAN = lire('plan.json');
 export const SCRIPT_DU_PLAN = '<script src="/plan.js" defer></script>';
 export const FEUILLE_DU_PLAN = '/plan.css';
-// Une page porte le plan quand elle contient sa racine : c’est elle, et non un script, qui rend l’action de l’en-tête ambre.
-export const aLePlan = (html) => html.includes('<div class="soir ');
 // Le choix du propriétaire, en attente : « arrondissements » (une démo marquée « Démo », à l’échelle des arrondissements,
 // jamais à une adresse) ou « aucune » (le plan reste vide, avec la phrase vraie). Un seul interrupteur.
 export const PLAN_DEMO = 'arrondissements';

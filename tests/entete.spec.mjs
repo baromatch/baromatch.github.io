@@ -122,7 +122,7 @@ for (const page of PAGES) {
 // taille du texte réglée dans le navigateur aussi (32 px sur 390 px : 12 em). Les quatre entrées restent deux rangs de
 // deux (la paire des matchs, puis « Pour les bars » et « À propos »), au lieu d’une colonne qui remplit l’écran : chaque
 // entrée se voit, se touche sur 44 px, sans mot coupé ; la page ne défile pas de côté ; la page où l’on est garde son
-// point sous le mot, pas sur une ligne à lui.
+// trait sous le mot, pas sur une ligne à lui.
 const ZOOMS = [
   { nom: 'iPhone 14 zoomé à 150 %', largeur: 260, hauteur: 443 },
   { nom: 'iPhone 14 zoomé à 200 %', largeur: 195, hauteur: 332 },
@@ -154,7 +154,7 @@ for (const { nom, largeur, hauteur, reglage } of ZOOMS) {
           }
           if (a.scrollWidth > a.clientWidth + 1) coupes.push(`${a.textContent} déborde`);
         }
-        // Le point de la page où l’on est : sous le mot, au bas de la pilule (comme au téléphone).
+        // Le trait de la page où l’on est : sous le mot, au bas de l’entrée (comme au téléphone).
         const courant = document.querySelector('.menu__lien[aria-current="page"]');
         if (!courant) return { coupes, point: null };
         const s = getComputedStyle(courant, '::before');
@@ -167,16 +167,16 @@ for (const { nom, largeur, hauteur, reglage } of ZOOMS) {
       });
       expect(vu.coupes, 'mots coupés ou qui débordent').toEqual([]);
       if (chemin === '/a-propos.html') {
-        expect(vu.point.absolu, 'le point de « À propos » sous le mot, pas sur une ligne à lui').toBe(true);
-        expect(vu.point.haut, 'le point sous le mot').toBeGreaterThanOrEqual(vu.point.basDuTexte - 0.5);
-        expect(vu.point.bas, 'le point dans la pilule').toBeLessThanOrEqual(vu.point.basDeLaPilule);
+        expect(vu.point.absolu, 'le trait de « À propos » sous le mot, pas sur une ligne à lui').toBe(true);
+        expect(vu.point.haut, 'le trait sous le mot').toBeGreaterThanOrEqual(vu.point.basDuTexte - 0.5);
+        expect(vu.point.bas, 'le trait dans l’entrée').toBeLessThanOrEqual(vu.point.basDeLaPilule);
       }
     });
   }
 }
 
 // Au téléphone debout (400 px de haut au moins), une fois le rang sorti de l’écran par le haut, il devient le bandeau du
-// bas (10 px au-dessus du bord) ; revenu en haut, il redevient le rang. La page ne bouge pas : la place du rang reste
+// bas (posé au bord de l’écran) ; revenu en haut, il redevient le rang. La page ne bouge pas : la place du rang reste
 // gardée sous le logo. Ailleurs (une tablette, l’ordinateur, le téléphone couché), rien ne devient fixe.
 for (const [largeur, hauteur] of [[360, 740], [375, 548], [390, 844], [412, 915], [600, 900], [719, 800], [720, 900], [768, 1024], [1280, 800], [844, 390], [667, 375]]) {
   const bandeau = largeur >= 360 && largeur < 720 && hauteur >= 400;
@@ -190,10 +190,19 @@ for (const [largeur, hauteur] of [[360, 740], [375, 548], [390, 844], [412, 915]
     });
     const arrivee = await lire();
     expect(arrivee.position).toBe('static');
+    // Pendant que le rang sort de l’écran (l’animation liée au défilement court), il garde ses valeurs de rang : la page
+    // ne bouge pas, rien ne grandit sous lui.
+    const rang = await onglet.evaluate(() => { const r = document.querySelector('.menu').getBoundingClientRect(); return { haut: r.top + scrollY, epaisseur: r.height }; });
+    for (const part of [0.1, 0.3, 0.5, 0.7, 0.9, 0.98]) {
+      await onglet.evaluate((y) => window.scrollTo(0, y), Math.round(rang.haut + part * rang.epaisseur));
+      const pendant = await lire();
+      expect(pendant.position, `${part * 100} % du rang sorti`).toBe('static');
+      expect(pendant.main, `${part * 100} % du rang sorti : la page ne bouge pas`).toBeCloseTo(arrivee.main, 0);
+    }
     await onglet.evaluate(() => window.scrollTo(0, document.querySelector('.menu').getBoundingClientRect().bottom + scrollY + 40));
     const loin = await lire();
     expect(loin.position).toBe(bandeau ? 'fixed' : 'static');
-    if (bandeau) expect(loin.ecran - loin.bas, 'à 10 px du bas de l’écran').toBeCloseTo(10, 0);
+    if (bandeau) expect(loin.ecran - loin.bas, 'posé au bas de l’écran').toBeCloseTo(0, 0);
     expect(loin.main, 'la page ne bouge pas').toBeCloseTo(arrivee.main, 0);
     await onglet.evaluate(() => window.scrollTo(0, 0));
     expect((await lire()).position).toBe('static');
@@ -201,7 +210,7 @@ for (const [largeur, hauteur] of [[360, 740], [375, 548], [390, 844], [412, 915]
 }
 
 // En cours de lecture, les barres du navigateur qui reviennent (la hauteur passe de 659 à 548 px, puis à 480) : le
-// bandeau reste en bas, à 10 px du bord.
+// bandeau reste posé en bas de l’écran.
 test('les barres du navigateur qui reviennent en cours de lecture : le bandeau reste en bas', async ({ page: onglet }) => {
   await ouvrir(onglet, '/a-propos.html', 393, 659);
   await onglet.evaluate(() => window.scrollTo(0, document.querySelector('.menu').getBoundingClientRect().bottom + scrollY + 40));
@@ -213,7 +222,7 @@ test('les barres du navigateur qui reviennent en cours de lecture : le bandeau r
       return { position: getComputedStyle(liste).position, bas: innerHeight - liste.getBoundingClientRect().bottom };
     });
     expect(lu.position, `${hauteur} px`).toBe('fixed');
-    expect(lu.bas, `${hauteur} px`).toBeCloseTo(10, 0);
+    expect(lu.bas, `${hauteur} px`).toBeCloseTo(0, 0);
   }
 });
 

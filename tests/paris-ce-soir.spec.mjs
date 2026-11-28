@@ -180,7 +180,7 @@ test.describe('« Ce soir » servi : le plan allumé sans plan.js', () => {
   });
 
   for (const chemin of ['/ce-soir/', '/matchs/psg-ol-2026-10-25/']) {
-    test(`${chemin} à 390 × 844 : pas de plan.js, la lumière des clubs allumée, « Préviens-moi » ambre dans l’en-tête`, async ({ browser }) => {
+    test(`${chemin} à 390 × 844 : pas de plan.js, la lumière des clubs allumée, « Préviens-moi » au point ambre dans l’en-tête`, async ({ browser }) => {
       const contexte = await browser.newContext({ viewport: { width: 390, height: 844 } });
       const onglet = await contexte.newPage();
       const scripts = [];
@@ -193,8 +193,12 @@ test.describe('« Ce soir » servi : le plan allumé sans plan.js', () => {
       expect(await lueur.evaluate((n) => Number(getComputedStyle(n).opacity))).toBeGreaterThan(0.9);
       await expect(onglet.locator('.scene[data-i="1"] .plan__svg')).toBeVisible();
       await expect(onglet.locator('.scene[data-i="1"] .liste')).toBeVisible();
+      // L’en-tête ne peint plus de surface ambre (il ne vole pas le héros de la page) : « Préviens-moi » y est un lien
+      // souligné, marqué d’un point ambre ; l’appel de la page vers la liste d’attente est le sien, juste dessous.
       const action = onglet.locator('.entete__attente');
-      expect(await action.evaluate((a) => getComputedStyle(a).backgroundColor)).toBe('rgb(255, 177, 61)');
+      await expect(action).toBeVisible();
+      const vu = await action.evaluate((a) => ({ fond: getComputedStyle(a).backgroundColor, point: getComputedStyle(a, '::before').backgroundColor, souligne: getComputedStyle(a).textDecorationLine }));
+      expect(vu).toEqual({ fond: 'rgba(0, 0, 0, 0)', point: 'rgb(255, 177, 61)', souligne: 'underline' });
       const lien = onglet.locator('.essai-place .tenir__btn');
       await expect(lien).toHaveText('Garder ta place dans l’appli');
       await expect(lien).toHaveAttribute('href', '/#attente');

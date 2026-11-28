@@ -3,12 +3,17 @@
 // bandeau du bas) et dedans (le fond de l’élément). Les couleurs du style, posées l’une sur l’autre, ne voient ni une
 // ombre, ni un halo, ni ce qui passe sous un élément fixe.
 //
-// mesurerLesBords(page, selecteur) : chaque élément visible du sélecteur, entièrement dans l’écran ; chaque côté qui a un
+// mesurerLesBords(page, selecteur) : chaque élément visible du sélecteur, entièrement dans l’écran (il peut en toucher le
+// bord, pas par un côté qui a un bord) ; chaque côté qui a un
 // bord (1 px au moins) est lu sur sa partie droite (hors des arrondis), en une trentaine de points, le texte de la page
 // caché le temps de la photo (un trait de lettre n’est pas un fond). Rend, par côté, le pire rapport contre le dehors et
 // contre le dedans, et leurs couleurs. La page s’ouvre avec deviceScaleFactor: 3 (un iPhone) : un bord de 1 px y fait
 // 3 pixels, et les pixels lus (le milieu du bord, celui qui le touche dehors, celui qui le touche dedans) restent les
 // bons quel que soit l’arrondi de sa position, à un pixel près.
+// La boîte est relue après la photo : une page qui a défilé entre-temps (la photo se cadre sur le document, la boîte sur
+// l’écran) est mesurée de nouveau, une fois posée. Sans cela, sur « Pour les bars », la salle et le formulaire qui
+// arrivent après le premier affichage faisaient défiler la page seule de quelques pixels (l’ancrage du défilement) entre
+// la lecture et la photo : le bandeau du bas était lu à côté de son trait.
 import { lirePng } from './pixels-peints.mjs';
 
 const TEXTE_CACHE = `*, *::before, *::after, *::placeholder, *::marker {
@@ -27,8 +32,10 @@ const rapport = (x, y) => {
 };
 const hex = (p) => `#${p.map((c) => c.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
 
-export const mesurerLesBords = async (page, selecteur) => {
-  const elements = await page.evaluate((s) => [...document.querySelectorAll(s)]
+// Les éléments du sélecteur, tels qu’ils sont à cet instant, avec le défilement de la page : la photo de Playwright se
+// cadre sur le document, la boîte d’un élément se lit dans l’écran ; les deux ne se répondent que si la page n’a pas
+// défilé entre-temps.
+const lireLesElements = (page, selecteur) => page.evaluate((s) => ({ defilement: [scrollX, scrollY], elements: [...document.querySelectorAll(s)]
     .filter((e) => e.checkVisibility({ visibilityProperty: true }))
     .map((e) => {
       const r = e.getBoundingClientRect();
@@ -39,9 +46,20 @@ export const mesurerLesBords = async (page, selecteur) => {
         gauche: r.left, haut: r.top, droite: r.right, bas: r.bottom,
         bords: { haut: parseFloat(st.borderTopWidth), bas: parseFloat(st.borderBottomWidth), gauche: parseFloat(st.borderLeftWidth), droite: parseFloat(st.borderRightWidth) },
         rayons: { hautGauche: rayon('TopLeft'), hautDroite: rayon('TopRight'), basGauche: rayon('BottomLeft'), basDroite: rayon('BottomRight') },
-        dansLEcran: r.top >= 1 && r.left >= 1 && r.bottom <= innerHeight - 1 && r.right <= innerWidth - 1,
+        // Entier dans l’écran ; il peut en toucher le bord (le bandeau du bas, posé au bas de l’écran) : ce côté-là n’a pas
+        // de dehors, et la photo s’arrête à l’écran.
+        dansLEcran: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth,
+        ecran: { largeur: innerWidth, hauteur: innerHeight },
       };
-    }), selecteur);
+    }) }), selecteur);
+const memePlace = (a, b) => a.defilement.join() === b.defilement.join() && a.elements.length === b.elements.length
+  && a.elements.every((e, i) => ['gauche', 'haut', 'droite', 'bas'].every((c) => Math.abs(e[c] - b.elements[i][c]) < 0.01));
+// Une page qui bouge encore (un script ou une police qui arrive tard, et l’ancrage du défilement qui compense : sur
+// « Pour les bars », la page défile seule de quelques pixels) : la mesure est refaite, jusqu’à 10 fois, sur une page posée.
+const ESSAIS_POUR_UNE_PAGE_POSEE = 10;
+
+export const mesurerLesBords = async (page, selecteur) => {
+  const { elements } = await lireLesElements(page, selecteur);
   const { dsf } = await page.evaluate(() => ({ dsf: window.devicePixelRatio }));
   if (dsf < 2.5) throw new Error(`mesurerLesBords : la page s’ouvre avec deviceScaleFactor: 3 (lu : ${dsf})`);
   const resultats = [];
@@ -51,13 +69,29 @@ export const mesurerLesBords = async (page, selecteur) => {
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, window.texteCacheDesBords];
   }, TEXTE_CACHE);
   try {
-    for (const e of elements) {
-      if (!e.dansLEcran) throw new Error(`mesurerLesBords : ${e.quoi} n’est pas entier dans l’écran`);
-      // La photo de l’élément et de 4 px autour, en pixels de l’écran (×3).
-      const clip = { x: Math.floor(e.gauche) - 4, y: Math.floor(e.haut) - 4 };
-      clip.width = Math.ceil(e.droite) + 4 - clip.x;
-      clip.height = Math.ceil(e.bas) + 4 - clip.y;
-      const image = lirePng(await page.screenshot({ clip }));
+    for (const [rang] of elements.entries()) {
+      // La boîte lue, la photo prise, la boîte relue : si la page a bougé entre les deux lectures, la photo ne montre pas
+      // l’élément là où sa boîte le dit ; on attend qu’elle se pose et on recommence.
+      let e = null;
+      let clip = null;
+      let image = null;
+      for (let essai = 1; ; essai += 1) {
+        const avant = await lireLesElements(page, selecteur);
+        e = avant.elements[rang];
+        if (!e) throw new Error(`mesurerLesBords : ${selecteur}, l’élément ${rang + 1} a disparu`);
+        if (!e.dansLEcran) throw new Error(`mesurerLesBords : ${e.quoi} n’est pas entier dans l’écran`);
+        // La photo de l’élément et de 4 px autour, en pixels de l’écran (×3).
+        clip = { x: Math.max(0, Math.floor(e.gauche) - 4), y: Math.max(0, Math.floor(e.haut) - 4) };
+        clip.width = Math.min(e.ecran.largeur, Math.ceil(e.droite) + 4) - clip.x;
+        clip.height = Math.min(e.ecran.hauteur, Math.ceil(e.bas) + 4) - clip.y;
+        const photo = await page.screenshot({ clip });
+        if (memePlace(avant, await lireLesElements(page, selecteur))) {
+          image = lirePng(photo);
+          break;
+        }
+        if (essai === ESSAIS_POUR_UNE_PAGE_POSEE) throw new Error(`mesurerLesBords : ${e.quoi}, la page bouge encore après ${essai} essais`);
+        await page.waitForTimeout(150);
+      }
       const pixel = (x, y) => {
         const d = (y * image.largeur + x) * 4;
         return [image.pixels[d], image.pixels[d + 1], image.pixels[d + 2]];
@@ -66,6 +100,8 @@ export const mesurerLesBords = async (page, selecteur) => {
       for (const cote of ['haut', 'bas', 'gauche', 'droite']) {
         const largeur = e.bords[cote];
         if (largeur < 1) continue;
+        // Un bord posé sur le bord de l’écran n’a rien dehors à quoi se mesurer.
+        if ((cote === 'haut' && e.haut < 3) || (cote === 'gauche' && e.gauche < 3) || (cote === 'bas' && e.bas > e.ecran.hauteur - 3) || (cote === 'droite' && e.droite > e.ecran.largeur - 3)) throw new Error(`mesurerLesBords : ${e.quoi}, son bord ${cote} est sur le bord de l’écran`);
         const epaisseur = Math.round(largeur * dsf);
         const horizontal = cote === 'haut' || cote === 'bas';
         // Le long du côté, hors des arrondis (et 2 px de plus).

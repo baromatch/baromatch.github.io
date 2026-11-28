@@ -2,10 +2,11 @@
 // - chaque page écrite à la main a, entre ses repères, exactement ce que la source écrit (« npm run cadre ») ; une
 //   retouche à la main de l’en-tête ou du pied est refusée ; les pages du générateur ont le même cadre, et, à la page où
 //   l’on est et à l’action près, l’en-tête et le pied sont les mêmes partout ;
-// - la page où l’on est le dit (aria-current), dans le menu et le pied, et se voit : la pilule pleine et son point, de la
-//   couleur de son texte (l’ambre est pour l’action) ; dans le pied, elle est soulignée (pas seulement une couleur) ;
-// - « Préviens-moi » est dans l’en-tête des pages décidées, ambre si la page n’a pas déjà son bouton ambre, en contour
-//   sinon (lu tel qu’il est peint) ; il mène à la liste d’attente de la page quand elle en a une (une ville) ;
+// - la page où l’on est le dit (aria-current), dans le menu et le pied, et se voit : un trait sous le mot et le mot plus
+//   gras, de la couleur de son texte (l’ambre est pour l’action) ; dans le pied, elle est soulignée (pas seulement une
+//   couleur) ; « Ce soir » et « La semaine » n’ont pas de surlignage commun ;
+// - « Préviens-moi » est dans l’en-tête des pages décidées : un lien souligné marqué d’un point ambre, jamais une surface
+//   ambre (lu tel qu’il est peint) ; il mène à la liste d’attente de la page quand elle en a une (une ville) ;
 // - le pied : ses deux actions, « Presse et partenariats » vers la page Presse, l’adresse e-mail soulignée ;
 // - la ligne d’état du pied suit marque.json (comme la pilule de l’accueil) ;
 // - plus aucune page publiée ne porte l’ancien cadre, et la feuille de style ne le met plus en forme ;
@@ -17,11 +18,10 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
-  actionDeLaPage, cibleDeLAction, ecrireLeCadre, entete, lireLeCadre, pageAvecLeCadre, PAGES_DU_CADRE, pageDuGenerateurAvecLAction, pied,
+  cibleDeLAction, ecrireLeCadre, entete, lireLeCadre, pageAvecLeCadre, PAGES_DU_CADRE, pageDuGenerateurAvecLAction, pied,
 } from '../generateur/cadre.mjs';
 import { insigne } from '../generateur/insigne.mjs';
 import { pagesEcritesALaMain } from '../generateur/mesure.mjs';
-import { aLePlan } from '../generateur/plan.mjs';
 import { chargerLeQr } from '../generateur/qr.mjs';
 import { construireEnMemoire } from '../generateur/site.mjs';
 import { echapper } from '../generateur/texte.mjs';
@@ -47,11 +47,10 @@ const AVEC_L_ACTION = ['/', '/a-propos.html', '/presse.html', '/comment-on-chois
 // Le scénario inventé, en mémoire, avec l’encodeur des QR codes (les affiches à imprimer et la feuille du patron).
 const { qr } = chargerLeQr();
 const scenario = () => construireEnMemoire({ source: `scenario:${SCENARIO}`, maintenant: MAINTENANT_DU_SCENARIO, racine, contenu: contenuDuScenario(), qr });
-const actionDe = (html) => {
-  const trouve = html.match(ENTETE)[0].match(/class="entete__attente( entete__attente--contour)?"/);
-  if (!trouve) return null;
-  return trouve[1] ? 'contour' : 'ambre';
-};
+// « Préviens-moi » dans l’en-tête : un seul dessin (plus d’ambre plein ni de contour selon la page).
+// Sa présence se lit à sa classe, quelle que soit la suite de l’attribut ; son dessin unique, à part (« sur les pages
+// décidées »).
+const actionDe = (html) => (/<a class="entete__attente[\s"]/.test(html.match(ENTETE)[0]) ? 'action' : null);
 // Des couches de fond (de l’élément vers la page) posées l’une sur l’autre : la couleur que l’œil voit derrière.
 const composer = (couches) => couches.map(lireCouleur).filter((c) => c.a > 0).reverse().reduce((dessous, couche) => poser(couche, dessous));
 const pagesHtml = (pages) => pages.filter((p) => typeof p.contenu === 'string' && p.contenu.includes('<header class="entete page"'));
@@ -101,8 +100,7 @@ test.describe('une seule source pour l’en-tête et le pied', () => {
     for (const p of generees) {
       const langue = p.langue ?? 'fr';
       const corps = p.contenu.slice(p.contenu.indexOf('<main'), p.contenu.indexOf('</main>'));
-      // Une page qui porte le plan (aLePlan) a « Préviens-moi » en ambre dès l’en-tête.
-      const action = pageDuGenerateurAvecLAction(p.chemin) ? (aLePlan(p.contenu) ? 'ambre' : actionDeLaPage(corps)) : null;
+      const action = pageDuGenerateurAvecLAction(p.chemin);
       expect(p.contenu.match(ENTETE)[0], p.chemin).toBe(entete(cadre, { chemin: p.chemin, action, cible: cibleDeLAction(corps), langue }));
       expect(p.contenu.match(PIED)[0], p.chemin).toBe(pied(cadre, { marque: MARQUE, chemin: p.chemin, langue }));
     }
@@ -137,30 +135,45 @@ test.describe('la page où l’on est', () => {
   });
 
   for (const largeur of [390, 1280]) {
-    test(`à ${largeur} px, la pilule pleine et son point de la couleur du texte (pas l’ambre de l’action), la nuit comme au jour`, async ({ page }) => {
+    test(`à ${largeur} px, un trait sous le mot, de la couleur du texte (pas l’ambre de l’action), la nuit comme au jour`, async ({ page }) => {
       await page.setViewportSize({ width: largeur, height: 800 });
       await page.goto('/a-propos.html');
-      const lirePilule = () => page.evaluate(() => {
+      const lireLaPage = () => page.evaluate(() => {
         const a = document.querySelector('.menu__lien[aria-current="page"]');
         const s = getComputedStyle(a);
-        return { texte: a.textContent, fond: s.backgroundColor, couleur: s.color, point: getComputedStyle(a, '::before').backgroundColor, autres: [...document.querySelectorAll('.menu__lien:not([aria-current])')].map((l) => getComputedStyle(l).backgroundColor) };
+        const t = getComputedStyle(a, '::before');
+        const fonds = [];
+        for (let n = a; n; n = n.parentElement) {
+          fonds.push(getComputedStyle(n).backgroundColor);
+          if (/^rgb\(/.test(fonds.at(-1))) break;
+        }
+        const autres = [...document.querySelectorAll('.menu__lien:not([aria-current])')];
+        return {
+          texte: a.textContent, couleur: s.color, graisse: s.fontWeight, fonds,
+          trait: { couleur: t.backgroundColor, hauteur: parseFloat(t.height), largeur: parseFloat(t.width), contenu: t.content },
+          autres: autres.map((l) => ({ graisse: getComputedStyle(l).fontWeight, trait: getComputedStyle(l, '::before').content })),
+        };
       });
-      // À propos est au jour (<html class="jour">) : la nuit se lit en retirant la classe, le jour en la remettant.
-      await page.evaluate(() => document.documentElement.classList.remove('jour'));
-      const nuit = await lirePilule();
-      expect(nuit.texte).toBe('À propos');
-      expect(nuit.fond).toBe('rgb(247, 247, 249)');
-      expect(nuit.point).toBe(nuit.couleur);
-      expect(nuit.point).not.toBe(AMBRE);
-      expect(rapport(lireCouleur(nuit.couleur), lireCouleur(nuit.fond))).toBeGreaterThanOrEqual(4.5);
-      for (const fond of nuit.autres) expect(fond).not.toBe(nuit.fond);
-      // Une page passée au jour (<html class="jour">) : le bleu nuit.
-      await page.evaluate(() => document.documentElement.classList.add('jour'));
-      const jour = await lirePilule();
-      expect(jour.fond).toBe('rgb(10, 11, 16)');
-      expect(jour.point).toBe(jour.couleur);
-      expect(jour.point).not.toBe(AMBRE);
-      expect(rapport(lireCouleur(jour.couleur), lireCouleur(jour.fond))).toBeGreaterThanOrEqual(4.5);
+      for (const jour of [false, true]) {
+        // À propos est au jour (<html class="jour">) : la nuit se lit en retirant la classe, le jour en la remettant.
+        await page.evaluate((j) => document.documentElement.classList.toggle('jour', j), jour);
+        const lu = await lireLaPage();
+        const fond = composer(lu.fonds);
+        expect(lu.texte).toBe('À propos');
+        expect(lu.trait.contenu, 'le trait sous le mot').not.toBe('none');
+        expect(lu.trait.couleur).toBe(lu.couleur);
+        expect(lu.trait.couleur).not.toBe(AMBRE);
+        expect(lu.trait.hauteur).toBeGreaterThanOrEqual(3);
+        expect(lu.trait.largeur).toBeGreaterThanOrEqual(24);
+        expect(rapport(poser(lireCouleur(lu.trait.couleur), fond), fond), 'le trait, à 3:1').toBeGreaterThanOrEqual(3);
+        expect(rapport(poser(lireCouleur(lu.couleur), fond), fond), 'le mot, à 4,5:1').toBeGreaterThanOrEqual(4.5);
+        // Les autres entrées : sans trait (la page où l’on est se lit sans la couleur) ; la même graisse (le mot ne
+        // change pas de largeur d’une page à l’autre, ni la place gardée pour le rang).
+        for (const autre of lu.autres) {
+          expect(autre.trait).toBe('none');
+          expect(autre.graisse).toBe(lu.graisse);
+        }
+      }
     });
   }
 });
@@ -234,6 +247,10 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
     const avecUnEntete = pagesHtml(pages);
     expect(avecUnEntete.some((p) => p.chemin.includes('/affiche/'))).toBe(true);
     for (const p of avecUnEntete) expect(actionDe(p.contenu) !== null, p.chemin).toBe(!p.chemin.includes('/affiche/') && !p.chemin.startsWith('/en/'));
+    // Un seul dessin : plus de variante (l’ancienne « en contour ») sur aucune page.
+    for (const html of [...PAGES_DU_CADRE.map((p) => lire(p.fichier)), ...avecUnEntete.map((p) => p.contenu)]) {
+      for (const [, classe] of html.match(ENTETE)[0].matchAll(/<a class="(entete__attente[^"]*)"/g)) expect(classe).toBe('entete__attente');
+    }
   });
 
   // Une page en anglais a sa liste d’attente en anglais (« Notify me ») : l’en-tête, resté en français, n’y ajoute pas
@@ -265,44 +282,42 @@ test.describe('« Préviens-moi » dans l’en-tête', () => {
     expect(`${TEXTES.action}${TEXTES.actionSuite}`).toBe('Préviens-moi quand Baromatch arrive');
   });
 
-  // Tel qu’il est peint : une page qui montre un bouton ambre (hors de l’en-tête et du pied) a « Préviens-moi » en
-  // contour, sinon en ambre ; le contour se voit à 3:1, son texte à 4,5:1.
-  // Les pages qui portent le plan : « Préviens-moi » y est ambre dès l’en-tête, le premier écran ; l’appel du bas reste le second.
-  const AVEC_LE_PLAN = ['/ce-soir/', '/matchs/psg-ol-2026-10-25/'];
+  // Tel qu’il est peint : jamais une surface ambre dans l’en-tête (le seul bouton ambre plein d’une page est le sien, et
+  // l’en-tête ne vole pas le héros) ; « Préviens-moi » est un lien souligné, marqué d’un point ambre, son texte à 4,5:1
+  // et son trait à 3:1 sur la page, au jour comme sur les pages des matchs.
   const CHEMINS_GENERES = ['/matchs/', '/ce-soir/', '/matchs/psg-ol-2026-10-25/', '/regarder-le-match/paris/', '/matchs/club/psg/', '/agenda/'];
   for (const largeur of [390, 1280]) {
     for (const chemin of [...AVEC_L_ACTION, ...CHEMINS_GENERES]) {
-      test(`${chemin} à ${largeur} px : ambre seulement si la page n’a pas déjà son bouton ambre`, async ({ page }) => {
+      test(`${chemin} à ${largeur} px : un lien marqué d’un point ambre, jamais une surface ambre`, async ({ page }) => {
         await couperLAPI(page);
         await page.setViewportSize({ width: largeur, height: 800 });
         await page.goto(CHEMINS_GENERES.includes(chemin) ? `${site.serveur.adresse}${chemin}` : chemin);
         await attendreLaPageFinie(page);
-        // La boutique dessine ses pièces (et leurs boutons) par son script.
-        if (chemin === '/boutique.html') await expect(page.locator('#boutique-grille button').first()).toBeVisible();
         const lu = await page.evaluate((ambre) => {
-          const ambres = [...document.querySelectorAll('body *')].filter((e) => !e.closest('.entete, .pied, .lien-evitement')
-            && getComputedStyle(e).backgroundColor === ambre && e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden');
+          const surfaces = [...document.querySelectorAll('.entete, .entete *')].filter((e) => getComputedStyle(e).backgroundColor === ambre);
           const a = document.querySelector('.entete__attente');
           const s = getComputedStyle(a);
+          const point = getComputedStyle(a, '::before');
           const fonds = [];
           for (let n = a.parentElement; n; n = n.parentElement) {
             fonds.push(getComputedStyle(n).backgroundColor);
             if (/^rgb\(/.test(fonds.at(-1))) break;
           }
-          return { ambres: ambres.map((e) => e.className || e.tagName), classe: a.className, fond: s.backgroundColor, couleur: s.color, bord: s.borderTopColor, largeurDuBord: s.borderTopWidth, fonds };
+          return {
+            surfaces: surfaces.map((e) => e.className || e.tagName), fond: s.backgroundColor, couleur: s.color, largeurDuBord: s.borderTopWidth,
+            souligne: s.textDecorationLine, trait: s.textDecorationColor, epaisseur: parseFloat(s.textDecorationThickness), point: point.backgroundColor, taillePoint: parseFloat(point.width), fonds,
+          };
         }, AMBRE);
-        const page_ = lu.fonds.map(lireCouleur).filter((c) => c.a > 0).reverse().reduce((dessous, couche) => poser(couche, dessous));
-        if (lu.ambres.length && !AVEC_LE_PLAN.includes(chemin)) {
-          expect(lu.classe, `la page a déjà ${lu.ambres.join(', ')}`).toBe('entete__attente entete__attente--contour');
-          expect(lu.fond).toBe('rgba(0, 0, 0, 0)');
-          expect(lu.largeurDuBord).toBe('1px');
-          expect(rapport(poser(lireCouleur(lu.bord), page_), page_), 'le contour, à 3:1').toBeGreaterThanOrEqual(3);
-          expect(rapport(lireCouleur(lu.couleur), page_), 'le texte, à 4,5:1').toBeGreaterThanOrEqual(4.5);
-        } else {
-          expect(lu.classe).toBe('entete__attente');
-          expect(lu.fond).toBe(AMBRE);
-          expect(rapport(lireCouleur(lu.couleur), lireCouleur(lu.fond))).toBeGreaterThanOrEqual(4.5);
-        }
+        const page_ = composer(lu.fonds);
+        expect(lu.surfaces, 'une surface ambre dans l’en-tête').toEqual([]);
+        expect(lu.fond).toBe('rgba(0, 0, 0, 0)');
+        expect(lu.largeurDuBord).toBe('0px');
+        expect(lu.point, 'le point ambre de l’action').toBe(AMBRE);
+        expect(lu.taillePoint).toBeGreaterThanOrEqual(8);
+        expect(lu.souligne).toBe('underline');
+        expect(lu.epaisseur).toBeGreaterThanOrEqual(1.5);
+        expect(rapport(poser(lireCouleur(lu.trait), page_), page_), 'le trait, à 3:1').toBeGreaterThanOrEqual(3);
+        expect(rapport(poser(lireCouleur(lu.couleur), page_), page_), 'le texte, à 4,5:1').toBeGreaterThanOrEqual(4.5);
       });
     }
   }
@@ -596,7 +611,13 @@ for (const [nom, chemin] of [['la nuit (CGU)', '/cgu.html'], ['le jour (accueil)
         }
       }
       expect(faibles).toEqual([]);
-      // Les bords : le bandeau (ou la paire des matchs à l’ordinateur) contre la page.
+      // Les bords : le seul trait qui dessine un composant est celui du bandeau du bas, au téléphone, une fois le rang
+      // sorti de l’écran (son haut, contre la page) ; à l’ordinateur, le menu n’a aucun bord.
+      if (largeur === 390) {
+        await page.evaluate(() => window.scrollTo(0, document.querySelector('.menu').getBoundingClientRect().bottom + scrollY + 40));
+        await page.evaluate(() => new Promise((suite) => { requestAnimationFrame(() => requestAnimationFrame(suite)); }));
+        expect(await page.evaluate(() => getComputedStyle(document.querySelector('.menu__liste')).position)).toBe('fixed');
+      }
       const bords = await page.evaluate(() => [...document.querySelectorAll('.menu__liste, .menu__matchs')]
         .map((e) => ({ s: getComputedStyle(e), e }))
         .filter(({ s }) => parseFloat(s.borderTopWidth) >= 1)
@@ -609,7 +630,7 @@ for (const [nom, chemin] of [['la nuit (CGU)', '/cgu.html'], ['le jour (accueil)
           }
           return { quoi: e.className, bord: s.borderTopColor, dedans: s.backgroundColor, couches };
         }));
-      expect(bords.length).toBeGreaterThan(0);
+      expect(bords.length).toBe(largeur === 390 ? 1 : 0);
       for (const b of bords) {
         const page_ = composer(b.couches);
         expect(rapport(poser(lireCouleur(b.bord), poser(lireCouleur(b.dedans), page_)), page_), `${b.quoi} : son bord`).toBeGreaterThanOrEqual(3);
@@ -620,11 +641,11 @@ for (const [nom, chemin] of [['la nuit (CGU)', '/cgu.html'], ['le jour (accueil)
 
 // ---------- Les bords de l’en-tête, tels qu’ils sont peints ----------
 
-// Le bord du menu (le rang sous le logo, le bandeau du bas, la paire des matchs à l’ordinateur) et celui de
-// « Préviens-moi » en contour, lus au pixel (tests/outils/bords-peints.mjs), à 3:1 au moins contre ce qui les touche,
-// dehors et dedans, au jour (l’accueil, « Pour les bars ») comme la nuit (les CGU). Le bandeau se lit à chaque
-// demi-écran, du rang sorti jusqu’au bas de la page : sous lui passent le crème, les halos, les cartes, les bandes de
-// nuit et les images, et son ombre se pose autour de lui.
+// Le seul bord du menu, celui du bandeau du bas (son haut, contre la page), lu au pixel (tests/outils/bords-peints.mjs),
+// à 3:1 au moins contre ce qui le touche, dehors et dedans, au jour (l’accueil, « Pour les bars ») comme la nuit (les
+// CGU) ; le rang sous le logo et la paire des matchs n’en ont aucun. Le bandeau se lit à chaque demi-écran, du rang sorti
+// jusqu’au bas de la page : sous lui passent le crème, les halos, les cartes, les bandes de nuit et les images ; la bande
+// de papier de 3 px au-dessus de son trait le garde lisible sur eux.
 test.describe('les bords de l’en-tête, tels qu’ils sont peints', () => {
   test.use({ deviceScaleFactor: 3 });
   const ouvrir = async (page, chemin, largeur, hauteur) => {
@@ -662,25 +683,15 @@ test.describe('les bords de l’en-tête, tels qu’ils sont peints', () => {
       expect(faibles).toEqual([]);
     });
 
-    test(`${nom}, à l’ordinateur : la paire des matchs`, async ({ page }) => {
-      await ouvrir(page, chemin, 1280, 800);
-      const mesures = await mesurerLesBords(page, '.menu__matchs');
-      expect(mesures.flatMap((m) => m.cotes.map((c) => c.cote)).sort()).toEqual(['bas', 'haut']);
-      expect(bordsTropFaibles(mesures)).toEqual([]);
-    });
-  }
-
-  // « Préviens-moi » en contour (le guide des testeurs a son bouton ambre) : sur sa page de nuit, et sur la même passée
-  // au jour (les pages qui le portent passeront au jour).
-  for (const largeur of [390, 1280]) {
-    test(`« Préviens-moi » en contour à ${largeur} px, la nuit comme au jour`, async ({ page }) => {
-      await ouvrir(page, '/testeurs-android.html', largeur, 800);
-      const faibles = bordsTropFaibles(await mesurerLesBords(page, '.entete__attente--contour'), 3, 'la nuit : ');
-      await page.evaluate(() => document.documentElement.classList.add('jour'));
-      const jour = await mesurerLesBords(page, '.entete__attente--contour');
-      expect(jour.flatMap((m) => m.cotes.map((c) => c.cote)).sort()).toEqual(['bas', 'haut']);
-      faibles.push(...bordsTropFaibles(jour, 3, 'le jour : '));
-      expect(faibles).toEqual([]);
-    });
+    // « Ce soir » et « La semaine » restent voisins, sans surlignage commun : ni fond, ni bord autour des deux (le lecteur
+    // ne les prend pas pour un seul bouton, ni pour deux pages où l’on serait à la fois).
+    for (const largeur of [390, 1280]) {
+      test(`${nom} à ${largeur} px : la paire des matchs, sans surlignage commun`, async ({ page }) => {
+        await ouvrir(page, chemin, largeur, 800);
+        const mesures = await mesurerLesBords(page, '.menu__matchs');
+        expect(mesures.flatMap((m) => m.cotes)).toEqual([]);
+        expect(await page.evaluate(() => getComputedStyle(document.querySelector('.menu__matchs')).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+      });
+    }
   }
 });

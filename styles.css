@@ -52,13 +52,8 @@
   --verre-reflet: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   --ombre-scene: 0 24px 60px rgba(0, 0, 0, 0.45);
   --sortie-douce: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --menu-fond: #151722;
-  --menu-releve: rgba(255, 255, 255, 0.06);
   --menu-bord: rgba(255, 255, 255, 0.36);
   --menu-survol: rgba(255, 255, 255, 0.1);
-  --menu-courant: #F7F7F9;
-  --menu-envers: #0A0B10;
-  --menu-ombre: 0 12px 32px rgba(0, 0, 0, 0.5);
   --zone-basse: env(safe-area-inset-bottom, 0px);
   --bandeau: 0px;
   --page: 1120px;
@@ -139,26 +134,24 @@ a:hover{ color: var(--goutte); }
 .entete__logo svg{ width: 100%; height: auto; }
 .menu{ flex: 1 0 100%; order: 2; min-width: 0; }
 .menu__liste, .menu__matchs{ display: flex; flex-wrap: wrap; gap: 2px; margin: 0; padding: 0; list-style: none; }
-.menu__liste{ padding: 4px; border: 1px solid var(--menu-bord); border-radius: 26px; background: var(--menu-fond); box-shadow: 0 0 0 1px var(--menu-fond); }
+.menu__liste{ padding: 0; box-shadow: inset 0 -1px 0 var(--trait); }
 .menu__liste > li{ display: flex; flex: 1 1 8rem; min-width: 0; }
 .menu__liste > .menu__groupe{ flex: 2 1 16rem; }
-.menu__matchs{ flex: 1; min-width: 0; border-radius: 22px; background: var(--menu-releve); }
+.menu__matchs{ flex: 1; min-width: 0; }
 .menu__matchs > li{ display: flex; flex: 1 1 7rem; min-width: 0; }
 .menu__lien{
   position: relative;
   display: flex;
   flex: 1;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 4px 8px;
   min-height: 48px;
   padding: 6px 10px;
-  border-radius: 22px;
+  border-radius: 6px;
   color: var(--texte);
   font-size: 0.9375rem;
   font-stretch: 92%;
-  font-weight: 650;
+  font-weight: var(--graisse-du-menu, 650);
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
@@ -167,9 +160,10 @@ a:hover{ color: var(--goutte); }
 @media (hover: hover) {
 .menu__lien:hover{ background: var(--menu-survol); color: var(--texte); }
 }
-.menu__lien[aria-current="page"], .menu__lien[aria-current="page"]:hover{ background: var(--menu-courant); color: var(--menu-envers); }
-.menu__lien[aria-current="page"]::before{ content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.menu__lien:focus-visible{ z-index: 1; box-shadow: 0 0 0 3px var(--menu-fond); }
+/* La page où l’on est : un trait sous le mot, de la couleur du texte ; le mot garde sa graisse (sa largeur ne change pas
+   d’une page à l’autre, et la place gardée pour le rang non plus). */
+.menu__lien[aria-current="page"]::before{ content: ""; position: absolute; left: 50%; bottom: 0; width: min(100% - 12px, 3.5rem); height: 3px; border-radius: 3px 3px 0 0; background: currentColor; transform: translateX(-50%); }
+.menu__lien:focus-visible{ z-index: 1; outline-offset: -3px; }
 .entete__attente{
   display: inline-flex;
   flex: none;
@@ -177,31 +171,30 @@ a:hover{ color: var(--goutte); }
   align-items: center;
   justify-content: center;
   max-width: 100%;
+  gap: 9px;
   min-height: 44px;
   margin-inline-start: auto;
-  padding: 0 18px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: var(--ambre);
-  color: var(--nuit);
+  padding: 0 2px 0 12px;
+  color: var(--texte);
   font-size: 0.9375rem;
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: var(--champ-bord);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.3em;
 }
-.entete__attente:hover{ background: #FFC163; color: var(--nuit); }
-.entete__attente--contour{ border-color: var(--champ-bord); background: transparent; color: var(--texte); }
-.entete__attente--contour:hover{ border-color: var(--texte); background: var(--menu-survol); color: var(--texte); }
+.entete__attente::before{ content: ""; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--ambre); box-shadow: 0 0 0 3px rgba(255, 177, 61, 0.24); }
+.entete__attente:hover{ color: var(--texte); text-decoration-color: currentColor; }
 @media (min-width: 60em) {
 .entete{ column-gap: 32px; padding-top: 16px; padding-bottom: 16px; reading-flow: flex-visual; }
 .menu{ flex: 1 1 auto; order: 1; }
-.menu__liste{ align-items: center; gap: 4px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.menu__liste{ align-items: center; gap: 4px; box-shadow: none; }
 .menu__liste > li, .menu__liste > .menu__groupe, .menu__matchs > li{ flex: none; }
 .menu__liste > li:nth-child(2){ margin-inline-start: auto; }
-.menu__matchs{ flex-wrap: nowrap; padding: 3px; border: 1px solid var(--menu-bord); border-radius: 999px; background: var(--menu-fond); box-shadow: 0 0 0 1px var(--menu-fond); }
-.menu__lien{ flex: none; flex-wrap: nowrap; min-height: 44px; padding: 0 20px; border-radius: 999px; font-size: 1rem; font-stretch: 100%; white-space: nowrap; }
-.menu__liste > li:not(.menu__groupe) .menu__lien{ padding: 0 16px; }
+.menu__matchs{ flex-wrap: nowrap; gap: 4px; }
+.menu__lien{ flex: none; flex-wrap: nowrap; min-height: 48px; padding: 0 14px; font-size: 1rem; font-stretch: 100%; white-space: nowrap; }
 .entete__attente{ order: 2; margin-inline-start: 8px; font-size: 1rem; }
 }
 .ouverture{
@@ -543,17 +536,18 @@ a:hover{ color: var(--goutte); }
 @media (min-width: 48em) {
 .pied__tete{ grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
 }
-/* Au téléphone (22,5 à 45 em de large : 360 à 719 px à texte normal), les quatre mots sur un seul rang sous le logo, un */
+/* Au téléphone (22,5 à 45 em de large : 360 à 719 px à texte normal), les quatre mots sur un seul rang sous le logo ;
+   --bandeau : la place gardée pour ce rang (une ligne tant que les mots tiennent, --seuil étant la taille du texte où ils
+   passent à deux lignes, puis deux, trois rangs). */
 @media screen and (min-width: 22.5em) and (max-width: 44.99em) {
-:root{ --seuil: calc(6.71vw - 5.85px); --bandeau: clamp(max(50px, 1.2rem + 24px), 50px + (1rem - var(--seuil)) * 1000, max(122px, 11.5rem - 254px)); }
+:root{ --seuil: calc(6.71vw - 5.5px); --bandeau: clamp(max(44px, 1.2rem + 18px), 44px + (1rem - var(--seuil)) * 1000, max(108px, 11.5rem - 262px)); }
 .entete{ row-gap: 6px; padding-top: 12px; padding-bottom: 0; }
-.entete__logo{ padding: 12px 0 9px; margin: -12px 0 -9px; }
+.entete__logo{ padding: 12px 0 9px; margin: -12px 0 -6px; }
 .entete__attente{ margin-top: 3px; }
 .menu{ min-height: var(--bandeau); }
-.menu__liste{ max-width: 28rem; margin-inline: auto; padding: 2px; }
 .menu__liste > li, .menu__matchs > li{ flex: 1 1 auto; }
 .menu__liste > .menu__groupe{ flex: 1.7 1 auto; }
-.menu__lien{ gap: 6px; padding-inline: 5px; }
+.menu__lien{ padding-inline: 5px; }
 }
 @media screen and (max-width: 22.49em) {
 .entete{ padding-top: 12px; padding-bottom: 0; }
@@ -563,16 +557,15 @@ a:hover{ color: var(--goutte); }
 }
 @media screen and (max-width: 44.99em) {
 .menu__lien{ min-height: 44px; font-size: 0.875rem; font-stretch: 86%; }
-.menu__lien[aria-current="page"]{ padding-bottom: 12px; }
-.menu__lien[aria-current="page"]::before{ position: absolute; bottom: 6px; left: 50%; margin-left: -3.5px; }
 }
 @media screen and (min-width: 36em) and (max-width: 44.99em) {
-:root{ --seuil: calc(5.13vw - 6.86px); }
-.menu__liste{ max-width: 32rem; }
+:root{ --seuil: calc(5.13vw - 6.56px); }
 .menu__lien{ padding-inline: 10px; font-size: 1rem; font-stretch: 100%; }
 }
 @supports (animation-timeline: view()) {
 @media screen and (min-width: 22.5em) and (max-width: 44.99em) and (min-height: 25em) {
+/* Le bandeau prend --bandeau + la zone basse (4 px au moins) + 4 px (son trait et sa bande de papier) : 10 px d’air
+   au moins au-dessus de lui pour ce qui prend le focus, 42 px pour la fin du pied. */
 html{ scroll-padding-bottom: calc(var(--bandeau) + var(--zone-basse) + 18px); }
 .pied{ padding-bottom: calc(40px + var(--bandeau) + var(--zone-basse) + 10px); }
 .menu{ view-timeline: --menu block; }
@@ -588,9 +581,14 @@ html:has(form:target, section:target form){ scroll-padding-bottom: auto; }
 html:has(form:target, section:target form) .pied{ padding-bottom: 40px; }
 }
 }
+/* Le bandeau du bas : posé au bord de l’écran, une bande de papier (de nuit sur une page de nuit) sous un trait à 3:1 ;
+   ses entrées au-dessus de la zone basse de l’iPhone (4 px au moins : le trait de la page où l’on est ne touche pas le
+   bord), d’une graisse plus légère que le rang (il ne devient pas un second point fort). Le trait garde 3 px de papier
+   au-dessus de lui, quoi qui passe dessous. */
 @keyframes bandeau-du-bas {
-  0%, 99.9% { position: static; }
-  100% { position: fixed; z-index: 30; left: 10px; right: 10px; bottom: calc(10px + var(--zone-basse)); box-shadow: 0 0 0 1px var(--menu-fond), var(--menu-ombre); }
+  /* Tant que le rang sort de l’écran, il garde ses valeurs de rang : rien ne grandit ni ne bouge pendant le défilement. */
+  0%, 99.9% { position: static; padding: 0; border-top: 0 none transparent; background: transparent; box-shadow: inset 0 -1px 0 var(--trait); }
+  100% { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; padding: 0 max(8px, 50vw - 16rem) max(4px, var(--zone-basse)); border-top: 1px solid var(--menu-bord); background: var(--fond, var(--nuit)); box-shadow: 0 -3px 0 var(--fond, var(--nuit)); --graisse-du-menu: 550; }
 }
 /* Le contraste élevé de Windows : la page où l’on est soulignée (le contour reste au focus), les pilules des clubs */
 @media (forced-colors: active) {
@@ -960,13 +958,8 @@ html:has(form:target, section:target form) .pied{ padding-bottom: 40px; }
   --verre-reflet: 0 1px 2px rgba(10, 11, 16, 0.06);
   --ombre-carte: 0 1px 2px rgba(10, 11, 16, 0.05), 0 10px 28px rgba(10, 11, 16, 0.06);
   --focus: var(--nuit);
-  --menu-fond: #FFFFFF;
-  --menu-releve: #F3EEE5;
   --menu-bord: rgba(10, 11, 16, 0.5);
   --menu-survol: rgba(10, 11, 16, 0.07);
-  --menu-courant: #0A0B10;
-  --menu-envers: #FAF7F1;
-  --menu-ombre: 0 12px 32px rgba(10, 11, 16, 0.2), 0 1px 3px rgba(10, 11, 16, 0.12);
   color-scheme: light;
 }
 .jour body{ background: var(--fond); }
